@@ -51,6 +51,18 @@ Basics (worlds 1–5, 23 lessons, 169 exercises), 12 mini-games on 5 game modes,
 
 Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by M5.
 
+### 3.1 Iterations (each merged + tagged `m<N>.<i>`, see [validation.md](validation.md))
+
+| Tag | Scope |
+|---|---|
+| `m0.1` | Workspace + tooling; core chess (diagram / FEN, `ChessRules`); content locale pipeline |
+| `m0.2` | Web PWA shell (Vite, React, Tailwind tokens, fonts, i18n), localStorage adapter, Playwright smoke + offline, Pages deploy, tag workflow |
+| `m1.1` | Board UI: own SVG piece set, stars / blocked squares, tap-tap + drag, highlights, move animation, screen-reader grid |
+| `m1.2` | Core exercise engine: variant rules (walls, static opponent), `collect-stars`, `select-squares`, `capture`, stars, hint ladder, solver, piece-vs-static mini-game |
+| `m1.3` | Content: lesson / exercise / mini-game schemas; Rook lesson + Hungry Rook; content tests (valid, solvable within star limits, keys present) |
+| `m1.4` | Lesson flow: Home → Story → Demo → Try → Exercises → Boss → Complete; narration (Web Speech + subtitles); 1 local profile; progress saved + resume |
+| `m1.5` | Tablet polish, accessibility and performance checks, offline lesson e2e → `m1` |
+
 ## 4. After MVP
 
 | # | Milestone | Scope |
