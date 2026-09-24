@@ -1,12 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { lessonStatus, totalStars } from '@chess-kids/core';
-import { pickCurrentLesson } from '../app/current-lesson.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, characterName } from '../content-text.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
+import { RankPill } from './RankPill.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
@@ -41,14 +41,36 @@ function SwitchPlayerIcon(): JSX.Element {
   );
 }
 
-/** Home: greeting, total stars, and the one primary action into today's lesson. */
+function JourneyIcon(): JSX.Element {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#2E7D5B"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" />
+      <path d="M9 4v14" />
+      <path d="M15 6v14" />
+    </svg>
+  );
+}
+
+/** Home: greeting, rank, total stars, and the one primary action into the Journey's next lesson. */
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
-  const startLesson = useAppStore((state) => state.startLesson);
+  const journey = useAppStore((state) => state.journey);
+  const startNext = useAppStore((state) => state.startNext);
   const goToPicker = useAppStore((state) => state.goToPicker);
+  const goToJourney = useAppStore((state) => state.goToJourney);
   const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
@@ -63,28 +85,27 @@ export function HomeScreen(): JSX.Element {
     };
   }, []);
 
-  const lesson = useMemo(() => pickCurrentLesson(services.deps.content.lessons()), [services]);
-  const lessonProgress = progress.find((entry) => entry.lessonId === lesson?.id);
-  const status = lesson ? lessonStatus(lesson, lessonProgress) : 'new';
+  const next = journey?.next ?? null;
+  const nextProgress = next ? progress.find((entry) => entry.lessonId === next.id) : undefined;
+  const isResuming = next !== null && lessonStatus(next, nextProgress) === 'in-progress';
   const stars = totalStars(progress);
 
-  const name = lesson ? characterName(t, lesson.character) : '';
-  const bubbleText = !lesson
+  const bubbleText = !journey
     ? ''
-    : status === 'new'
-      ? t('home.owl-new', { name })
-      : status === 'in-progress'
-        ? t('home.owl-in-progress')
-        : t('home.owl-done', { name });
+    : !next
+      ? t('home.owl-all-done')
+      : isResuming
+        ? t('home.owl-resume')
+        : t('home.owl-next', { character: characterName(t, next.character) });
   const replay = useNarratedText(services.narrator, bubbleText);
 
-  if (!profile || !lesson) {
+  if (!profile || !journey) {
     // First render before `init()` resolves; a blank cream screen for an instant beats a flash.
     return <main className="min-h-screen bg-cream" />;
   }
 
-  const buttonLabel =
-    status === 'new' ? t('home.start') : status === 'in-progress' ? t('continue') : t('play-again');
+  const buttonLabel = isResuming ? t('continue') : t('home.start-today');
+  const subtitle = next?.boss ? t('home.subtitle-with-minigame') : t('home.subtitle-lesson-only');
 
   return (
     <main className="flex min-h-screen flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
@@ -103,6 +124,7 @@ export function HomeScreen(): JSX.Element {
           <span className="font-display text-2xl text-ink sm:text-3xl">{profile.nickname}</span>
         </div>
         <div className="flex items-center gap-3">
+          <RankPill rank={journey.rank} />
           <StarsPill count={stars} />
           <button
             type="button"
@@ -122,15 +144,33 @@ export function HomeScreen(): JSX.Element {
           <SpeechBubble text={bubbleText} />
           <ReplayButton onClick={replay} label={t('exercise.replay')} />
         </div>
+        {next && (
+          <button
+            type="button"
+            onClick={() => {
+              void startNext();
+            }}
+            className="flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
+          >
+            <span className="flex items-center gap-3 font-display text-2xl font-semibold sm:text-3xl">
+              <PlayIcon />
+              {buttonLabel}
+            </span>
+            <span className="text-sm font-bold sm:text-base">{subtitle}</span>
+          </button>
+        )}
+      </div>
+
+      <div className="flex justify-center sm:justify-start">
         <button
           type="button"
-          onClick={() => {
-            void startLesson(lesson.id);
-          }}
-          className="flex h-24 items-center justify-center gap-3 rounded-[2rem] bg-today px-8 font-display text-2xl font-semibold text-white sm:h-32 sm:w-96 sm:text-3xl"
+          onClick={goToJourney}
+          className="flex h-24 items-center gap-4 rounded-[2rem] bg-[#DCEFE3] px-8 text-[#1F5A41]"
         >
-          <PlayIcon />
-          {buttonLabel}
+          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-white">
+            <JourneyIcon />
+          </div>
+          <span className="font-display text-2xl font-semibold">{t('home.journey-tile')}</span>
         </button>
       </div>
 

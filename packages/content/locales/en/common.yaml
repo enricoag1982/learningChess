@@ -14,12 +14,15 @@ piece:
   n: Knight
   p: Pawn
 home:
-  owl-new: "Hi! I'm Owl. Today you meet {{name}}!"
-  owl-in-progress: Welcome back! Let's keep going.
-  owl-done: "You finished {{name}}'s lesson! Want to play again?"
-  start: Start
+  owl-next: 'Today you meet {{character}}!'
+  owl-resume: Let's keep going!
+  owl-all-done: You finished everything for now. Come back soon for more!
+  start-today: Start today
+  subtitle-with-minigame: New lesson · Mini-game
+  subtitle-lesson-only: New lesson
   avatar-alt: '{{name}} avatar'
   switch-player: Switch player
+  journey-tile: Journey
 avatar:
   fox: Fox
   bear: Bear

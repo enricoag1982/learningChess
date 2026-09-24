@@ -102,7 +102,15 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   // 1. Home.
   await completeFirstRun(page);
   await expectKidTouchTarget(page, /Start/);
+  await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
+
+  // 1b. Journey map, then back to Home.
+  await page.getByRole('button', { name: /Journey/ }).click();
+  await expectKidTouchTarget(page, /Back to Home/);
+  await expectKidTouchTarget(page, /Rhino the Rook/);
+  await expectNoSeriousViolations(page, 'Journey');
+  await page.getByRole('button', { name: /Back to Home/ }).click();
 
   // 2. Story.
   await page.getByRole('button', { name: /Start/ }).click();

@@ -1,4 +1,12 @@
-import type { ContentSource, ExerciseDef, Lesson, MiniGame } from '@chess-kids/core';
+import type {
+  ContentSource,
+  ExerciseDef,
+  Lesson,
+  MiniGame,
+  Track,
+  TracksCatalog,
+  World,
+} from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
 
 /** A tiny collect-stars exercise: rook at a1, one star at h1 (solved in exactly one move). */
@@ -53,7 +61,30 @@ export function fixtureLesson(overrides: Partial<Lesson> = {}): Lesson {
   };
 }
 
-/** `ContentSource` serving exactly one lesson (and its mini-games, if any). */
+/** One-world, one-track catalog matching `fixtureLesson()`'s default `world: 'test'`, `order: 1`. */
+const FIXTURE_WORLD: World = {
+  id: 'test',
+  track: 'test',
+  order: 1,
+  habitat: 'meadow',
+  titleKey: 'fixtures:world',
+};
+const FIXTURE_TRACK: Track = {
+  id: 'test',
+  kind: 'main',
+  titleKey: 'fixtures:track',
+  worlds: [FIXTURE_WORLD],
+};
+export const fixtureCatalog: TracksCatalog = {
+  tracks: [FIXTURE_TRACK],
+  ranks: [{ id: 'pawn', after: 'start' }],
+};
+
+/**
+ * `ContentSource` serving exactly one lesson (and its mini-games, if any), plus a matching
+ * one-world `catalog()` so `loadJourney` (called on every profile select) has something to work
+ * with — tests that need a different worlds/tracks shape build their own `ContentSource`.
+ */
 export function fixtureContentSource(
   lesson: Lesson,
   minigames: readonly MiniGame[] = [],
@@ -63,5 +94,6 @@ export function fixtureContentSource(
     lesson: (id) => (id === lesson.id ? lesson : undefined),
     minigames: () => minigames,
     minigame: (id) => minigames.find((game) => game.id === id),
+    catalog: () => fixtureCatalog,
   };
 }

@@ -1,12 +1,13 @@
 import { createContext, useContext } from 'react';
 import { create } from 'zustand';
-import type { Lesson, LessonProgress, Profile } from '@chess-kids/core';
+import type { Journey, Lesson, LessonProgress, Profile } from '@chess-kids/core';
 import {
   createProfile,
   getLessonProgress,
   isFirstRun,
   lessonStatus,
   listProfiles,
+  loadJourney,
   loadProgress,
   selectProfile,
 } from '@chess-kids/core';
@@ -14,7 +15,18 @@ import type { Services } from './services.ts';
 
 /** Which top-level screen is showing. `loading` is the instant before `init()` resolves. */
 export type Screen =
-  'loading' | 'first-run' | 'new-player' | 'picker' | 'password' | 'parent' | 'home' | 'lesson';
+  | 'loading'
+  | 'first-run'
+  | 'new-player'
+  | 'picker'
+  | 'password'
+  | 'parent'
+  | 'home'
+  | 'journey'
+  | 'lesson';
+
+/** Where the current lesson was opened from: decides where "Continue"/Close returns to. */
+export type LessonOrigin = 'home' | 'journey';
 
 /** Last-used profile first (docs/screens.md: picker shows it first), rest unchanged. */
 function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | null): Profile[] {
@@ -36,8 +48,12 @@ export interface AppState {
   /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
   readonly progress: readonly LessonProgress[];
+  /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
+  readonly journey: Journey | null;
   readonly lessonId: string | null;
   readonly stepIndex: number;
+  /** Where the open lesson was entered from; decides where Close/Continue returns to. */
+  readonly lessonOrigin: LessonOrigin;
   /** New-player wizard: return to Parent area instead of Home once it creates the profile. */
   readonly newPlayerReturnsToParent: boolean;
 
@@ -60,12 +76,25 @@ export interface AppState {
   readonly goToParentArea: () => Promise<void>;
   /** Re-reads the profiles list without changing screen (parent area, after rename/avatar/delete/add). */
   readonly refreshProfiles: () => Promise<void>;
-  /** Enters a lesson: resumes at its saved step, or restarts at the story once it is complete. */
+  /** Opens the Journey map. */
+  readonly goToJourney: () => void;
+  /** Journey's back button. */
+  readonly goToHome: () => void;
+  /**
+   * Home's primary button: opens the Journey's next lesson (resuming at its saved step), if any.
+   * No-op once `journey.next` is `null` (nothing left to do).
+   */
+  readonly startNext: () => Promise<void>;
+  /**
+   * Journey tap: opens `lessonId` (available / complete / mastered only — a no-op for a locked
+   * one, which the Journey screen intercepts with a spoken "Finish … first" line instead). A
+   * complete/mastered lesson restarts at the story; otherwise resumes at its saved step.
+   */
   readonly startLesson: (lessonId: string) => Promise<void>;
   readonly goToStep: (index: number) => void;
-  /** Leaves the lesson screen for Home; progress up to here is already saved. */
+  /** Leaves the lesson screen for Home or the Journey, whichever it was opened from. */
   readonly exitLesson: () => void;
-  /** Re-reads saved progress from storage (e.g. after a lesson updates it). */
+  /** Re-reads saved progress (and the derived Journey) from storage, e.g. after a lesson updates it. */
   readonly refreshProgress: () => Promise<void>;
 }
 
@@ -74,118 +103,153 @@ export type AppStore = ReturnType<typeof createAppStore>;
 
 /** Builds a fresh Zustand store bound to `services`; call once per `App` instance. */
 export function createAppStore(services: Services) {
-  return create<AppState>((set, get) => ({
-    services,
-    screen: 'loading',
-    profiles: [],
-    profile: null,
-    progress: [],
-    lessonId: null,
-    stepIndex: 0,
-    newPlayerReturnsToParent: false,
-
-    async init() {
-      if (await isFirstRun(services.deps)) {
-        set({ screen: 'first-run' });
-        return;
-      }
-      await get().goToPicker();
-    },
-
-    async finishFirstRun() {
-      const profiles = await listProfiles(services.deps);
-      if (profiles.length === 0) {
-        set({ screen: 'new-player', newPlayerReturnsToParent: false, profiles });
-        return;
-      }
-      const [only] = profiles;
-      if (profiles.length === 1 && only) {
-        // M1-upgrade path: an existing single profile with no parent lock yet skips profile
-        // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
-        await selectProfile(services.deps, only.id);
-        const progress = await loadProgress(services.deps, only.id);
-        set({ profile: only, progress, profiles, screen: 'home' });
-        return;
-      }
-      await get().goToPicker();
-    },
-
-    startNewPlayer(returnsToParent: boolean) {
-      set({ screen: 'new-player', newPlayerReturnsToParent: returnsToParent });
-    },
-
-    async finishNewPlayer(nickname: string, avatar: string) {
-      const profile = await createProfile(services.deps, nickname, avatar);
-      if (get().newPlayerReturnsToParent) {
-        const profiles = await listProfiles(services.deps);
-        set({ profiles, screen: 'parent' });
-        return;
-      }
-      await selectProfile(services.deps, profile.id);
-      const [profiles, progress] = await Promise.all([
-        listProfiles(services.deps),
-        loadProgress(services.deps, profile.id),
-      ]);
-      set({ profile, progress, profiles, screen: 'home' });
-    },
-
-    async goToPicker() {
-      const [profiles, settings] = await Promise.all([
-        listProfiles(services.deps),
-        services.deps.settings.get(),
-      ]);
-      set({ profiles: orderByLastUsed(profiles, settings.lastProfileId), screen: 'picker' });
-    },
-
-    async selectProfileAndHome(profileId: string) {
-      const profile = await services.deps.profiles.get(profileId);
-      if (!profile) return;
-      await selectProfile(services.deps, profileId);
-      const progress = await loadProgress(services.deps, profileId);
-      set({ profile, progress, screen: 'home' });
-    },
-
-    goToPasswordScreen() {
-      set({ screen: 'password' });
-    },
-
-    async goToParentArea() {
-      const profiles = await listProfiles(services.deps);
-      set({ profiles, screen: 'parent' });
-    },
-
-    async refreshProfiles() {
-      const profiles = await listProfiles(services.deps);
-      set({ profiles });
-    },
-
-    async startLesson(lessonId: string) {
-      const { profile } = get();
+  return create<AppState>((set, get) => {
+    /** Enters `lessonId`, remembering `origin` for `exitLesson`. Shared by `startLesson`/`startNext`. */
+    async function enterLesson(lessonId: string, origin: LessonOrigin): Promise<void> {
+      const { profile, journey } = get();
       if (!profile) return;
       const lesson: Lesson | undefined = services.deps.content.lesson(lessonId);
       if (!lesson) return;
+      if (journey?.statuses.get(lessonId) === 'locked') return;
       const saved = await getLessonProgress(services.deps, profile.id, lessonId);
       const status = lessonStatus(lesson, saved);
       const startIndex = status === 'complete' || status === 'mastered' ? 0 : saved.resumeStep;
-      set({ screen: 'lesson', lessonId, stepIndex: startIndex });
-    },
+      set({ screen: 'lesson', lessonId, stepIndex: startIndex, lessonOrigin: origin });
+    }
 
-    goToStep(index: number) {
-      set({ stepIndex: index });
-    },
+    return {
+      services,
+      screen: 'loading',
+      profiles: [],
+      profile: null,
+      progress: [],
+      journey: null,
+      lessonId: null,
+      stepIndex: 0,
+      lessonOrigin: 'home',
+      newPlayerReturnsToParent: false,
 
-    exitLesson() {
-      set({ screen: 'home', lessonId: null, stepIndex: 0 });
-      void get().refreshProgress();
-    },
+      async init() {
+        if (await isFirstRun(services.deps)) {
+          set({ screen: 'first-run' });
+          return;
+        }
+        await get().goToPicker();
+      },
 
-    async refreshProgress() {
-      const { profile } = get();
-      if (!profile) return;
-      const progress = await loadProgress(services.deps, profile.id);
-      set({ progress });
-    },
-  }));
+      async finishFirstRun() {
+        const profiles = await listProfiles(services.deps);
+        if (profiles.length === 0) {
+          set({ screen: 'new-player', newPlayerReturnsToParent: false, profiles });
+          return;
+        }
+        const [only] = profiles;
+        if (profiles.length === 1 && only) {
+          // M1-upgrade path: an existing single profile with no parent lock yet skips profile
+          // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
+          await selectProfile(services.deps, only.id);
+          const [progress, journey] = await Promise.all([
+            loadProgress(services.deps, only.id),
+            loadJourney(services.deps, only.id),
+          ]);
+          set({ profile: only, progress, journey, profiles, screen: 'home' });
+          return;
+        }
+        await get().goToPicker();
+      },
+
+      startNewPlayer(returnsToParent: boolean) {
+        set({ screen: 'new-player', newPlayerReturnsToParent: returnsToParent });
+      },
+
+      async finishNewPlayer(nickname: string, avatar: string) {
+        const profile = await createProfile(services.deps, nickname, avatar);
+        if (get().newPlayerReturnsToParent) {
+          const profiles = await listProfiles(services.deps);
+          set({ profiles, screen: 'parent' });
+          return;
+        }
+        await selectProfile(services.deps, profile.id);
+        const [profiles, progress, journey] = await Promise.all([
+          listProfiles(services.deps),
+          loadProgress(services.deps, profile.id),
+          loadJourney(services.deps, profile.id),
+        ]);
+        set({ profile, progress, journey, profiles, screen: 'home' });
+      },
+
+      async goToPicker() {
+        const [profiles, settings] = await Promise.all([
+          listProfiles(services.deps),
+          services.deps.settings.get(),
+        ]);
+        set({ profiles: orderByLastUsed(profiles, settings.lastProfileId), screen: 'picker' });
+      },
+
+      async selectProfileAndHome(profileId: string) {
+        const profile = await services.deps.profiles.get(profileId);
+        if (!profile) return;
+        await selectProfile(services.deps, profileId);
+        const [progress, journey] = await Promise.all([
+          loadProgress(services.deps, profileId),
+          loadJourney(services.deps, profileId),
+        ]);
+        set({ profile, progress, journey, screen: 'home' });
+      },
+
+      goToPasswordScreen() {
+        set({ screen: 'password' });
+      },
+
+      async goToParentArea() {
+        const profiles = await listProfiles(services.deps);
+        set({ profiles, screen: 'parent' });
+      },
+
+      async refreshProfiles() {
+        const profiles = await listProfiles(services.deps);
+        set({ profiles });
+      },
+
+      goToJourney() {
+        set({ screen: 'journey' });
+      },
+
+      goToHome() {
+        set({ screen: 'home' });
+      },
+
+      async startNext() {
+        const next = get().journey?.next;
+        if (!next) return;
+        await enterLesson(next.id, 'home');
+      },
+
+      async startLesson(lessonId: string) {
+        await enterLesson(lessonId, 'journey');
+      },
+
+      goToStep(index: number) {
+        set({ stepIndex: index });
+      },
+
+      exitLesson() {
+        const origin = get().lessonOrigin;
+        set({ screen: origin === 'journey' ? 'journey' : 'home', lessonId: null, stepIndex: 0 });
+        void get().refreshProgress();
+      },
+
+      async refreshProgress() {
+        const { profile } = get();
+        if (!profile) return;
+        const [progress, journey] = await Promise.all([
+          loadProgress(services.deps, profile.id),
+          loadJourney(services.deps, profile.id),
+        ]);
+        set({ progress, journey });
+      },
+    };
+  });
 }
 
 const StoreContext = createContext<AppStore | null>(null);
