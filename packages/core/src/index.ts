@@ -134,11 +134,19 @@ export {
 export type { RecordMiniGameResultInput } from './app/minigames.ts';
 export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
 
-export type { RecordGameInput, ComputerLevelCondition, ComputerLevelStatus } from './app/games.ts';
+export type {
+  RecordGameInput,
+  ComputerLevelCondition,
+  ComputerLevelStatus,
+  SuggestedLevelUpdate,
+} from './app/games.ts';
 export {
   recordGame,
   loadGameRecords,
   computerLevelStatus,
+  nextSuggestedLevel,
+  suggestedLevel,
+  updateSuggestedLevel,
   versusGameRecordResult,
 } from './app/games.ts';
 

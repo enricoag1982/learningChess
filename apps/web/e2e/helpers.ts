@@ -276,6 +276,44 @@ export async function seedMiniGameWon(
 }
 
 /**
+ * Seeds `count` full-game wins vs `opponentLevel` (same real storage shape as
+ * `LocalStorageGameRecordRepository`: a flat, append-only `GameRecord[]`) — used to unlock a
+ * higher computer level without playing every prerequisite game through the UI (M4.2,
+ * `docs/computer-opponent.md` §3: 3 full-game wins vs the level right below unlocks the next one).
+ */
+export async function seedGameRecordWins(
+  page: Page,
+  profileId: string,
+  opponentLevel: number,
+  count: number,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, opponentLevel, count }) => {
+      const key = 'chess-kids:game-records';
+      const raw = localStorage.getItem(key);
+      const all: unknown[] = raw ? (JSON.parse(raw) as unknown[]) : [];
+      const now = new Date();
+      for (let i = 0; i < count; i += 1) {
+        now.setSeconds(now.getSeconds() + 1);
+        all.push({
+          id: `seed-win-${String(opponentLevel)}-${String(i)}`,
+          profileId: pid,
+          game: 'full',
+          opponent: `computer:${String(opponentLevel)}`,
+          result: 'win',
+          reason: 'checkmate',
+          moves: ['e4', 'e5'],
+          createdAt: now.toISOString(),
+          updatedAt: now.toISOString(),
+        });
+      }
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    { profileId, opponentLevel, count },
+  );
+}
+
+/**
  * Seeds one lesson's progress with explicit `bestStars` and `resumeStep` (same real storage
  * key/shape as `seedLessonMastered`), for a spec that needs to land mid-lesson — e.g. right at a
  * scored exercise that offers an easier variant — instead of at a freshly mastered or brand-new one.

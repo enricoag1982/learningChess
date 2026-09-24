@@ -164,7 +164,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
       write: (password) => Promise.resolve({ location: `fake/${password}.txt` }),
     } satisfies PasswordFileWriter,
     settings: {
-      get: () => Promise.resolve<AppSettings>({ lastProfileId: null }),
+      get: () => Promise.resolve<AppSettings>({ lastProfileId: null, suggestedLevels: {} }),
       save: () => Promise.resolve(),
     } satisfies SettingsRepository,
     random: seededRandom(1),

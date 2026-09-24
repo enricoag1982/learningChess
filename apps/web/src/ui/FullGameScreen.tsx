@@ -94,6 +94,7 @@ export function FullGameScreen(): JSX.Element {
   const profile = useAppStore((state) => state.profile);
   const level = useAppStore((state) => state.fullGameLevel);
   const exitFullGame = useAppStore((state) => state.exitFullGame);
+  const updateAutomaticLevel = useAppStore((state) => state.updateAutomaticLevel);
 
   const [current, setCurrent] = useState<VersusState | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
@@ -146,7 +147,9 @@ export function FullGameScreen(): JSX.Element {
         result,
         reason,
         moves: versusGameState(state).history.map((move) => move.san),
-      }).then(() => undefined);
+      })
+        .then(() => updateAutomaticLevel(level))
+        .then(() => undefined);
     },
     primaryLabel: t('play.back-to-play'),
     onPrimary: exitFullGame,

@@ -3,12 +3,32 @@ import type { LocalStore } from './local-store.ts';
 import { StorageError } from './local-store.ts';
 
 const RECORD_NAME = 'settings';
-const DEFAULT_SETTINGS: AppSettings = { lastProfileId: null };
+const DEFAULT_SETTINGS: AppSettings = { lastProfileId: null, suggestedLevels: {} };
 
-function isAppSettingsShape(value: unknown): value is AppSettings {
+/** Loosely-typed stored shape, before `normalize` fills in a field a pre-`suggestedLevels` record
+ * (M4.1 and earlier) does not have — same "old data reads back as the empty default" approach
+ * `migrations.ts` already uses for `concept-stats`/`game-records`, so this needs no version bump. */
+function isAppSettingsShape(
+  value: unknown,
+): value is { lastProfileId: string | null; suggestedLevels?: unknown } {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
-  return record.lastProfileId === null || typeof record.lastProfileId === 'string';
+  if (record.lastProfileId !== null && typeof record.lastProfileId !== 'string') return false;
+  return (
+    record.suggestedLevels === undefined ||
+    (typeof record.suggestedLevels === 'object' && record.suggestedLevels !== null)
+  );
+}
+
+/** Fills in `suggestedLevels: {}` for a record stored before it existed. */
+function normalize(stored: {
+  lastProfileId: string | null;
+  suggestedLevels?: unknown;
+}): AppSettings {
+  return {
+    lastProfileId: stored.lastProfileId,
+    suggestedLevels: (stored.suggestedLevels as Record<string, number> | undefined) ?? {},
+  };
 }
 
 /**
@@ -40,7 +60,7 @@ export class LocalStorageSettingsRepository implements SettingsRepository {
       if (!isAppSettingsShape(raw)) {
         throw new StorageError(`Corrupt settings data stored at "${RECORD_NAME}"`);
       }
-      return raw;
+      return normalize(raw);
     });
   }
 

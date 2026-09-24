@@ -6,8 +6,11 @@ import {
   findMiniGame,
   getSoleProfileId,
   pickProfileFromPicker,
+  playOneKidVersusMove,
   playSolveLine,
+  seedGameRecordWins,
   seedLessonMastered,
+  waitForVersusTurnOrEnd,
 } from './helpers.ts';
 
 /** The `hungry-rook` mini-game's own `MiniGameProgress` record, straight from real storage. */
@@ -72,5 +75,72 @@ test.describe('Play screen and My Den', () => {
     await expect(page.getByText("Kid's Den")).toBeVisible();
     await expect(page.getByRole('listitem', { name: 'Rhino, friend' })).toBeVisible();
     await expect(page.getByRole('listitem', { name: 'Pawn, You are here' })).toBeVisible();
+  });
+});
+
+/**
+ * Play -> vs Computer: Fox playable (M4.2, `docs/computer-opponent.md` §3): Fox unlocks with 3
+ * full-game wins vs Rabbit (`computerLevelStatus`, `opponent: computer:2`), seeded directly —
+ * unlike Mouse/Rabbit this needs no World mastery at all. A seeded bot keeps every reply fast and
+ * deterministic (`world4.spec.ts`'s pattern); `first-game`'s own position/rules stand in for the
+ * runtime-built "full game vs Fox" (same standard start, same real check rules).
+ */
+test.describe('Play -> vs Computer: Fox unlocked (M4.2, seeded smoke test)', () => {
+  test('starts a full game vs Fox, plays 2 kid moves with fast bot replies, and can be left mid-game', async ({
+    page,
+  }) => {
+    const boss = findMiniGame('first-game');
+    if (boss.mode !== 'versus') {
+      throw new Error('first-game is expected to be a versus mini-game');
+    }
+
+    await completeFirstRun(page, 'Kid');
+    await page.evaluate(() => {
+      localStorage.setItem('chess-kids:test-seed', '20260924');
+    });
+
+    const profileId = await getSoleProfileId(page);
+    // 3 full-game wins vs Rabbit unlock Fox directly (no World mastery needed for this check).
+    await seedGameRecordWins(page, profileId, 2, 3);
+    await page.reload();
+    await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+    await pickProfileFromPicker(page, 'Kid');
+
+    await page.getByRole('button', { name: 'Play', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Play' })).toBeVisible();
+    // No games recorded directly against Fox itself (only vs Rabbit, to unlock it).
+    await page.getByRole('button', { name: 'Fox, not played yet' }).click();
+    await page.getByRole('button', { name: 'Play a full game' }).click();
+
+    await expect(page.getByText('Full Game vs Fox')).toBeVisible();
+    await expect(page.locator('[data-versus-status]')).toHaveAttribute(
+      'data-versus-status',
+      'playing',
+    );
+
+    for (let move = 0; move < 2; move += 1) {
+      const start = Date.now();
+      await playOneKidVersusMove(page, boss);
+      await waitForVersusTurnOrEnd(page);
+      const elapsedMs = Date.now() - start;
+      expect(elapsedMs, `bot did not reply within 3s (took ${String(elapsedMs)}ms)`).toBeLessThan(
+        3000,
+      );
+    }
+
+    // Leave mid-game: the "Stop game?" confirm, then confirming records it as `abandoned`.
+    await page.getByRole('button', { name: 'Close' }).click();
+    await expect(page.getByRole('alertdialog', { name: 'Stop this game?' })).toBeVisible();
+    await page.getByRole('button', { name: 'Stop game' }).click();
+    await expect(page.getByRole('heading', { name: 'Play' })).toBeVisible();
+
+    const records = await page.evaluate(() => {
+      const raw = localStorage.getItem('chess-kids:game-records');
+      return raw ? (JSON.parse(raw) as { game: string; opponent: string; result: string }[]) : [];
+    });
+    const record = records.find(
+      (entry) => entry.game === 'full' && entry.opponent === 'computer:3',
+    );
+    expect(record).toMatchObject({ result: 'abandoned' });
   });
 });

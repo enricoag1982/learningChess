@@ -1,5 +1,6 @@
 import type { BotPlayer, Move, game } from '@chess-kids/core';
 import { bot, chessJsRules } from '@chess-kids/core';
+import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
 /** In-thread fallback: the same search, run synchronously on the caller's own thread. */
@@ -8,7 +9,7 @@ function chooseMoveInThread(state: game.GameState, level: number, seed: number):
   if (botLevel === undefined) {
     throw new Error(`worker-bot-player: unknown bot level ${String(level)}`);
   }
-  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed));
+  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
 }
 
 /**

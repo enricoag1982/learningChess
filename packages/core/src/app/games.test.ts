@@ -4,7 +4,14 @@ import type { GameRecord } from '../domain/progress.ts';
 import type { Profile } from '../domain/profile.ts';
 import { seededRandom } from '../domain/random.ts';
 import type { Journey } from './journey.ts';
-import { computerLevelStatus, loadGameRecords, recordGame } from './games.ts';
+import {
+  computerLevelStatus,
+  loadGameRecords,
+  nextSuggestedLevel,
+  recordGame,
+  suggestedLevel,
+  updateSuggestedLevel,
+} from './games.ts';
 import type { AppDeps } from './use-cases.ts';
 import type {
   AppSettings,
@@ -73,6 +80,20 @@ const stubContent: ContentSource = {
   minigame: () => undefined,
 };
 
+/** In-memory `SettingsRepository`, so `updateSuggestedLevel`'s save-then-get round-trips. */
+function makeSettingsRepo(
+  initial: AppSettings = { lastProfileId: null, suggestedLevels: {} },
+): SettingsRepository {
+  let settings = initial;
+  return {
+    get: () => Promise.resolve(settings),
+    save: (next) => {
+      settings = next;
+      return Promise.resolve();
+    },
+  };
+}
+
 function makeDeps(records: readonly GameRecord[] = []): AppDeps {
   return {
     profiles: {
@@ -93,10 +114,7 @@ function makeDeps(records: readonly GameRecord[] = []): AppDeps {
     passwordFile: {
       write: (password) => Promise.resolve({ location: `fake/${password}.txt` }),
     } satisfies PasswordFileWriter,
-    settings: {
-      get: () => Promise.resolve<AppSettings>({ lastProfileId: null }),
-      save: () => Promise.resolve(),
-    } satisfies SettingsRepository,
+    settings: makeSettingsRepo(),
     random: seededRandom(1),
   };
 }
@@ -231,7 +249,7 @@ describe('computerLevelStatus', () => {
       record({ id: 'r1', result: 'win' }),
       record({ id: 'r2', result: 'win' }),
       record({ id: 'r3', result: 'win', game: 'pawn-wars' }), // not a full game
-      record({ id: 'r4', result: 'win', opponent: 'computer:2' }), // a different level
+      record({ id: 'r4', result: 'win', opponent: 'computer:3' }), // a different level (Fox)
       record({ id: 'r5', result: 'abandoned' }),
     ];
 
@@ -240,6 +258,235 @@ describe('computerLevelStatus', () => {
     const mouse = statuses.find((s) => s.name === 'mouse');
     expect(mouse).toMatchObject({ wins: 2, games: 2 });
     const rabbit = statuses.find((s) => s.name === 'rabbit');
-    expect(rabbit?.locked).toBe(true); // only 2 full-game wins vs Mouse, not 3
+    expect(rabbit?.locked).toBe(true); // only 2 full-game wins vs Mouse, not 3, and no own win yet
+  });
+
+  it('a level with any recorded full-game win of its own stays unlocked short of 3 wins below it', () => {
+    // Covers a world boss fought directly at Rabbit (e.g. World 5's, authored in parallel) before
+    // the kid has separately won 3 Play-screen games vs Mouse.
+    const records = [record({ id: 'r1', result: 'win', opponent: 'computer:2' })];
+
+    const statuses = computerLevelStatus(records, makeJourney('mastered'));
+
+    const rabbit = statuses.find((s) => s.name === 'rabbit');
+    expect(rabbit).toMatchObject({ locked: false, wins: 1, games: 1 });
+    expect(rabbit?.condition).toBeUndefined();
+  });
+
+  it('an own-level win unlocks Fox/Wolf/Bear too, the same way', () => {
+    const fox = computerLevelStatus(
+      [record({ id: 'r1', result: 'win', opponent: 'computer:3' })],
+      makeJourney('mastered'),
+    ).find((s) => s.name === 'fox');
+    expect(fox?.locked).toBe(false);
+
+    const wolf = computerLevelStatus(
+      [record({ id: 'r1', result: 'win', opponent: 'computer:4' })],
+      makeJourney('mastered'),
+    ).find((s) => s.name === 'wolf');
+    expect(wolf?.locked).toBe(false);
+
+    const bear = computerLevelStatus(
+      [record({ id: 'r1', result: 'draw', opponent: 'computer:5' })],
+      makeJourney('mastered'),
+    ).find((s) => s.name === 'bear');
+    expect(bear?.locked).toBe(true); // a draw is not a win
+  });
+
+  it('Fox/Wolf/Bear unlock with 3 full-game wins vs the level right below', () => {
+    const winsVs = (level: number) =>
+      Array.from({ length: 3 }, (_, i) =>
+        record({
+          id: `w${String(level)}-${String(i)}`,
+          result: 'win',
+          opponent: `computer:${String(level)}`,
+        }),
+      );
+
+    const foxStatuses = computerLevelStatus(winsVs(2), makeJourney('mastered'));
+    expect(foxStatuses.find((s) => s.name === 'fox')?.locked).toBe(false);
+    expect(foxStatuses.find((s) => s.name === 'wolf')?.locked).toBe(true);
+
+    const wolfStatuses = computerLevelStatus(winsVs(3), makeJourney('mastered'));
+    expect(wolfStatuses.find((s) => s.name === 'wolf')?.locked).toBe(false);
+    expect(wolfStatuses.find((s) => s.name === 'bear')?.locked).toBe(true);
+
+    const bearStatuses = computerLevelStatus(winsVs(4), makeJourney('mastered'));
+    expect(bearStatuses.find((s) => s.name === 'bear')?.locked).toBe(false);
+  });
+});
+
+describe('nextSuggestedLevel', () => {
+  const UNLOCKED_STATUSES = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'].map((name, index) => ({
+    level: (index + 1) as 1 | 2 | 3 | 4 | 5,
+    name: name as 'mouse' | 'rabbit' | 'fox' | 'wolf' | 'bear',
+    locked: false,
+    wins: 0,
+    games: 0,
+  }));
+
+  const LOCKED_ABOVE_FOX = UNLOCKED_STATUSES.map((status) =>
+    status.level >= 4 ? { ...status, locked: true } : status,
+  );
+
+  function winsAndLosses(level: number, results: readonly ('win' | 'loss')[]): GameRecord[] {
+    return results.map((result, index) =>
+      record({
+        id: `g${String(level)}-${String(index)}`,
+        result,
+        opponent: `computer:${String(level)}`,
+        createdAt: `2026-01-01T00:0${String(index)}:00.000Z`,
+      }),
+    );
+  }
+
+  it('returns null before 5 full games have been played at that level', () => {
+    const records = winsAndLosses(3, ['win', 'win', 'win', 'win']);
+    expect(nextSuggestedLevel(records, 3, UNLOCKED_STATUSES)).toBeNull();
+  });
+
+  it('suggests the next level once >= 4 of the last 5 games are wins, if it is unlocked', () => {
+    const records = winsAndLosses(3, ['win', 'win', 'win', 'win', 'loss']);
+    expect(nextSuggestedLevel(records, 3, UNLOCKED_STATUSES)).toEqual({
+      level: 4,
+      leveledUp: true,
+    });
+  });
+
+  it('does not suggest a next level that is still locked', () => {
+    const records = winsAndLosses(3, ['win', 'win', 'win', 'win', 'win']);
+    expect(nextSuggestedLevel(records, 3, LOCKED_ABOVE_FOX)).toBeNull();
+  });
+
+  it('drops one level once <= 1 of the last 5 games is a win', () => {
+    const records = winsAndLosses(3, ['loss', 'loss', 'loss', 'loss', 'win']);
+    expect(nextSuggestedLevel(records, 3, UNLOCKED_STATUSES)).toEqual({
+      level: 2,
+      leveledUp: false,
+    });
+  });
+
+  it('never drops below Mouse', () => {
+    const records = winsAndLosses(1, ['loss', 'loss', 'loss', 'loss', 'loss']);
+    expect(nextSuggestedLevel(records, 1, UNLOCKED_STATUSES)).toBeNull();
+  });
+
+  it('does nothing in the middle band (2 or 3 wins of the last 5)', () => {
+    const records = winsAndLosses(3, ['win', 'win', 'loss', 'loss', 'loss']);
+    expect(nextSuggestedLevel(records, 3, UNLOCKED_STATUSES)).toBeNull();
+  });
+
+  it('only ever moves one level, never more, even with a perfect streak', () => {
+    const records = winsAndLosses(2, ['win', 'win', 'win', 'win', 'win']);
+    const update = nextSuggestedLevel(records, 2, UNLOCKED_STATUSES);
+    expect(update?.level).toBe(3);
+  });
+
+  it('only looks at the last 5 games at that level: an older 0-win run does not still count', () => {
+    const stale = winsAndLosses(3, ['loss', 'loss', 'loss', 'loss', 'loss']).map((r, i) => ({
+      ...r,
+      id: `stale-${String(i)}`,
+      createdAt: `2020-01-01T00:0${String(i)}:00.000Z`,
+    }));
+    const recent = winsAndLosses(3, ['win', 'win', 'win', 'win', 'win']);
+    expect(nextSuggestedLevel([...stale, ...recent], 3, UNLOCKED_STATUSES)).toEqual({
+      level: 4,
+      leveledUp: true,
+    });
+  });
+
+  it('ignores abandoned games in the last-5 window', () => {
+    const abandoned = record({
+      id: 'left',
+      result: 'abandoned',
+      opponent: 'computer:3',
+      createdAt: '2026-01-01T00:09:00.000Z',
+    });
+    const records = [...winsAndLosses(3, ['win', 'win', 'win', 'win', 'win']), abandoned];
+    expect(nextSuggestedLevel(records, 3, UNLOCKED_STATUSES)).toEqual({
+      level: 4,
+      leveledUp: true,
+    });
+  });
+});
+
+describe('suggestedLevel', () => {
+  const STATUSES = [
+    { level: 1 as const, name: 'mouse' as const, locked: false, wins: 0, games: 0 },
+    { level: 2 as const, name: 'rabbit' as const, locked: false, wins: 0, games: 0 },
+    { level: 3 as const, name: 'fox' as const, locked: true, wins: 0, games: 0 },
+  ];
+
+  it('uses the stored suggestion when it still names an unlocked level', () => {
+    expect(suggestedLevel(2, STATUSES)).toBe(2);
+  });
+
+  it('falls back to the highest unlocked level with no suggestion stored', () => {
+    expect(suggestedLevel(undefined, STATUSES)).toBe(2);
+  });
+
+  it('falls back to the highest unlocked level when the stored one is locked', () => {
+    expect(suggestedLevel(3, STATUSES)).toBe(2);
+  });
+
+  it('falls back to Mouse when nothing at all is unlocked', () => {
+    const allLocked = STATUSES.map((status) => ({ ...status, locked: true }));
+    expect(suggestedLevel(undefined, allLocked)).toBe(1);
+  });
+});
+
+describe('updateSuggestedLevel', () => {
+  const STATUSES = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'].map((name, index) => ({
+    level: (index + 1) as 1 | 2 | 3 | 4 | 5,
+    name: name as 'mouse' | 'rabbit' | 'fox' | 'wolf' | 'bear',
+    locked: false,
+    wins: 0,
+    games: 0,
+  }));
+
+  function winsAndLosses(level: number, results: readonly ('win' | 'loss')[]): GameRecord[] {
+    return results.map((result, index) =>
+      record({
+        id: `g${String(index)}`,
+        result,
+        opponent: `computer:${String(level)}`,
+        createdAt: `2026-01-01T00:0${String(index)}:00.000Z`,
+      }),
+    );
+  }
+
+  it('saves the update to AppSettings.suggestedLevels, keyed by profile', async () => {
+    const deps = makeDeps();
+    const records = winsAndLosses(2, ['win', 'win', 'win', 'win', 'win']);
+
+    const update = await updateSuggestedLevel(deps, 'profile-1', 2, records, STATUSES);
+
+    expect(update).toEqual({ level: 3, leveledUp: true });
+    expect(await deps.settings.get()).toMatchObject({ suggestedLevels: { 'profile-1': 3 } });
+  });
+
+  it('returns null and does not touch settings when nothing changes', async () => {
+    const deps = makeDeps();
+    const records = winsAndLosses(2, ['win', 'loss', 'win', 'loss', 'win']);
+
+    const update = await updateSuggestedLevel(deps, 'profile-1', 2, records, STATUSES);
+
+    expect(update).toBeNull();
+    expect(await deps.settings.get()).toMatchObject({ suggestedLevels: {} });
+  });
+
+  it('keeps other profiles’ suggestions when saving one', async () => {
+    const deps = makeDeps();
+    await deps.settings.save({
+      lastProfileId: null,
+      suggestedLevels: { 'profile-other': 4 },
+    });
+    const records = winsAndLosses(2, ['loss', 'loss', 'loss', 'loss', 'loss']);
+
+    await updateSuggestedLevel(deps, 'profile-1', 2, records, STATUSES);
+
+    expect(await deps.settings.get()).toMatchObject({
+      suggestedLevels: { 'profile-other': 4, 'profile-1': 1 },
+    });
   });
 });

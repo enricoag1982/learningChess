@@ -52,6 +52,13 @@ export interface SearchBoard {
   pieces(): Partial<Record<Square, Piece>>;
   /** Current position (markers carried over unchanged from the board this was built from). */
   position(): Position;
+  /**
+   * Cheap Zobrist-style hash of the current position (pieces, side to move, castling rights, en
+   * passant square) — O(1) per `play`/`undo`, so a search can key a transposition table by it
+   * without ever building a FEN. Not a cryptographic hash; collisions are astronomically unlikely
+   * but not impossible, same trade-off every chess engine's TT makes.
+   */
+  hash(): bigint;
 }
 
 /** Standard chess rules. Variant rules (blocked squares, custom wins) live in a separate layer (M1). */

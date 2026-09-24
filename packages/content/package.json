@@ -6,7 +6,8 @@
   "exports": {
     "./locales/*": "./dist/locales/*",
     "./content.json": "./dist/content.json",
-    "./tracks.json": "./dist/tracks.json"
+    "./tracks.json": "./dist/tracks.json",
+    "./bot-book.json": "./dist/bot-book.json"
   },
   "scripts": {
     "build": "node scripts/build.ts",
