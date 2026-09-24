@@ -11,8 +11,22 @@ if (!rootElement) {
   throw new Error('Root element "#root" not found');
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+const root = createRoot(rootElement);
+
+// Dev-only board playground at /#board; dynamically imported so it never reaches the production
+// bundle (see src/dev/BoardPlayground.tsx).
+if (import.meta.env.DEV && location.hash === '#board') {
+  void import('./dev/BoardPlayground.tsx').then(({ BoardPlayground }) => {
+    root.render(
+      <StrictMode>
+        <BoardPlayground />
+      </StrictMode>,
+    );
+  });
+} else {
+  root.render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}
