@@ -12,6 +12,7 @@ export default defineConfig([
     '**/coverage/**',
     '**/playwright-report/**',
     '**/test-results/**',
+    '.claude/**',
   ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
@@ -68,7 +69,7 @@ export default defineConfig([
   },
   {
     files: ['apps/web/**/*.{ts,tsx}'],
-    extends: [reactHooks.configs.recommended, reactRefresh.configs.vite],
+    extends: [reactHooks.configs.flat['recommended-latest'], reactRefresh.configs.vite],
     languageOptions: {
       globals: globals.browser,
     },

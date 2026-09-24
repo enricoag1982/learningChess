@@ -18,6 +18,15 @@
 
 Format check → lint → typecheck → unit + content tests → build → E2E smoke test (Playwright). New checks are added as steps of the same job, so the required check name never changes.
 
+## Local commands
+
+| Command | Does |
+|---|---|
+| `pnpm install` | Install; builds content JSON (`prepare`) |
+| `pnpm dev` | Web app dev server |
+| `pnpm format` / `pnpm lint` / `pnpm typecheck` / `pnpm test` | Same checks as CI |
+| `pnpm build && pnpm test:e2e` | Production build + Playwright smoke (first time: `pnpm --filter @chess-kids/web exec playwright install chromium`) |
+
 ## Repository settings (manual, GitHub UI)
 
 **Settings → Rules → Rulesets → New branch ruleset**

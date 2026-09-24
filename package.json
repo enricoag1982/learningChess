@@ -8,12 +8,14 @@
   },
   "scripts": {
     "prepare": "pnpm --filter @chess-kids/content build",
+    "dev": "pnpm --filter @chess-kids/web dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "test:e2e": "pnpm --filter @chess-kids/web test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

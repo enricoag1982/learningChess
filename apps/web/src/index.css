@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+/* Design tokens: see docs/screens.md §1.1 (kept in sync by the lead). */
+@theme {
+  --color-cream: #fbf6ec;
+  --color-ink: #22313a;
+  --color-muted: #55636b;
+  --color-line: #e6dcc8;
+  --color-card: #ffffff;
+  --color-go: #2e7d5b;
+  --color-today: #b8561a;
+  --color-star: #e9a92b;
+  --color-info: #2f5e9e;
+  --color-locked: #8c8c8c;
+  --color-board-light: #f1e4c8;
+  --color-board-dark: #c49a6c;
+  --color-board-frame: #8a6a48;
+
+  --font-display: 'Fredoka Variable', ui-rounded, system-ui, sans-serif;
+  --font-body: 'Nunito Variable', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-cream text-ink font-body;
+  }
+}
+
+/* No animations yet, but keep the standard reduce-motion rule in place for M1+. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

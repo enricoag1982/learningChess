@@ -37,10 +37,11 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 - Animal theme; English first (i18n); narration = Web Speech API (device voices) until v3.
 - Parent password kept in a simple plain-text file; password screen reminds where the file is (web: copy in Downloads; store apps: editable file in app Documents). Daily time limit in v1.
 
-## Next step: M0 scaffold (see `docs/roadmap.md`)
+## Status and next step
 
-Scope: pnpm workspace (`packages/core`, `packages/content`, `apps/web`), TS strict, ESLint, Prettier, Vitest, Playwright smoke test, React + Vite + Tailwind + vite-plugin-pwa shell, i18next, localStorage adapter, board diagram parser + chess.js adapter with tests, GitHub Pages deploy workflow. Root scripts used by CI `quality` job: `format:check`, `lint`, `typecheck`, `test`, `build`; add an e2e step to the `quality` job; add `npm` ecosystem to `.github/dependabot.yml`.
-Exit: CI green; empty PWA deployed; rules tests pass.
+- M0 done (tags `m0.1`, `m0.2`, `m0`). Pending user action: Settings → Pages → Source = GitHub Actions (then `deploy.yml` publishes `master`).
+- Next: M1 vertical slice, iterations `m1.1`–`m1.5` in `docs/roadmap.md` §3.1. Branch `m1-vertical-slice`.
+- Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path).
 
 Version notes (checked 2026-09-24):
 
