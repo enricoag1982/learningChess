@@ -99,7 +99,7 @@ squares:
   demo: Look at your two corners. The one near your right hand is light. The one near your left hand is dark.
 squares-g1: Your king is standing in your right-hand corner. Is that square light?
 squares-g2: Now he hopped to your left-hand corner. Is that square light?
-squares-01: Your king found the far corner, near your right hand. Is that square light too?
+squares-01: Now he went to the far corner on your right. Is that square light?
 squares-02: He hopped all the way to the far corner on your left. Is that square light?
 squares-03: Now he's out in the middle of the board. Is his square light?
 squares-04: Tap every light square in the row closest to you.
@@ -125,16 +125,16 @@ square-hunt-r1: Tap every square in your king's row.
 square-hunt-r2: Tap every square in your king's column.
 square-hunt-r3: Tap every square in your king's row.
 square-hunt-r4: Tap every square in your king's column.
-square-hunt-r5: Tap every square on your king's diagonal.
-square-hunt-r6: Tap every square on this diagonal.
+square-hunt-r5: Tap every square on the long diagonal through your king, from corner to corner.
+square-hunt-r6: Now the other long diagonal through your king. Tap it from corner to corner.
 setup:
   title: Setting Up the Board
   story: >-
     Every game starts the same way. Rooks stand in the corners, knights right beside them, then
     bishops, and the queen and king share the middle. Pawns line up in front to protect them all.
   demo: Here is the whole starting line-up, ready to play.
-setup-g1: Let's start easy. Place the king in the middle of the back row.
-setup-g2: Now put the queen right next to him.
+setup-g1: "Let's start easy. Place the king on the dark square in the middle of the back row."
+setup-g2: Now put the queen right next to him, on his left side.
 setup-01: Place both rooks in their corners.
 setup-02: Now add the knights, right next to the rooks.
 setup-03: Next come the bishops, next to the knights.
