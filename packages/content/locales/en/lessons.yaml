@@ -141,8 +141,8 @@ squares-g2: Now he hopped to your left-hand corner. Is that square light?
 squares-01: Now he went to the far corner on your right. Is that square light?
 squares-02: He hopped all the way to the far corner on your left. Is that square light?
 squares-03: Now he's out in the middle of the board. Is his square light?
-squares-04: Tap every light square in the row closest to you.
-squares-05: Now tap every dark square in that same row.
+squares-04: Tap every light square in the bottom row, the one nearest you.
+squares-05: Now tap every dark square in that bottom row.
 lines:
   title: Rows, Columns, and Diagonals
   story: >-
