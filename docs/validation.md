@@ -27,3 +27,4 @@ Every merged iteration gets an annotated tag `m<N>.<i>` (milestone done: `m<N>`)
 
 | Tag | Date | Scope | Checks | Notes |
 |---|---|---|---|---|
+| `m0.1` | 2026-09-24 | Workspace + tooling; core chess (diagram / FEN parser, `ChessRules` over chess.js); content locale pipeline | F L T U B CI C P N | U: 60 tests (core 42, content 18). P: 5 reference positions match published perft counts (kept as unit test). N: bad diagram, bad FEN, two white kings, empty text, bad key, duplicate key → rejected with file / row / key in message. C: fresh clone of branch green. Lint rules checked to fire (chess.js import, React in domain) |
