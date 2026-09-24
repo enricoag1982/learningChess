@@ -8,6 +8,7 @@ void i18next.use(initReactI18next).init({
   resources: { en },
   lng: 'en',
   fallbackLng: 'en',
+  ns: ['common', 'lessons', 'characters'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 });
