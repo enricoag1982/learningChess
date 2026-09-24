@@ -120,6 +120,7 @@ board:
     empty: '{{square}}, empty'
     selected: '{{base}}, selected'
     possible-move: '{{base}}, possible move'
+    focus: '{{base}}, look here'
 story:
   listen-again: Listen again
   primary: Let me try
@@ -130,6 +131,8 @@ exercise:
   hint: Hint
   undo: Undo
   check: Check
+  yes: Yes
+  no: 'No'
   moves-label: Moves
   moves-of: '{{current}} of {{total}}'
   moves-target_one: 'in {{count}} move'
@@ -137,9 +140,14 @@ exercise:
   tap-piece-first: 'Tap {{name}} first.'
   select-wrong: Not quite! Look at the orange squares.
   select-missing: Almost! Some squares are still missing.
+  answer-wrong: Not quite! Try again.
+  move-wrong: Not this one. Try again!
   hint-piece: 'Look at {{name}}.'
   hint-target: Try the orange square.
   hint-answer: Here is the answer.
+  hint-look: Look closely.
+  hint-think-again: Think about it again.
+  hint-remove-option: One choice is ruled out.
   praise-3: Amazing!
   praise-2: Well done!
   praise-1: Good try!
@@ -150,6 +158,12 @@ exercise:
     k: '{{name}} only steps one square at a time!'
     n: '{{name}} only jumps in an L shape!'
     p: '{{name}} only moves straight ahead (and captures diagonally)!'
+  setup:
+    wrong: Not quite! Try a different piece or square.
+    palette-label: Pieces to place
+    palette-item: '{{color}} {{piece}}, {{count}} left'
+    hint-piece: 'Place the {{color}} {{piece}} next.'
+    hint-square: Put it on the orange square.
 boss:
   captured-of: 'Captured {{current}} of {{total}}'
   moves-par: 'Moves {{moves}} · Par {{par}}'

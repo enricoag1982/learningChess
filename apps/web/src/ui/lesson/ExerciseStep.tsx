@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDef, Lesson, MoveInput } from '@chess-kids/core';
-import { exerciseMoves, recordExerciseResult, starsFor } from '@chess-kids/core';
+import type { ExerciseDef, Hint, Lesson, MoveInput, Piece, Square } from '@chess-kids/core';
+import { exerciseMoves, recordExerciseResult, setupPalette, starsFor } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { Board } from '../board/Board.tsx';
 import { ReplayButton } from '../ReplayButton.tsx';
@@ -10,10 +10,13 @@ import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useNarratedText } from '../useNarratedText.ts';
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from './button-styles.ts';
+import { ChoiceOptions } from './ChoiceOptions.tsx';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
 import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
+import { SetupPalette } from './SetupPalette.tsx';
+import { YesNoButtons } from './YesNoButtons.tsx';
 
 export interface ExerciseStepProps {
   readonly lesson: Lesson;
@@ -86,7 +89,14 @@ function MovesCard({
   );
 }
 
-/** One guided try or scored exercise: collect-stars, capture, or select-squares. */
+/** The board's `hint` ring squares, for the hint kinds that carry one (`squares` and `yes-no`). */
+function hintSquares(hint: Hint | null): readonly Square[] | undefined {
+  if (hint === null) return undefined;
+  if (hint.kind === 'squares' || hint.kind === 'yes-no') return hint.squares;
+  return undefined;
+}
+
+/** One guided try or scored exercise, of any of the exercise types. */
 export function ExerciseStep({
   lesson,
   exercise,
@@ -101,6 +111,8 @@ export function ExerciseStep({
 
   const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
   const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
+  /** setup only: the palette piece currently selected, waiting for a square tap. */
+  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
 
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
   const [startedAt] = useState(() => Date.now());
@@ -149,111 +161,203 @@ export function ExerciseStep({
   const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
   const replay = useNarratedText(services.narrator, spokenText);
   const isSelectSquares = exercise.type === 'select-squares';
+  const isMoveCounted = exercise.type === 'collect-stars' || exercise.type === 'capture';
 
   function handleMove(move: MoveInput): void {
     dispatch({ type: 'move', move });
   }
 
-  const board = isSelectSquares ? (
-    <Board
-      position={state.core.position}
-      legalMoves={[]}
-      onSquareTap={(square) => {
-        dispatch({ type: 'toggle', square });
-      }}
-      highlights={{
-        selectedSquares: state.core.selected,
-        wrong: state.wrongSquares,
-        ...(state.hint ? { hint: state.hint.squares } : {}),
-      }}
-      label={t('lesson.board-label')}
-    />
-  ) : (
-    <Board
-      position={state.core.position}
-      legalMoves={exerciseMoves(state.core, services.rules)}
-      onMove={({ from, to }) => {
-        handleMove({ from, to });
-      }}
-      onIllegal={(attempt) => {
-        if (attempt.from === null) {
-          dispatch({ type: 'tap-first' });
-        } else {
-          handleMove({ from: attempt.from, to: attempt.to });
-        }
-      }}
-      highlights={{
-        ...(state.hint ? { hint: state.hint.squares } : {}),
-        ...(state.lastMove ? { lastMove: state.lastMove } : {}),
-      }}
-      label={t('lesson.board-label')}
-    />
+  function handlePlace(square: Square, piece: Piece): void {
+    dispatch({ type: 'place', square, piece });
+    setSelectedPiece(null);
+  }
+
+  let board: JSX.Element | null;
+  if (isSelectSquares) {
+    board = (
+      <Board
+        position={state.core.position}
+        legalMoves={[]}
+        onSquareTap={(square) => {
+          dispatch({ type: 'toggle', square });
+        }}
+        highlights={{
+          selectedSquares: state.core.selected,
+          wrong: state.wrongSquares,
+          ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  } else if (exercise.type === 'yes-no') {
+    board = (
+      <Board
+        position={state.core.position}
+        legalMoves={[]}
+        highlights={{
+          focus: exercise.focus ? [exercise.focus] : [],
+          ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  } else if (exercise.type === 'choice') {
+    board = exercise.showBoard ? (
+      <Board position={state.core.position} legalMoves={[]} label={t('lesson.board-label')} />
+    ) : null;
+  } else if (exercise.type === 'best-move') {
+    board = (
+      <Board
+        position={state.core.position}
+        legalMoves={exerciseMoves(state.core, services.rules)}
+        onMove={({ from, to }) => {
+          handleMove({ from, to });
+        }}
+        onIllegal={(attempt) => {
+          if (attempt.from === null) {
+            dispatch({ type: 'tap-first' });
+          } else {
+            handleMove({ from: attempt.from, to: attempt.to });
+          }
+        }}
+        highlights={{
+          ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...(state.lastMove ? { lastMove: state.lastMove } : {}),
+          ...(state.wrongMove ? { wrongMove: state.wrongMove } : {}),
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  } else if (exercise.type === 'setup') {
+    const setupHint = state.hint?.kind === 'setup' ? state.hint : null;
+    board = (
+      <Board
+        position={state.core.position}
+        legalMoves={[]}
+        onSquareTap={(square) => {
+          if (selectedPiece) handlePlace(square, selectedPiece);
+        }}
+        highlights={{
+          wrong: state.wrongSquares,
+          ...(setupHint?.square ? { hint: [setupHint.square] } : {}),
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  } else {
+    board = (
+      <Board
+        position={state.core.position}
+        legalMoves={exerciseMoves(state.core, services.rules)}
+        onMove={({ from, to }) => {
+          handleMove({ from, to });
+        }}
+        onIllegal={(attempt) => {
+          if (attempt.from === null) {
+            dispatch({ type: 'tap-first' });
+          } else {
+            handleMove({ from: attempt.from, to: attempt.to });
+          }
+        }}
+        highlights={{
+          ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...(state.lastMove ? { lastMove: state.lastMove } : {}),
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  }
+
+  const panel = (
+    <>
+      <SpeechBubble text={instructionText} note={note} />
+      <ReplayButton onClick={replay} label={t('exercise.replay')} />
+      {solved ? (
+        <div className="mt-auto flex flex-col items-center gap-4">
+          {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
+          {!guided && <StarsRow earned={stars} animate />}
+          {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
+          {saved && (
+            <NextButton
+              onClick={() => {
+                goToStep(nextStepIndex);
+              }}
+              className="w-full"
+            />
+          )}
+        </div>
+      ) : (
+        <div className="mt-auto flex flex-col gap-4">
+          {isMoveCounted && <MovesCard current={state.core.moves} target={exercise.stars3} />}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'hint' });
+              }}
+              className={SECONDARY_BUTTON}
+            >
+              <HintIcon />
+              {t('exercise.hint')}
+            </button>
+            {isSelectSquares && (
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch({ type: 'submit' });
+                }}
+                className={PRIMARY_BUTTON}
+              >
+                {t('exercise.check')}
+              </button>
+            )}
+            {isMoveCounted && (
+              <button
+                type="button"
+                onClick={() => {
+                  dispatch({ type: 'undo' });
+                }}
+                className={SECONDARY_BUTTON}
+              >
+                <UndoIcon />
+                {t('exercise.undo')}
+              </button>
+            )}
+          </div>
+          {exercise.type === 'yes-no' && (
+            <YesNoButtons
+              wrongValue={state.wrongAnswer}
+              onAnswer={(value) => {
+                dispatch({ type: 'answer-yes-no', value });
+              }}
+            />
+          )}
+          {exercise.type === 'choice' && (
+            <ChoiceOptions
+              options={exercise.options}
+              wrongOptionIds={state.core.wrongOptions ?? []}
+              onPick={(optionId) => {
+                dispatch({ type: 'answer-choice', optionId });
+              }}
+            />
+          )}
+          {exercise.type === 'setup' && (
+            <SetupPalette
+              palette={setupPalette(state.core)}
+              selected={selectedPiece}
+              hint={state.hint}
+              onSelect={setSelectedPiece}
+            />
+          )}
+        </div>
+      )}
+    </>
   );
 
-  return (
-    <GameLayout
-      board={board}
-      panel={
-        <>
-          <SpeechBubble text={instructionText} note={note} />
-          <ReplayButton onClick={replay} label={t('exercise.replay')} />
-          {solved ? (
-            <div className="mt-auto flex flex-col items-center gap-4">
-              {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
-              {!guided && <StarsRow earned={stars} animate />}
-              {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
-              {saved && (
-                <NextButton
-                  onClick={() => {
-                    goToStep(nextStepIndex);
-                  }}
-                  className="w-full"
-                />
-              )}
-            </div>
-          ) : (
-            <div className="mt-auto flex flex-col gap-4">
-              {exercise.type !== 'select-squares' && (
-                <MovesCard current={state.core.moves} target={exercise.stars3} />
-              )}
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    dispatch({ type: 'hint' });
-                  }}
-                  className={SECONDARY_BUTTON}
-                >
-                  <HintIcon />
-                  {t('exercise.hint')}
-                </button>
-                {isSelectSquares ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      dispatch({ type: 'submit' });
-                    }}
-                    className={PRIMARY_BUTTON}
-                  >
-                    {t('exercise.check')}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      dispatch({ type: 'undo' });
-                    }}
-                    className={SECONDARY_BUTTON}
-                  >
-                    <UndoIcon />
-                    {t('exercise.undo')}
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </>
-      }
-    />
-  );
+  // A choice exercise with its board hidden gets the panel's full width instead of GameLayout's
+  // board+panel split, which would otherwise leave an empty board-shaped gap.
+  if (exercise.type === 'choice' && !exercise.showBoard) {
+    return <div className="flex min-h-0 flex-1 flex-col gap-4">{panel}</div>;
+  }
+  return <GameLayout board={board} panel={panel} />;
 }

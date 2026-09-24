@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { ExerciseDef, PieceType, Stars } from '@chess-kids/core';
+import type { ExerciseDef, Hint, PieceType, Stars } from '@chess-kids/core';
 import { characterName, tContent } from '../../content-text.ts';
 import { characterPiece } from '../art/character-meta.ts';
 import type { SpeechBubbleNote } from '../SpeechBubble.tsx';
@@ -35,6 +35,31 @@ export function exerciseInstructionText(t: TFunction, def: ExerciseDef): string 
   return tContent(t, def.textKey);
 }
 
+/** Hint-ladder text: shape (and so wording) depends on the exercise type (`hint.kind`). */
+function hintNoteText(t: TFunction, hint: Hint, name: string): string {
+  if (hint.kind === 'squares') {
+    if (hint.level === 1) return t('exercise.hint-piece', { name });
+    if (hint.level === 2) return t('exercise.hint-target');
+    return t('exercise.hint-answer');
+  }
+  if (hint.kind === 'yes-no') {
+    if (hint.level === 1) return t('exercise.hint-look');
+    if (hint.level === 2) return t('exercise.hint-think-again');
+    return t('exercise.hint-answer');
+  }
+  if (hint.kind === 'choice') {
+    if (hint.level === 3) return t('exercise.hint-answer');
+    return t('exercise.hint-remove-option');
+  }
+  // setup
+  if (hint.level === 3 || hint.piece === undefined) return t('exercise.hint-answer');
+  if (hint.level === 2 && hint.square !== undefined) return t('exercise.setup.hint-square');
+  return t('exercise.setup.hint-piece', {
+    color: t(`board.color.${hint.piece.color}`),
+    piece: t(`board.piece.${hint.piece.type}`),
+  });
+}
+
 /**
  * The note under the instruction for the current feedback, or `undefined` while just reading the
  * instruction (teaching-process.md §3.3: wrong move → explanation; hint ladder; praise on solve).
@@ -57,11 +82,14 @@ export function exerciseNote(
       return { text: t('exercise.select-wrong'), tone: 'attention' };
     case 'select-missing':
       return { text: t('exercise.select-missing'), tone: 'attention' };
+    case 'wrong-answer':
+      return { text: t('exercise.answer-wrong'), tone: 'attention' };
+    case 'wrong-move':
+      return { text: t('exercise.move-wrong'), tone: 'attention' };
+    case 'wrong-placement':
+      return { text: t('exercise.setup.wrong'), tone: 'attention' };
     case 'hint':
-      if (feedback.level === 1)
-        return { text: t('exercise.hint-piece', { name }), tone: 'attention' };
-      if (feedback.level === 2) return { text: t('exercise.hint-target'), tone: 'attention' };
-      return { text: t('exercise.hint-answer'), tone: 'attention' };
+      return { text: hintNoteText(t, feedback.hint, name), tone: 'attention' };
     case 'solved':
       return { text: praiseText(t, stars), tone: 'praise' };
   }

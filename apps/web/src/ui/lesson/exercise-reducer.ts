@@ -3,10 +3,14 @@ import type {
   ExerciseState,
   Hint,
   MoveInput,
+  Piece,
   Square,
   VariantRules,
 } from '@chess-kids/core';
 import {
+  answerChoice,
+  answerYesNo,
+  placePiece,
   playMove,
   requestHint,
   startExercise,
@@ -22,7 +26,13 @@ export type ExerciseFeedback =
   | { readonly kind: 'illegal' }
   | { readonly kind: 'select-wrong' }
   | { readonly kind: 'select-missing' }
-  | { readonly kind: 'hint'; readonly level: 1 | 2 | 3 }
+  /** yes-no / choice: a wrong pick. */
+  | { readonly kind: 'wrong-answer' }
+  /** best-move: a legal move that is not in `solutions`. */
+  | { readonly kind: 'wrong-move' }
+  /** setup: a piece placed on the wrong square (or an already-filled one). */
+  | { readonly kind: 'wrong-placement' }
+  | { readonly kind: 'hint'; readonly hint: Hint }
   | { readonly kind: 'solved' };
 
 export interface ExerciseUIState {
@@ -30,10 +40,14 @@ export interface ExerciseUIState {
   /** Current hint highlight, if any (cleared by a move/toggle/submit/undo). */
   readonly hint: Hint | null;
   readonly feedback: ExerciseFeedback;
-  /** Squares wrongly selected in the last submission (select-squares only); orange, never red. */
+  /** Squares wrongly selected/placed in the last try; orange, never red. */
   readonly wrongSquares: readonly Square[];
-  /** The last played kid move, for the board's slide animation (collect-stars / capture only). */
+  /** The last played kid move, for the board's slide animation (collect-stars / capture / best-move). */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
+  /** best-move: a legal-but-wrong attempt, for the board's slide-and-bounce-back animation. */
+  readonly wrongMove?: { readonly from: Square; readonly to: Square };
+  /** yes-no: the value last picked wrong, if any — that button turns orange and disables. */
+  readonly wrongAnswer?: boolean;
 }
 
 export type ExerciseAction =
@@ -41,6 +55,9 @@ export type ExerciseAction =
   | { readonly type: 'tap-first' }
   | { readonly type: 'toggle'; readonly square: Square }
   | { readonly type: 'submit' }
+  | { readonly type: 'answer-yes-no'; readonly value: boolean }
+  | { readonly type: 'answer-choice'; readonly optionId: string }
+  | { readonly type: 'place'; readonly square: Square; readonly piece: Piece }
   | { readonly type: 'hint' }
   /** Guided tries pre-show hint level 1 on mount; unlike 'hint', this leaves feedback untouched. */
   | { readonly type: 'auto-hint' }
@@ -65,7 +82,24 @@ export function createExerciseReducer(
       case 'move': {
         const { state: core, outcome } = playMove(state.core, rules, action.move);
         if (outcome.kind === 'illegal') {
-          return { ...state, core, hint: null, feedback: { kind: 'illegal' }, wrongSquares: [] };
+          return {
+            ...state,
+            core,
+            hint: null,
+            feedback: { kind: 'illegal' },
+            wrongSquares: [],
+            wrongMove: undefined,
+          };
+        }
+        if (outcome.kind === 'wrong') {
+          return {
+            ...state,
+            core,
+            hint: null,
+            feedback: { kind: 'wrong-move' },
+            wrongSquares: [],
+            wrongMove: { from: outcome.move.from, to: outcome.move.to },
+          };
         }
         return {
           ...state,
@@ -73,6 +107,7 @@ export function createExerciseReducer(
           hint: null,
           feedback: outcome.kind === 'solved' ? { kind: 'solved' } : { kind: 'instruction' },
           wrongSquares: [],
+          wrongMove: undefined,
           lastMove: { from: outcome.move.from, to: outcome.move.to },
         };
       }
@@ -98,13 +133,50 @@ export function createExerciseReducer(
           wrongSquares: onlyMissing ? [] : result.wrong,
         };
       }
+      case 'answer-yes-no': {
+        const core = answerYesNo(state.core, action.value);
+        return {
+          ...state,
+          core,
+          hint: null,
+          feedback: core.solved ? { kind: 'solved' } : { kind: 'wrong-answer' },
+          wrongSquares: [],
+          wrongAnswer: core.solved ? undefined : action.value,
+        };
+      }
+      case 'answer-choice': {
+        const core = answerChoice(state.core, action.optionId);
+        return {
+          ...state,
+          core,
+          hint: null,
+          feedback: core.solved ? { kind: 'solved' } : { kind: 'wrong-answer' },
+          wrongSquares: [],
+        };
+      }
+      case 'place': {
+        const { state: core, outcome } = placePiece(state.core, action.square, action.piece);
+        const wrong = outcome.kind === 'wrong';
+        return {
+          ...state,
+          core,
+          hint: null,
+          feedback:
+            outcome.kind === 'solved'
+              ? { kind: 'solved' }
+              : wrong
+                ? { kind: 'wrong-placement' }
+                : { kind: 'instruction' },
+          wrongSquares: wrong ? [action.square] : [],
+        };
+      }
       case 'hint': {
         const { state: core, hint } = requestHint(state.core, rules);
         return {
           ...state,
           core,
           hint,
-          feedback: { kind: 'hint', level: hint.level },
+          feedback: { kind: 'hint', hint },
           wrongSquares: [],
         };
       }

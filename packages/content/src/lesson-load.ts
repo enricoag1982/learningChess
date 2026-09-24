@@ -1,13 +1,17 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import type {
+  BestMoveDef,
   CaptureDef,
+  ChoiceOption,
   CollectStarsDef,
   CompiledContent,
   ExerciseDef,
   Lesson,
   MiniGame,
+  Piece,
   Position,
+  SetupDef,
   Square,
 } from '@chess-kids/core';
 import {
@@ -23,7 +27,12 @@ import { parse as parseYaml } from 'yaml';
 import type { ZodError } from 'zod';
 import { ContentError, type Locales } from './load.ts';
 import type { LocaleTree } from './schema.ts';
-import { type ExerciseYaml, lessonSchema, miniGameSchema } from './lesson-schema.ts';
+import {
+  type ChoiceOptionYaml,
+  type ExerciseYaml,
+  lessonSchema,
+  miniGameSchema,
+} from './lesson-schema.ts';
 
 const rules = createVariantRules(chessJsRules);
 
@@ -63,6 +72,20 @@ function assertValidated<T>(value: T | undefined, context: string): T {
   return value;
 }
 
+/** FEN letter → `Piece` (upper case = white); `choiceOptionSchema` already restricts the alphabet. */
+function pieceFromLetter(letter: string): Piece {
+  const color = letter === letter.toUpperCase() ? 'w' : 'b';
+  return { color, type: letter.toLowerCase() as Piece['type'] };
+}
+
+function compileChoiceOption(raw: ChoiceOptionYaml): ChoiceOption {
+  return {
+    id: raw.id,
+    ...(raw.text === undefined ? {} : { textKey: `lessons:${raw.text}` }),
+    ...(raw.piece === undefined ? {} : { piece: pieceFromLetter(raw.piece) }),
+  };
+}
+
 function compileExercise(
   relPath: string,
   fieldPath: string,
@@ -86,6 +109,49 @@ function compileExercise(
             from: assertValidated(raw.from, `${fieldPath}.from`) as Square,
           };
     return { id: raw.id, concept, textKey, position, type: 'select-squares', answer, ...easier };
+  }
+  if (raw.type === 'yes-no') {
+    return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'yes-no',
+      answer: raw.answer === 'yes',
+      ...(raw.focus === undefined ? {} : { focus: raw.focus as Square }),
+      ...easier,
+    };
+  }
+  if (raw.type === 'choice') {
+    return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'choice',
+      options: raw.options.map(compileChoiceOption),
+      answer: raw.answer,
+      showBoard: raw.showBoard ?? true,
+      ...easier,
+    };
+  }
+  if (raw.type === 'best-move') {
+    return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'best-move',
+      solutions: raw.solutions,
+      ...easier,
+    };
+  }
+  if (raw.type === 'setup') {
+    const target = compilePosition(relPath, `${fieldPath}.target.board`, raw.target, issues);
+    if (target === null) {
+      return null;
+    }
+    return { id: raw.id, concept, textKey, position, type: 'setup', target, ...easier };
   }
   return {
     id: raw.id,
@@ -223,6 +289,57 @@ function hasKidPiece(position: Position): boolean {
   return Object.values(position.pieces).some((piece) => piece.color === position.toMove);
 }
 
+/** Strips a trailing check/mate mark, matching the engine's own SAN comparison (`engine.ts`). */
+function normalizeSan(san: string): string {
+  return san.replace(/[+#]+$/, '');
+}
+
+function checkBestMoveShape(exercise: BestMoveDef, where: string, issues: string[]): void {
+  const legalSans = new Set(
+    rules
+      .legalMoves(exercise.position, { staticOpponent: true })
+      .map((move) => normalizeSan(move.san)),
+  );
+  for (const solution of exercise.solutions) {
+    if (!legalSans.has(normalizeSan(solution))) {
+      issues.push(`${where}: solution "${solution}" is not a legal move in the position`);
+    }
+  }
+}
+
+/** True when both piece maps hold exactly the same pieces on the same squares. */
+function piecesEqual(a: Position['pieces'], b: Position['pieces']): boolean {
+  const aEntries = Object.entries(a);
+  const bEntries = Object.entries(b);
+  if (aEntries.length !== bEntries.length) {
+    return false;
+  }
+  return aEntries.every(([square, piece]) => {
+    const other = b[square as Square];
+    return other !== undefined && other.color === piece.color && other.type === piece.type;
+  });
+}
+
+function checkSetupShape(exercise: SetupDef, where: string, issues: string[]): void {
+  const { position, target } = exercise;
+  if (target.markers.stars.length > 0 || target.markers.blocked.length > 0) {
+    issues.push(`${where}: setup target must not use star or blocked markers`);
+  }
+  for (const [square, piece] of Object.entries(position.pieces)) {
+    const targetPiece = target.pieces[square as Square];
+    if (
+      targetPiece === undefined ||
+      targetPiece.color !== piece.color ||
+      targetPiece.type !== piece.type
+    ) {
+      issues.push(`${where}: start piece at ${square} is not part of the target`);
+    }
+  }
+  if (piecesEqual(position.pieces, target.pieces)) {
+    issues.push(`${where}: setup target is the same as the start position`);
+  }
+}
+
 function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string[]): void {
   if (exercise.type === 'collect-stars') {
     if (exercise.position.markers.stars.length === 0) {
@@ -241,16 +358,28 @@ function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string
     checkOptimalMoves(exercise, where, issues);
     return;
   }
-  if ('squares' in exercise.answer) {
-    if (exercise.answer.squares.length === 0) {
-      issues.push(`${where}: select-squares answer is empty`);
+  if (exercise.type === 'select-squares') {
+    if ('squares' in exercise.answer) {
+      if (exercise.answer.squares.length === 0) {
+        issues.push(`${where}: select-squares answer is empty`);
+      }
+      return;
+    }
+    const fromPiece = exercise.position.pieces[exercise.answer.from];
+    if (fromPiece === undefined || fromPiece.color !== exercise.position.toMove) {
+      issues.push(`${where}: select-squares "from" square has no piece of the side to move`);
     }
     return;
   }
-  const fromPiece = exercise.position.pieces[exercise.answer.from];
-  if (fromPiece === undefined || fromPiece.color !== exercise.position.toMove) {
-    issues.push(`${where}: select-squares "from" square has no piece of the side to move`);
+  if (exercise.type === 'best-move') {
+    checkBestMoveShape(exercise, where, issues);
+    return;
   }
+  if (exercise.type === 'setup') {
+    checkSetupShape(exercise, where, issues);
+  }
+  // choice: uniqueness, answer membership and "text or piece" are schema-level (lesson-schema.ts).
+  // yes-no: the schema already guarantees a boolean answer and a valid (optional) focus square.
 }
 
 function checkOptimalMoves(
@@ -370,8 +499,21 @@ function validateSemantics(
       exerciseIds.add(exercise.id);
       claimId(exercise.id, exerciseWhere);
       checkTextKey(exercise.textKey, locales, exerciseWhere, issues);
-      if (!hasKidPiece(exercise.position)) {
+      // setup exercises typically start from an empty board: "side to move has a piece" doesn't apply.
+      if (exercise.type !== 'setup' && !hasKidPiece(exercise.position)) {
         issues.push(`${exerciseWhere}: side to move has no piece`);
+      }
+      if (exercise.type === 'choice') {
+        for (const option of exercise.options) {
+          if (option.textKey !== undefined) {
+            checkTextKey(
+              option.textKey,
+              locales,
+              `${exerciseWhere}: option "${option.id}"`,
+              issues,
+            );
+          }
+        }
       }
       checkExerciseShape(exercise, exerciseWhere, issues);
     }

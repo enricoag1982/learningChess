@@ -48,3 +48,24 @@
 .chess-star-pop {
   animation: chess-star-pop 280ms ease-out forwards;
 }
+
+/*
+ * best-move: a legal-but-wrong move attempt. The piece slides out to the tried square, holds
+ * there briefly (the Owl's spoken feedback plays over this), then slides back — the position
+ * itself never changes. 0%/100% match the CSS default (no transform), so this composes safely
+ * with an element that has no other transform set.
+ */
+@keyframes chess-piece-bounce {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  70% {
+    transform: var(--bounce-to, none);
+  }
+}
+
+.chess-piece-bounce {
+  animation: chess-piece-bounce 900ms ease-in-out;
+}

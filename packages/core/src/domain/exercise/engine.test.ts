@@ -2,18 +2,31 @@ import { describe, expect, it } from 'vitest';
 
 import { chessJsRules } from '../chess/chessjs-rules.ts';
 import { parseDiagram } from '../chess/diagram.ts';
+import type { Position } from '../chess/types.ts';
 import { createVariantRules } from '../variant/rules.ts';
 import {
+  answerChoice,
+  answerYesNo,
   exerciseMoves,
+  placePiece,
   playMove,
   requestHint,
+  setupPalette,
   starsFor,
   startExercise,
   submitSelection,
   toggleSquare,
   undo,
 } from './engine.ts';
-import type { CaptureDef, CollectStarsDef, SelectSquaresDef } from './types.ts';
+import type {
+  BestMoveDef,
+  CaptureDef,
+  ChoiceDef,
+  CollectStarsDef,
+  SelectSquaresDef,
+  SetupDef,
+  YesNoDef,
+} from './types.ts';
 
 const rules = createVariantRules(chessJsRules);
 
@@ -102,15 +115,20 @@ describe('collect-stars', () => {
 
     const hint1 = requestHint(state, rules);
     state = hint1.state;
-    expect(hint1.hint).toEqual({ level: 1, squares: ['a1'] });
+    expect(hint1.hint).toEqual({ kind: 'squares', level: 1, squares: ['a1'] });
 
     const hint2 = requestHint(state, rules);
     state = hint2.state;
-    expect(hint2.hint).toEqual({ level: 2, squares: ['a8'] });
+    expect(hint2.hint).toEqual({ kind: 'squares', level: 2, squares: ['a8'] });
 
     const hint3 = requestHint(state, rules);
     state = hint3.state;
-    expect(hint3.hint).toEqual({ level: 3, move: { from: 'a1', to: 'a8' }, squares: ['a1', 'a8'] });
+    expect(hint3.hint).toEqual({
+      kind: 'squares',
+      level: 3,
+      move: { from: 'a1', to: 'a8' },
+      squares: ['a1', 'a8'],
+    });
 
     expect(state.hintLevel).toBe(3);
     // A further request stays capped at level 3.
@@ -343,7 +361,7 @@ describe('select-squares', () => {
 
     const state = startExercise(def);
     const { hint } = requestHint(state, rules);
-    expect(hint).toEqual({ level: 1, squares: [] });
+    expect(hint).toEqual({ kind: 'squares', level: 1, squares: [] });
   });
 
   it('grades stars: 3 clean, 2 with one hint/error, 1 otherwise', () => {
@@ -384,5 +402,355 @@ describe('select-squares', () => {
     twoErrors = submitSelection(toggleSquare(twoErrors, 'd5'), rules).state; // now correct
     expect(twoErrors.errors).toBe(2);
     expect(starsFor(twoErrors)).toBe(1);
+  });
+});
+
+describe('yes-no', () => {
+  const position = parseDiagram(
+    [
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . p . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+    ].join('\n'),
+  );
+  const def: YesNoDef = {
+    id: 'yn1',
+    concept: 'hanging-piece',
+    textKey: 'yn1.text',
+    type: 'yes-no',
+    position,
+    answer: true,
+    focus: 'e4',
+  };
+
+  it('solves on the correct answer', () => {
+    const state = answerYesNo(startExercise(def), true);
+    expect(state.solved).toBe(true);
+    expect(starsFor(state)).toBe(3);
+  });
+
+  it('a wrong answer counts an error and can be retried', () => {
+    let state = answerYesNo(startExercise(def), false);
+    expect(state.errors).toBe(1);
+    expect(state.solved).toBe(false);
+
+    state = answerYesNo(state, true);
+    expect(state.solved).toBe(true);
+    expect(starsFor(state)).toBe(2);
+  });
+
+  it('is a no-op once solved', () => {
+    const solved = answerYesNo(startExercise(def), true);
+    expect(answerYesNo(solved, false)).toEqual(solved);
+  });
+
+  it('hint ladder: focus square, then a nudge, then reveal', () => {
+    let state = startExercise(def);
+
+    const hint1 = requestHint(state, rules);
+    expect(hint1.hint).toEqual({ kind: 'yes-no', level: 1, squares: ['e4'], reveal: false });
+    state = hint1.state;
+
+    const hint2 = requestHint(state, rules);
+    expect(hint2.hint).toEqual({ kind: 'yes-no', level: 2, squares: [], reveal: false });
+    state = hint2.state;
+
+    const hint3 = requestHint(state, rules);
+    expect(hint3.hint).toEqual({ kind: 'yes-no', level: 3, squares: ['e4'], reveal: true });
+  });
+
+  it('has no focus squares to highlight when the exercise sets none', () => {
+    const noFocus: YesNoDef = { ...def, focus: undefined };
+    const hint = requestHint(startExercise(noFocus), rules).hint;
+    expect(hint).toEqual({ kind: 'yes-no', level: 1, squares: [], reveal: false });
+  });
+});
+
+describe('choice', () => {
+  const position = parseDiagram(
+    [
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+    ].join('\n'),
+  );
+  const def: ChoiceDef = {
+    id: 'ch1',
+    concept: 'exchange',
+    textKey: 'ch1.text',
+    type: 'choice',
+    position,
+    showBoard: false,
+    options: [
+      { id: 'queen', textKey: 'ch1.queen' },
+      { id: 'rook', textKey: 'ch1.rook' },
+      { id: 'bishop', textKey: 'ch1.bishop' },
+    ],
+    answer: 'queen',
+  };
+
+  it('solves on the correct option', () => {
+    const state = answerChoice(startExercise(def), 'queen');
+    expect(state.solved).toBe(true);
+    expect(starsFor(state)).toBe(3);
+  });
+
+  it('a wrong pick counts an error and disables that option', () => {
+    let state = answerChoice(startExercise(def), 'rook');
+    expect(state.errors).toBe(1);
+    expect(state.wrongOptions).toEqual(['rook']);
+    expect(state.solved).toBe(false);
+
+    state = answerChoice(state, 'queen');
+    expect(state.solved).toBe(true);
+    expect(starsFor(state)).toBe(2);
+  });
+
+  it('picking the same wrong option twice only disables it once', () => {
+    let state = answerChoice(startExercise(def), 'rook');
+    state = answerChoice(state, 'rook');
+    expect(state.errors).toBe(2);
+    expect(state.wrongOptions).toEqual(['rook']);
+  });
+
+  it('is a no-op once solved', () => {
+    const solved = answerChoice(startExercise(def), 'queen');
+    expect(answerChoice(solved, 'rook')).toEqual(solved);
+  });
+
+  it('hint ladder removes one wrong option per level, then reveals', () => {
+    let state = startExercise(def);
+
+    const hint1 = requestHint(state, rules);
+    expect(hint1.hint).toMatchObject({ kind: 'choice', level: 1, reveal: false });
+    state = hint1.state;
+    expect(state.wrongOptions).toHaveLength(1);
+    expect(state.wrongOptions?.[0]).not.toBe('queen');
+
+    const hint2 = requestHint(state, rules);
+    state = hint2.state;
+    expect(state.wrongOptions).toHaveLength(2);
+    expect(state.wrongOptions).toEqual(expect.arrayContaining(['rook', 'bishop']));
+
+    const hint3 = requestHint(state, rules);
+    expect(hint3.hint).toEqual({ kind: 'choice', level: 3, reveal: true });
+  });
+
+  it('caps stars at 1 after a level-3 hint even with no errors', () => {
+    let state = startExercise(def);
+    state = requestHint(state, rules).state;
+    state = requestHint(state, rules).state;
+    state = requestHint(state, rules).state;
+    state = answerChoice(state, 'queen');
+    expect(starsFor(state)).toBe(1);
+  });
+});
+
+describe('best-move', () => {
+  const position = parseDiagram(
+    [
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      'R . . . . . . .',
+    ].join('\n'),
+  );
+  const def: BestMoveDef = {
+    id: 'bm1',
+    concept: 'rook-move',
+    textKey: 'bm1.text',
+    type: 'best-move',
+    position,
+    solutions: ['Ra8'],
+  };
+
+  it('solves with a listed solution move', () => {
+    const result = playMove(startExercise(def), rules, { from: 'a1', to: 'a8' });
+    expect(result.outcome).toMatchObject({ kind: 'solved' });
+    expect(result.state.solved).toBe(true);
+    expect(starsFor(result.state)).toBe(3);
+  });
+
+  it('a legal but wrong move counts an error and leaves the position unchanged', () => {
+    let state = startExercise(def);
+    const result = playMove(state, rules, { from: 'a1', to: 'h1' });
+    expect(result.outcome).toMatchObject({ kind: 'wrong' });
+    expect(result.outcome).toMatchObject({ move: { from: 'a1', to: 'h1' } });
+    state = result.state;
+    expect(state.errors).toBe(1);
+    expect(state.solved).toBe(false);
+    expect(state.position).toEqual(position);
+
+    const solved = playMove(state, rules, { from: 'a1', to: 'a8' });
+    expect(solved.outcome.kind).toBe('solved');
+    expect(starsFor(solved.state)).toBe(2); // one earlier error caps the solve at 2 stars
+  });
+
+  it('an illegal move behaves as usual (not a "wrong" outcome)', () => {
+    const result = playMove(startExercise(def), rules, { from: 'a1', to: 'b2' });
+    expect(result.outcome).toEqual({ kind: 'illegal' });
+    expect(result.state.errors).toBe(1);
+  });
+
+  it('matches a solution regardless of a trailing check/mate mark', () => {
+    const checkDef: BestMoveDef = { ...def, solutions: ['Ra8+'] };
+    const result = playMove(startExercise(checkDef), rules, { from: 'a1', to: 'a8' });
+    expect(result.outcome.kind).toBe('solved');
+  });
+
+  it('hint ladder: piece, target square, then the move (from the first solution)', () => {
+    let state = startExercise(def);
+
+    const hint1 = requestHint(state, rules);
+    expect(hint1.hint).toEqual({ kind: 'squares', level: 1, squares: ['a1'] });
+    state = hint1.state;
+
+    const hint2 = requestHint(state, rules);
+    expect(hint2.hint).toEqual({ kind: 'squares', level: 2, squares: ['a8'] });
+    state = hint2.state;
+
+    const hint3 = requestHint(state, rules);
+    expect(hint3.hint).toEqual({
+      kind: 'squares',
+      level: 3,
+      move: { from: 'a1', to: 'a8' },
+      squares: ['a1', 'a8'],
+    });
+  });
+});
+
+describe('setup', () => {
+  const emptyPosition: Position = {
+    pieces: {},
+    markers: { stars: [], blocked: [] },
+    toMove: 'w',
+    castling: '-',
+    enPassant: null,
+  };
+  const target = parseDiagram(
+    [
+      '. . . . . . . r',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      '. . . . . . . .',
+      'R . . . . . . .',
+    ].join('\n'),
+  );
+  const def: SetupDef = {
+    id: 'su1',
+    concept: 'board-setup',
+    textKey: 'su1.text',
+    type: 'setup',
+    position: emptyPosition,
+    target,
+  };
+
+  it('lists remaining target pieces in board reading order, grouped with counts', () => {
+    expect(setupPalette(startExercise(def))).toEqual([
+      { color: 'b', type: 'r', count: 1 },
+      { color: 'w', type: 'r', count: 1 },
+    ]);
+  });
+
+  it('places a piece on its correct, free target square', () => {
+    const result = placePiece(startExercise(def), 'h8', { color: 'b', type: 'r' });
+    expect(result.outcome).toEqual({
+      kind: 'placed',
+      square: 'h8',
+      piece: { color: 'b', type: 'r' },
+    });
+    expect(result.state.position.pieces.h8).toEqual({ color: 'b', type: 'r' });
+    expect(result.state.solved).toBe(false);
+  });
+
+  it('is solved once every target piece is placed', () => {
+    let state = startExercise(def);
+    state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state;
+    const result = placePiece(state, 'a1', { color: 'w', type: 'r' });
+    expect(result.outcome.kind).toBe('solved');
+    expect(result.state.solved).toBe(true);
+    expect(starsFor(result.state)).toBe(3);
+  });
+
+  it('a wrong piece for the square counts an error and places nothing', () => {
+    const result = placePiece(startExercise(def), 'a1', { color: 'b', type: 'r' });
+    expect(result.outcome).toEqual({
+      kind: 'wrong',
+      square: 'a1',
+      piece: { color: 'b', type: 'r' },
+    });
+    expect(result.state.errors).toBe(1);
+    expect(result.state.position.pieces.a1).toBeUndefined();
+  });
+
+  it('placing on an already-occupied square counts an error', () => {
+    let state = startExercise(def);
+    state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state;
+    const result = placePiece(state, 'h8', { color: 'b', type: 'r' });
+    expect(result.outcome.kind).toBe('wrong');
+    expect(result.state.errors).toBe(1);
+  });
+
+  it('hint ladder: next palette piece, then its square, then places it', () => {
+    let state = startExercise(def);
+
+    const hint1 = requestHint(state, rules);
+    expect(hint1.hint).toEqual({
+      kind: 'setup',
+      level: 1,
+      piece: { color: 'b', type: 'r' },
+      placed: false,
+    });
+    state = hint1.state;
+
+    const hint2 = requestHint(state, rules);
+    expect(hint2.hint).toEqual({
+      kind: 'setup',
+      level: 2,
+      piece: { color: 'b', type: 'r' },
+      square: 'h8',
+      placed: false,
+    });
+    state = hint2.state;
+
+    const hint3 = requestHint(state, rules);
+    expect(hint3.hint).toEqual({
+      kind: 'setup',
+      level: 3,
+      piece: { color: 'b', type: 'r' },
+      square: 'h8',
+      placed: true,
+    });
+    state = hint3.state;
+    expect(state.position.pieces.h8).toEqual({ color: 'b', type: 'r' });
+    expect(setupPalette(state)).toEqual([{ color: 'w', type: 'r', count: 1 }]);
+  });
+
+  it('grades stars: allows up to 2 errors for 2 stars (placing many pieces invites slips)', () => {
+    let state = startExercise(def);
+    state = placePiece(state, 'a1', { color: 'b', type: 'r' }).state; // wrong, error 1
+    state = placePiece(state, 'h8', { color: 'w', type: 'r' }).state; // wrong, error 2
+    state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state; // correct
+    state = placePiece(state, 'a1', { color: 'w', type: 'r' }).state; // correct, solved
+    expect(state.errors).toBe(2);
+    expect(state.solved).toBe(true);
+    expect(starsFor(state)).toBe(2);
   });
 });

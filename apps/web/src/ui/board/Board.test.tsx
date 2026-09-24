@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { chessJsRules, parseDiagram } from '@chess-kids/core';
 import type { Move, Square } from '@chess-kids/core';
 import '../../i18n.ts';
@@ -150,6 +150,43 @@ describe('Board — square mode', () => {
     expect(onMove).not.toHaveBeenCalled();
     // No tap-tap selection visuals in square mode.
     expect(cell('d5').getAttribute('aria-label')).toBe('d5, white rook');
+  });
+});
+
+describe('Board — highlights', () => {
+  it('marks a focus square with "look here", independent of hint/wrong', () => {
+    render(
+      <Board
+        position={POSITION}
+        legalMoves={[]}
+        highlights={{ focus: ['d5'] }}
+        label="Chess board"
+      />,
+    );
+    expect(cell('d5').getAttribute('aria-label')).toBe('d5, white rook, look here');
+    expect(cell('a1').getAttribute('aria-label')).toBe('a1, empty');
+  });
+
+  it('best-move: a new wrongMove bounces the piece to `to` and back, without moving it in the data', async () => {
+    const { rerender } = render(
+      <Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />,
+    );
+    expect(cell('d5').getAttribute('aria-label')).toBe('d5, white rook');
+
+    rerender(
+      <Board
+        position={POSITION}
+        legalMoves={LEGAL_MOVES}
+        highlights={{ wrongMove: { from: 'd5', to: 'd1' } }}
+        label="Chess board"
+      />,
+    );
+
+    // The piece still lives at d5 in `position`; the animation is purely visual.
+    await waitFor(() => {
+      expect(cell('d5').querySelector('.chess-piece-bounce')).not.toBeNull();
+    });
+    expect(cell('d1').getAttribute('aria-label')).toBe('d1, empty');
   });
 });
 

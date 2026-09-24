@@ -29,6 +29,13 @@ export interface BoardHighlights {
   readonly wrong?: readonly Square[];
   /** Squares of the move just played, for the slide/fade animation and a soft tint. */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
+  /** Steady (non-pulsing) ring, always shown: yes-no exercises' question square. */
+  readonly focus?: readonly Square[];
+  /**
+   * best-move exercises: a legal-but-wrong move attempt. The piece at `from` slides to `to` and
+   * bounces back; the position itself never changes, so this is a distinct field from `lastMove`.
+   */
+  readonly wrongMove?: { readonly from: Square; readonly to: Square };
 }
 
 export interface BoardProps {
@@ -65,6 +72,7 @@ function describeSquare(
   position: Position,
   selected: boolean,
   target: boolean,
+  focus: boolean,
 ): string {
   const piece = position.pieces[square];
   let base: string;
@@ -83,6 +91,7 @@ function describeSquare(
   }
   if (selected) return t('board.square.selected', { base });
   if (target) return t('board.square.possible-move', { base });
+  if (focus) return t('board.square.focus', { base });
   return base;
 }
 
@@ -99,6 +108,12 @@ interface DragState {
 }
 
 interface SlideState {
+  readonly square: Square;
+  readonly dx: number;
+  readonly dy: number;
+}
+
+interface BounceState {
   readonly square: Square;
   readonly dx: number;
   readonly dy: number;
@@ -135,6 +150,7 @@ export function Board({
   const [focusSquare, setFocusSquare] = useState<Square>('a8');
   const [drag, setDrag] = useState<DragState | null>(null);
   const [slide, setSlide] = useState<SlideState | null>(null);
+  const [bounce, setBounce] = useState<BounceState | null>(null);
   const [captureFade, setCaptureFade] = useState<CaptureFadeState | null>(null);
   const [starPop, setStarPop] = useState<Square | null>(null);
 
@@ -187,6 +203,24 @@ export function Board({
       setSlide(null);
       setCaptureFade(null);
       setStarPop(null);
+    }
+  }
+
+  // Same render-time-adjustment pattern, keyed on `highlights.wrongMove` instead of `position`:
+  // a best-move exercise's wrong-but-legal attempt never changes the position, so a new object
+  // reference here (set by the caller for each attempt) is the only signal a bounce should play.
+  const [prevWrongMove, setPrevWrongMove] = useState(highlights?.wrongMove);
+  if (highlights?.wrongMove !== prevWrongMove) {
+    setPrevWrongMove(highlights?.wrongMove);
+    const wrongMove = highlights?.wrongMove;
+    if (wrongMove) {
+      const fromCell = squareToCell(wrongMove.from, orientation);
+      const toCell = squareToCell(wrongMove.to, orientation);
+      const dx = toCell.col - fromCell.col;
+      const dy = toCell.row - fromCell.row;
+      setBounce(dx !== 0 || dy !== 0 ? { square: wrongMove.from, dx, dy } : null);
+    } else {
+      setBounce(null);
     }
   }
 
@@ -373,6 +407,7 @@ export function Board({
                   lastMove !== undefined && (lastMove.from === square || lastMove.to === square);
                 const isHint = highlights?.hint?.includes(square) ?? false;
                 const isWrong = highlights?.wrong?.includes(square) ?? false;
+                const isFocus = highlights?.focus?.includes(square) ?? false;
                 const isStar = position.markers.stars.includes(square);
                 const isBlocked = position.markers.blocked.includes(square);
                 const isDraggingThis = drag?.from === square && drag.dragging;
@@ -382,6 +417,7 @@ export function Board({
                   position,
                   tapSelected || squareModeSelected,
                   isTarget,
+                  isFocus,
                 );
 
                 return (
@@ -438,16 +474,25 @@ export function Board({
                           aria-hidden="true"
                           className={`pointer-events-none absolute inset-[2%] ${
                             slide?.square === square ? 'chess-piece-slide' : ''
-                          }`}
+                          } ${bounce?.square === square ? 'chess-piece-bounce' : ''}`}
                           style={
                             slide?.square === square
                               ? ({
                                   '--slide-from': `translate(${String(slide.dx * 100)}%, ${String(slide.dy * 100)}%)`,
+                                  // A translated piece must paint over every square, including
+                                  // later siblings in DOM order (e.g. sliding right-to-left).
+                                  zIndex: 20,
                                 } as CSSProperties)
-                              : undefined
+                              : bounce?.square === square
+                                ? ({
+                                    '--bounce-to': `translate(${String(bounce.dx * 100)}%, ${String(bounce.dy * 100)}%)`,
+                                    zIndex: 20,
+                                  } as CSSProperties)
+                                : undefined
                           }
                           onAnimationEnd={() => {
                             setSlide((current) => (current?.square === square ? null : current));
+                            setBounce((current) => (current?.square === square ? null : current));
                           }}
                         >
                           <PieceIcon piece={piece} />
@@ -512,6 +557,12 @@ export function Board({
                         <span
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-[6%] rounded-md border-4 border-today"
+                        />
+                      )}
+                      {isFocus && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-[6%] rounded-md border-4 border-info"
                         />
                       )}
 

@@ -61,6 +61,11 @@ export function playGameMove(
   if (outcome.kind === 'illegal') {
     return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
   }
+  if (outcome.kind === 'wrong') {
+    // Mini-games are always `capture` exercises (see `toCaptureDef`): `playMove` never produces
+    // this outcome for them (best-move only). Handled for exhaustiveness, not reachability.
+    return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
+  }
 
   const captured = outcome.captured === undefined ? {} : { captured: outcome.captured };
   if (outcome.kind === 'solved') {

@@ -13,13 +13,21 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 
-// Dev-only board playground at /#board; dynamically imported so it never reaches the production
-// bundle (see src/dev/BoardPlayground.tsx).
+// Dev-only board / exercise playgrounds at /#board and /#exercises; dynamically imported so
+// neither reaches the production bundle (see src/dev/BoardPlayground.tsx, ExercisePlayground.tsx).
 if (import.meta.env.DEV && location.hash === '#board') {
   void import('./dev/BoardPlayground.tsx').then(({ BoardPlayground }) => {
     root.render(
       <StrictMode>
         <BoardPlayground />
+      </StrictMode>,
+    );
+  });
+} else if (import.meta.env.DEV && location.hash === '#exercises') {
+  void import('./dev/ExercisePlayground.tsx').then(({ ExercisePlayground }) => {
+    root.render(
+      <StrictMode>
+        <ExercisePlayground />
       </StrictMode>,
     );
   });
