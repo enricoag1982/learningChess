@@ -201,6 +201,8 @@ export {
   isAttacked,
   isDefended,
   isHanging,
+  isSafe,
+  pieceValue,
   isInCheck,
   isCheckmate,
   isStalemate,

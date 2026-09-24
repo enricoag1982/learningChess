@@ -1,0 +1,25 @@
+id: win-the-queen
+concept: exchange
+unlockAfter: trades
+mode: versus
+title: win-the-queen.title
+goal: win-the-queen.goal
+board: |
+  r n b q . b n r
+  p p p p p p p p
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  P P P P P P P P
+  R N B Q . B N R
+rules:
+  kings: false
+  noMoves: lose
+  win:
+    kid: [{ capture: q }]
+    opponent: [{ capture: q }]
+moveLimit: 40
+opponent:
+  bot: 1
+par: 10

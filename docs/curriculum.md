@@ -36,7 +36,7 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 |---|---|---|---|---|---|---|---|
 | 11 | Attack | `attack` | What a piece attacks; attack a piece with a move | sel, best | 8 | A | Queen vs Pawns |
 | 12 | Defend | `defend` | Protect an attacked piece: move away, defend, block | best, yn | 8 | A | — |
-| 13 | Safe or not? | `hanging-piece` | Spot unprotected attacked pieces; take free pieces | yn, best | 10 | A+L | Safe or Not? |
+| 13 | Safe or not? (id `safe-pieces`) | `hanging-piece` | Spot unprotected attacked pieces; take free pieces | yn, best | 10 | A+L | Safe or Not? |
 | 14 | Piece values | `piece-value` | P1 N3 B3 R5 Q9 | ch | 6 | A | — |
 | 15 | Trades | `exchange` | Good / equal / bad trade | ch, best | 8 | A | Army Battle |
 | — | World boss | — | — | — | — | — | Win the Queen |
@@ -114,7 +114,7 @@ Guided tries (~2 per lesson) and easier variants add ~30% authoring.
 | King Walk | 2 | King + enemy pieces | Reach square without being capturable | static |
 | Knight Maze | 2 | Knight + blocked squares | Reach target | — |
 | Pawn Wars (4 / 8 pawns) | 2 | Pawns only | Promote or capture all | bot 1 |
-| Queen vs Pawns | 3 | Q vs 8 pawns | Capture all pawns | bot 1 |
+| Queen vs Pawns | 3 | Q (d1) vs 4 pawns (b7 d7 f7 h7); 8 pawns measured too hard (bear stand-in < 50%), possible later variant | Capture all pawns | bot 1 |
 | Safe or Not? | 3 | Series of positions | 10 correct answers | — |
 | Army Battle | 3 | Pawns + 1 piece type each, no kings | Capture all | bot 1 |
 | Win the Queen | 3 | Full set, no kings | Capture the queen | bot 1 |

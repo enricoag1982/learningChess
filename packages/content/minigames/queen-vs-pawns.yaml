@@ -1,0 +1,25 @@
+id: queen-vs-pawns
+concept: attack
+unlockAfter: attack
+mode: versus
+title: queen-vs-pawns.title
+goal: queen-vs-pawns.goal
+board: |
+  . . . . . . . .
+  . p . p . p . p
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . Q . . . .
+rules:
+  kings: false
+  noMoves: lose
+  win:
+    kid: [capture-all]
+    opponent: [promote, capture-all]
+moveLimit: 20
+opponent:
+  bot: 1
+par: 8

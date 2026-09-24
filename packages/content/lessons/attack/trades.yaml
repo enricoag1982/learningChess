@@ -1,0 +1,190 @@
+id: trades
+world: attack
+order: 5
+concept: exchange
+character: owl
+title: trades.title
+story: trades.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    R . . . . . . q
+  text: trades.demo
+  highlight: squares h1
+guided:
+  - id: trades-g1
+    type: choice
+    text: trades-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . q
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: good
+    verify: trade Rxh1
+  - id: trades-g2
+    type: best-move
+    text: trades-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . n .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    solutions: [Bxg5]
+    verify: good-trade
+exercises:
+  - id: trades-01
+    type: choice
+    text: trades-01
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . p . . .
+      . . . r . . . .
+      . . . . . . . .
+      . . N . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: good
+    verify: trade Nxd5
+  - id: trades-02
+    type: choice
+    text: trades-02
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      R . . . . . . p
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: bad
+    verify: trade Rxh1
+  - id: trades-03
+    type: choice
+    text: trades-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      R . . . . . . r
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: equal
+    verify: trade Rxh1
+  - id: trades-04
+    type: choice
+    text: trades-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . p . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: good
+    verify: trade Bxf4
+  - id: trades-05
+    type: choice
+    text: trades-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . p . . . . . .
+      . . p . . . . .
+      . . . . . . . .
+      . N . . . . . .
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: bad
+    verify: trade Nxc3
+  - id: trades-06
+    type: choice
+    text: trades-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . p . . . . . .
+      . . n . . . . .
+      . . . . . . . .
+      . N . . . . . .
+    options:
+      - { id: good, text: trade-good }
+      - { id: equal, text: trade-equal }
+      - { id: bad, text: trade-bad }
+    answer: equal
+    verify: trade Nxc3
+  - id: trades-07
+    type: best-move
+    text: trades-07
+    board: |
+      q . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      R . . . . . . r
+    solutions: [Rxa8]
+    verify: good-trade
+  - id: trades-08
+    type: best-move
+    text: trades-08
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . q . .
+      n . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    solutions: [Bxa3, Bxf4]
+    verify: good-trade
+boss: army-battle

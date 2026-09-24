@@ -1,0 +1,166 @@
+id: piece-values
+world: attack
+order: 4
+concept: piece-value
+character: owl
+title: piece-values.title
+story: piece-values.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    P N B R Q . . .
+  text: piece-values.demo
+  highlight: squares a1 b1 c1 d1 e1
+guided:
+  - id: piece-values-g1
+    type: choice
+    text: piece-values-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      P . . . . . . R
+    options:
+      - { id: pawn, piece: P }
+      - { id: rook, piece: R }
+    answer: rook
+    verify: higher-value
+  - id: piece-values-g2
+    type: choice
+    text: piece-values-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      N . . . . . . Q
+    options:
+      - { id: knight, piece: N }
+      - { id: queen, piece: Q }
+    answer: queen
+    verify: higher-value
+exercises:
+  - id: piece-values-01
+    type: choice
+    text: piece-values-01
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      P . . . . . . N
+    options:
+      - { id: pawn, piece: P }
+      - { id: knight, piece: N }
+    answer: knight
+    verify: higher-value
+  - id: piece-values-02
+    type: choice
+    text: piece-values-02
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      B . . . . . . R
+    options:
+      - { id: bishop, piece: B }
+      - { id: rook, piece: R }
+    answer: rook
+    verify: higher-value
+  - id: piece-values-03
+    type: choice
+    text: piece-values-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . Q
+    options:
+      - { id: rook, piece: R }
+      - { id: queen, piece: Q }
+    answer: queen
+    verify: higher-value
+  - id: piece-values-04
+    type: choice
+    text: piece-values-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      P N B R Q . . .
+    options:
+      - { id: pawn, piece: P }
+      - { id: knight, piece: N }
+      - { id: bishop, piece: B }
+      - { id: rook, piece: R }
+      - { id: queen, piece: Q }
+    answer: rook
+    verify: worth 5
+  - id: piece-values-05
+    type: choice
+    text: piece-values-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      P N B R Q . . .
+    options:
+      - { id: pawn, piece: P }
+      - { id: knight, piece: N }
+      - { id: bishop, piece: B }
+      - { id: rook, piece: R }
+      - { id: queen, piece: Q }
+    answer: queen
+    verify: worth 9
+  - id: piece-values-06
+    type: choice
+    text: piece-values-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      P N B R Q . . .
+    options:
+      - { id: pawn, piece: P }
+      - { id: knight, piece: N }
+      - { id: bishop, piece: B }
+      - { id: rook, piece: R }
+      - { id: queen, piece: Q }
+    answer: pawn
+    verify: worth 1

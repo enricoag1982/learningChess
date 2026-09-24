@@ -201,6 +201,110 @@ function validChoiceHigherValueExercise(
   };
 }
 
+/** Knight g1, enemy rook e5: only Nf3 newly attacks e5 (Ne2/Nh3 don't). */
+function validAttackVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ g1: 'N', e5: 'r' }),
+    solutions: ['Nf3'],
+    verify: 'attack e5',
+    ...overrides,
+  };
+}
+
+/** Knight a1 attacked (undefended) by the rook on a8: either escape (Nb3/Nc2) saves it. */
+function validSaveVerifyExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ a1: 'N', a8: 'r' }),
+    solutions: ['Nb3', 'Nc2'],
+    verify: 'save a1',
+    ...overrides,
+  };
+}
+
+/**
+ * Rook a1: an undefended pawn on a8 and a knight-defended pawn on h1 — only Rxa8 is take-free.
+ * (Not a bishop on g2: that square sits on the same a8-h1 diagonal, so it would defend both ends.)
+ */
+function validTakeFreeVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ a1: 'R', a8: 'p', h1: 'p', f2: 'n' }),
+    solutions: ['Rxa8'],
+    verify: 'take-free',
+    ...overrides,
+  };
+}
+
+/**
+ * Rook a1: an undefended queen on a8 (good trade regardless) and a knight-defended rook on h1
+ * (equal value, defended: not a good trade). See `validTakeFreeVerifyExercise` on why a knight,
+ * not a bishop, defends h1 here.
+ */
+function validGoodTradeVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ a1: 'R', a8: 'q', h1: 'r', f2: 'n' }),
+    solutions: ['Rxa8'],
+    verify: 'good-trade',
+    ...overrides,
+  };
+}
+
+/** Rook vs. queen options: a "worth 9" choice exercise (only the queen is worth 9). */
+function validChoiceWorthExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'choice',
+    text: 'demo-01',
+    board: diagram({ a1: 'R' }),
+    options: [
+      { id: 'rook', piece: 'R' },
+      { id: 'queen', piece: 'Q' },
+    ],
+    answer: 'queen',
+    verify: 'worth 9',
+    ...overrides,
+  };
+}
+
+/** Rook a1 capturing the queen on h1: a "good" trade (queen worth more than the rook). */
+function validChoiceTradeExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'choice',
+    text: 'demo-01',
+    board: diagram({ a1: 'R', h1: 'q' }),
+    options: [
+      { id: 'good', text: 'demo-01' },
+      { id: 'equal', text: 'demo-01' },
+      { id: 'bad', text: 'demo-01' },
+    ],
+    answer: 'good',
+    verify: 'trade Rxh1',
+    ...overrides,
+  };
+}
+
 function validLesson(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 'demo-lesson',
@@ -946,6 +1050,42 @@ describe('loadContent', () => {
       ).toBe(true);
     });
 
+    it('rejects "not hanging" on a defended piece attacked by a cheaper piece', () => {
+      // Black queen e4, defended by the rook e8, attacked by the white pawn d3: not hanging, but
+      // not safe either (pawn takes queen).
+      writeLesson({
+        exercises: [
+          validYesNoHangingExercise({
+            board: diagram({ e4: 'q', e8: 'r', d3: 'P', a1: 'K', h8: 'k' }),
+            answer: 'no',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('attacked by a cheaper piece'))).toBe(true);
+    });
+
+    it('accepts "not hanging" on a defended piece attacked by an equal or dearer piece', () => {
+      // White knight d4 attacked by the black queen d8, defended by the pawn c3: safe.
+      writeLesson({
+        exercises: [
+          validYesNoHangingExercise({
+            board: diagram({ d4: 'N', d8: 'q', c3: 'P', a1: 'K', h8: 'k' }),
+            answer: 'no',
+            focus: 'd4',
+            verify: 'hanging d4',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
     it('accepts "in-check" with no square', () => {
       writeLesson({
         exercises: [
@@ -1021,6 +1161,342 @@ describe('loadContent', () => {
       expect(issues.some((issue) => issue.includes('requires a unique highest-value option'))).toBe(
         true,
       );
+    });
+  });
+
+  describe('best-move: verify attack', () => {
+    it('loads a valid "attack" verify with no issues', () => {
+      writeLesson({ exercises: [validAttackVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a target square that is not an enemy piece', () => {
+      writeLesson({
+        exercises: [validAttackVerifyExercise({ board: diagram({ g1: 'N' }) })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "attack e5" requires an enemy piece on e5')),
+      ).toBe(true);
+    });
+
+    it('reports an empty computed set when no legal move attacks the target', () => {
+      writeLesson({
+        exercises: [
+          validAttackVerifyExercise({
+            board: diagram({ g1: 'N', a8: 'r' }),
+            verify: 'attack a8',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "attack a8" computed no matching move')),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validAttackVerifyExercise({ solutions: ['Nh3'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "attack e5"') &&
+            issue.includes('solutions should be [Nf3]') &&
+            issue.includes('authored [Nh3]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify save', () => {
+    it('loads a valid "save" verify with no issues', () => {
+      writeLesson({ exercises: [validSaveVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it("rejects a target square that is not the kid's own piece", () => {
+      writeLesson({
+        exercises: [
+          validSaveVerifyExercise({ board: diagram({ a1: 'n', h1: 'P' }), solutions: ['h2'] }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('verify "save a1" requires the kid\'s own piece on a1'),
+        ),
+      ).toBe(true);
+    });
+
+    it('rejects a piece that is already safe', () => {
+      writeLesson({
+        exercises: [validSaveVerifyExercise({ board: diagram({ a1: 'N', a8: 'r', b2: 'Q' }) })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('verify "save a1" requires that piece to not be safe yet'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validSaveVerifyExercise({ solutions: ['Nb3'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "save a1"') &&
+            issue.includes('solutions should be [Nb3, Nc2]') &&
+            issue.includes('authored [Nb3]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify take-free', () => {
+    it('loads a valid "take-free" verify with no issues', () => {
+      writeLesson({ exercises: [validTakeFreeVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports an empty computed set when every capture is defended', () => {
+      writeLesson({
+        exercises: [
+          validTakeFreeVerifyExercise({
+            board: diagram({ a1: 'R', h1: 'r', g2: 'b' }),
+            solutions: ['Rxh1'],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "take-free" computed no matching move')),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validTakeFreeVerifyExercise({ solutions: ['Rxh1'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "take-free"') &&
+            issue.includes('solutions should be [Rxa8]') &&
+            issue.includes('authored [Rxh1]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify good-trade', () => {
+    it('loads a valid "good-trade" verify with no issues', () => {
+      writeLesson({ exercises: [validGoodTradeVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validGoodTradeVerifyExercise({ solutions: ['Rxh1'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "good-trade"') &&
+            issue.includes('solutions should be [Rxa8]') &&
+            issue.includes('authored [Rxh1]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('choice: verify worth', () => {
+    it('loads a valid "worth" verify with no issues', () => {
+      writeLesson({ exercises: [validChoiceWorthExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a text-only option (no piece to value)', () => {
+      writeLesson({
+        exercises: [
+          validChoiceWorthExercise({
+            options: [
+              { id: 'rook', piece: 'R' },
+              { id: 'other', text: 'demo-01' },
+            ],
+            answer: 'rook',
+            verify: 'worth 5',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('requires every option to be a piece'))).toBe(
+        true,
+      );
+    });
+
+    it('rejects a value with no unique matching option', () => {
+      writeLesson({
+        exercises: [
+          validChoiceWorthExercise({
+            options: [
+              { id: 'bishop', piece: 'B' },
+              { id: 'knight', piece: 'N' },
+            ],
+            answer: 'bishop',
+            verify: 'worth 3',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('requires exactly one option worth 3'))).toBe(
+        true,
+      );
+    });
+
+    it('rejects an answer that is not the matching-value option', () => {
+      writeLesson({ exercises: [validChoiceWorthExercise({ answer: 'rook' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('answer should be "queen"'))).toBe(true);
+    });
+  });
+
+  describe('choice: verify trade', () => {
+    it('loads a valid "good" trade verify with no issues', () => {
+      writeLesson({ exercises: [validChoiceTradeExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid "equal" trade verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validChoiceTradeExercise({
+            board: diagram({ a1: 'R', h1: 'r', g2: 'b' }),
+            answer: 'equal',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid "bad" trade verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validChoiceTradeExercise({
+            board: diagram({ a1: 'R', h1: 'p', g2: 'b' }),
+            answer: 'bad',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects options that are not exactly "good"/"equal"/"bad"', () => {
+      writeLesson({
+        exercises: [
+          validChoiceTradeExercise({
+            options: [
+              { id: 'good', text: 'demo-01' },
+              { id: 'meh', text: 'demo-01' },
+            ],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('requires options ids "good", "equal", "bad"')),
+      ).toBe(true);
+    });
+
+    it('rejects a move that is not a legal capture', () => {
+      writeLesson({
+        exercises: [validChoiceTradeExercise({ board: diagram({ a1: 'R' }) })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "trade Rxh1" is not a legal capture')),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the classification and the authored answer', () => {
+      writeLesson({ exercises: [validChoiceTradeExercise({ answer: 'bad' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "trade Rxh1" classifies as "good"') &&
+            issue.includes('answer is "bad"'),
+        ),
+      ).toBe(true);
     });
   });
 
