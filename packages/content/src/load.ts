@@ -154,6 +154,45 @@ function validateNode(
   return result;
 }
 
+/** Looks up a dot-separated key path in a locale tree (e.g. `tracks.basics`). */
+export function hasKeyPath(tree: LocaleTree, dotPath: string): boolean {
+  let node: LocaleTree | string = tree;
+  for (const segment of dotPath.split('.')) {
+    if (typeof node === 'string') {
+      return false;
+    }
+    const child: LocaleTree | string | undefined = node[segment];
+    if (child === undefined) {
+      return false;
+    }
+    node = child;
+  }
+  return typeof node === 'string';
+}
+
+/**
+ * Checks that `fullKey` (e.g. `journey:tracks.basics`) resolves to a leaf in the `en` locale — a
+ * pluralized leaf (`<key>_other`, always present per CLDR) satisfies a plain (non-suffixed) key too.
+ */
+export function checkTextKey(
+  fullKey: string,
+  locales: Locales,
+  where: string,
+  issues: string[],
+): void {
+  const separatorIndex = fullKey.indexOf(':');
+  const namespace = separatorIndex < 0 ? '' : fullKey.slice(0, separatorIndex);
+  const dotPath = separatorIndex < 0 ? '' : fullKey.slice(separatorIndex + 1);
+  const tree = locales.en?.[namespace];
+  const resolves =
+    tree !== undefined &&
+    dotPath !== '' &&
+    (hasKeyPath(tree, dotPath) || hasKeyPath(tree, `${dotPath}_other`));
+  if (!resolves) {
+    issues.push(`${where}: missing text key "${fullKey}" in en locale`);
+  }
+}
+
 /** Flattened, sorted dot paths of every leaf in a locale tree. */
 export function keyPaths(tree: LocaleTree): string[] {
   const paths: string[] = [];

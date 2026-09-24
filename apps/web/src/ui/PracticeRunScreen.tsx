@@ -27,6 +27,7 @@ export function PracticeRunScreen(): JSX.Element {
       tasks={practiceTasks}
       headerText={headerText}
       closeAriaLabel={t('session.leave')}
+      reviewSource={practiceConceptId === null ? 'warmup' : 'practice'}
       onDone={exitPracticeRun}
       onClose={exitPracticeRun}
     />

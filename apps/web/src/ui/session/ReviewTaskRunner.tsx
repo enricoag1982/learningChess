@@ -54,6 +54,8 @@ export interface ReviewTaskRunnerProps {
   /** e.g. "Warm-up {{current}}/{{total}}" (warm-up) or "Practice {{current}}/{{total}}" (Practice). */
   readonly headerText: (current: number, total: number) => string;
   readonly closeAriaLabel: string;
+  /** Threaded into every `recordReviewResult` call (rewards.md §4 "Warm-up Champ"). */
+  readonly reviewSource: 'warmup' | 'practice';
   /** Called once every task is solved and its result saved. */
   readonly onDone: () => void;
   /** Top-bar Close: leaves the run early (kid can leave any time). */
@@ -69,6 +71,7 @@ export function ReviewTaskRunner({
   tasks,
   headerText,
   closeAriaLabel,
+  reviewSource,
   onDone,
   onClose,
 }: ReviewTaskRunnerProps): JSX.Element {
@@ -108,7 +111,12 @@ export function ReviewTaskRunner({
       <TaskDots current={index} total={tasks.length} />
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <ReviewExerciseStep key={task.exercise.id} task={task} onNext={advance} />
+        <ReviewExerciseStep
+          key={task.exercise.id}
+          task={task}
+          reviewSource={reviewSource}
+          onNext={advance}
+        />
       </div>
     </main>
   );

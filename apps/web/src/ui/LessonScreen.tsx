@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { lessonSteps, saveResumeStep, stepPhase, totalStars } from '@chess-kids/core';
@@ -80,6 +80,7 @@ export function LessonScreen(): JSX.Element {
   const goToStep = useAppStore((state) => state.goToStep);
   const exitLesson = useAppStore((state) => state.exitLesson);
   const completeLessonActivity = useAppStore((state) => state.completeLessonActivity);
+  const checkForCelebrations = useAppStore((state) => state.checkForCelebrations);
 
   const lesson = lessonId ? services.deps.content.lesson(lessonId) : undefined;
   const steps = useMemo(
@@ -87,6 +88,15 @@ export function LessonScreen(): JSX.Element {
     [lesson, services],
   );
   const step = steps[stepIndex];
+
+  // rewards.md §4 "lesson complete" celebration moment: the exercise/boss use cases already wrote
+  // any newly earned badge (`checkRewards`, app layer) by the time this step renders — this just
+  // picks it up and queues it (`checkForCelebrations`), capped and deduped by the store itself.
+  useEffect(() => {
+    if (step?.kind === 'complete') {
+      void checkForCelebrations();
+    }
+  }, [step?.kind, checkForCelebrations]);
 
   if (!lesson || !step || !profile) {
     return <main className="min-h-screen bg-cream" />;

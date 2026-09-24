@@ -23,6 +23,8 @@ import { NextButton } from '../lesson/NextButton.tsx';
 
 export interface ReviewExerciseStepProps {
   readonly task: ConceptTask;
+  /** Threaded into `recordReviewResult` (rewards.md §4 "Warm-up Champ"). */
+  readonly reviewSource: 'warmup' | 'practice';
   /** Called once the solved attempt is saved (`recordReviewResult`) and Next is tapped. */
   readonly onNext: () => void;
 }
@@ -32,7 +34,11 @@ export interface ReviewExerciseStepProps {
  * lesson's scored exercise uses, minus the easier-variant machinery (never offered on a review
  * task) and never touching the task's own lesson's `bestStars` — see `recordReviewResult`.
  */
-export function ReviewExerciseStep({ task, onNext }: ReviewExerciseStepProps): JSX.Element {
+export function ReviewExerciseStep({
+  task,
+  reviewSource,
+  onNext,
+}: ReviewExerciseStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
@@ -65,10 +71,11 @@ export function ReviewExerciseStep({ task, onNext }: ReviewExerciseStepProps): J
       task,
       state: state.core,
       durationMs: Date.now() - startedAt,
+      reviewSource,
     }).then(() => {
       setSaved(true);
     });
-  }, [solved, profile, services.deps, task, state.core, startedAt]);
+  }, [solved, profile, services.deps, task, state.core, startedAt, reviewSource]);
 
   const character = lesson?.character ?? 'owl';
   const instructionText = exerciseInstructionText(t, exercise);

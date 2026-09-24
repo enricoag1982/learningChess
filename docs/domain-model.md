@@ -29,7 +29,7 @@ Character 1─1 piece type
 | Assessment | `id`, `kind` (`placement` / `test-out` / `world-test`), `scope`, `tasksPerConcept`, `pass` (default 0.8) |
 | Character | `id` (`rhino`, …), `piece`, `nameKey`, `storyKey` |
 | Rank | `id` (`pawn` … `king`), `after` (world id, track id, or `all-tracks`) |
-| BadgeDef | `id`, `category` (`milestone` / `skill` / `play` / `habit`), `nameKey`, `condition` (type + params), `tiers[]` — see [rewards.md](rewards.md) |
+| BadgeDef | `id`, `category` (`milestone` / `skill` / `play` / `habit`), `nameKey`/`conditionKey` (derived from `id`: `rewards:badges.<id>.name`/`.condition`, not authored per badge), `condition` (`type` + `thresholds[]` (1 = single-tier, 3 = bronze/silver/gold) + type-specific params) — see [rewards.md](rewards.md) §4 |
 | BotLevel | `level` (1–5), `name` (`mouse` … `bear`), `random`, `shallow`, `depth`, `book`, `queenHomeMoves`, `aids` — see [computer-opponent.md](computer-opponent.md) |
 
 ### 1.1 Position
@@ -75,12 +75,12 @@ Character 1─1 piece type
 | Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
-| Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
+| Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (M4.4, only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
 | Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` — **not stored in v1** (M4.3 decision log): only the `GameRecord`s below are saved; `MatchService` stays a hook for v2 online play |
 | GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend, same device, M4.3), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
-| Badge | `badgeId`, `tier`, `at`, `seen` |
-| Streak | `current`, `best`, `lastDay`, `skipsUsedThisWeek` |
-| SessionLog | `date`, `minutes` |
+| Badge (`EarnedBadge` in code — `Badge` is `BadgeDef`'s catalogue entry) | `badgeId`, `tier`, `at`, `seen`; one row per tier reached, so a tiered badge gets up to 3 |
+| Streak | `current`, `best`, `lastDay` (local day, device time zone), `skipsUsedThisWeek` (tracked per ISO week of the day the skip is used, not the missed day) |
+| SessionLog | `date`, `minutes`; one row per profile + local day, minutes summed across sessions |
 | TimeEntry (v2) | `start`, `end`, `activity` (`lesson` / `practice` / `play`) |
 | TimePolicy (v2) | `perWeekday` (minutes), `allowedHours`, `playLimit`, `learnLimit` |
 | TimeException (v2) | `date`, `extraMinutes` or policy override, `note` |
@@ -161,6 +161,7 @@ Failing any assessment: no penalty, no data lost.
 | Full game (M3.5) | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
 | Friend play (M4.3) | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
 | Parent | `getReport`, `unlock`, `resetProgress` |
+| Rewards (M4.4) | `checkRewards` (the one call every activity choke point makes: folds today into the streak, then evaluates + persists new badges — permissive no-op without `AppDeps.rewards`/`ContentSource.catalog()`); `evaluateAndRecordBadges`, `buildBadgeFacts`, `recordDailyActivity`, `recordSessionMinutes` (its own building blocks, `app/rewards.ts`) |
 
 ## 5. Ports
 
@@ -168,6 +169,7 @@ Failing any assessment: no penalty, no data lost.
 |---|---|
 | `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`) |
 | `GameRecordRepository` (M3.5) | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
+| `RewardsRepository` (M4.4) | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` (backward-compatible with every pre-M4.4 test fixture) |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |

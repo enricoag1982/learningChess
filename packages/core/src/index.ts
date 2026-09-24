@@ -45,6 +45,24 @@ export {
 export type { AnimalFriend, RankState, RankLadderEntry } from './domain/rewards.ts';
 export { animalFriends, rankLadder } from './domain/rewards.ts';
 
+export type {
+  BadgeCategory,
+  BadgeTier,
+  BadgeConditionType,
+  BadgeCondition,
+  BadgeDef,
+  EarnedBadge,
+  BadgeFacts,
+  NewlyEarnedBadge,
+} from './domain/badges.ts';
+export { evaluateBadges, newEarnedBadge, markSeen } from './domain/badges.ts';
+
+export type { Streak } from './domain/streak.ts';
+export { newStreak, localDayString, isoWeekKey, recordActivityDay } from './domain/streak.ts';
+
+export type { SessionLog } from './domain/session-log.ts';
+export { newSessionLog, addMinutes } from './domain/session-log.ts';
+
 export type { ReviewBox, ConceptStats, ConceptPoolEntry, ConceptTask } from './domain/review.ts';
 export {
   newConceptStats,
@@ -99,6 +117,7 @@ export type {
   ProfileRepository,
   ProgressRepository,
   GameRecordRepository,
+  RewardsRepository,
   ParentLockRepository,
   PasswordFileWriter,
   AppSettings,
@@ -160,6 +179,15 @@ export {
 
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
+
+export type { RewardsCheckResult } from './app/rewards.ts';
+export {
+  buildBadgeFacts,
+  evaluateAndRecordBadges,
+  recordDailyActivity,
+  recordSessionMinutes,
+  checkRewards,
+} from './app/rewards.ts';
 
 export type { TodayActivity, TodaySessionPlan } from './app/session.ts';
 export {

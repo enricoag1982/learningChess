@@ -1,6 +1,7 @@
-import type { CompiledContent, ContentSource, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, CompiledContent, ContentSource, TracksCatalog } from '@chess-kids/core';
 import bundled from '@chess-kids/content/content.json';
 import bundledTracks from '@chess-kids/content/tracks.json';
+import bundledBadges from '@chess-kids/content/badges.json';
 
 /**
  * The only place the raw JSON import is treated as `CompiledContent`: the content build
@@ -11,6 +12,9 @@ const content = bundled as unknown as CompiledContent;
 
 /** Same conversion as `content` above, for `packages/content/tracks.yaml`'s compiled output. */
 const tracks = bundledTracks as unknown as TracksCatalog;
+
+/** Same conversion as `content` above, for `packages/content/badges.yaml`'s compiled output. */
+const badges = bundledBadges as unknown as BadgeDef[];
 
 /** `ContentSource` over the content package's build-time compiled bundle. */
 export function createBundledContentSource(): ContentSource {
@@ -23,5 +27,6 @@ export function createBundledContentSource(): ContentSource {
     minigames: () => content.minigames,
     minigame: (id: string) => minigamesById.get(id),
     catalog: () => tracks,
+    badges: () => badges,
   };
 }

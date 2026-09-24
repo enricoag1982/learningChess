@@ -4,16 +4,19 @@ import type {
   AnimalFriend,
   ConceptStats,
   ConceptTask,
+  EarnedBadge,
   GameRecord,
   Journey,
   Lesson,
   LessonProgress,
   MiniGameProgress,
   Profile,
+  Streak,
   TodaySessionPlan,
 } from '@chess-kids/core';
 import {
   animalFriends,
+  checkRewards,
   computerLevelStatus,
   createProfile,
   getLessonProgress,
@@ -27,11 +30,18 @@ import {
   loadProgress,
   loadTodaySession,
   loadWarmUp,
+  markSeen,
+  recordSessionMinutes,
   selectProfile,
   totalStars,
   updateSuggestedLevel,
 } from '@chess-kids/core';
 import type { Services } from './services.ts';
+
+/** Rare celebrations (rewards.md §1): at most this many full-screen badge celebrations per app
+ * sitting (reset when a profile is selected); every other newly earned badge still shows as a
+ * "new" dot in My Den. */
+const MAX_CELEBRATIONS_PER_SESSION = 2;
 
 /** Which top-level screen is showing. `loading` is the instant before `init()` resolves. */
 export type Screen =
@@ -128,6 +138,16 @@ export interface AppState {
   /** This profile's concept mastery + review state (M3.4 Leitner scheduler): Home's "Start today"
    * button and the Practice screen's due count / weak tags both read this. */
   readonly conceptStats: readonly ConceptStats[];
+  /** This profile's earned badges (M4.4, My Den's grid + celebrations' "new" dot). */
+  readonly earnedBadges: readonly EarnedBadge[];
+  /** This profile's daily-play streak (M4.4); `null` before it has any counted day yet. */
+  readonly streak: Streak | null;
+  /** The badge celebration currently showing full-screen (M4.4, rewards.md §1); `null` when none is. */
+  readonly activeCelebration: EarnedBadge | null;
+  /** Celebrations already shown this app sitting (reset on profile select); caps at {@link MAX_CELEBRATIONS_PER_SESSION}. */
+  readonly celebrationsShownThisSession: number;
+  /** `Date.now()` at `startToday()`, for the session's played-minutes tally on the summary. */
+  readonly todaySessionStartedAt: number | null;
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
   readonly lessonId: string | null;
@@ -273,6 +293,20 @@ export interface AppState {
   readonly startPracticeTopic: (conceptId: string) => Promise<void>;
   /** Leaves the Practice task run back to the topic list, refreshing progress. */
   readonly exitPracticeRun: () => void;
+
+  /**
+   * Re-reads this profile's earned badges/streak and, when nothing is already showing and this
+   * session is still under {@link MAX_CELEBRATIONS_PER_SESSION}, queues the oldest unseen badge as
+   * `activeCelebration` (rewards.md §1 "Rare celebrations"). Called after the exact 3 moments a
+   * celebration may show (lesson complete, a full game's result, the Today session summary) — every
+   * other newly earned badge stays unseen until My Den shows/clears its own "new" dot.
+   */
+  readonly checkForCelebrations: () => Promise<void>;
+  /** Marks `activeCelebration` seen, counts it against this session's cap, and clears it — then
+   * queues the next one, if any and still under cap. */
+  readonly dismissCelebration: () => Promise<void>;
+  /** My Den: marks one earned badge's "new" dot cleared (tapped/viewed), a no-op if already seen. */
+  readonly markBadgeSeen: (earnedBadgeId: string) => Promise<void>;
 }
 
 /** A created store instance, as returned by `createAppStore` (one per `App`, for test isolation). */
@@ -302,7 +336,22 @@ export function createAppStore(services: Services) {
       const plan = get().todayPlan;
       const activity = plan?.activities[index];
       if (!plan || !activity) {
+        // rewards.md §4 "session ended" event: logs today's played minutes, folds the session into
+        // the streak/badges one more time (picks up anything only true once the whole session is
+        // done, e.g. Warm-up Champ), then the summary screen may show a celebration for it.
+        const { profile, todaySessionStartedAt } = get();
+        if (profile) {
+          const minutes =
+            todaySessionStartedAt === null
+              ? 0
+              : Math.round((Date.now() - todaySessionStartedAt) / 60_000);
+          if (minutes > 0) {
+            await recordSessionMinutes(services.deps, profile.id, minutes, new Date());
+          }
+          await checkRewards(services.deps, profile.id);
+        }
         set({ screen: 'today-summary', todayActivityIndex: index });
+        await get().checkForCelebrations();
         return;
       }
       set({ todayActivityIndex: index });
@@ -325,6 +374,29 @@ export function createAppStore(services: Services) {
       set({ screen: 'minigame', miniGameId, miniGameOrigin: 'today' });
     }
 
+    /** This profile's earned badges + streak (M4.4), `[]`/`undefined` when `rewards` is not wired. */
+    async function loadRewards(
+      profileId: string,
+    ): Promise<{ readonly earnedBadges: EarnedBadge[]; readonly streak: Streak | undefined }> {
+      const [earnedBadges, streak] = await Promise.all([
+        services.deps.rewards?.listEarnedBadges(profileId) ?? Promise.resolve([]),
+        services.deps.rewards?.getStreak(profileId) ?? Promise.resolve(undefined),
+      ]);
+      return { earnedBadges, streak };
+    }
+
+    /**
+     * Queues the oldest unseen earned badge as `activeCelebration` (rewards.md §1), when nothing is
+     * already showing and this app sitting is still under {@link MAX_CELEBRATIONS_PER_SESSION}.
+     * Assumes `earnedBadges`/`activeCelebration`/`celebrationsShownThisSession` are already current.
+     */
+    function queueNextCelebration(): void {
+      const { activeCelebration, celebrationsShownThisSession, earnedBadges } = get();
+      if (activeCelebration || celebrationsShownThisSession >= MAX_CELEBRATIONS_PER_SESSION) return;
+      const next = earnedBadges.find((badge) => !badge.seen);
+      if (next) set({ activeCelebration: next });
+    }
+
     return {
       services,
       screen: 'loading',
@@ -334,6 +406,11 @@ export function createAppStore(services: Services) {
       miniGameProgress: [],
       gameRecords: [],
       conceptStats: [],
+      earnedBadges: [],
+      streak: null,
+      activeCelebration: null,
+      celebrationsShownThisSession: 0,
+      todaySessionStartedAt: null,
       journey: null,
       lessonId: null,
       stepIndex: 0,
@@ -371,13 +448,14 @@ export function createAppStore(services: Services) {
           // M1-upgrade path: an existing single profile with no parent lock yet skips profile
           // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
           await selectProfile(services.deps, only.id);
-          const [progress, miniGameProgress, gameRecords, conceptStats, journey] =
+          const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
             await Promise.all([
               loadProgress(services.deps, only.id),
               loadMiniGameProgress(services.deps, only.id),
               loadGameRecords(services.deps, only.id),
               services.deps.progress.listConceptStats(only.id),
               loadJourney(services.deps, only.id),
+              loadRewards(only.id),
             ]);
           set({
             profile: only,
@@ -387,6 +465,10 @@ export function createAppStore(services: Services) {
             conceptStats,
             journey,
             profiles,
+            earnedBadges: rewards.earnedBadges,
+            streak: rewards.streak ?? null,
+            activeCelebration: null,
+            celebrationsShownThisSession: 0,
             screen: 'home',
           });
           return;
@@ -406,7 +488,7 @@ export function createAppStore(services: Services) {
           return;
         }
         await selectProfile(services.deps, profile.id);
-        const [profiles, progress, miniGameProgress, gameRecords, conceptStats, journey] =
+        const [profiles, progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
           await Promise.all([
             listProfiles(services.deps),
             loadProgress(services.deps, profile.id),
@@ -414,6 +496,7 @@ export function createAppStore(services: Services) {
             loadGameRecords(services.deps, profile.id),
             services.deps.progress.listConceptStats(profile.id),
             loadJourney(services.deps, profile.id),
+            loadRewards(profile.id),
           ]);
         set({
           profile,
@@ -423,6 +506,10 @@ export function createAppStore(services: Services) {
           conceptStats,
           journey,
           profiles,
+          earnedBadges: rewards.earnedBadges,
+          streak: rewards.streak ?? null,
+          activeCelebration: null,
+          celebrationsShownThisSession: 0,
           screen: 'home',
         });
       },
@@ -439,13 +526,15 @@ export function createAppStore(services: Services) {
         const profile = await services.deps.profiles.get(profileId);
         if (!profile) return;
         await selectProfile(services.deps, profileId);
-        const [progress, miniGameProgress, gameRecords, conceptStats, journey] = await Promise.all([
-          loadProgress(services.deps, profileId),
-          loadMiniGameProgress(services.deps, profileId),
-          loadGameRecords(services.deps, profileId),
-          services.deps.progress.listConceptStats(profileId),
-          loadJourney(services.deps, profileId),
-        ]);
+        const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
+          await Promise.all([
+            loadProgress(services.deps, profileId),
+            loadMiniGameProgress(services.deps, profileId),
+            loadGameRecords(services.deps, profileId),
+            services.deps.progress.listConceptStats(profileId),
+            loadJourney(services.deps, profileId),
+            loadRewards(profileId),
+          ]);
         set({
           profile,
           progress,
@@ -453,6 +542,10 @@ export function createAppStore(services: Services) {
           gameRecords,
           conceptStats,
           journey,
+          earnedBadges: rewards.earnedBadges,
+          streak: rewards.streak ?? null,
+          activeCelebration: null,
+          celebrationsShownThisSession: 0,
           screen: 'home',
         });
       },
@@ -512,14 +605,24 @@ export function createAppStore(services: Services) {
       async refreshProgress() {
         const { profile } = get();
         if (!profile) return;
-        const [progress, miniGameProgress, gameRecords, conceptStats, journey] = await Promise.all([
-          loadProgress(services.deps, profile.id),
-          loadMiniGameProgress(services.deps, profile.id),
-          loadGameRecords(services.deps, profile.id),
-          services.deps.progress.listConceptStats(profile.id),
-          loadJourney(services.deps, profile.id),
-        ]);
-        set({ progress, miniGameProgress, gameRecords, conceptStats, journey });
+        const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
+          await Promise.all([
+            loadProgress(services.deps, profile.id),
+            loadMiniGameProgress(services.deps, profile.id),
+            loadGameRecords(services.deps, profile.id),
+            services.deps.progress.listConceptStats(profile.id),
+            loadJourney(services.deps, profile.id),
+            loadRewards(profile.id),
+          ]);
+        set({
+          progress,
+          miniGameProgress,
+          gameRecords,
+          conceptStats,
+          journey,
+          earnedBadges: rewards.earnedBadges,
+          streak: rewards.streak ?? null,
+        });
       },
 
       goToPlay() {
@@ -603,6 +706,7 @@ export function createAppStore(services: Services) {
           todaySessionStartTotalStars: totalStars(progress),
           todaySessionStartFriends: animalFriends(journey.lessons, progress),
           todaySessionStartRankId: journey.rank?.id ?? null,
+          todaySessionStartedAt: Date.now(),
         });
         await enterTodayActivity(0);
       },
@@ -621,6 +725,7 @@ export function createAppStore(services: Services) {
         set({
           todayPlan: null,
           todayActivityIndex: 0,
+          todaySessionStartedAt: null,
           lessonId: null,
           miniGameId: null,
           screen: 'home',
@@ -629,7 +734,12 @@ export function createAppStore(services: Services) {
       },
 
       finishToday() {
-        set({ todayPlan: null, todayActivityIndex: 0, screen: 'home' });
+        set({
+          todayPlan: null,
+          todayActivityIndex: 0,
+          todaySessionStartedAt: null,
+          screen: 'home',
+        });
         void get().refreshProgress();
       },
 
@@ -655,6 +765,36 @@ export function createAppStore(services: Services) {
       exitPracticeRun() {
         set({ screen: 'practice', practiceConceptId: null, practiceTasks: [] });
         void get().refreshProgress();
+      },
+
+      async checkForCelebrations() {
+        const { profile } = get();
+        if (!profile) return;
+        const rewards = await loadRewards(profile.id);
+        set({ earnedBadges: rewards.earnedBadges, streak: rewards.streak ?? null });
+        queueNextCelebration();
+      },
+
+      async dismissCelebration() {
+        const { profile, activeCelebration, celebrationsShownThisSession, earnedBadges } = get();
+        if (!profile || !activeCelebration) return;
+        const seen = markSeen(activeCelebration, services.deps.clock.now());
+        await services.deps.rewards?.saveEarnedBadge(seen);
+        set({
+          activeCelebration: null,
+          celebrationsShownThisSession: celebrationsShownThisSession + 1,
+          earnedBadges: earnedBadges.map((badge) => (badge.id === seen.id ? seen : badge)),
+        });
+        queueNextCelebration();
+      },
+
+      async markBadgeSeen(earnedBadgeId: string) {
+        const { profile, earnedBadges } = get();
+        const badge = earnedBadges.find((entry) => entry.id === earnedBadgeId);
+        if (!profile || !badge || badge.seen) return;
+        const seen = markSeen(badge, services.deps.clock.now());
+        await services.deps.rewards?.saveEarnedBadge(seen);
+        set({ earnedBadges: earnedBadges.map((entry) => (entry.id === seen.id ? seen : entry)) });
       },
     };
   });

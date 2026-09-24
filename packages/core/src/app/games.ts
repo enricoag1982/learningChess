@@ -3,6 +3,7 @@ import type { VersusState } from '../domain/exercise/versus.ts';
 import { versusEndReason } from '../domain/exercise/versus.ts';
 import type { GameRecord, GameRecordResult } from '../domain/progress.ts';
 import type { Journey } from './journey.ts';
+import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** Result + reason for a `GameRecord`, from a `VersusState` that has already ended. */
@@ -43,6 +44,14 @@ export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise
     updatedAt: now,
   };
   await deps.gameRecords.add(record);
+
+  // rewards.md §4 "game finished" event: an abandoned game is never a real finish (never a win,
+  // never today's counted activity — domain-model.md §3 "leaving mid-game ... never a loss" applies
+  // the same way here: it also never triggers a badge/streak check).
+  if (result !== 'abandoned') {
+    await checkRewards(deps, profileId);
+  }
+
   return record;
 }
 

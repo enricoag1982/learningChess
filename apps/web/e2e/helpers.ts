@@ -840,6 +840,21 @@ export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<vo
 }
 
 /**
+ * Dismisses the M4.4 badge celebration overlay if one is showing (a no-op otherwise) — lesson
+ * complete, a game's result and the session summary can each now surface one, and its own
+ * "Continue" button shares its text with that same screen's own primary button underneath, so
+ * specs call this first to avoid an ambiguous match. Loops (bounded, celebrations cap at 2 per
+ * app sitting) since dismissing one can immediately queue a second.
+ */
+export async function dismissCelebrationIfShown(page: Page): Promise<void> {
+  const celebration = page.getByRole('alertdialog', { name: 'New badge!' });
+  for (let i = 0; i < 2; i += 1) {
+    if (!(await celebration.isVisible().catch(() => false))) return;
+    await celebration.getByRole('button', { name: 'Continue' }).click();
+  }
+}
+
+/**
  * From the profile picker (a parent lock already exists), taps the tile named `nickname` and
  * waits for Home. Every reload shows the picker again (app-structure.md §3), so specs that reload
  * mid-flow call this to get back to Home.

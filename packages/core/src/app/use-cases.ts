@@ -24,9 +24,11 @@ import type {
   ProfileRepository,
   ProgressRepository,
   Random,
+  RewardsRepository,
   SettingsRepository,
 } from './ports.ts';
 import type { Clock } from './ports.ts';
+import { checkRewards } from './rewards.ts';
 
 /** Everything a use case needs, gathered in one place so call sites pass a single `deps` object. */
 export interface AppDeps {
@@ -34,6 +36,10 @@ export interface AppDeps {
   readonly progress: ProgressRepository;
   /** Full games and versus mini-games played vs the computer (M3.5). */
   readonly gameRecords: GameRecordRepository;
+  /** Earned badges, streak, session log (M4.4). Optional so every existing `AppDeps` fixture built
+   * before M4.4 keeps typechecking unchanged (same reasoning as `ContentSource.catalog`/`badges`);
+   * `checkRewards` (`app/rewards.ts`) simply no-ops without it. */
+  readonly rewards?: RewardsRepository;
   readonly clock: Clock;
   readonly ids: IdGenerator;
   readonly content: ContentSource;
@@ -198,6 +204,14 @@ export async function recordExerciseResult(
     await deps.progress.saveConceptStats(enterReview(stats, now, false));
   }
 
+  // rewards.md §4 "exercise completed" event: only a real completion (solved, scored one way or
+  // another) counts as today's activity / a chance at a new badge — never a guided try, and never
+  // an unsolved attempt logged on the way to an easier variant (`recordAttempt` above already ran
+  // for that case, on its own, with nothing solved).
+  if (state.solved && stars !== 0 && (scored || standsInFor !== undefined)) {
+    await checkRewards(deps, profileId);
+  }
+
   return progress;
 }
 
@@ -253,6 +267,9 @@ export async function recordBossResult(
     await saveMiniGamePlay(deps, { profileId, game: minigame, state });
   }
 
+  // rewards.md §4 "game finished" / "exercise completed" event: a boss is always a finished play.
+  await checkRewards(deps, profileId);
+
   return progress;
 }
 
@@ -262,6 +279,9 @@ export interface RecordReviewResultInput {
   readonly task: ConceptTask;
   readonly state: ExerciseState;
   readonly durationMs: number;
+  /** Which screen this task ran on (rewards.md §4 "Warm-up Champ"): `'warmup'` for Today's inline
+   * warm-up or Practice's own "Daily warm-up" card, `'practice'` for a Practice topic run. */
+  readonly reviewSource: 'warmup' | 'practice';
 }
 
 /**
@@ -275,7 +295,7 @@ export async function recordReviewResult(
   deps: AppDeps,
   input: RecordReviewResultInput,
 ): Promise<ConceptStats> {
-  const { profileId, task, state, durationMs } = input;
+  const { profileId, task, state, durationMs, reviewSource } = input;
   const now = deps.clock.now();
   const stars = starsFor(state);
   const correct = state.solved && state.errors === 0 && state.hintLevel === 0;
@@ -288,6 +308,7 @@ export async function recordReviewResult(
     conceptId: task.conceptId,
     scored: true,
     review: true,
+    reviewSource,
     correct,
     stars,
     hints: state.hintLevel,
@@ -302,6 +323,11 @@ export async function recordReviewResult(
   stats = appendResult(stats, correct, now);
   stats = applyReviewResult(stats, correct, task.exercise.id, now);
   await deps.progress.saveConceptStats(stats);
+
+  // rewards.md §4 "warm-up task" activity + "Warm-up Champ" badge (only `reviewSource: 'warmup'`
+  // attempts count towards it, see `Attempt.reviewSource`'s own doc).
+  await checkRewards(deps, profileId);
+
   return stats;
 }
 

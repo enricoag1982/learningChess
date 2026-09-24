@@ -4,6 +4,7 @@ import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import { unlockedMiniGames } from '../domain/play.ts';
 import type { GameRecord, GameRecordResult, LessonProgress } from '../domain/progress.ts';
 import { computerLevelStatus } from './games.ts';
+import { checkRewards } from './rewards.ts';
 import type { Journey } from './journey.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -127,10 +128,15 @@ export async function recordLocalMatch(
       result,
       reason,
       moves: input.moves,
+      color,
       createdAt: now,
       updatedAt: now,
     });
   }
   await Promise.all(records.map((record) => deps.gameRecords.add(record)));
+  // rewards.md §4 "game finished": Friendly Match, Queen Keeper, … for every profile involved.
+  for (const record of records) {
+    await checkRewards(deps, record.profileId);
+  }
   return records;
 }

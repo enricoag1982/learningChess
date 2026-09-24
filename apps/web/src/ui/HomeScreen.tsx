@@ -11,6 +11,7 @@ import { RankPill } from './RankPill.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
+import { StreakPill } from './StreakPill.tsx';
 import { useNarratedText } from './useNarratedText.ts';
 
 function PlayIcon(): JSX.Element {
@@ -157,6 +158,7 @@ export function HomeScreen(): JSX.Element {
   const progress = useAppStore((state) => state.progress);
   const journey = useAppStore((state) => state.journey);
   const conceptStats = useAppStore((state) => state.conceptStats);
+  const streak = useAppStore((state) => state.streak);
   const startToday = useAppStore((state) => state.startToday);
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToJourney = useAppStore((state) => state.goToJourney);
@@ -242,7 +244,8 @@ export function HomeScreen(): JSX.Element {
           </div>
           <span className="font-display text-2xl text-ink sm:text-3xl">{profile.nickname}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          {streak && streak.current >= 2 && <StreakPill days={streak.current} />}
           <RankPill rank={journey.rank} />
           <StarsPill count={stars} />
           <button
