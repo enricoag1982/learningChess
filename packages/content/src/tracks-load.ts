@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { RankDef, Track, TracksCatalog, World } from '@chess-kids/core';
+import type { Lesson, MiniGame, RankDef, Track, TracksCatalog, World } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
 import type { ZodError } from 'zod';
 import { ContentError, type Locales } from './load.ts';
@@ -58,6 +58,7 @@ function compileWorld(raw: WorldYaml, trackId: string): World {
     order: raw.order,
     habitat: raw.habitat,
     titleKey: `journey:${raw.title}`,
+    ...(raw.boss === undefined ? {} : { boss: raw.boss }),
   };
 }
 
@@ -85,11 +86,47 @@ function claimId(claimed: Map<string, string>, id: string, where: string, issues
 }
 
 /**
- * Cross-record checks the schema cannot express alone: ids unique (per kind), orders unique
- * within a track, exactly one main track, rank `after` references an existing world/track, and
- * every title/habitat/rank text key resolves in the `en` locale.
+ * Checks one world's `boss` (if set) references an existing mini-game, and that mini-game's
+ * `unlockAfter` names a lesson of this same world (build-time check, domain-model.md §3: a world
+ * boss's Play tile must unlock alongside the world it belongs to).
  */
-function validateSemantics(catalog: TracksCatalog, locales: Locales, issues: string[]): void {
+function checkWorldBoss(
+  world: World,
+  worldWhere: string,
+  minigames: readonly MiniGame[],
+  lessons: readonly Lesson[],
+  issues: string[],
+): void {
+  if (world.boss === undefined) {
+    return;
+  }
+  const minigame = minigames.find((candidate) => candidate.id === world.boss);
+  if (minigame === undefined) {
+    issues.push(`${worldWhere}: boss references unknown mini-game "${world.boss}"`);
+    return;
+  }
+  const lesson = lessons.find((candidate) => candidate.id === minigame.unlockAfter);
+  if (lesson === undefined || lesson.world !== world.id) {
+    issues.push(
+      `${worldWhere}: boss mini-game "${world.boss}" unlocks after lesson ` +
+        `"${minigame.unlockAfter}", which is not a lesson of this world`,
+    );
+  }
+}
+
+/**
+ * Cross-record checks the schema cannot express alone: ids unique (per kind), orders unique
+ * within a track, exactly one main track, rank `after` references an existing world/track, every
+ * title/habitat/rank text key resolves in the `en` locale, and every world boss references a real
+ * mini-game unlocked by one of that world's own lessons.
+ */
+function validateSemantics(
+  catalog: TracksCatalog,
+  locales: Locales,
+  minigames: readonly MiniGame[],
+  lessons: readonly Lesson[],
+  issues: string[],
+): void {
   const trackIds = new Map<string, string>();
   const worldIds = new Map<string, string>();
   const rankIds = new Map<string, string>();
@@ -108,6 +145,7 @@ function validateSemantics(catalog: TracksCatalog, locales: Locales, issues: str
       const worldWhere = `tracks.yaml: tracks.${track.id}.worlds.${world.id}`;
       claimId(worldIds, world.id, worldWhere, issues);
       checkTextKey(world.titleKey, locales, worldWhere, issues);
+      checkWorldBoss(world, worldWhere, minigames, lessons, issues);
 
       const orderClaimedAt = orders.get(world.order);
       if (orderClaimedAt !== undefined) {
@@ -152,9 +190,16 @@ function validateSemantics(catalog: TracksCatalog, locales: Locales, issues: str
 
 /**
  * Loads and validates `tracks.yaml`, compiling it to `TracksCatalog`. Collects every issue
- * (parse, schema and semantic) before throwing a single `ContentError`.
+ * (parse, schema and semantic) before throwing a single `ContentError`. `minigames`/`lessons`
+ * (the compiled content, from `loadContent`) validate world bosses' cross-references; omit them
+ * only where that check does not matter (e.g. a fixture with no `boss:` set).
  */
-export function loadTracks(filePath: string, locales: Locales): TracksCatalog {
+export function loadTracks(
+  filePath: string,
+  locales: Locales,
+  minigames: readonly MiniGame[] = [],
+  lessons: readonly Lesson[] = [],
+): TracksCatalog {
   let raw: string;
   try {
     raw = readFileSync(filePath, 'utf8');
@@ -180,7 +225,7 @@ export function loadTracks(filePath: string, locales: Locales): TracksCatalog {
   };
 
   const issues: string[] = [];
-  validateSemantics(catalog, locales, issues);
+  validateSemantics(catalog, locales, minigames, lessons, issues);
   if (issues.length > 0) {
     throw new ContentError(issues);
   }

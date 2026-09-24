@@ -34,6 +34,7 @@ export function MiniGameSessionScreen(): JSX.Element {
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const miniGameId = useAppStore((state) => state.miniGameId);
+  const miniGameOrigin = useAppStore((state) => state.miniGameOrigin);
   const exitMiniGame = useAppStore((state) => state.exitMiniGame);
 
   const minigame = miniGameId ? services.deps.content.minigame(miniGameId) : undefined;
@@ -43,6 +44,13 @@ export function MiniGameSessionScreen(): JSX.Element {
     return <main className="min-h-screen bg-cream" />;
   }
 
+  const primaryLabel =
+    miniGameOrigin === 'journey'
+      ? t('play.back-to-journey')
+      : miniGameOrigin === 'home'
+        ? t('play.back-to-home')
+        : t('play.back-to-play');
+
   const session: BossPlaySession = {
     save: (state, durationMs) =>
       recordMiniGameResult(services.deps, {
@@ -51,7 +59,7 @@ export function MiniGameSessionScreen(): JSX.Element {
         state,
         durationMs,
       }).then(() => undefined),
-    primaryLabel: t('play.back-to-play'),
+    primaryLabel,
     onPrimary: exitMiniGame,
   };
 

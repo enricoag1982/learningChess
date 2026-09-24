@@ -7,6 +7,8 @@ import {
   isHabitat,
   lessonAvailability,
   nextLesson,
+  nextStep,
+  worldBossStatus,
   worldLessons,
   worldStatus,
   type Track,
@@ -14,7 +16,7 @@ import {
   type World,
 } from './journey.ts';
 import type { Lesson } from './lesson.ts';
-import type { LessonProgress } from './progress.ts';
+import type { LessonProgress, MiniGameProgress } from './progress.ts';
 import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
 
 const EMPTY_POSITION = {
@@ -358,5 +360,146 @@ describe('currentRank', () => {
     ];
     const unlocked = new Set(['w3']);
     expect(currentRank(CATALOG, ALL_LESSONS, everything, unlocked)?.id).toBe('king');
+  });
+});
+
+// World bosses (M3.2a): a dedicated 2-world catalog, bw1 and bw2 each with their own boss
+// mini-game, kept separate from CATALOG above so its own-boss rules don't affect other tests.
+const BW1: World = {
+  id: 'bw1',
+  track: 'boss',
+  order: 1,
+  habitat: 'meadow',
+  titleKey: 'journey:worlds.board',
+  boss: 'boss-bw1',
+};
+const BW2: World = {
+  id: 'bw2',
+  track: 'boss',
+  order: 2,
+  habitat: 'savannah',
+  titleKey: 'journey:worlds.pieces',
+  boss: 'boss-bw2',
+};
+const BOSS_TRACK: Track = {
+  id: 'boss',
+  kind: 'main',
+  titleKey: 'journey:tracks.basics',
+  worlds: [BW1, BW2],
+};
+const BOSS_CATALOG: TracksCatalog = {
+  tracks: [BOSS_TRACK],
+  ranks: [
+    { id: 'pawn', after: 'start' },
+    { id: 'knight', after: 'world:bw1' },
+  ],
+};
+const BL1 = makeLesson('bl1', 'bw1', 1);
+const BL2 = makeLesson('bl2', 'bw2', 1);
+const BOSS_LESSONS = [BL1, BL2];
+
+/** A `MiniGameProgress` for `miniGameId`: `wins` wins (any win — Journey node or Play screen). */
+function bossWin(miniGameId: string, wins: 0 | 1): MiniGameProgress {
+  const nowIso = NOW.toISOString();
+  return {
+    id: `mg-${miniGameId}`,
+    profileId: 'profile-1',
+    miniGameId,
+    bestStars: wins > 0 ? 3 : 0,
+    plays: Math.max(wins, 1),
+    wins,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  };
+}
+
+describe('worldBossStatus', () => {
+  it('is none for a world with no boss', () => {
+    expect(worldBossStatus(CATALOG, W1, ALL_LESSONS, [])).toBe('none');
+  });
+
+  it('is locked while the world itself is locked, even once it would otherwise qualify', () => {
+    expect(worldBossStatus(BOSS_CATALOG, BW2, BOSS_LESSONS, [])).toBe('locked');
+  });
+
+  it('is locked while the world is available but its lessons are not all complete', () => {
+    expect(worldBossStatus(BOSS_CATALOG, BW1, BOSS_LESSONS, [])).toBe('locked');
+  });
+
+  it('is available once every lesson of the world is complete (or better), boss unwon', () => {
+    const progress = [completeProgress(BL1)];
+    expect(worldBossStatus(BOSS_CATALOG, BW1, BOSS_LESSONS, progress)).toBe('available');
+  });
+
+  it('is won once its mini-game has any win, regardless of where it was played', () => {
+    const progress = [completeProgress(BL1)];
+    const miniGames = [bossWin('boss-bw1', 1)];
+    expect(worldBossStatus(BOSS_CATALOG, BW1, BOSS_LESSONS, progress, undefined, miniGames)).toBe(
+      'won',
+    );
+  });
+});
+
+describe('world mastery and the next world with a world boss', () => {
+  it('a world is not mastered until its boss is won, even with every lesson mastered', () => {
+    const progress = [masteredProgress(BL1)];
+    expect(worldStatus(BOSS_CATALOG, BW1, BOSS_LESSONS, progress)).toBe('available');
+    expect(worldStatus(BOSS_CATALOG, BW2, BOSS_LESSONS, progress)).toBe('locked');
+  });
+
+  it('the next world opens once the previous one is mastered and its boss won', () => {
+    const progress = [masteredProgress(BL1)];
+    const miniGames = [bossWin('boss-bw1', 1)];
+    expect(worldStatus(BOSS_CATALOG, BW1, BOSS_LESSONS, progress, undefined, miniGames)).toBe(
+      'mastered',
+    );
+    expect(worldStatus(BOSS_CATALOG, BW2, BOSS_LESSONS, progress, undefined, miniGames)).toBe(
+      'available',
+    );
+  });
+
+  it('a parent/test-out unlock overrides an unwon world boss for gating the next world', () => {
+    const progress = [completeProgress(BL1)]; // lessons done, boss never played
+    expect(worldStatus(BOSS_CATALOG, BW2, BOSS_LESSONS, progress)).toBe('locked');
+    expect(worldStatus(BOSS_CATALOG, BW2, BOSS_LESSONS, progress, new Set(['bw1']))).toBe(
+      'available',
+    );
+  });
+
+  it('a parent/test-out unlock also overrides an unwon world boss for rank gating', () => {
+    const progress = [completeProgress(BL1)];
+    expect(currentRank(BOSS_CATALOG, BOSS_LESSONS, progress)?.id).toBe('pawn');
+    expect(currentRank(BOSS_CATALOG, BOSS_LESSONS, progress, new Set(['bw1']))?.id).toBe('knight');
+  });
+});
+
+describe('nextStep', () => {
+  it('is the next lesson while lessons remain, same as nextLesson', () => {
+    const step = nextStep(BOSS_CATALOG, BOSS_LESSONS, []);
+    expect(step).toEqual({ kind: 'lesson', lesson: BL1 });
+  });
+
+  it('is the world boss once every lesson of its world is done and the boss is unwon', () => {
+    const progress = [masteredProgress(BL1)];
+    expect(nextLesson(BOSS_CATALOG, BOSS_LESSONS, progress)).toBeNull();
+    expect(nextStep(BOSS_CATALOG, BOSS_LESSONS, progress)).toEqual({
+      kind: 'world-boss',
+      world: BW1,
+    });
+  });
+
+  it('advances to the next lesson once that world boss is won', () => {
+    const progress = [masteredProgress(BL1)];
+    const miniGames = [bossWin('boss-bw1', 1)];
+    expect(nextStep(BOSS_CATALOG, BOSS_LESSONS, progress, undefined, miniGames)).toEqual({
+      kind: 'lesson',
+      lesson: BL2,
+    });
+  });
+
+  it('is null once every lesson is mastered and every world boss is won', () => {
+    const progress = [masteredProgress(BL1), masteredProgress(BL2)];
+    const miniGames = [bossWin('boss-bw1', 1), bossWin('boss-bw2', 1)];
+    expect(nextStep(BOSS_CATALOG, BOSS_LESSONS, progress, undefined, miniGames)).toBeNull();
   });
 });

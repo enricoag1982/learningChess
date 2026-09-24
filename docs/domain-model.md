@@ -95,7 +95,8 @@ Character 1─1 piece type
 | Lesson complete | Every exercise ≥ 1 star |
 | Lesson mastered | Σ best stars ≥ 80% of max, or test-out / placement / parent unlock |
 | Lesson available | Previous lesson complete (first lesson: world available) |
-| World mastered | All lessons mastered + boss won |
+| World boss (optional, `World.boss`) | Locked / available / won. Available once every authored lesson of the world is complete (or better) and the world itself is not locked; won once its `MiniGameProgress.wins ≥ 1` (any route: Journey node or Play screen) |
+| World mastered | All lessons mastered (incl. every lesson's own boss `bossStars ≥ 2`) + its world boss won, if it has one |
 | World available | Previous world in same track mastered (first world: track available), or unlocked by test-out / parent |
 | Track mastered | All its worlds mastered |
 | Track available | Main track: always. Branch tracks: main track mastered |
@@ -104,6 +105,7 @@ Character 1─1 piece type
 | Easier variant | 2 wrong attempts on one exercise → its `easier` exercise, if defined |
 | Rank | Highest rank whose `after` is mastered |
 | Full game vs computer | Available after World 4 mastered |
+| Next step (Home "Today" / Journey highlight) | Next available lesson; once a world's lessons are all done and its world boss is available but unwon, the world boss |
 
 ### 3.1 Review scheduler (Leitner)
 - Concept enters box 1 when its lesson is complete.
