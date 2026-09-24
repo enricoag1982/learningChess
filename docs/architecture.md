@@ -169,4 +169,7 @@ stars2: 5
 | Solver | BFS over kid moves, state = placement + castling + en passant + stars; fast replay of known-legal moves except castling; used for hints, content checks (`stars3` = optimal) |
 | Lesson content | `lessons/<world>/<id>.yaml`, `minigames/<id>.yaml`; build compiles boards to `Position` and fails on: invalid board, unsolvable exercise, `stars3` ≠ solver optimum, `stars2` < `stars3`, mini-game `par` ≠ optimum, unknown id reference, missing text key; output `dist/content.json` (`CompiledContent`) |
 | Text namespaces | `common` (UI), `lessons` (lesson, exercise, mini-game texts), `characters` (`<id>.name`) |
+| Board | `Board` component: legality only from `legalMoves` prop; tap-tap + drag (pointer events, 6 px tap threshold); `role="grid"` with one labelled button per square; own SVG piece set (classic shapes, chunky, knight = horse head); dev playground at `/#board` (dev builds only) |
+| Progress | `LessonProgress` (best stars per exercise, boss stars, `resumeStep`, `completedAt`) + `Attempt` per try (first-try correct, hints, errors, moves, duration) for later mastery / review; resume at the start of the unfinished step |
+| Narration | `Narrator` port; Web Speech adapter prefers an on-device English voice, silent no-op when unavailable (subtitles always shown) |
 | Test layers (web) | Vitest + jsdom + Testing Library (components, adapters); Playwright on the production build (desktop + tablet 1024×768 touch) |
