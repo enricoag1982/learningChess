@@ -1,0 +1,73 @@
+id: draws
+world: rules
+order: 3
+concept: draw
+character: owl
+title: draws.title
+story: draws.story
+demo:
+  fen: k7/2Q5/2K5/8/8/8/8/8 b - - 0 1
+  text: draws.demo
+  highlight: squares a7 b7 b8
+guided:
+  - id: draws-g1
+    type: yes-no
+    text: draws-g1
+    fen: k7/2Q5/2K5/8/8/8/8/8 b - - 0 1
+    answer: 'yes'
+    focus: a8
+    verify: stalemate
+  - id: draws-g2
+    type: choice
+    text: draws-g2
+    fen: 3k4/8/8/8/8/8/8/3K4 w - - 0 1
+    options:
+      - { id: stalemate, text: draws-opt-stalemate }
+      - { id: insufficient-material, text: draws-opt-insufficient }
+      - { id: not-a-draw, text: draws-opt-not-a-draw }
+    answer: insufficient-material
+    verify: draw-kind
+exercises:
+  - id: draws-01
+    type: yes-no
+    text: draws-01
+    fen: 7k/5K2/6P1/8/8/8/8/8 b - - 0 1
+    answer: 'yes'
+    focus: h8
+    verify: stalemate
+  - id: draws-02
+    type: yes-no
+    text: draws-02
+    fen: 3k4/8/8/5N2/3K4/8/8/8 w - - 0 1
+    answer: 'yes'
+    verify: insufficient-material
+  - id: draws-03
+    type: choice
+    text: draws-03
+    fen: k7/2K5/1P6/8/8/8/8/8 b - - 0 1
+    options:
+      - { id: stalemate, text: draws-opt-stalemate }
+      - { id: insufficient-material, text: draws-opt-insufficient }
+      - { id: not-a-draw, text: draws-opt-not-a-draw }
+    answer: stalemate
+    verify: draw-kind
+  - id: draws-04
+    type: choice
+    text: draws-04
+    fen: 4k3/8/8/8/4K3/8/6B1/8 w - - 0 1
+    options:
+      - { id: stalemate, text: draws-opt-stalemate }
+      - { id: insufficient-material, text: draws-opt-insufficient }
+      - { id: not-a-draw, text: draws-opt-not-a-draw }
+    answer: insufficient-material
+    verify: draw-kind
+  - id: draws-05
+    type: choice
+    text: draws-05
+    fen: 4k3/4p3/8/8/8/8/4P3/4K3 w - - 0 1
+    options:
+      - { id: stalemate, text: draws-opt-stalemate }
+      - { id: insufficient-material, text: draws-opt-insufficient }
+      - { id: not-a-draw, text: draws-opt-not-a-draw }
+    answer: not-a-draw
+    verify: draw-kind

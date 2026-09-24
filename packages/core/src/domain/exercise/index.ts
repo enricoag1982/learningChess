@@ -50,6 +50,9 @@ export {
   isInCheck,
   isCheckmate,
   isStalemate,
+  isInsufficientMaterial,
+  canCastle,
+  canEnPassant,
 } from './facts.ts';
 
 export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';

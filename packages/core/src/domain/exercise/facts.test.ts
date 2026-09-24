@@ -3,11 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../chess/chessjs-rules.ts';
 import { parseFen } from '../chess/fen.ts';
 import {
+  canCastle,
+  canEnPassant,
   isAttacked,
   isCheckmate,
   isDefended,
   isHanging,
   isInCheck,
+  isInsufficientMaterial,
   isSafe,
   isStalemate,
   kingSquare,
@@ -121,6 +124,72 @@ describe('isSafe', () => {
   it('an empty square is never safe', () => {
     const position = parseFen('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
     expect(isSafe(position, 'd5', rules)).toBe(false);
+  });
+});
+
+describe('isInsufficientMaterial', () => {
+  it('a lone king vs. a lone king is insufficient material', () => {
+    const position = parseFen('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+    expect(isInsufficientMaterial(position, rules)).toBe(true);
+  });
+
+  it('a king and rook vs. a lone king is sufficient material', () => {
+    const position = parseFen('4k3/8/8/8/8/8/8/3RK3 w - - 0 1');
+    expect(isInsufficientMaterial(position, rules)).toBe(false);
+  });
+});
+
+describe('canCastle', () => {
+  // White king e1, rooks a1/h1, both castling rights, black king far away: both directions legal.
+  const bothSides = parseFen('4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1');
+
+  it('true for kingside when the right is present and the path is clear and unattacked', () => {
+    expect(canCastle(bothSides, 'kingside', rules)).toBe(true);
+  });
+
+  it('true for queenside when the right is present and the path is clear and unattacked', () => {
+    expect(canCastle(bothSides, 'queenside', rules)).toBe(true);
+  });
+
+  it('false for either side once the castling right is gone (king/rook already moved)', () => {
+    const noRights = parseFen('4k3/8/8/8/8/8/8/R3K2R w - - 0 1');
+    expect(canCastle(noRights, 'kingside', rules)).toBe(false);
+    expect(canCastle(noRights, 'queenside', rules)).toBe(false);
+  });
+
+  it('false when the king is in check', () => {
+    const inCheck = parseFen('4k3/8/8/8/8/8/4r3/R3K2R w KQ - 0 1');
+    expect(canCastle(inCheck, 'kingside', rules)).toBe(false);
+  });
+
+  it('false when a square in the path is occupied', () => {
+    const blocked = parseFen('4k3/8/8/8/8/8/8/R3KB1R w KQ - 0 1'); // bishop on f1 blocks O-O
+    expect(canCastle(blocked, 'kingside', rules)).toBe(false);
+  });
+
+  it('false when the king would cross or land on an attacked square', () => {
+    // Black rook on f8 covers f1, the square the king must cross for O-O.
+    const attacked = parseFen('5rk1/8/8/8/8/8/8/R3K2R w KQ - 0 1');
+    expect(canCastle(attacked, 'kingside', rules)).toBe(false);
+  });
+});
+
+describe('canEnPassant', () => {
+  // Black just played d7-d5; the white pawn on e5 may capture it en passant on d6.
+  const justDoubleStepped = parseFen('4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1');
+
+  it('true right after the double step, with a capturing pawn in place', () => {
+    expect(canEnPassant(justDoubleStepped, rules)).toBe(true);
+  });
+
+  it('false once the en passant square is no longer set (double step was not the last move)', () => {
+    const noEpRights = parseFen('4k3/8/8/3pP3/8/8/8/4K3 w - - 0 1');
+    expect(canEnPassant(noEpRights, rules)).toBe(false);
+  });
+
+  it('false with no pawn able to capture on the en passant square', () => {
+    const noCapturer = parseFen('4k3/8/8/3p4/8/8/8/4K3 w - d6 0 1');
+    expect(canEnPassant(noCapturer, rules)).toBe(false);
   });
 });
 

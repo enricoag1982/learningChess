@@ -1,0 +1,65 @@
+id: en-passant
+world: rules
+order: 2
+concept: en-passant
+character: owl
+title: en-passant.title
+story: en-passant.story
+demo:
+  fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
+  text: en-passant.demo
+  highlight: legal-moves e5
+guided:
+  - id: en-passant-g1
+    type: best-move
+    text: en-passant-g1
+    fen: 4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1
+    lastMove: d7d5
+    solutions: [exd6]
+    verify: en-passant
+  - id: en-passant-g2
+    type: yes-no
+    text: en-passant-g2
+    fen: 4k3/8/8/1pP5/8/8/8/4K3 w - b6 0 1
+    lastMove: b7b5
+    answer: 'yes'
+    focus: c5
+    verify: can-en-passant
+exercises:
+  - id: en-passant-01
+    type: best-move
+    text: en-passant-01
+    fen: 3k4/8/8/4Pp2/8/8/8/3K4 w - f6 0 1
+    lastMove: f7f5
+    solutions: [exf6]
+    verify: en-passant
+  - id: en-passant-02
+    type: best-move
+    text: en-passant-02
+    fen: 6k1/8/8/Pp6/8/8/8/6K1 w - b6 0 1
+    lastMove: b7b5
+    solutions: [axb6]
+    verify: en-passant
+  - id: en-passant-03
+    type: best-move
+    text: en-passant-03
+    fen: k7/8/8/2PpP3/8/8/8/K7 w - d6 0 1
+    lastMove: d7d5
+    solutions: [cxd6, exd6]
+    verify: en-passant
+  - id: en-passant-04
+    type: yes-no
+    text: en-passant-04
+    fen: 4k3/8/8/6pP/8/8/8/4K3 w - g6 0 1
+    lastMove: g7g5
+    answer: 'yes'
+    focus: h5
+    verify: can-en-passant
+  - id: en-passant-05
+    type: yes-no
+    text: en-passant-05
+    fen: 6k1/8/8/3Pp3/8/8/8/6K1 w - - 0 1
+    lastMove: f8g8
+    answer: 'no'
+    focus: d5
+    verify: can-en-passant

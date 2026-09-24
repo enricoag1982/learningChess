@@ -428,6 +428,19 @@ describe('ExerciseStep', () => {
       fireEvent.click(hintButton);
       await screen.findByText('Here is the answer.');
     });
+
+    it("shows the opponent's lastMove highlight from the start (M4.1, before any move is played)", async () => {
+      const withLastMove: BestMoveDef = { ...exercise, lastMove: { from: 'h1', to: 'a1' } };
+      const lesson = fixtureLesson({ exercises: [withLastMove] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={withLastMove} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const a1 = screen.getByRole('button', { name: /^a1,/ });
+      expect(a1.querySelector('[class*="F4D35E"]')).not.toBeNull();
+    });
   });
 
   describe('setup', () => {

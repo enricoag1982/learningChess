@@ -97,6 +97,7 @@ export function buildExercisePlayArea({
         highlights={{
           focus: exercise.focus ? [exercise.focus] : [],
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...(state.lastMove ? { lastMove: state.lastMove } : {}),
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}

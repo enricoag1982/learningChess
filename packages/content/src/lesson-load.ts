@@ -24,6 +24,8 @@ import type {
 import {
   DiagramError,
   FenError,
+  canCastle,
+  canEnPassant,
   chessJsRules,
   createVariantRules,
   game,
@@ -32,6 +34,7 @@ import {
   isDefended,
   isHanging,
   isInCheck,
+  isInsufficientMaterial,
   isSafe,
   isStalemate,
   kingSquare,
@@ -108,11 +111,27 @@ function compileChoiceOption(raw: ChoiceOptionYaml): ChoiceOption {
 /** A `yes-no` exercise's parsed `verify` field (`lesson-schema.ts`'s `yesNoVerifySchema`). */
 type VerifyFact =
   | { readonly kind: 'hanging' | 'attacked' | 'defended'; readonly square: Square }
-  | { readonly kind: 'in-check' | 'checkmate' | 'stalemate' };
+  | { readonly kind: 'in-check' | 'checkmate' | 'stalemate' | 'insufficient-material' }
+  | { readonly kind: 'can-castle'; readonly side: 'kingside' | 'queenside' }
+  | { readonly kind: 'can-en-passant' };
 
 function parseVerify(raw: string): VerifyFact {
+  if (raw === 'can-en-passant') {
+    return { kind: 'can-en-passant' };
+  }
+  if (raw.startsWith('can-castle ')) {
+    return {
+      kind: 'can-castle',
+      side: raw.slice('can-castle '.length) as 'kingside' | 'queenside',
+    };
+  }
   const [kind, square] = raw.split(' ');
-  if (kind === 'in-check' || kind === 'checkmate' || kind === 'stalemate') {
+  if (
+    kind === 'in-check' ||
+    kind === 'checkmate' ||
+    kind === 'stalemate' ||
+    kind === 'insufficient-material'
+  ) {
     return { kind };
   }
   return { kind: kind as 'hanging' | 'attacked' | 'defended', square: square as Square };
@@ -124,7 +143,10 @@ function computeVerifyFact(fact: VerifyFact, position: Position): boolean {
   if (fact.kind === 'defended') return isDefended(position, fact.square, chessJsRules);
   if (fact.kind === 'in-check') return isInCheck(position, chessJsRules);
   if (fact.kind === 'checkmate') return isCheckmate(position, chessJsRules);
-  return isStalemate(position, chessJsRules);
+  if (fact.kind === 'stalemate') return isStalemate(position, chessJsRules);
+  if (fact.kind === 'insufficient-material') return isInsufficientMaterial(position, chessJsRules);
+  if (fact.kind === 'can-castle') return canCastle(position, fact.side, chessJsRules);
+  return canEnPassant(position, chessJsRules);
 }
 
 /**
@@ -184,10 +206,12 @@ function classifyTrade(
 type ChoiceVerify =
   | { readonly kind: 'higher-value' }
   | { readonly kind: 'worth'; readonly value: number }
-  | { readonly kind: 'trade'; readonly san: string };
+  | { readonly kind: 'trade'; readonly san: string }
+  | { readonly kind: 'draw-kind' };
 
 function parseChoiceVerify(raw: string): ChoiceVerify {
   if (raw === 'higher-value') return { kind: 'higher-value' };
+  if (raw === 'draw-kind') return { kind: 'draw-kind' };
   if (raw.startsWith('worth ')) {
     return { kind: 'worth', value: Number(raw.slice('worth '.length)) };
   }
@@ -275,9 +299,50 @@ function checkChoiceTrade(exercise: ChoiceDef, san: string, where: string, issue
 }
 
 /**
+ * `draw-kind` (M4.1): a single static position classified from real chess rules only — checkmate
+ * and stalemate both leave no legal move, but only stalemate (no check) is a draw; repetition and
+ * the 50-move rule need move history, not just a position, so they are never "not-a-draw" here —
+ * lesson text covers them separately (`docs/curriculum.md` World 5 "Draws").
+ */
+function classifyDrawKind(
+  position: Position,
+): 'stalemate' | 'insufficient-material' | 'not-a-draw' {
+  const status = chessJsRules.status(position);
+  if (status.checkmate) return 'not-a-draw';
+  if (status.stalemate) return 'stalemate';
+  if (status.insufficientMaterial) return 'insufficient-material';
+  return 'not-a-draw';
+}
+
+const DRAW_KIND_OPTION_IDS: ReadonlySet<string> = new Set([
+  'stalemate',
+  'insufficient-material',
+  'not-a-draw',
+]);
+
+function checkChoiceDrawKind(exercise: ChoiceDef, where: string, issues: string[]): void {
+  const ids = new Set(exercise.options.map((option) => option.id));
+  if (
+    ids.size !== DRAW_KIND_OPTION_IDS.size ||
+    ![...DRAW_KIND_OPTION_IDS].every((id) => ids.has(id))
+  ) {
+    issues.push(
+      `${where}: verify "draw-kind" requires options ids "stalemate", "insufficient-material", "not-a-draw"`,
+    );
+    return;
+  }
+  const classification = classifyDrawKind(exercise.position);
+  if (classification !== exercise.answer) {
+    issues.push(
+      `${where}: verify "draw-kind" classifies as "${classification}", but answer is "${exercise.answer}"`,
+    );
+  }
+}
+
+/**
  * A `choice` exercise's optional `verify` (`lesson-schema.ts`): `higher-value` / `worth <n>` need
- * every option to be a piece; `trade <SAN>` classifies a kid capture. Load-time only: never affects
- * the compiled `ChoiceDef`.
+ * every option to be a piece; `trade <SAN>` classifies a kid capture; `draw-kind` (M4.1) classifies
+ * the position itself. Load-time only: never affects the compiled `ChoiceDef`.
  */
 function checkChoiceVerify(
   exercise: ChoiceDef,
@@ -293,6 +358,10 @@ function checkChoiceVerify(
     checkChoiceHigherValue(exercise, where, issues);
     return;
   }
+  if (parsed.kind === 'draw-kind') {
+    checkChoiceDrawKind(exercise, where, issues);
+    return;
+  }
   if (parsed.kind === 'worth') {
     checkChoiceWorth(exercise, parsed.value, where, issues);
     return;
@@ -305,7 +374,14 @@ type BestMoveVerify =
   | { readonly kind: 'attack' | 'save'; readonly square: Square }
   | {
       readonly kind:
-        'take-free' | 'good-trade' | 'check' | 'escape-king' | 'escape-block' | 'escape-capture';
+        | 'take-free'
+        | 'good-trade'
+        | 'check'
+        | 'escape-king'
+        | 'escape-block'
+        | 'escape-capture'
+        | 'castle'
+        | 'en-passant';
     };
 
 function parseBestMoveVerify(raw: string): BestMoveVerify {
@@ -315,7 +391,14 @@ function parseBestMoveVerify(raw: string): BestMoveVerify {
   }
   return {
     kind: kind as
-      'take-free' | 'good-trade' | 'check' | 'escape-king' | 'escape-block' | 'escape-capture',
+      | 'take-free'
+      | 'good-trade'
+      | 'check'
+      | 'escape-king'
+      | 'escape-block'
+      | 'escape-capture'
+      | 'castle'
+      | 'en-passant',
   };
 }
 
@@ -380,6 +463,26 @@ function computeVerifiedBestMoves(
   if (verify.kind === 'take-free') {
     return candidates
       .filter((move) => move.captured !== undefined && !isDefended(position, move.to, chessJsRules))
+      .map((move) => move.san);
+  }
+
+  if (verify.kind === 'castle') {
+    return candidates
+      .filter((move) => {
+        const san = normalizeSan(move.san);
+        return san === 'O-O' || san === 'O-O-O';
+      })
+      .map((move) => move.san);
+  }
+
+  if (verify.kind === 'en-passant') {
+    // Same rule as `facts.ts`'s `canEnPassant`: only an en passant capture ever lands a pawn move
+    // on the position's own (otherwise empty) en passant square.
+    return candidates
+      .filter(
+        (move) =>
+          move.piece === 'p' && move.captured !== undefined && move.to === position.enPassant,
+      )
       .map((move) => move.san);
   }
 
@@ -496,6 +599,43 @@ function checkMateInNTrap(
   }
 }
 
+/** Parses `lastMove`'s `<from><to>` shape (`lesson-schema.ts`'s regex already restricted it). */
+function parseLastMove(raw: string): { readonly from: Square; readonly to: Square } {
+  return { from: raw.slice(0, 2) as Square, to: raw.slice(2, 4) as Square };
+}
+
+/**
+ * Exercise field `lastMove` (M4.1, display only): checks it against `position` — a piece must sit
+ * on `to` (something must have just moved there), and, when the position has an en passant square,
+ * `lastMove` must be exactly the double step that produced it, so the board never shows the kid a
+ * "last move" that could not have just happened.
+ */
+function checkLastMove(
+  position: Position,
+  lastMove: { readonly from: Square; readonly to: Square },
+  where: string,
+  issues: string[],
+): void {
+  if (position.pieces[lastMove.to] === undefined) {
+    issues.push(`${where}: lastMove "${lastMove.from}${lastMove.to}": no piece on ${lastMove.to}`);
+  }
+  const ep = position.enPassant;
+  if (ep === null) {
+    return;
+  }
+  const file = ep.charAt(0);
+  const fromRank = ep.charAt(1) === '6' ? '7' : '2';
+  const toRank = ep.charAt(1) === '6' ? '5' : '4';
+  const expectedFrom = `${file}${fromRank}`;
+  const expectedTo = `${file}${toRank}`;
+  if (lastMove.from !== expectedFrom || lastMove.to !== expectedTo) {
+    issues.push(
+      `${where}: lastMove "${lastMove.from}${lastMove.to}" is not the double step matching en ` +
+        `passant square ${ep} (expected "${expectedFrom}${expectedTo}")`,
+    );
+  }
+}
+
 function compileExercise(
   relPath: string,
   fieldPath: string,
@@ -509,6 +649,12 @@ function compileExercise(
   }
   const textKey = `lessons:${raw.text}`;
   const easier = raw.easier === undefined ? {} : { easier: raw.easier };
+  let lastMove: { readonly from: Square; readonly to: Square } | undefined;
+  if (raw.lastMove !== undefined) {
+    lastMove = parseLastMove(raw.lastMove);
+    checkLastMove(position, lastMove, `${relPath}: ${fieldPath}`, issues);
+  }
+  const lastMoveField = lastMove === undefined ? {} : { lastMove };
 
   if (raw.type === 'select-squares') {
     let answer: SelectSquaresDef['answer'];
@@ -527,7 +673,16 @@ function compileExercise(
         from: assertValidated(raw.from, `${fieldPath}.from`) as Square,
       };
     }
-    return { id: raw.id, concept, textKey, position, type: 'select-squares', answer, ...easier };
+    return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'select-squares',
+      answer,
+      ...easier,
+      ...lastMoveField,
+    };
   }
   if (raw.type === 'mate-in-n') {
     const exercise: MateInNDef = {
@@ -539,6 +694,7 @@ function compileExercise(
       n: raw.n,
       line: raw.line,
       ...easier,
+      ...lastMoveField,
     };
     checkMateInNTrap(exercise, raw.trap, `${relPath}: ${fieldPath}`, issues);
     return exercise;
@@ -553,6 +709,7 @@ function compileExercise(
       answer: raw.answer === 'yes',
       ...(raw.focus === undefined ? {} : { focus: raw.focus as Square }),
       ...easier,
+      ...lastMoveField,
     };
     checkYesNoVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
     return exercise;
@@ -568,6 +725,7 @@ function compileExercise(
       answer: raw.answer,
       showBoard: raw.showBoard ?? true,
       ...easier,
+      ...lastMoveField,
     };
     checkChoiceVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
     return exercise;
@@ -581,6 +739,7 @@ function compileExercise(
       type: 'best-move',
       solutions: raw.solutions,
       ...easier,
+      ...lastMoveField,
     };
     checkBestMoveVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
     return exercise;
@@ -590,7 +749,16 @@ function compileExercise(
     if (target === null) {
       return null;
     }
-    return { id: raw.id, concept, textKey, position, type: 'setup', target, ...easier };
+    return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'setup',
+      target,
+      ...easier,
+      ...lastMoveField,
+    };
   }
   return {
     id: raw.id,
@@ -601,6 +769,7 @@ function compileExercise(
     stars3: raw.stars3,
     stars2: raw.stars2,
     ...easier,
+    ...lastMoveField,
   };
 }
 

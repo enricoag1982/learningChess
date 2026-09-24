@@ -47,6 +47,15 @@ const exerciseCommonFields = {
   id: keySchema,
   text: textRefSchema,
   easier: keySchema.optional(),
+  /**
+   * The opponent's last move, `<from><to>` (e.g. `d7d5`), display only (M4.1): the loader checks a
+   * piece sits on `to`, and — when the position has an en passant square — that this is exactly the
+   * double step that produced it. See `ExerciseBase.lastMove` (`@chess-kids/core`).
+   */
+  lastMove: z
+    .string()
+    .regex(/^[a-h][1-8][a-h][1-8]$/)
+    .optional(),
   ...positionFields,
 };
 
@@ -82,10 +91,13 @@ const selectSquaresSchema = z
  * A `yes-no` exercise's optional load-time-only check: the loader computes the named rule fact on
  * the exercise's own position and fails the build if it contradicts `answer`, so a "safe?" /
  * "in check?" answer can never be authored wrong. Never compiled into the runtime `ExerciseDef`.
+ * M4.1 adds `can-castle kingside|queenside`, `can-en-passant` and `insufficient-material`.
  */
 const yesNoVerifySchema = z
   .string()
-  .regex(/^(?:hanging|attacked|defended) [a-h][1-8]$|^(?:in-check|checkmate|stalemate)$/);
+  .regex(
+    /^(?:hanging|attacked|defended) [a-h][1-8]$|^(?:in-check|checkmate|stalemate|insufficient-material)$|^can-castle (?:kingside|queenside)$|^can-en-passant$/,
+  );
 
 const yesNoSchema = z
   .object({
@@ -126,12 +138,13 @@ const choiceSchema = z
      * requires every option to be a piece and `answer` to be the (unique) higher-value one;
      * `worth <n>` requires every option to be a piece and `answer` to be the (unique) option worth
      * exactly `<n>`; `trade <SAN>` requires options ids `good`/`equal`/`bad` and `answer` to match
-     * the loader's classification of the kid capture `<SAN>` in the position. Never compiled into
-     * the runtime `ExerciseDef`.
+     * the loader's classification of the kid capture `<SAN>` in the position; `draw-kind` (M4.1)
+     * requires options ids `stalemate`/`insufficient-material`/`not-a-draw` and `answer` to match
+     * the loader's classification of the position. Never compiled into the runtime `ExerciseDef`.
      */
     verify: z
       .string()
-      .regex(/^higher-value$|^worth [0-9]+$|^trade \S+$/)
+      .regex(/^higher-value$|^worth [0-9]+$|^trade \S+$|^draw-kind$/)
       .optional(),
   })
   .strict();
@@ -145,12 +158,14 @@ const choiceSchema = z
  * `good-trade` (captures worth more than the capturer, or of an undefended piece), `check` (the
  * move gives check), `escape-king` / `escape-block` / `escape-capture` (the kid's king must be in
  * check: a non-capturing king move / an interposition / a capture of the checking piece, a king
- * capture included only under `escape-capture`). Never compiled into the runtime `BestMoveDef`.
+ * capture included only under `escape-capture`); `castle` (M4.1: exactly the legal `O-O`/`O-O-O`
+ * moves), `en-passant` (M4.1: exactly the legal en passant captures). Never compiled into the
+ * runtime `BestMoveDef`.
  */
 const bestMoveVerifySchema = z
   .string()
   .regex(
-    /^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$|^check$|^escape-king$|^escape-block$|^escape-capture$/,
+    /^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$|^check$|^escape-king$|^escape-block$|^escape-capture$|^castle$|^en-passant$/,
   );
 
 const bestMoveSchema = z

@@ -404,3 +404,56 @@ mate-hunt-r10: Checkmate in one! Lion guards the checking square.
 first-game:
   title: Your First Full Game!
   goal: Play a whole game against Mouse. Checkmate him to win — good luck!
+castling:
+  title: 'Castling: King and Rook Swap'
+  story: >-
+    Castling is a special move! Lion and a Rhino move together: Lion jumps two squares
+    toward a Rhino that hasn't moved yet, and that Rhino hops right over to stand beside
+    him. It's the only time two pieces move in one turn!
+  demo: Try it! Move Lion two squares toward a Rhino to castle.
+castling-g1: "Lion and the kingside Rhino haven't moved, and nothing stands between them. Can Lion castle kingside right now?"
+castling-g2: Castle kingside! Move Lion two squares to swap places with Rhino.
+castling-01: 'Lion and the queenside Rhino are both still home, with a clear path between them. Can Lion castle queenside right now?'
+castling-02: 'The kingside Rhino already moved away from the corner. Can Lion castle kingside right now?'
+castling-03: A black rook is giving Lion check! Can Lion castle kingside right now?
+castling-04: Horse stands between Lion and the kingside Rhino. Can Lion castle kingside right now?
+castling-05: A black bishop watches the square right next to Lion. Can Lion castle queenside right now?
+castling-06: Only the queenside Rhino is still home. Castle queenside!
+castling-07: Only the kingside Rhino is still home. Castle kingside!
+castling-08: Both Rhinos are still home! Castle with either one.
+en-passant:
+  title: 'En Passant: Catch It "In Passing"'
+  story: >-
+    Sometimes a Caterpillar rushes two squares on its very first move, right past an enemy
+    Caterpillar standing beside it. That's not quite fair — so, just this once, the enemy
+    Caterpillar may capture it anyway, as if it had only moved one square. This is called
+    "en passant" (French for "in passing"), and it only works right away, the very next move.
+  demo: Black's pawn just rushed two squares past yours. Capture it en passant, right now!
+en-passant-g1: Black's pawn just rushed two squares and landed beside yours. Capture it en passant!
+en-passant-g2: "Black's pawn just rushed two squares past your Caterpillar on c5. Can you capture it en passant right now?"
+en-passant-01: Black's pawn just rushed two squares past yours. Capture it en passant!
+en-passant-02: Black's pawn just rushed two squares past yours. Capture it en passant!
+en-passant-03: Two of your Caterpillars could catch this one — either capture works!
+en-passant-04: "Black's pawn just rushed two squares past your Caterpillar on h5. Can you capture it en passant right now?"
+en-passant-05: "Black's last move was the king, not the pawn. Can your Caterpillar on d5 capture the e5 pawn en passant right now?"
+draws:
+  title: 'Draws: Nobody Wins'
+  story: >-
+    Some games end in a draw — nobody wins! Stalemate is one way: no legal move, but not in
+    check. A game is also a draw when there isn't enough material left to checkmate (like a
+    lone king against a lone king), if the exact same position happens three times in a row,
+    or if 50 moves pass with no capture and no pawn move.
+  demo: The black king has no legal move, and he isn't in check. That's stalemate — a draw!
+draws-g1: "The black king has no legal move, and he isn't in check. Is he stalemated?"
+draws-g2: 'Only two lone kings are left on the board. Stalemate, not enough material — or not a draw at all?'
+draws-01: "The black king has no legal move, and he isn't in check. Is he stalemated?"
+draws-02: A king and knight can never checkmate a lone king. Is this a draw by insufficient material?
+draws-03: "It's Black's turn. Stalemate, not enough material — or not a draw at all?"
+draws-04: 'Look at every piece on the board. Stalemate, not enough material — or not a draw at all?'
+draws-05: "It's White's turn. Stalemate, not enough material — or not a draw at all?"
+draws-opt-stalemate: Stalemate
+draws-opt-insufficient: Not enough material
+draws-opt-not-a-draw: Not a draw
+full-game-rabbit:
+  title: Full Game vs Rabbit
+  goal: Play a whole game against Rabbit. Checkmate him to win — he's quicker than Mouse!

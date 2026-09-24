@@ -10,6 +10,12 @@ interface ExerciseBase {
   readonly position: Position;
   /** Id of an entry in the lesson's `variants`, offered after `EASIER_AFTER_ERRORS` errors on this (scored) exercise. */
   readonly easier?: string;
+  /**
+   * The opponent's last move, display only (M4.1): the board highlights `from`/`to` from the start,
+   * before the kid's own first move — needed for en passant, so the kid sees the double step that
+   * makes the capture legal. Never affects legality or scoring; loader-checked against `position`.
+   */
+  readonly lastMove?: { readonly from: Square; readonly to: Square };
 }
 
 /** Move a piece over every star; 3/2-star move-count thresholds. Opponent, if any, is static. */
