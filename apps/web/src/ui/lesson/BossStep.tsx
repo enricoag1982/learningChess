@@ -53,8 +53,11 @@ export function BossStep({ lesson, game: minigame, nextStepIndex }: BossStepProp
   const goalText = tContent(t, minigame.goalKey);
   const replay = useNarratedText(services.narrator, goalText);
   const kidColor = minigame.position.toMove;
+  const isCollectStars = minigame.goal === 'collect-stars';
   const totalEnemies = enemyCount(minigame.position, kidColor);
   const captured = totalEnemies - enemyCount(game.exercise.position, kidColor);
+  const totalStars = minigame.position.markers.stars.length;
+  const starsCollected = totalStars - game.exercise.position.markers.stars.length;
 
   useEffect(() => {
     if (result === 'playing' || savedRef.current || !profile) return;
@@ -110,7 +113,11 @@ export function BossStep({ lesson, game: minigame, nextStepIndex }: BossStepProp
             <SpeechBubble text={goalText} />
             <ReplayButton onClick={replay} label={t('exercise.replay')} />
             <div className="flex flex-col gap-1 rounded-3xl border-2 border-line bg-card px-5 py-4 font-display text-lg text-ink">
-              <span>{t('boss.captured-of', { current: captured, total: totalEnemies })}</span>
+              <span>
+                {isCollectStars
+                  ? t('boss.stars-of', { current: starsCollected, total: totalStars })
+                  : t('boss.captured-of', { current: captured, total: totalEnemies })}
+              </span>
               <span>{t('boss.moves-par', { moves: game.exercise.moves, par: minigame.par })}</span>
             </div>
             {/* Autosave (recordBossResult) completes before either Next button appears. */}

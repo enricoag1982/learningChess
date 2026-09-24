@@ -17,3 +17,77 @@ rook-08: Rhino's biggest challenge yet. Collect every star around the rock.
 hungry-rook:
   title: Hungry Rook
   goal: Rhino is starving! Capture every piece before the moves run out.
+bishop:
+  title: Meet Elephant the Bishop
+  story: >-
+    Elephant only walks on diagonal paths, but he can go as far as he likes! Long ago people even
+    called this piece "the Elephant." He always stays on squares of one colour.
+  demo: Watch Elephant walk to every green dot. Diagonal paths, any distance!
+bishop-g1: Move Elephant diagonally to the star.
+bishop-g2: Move Elephant the other diagonal way to the star.
+bishop-01: Help Elephant grab both stars, corner to corner.
+bishop-02: Collect every star. Plan Elephant's diagonal path first!
+bishop-03: Elephant only visits squares of one colour. Can Elephant reach the star?
+bishop-04: Tap every square Elephant can reach. Look — they're all the same colour!
+bishop-05: A rock blocks the diagonal! Find another way to the star.
+bishop-06: Elephant is hungry. Gobble up the pawn!
+bishop-07: A rock blocks one path, a pawn waits on another. Tap every square Elephant can reach.
+bishop-08: Elephant's biggest challenge yet. Capture all four pawns.
+hungry-bishop:
+  title: Hungry Bishop
+  goal: Elephant is starving! Capture every piece before the moves run out.
+queen:
+  title: Meet Lioness the Queen
+  story: >-
+    Lioness combines Rhino's straight charges and Elephant's diagonal paths. She is the strongest
+    hunter on the board!
+  demo: Watch Lioness run to every green dot. Straight lines and diagonals, any distance!
+queen-g1: Move Lioness straight up to the star.
+queen-g2: Move Lioness straight across to the star.
+queen-01: Help Lioness grab both stars in the corners.
+queen-02: One swift diagonal move reaches the far star!
+queen-03: Tap every square Lioness can reach from here.
+queen-04: A rock blocks the way! Find another path to the star.
+queen-05: Lioness is hungry. Gobble up the pawn!
+queen-06: A friend blocks one line, a pawn waits on another. Tap every square Lioness can reach.
+queen-07: Three pawns, three captures. Get them all!
+queen-08: Lioness's biggest challenge yet. Collect every star around the rock.
+hungry-queen:
+  title: Hungry Queen
+  goal: Lioness is starving! Capture every piece before the moves run out.
+king:
+  title: Meet Lion the King
+  story: >-
+    Lion is the most important piece of all! He only steps one square at a time, in any direction,
+    and he must always stay safe.
+  demo: Watch Lion take one careful step in every direction.
+king-g1: Move Lion one step up to the star.
+king-g2: Move Lion one step to the star.
+king-01: Walk Lion to the star, one step at a time.
+king-02: Tap every square Lion can step to.
+king-03: A pawn is watching a square! Find a safe path to the star.
+king-04: Tap only the squares where Lion is safe.
+king-05: A pawn blocks the direct path. Find the safe way to the star.
+king-06: Lion's longest walk yet. Stay safe all the way to the star.
+king-walk:
+  title: King Walk
+  goal: Lion must reach both stars, one careful step at a time, always staying safe.
+knight:
+  title: Meet Horse the Knight
+  story: >-
+    Horse jumps in an L shape: two squares one way, then one more to the side. He can jump right
+    over anyone standing in between!
+  demo: Watch Horse jump to every green dot. Always an L shape!
+knight-g1: Jump Horse to the star.
+knight-g2: Jump Horse to the star.
+knight-01: Jump Horse to the star.
+knight-02: Rocks are in the way, but Horse jumps right over them!
+knight-03: Tap every square Horse can jump to.
+knight-04: Horse is hungry. Gobble up the pawn!
+knight-05: A rock blocks one landing spot. Tap every square Horse can jump to.
+knight-06: Horse is boxed in by rocks, but a knight jumps right over them!
+knight-07: Two jumps, two captures. Get them both!
+knight-08: Collect both stars. Plan Horse's jumps!
+knight-maze:
+  title: Knight Maze
+  goal: Horse must collect every star by jumping over the rocks!

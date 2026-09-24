@@ -3,13 +3,22 @@ import type { PieceType, Position } from '../chess/types.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { playMove, startExercise } from './engine.ts';
 import type { ExerciseState } from './engine.ts';
-import type { CaptureDef } from './types.ts';
+import type { CaptureDef, CollectStarsDef } from './types.ts';
 
-/** Hungry-piece style mini-game: kid pieces vs static enemies, win = capture all. */
+/**
+ * Mini-game win condition: `capture-all` (Hungry Piece: capture every enemy) or `collect-stars`
+ * (Knight Maze / King Walk: reach every star; a static enemy may still make some squares unsafe
+ * for a king, enforced by normal move legality — see `VariantRules`).
+ */
+export type MiniGameGoal = 'capture-all' | 'collect-stars';
+
+/** Static-opponent mini-game: kid piece(s) vs static enemies / rocks, win = reach `goal`. */
 export interface StaticCaptureGameDef {
   readonly id: string;
   readonly concept: string;
   readonly position: Position;
+  /** Win condition; defaults to `capture-all` (every mini-game before M2.3 was capture-only). */
+  readonly goal?: MiniGameGoal;
   /** Move count within which a win earns 3 stars. */
   readonly par: number;
   /** Optional cap on kid moves; reaching it without winning ends the game. */
@@ -30,21 +39,24 @@ export type GameOutcome =
   | { readonly kind: 'won'; readonly move: Move; readonly captured?: PieceType }
   | { readonly kind: 'ended'; readonly move: Move; readonly captured?: PieceType };
 
-function toCaptureDef(def: StaticCaptureGameDef): CaptureDef {
-  return {
+function toGoalDef(def: StaticCaptureGameDef): CaptureDef | CollectStarsDef {
+  const shared = {
     id: def.id,
     concept: def.concept,
     textKey: def.id,
     position: def.position,
-    type: 'capture',
     stars3: def.par,
     stars2: def.par,
-  };
+  } as const;
+  if ((def.goal ?? 'capture-all') === 'collect-stars') {
+    return { ...shared, type: 'collect-stars' };
+  }
+  return { ...shared, type: 'capture' };
 }
 
 /** Starts a fresh mini-game at its authored position. */
 export function startStaticCaptureGame(def: StaticCaptureGameDef): GameState {
-  return { def, exercise: startExercise(toCaptureDef(def)), ended: false };
+  return { def, exercise: startExercise(toGoalDef(def)), ended: false };
 }
 
 /** Plays one kid move. Reuses the capture exercise engine for legality and win detection. */
@@ -62,8 +74,9 @@ export function playGameMove(
     return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
   }
   if (outcome.kind === 'wrong') {
-    // Mini-games are always `capture` exercises (see `toCaptureDef`): `playMove` never produces
-    // this outcome for them (best-move only). Handled for exhaustiveness, not reachability.
+    // Mini-games are always `capture` or `collect-stars` exercises (see `toGoalDef`): `playMove`
+    // never produces this outcome for them (best-move only). Handled for exhaustiveness, not
+    // reachability.
     return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
   }
 

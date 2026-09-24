@@ -143,6 +143,7 @@ export type {
   Hint,
   SolverMove,
   StaticCaptureGameDef,
+  MiniGameGoal,
   GameState,
   GameOutcome,
 } from './domain/exercise/index.ts';

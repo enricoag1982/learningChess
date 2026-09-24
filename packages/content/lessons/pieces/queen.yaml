@@ -1,0 +1,162 @@
+id: queen
+world: pieces
+order: 3
+concept: queen-move
+character: lioness
+title: queen.title
+story: queen.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . Q . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: queen.demo
+  highlight: legal-moves d4
+guided:
+  - id: queen-g1
+    type: collect-stars
+    text: queen-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . * . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+    stars3: 1
+    stars2: 2
+  - id: queen-g2
+    type: collect-stars
+    text: queen-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . *
+    stars3: 1
+    stars2: 2
+exercises:
+  - id: queen-01
+    type: collect-stars
+    text: queen-01
+    board: |
+      * . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+    stars3: 2
+    stars2: 3
+  - id: queen-02
+    type: collect-stars
+    text: queen-02
+    board: |
+      . . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+    stars3: 1
+    stars2: 2
+  - id: queen-03
+    type: select-squares
+    text: queen-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: queen-04
+    type: collect-stars
+    text: queen-04
+    board: |
+      * . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      x . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+    stars3: 2
+    stars2: 3
+  - id: queen-05
+    type: capture
+    text: queen-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . p . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+    stars3: 1
+    stars2: 2
+  - id: queen-06
+    type: select-squares
+    text: queen-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . P . . . .
+      . . . . . . . .
+      p . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: queen-07
+    type: capture
+    text: queen-07
+    board: |
+      p . . . p . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . Q . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . p
+    stars3: 3
+    stars2: 4
+  - id: queen-08
+    type: collect-stars
+    text: queen-08
+    board: |
+      * . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . x . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      * . . . . . . *
+    stars3: 4
+    stars2: 6
+boss: hungry-queen

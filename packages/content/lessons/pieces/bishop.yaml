@@ -1,0 +1,162 @@
+id: bishop
+world: pieces
+order: 2
+concept: bishop-move
+character: elephant
+title: bishop.title
+story: bishop.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . B . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: bishop.demo
+  highlight: legal-moves d4
+guided:
+  - id: bishop-g1
+    type: collect-stars
+    text: bishop-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . * . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    stars3: 1
+    stars2: 2
+  - id: bishop-g2
+    type: collect-stars
+    text: bishop-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . * . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    stars3: 1
+    stars2: 2
+exercises:
+  - id: bishop-01
+    type: collect-stars
+    text: bishop-01
+    board: |
+      . . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      * . . . . . . .
+    stars3: 2
+    stars2: 3
+  - id: bishop-02
+    type: collect-stars
+    text: bishop-02
+    board: |
+      . . . . . . . .
+      * . . . . . * .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . * .
+    stars3: 4
+    stars2: 5
+  - id: bishop-03
+    type: yes-no
+    text: bishop-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B * . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: e4
+  - id: bishop-04
+    type: select-squares
+    text: bishop-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: bishop-05
+    type: collect-stars
+    text: bishop-05
+    board: |
+      . . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . x . . . .
+      . . . . . . . .
+      . B . . . . . .
+      . . . . . . . .
+    stars3: 4
+    stars2: 5
+  - id: bishop-06
+    type: capture
+    text: bishop-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      p . . . . . . .
+    stars3: 1
+    stars2: 2
+  - id: bishop-07
+    type: select-squares
+    text: bishop-07
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . p . .
+      . . . . . . . .
+      . . . B . . . .
+      . . x . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: bishop-08
+    type: capture
+    text: bishop-08
+    board: |
+      . . . . . . . p
+      p . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      p . . . . . p .
+    stars3: 5
+    stars2: 6
+boss: hungry-bishop
