@@ -33,3 +33,29 @@ describe('perft', () => {
     expect(perft(parseFen(fen), depth)).toBe(expected);
   });
 });
+
+/** Same leaf count as `perft`, but through one reused `SearchBoard` (play/undo) instead of `play`. */
+function perftViaSearchBoard(position: Position, depth: number): number {
+  const board = rules.searchBoard(position);
+  function walk(remaining: number): number {
+    const moves = board.moves();
+    if (remaining === 1) return moves.length;
+    let nodes = 0;
+    for (const move of moves) {
+      board.play(move);
+      nodes += walk(remaining - 1);
+      board.undo();
+    }
+    return nodes;
+  }
+  return walk(depth);
+}
+
+describe('perft via searchBoard', () => {
+  it.each([
+    ['start', 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', 3, 8902],
+    ['kiwipete', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1', 2, 2039],
+  ])('%s depth %i = %i', (_name, fen, depth, expected) => {
+    expect(perftViaSearchBoard(parseFen(fen), depth)).toBe(expected);
+  });
+});

@@ -1,4 +1,4 @@
-import type { Color, PieceType, Position, Square } from './types.ts';
+import type { Color, Piece, PieceType, Position, Square } from './types.ts';
 
 /** A played or candidate move. */
 export interface Move {
@@ -30,6 +30,30 @@ export class InvalidPositionError extends Error {
   }
 }
 
+/**
+ * One board, built once from a `Position` and mutated in place via `play`/`undo`. For engines
+ * (bots, perft) that walk thousands of positions per move: rebuilding a fresh chess.js instance
+ * from FEN for every node is too slow, so this reuses a single instance instead. Same kingless
+ * handling as `ChessRules` (a missing king skips validation); walls and the static-opponent
+ * variant are lesson-only and have no place here.
+ */
+export interface SearchBoard {
+  /** Legal moves for the side to move. */
+  moves(): Move[];
+  /** Plays a move obtained from `moves()` (or an equivalent legal move) in place. */
+  play(move: Move): void;
+  /** Undoes the last move played. */
+  undo(): void;
+  turn(): Color;
+  inCheck(): boolean;
+  isCheckmate(): boolean;
+  isStalemate(): boolean;
+  /** Occupied squares only. */
+  pieces(): Partial<Record<Square, Piece>>;
+  /** Current position (markers carried over unchanged from the board this was built from). */
+  position(): Position;
+}
+
 /** Standard chess rules. Variant rules (blocked squares, custom wins) live in a separate layer (M1). */
 export interface ChessRules {
   /** Legal moves for the side to move, optionally only from one square. */
@@ -42,4 +66,6 @@ export interface ChessRules {
   status(position: Position): PositionStatus;
   /** Squares of `by` pieces attacking `square`. */
   attackers(position: Position, square: Square, by: Color): Square[];
+  /** One reusable board for fast search (bots, perft); see `SearchBoard`. */
+  searchBoard(position: Position): SearchBoard;
 }
