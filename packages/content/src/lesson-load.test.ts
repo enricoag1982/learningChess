@@ -60,6 +60,59 @@ function validSelectSquaresExercise(
   };
 }
 
+/** Rook on a1: a yes-no exercise, answer "yes". */
+function validYesNoExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'yes-no',
+    text: 'demo-01',
+    board: diagram({ a1: 'R' }),
+    answer: 'yes',
+    focus: 'a1',
+    ...overrides,
+  };
+}
+
+/** Rook + pawn on the board: a choice exercise between the two pieces, piece-only options. */
+function validChoiceExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'choice',
+    text: 'demo-01',
+    board: diagram({ a1: 'R', h1: 'P' }),
+    options: [
+      { id: 'rook', piece: 'R' },
+      { id: 'pawn', piece: 'P' },
+    ],
+    answer: 'rook',
+    ...overrides,
+  };
+}
+
+/** Rook on a1: a best-move exercise solved by moving the rook to a8. */
+function validBestMoveExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ a1: 'R' }),
+    solutions: ['Ra8'],
+    ...overrides,
+  };
+}
+
+/** Empty board: a setup exercise placing one rook on a1. */
+function validSetupExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'setup',
+    text: 'demo-01',
+    board: diagram({}),
+    target: { board: diagram({ a1: 'R' }) },
+    ...overrides,
+  };
+}
+
 function validLesson(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 'demo-lesson',
@@ -110,6 +163,7 @@ function writeDefaultLocales(): void {
       'demo-lesson': { title: 'Title', story: 'Story' },
       'demo-demo': 'Demo',
       'demo-01': 'Exercise',
+      'choice-opt-a': 'Option A',
       mg1: { title: 'Title', goal: 'Goal' },
     }),
   );
@@ -339,5 +393,244 @@ describe('loadContent', () => {
     expect(issues.length).toBeGreaterThanOrEqual(2);
     expect(issues.some((issue) => issue.includes('unknown mini-game'))).toBe(true);
     expect(issues.some((issue) => issue.includes('missing text key'))).toBe(true);
+  });
+
+  describe('yes-no', () => {
+    it('loads a valid yes-no exercise with no issues', () => {
+      writeLesson({ exercises: [validYesNoExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a focus square that is not a valid square', () => {
+      writeLesson({ exercises: [validYesNoExercise({ focus: 'z9' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('exercises.0.focus'))).toBe(true);
+    });
+
+    it('rejects an answer that is not "yes" or "no"', () => {
+      writeLesson({ exercises: [validYesNoExercise({ answer: 'maybe' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('exercises.0.answer'))).toBe(true);
+    });
+  });
+
+  describe('choice', () => {
+    it('loads a valid choice exercise with no issues', () => {
+      writeLesson({ exercises: [validChoiceExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects fewer than 2 options', () => {
+      writeLesson({ exercises: [validChoiceExercise({ options: [{ id: 'rook', piece: 'R' }] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('exercises.0.options'))).toBe(true);
+    });
+
+    it('reports duplicate option ids', () => {
+      writeLesson({
+        exercises: [
+          validChoiceExercise({
+            options: [
+              { id: 'rook', piece: 'R' },
+              { id: 'rook', piece: 'P' },
+            ],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('duplicate option id "rook"'))).toBe(true);
+    });
+
+    it('reports an answer that is not among its options', () => {
+      writeLesson({ exercises: [validChoiceExercise({ answer: 'no-such-option' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('"answer" must reference one of "options"')),
+      ).toBe(true);
+    });
+
+    it('reports an option with neither text nor piece', () => {
+      writeLesson({
+        exercises: [validChoiceExercise({ options: [{ id: 'rook' }, { id: 'pawn', piece: 'P' }] })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('option needs "text" or "piece"'))).toBe(true);
+    });
+
+    it('loads a valid choice exercise with a text option', () => {
+      writeLesson({
+        exercises: [
+          validChoiceExercise({
+            options: [
+              { id: 'rook', text: 'choice-opt-a' },
+              { id: 'pawn', piece: 'P' },
+            ],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it("reports a missing text key for an option's text", () => {
+      writeLesson({
+        exercises: [
+          validChoiceExercise({
+            options: [
+              { id: 'rook', text: 'no-such-option-key' },
+              { id: 'pawn', piece: 'P' },
+            ],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('missing text key "lessons:no-such-option-key"')),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move', () => {
+    it('loads a valid best-move exercise with no issues', () => {
+      writeLesson({ exercises: [validBestMoveExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an empty solutions list', () => {
+      writeLesson({ exercises: [validBestMoveExercise({ solutions: [] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('exercises.0.solutions'))).toBe(true);
+    });
+
+    it('reports a solution that is not a legal move in the position', () => {
+      writeLesson({ exercises: [validBestMoveExercise({ solutions: ['Qh5'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('solution "Qh5" is not a legal move in the position'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('setup', () => {
+    it('loads a valid setup exercise with no issues', () => {
+      writeLesson({ exercises: [validSetupExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports a start piece that is not part of the target', () => {
+      writeLesson({
+        exercises: [
+          validSetupExercise({
+            board: diagram({ h8: 'r' }), // not in the target (a1 rook only)
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('start piece at h8 is not part of the target')),
+      ).toBe(true);
+    });
+
+    it('reports a target that is the same as the start position', () => {
+      writeLesson({
+        exercises: [
+          validSetupExercise({
+            board: diagram({ a1: 'R' }),
+            target: { board: diagram({ a1: 'R' }) },
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('setup target is the same as the start position')),
+      ).toBe(true);
+    });
+
+    it('reports star/blocked markers on the target', () => {
+      writeLesson({
+        exercises: [validSetupExercise({ target: { board: diagram({ a1: 'R', h8: '*' }) } })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('setup target must not use star or blocked markers')),
+      ).toBe(true);
+    });
+
+    it('requires exactly one of "board" or "fen" on the target', () => {
+      writeLesson({ exercises: [validSetupExercise({ target: {} })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('exercises.0.target'))).toBe(true);
+    });
+  });
+
+  it('loads a fixture lesson using all four new exercise types with no issues', () => {
+    writeLesson({
+      guided: [],
+      exercises: [
+        validYesNoExercise({ id: 'yn-01' }),
+        validChoiceExercise({ id: 'ch-01' }),
+        validBestMoveExercise({ id: 'bm-01' }),
+        validSetupExercise({ id: 'su-01' }),
+      ],
+    });
+    writeMiniGame();
+    writeDefaultLocales();
+
+    expect(issuesOf()).toEqual([]);
   });
 });

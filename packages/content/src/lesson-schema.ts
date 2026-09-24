@@ -74,32 +74,119 @@ const selectSquaresSchema = z
   })
   .strict();
 
+const yesNoSchema = z
+  .object({
+    ...exerciseCommonFields,
+    type: z.literal('yes-no'),
+    answer: z.enum(['yes', 'no']),
+    focus: squareSchema.optional(),
+  })
+  .strict();
+
+/** FEN letter of a piece, either colour (`K`, `q`, …). */
+const FEN_PIECE_PATTERN = /^[KQRBNPkqrbnp]$/;
+
+const choiceOptionSchema = z
+  .object({
+    id: keySchema,
+    text: textRefSchema.optional(),
+    piece: z.string().regex(FEN_PIECE_PATTERN).optional(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.text === undefined && value.piece === undefined) {
+      ctx.addIssue({ code: 'custom', message: 'option needs "text" or "piece"' });
+    }
+  });
+
+const choiceSchema = z
+  .object({
+    ...exerciseCommonFields,
+    type: z.literal('choice'),
+    options: z.array(choiceOptionSchema).min(2),
+    answer: z.string(),
+    /** Hides the board (default: shown). Named apart from `board`, the position diagram field. */
+    showBoard: z.boolean().optional(),
+  })
+  .strict();
+
+const bestMoveSchema = z
+  .object({
+    ...exerciseCommonFields,
+    type: z.literal('best-move'),
+    solutions: z.array(z.string()).min(1),
+  })
+  .strict();
+
+/** A setup exercise's goal position: same shape as `positionFields`, minus `toMove` (unused). */
+const targetSchema = z
+  .object({ board: z.string().optional(), fen: z.string().optional() })
+  .strict()
+  .superRefine(checkExactlyOnePosition);
+
+const setupSchema = z
+  .object({
+    ...exerciseCommonFields,
+    type: z.literal('setup'),
+    target: targetSchema,
+  })
+  .strict();
+
 /** One exercise (`guided` or `exercises` entry), discriminated by `type`. */
 export const exerciseSchema = z
-  .discriminatedUnion('type', [collectStarsSchema, captureSchema, selectSquaresSchema])
+  .discriminatedUnion('type', [
+    collectStarsSchema,
+    captureSchema,
+    selectSquaresSchema,
+    yesNoSchema,
+    choiceSchema,
+    bestMoveSchema,
+    setupSchema,
+  ])
   .superRefine((value, ctx) => {
     checkExactlyOnePosition(value, ctx);
-    if (value.type !== 'select-squares') {
-      return;
+    if (value.type === 'select-squares') {
+      const hasAnswer = value.answer !== undefined;
+      const hasDerive = value.derive !== undefined || value.from !== undefined;
+      if (hasAnswer === hasDerive) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'exactly one of "answer" or "derive" + "from" is required',
+        });
+        return;
+      }
+      if (hasDerive && (value.derive === undefined || value.from === undefined)) {
+        ctx.addIssue({ code: 'custom', message: '"derive" requires both "derive" and "from"' });
+      }
+      if (hasAnswer && value.answer?.length === 0) {
+        ctx.addIssue({ code: 'custom', path: ['answer'], message: '"answer" must not be empty' });
+      }
     }
-    const hasAnswer = value.answer !== undefined;
-    const hasDerive = value.derive !== undefined || value.from !== undefined;
-    if (hasAnswer === hasDerive) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'exactly one of "answer" or "derive" + "from" is required',
-      });
-      return;
-    }
-    if (hasDerive && (value.derive === undefined || value.from === undefined)) {
-      ctx.addIssue({ code: 'custom', message: '"derive" requires both "derive" and "from"' });
-    }
-    if (hasAnswer && value.answer?.length === 0) {
-      ctx.addIssue({ code: 'custom', path: ['answer'], message: '"answer" must not be empty' });
+    if (value.type === 'choice') {
+      const ids = value.options.map((option) => option.id);
+      const seen = new Set<string>();
+      for (const id of ids) {
+        if (seen.has(id)) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['options'],
+            message: `duplicate option id "${id}"`,
+          });
+        }
+        seen.add(id);
+      }
+      if (!ids.includes(value.answer)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['answer'],
+          message: '"answer" must reference one of "options"',
+        });
+      }
     }
   });
 
 export type ExerciseYaml = z.infer<typeof exerciseSchema>;
+export type ChoiceOptionYaml = z.infer<typeof choiceOptionSchema>;
 
 /** One lesson file (`lessons/<world>/<lesson-id>.yaml`). */
 export const lessonSchema = z

@@ -46,7 +46,7 @@ describe('real content', () => {
   it('every collect-stars / capture exercise (guided and scored) is solvable at its stars3', () => {
     for (const lesson of content.lessons) {
       for (const exercise of [...lesson.guided, ...lesson.exercises]) {
-        if (exercise.type === 'select-squares') {
+        if (exercise.type !== 'collect-stars' && exercise.type !== 'capture') {
           continue;
         }
         expect(optimalMoves(exercise, rules)).toBe(exercise.stars3);

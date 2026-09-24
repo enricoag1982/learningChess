@@ -153,7 +153,7 @@ export function solve(
 
 /** Shortest solve length for `def` (collect-stars / capture only); `null` when unsolvable. Used by content tests. */
 export function optimalMoves(def: ExerciseDef, rules: VariantRules): number | null {
-  if (def.type === 'select-squares') {
+  if (def.type !== 'collect-stars' && def.type !== 'capture') {
     return null;
   }
   const line = solve(def.position, rules, def.type);

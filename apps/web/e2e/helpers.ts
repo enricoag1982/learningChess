@@ -63,8 +63,11 @@ export async function completeExercise(page: Page, def: ExerciseDef): Promise<vo
       await clickSquare(page, square);
     }
     await page.getByRole('button', { name: /Check/ }).click();
-  } else {
+  } else if (def.type === 'collect-stars' || def.type === 'capture') {
     await playSolveLine(page, def.position, def.type);
+  } else {
+    // Real lesson content ships no yes-no / choice / best-move / setup exercises yet.
+    throw new Error(`completeExercise: unsupported exercise type "${def.type}"`);
   }
   await page.getByRole('button', { name: /^Next/ }).click();
 }

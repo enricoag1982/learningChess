@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
-import type { ExerciseDef, SelectSquaresDef } from '@chess-kids/core';
+import type {
+  BestMoveDef,
+  ChoiceDef,
+  ExerciseDef,
+  Position,
+  SelectSquaresDef,
+  SetupDef,
+  YesNoDef,
+} from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';
@@ -211,5 +219,269 @@ describe('ExerciseStep', () => {
     const profile = store.getState().profile;
     const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
     expect(saved?.bestStars[exercise.id]).toBe(2);
+  });
+
+  describe('yes-no', () => {
+    const position = parseDiagram(`
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . R . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    `);
+    const exercise: YesNoDef = {
+      id: 'yn-me',
+      concept: 'fixture-move',
+      textKey: 'fixtures:yn',
+      position,
+      type: 'yes-no',
+      answer: true,
+      focus: 'e4',
+    };
+
+    it('a wrong answer explains and can be retried; the right one solves it', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'No' }));
+      await screen.findByText('Not quite! Try again.');
+
+      fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
+      await screen.findByText('Well done!'); // one earlier wrong answer caps this at 2 stars
+
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars[exercise.id]).toBe(2);
+    });
+
+    it('hint ladder: look closely, then think again, then reveal', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const hintButton = screen.getByRole('button', { name: /Hint/ });
+      fireEvent.click(hintButton);
+      await screen.findByText('Look closely.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Think about it again.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Here is the answer.');
+    });
+  });
+
+  describe('choice', () => {
+    const position = parseDiagram(`
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    `);
+    const exercise: ChoiceDef = {
+      id: 'ch-me',
+      concept: 'fixture-move',
+      textKey: 'fixtures:ch',
+      position,
+      type: 'choice',
+      showBoard: false,
+      options: [
+        { id: 'queen', textKey: 'fixtures:opt-queen' },
+        { id: 'rook', textKey: 'fixtures:opt-rook' },
+        { id: 'bishop', textKey: 'fixtures:opt-bishop' },
+      ],
+      answer: 'queen',
+    };
+
+    it('a wrong pick disables it and explains; the right one solves it', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'opt-rook' }));
+      await screen.findByText('Not quite! Try again.');
+      expect(screen.getByRole('button', { name: 'opt-rook' }).hasAttribute('disabled')).toBe(true);
+
+      fireEvent.click(screen.getByRole('button', { name: 'opt-queen' }));
+      await screen.findByText('Well done!'); // one earlier wrong pick caps this at 2 stars
+
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars[exercise.id]).toBe(2);
+    });
+
+    it('hint ladder removes one wrong option per level, then reveals', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const hintButton = screen.getByRole('button', { name: /Hint/ });
+      fireEvent.click(hintButton);
+      await screen.findByText('One choice is ruled out.');
+      const disabledAfterFirst = [
+        screen.getByRole('button', { name: 'opt-rook' }).hasAttribute('disabled'),
+        screen.getByRole('button', { name: 'opt-bishop' }).hasAttribute('disabled'),
+      ].filter(Boolean).length;
+      expect(disabledAfterFirst).toBe(1);
+
+      fireEvent.click(hintButton);
+      expect(screen.getByRole('button', { name: 'opt-rook' }).hasAttribute('disabled')).toBe(true);
+      expect(screen.getByRole('button', { name: 'opt-bishop' }).hasAttribute('disabled')).toBe(
+        true,
+      );
+
+      fireEvent.click(hintButton);
+      await screen.findByText('Here is the answer.');
+    });
+  });
+
+  describe('best-move', () => {
+    const position = parseDiagram(`
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    `);
+    const exercise: BestMoveDef = {
+      id: 'bm-me',
+      concept: 'fixture-move',
+      textKey: 'fixtures:bm',
+      position,
+      type: 'best-move',
+      solutions: ['Ra8'],
+    };
+
+    it('a legal but wrong move explains and leaves the piece in place; the solution solves it', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^h1,/ })); // legal, not the solution
+      await screen.findByText('Not this one. Try again!');
+      expect(screen.getByRole('button', { name: /^a1, white rook/ })).toBeTruthy();
+
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^a8,/ })); // the listed solution
+      await screen.findByText('Well done!'); // one earlier wrong attempt caps this at 2 stars
+
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars[exercise.id]).toBe(2);
+    });
+
+    it('hint ladder from piece to target to the move', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const hintButton = screen.getByRole('button', { name: /Hint/ });
+      fireEvent.click(hintButton);
+      await screen.findByText('Look at Rhino.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Try the orange square.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Here is the answer.');
+    });
+  });
+
+  describe('setup', () => {
+    const emptyPosition: Position = {
+      pieces: {},
+      markers: { stars: [], blocked: [] },
+      toMove: 'w',
+      castling: '-',
+      enPassant: null,
+    };
+    const target = parseDiagram(`
+      . . . . . . . r
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    `);
+    const exercise: SetupDef = {
+      id: 'su-me',
+      concept: 'board-setup',
+      textKey: 'fixtures:su',
+      position: emptyPosition,
+      type: 'setup',
+      target,
+    };
+
+    it('places from the palette; a wrong square explains; solves once complete', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /black rook, \d+ left/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^h8,/ }));
+      await screen.findByRole('button', { name: /^h8, black rook/ });
+
+      fireEvent.click(screen.getByRole('button', { name: /white rook, \d+ left/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^h1,/ })); // wrong square for the white rook
+      await screen.findByText('Not quite! Try a different piece or square.');
+
+      fireEvent.click(screen.getByRole('button', { name: /white rook, \d+ left/ })); // reselect
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ })); // correct: solves
+      await screen.findByText('Well done!'); // one earlier wrong placement caps this at 2 stars
+
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars[exercise.id]).toBe(2);
+    });
+
+    it('hint ladder: next piece, then its square, then places it', async () => {
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const hintButton = screen.getByRole('button', { name: /Hint/ });
+      fireEvent.click(hintButton);
+      await screen.findByText('Place the black rook next.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Put it on the orange square.');
+      fireEvent.click(hintButton);
+      await screen.findByText('Here is the answer.');
+
+      await screen.findByRole('button', { name: /^h8, black rook/ });
+    });
   });
 });

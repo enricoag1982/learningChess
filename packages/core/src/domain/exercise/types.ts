@@ -1,4 +1,4 @@
-import type { Position, Square } from '../chess/types.ts';
+import type { Piece, Position, Square } from '../chess/types.ts';
 
 /** Fields shared by every exercise definition. */
 interface ExerciseBase {
@@ -35,5 +35,40 @@ export interface SelectSquaresDef extends ExerciseBase {
     | { readonly derive: 'legal-moves'; readonly from: Square };
 }
 
-/** All M1 exercise definitions. */
-export type ExerciseDef = CollectStarsDef | SelectSquaresDef | CaptureDef;
+/** Answer a yes/no question about the position; `focus`, if given, is the square the question is about. */
+export interface YesNoDef extends ExerciseBase {
+  readonly type: 'yes-no';
+  readonly answer: boolean;
+  readonly focus?: Square;
+}
+
+/** One pickable option: at least one of `textKey` / `piece` is set (schema-enforced). */
+export interface ChoiceOption {
+  readonly id: string;
+  readonly textKey?: string;
+  readonly piece?: Piece;
+}
+
+/** Pick the correct option (e.g. "which piece is worth more?"). */
+export interface ChoiceDef extends ExerciseBase {
+  readonly type: 'choice';
+  readonly options: readonly ChoiceOption[];
+  readonly answer: string;
+  readonly showBoard: boolean;
+}
+
+/** Play the right move; any SAN in `solutions` solves it. Opponent, if any, is static. */
+export interface BestMoveDef extends ExerciseBase {
+  readonly type: 'best-move';
+  readonly solutions: readonly string[];
+}
+
+/** Place pieces from a palette to match `target`; `position` is the (often empty) starting board. */
+export interface SetupDef extends ExerciseBase {
+  readonly type: 'setup';
+  readonly target: Position;
+}
+
+/** All exercise definitions. */
+export type ExerciseDef =
+  CollectStarsDef | SelectSquaresDef | CaptureDef | YesNoDef | ChoiceDef | BestMoveDef | SetupDef;

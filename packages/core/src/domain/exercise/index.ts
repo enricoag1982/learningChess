@@ -1,12 +1,33 @@
-export type { CollectStarsDef, CaptureDef, SelectSquaresDef, ExerciseDef } from './types.ts';
+export type {
+  CollectStarsDef,
+  CaptureDef,
+  SelectSquaresDef,
+  YesNoDef,
+  ChoiceOption,
+  ChoiceDef,
+  BestMoveDef,
+  SetupDef,
+  ExerciseDef,
+} from './types.ts';
 
-export type { ExerciseState, MoveOutcome, SelectionResult, Hint } from './engine.ts';
+export type {
+  ExerciseState,
+  MoveOutcome,
+  SelectionResult,
+  PlaceOutcome,
+  PalettePiece,
+  Hint,
+} from './engine.ts';
 export {
   startExercise,
   exerciseMoves,
   playMove,
   toggleSquare,
   submitSelection,
+  answerYesNo,
+  answerChoice,
+  placePiece,
+  setupPalette,
   undo,
   requestHint,
   starsFor,
