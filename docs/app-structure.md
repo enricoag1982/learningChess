@@ -19,10 +19,16 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 - **Parent mode**: behind parent password. All profiles, progress, settings.
 
 ### Parent password
-- First run: welcome → set parent password (≥ 4 characters, numeric PIN allowed) → app saves a recovery file (random code) and tells the parent where it is (web: Downloads; tablet apps: Files / Documents) → first child profile.
+- Simple kid-gate, not a security boundary: password kept in plain text in a simple file.
+- First run: welcome → set parent password (≥ 4 characters, numeric PIN allowed) → file saved → app shows where it is → first child profile.
+- Password screen always shows the reminder: "Forgot it? It is in the file `<path>`."
 - Asked for: parent area, unlock lessons, change limits, extra time, reset / delete, external links.
 - 5 wrong attempts → 1-minute wait.
-- Forgotten: "Forgot password" → choose recovery file (or type its code) → set new password. File lost: reset app (backup file can be imported).
+
+| Platform | File | Change password |
+|---|---|---|
+| Web (v1) | Browser cannot read a file from a fixed path → app keeps the password; copy saved as `Downloads/chess-for-kids-parent-password.txt` at setup and at every change | In parent area; forgotten → read the file |
+| Store apps (M6) | App reads the password from `parent-password.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in parent area. Android location to verify at M6 |
 
 ## 3. Profiles
 

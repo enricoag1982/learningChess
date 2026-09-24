@@ -70,7 +70,7 @@ Character 1─1 piece type
 | Entity | Fields |
 |---|---|
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
-| ParentLock | `passwordHash`, `salt` (PBKDF2 via WebCrypto), `recoveryHash`, `failedAttempts`, `lockedUntil` |
+| ParentLock | `password` (plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
 | Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |

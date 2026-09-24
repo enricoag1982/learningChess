@@ -33,7 +33,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 
 ## 3. Not sketched yet
 
-Reuse the Exercise / board layout: Practice warm-up, placement test, test-out, game vs computer, mini-game screens. Separate: first-run setup (parent password + recovery file), new-player creation, password screen, "See you tomorrow" screen.
+Reuse the Exercise / board layout: Practice warm-up, placement test, test-out, game vs computer, mini-game screens. Separate: first-run setup (parent password + file location), new-player creation, password screen (with "Forgot it? It is in the file `<path>`"), "See you tomorrow" screen.
 
 ## 4. New proposals in sketches
 

@@ -34,7 +34,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 - TypeScript + React + Vite PWA; Capacitor later for Android / iPad. GitHub Pages hosts the static app.
 - Layers: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`. Content in YAML → Zod → JSON.
 - Animal theme; English first (i18n); narration = Web Speech API (device voices) until v3.
-- Parent password (+ recovery file); daily time limit in v1.
+- Parent password kept in a simple plain-text file; password screen reminds where the file is (web: copy in Downloads; store apps: editable file in app Documents). Daily time limit in v1.
 
 ## Next step: M0 scaffold (see `docs/roadmap.md`)
 
