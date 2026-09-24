@@ -62,6 +62,13 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m1.3` | Content: lesson / exercise / mini-game schemas; Rook lesson + Hungry Rook; content tests (valid, solvable within star limits, keys present) |
 | `m1.4` | Lesson flow: Home → Story → Demo → Try → Exercises → Boss → Complete; narration (Web Speech + subtitles); 1 local profile; progress saved + resume |
 | `m1.5` | Tablet polish, accessibility and performance checks, offline lesson e2e → `m1` |
+| `m2.1` | Profiles (picker, new player: nickname + avatar), first run, parent password (file copy, reminder, 5 tries → 1 min), basic parent area (children, rename, delete, add, change password) |
+| `m2.2` | Journey map (Worlds 1–2, habitats, lesson nodes done / current / locked), availability rules, Home tiles (Journey, Play) |
+| `m2.3` | Task types `yes-no`, `choice`, `best-move`, `setup` (+ `select-squares` derivations): engine, content schema, UI |
+| `m2.4` | World 2 lessons: Bishop, Queen, King, Knight + bosses (Hungry Bishop / Queen, King Walk, Knight Maze: reach-square wins) |
+| `m2.5` | Mouse bot (level 1) in a worker; variant vs computer mode; Pawn + Promotion lessons; Pawn Wars |
+| `m2.6` | World 1 lessons: Squares, Lines, Setup + Square Hunt, Setup Race |
+| `m2.7` | Animal friends, stars totals, basic My Den; Play screen (unlocked mini-games) → `m2` (playtest 2 by user) |
 
 ## 4. After MVP
 

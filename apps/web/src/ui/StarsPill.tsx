@@ -7,6 +7,7 @@ export function StarsPill({ count }: { readonly count: number }): JSX.Element {
   const { t } = useTranslation();
   return (
     <div
+      role="img"
       className="flex h-14 items-center gap-2 rounded-full bg-[#FBEFD3] px-4 font-display text-lg font-semibold text-[#6E4A07]"
       aria-label={t('stars-count', { count })}
     >

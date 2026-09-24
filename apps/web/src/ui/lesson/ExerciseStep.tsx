@@ -5,11 +5,13 @@ import type { ExerciseDef, Lesson, MoveInput } from '@chess-kids/core';
 import { exerciseMoves, recordExerciseResult, starsFor } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { Board } from '../board/Board.tsx';
+import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
+import { useNarratedText } from '../useNarratedText.ts';
 import { PRIMARY_BUTTON, SECONDARY_BUTTON } from './button-styles.ts';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
-import { exerciseBubbleText } from './exercise-text.ts';
+import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
 
@@ -142,7 +144,10 @@ export function ExerciseStep({
     refreshProgress,
   ]);
 
-  const bubbleText = exerciseBubbleText(t, state.feedback, exercise, lesson.character, stars);
+  const instructionText = exerciseInstructionText(t, exercise);
+  const note = exerciseNote(t, state.feedback, lesson.character, stars);
+  const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
+  const replay = useNarratedText(services.narrator, spokenText);
   const isSelectSquares = exercise.type === 'select-squares';
 
   function handleMove(move: MoveInput): void {
@@ -190,14 +195,12 @@ export function ExerciseStep({
       board={board}
       panel={
         <>
-          <SpeechBubble
-            narrator={services.narrator}
-            text={bubbleText}
-            replayLabel={t('exercise.replay')}
-          />
+          <SpeechBubble text={instructionText} note={note} />
+          <ReplayButton onClick={replay} label={t('exercise.replay')} />
           {solved ? (
             <div className="mt-auto flex flex-col items-center gap-4">
-              <StarsRow earned={stars} animate />
+              {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
+              {!guided && <StarsRow earned={stars} animate />}
               {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
               {saved && (
                 <NextButton

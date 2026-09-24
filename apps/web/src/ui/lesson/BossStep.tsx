@@ -12,8 +12,10 @@ import {
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { Board } from '../board/Board.tsx';
+import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
+import { useNarratedText } from '../useNarratedText.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
@@ -48,6 +50,8 @@ export function BossStep({ lesson, game: minigame, nextStepIndex }: BossStepProp
 
   const result = gameResult(game);
   const stars = gameStars(game);
+  const goalText = tContent(t, minigame.goalKey);
+  const replay = useNarratedText(services.narrator, goalText);
   const kidColor = minigame.position.toMove;
   const totalEnemies = enemyCount(minigame.position, kidColor);
   const captured = totalEnemies - enemyCount(game.exercise.position, kidColor);
@@ -103,11 +107,8 @@ export function BossStep({ lesson, game: minigame, nextStepIndex }: BossStepProp
         }
         panel={
           <>
-            <SpeechBubble
-              narrator={services.narrator}
-              text={tContent(t, minigame.goalKey)}
-              replayLabel={t('exercise.replay')}
-            />
+            <SpeechBubble text={goalText} />
+            <ReplayButton onClick={replay} label={t('exercise.replay')} />
             <div className="flex flex-col gap-1 rounded-3xl border-2 border-line bg-card px-5 py-4 font-display text-lg text-ink">
               <span>{t('boss.captured-of', { current: captured, total: totalEnemies })}</span>
               <span>{t('boss.moves-par', { moves: game.exercise.moves, par: minigame.par })}</span>

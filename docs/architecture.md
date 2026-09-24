@@ -27,6 +27,8 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Narration | `Narrator` port: Web Speech API (v1, device voices) → generated audio files (v3) | No audio production in v1; nicer voices later without code changes elsewhere |
 | App state | Zustand store: screen, profile, progress, current lesson + step; exercise / game state local to the step component (reducer over core engine functions); services injected (`createServices`) for tests |
 | Content text keys | Content ids are plain strings in core; UI resolves them through one helper (`tContent`); all other UI keys are type-checked |
+| Plural text | i18next plural suffixes (`_one`, `_other`, …) allowed on text leaves; languages compared by base key |
+| Layout | Tablet landscape: board left, panel right; below 1024 px wide: board on top, panel below; phone: one-row top bar with phase chip |
 | Web delivery | PWA (vite-plugin-pwa / Workbox) | Browser + home-screen install; everything precached, fully offline ([non-functional.md](non-functional.md)) |
 | Fonts | Self-hosted | Offline, no third-party requests |
 | Mobile | Capacitor (Android + iPad) | Same web app packaged for stores |

@@ -39,9 +39,10 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 
 ## Status and next step
 
-- M0 done (tags `m0.1`, `m0.2`, `m0`). Pending user action: Settings → Pages → Source = GitHub Actions (then `deploy.yml` publishes `master`).
-- Next: M1 vertical slice, iterations `m1.1`–`m1.5` in `docs/roadmap.md` §3.1. Branch `m1-vertical-slice`.
-- Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path).
+- Done: M0 (`m0`), M1 (`m1`). Pending user actions: Settings → Pages → Source = GitHub Actions; playtest 1 (`docs/roadmap.md` §5).
+- Next: M2, iterations `m2.1`–`m2.7` in `docs/roadmap.md` §3.1. Branch `m2-worlds-1-2`.
+- Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
+- Dev board playground: `pnpm dev` → `/#board`.
 
 Version notes (checked 2026-09-24):
 

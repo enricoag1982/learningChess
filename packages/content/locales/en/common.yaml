@@ -29,6 +29,24 @@ lesson:
     boss: Boss
   stage-of: '{{current}} of {{total}}'
   board-label: Chess board
+board:
+  color:
+    w: white
+    b: black
+  piece:
+    k: king
+    q: queen
+    r: rook
+    b: bishop
+    n: knight
+    p: pawn
+  square:
+    piece: '{{square}}, {{color}} {{piece}}'
+    star: '{{square}}, star'
+    blocked: '{{square}}, blocked'
+    empty: '{{square}}, empty'
+    selected: '{{base}}, selected'
+    possible-move: '{{base}}, possible move'
 story:
   listen-again: Listen again
   primary: Let me try
@@ -41,7 +59,8 @@ exercise:
   check: Check
   moves-label: Moves
   moves-of: '{{current}} of {{total}}'
-  moves-target: 'in {{count}} moves'
+  moves-target_one: 'in {{count}} move'
+  moves-target_other: 'in {{count}} moves'
   tap-piece-first: 'Tap {{name}} first.'
   select-wrong: Not quite! Look at the orange squares.
   select-missing: Almost! Some squares are still missing.

@@ -6,6 +6,14 @@ export const LANG_PATTERN = /^[a-z]{2}(-[A-Z]{2})?$/;
 /** Kebab-case name pattern shared by namespace file names and locale tree keys. */
 export const KEY_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
+/** i18next plural suffixes allowed on leaf keys (`moves_one`, `moves_other`). */
+export const PLURAL_SUFFIX_PATTERN = /_(zero|one|two|few|many|other)$/;
+
+/** Validates a locale leaf key: kebab-case, optionally with an i18next plural suffix. */
+export const leafKeySchema = z
+  .string()
+  .refine((key) => KEY_PATTERN.test(key.replace(PLURAL_SUFFIX_PATTERN, '')));
+
 /** Validates a language directory name. */
 export const langSchema = z.string().regex(LANG_PATTERN);
 

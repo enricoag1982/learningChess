@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { chessJsRules, parseDiagram } from '@chess-kids/core';
 import type { Move, Square } from '@chess-kids/core';
+import '../../i18n.ts';
 import { Board } from './Board.tsx';
 
 afterEach(cleanup);
