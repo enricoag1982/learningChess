@@ -2,6 +2,8 @@ import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { starsFor } from '../domain/exercise/engine.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
 import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
+import type { VersusState } from '../domain/exercise/versus.ts';
+import { kidMoveCount, versusStars } from '../domain/exercise/versus.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import type { LessonProgress, Stars } from '../domain/progress.ts';
 import {
@@ -101,11 +103,11 @@ export async function recordExerciseResult(
   return progress;
 }
 
-/** Result of playing a lesson's boss mini-game: a `static` capture game or a `series` of rounds. */
+/** Result of playing a lesson's boss mini-game: `static`, `series`, or `versus` (vs the bot). */
 export interface RecordBossResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
-  readonly state: GameState | SeriesGameState;
+  readonly state: GameState | SeriesGameState | VersusState;
   readonly durationMs: number;
   /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
@@ -122,7 +124,7 @@ interface BossAttemptSummary {
   readonly moves: number;
 }
 
-function bossAttemptSummary(state: GameState | SeriesGameState): BossAttemptSummary {
+function bossAttemptSummary(state: GameState | SeriesGameState | VersusState): BossAttemptSummary {
   if (state.mode === 'series') {
     return {
       exerciseId: state.def.id,
@@ -134,6 +136,19 @@ function bossAttemptSummary(state: GameState | SeriesGameState): BossAttemptSumm
       hints: 0,
       errors: state.mistakes,
       moves: state.def.rounds.length,
+    };
+  }
+  if (state.mode === 'versus') {
+    // No hints or wrong tries in a versus boss (it is a real game against the bot, not a scored
+    // exercise): "correct" is simply a win, and "errors" has no equivalent — logged as 0.
+    return {
+      exerciseId: state.def.id,
+      conceptId: state.def.concept,
+      stars: versusStars(state),
+      correct: state.status === 'won',
+      hints: 0,
+      errors: 0,
+      moves: kidMoveCount(state),
     };
   }
   const { exercise } = state;

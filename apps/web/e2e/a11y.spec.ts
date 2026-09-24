@@ -15,8 +15,11 @@ import {
   isMoveCountedExercise,
   journeyNodeName,
   lessonsInJourneyOrder,
+  playOneKidVersusMove,
   playSolveLine,
+  playVersusBoss,
   selectSquaresAnswer,
+  waitForVersusTurnOrEnd,
 } from './helpers.ts';
 
 const content = rawContent as unknown as CompiledContent;
@@ -166,6 +169,11 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
 }) => {
+  // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
+  // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
+  // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
+  test.setTimeout(150_000);
+
   // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
   // exists in content, the first series boss (mid-round) and first static boss, and the Complete
   // step — whichever lessons those turn out to be, so this stays correct as content grows.
@@ -174,12 +182,18 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   const scannedTypes = new Set<string>();
   let seriesBossScanned = false;
   let staticBossScanned = false;
+  let versusBossScanned = false;
   let completeScanned = false;
   let storyDemoScanned = false;
   let journeyScanned = false;
   let currentWorldId: string | undefined;
 
   await completeFirstRun(page);
+  // Shortens the bot's "thinking" pause for every versus boss reached below (Pawn Wars Jr. and,
+  // to deep-scan `choice`/`best-move`, Pawn Wars too) — set now, well before either is reached.
+  await page.evaluate(() => {
+    localStorage.setItem('chess-kids:test-seed', '1');
+  });
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
@@ -189,6 +203,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       scannedTypes.size === wantedTypes.size &&
       seriesBossScanned &&
       staticBossScanned &&
+      versusBossScanned &&
       completeScanned;
     if (allScanned) break;
 
@@ -265,6 +280,15 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
         await playSolveLine(page, boss.position, goal);
         await page.getByRole('button', { name: /^Next/ }).click();
         staticBossScanned = true;
+      } else if (boss.mode === 'versus' && !versusBossScanned) {
+        await expectKidTouchTarget(page, /Take back/);
+        await expectNoSeriousViolations(page, 'Boss (versus, start)');
+        await playOneKidVersusMove(page, boss);
+        await waitForVersusTurnOrEnd(page);
+        await expectNoSeriousViolations(page, 'Boss (versus, mid-game)');
+        await playVersusBoss(page, boss);
+        await page.getByRole('button', { name: /^Next/ }).click();
+        versusBossScanned = true;
       } else {
         await completeBoss(page, boss);
       }
@@ -291,5 +315,6 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   );
   expect(seriesBossScanned, 'a series boss got a mid-round scan').toBe(true);
   expect(staticBossScanned, 'a static boss got a scan').toBe(true);
+  expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
   expect(completeScanned, 'the Complete step got a scan').toBe(true);
 });

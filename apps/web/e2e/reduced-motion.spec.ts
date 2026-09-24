@@ -8,8 +8,8 @@ import {
   completeFirstRun,
   completeExercise,
   getSoleProfileId,
-  isMoveCountedExercise,
   lessonsInJourneyOrder,
+  movesAPiece,
   pickProfileFromPicker,
   seedLessonsMastered,
 } from './helpers.ts';
@@ -31,7 +31,7 @@ interface MoveStep {
  */
 function firstPieceMoveStep(): MoveStep {
   for (const lesson of lessonsInJourneyOrder(catalog, content.lessons)) {
-    const def = [...lesson.guided, ...lesson.exercises].find(isMoveCountedExercise);
+    const def = [...lesson.guided, ...lesson.exercises].find(movesAPiece);
     if (def) return { lesson, def };
   }
   throw new Error('bundled content: no guided try or exercise moves a piece');

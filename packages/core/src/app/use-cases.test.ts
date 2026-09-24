@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
+import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { starsFor } from '../domain/exercise/engine.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
 import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
 import type { ExerciseDef, CaptureDef } from '../domain/exercise/types.ts';
+import { playVersusMove, startVersus, versusStars } from '../domain/exercise/versus.ts';
+import type { VersusGameDef } from '../domain/exercise/versus.ts';
+import type { GameRulesDef } from '../domain/game/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
@@ -473,6 +477,109 @@ describe('recordBossResult', () => {
       moves: 2,
       durationMs: 9000,
     });
+  });
+
+  it('records a won versus boss attempt (win within par), raising bossStars', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson({ boss: 'pawn-wars-4' });
+    const rules: GameRulesDef = {
+      kings: false,
+      checkRules: false,
+      noMoves: 'lose',
+      win: {
+        w: [{ kind: 'promote' }, { kind: 'capture-all' }],
+        b: [{ kind: 'promote' }, { kind: 'capture-all' }],
+      },
+    };
+    const def: VersusGameDef = {
+      id: 'pawn-wars-4',
+      concept: 'pawn-move',
+      rules,
+      position: {
+        pieces: {
+          a7: { color: 'w', type: 'p' },
+          h7: { color: 'b', type: 'p' },
+        },
+        markers: { stars: [], blocked: [] },
+        toMove: 'w',
+        castling: '-',
+        enPassant: null,
+      },
+      opponentLevel: 1,
+      kidColor: 'w',
+      par: 1,
+    };
+    const { state } = playVersusMove(startVersus(def), chessJsRules, { from: 'a7', to: 'a8' });
+    expect(versusStars(state)).toBe(3);
+
+    const progress = await recordBossResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      durationMs: 5000,
+      nextStep: 9,
+    });
+
+    expect(progress.bossStars).toBe(3);
+    expect(progress.resumeStep).toBe(9);
+
+    const [attempt] = await deps.progress.listAttempts('profile-1');
+    expect(attempt).toMatchObject({
+      exerciseId: 'pawn-wars-4',
+      conceptId: 'pawn-move',
+      scored: true,
+      correct: true,
+      stars: 3,
+      hints: 0,
+      errors: 0,
+      moves: 1,
+      durationMs: 5000,
+    });
+  });
+
+  it('records a lost versus boss attempt as 1 star, not correct', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson({ boss: 'pawn-wars-4' });
+    const rules: GameRulesDef = {
+      kings: false,
+      checkRules: false,
+      noMoves: 'lose',
+      win: {
+        w: [{ kind: 'promote' }, { kind: 'capture-all' }],
+        b: [{ kind: 'promote' }, { kind: 'capture-all' }],
+      },
+    };
+    const def: VersusGameDef = {
+      id: 'pawn-wars-4',
+      concept: 'pawn-move',
+      rules,
+      position: {
+        pieces: {
+          h2: { color: 'b', type: 'p' },
+          a2: { color: 'w', type: 'p' },
+        },
+        markers: { stars: [], blocked: [] },
+        toMove: 'b',
+        castling: '-',
+        enPassant: null,
+      },
+      opponentLevel: 1,
+      kidColor: 'w',
+    };
+    const { state } = playVersusMove(startVersus(def), chessJsRules, { from: 'h2', to: 'h1' });
+    expect(state.status).toBe('lost');
+
+    const progress = await recordBossResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      durationMs: 3000,
+      nextStep: 9,
+    });
+
+    expect(progress.bossStars).toBe(1);
+    const [attempt] = await deps.progress.listAttempts('profile-1');
+    expect(attempt).toMatchObject({ correct: false, stars: 1, moves: 0 });
   });
 });
 

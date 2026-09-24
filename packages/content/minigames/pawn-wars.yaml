@@ -1,0 +1,25 @@
+id: pawn-wars
+concept: promotion
+unlockAfter: promotion
+mode: versus
+title: pawn-wars.title
+goal: pawn-wars.goal
+board: |
+  . . . . . . . .
+  p p p p p p p p
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  P P P P P P P P
+  . . . . . . . .
+rules:
+  kings: false
+  noMoves: lose
+  win:
+    kid: [promote, capture-all]
+    opponent: [promote, capture-all]
+moveLimit: 25
+opponent:
+  bot: 1
+par: 10

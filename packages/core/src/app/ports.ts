@@ -1,3 +1,5 @@
+import type { Move } from '../domain/chess/rules.ts';
+import type { GameState } from '../domain/game/types.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
@@ -82,6 +84,16 @@ export interface Clock {
 /** Randomness in [0, 1); seeded in tests. */
 export interface Random {
   next(): number;
+}
+
+/**
+ * The computer opponent for `versus` mini-games (Pawn Wars, …). Runs in a Web Worker on the web
+ * (`docs/architecture.md` §2) so the search never blocks the UI thread; `level` is a `BotLevel.level`
+ * (1 Mouse .. 5 Bear) and `seed` drives `domain/bot`'s deterministic `Random`, so the same position
+ * + level + seed always replies with the same move. `null` only when the side to move has none.
+ */
+export interface BotPlayer {
+  chooseMove(state: GameState, level: number, seed: number): Promise<Move | null>;
 }
 
 /** Online features are off in v1. */

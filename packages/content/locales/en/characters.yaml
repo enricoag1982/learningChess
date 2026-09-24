@@ -8,5 +8,7 @@ lion:
   name: Lion
 horse:
   name: Horse
+caterpillar:
+  name: Caterpillar
 owl:
   name: Owl

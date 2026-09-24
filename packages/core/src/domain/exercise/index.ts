@@ -41,3 +41,16 @@ export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './m
 
 export type { SeriesGameDef, SeriesGameState } from './minigame.ts';
 export { startSeries, currentRound, completeRound, seriesResult, seriesStars } from './minigame.ts';
+
+export type { VersusGameDef, VersusState, VersusStatus, VersusMoveOutcome } from './versus.ts';
+export {
+  startVersus,
+  versusPosition,
+  versusGameState,
+  isKidTurn,
+  kidMoveCount,
+  playVersusMove,
+  canTakeBack,
+  takeBackVersusMove,
+  versusStars,
+} from './versus.ts';

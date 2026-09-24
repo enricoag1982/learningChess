@@ -156,6 +156,31 @@ function writeMiniGame(overrides: Record<string, unknown> = {}): void {
   write('minigames/mg1.yaml', stringify(validMiniGame(overrides)));
 }
 
+/** Kingless 2-pawns-each `versus` mini-game vs. Mouse: not already over, kid to move, white. */
+function validVersusMiniGame(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'vg1',
+    concept: 'c1',
+    unlockAfter: 'demo-lesson',
+    mode: 'versus',
+    title: 'vg1.title',
+    goal: 'vg1.goal',
+    board: diagram({ a2: 'P', h2: 'P', a7: 'p', h7: 'p' }),
+    rules: {
+      kings: false,
+      noMoves: 'lose',
+      win: { kid: ['promote', 'capture-all'], opponent: ['promote', 'capture-all'] },
+    },
+    opponent: { bot: 1 },
+    par: 6,
+    ...overrides,
+  };
+}
+
+function writeVersusMiniGame(overrides: Record<string, unknown> = {}): void {
+  write('minigames/vg1.yaml', stringify(validVersusMiniGame(overrides)));
+}
+
 function writeDefaultLocales(): void {
   write(
     'locales/en/lessons.yaml',
@@ -165,6 +190,7 @@ function writeDefaultLocales(): void {
       'demo-01': 'Exercise',
       'choice-opt-a': 'Option A',
       mg1: { title: 'Title', goal: 'Goal' },
+      vg1: { title: 'VTitle', goal: 'VGoal' },
     }),
   );
   write('locales/en/characters.yaml', stringify({ char1: { name: 'Char' } }));
@@ -674,5 +700,114 @@ describe('loadContent', () => {
     writeDefaultLocales();
 
     expect(issuesOf()).toEqual([]);
+  });
+
+  describe('versus mini-game', () => {
+    function compiledVersusGame() {
+      writeLesson();
+      writeVersusMiniGame();
+      writeDefaultLocales();
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      const game = content.minigames.find((entry) => entry.id === 'vg1');
+      if (game === undefined || game.mode !== 'versus') {
+        throw new Error('expected a compiled versus mini-game');
+      }
+      return game;
+    }
+
+    it('loads with no issues and compiles win conditions by kid colour (default white)', () => {
+      const game = compiledVersusGame();
+      expect(game.kidColor).toBe('w');
+      expect(game.opponentLevel).toBe(1);
+      expect(game.par).toBe(6);
+      expect(game.rules).toEqual({
+        kings: false,
+        checkRules: false,
+        noMoves: 'lose',
+        win: {
+          w: [{ kind: 'promote' }, { kind: 'capture-all' }],
+          b: [{ kind: 'promote' }, { kind: 'capture-all' }],
+        },
+      });
+    });
+
+    it('maps "kid"/"opponent" win lists to the opposite w/b sides when kidColor is black', () => {
+      writeLesson();
+      writeVersusMiniGame({
+        kidColor: 'b',
+        board: diagram({ a2: 'P', h2: 'P', a7: 'p', h7: 'p' }),
+        rules: {
+          kings: false,
+          noMoves: 'lose',
+          win: { kid: ['capture-all'], opponent: ['promote'] },
+        },
+      });
+      writeDefaultLocales();
+      const issues = issuesOf();
+      expect(issues).toEqual([]);
+
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      const game = content.minigames.find((entry) => entry.id === 'vg1');
+      if (game === undefined || game.mode !== 'versus') {
+        throw new Error('expected a compiled versus mini-game');
+      }
+      expect(game.rules.win.b).toEqual([{ kind: 'capture-all' }]);
+      expect(game.rules.win.w).toEqual([{ kind: 'promote' }]);
+    });
+
+    it('rejects a bot level out of 1-5', () => {
+      writeLesson();
+      writeVersusMiniGame({ opponent: { bot: 6 } });
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.length).toBeGreaterThan(0);
+    });
+
+    it('reports a start position missing a king when rules.kings is true', () => {
+      writeLesson();
+      writeVersusMiniGame({
+        board: diagram({ a2: 'P', h2: 'P', a7: 'p', h7: 'p' }),
+        rules: {
+          kings: true,
+          noMoves: 'draw',
+          win: { kid: ['checkmate'], opponent: ['checkmate'] },
+        },
+      });
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('rules.kings is true but the start position is missing a king'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports a king on the board when rules.kings is false', () => {
+      writeLesson();
+      writeVersusMiniGame({ board: diagram({ a2: 'P', h2: 'P', a7: 'p', h7: 'p', e1: 'K' }) });
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('rules.kings is false but the start position has a king'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports a game already over at its start position (no opponent piece: instant capture-all win)', () => {
+      writeLesson();
+      writeVersusMiniGame({ board: diagram({ a2: 'P' }) });
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('the game is already over at its start position')),
+      ).toBe(true);
+    });
   });
 });

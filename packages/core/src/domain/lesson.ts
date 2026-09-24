@@ -1,6 +1,7 @@
 import type { Position, Square } from './chess/types.ts';
 import type { StaticCaptureGameDef } from './exercise/minigame.ts';
 import type { ExerciseDef } from './exercise/types.ts';
+import type { VersusGameDef } from './exercise/versus.ts';
 
 /**
  * A demo's board highlight: every square one piece can reach from `legalMovesFrom` (most lessons),
@@ -61,8 +62,13 @@ export interface SeriesMiniGame extends MiniGameBase {
   readonly errors2: number;
 }
 
-/** Mini-game content: `static` (existing capture-all / collect-stars) or `series` (M2.4). */
-export type MiniGame = StaticMiniGame | SeriesMiniGame;
+/** `versus` mini-game (Pawn Wars, …): variant rules played against the computer opponent (M2.6). */
+export interface VersusMiniGame extends VersusGameDef, MiniGameBase {
+  readonly mode: 'versus';
+}
+
+/** Mini-game content: `static` (capture-all / collect-stars), `series` (M2.4), or `versus` (M2.6). */
+export type MiniGame = StaticMiniGame | SeriesMiniGame | VersusMiniGame;
 
 /** Whole compiled content bundle written to `content.json`. */
 export interface CompiledContent {

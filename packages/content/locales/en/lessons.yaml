@@ -91,6 +91,43 @@ knight-08: Collect both stars. Plan Horse's jumps!
 knight-maze:
   title: Knight Maze
   goal: Horse must collect every star by jumping over the rocks!
+pawn:
+  title: Meet Caterpillar the Pawn
+  story: >-
+    Caterpillar only creeps straight ahead, never sideways or back. On her very first move she can
+    creep one square or two — after that, always just one. To capture, she steps diagonally
+    forward instead, never straight ahead.
+  demo: Watch Caterpillar creep forward. On her very first step she can go one square or two!
+pawn-g1: Creep Caterpillar forward, one square, to the star.
+pawn-g2: On her very first move, Caterpillar can creep two squares. Reach the star!
+pawn-01: Creep Caterpillar to the star. Her first move can go one square or two!
+pawn-02: Caterpillar already made her first move. Now she creeps one square at a time. Reach the star.
+pawn-03: Something blocks Caterpillar's path straight ahead. Tap every square she can still reach.
+pawn-04: Caterpillar can only capture on a diagonal, never straight ahead. Find the piece she can capture.
+pawn-05: Caterpillar is blocked straight ahead, but she can still capture on either diagonal. Tap every square she can reach.
+pawn-06: A piece waits on the diagonal. Capture it, then keep creeping to the star!
+pawn-07: Two pieces stand in Caterpillar's way. Creep closer, then capture them both!
+pawn-08: Collect the first star, then find a way around the blocker to reach the second!
+pawn-wars-4:
+  title: Pawn Wars Jr.
+  goal: Four caterpillars each! Be the first to transform into a queen, or capture every enemy.
+promotion:
+  title: Caterpillar Transforms!
+  story: >-
+    At the very last row, something amazing happens: Caterpillar transforms into a brand-new
+    piece! She can become a queen, a rook, a bishop, or a knight — the powerful queen is almost
+    always the best choice.
+  demo: Watch Caterpillar creep all the way to the last row. There, she transforms!
+promotion-g1: One more step and Caterpillar transforms! Move her to the last row.
+promotion-g2: Caterpillar is about to transform! Which piece should she become?
+promotion-01: One more step and Caterpillar transforms! Move her to the last row.
+promotion-02: Caterpillar is about to transform! Which piece should she become?
+promotion-03: A knight blocks the square ahead, but Caterpillar can capture her way to the last row. Find the winning move!
+promotion-04: Tap every square where Caterpillar could transform this move.
+promotion-05: Look at Caterpillar. Is she about to transform into a new piece?
+pawn-wars:
+  title: Pawn Wars
+  goal: Eight caterpillars each! Race to transform first, or capture every piece.
 squares:
   title: Meet the Squares
   story: >-
