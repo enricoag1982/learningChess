@@ -1,0 +1,145 @@
+id: stalemate
+world: check
+order: 5
+concept: stalemate
+character: owl
+title: stalemate.title
+story: stalemate.story
+demo:
+  board: |
+    . Q . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . K . .
+    . . . . . . . k
+  text: stalemate.demo
+  highlight: squares g1 g2 h2
+guided:
+  - id: stalemate-g1
+    type: yes-no
+    text: stalemate-g1
+    board: |
+      . Q . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . K . .
+      . . . . . . . k
+    toMove: b
+    answer: 'yes'
+    focus: h1
+    verify: stalemate
+  - id: stalemate-g2
+    type: mate-in-n
+    text: stalemate-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    n: 1
+    line: [Rh1#]
+exercises:
+  - id: stalemate-01
+    type: yes-no
+    text: stalemate-01
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . K . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: a8
+    verify: stalemate
+  - id: stalemate-02
+    type: yes-no
+    text: stalemate-02
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . K .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: h8
+    verify: stalemate
+  - id: stalemate-03
+    type: yes-no
+    text: stalemate-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'no'
+    focus: e5
+    verify: stalemate
+  - id: stalemate-04
+    type: yes-no
+    text: stalemate-04
+    board: |
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . R . . .
+    toMove: b
+    answer: 'no'
+    focus: e8
+    verify: stalemate
+  - id: stalemate-05
+    type: mate-in-n
+    text: stalemate-05
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . Q
+      . . . . . . . .
+    n: 1
+    line: [Qh8#]
+    trap: stalemate
+  - id: stalemate-06
+    type: mate-in-n
+    text: stalemate-06
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qa8#]
+    trap: stalemate

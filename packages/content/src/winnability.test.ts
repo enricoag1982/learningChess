@@ -142,4 +142,25 @@ describe('versus mini-game winnability (M3.2b docs/roadmap.md §3.1 m3.2)', () =
     );
     expect(report.winRate).toBeGreaterThanOrEqual(0.8);
   }, 20_000);
+
+  /**
+   * `first-game` (M3.3, World 4's world boss): standard starting position, real check rules, kid
+   * White vs Mouse (bot 1). A fox-level (bot 3) kid stand-in must checkmate Mouse within the
+   * authored `moveLimit` in >= 80% of seeded games — the spec's minimum kid level for this check
+   * (`docs/roadmap.md` §3.1 m3.3).
+   */
+  it('first-game: a fox-level stand-in wins by checkmate >= 80% of 10 seeded games', () => {
+    const minigame = findVersusMiniGame('first-game');
+    const seeds = 10;
+    const start = Date.now();
+    const report = measureWinnability(minigame, FOX, seeds);
+    const durationMs = Date.now() - start;
+    console.log(
+      `first-game: fox stand-in won ${String(report.wins)}/${String(report.seeds)} ` +
+        `(${String(Math.round(report.winRate * 100))}%), median kid moves in a win: ` +
+        `${String(report.medianKidMovesWon ?? 'n/a')}, ${String(durationMs)} ms`,
+    );
+    expect(report.winRate).toBeGreaterThanOrEqual(0.8);
+    expect(durationMs).toBeLessThan(20_000);
+  }, 20_000);
 });

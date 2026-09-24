@@ -1,0 +1,145 @@
+id: escape-the-check
+concept: check-escape
+unlockAfter: escape-check
+mode: series
+title: escape-the-check.title
+goal: escape-the-check.goal
+errors3: 0
+errors2: 2
+rounds:
+  - id: escape-the-check-r1
+    type: select-squares
+    text: escape-the-check-r1
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . r . . . .
+    derive: check-escapes
+  - id: escape-the-check-r2
+    type: select-squares
+    text: escape-the-check-r2
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . K . .
+      . . . . . . . .
+      . . . . . . . .
+      . . b . . . . .
+    derive: check-escapes
+  - id: escape-the-check-r3
+    type: select-squares
+    text: escape-the-check-r3
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . K . . . . r
+      . . . . . . . .
+      . . . . . . . .
+    derive: check-escapes
+  - id: escape-the-check-r4
+    type: select-squares
+    text: escape-the-check-r4
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      b . . . . . . .
+      . . . . . . . .
+    derive: check-escapes
+  - id: escape-the-check-r5
+    type: best-move
+    text: escape-the-check-r5
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . n . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [Kd5, Ke5, Ke4, Ke3, Kd3, Kc3, Kc4]
+    verify: escape-king
+  - id: escape-the-check-r6
+    type: best-move
+    text: escape-the-check-r6
+    board: |
+      . . . . . . r .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    solutions: [Kf5, Kh5, Kh4, Kh3, Kf3, Kf4]
+    verify: escape-king
+  - id: escape-the-check-r7
+    type: best-move
+    text: escape-the-check-r7
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . B . .
+      . . . . . . . .
+      r . . . K . . .
+    solutions: [Bd1]
+    verify: escape-block
+  - id: escape-the-check-r8
+    type: best-move
+    text: escape-the-check-r8
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . b
+      . . . . . . . .
+      . R . . . . . .
+      . . . . K . . .
+    solutions: [Rf2]
+    verify: escape-block
+  - id: escape-the-check-r9
+    type: best-move
+    text: escape-the-check-r9
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      . . . . . . P .
+      . . . . . . K .
+    solutions: [gxf3]
+    verify: escape-capture
+  - id: escape-the-check-r10
+    type: best-move
+    text: escape-the-check-r10
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . r . . .
+      . . . . K . . .
+    solutions: [Kxe2]
+    verify: escape-capture

@@ -1,0 +1,149 @@
+id: mate-hunt
+concept: mate-in-1
+unlockAfter: mate-in-1
+mode: series
+title: mate-hunt.title
+goal: mate-hunt.goal
+errors3: 0
+errors2: 2
+rounds:
+  - id: mate-hunt-r1
+    type: mate-in-n
+    text: mate-hunt-r1
+    board: |
+      . . k . . . . .
+      . p p p . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . K
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    n: 1
+    line: [Ra8#]
+  - id: mate-hunt-r2
+    type: mate-in-n
+    text: mate-hunt-r2
+    board: |
+      . . . . . k . .
+      . . . . p p p .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      Q . . . . . . .
+      . . . . . . . .
+      . . . . . . . K
+    n: 1
+    line: [Qa8#]
+  - id: mate-hunt-r3
+    type: mate-in-n
+    text: mate-hunt-r3
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . R . . .
+      . . . . . . . .
+    n: 1
+    line: [Re8#]
+  - id: mate-hunt-r4
+    type: mate-in-n
+    text: mate-hunt-r4
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . K . .
+      . . . . . . . Q
+      . . . . . k . .
+    n: 1
+    line: [Qf2#]
+  - id: mate-hunt-r5
+    type: mate-in-n
+    text: mate-hunt-r5
+    board: |
+      . . . . k . . .
+      . . R . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+      . . . . . . . K
+    n: 1
+    line: [Ra8#]
+  - id: mate-hunt-r6
+    type: mate-in-n
+    text: mate-hunt-r6
+    board: |
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . R .
+      . k . . . . . .
+    n: 1
+    line: [Rh1#]
+  - id: mate-hunt-r7
+    type: mate-in-n
+    text: mate-hunt-r7
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . R . . . . .
+    n: 1
+    line: [Rc8#]
+  - id: mate-hunt-r8
+    type: mate-in-n
+    text: mate-hunt-r8
+    board: |
+      . . . k . . . .
+      . . p p p . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . R .
+      K . . . . . . .
+    n: 1
+    line: [Rg8#]
+  - id: mate-hunt-r9
+    type: mate-in-n
+    text: mate-hunt-r9
+    board: |
+      . . . . . . k .
+      Q . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qg7#]
+  - id: mate-hunt-r10
+    type: mate-in-n
+    text: mate-hunt-r10
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+      . . . . . . . Q
+      k . . . . . . .
+    n: 1
+    line: [Qa2#]

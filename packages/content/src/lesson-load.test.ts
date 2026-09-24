@@ -166,6 +166,25 @@ function validMateInTwoExercise(overrides: Record<string, unknown> = {}): Record
   };
 }
 
+/**
+ * Black king a8, white king b6, white queen d5: `Qb7#` mates, but `Qxa8`/`Qd6`/`Qe5` each stalemate
+ * instead — a "don't stalemate" mate-in-1 with `trap: stalemate`.
+ */
+function validMateInOneWithStalemateTrapExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'mate-in-n',
+    text: 'demo-01',
+    board: diagram({ a8: 'k', b6: 'K', d5: 'Q' }),
+    n: 1,
+    line: ['Qb7#'],
+    trap: 'stalemate',
+    ...overrides,
+  };
+}
+
 /** A black pawn on e4, attacked by the white pawn on d3 and undefended: a "hanging" yes-no exercise. */
 function validYesNoHangingExercise(
   overrides: Record<string, unknown> = {},
@@ -262,6 +281,41 @@ function validGoodTradeVerifyExercise(
     board: diagram({ a1: 'R', a8: 'q', h1: 'r', f2: 'n' }),
     solutions: ['Rxa8'],
     verify: 'good-trade',
+    ...overrides,
+  };
+}
+
+/** Rook a1, black king e7: only Ra7 and Re1 give check (same rank / file as the king). */
+function validCheckVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ a1: 'R', e7: 'k' }),
+    solutions: ['Ra7', 'Re1'],
+    verify: 'check',
+    ...overrides,
+  };
+}
+
+/**
+ * White king e1 in check from the black rook on e8 (e-file): king can step to d1/d2/f1/f2
+ * (`escape-king`), the rook on b4 or the knight on d6 can interpose on e4 (`escape-block`), or the
+ * knight can capture the checking rook, Nxe8 (`escape-capture`). Neither white piece attacks the
+ * black king on a8, so the start position itself is not already giving black an illegal check.
+ */
+function validEscapeCheckVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    board: diagram({ e1: 'K', b4: 'R', d6: 'N', e8: 'r', a8: 'k' }),
+    solutions: ['Kd1', 'Kd2', 'Kf1', 'Kf2'],
+    verify: 'escape-king',
     ...overrides,
   };
 }
@@ -1101,6 +1155,29 @@ describe('loadContent', () => {
     });
   });
 
+  describe('mate-in-n: trap stalemate', () => {
+    it('loads a valid "trap: stalemate" with no issues', () => {
+      writeLesson({ exercises: [validMateInOneWithStalemateTrapExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects "trap: stalemate" when no legal kid move stalemates', () => {
+      writeLesson({ exercises: [validMateInOneExercise({ trap: 'stalemate' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) => issue.includes('trap "stalemate"') && issue.includes('requires >= 1'),
+        ),
+      ).toBe(true);
+    });
+  });
+
   describe('yes-no: verify', () => {
     it('loads a valid "hanging" verify with no issues', () => {
       writeLesson({ exercises: [validYesNoHangingExercise()] });
@@ -1418,6 +1495,154 @@ describe('loadContent', () => {
             issue.includes('solutions should be [Rxa8]') &&
             issue.includes('authored [Rxh1]'),
         ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify check', () => {
+    it('loads a valid "check" verify with no issues', () => {
+      writeLesson({ exercises: [validCheckVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports an empty computed set when no legal move gives check', () => {
+      writeLesson({
+        exercises: [validCheckVerifyExercise({ board: diagram({ a1: 'R' }), solutions: ['Ra8'] })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "check" computed no matching move')),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validCheckVerifyExercise({ solutions: ['Ra7'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "check"') &&
+            issue.includes('solutions should be [Ra7, Re1]') &&
+            issue.includes('authored [Ra7]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify escape-king', () => {
+    it('loads a valid "escape-king" verify with no issues', () => {
+      writeLesson({ exercises: [validEscapeCheckVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it("requires the kid's king to be in check", () => {
+      writeLesson({
+        exercises: [
+          validEscapeCheckVerifyExercise({
+            board: diagram({ e1: 'K', b4: 'R', d6: 'N', a8: 'k' }),
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes("requires the kid's king to be in check"))).toBe(
+        true,
+      );
+    });
+
+    it('reports a mismatch between the computed set and the authored solutions', () => {
+      writeLesson({ exercises: [validEscapeCheckVerifyExercise({ solutions: ['Kd1'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "escape-king"') &&
+            issue.includes('solutions should be [Kd1, Kd2, Kf1, Kf2]') &&
+            issue.includes('authored [Kd1]'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify escape-block', () => {
+    it('loads a valid "escape-block" verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validEscapeCheckVerifyExercise({ verify: 'escape-block', solutions: ['Ne4', 'Re4'] }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports an empty computed set when no legal move blocks the check', () => {
+      writeLesson({
+        exercises: [
+          validEscapeCheckVerifyExercise({
+            board: diagram({ e1: 'K', e8: 'r', a8: 'k' }),
+            verify: 'escape-block',
+            solutions: ['Ke2'],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "escape-block" computed no matching move')),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify escape-capture', () => {
+    it('loads a valid "escape-capture" verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validEscapeCheckVerifyExercise({ verify: 'escape-capture', solutions: ['Nxe8'] }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports an empty computed set when no legal move captures the checker', () => {
+      writeLesson({
+        exercises: [
+          validEscapeCheckVerifyExercise({
+            board: diagram({ e1: 'K', e8: 'r', a8: 'k' }),
+            verify: 'escape-capture',
+            solutions: ['Ke2'],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "escape-capture" computed no matching move')),
       ).toBe(true);
     });
   });

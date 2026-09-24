@@ -1,0 +1,181 @@
+id: checkmate
+world: check
+order: 3
+concept: checkmate
+character: owl
+title: checkmate.title
+story: checkmate.story
+demo:
+  board: |
+    . . . k . . . .
+    . . . Q . . . .
+    . . . K . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: checkmate.demo
+  highlight: squares c7 c8 d7 e7 e8
+guided:
+  - id: checkmate-g1
+    type: yes-no
+    text: checkmate-g1
+    board: |
+      . . . k . . . .
+      . . . Q . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: d8
+    verify: checkmate
+  - id: checkmate-g2
+    type: yes-no
+    text: checkmate-g2
+    board: |
+      . . . k . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'no'
+    focus: d8
+    verify: checkmate
+exercises:
+  - id: checkmate-01
+    type: yes-no
+    text: checkmate-01
+    board: |
+      . . . . R . k .
+      . . . . . p p p
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: g8
+    verify: checkmate
+  - id: checkmate-02
+    type: yes-no
+    text: checkmate-02
+    board: |
+      . . . . R . k .
+      . . . . . p . p
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'no'
+    focus: g8
+    verify: checkmate
+  - id: checkmate-03
+    type: yes-no
+    text: checkmate-03
+    board: |
+      R . . . . . . k
+      R . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: h8
+    verify: checkmate
+  - id: checkmate-04
+    type: yes-no
+    text: checkmate-04
+    board: |
+      R . . . . . . k
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'no'
+    focus: h8
+    verify: checkmate
+  - id: checkmate-05
+    type: yes-no
+    text: checkmate-05
+    board: |
+      k . . . . . . .
+      . Q . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: a8
+    verify: checkmate
+  - id: checkmate-06
+    type: yes-no
+    text: checkmate-06
+    board: |
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . R . . .
+    toMove: b
+    answer: 'no'
+    focus: e8
+    verify: checkmate
+  - id: checkmate-07
+    type: yes-no
+    text: checkmate-07
+    board: |
+      . . . . . . . k
+      . . . . . . Q .
+      . . . . . K . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    toMove: b
+    answer: 'yes'
+    focus: h8
+    verify: checkmate
+  - id: checkmate-08
+    type: yes-no
+    text: checkmate-08
+    board: |
+      . . . . . . . k
+      . . . . . . Q .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    toMove: b
+    answer: 'no'
+    focus: h8
+    verify: checkmate

@@ -34,6 +34,7 @@ import {
   isInCheck,
   isSafe,
   isStalemate,
+  kingSquare,
   optimalMoves,
   parseDiagram,
   parseFen,
@@ -302,14 +303,20 @@ function checkChoiceVerify(
 /** A `best-move` exercise's optional `verify` (`lesson-schema.ts`'s regex already restricts the shape). */
 type BestMoveVerify =
   | { readonly kind: 'attack' | 'save'; readonly square: Square }
-  | { readonly kind: 'take-free' | 'good-trade' };
+  | {
+      readonly kind:
+        'take-free' | 'good-trade' | 'check' | 'escape-king' | 'escape-block' | 'escape-capture';
+    };
 
 function parseBestMoveVerify(raw: string): BestMoveVerify {
   const [kind, square] = raw.split(' ');
   if (kind === 'attack' || kind === 'save') {
     return { kind, square: square as Square };
   }
-  return { kind: kind as 'take-free' | 'good-trade' };
+  return {
+    kind: kind as
+      'take-free' | 'good-trade' | 'check' | 'escape-king' | 'escape-block' | 'escape-capture',
+  };
 }
 
 /**
@@ -376,6 +383,36 @@ function computeVerifiedBestMoves(
       .map((move) => move.san);
   }
 
+  if (verify.kind === 'check') {
+    // chess.js's own verbose `moves()` already appends "+"/"#" to a move's SAN based on the real
+    // resulting position, independent of `staticOpponent` (which only affects `play`, not move
+    // generation) — the simplest and cheapest way to ask "does this move give check".
+    return candidates.filter((move) => /[+#]$/.test(move.san)).map((move) => move.san);
+  }
+
+  if (
+    verify.kind === 'escape-king' ||
+    verify.kind === 'escape-block' ||
+    verify.kind === 'escape-capture'
+  ) {
+    const king = kingSquare(position, kidColor);
+    if (king === undefined || !isInCheck(position, chessJsRules)) {
+      issues.push(`${where}: verify "${verifyLabel}" requires the kid's king to be in check`);
+      return null;
+    }
+    const opponentColor: Color = kidColor === 'w' ? 'b' : 'w';
+    const checkers = new Set(chessJsRules.attackers(position, king, opponentColor));
+    return candidates
+      .filter((move) => {
+        const capturesChecker = move.captured !== undefined && checkers.has(move.to);
+        const isKingMove = move.from === king;
+        if (verify.kind === 'escape-capture') return capturesChecker;
+        if (verify.kind === 'escape-king') return isKingMove && !capturesChecker;
+        return !isKingMove && !capturesChecker; // escape-block: the only other legal way out
+      })
+      .map((move) => move.san);
+  }
+
   // good-trade
   return candidates
     .filter((move) => {
@@ -427,6 +464,38 @@ function checkBestMoveVerify(
   }
 }
 
+/**
+ * A `mate-in-n` exercise's optional `trap: stalemate` (M3.3 "don't stalemate"): requires at least
+ * one legal kid move, at the exercise's own start position, that stalemates the opponent instead
+ * of the scripted mating line — a mistake the exercise is meant to teach avoiding. Real rules (both
+ * kings, real turn alternation), like every other mate-in-n check; never compiled into the runtime
+ * `MateInNDef`.
+ */
+function checkMateInNTrap(
+  exercise: MateInNDef,
+  trap: 'stalemate' | undefined,
+  where: string,
+  issues: string[],
+): void {
+  if (trap === undefined) {
+    return;
+  }
+  const candidates = rules.legalMoves(exercise.position, { staticOpponent: true });
+  const hasStalemateTrap = candidates.some((move) => {
+    const played = chessJsRules.play(exercise.position, {
+      from: move.from,
+      to: move.to,
+      ...(move.promotion === undefined ? {} : { promotion: move.promotion }),
+    });
+    return played !== null && isStalemate(played.position, chessJsRules);
+  });
+  if (!hasStalemateTrap) {
+    issues.push(
+      `${where}: trap "stalemate" requires >= 1 legal kid move (besides the scripted line) that stalemates the opponent`,
+    );
+  }
+}
+
 function compileExercise(
   relPath: string,
   fieldPath: string,
@@ -461,7 +530,7 @@ function compileExercise(
     return { id: raw.id, concept, textKey, position, type: 'select-squares', answer, ...easier };
   }
   if (raw.type === 'mate-in-n') {
-    return {
+    const exercise: MateInNDef = {
       id: raw.id,
       concept,
       textKey,
@@ -471,6 +540,8 @@ function compileExercise(
       line: raw.line,
       ...easier,
     };
+    checkMateInNTrap(exercise, raw.trap, `${relPath}: ${fieldPath}`, issues);
+    return exercise;
   }
   if (raw.type === 'yes-no') {
     const exercise: YesNoDef = {

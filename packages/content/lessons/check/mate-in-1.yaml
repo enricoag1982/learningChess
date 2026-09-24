@@ -1,0 +1,218 @@
+id: mate-in-1
+world: check
+order: 4
+concept: mate-in-1
+character: owl
+title: mate-in-1.title
+story: mate-in-1.story
+demo:
+  board: |
+    . . . . . . k .
+    . . . . . p p p
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . K . R . . .
+  text: mate-in-1.demo
+  highlight: squares e8
+guided:
+  - id: mate-in-1-g1
+    type: mate-in-n
+    text: mate-in-1-g1
+    board: |
+      . . . . . . k .
+      . . . . . p p p
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . K . R . . .
+    n: 1
+    line: [Re8#]
+  - id: mate-in-1-g2
+    type: mate-in-n
+    text: mate-in-1-g2
+    board: |
+      k . . . . . . .
+      . . . . . Q . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qa7#]
+exercises:
+  - id: mate-in-1-01
+    type: mate-in-n
+    text: mate-in-1-01
+    board: |
+      . . . . . . k .
+      . . . . . p p p
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . K . . . . .
+    n: 1
+    line: [Ra8#]
+  - id: mate-in-1-02
+    type: mate-in-n
+    text: mate-in-1-02
+    board: |
+      . k . . . . . .
+      p p p . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    n: 1
+    line: [Rh8#]
+  - id: mate-in-1-03
+    type: mate-in-n
+    text: mate-in-1-03
+    board: |
+      . . . . . . k .
+      . . . . . p p p
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    n: 1
+    line: [Qd8#]
+  - id: mate-in-1-04
+    type: mate-in-n
+    text: mate-in-1-04
+    board: |
+      . . . k . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      Q . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qd7#]
+  - id: mate-in-1-05
+    type: mate-in-n
+    text: mate-in-1-05
+    board: |
+      k . . . . . . .
+      . . . . . . . Q
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qb7#]
+  - id: mate-in-1-06
+    type: mate-in-n
+    text: mate-in-1-06
+    board: |
+      . . . . . . . k
+      Q . . . . . . .
+      . . . . . K . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    n: 1
+    line: [Qg7#]
+  - id: mate-in-1-07
+    type: mate-in-n
+    text: mate-in-1-07
+    board: |
+      . . . . . . . k
+      . R . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    n: 1
+    line: [Ra8#]
+  - id: mate-in-1-08
+    type: mate-in-n
+    text: mate-in-1-08
+    board: |
+      k . . . . . . .
+      . . R . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    n: 1
+    line: [Rh8#]
+  - id: mate-in-1-09
+    type: mate-in-n
+    text: mate-in-1-09
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    n: 1
+    line: [Ra8#]
+  - id: mate-in-1-10
+    type: mate-in-n
+    text: mate-in-1-10
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      . K . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    n: 1
+    line: [Rh1#]
+  - id: mate-in-1-11
+    type: mate-in-n
+    text: mate-in-1-11
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . N . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . Q . K . . . .
+    n: 1
+    line: [Qb8#]
+  - id: mate-in-1-12
+    type: mate-in-n
+    text: mate-in-1-12
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . N . P
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . R . . K . . .
+    n: 1
+    line: [Rb8#]
+boss: mate-hunt

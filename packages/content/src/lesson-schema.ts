@@ -137,17 +137,21 @@ const choiceSchema = z
   .strict();
 
 /**
- * A `best-move` exercise's optional load-time-only check (M3.2b): the loader computes the exact
- * set of legal kid moves satisfying the named rule and fails the build unless `solutions` equals
- * that set (order-insensitive, by SAN) — `attack <sq>` (the moved piece newly attacks the enemy
- * piece on `<sq>`), `save <sq>` (the kid piece on `<sq>`, not safe now, is safe after the move, on
- * its new square if it moved), `take-free` (captures of an undefended enemy piece), `good-trade`
- * (captures worth more than the capturer, or of an undefended piece). Never compiled into the
- * runtime `BestMoveDef`.
+ * A `best-move` exercise's optional load-time-only check (M3.2b, M3.3): the loader computes the
+ * exact set of legal kid moves satisfying the named rule and fails the build unless `solutions`
+ * equals that set (order-insensitive, by SAN) — `attack <sq>` (the moved piece newly attacks the
+ * enemy piece on `<sq>`), `save <sq>` (the kid piece on `<sq>`, not safe now, is safe after the
+ * move, on its new square if it moved), `take-free` (captures of an undefended enemy piece),
+ * `good-trade` (captures worth more than the capturer, or of an undefended piece), `check` (the
+ * move gives check), `escape-king` / `escape-block` / `escape-capture` (the kid's king must be in
+ * check: a non-capturing king move / an interposition / a capture of the checking piece, a king
+ * capture included only under `escape-capture`). Never compiled into the runtime `BestMoveDef`.
  */
 const bestMoveVerifySchema = z
   .string()
-  .regex(/^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$/);
+  .regex(
+    /^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$|^check$|^escape-king$|^escape-block$|^escape-capture$/,
+  );
 
 const bestMoveSchema = z
   .object({
@@ -164,6 +168,12 @@ const mateInNSchema = z
     type: z.literal('mate-in-n'),
     n: z.number().int().positive(),
     line: z.array(z.string()).min(1),
+    /**
+     * M3.3 "don't stalemate" exercises: the loader requires at least one legal kid move (other than
+     * the scripted mating line) that would stalemate the opponent instead — a trap the exercise is
+     * meant to teach avoiding. Load-time only, never compiled into the runtime `MateInNDef`.
+     */
+    trap: z.literal('stalemate').optional(),
   })
   .strict()
   .superRefine((value, ctx) => {
