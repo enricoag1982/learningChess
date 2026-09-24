@@ -44,7 +44,7 @@ Warm-up review (2 min) → 1 new concept (5–8 min) → 1 mini-game (5 min).
 - Wrong move: undo + short spoken explanation.
 - Hint ladder: highlight piece → highlight target squares → show move.
 - 3 stars = no hint, no error.
-- 2 failures on a concept → easier variant, concept added to review.
+- 2 failures on a concept → easier variant offered (kid may keep trying), concept added to review. Rules: [domain-model.md](domain-model.md) §3.
 - Mastery = ≥80% of max stars on the concept; required to move on.
 
 ## 4. Curriculum

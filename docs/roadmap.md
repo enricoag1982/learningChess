@@ -75,7 +75,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | # | Item | Scope | Notes |
 |---|---|---|---|
 | F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | No README yet; `docs/` are compact specs, not for casual readers |
-| F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) | Engine + UI + Rook variants: E5 follow-up PR; see domain-model.md §3 |
+| F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Engine, UI, Rook variants (`rook-04`, `rook-08`) done; rules: domain-model.md §3.4 |
 
 ## 4. After MVP
 
