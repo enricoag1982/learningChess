@@ -12,10 +12,11 @@
 | Merge | Squash merge only; PR title = commit message; branch deleted after merge |
 | History | Linear; no force push or deletion of `master` |
 | Decisions | Recorded in `docs/` in the same PR |
+| Tags | Each merged iteration: annotated tag `m<N>.<i>` on `master` (milestone done: `m<N>`); message = scope + checks run; checks defined and logged in [docs/validation.md](docs/validation.md) |
 
 ## Quality gate (`quality` job, `.github/workflows/ci.yml`)
 
-Format check → lint → typecheck → unit + content tests → build. E2E smoke test added in M0. New checks are added as steps of the same job, so the required check name never changes.
+Format check → lint → typecheck → unit + content tests → build → E2E smoke test (Playwright). New checks are added as steps of the same job, so the required check name never changes.
 
 ## Repository settings (manual, GitHub UI)
 

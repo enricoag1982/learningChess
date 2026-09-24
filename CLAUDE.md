@@ -11,7 +11,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
   - `model: "sonnet"`: implementation tasks with a clear spec (files, interfaces, tests to write).
   - `model: "haiku"`: running lint / typecheck / tests, mechanical edits, dependency checks.
   - Main agent: plans, writes precise task specs, reviews diffs, decides, commits.
-- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Milestone branches from `master` (current: `m0-scaffold`); commit and push after each step; ask the user before merging a milestone PR.
+- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Milestone branches from `master` (current: `m0-scaffold`); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: annotated tag `m<N>.<i>` + log row in `docs/validation.md` (checks run, manual checks).
 
 ## Docs (read the relevant one before working on an area)
 
@@ -27,6 +27,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 | `docs/non-functional.md` | Offline, accessibility, privacy, performance, reliability |
 | `docs/screens.md` | UI rules, screen list; sketches: https://claude.ai/artifact/HohYgZ3J9mqBrsamJnin5S |
 | `docs/roadmap.md` | MVP scope, epics, milestones M0–M5, playtests, metrics, decisions |
+| `docs/validation.md` | Check IDs, per-tag validation log |
 
 ## Key decisions
 

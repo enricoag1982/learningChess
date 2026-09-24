@@ -1,0 +1,7 @@
+app:
+  title: Chess for Kids
+home:
+  greeting: Hi! I'm Owl. Let's learn chess together!
+  coming-soon: Lessons are coming soon.
+offline:
+  ready: Ready to play offline.
