@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress } from '../domain/progress.ts';
+import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import {
   changeAvatar,
   changeParentPassword,
@@ -71,6 +71,9 @@ function makeProgressRepo(): ProgressRepository & { readonly deletedFor: string[
     },
     addAttempt: () => Promise.resolve(),
     listAttempts: () => Promise.resolve<Attempt[]>([]),
+    getMiniGame: () => Promise.resolve(undefined),
+    listMiniGames: () => Promise.resolve<MiniGameProgress[]>([]),
+    saveMiniGame: () => Promise.resolve(),
     deleteProfileData: (profileId) => {
       deletedFor.push(profileId);
       for (const [key, progress] of lessons) {

@@ -24,6 +24,8 @@ home:
   avatar-alt: '{{name}} avatar'
   switch-player: Switch player
   journey-tile: Journey
+  play-tile: Play
+  den-tile: My Den
 avatar:
   fox: Fox
   bear: Bear
@@ -199,3 +201,31 @@ complete:
   title: Lesson complete!
   stars-pill: '+{{count}} stars'
   new-in-play: New in Play
+play:
+  title: Play
+  owl-line: Pick a game!
+  vs-computer: vs Computer
+  full-game: Play a full game
+  full-game-locked: After World 4
+  vs-friend: vs Friend
+  vs-friend-note: On this tablet
+  vs-friend-locked: Coming soon
+  minigames-heading: Mini-games
+  locked-condition: 'After {{label}} lesson'
+  minigame-name-stars: '{{title}}, {{stars}}'
+  minigame-name-locked: '{{title}}, locked, {{condition}}'
+  close: Close
+  back-to-play: Back to Play
+den:
+  title: "{{name}}'s Den"
+  owl-line: Look at all your friends!
+  rank-heading: My rank
+  rank-current: You are here
+  rank-start: Start
+  rank-after-world: 'After World {{order}}'
+  rank-after-track: 'After {{track}}'
+  rank-all-tracks: After all paths
+  friends-heading: Animal friends
+  friend-name: '{{character}}, friend'
+  friend-name-locked: '{{character}}, locked, finish the {{piece}} lesson'
+  friend-condition: 'Finish the {{piece}} lesson'

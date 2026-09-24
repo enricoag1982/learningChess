@@ -16,6 +16,7 @@ import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useNarratedText } from '../useNarratedText.ts';
+import type { BossPlaySession } from './BossStep.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
@@ -24,6 +25,7 @@ export interface StaticBossStepProps {
   readonly lesson: Lesson;
   readonly game: StaticMiniGame;
   readonly nextStepIndex: number;
+  readonly session?: BossPlaySession;
 }
 
 /** Pieces on `position` that are not `kidColor`. */
@@ -36,6 +38,7 @@ export function StaticBossStep({
   lesson,
   game: minigame,
   nextStepIndex,
+  session,
 }: StaticBossStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -66,18 +69,23 @@ export function StaticBossStep({
   useEffect(() => {
     if (result === 'playing' || savedRef.current || !profile) return;
     savedRef.current = true;
-    void recordBossResult(services.deps, {
-      profileId: profile.id,
-      lesson,
-      state: game,
-      durationMs: Date.now() - startedAtRef.current,
-      nextStep: nextStepIndex,
-    }).then(() => {
+    const durationMs = Date.now() - startedAtRef.current;
+    const persist = session
+      ? session.save(game, durationMs)
+      : recordBossResult(services.deps, {
+          profileId: profile.id,
+          lesson,
+          state: game,
+          durationMs,
+          nextStep: nextStepIndex,
+        }).then(() => {
+          // Keeps the store's `progress` current: the Complete step reads it straight from the store.
+          void refreshProgress();
+        });
+    void persist.then(() => {
       setSaved(true);
-      // Keeps the store's `progress` current: the Complete step reads it straight from the store.
-      void refreshProgress();
     });
-  }, [result, profile, services.deps, lesson, nextStepIndex, game, refreshProgress]);
+  }, [result, profile, services.deps, lesson, nextStepIndex, game, refreshProgress, session]);
 
   function handleMove(move: { from: Square; to: Square }): void {
     const { state: next, outcome } = playGameMove(game, services.rules, move);
@@ -124,18 +132,32 @@ export function StaticBossStep({
               </span>
               <span>{t('boss.moves-par', { moves: game.exercise.moves, par: minigame.par })}</span>
             </div>
-            {/* Autosave (recordBossResult) completes before either Next button appears. */}
+            {/* Autosave (recordBossResult, or `session.save` standalone) completes before either
+                Next/primary button appears. A standalone session always also offers "Play again"
+                (win included); a lesson boss only offers it once the play did not win outright. */}
             {result === 'won' && (
               <div className="mt-auto flex flex-col items-center gap-4">
                 <StarsRow earned={stars} animate />
-                {saved && (
-                  <NextButton
-                    onClick={() => {
-                      goToStep(nextStepIndex);
-                    }}
-                    className="w-full"
-                  />
-                )}
+                {saved &&
+                  (session ? (
+                    <div className="flex w-full gap-3">
+                      <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
+                        {t('play-again')}
+                      </button>
+                      <NextButton
+                        onClick={session.onPrimary}
+                        label={session.primaryLabel}
+                        className="flex-1"
+                      />
+                    </div>
+                  ) : (
+                    <NextButton
+                      onClick={() => {
+                        goToStep(nextStepIndex);
+                      }}
+                      className="w-full"
+                    />
+                  ))}
               </div>
             )}
             {result === 'ended' && (
@@ -148,9 +170,14 @@ export function StaticBossStep({
                       {t('play-again')}
                     </button>
                     <NextButton
-                      onClick={() => {
-                        goToStep(nextStepIndex);
-                      }}
+                      onClick={
+                        session
+                          ? session.onPrimary
+                          : () => {
+                              goToStep(nextStepIndex);
+                            }
+                      }
+                      label={session?.primaryLabel}
                       className="flex-1"
                     />
                   </div>

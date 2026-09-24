@@ -3,13 +3,16 @@ import type { JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
+import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
 import { HomeScreen } from './ui/HomeScreen.tsx';
 import { JourneyScreen } from './ui/JourneyScreen.tsx';
 import { LessonScreen } from './ui/LessonScreen.tsx';
+import { MiniGameSessionScreen } from './ui/MiniGameSessionScreen.tsx';
 import { NewPlayerScreen } from './ui/NewPlayerScreen.tsx';
 import { ParentAreaScreen } from './ui/ParentAreaScreen.tsx';
 import { PasswordScreen } from './ui/PasswordScreen.tsx';
+import { PlayScreen } from './ui/PlayScreen.tsx';
 import { ProfilePickerScreen } from './ui/ProfilePickerScreen.tsx';
 
 function Screens(): JSX.Element {
@@ -31,6 +34,12 @@ function Screens(): JSX.Element {
       return <HomeScreen />;
     case 'journey':
       return <JourneyScreen />;
+    case 'play':
+      return <PlayScreen />;
+    case 'den':
+      return <DenScreen />;
+    case 'minigame':
+      return <MiniGameSessionScreen />;
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.

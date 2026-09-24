@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Attempt, LessonProgress } from '@chess-kids/core';
+import type { Attempt, LessonProgress, MiniGameProgress } from '@chess-kids/core';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 
@@ -11,6 +11,20 @@ function makeProgress(overrides: Partial<LessonProgress> = {}): LessonProgress {
     bestStars: {},
     bossStars: 0,
     resumeStep: 0,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+function makeMiniGameProgress(overrides: Partial<MiniGameProgress> = {}): MiniGameProgress {
+  return {
+    id: 'mg1',
+    profileId: 'profile-1',
+    miniGameId: 'hungry-rook',
+    bestStars: 3,
+    plays: 1,
+    wins: 1,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -93,6 +107,51 @@ describe('LocalStorageProgressRepository — deleteProfileData', () => {
     expect(await repo.listAttempts('profile-1')).toEqual([]);
     expect(await repo.listLessons('profile-2')).toHaveLength(1);
     expect(await repo.listAttempts('profile-2')).toHaveLength(1);
+  });
+
+  it('also removes mini-game progress for the profile, leaving other profiles untouched', async () => {
+    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    await repo.saveMiniGame(makeMiniGameProgress({ id: 'a' }));
+    await repo.saveMiniGame(makeMiniGameProgress({ id: 'b', profileId: 'profile-2' }));
+
+    await repo.deleteProfileData('profile-1');
+
+    expect(await repo.listMiniGames('profile-1')).toEqual([]);
+    expect(await repo.listMiniGames('profile-2')).toHaveLength(1);
+  });
+});
+
+describe('LocalStorageProgressRepository — mini-game progress', () => {
+  it('saves, gets and lists mini-games keyed by profile + mini-game, and updates in place', async () => {
+    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const rook = makeMiniGameProgress({ id: 'a', miniGameId: 'hungry-rook' });
+    const bishop = makeMiniGameProgress({ id: 'b', miniGameId: 'hungry-bishop' });
+    const otherProfile = makeMiniGameProgress({
+      id: 'c',
+      profileId: 'profile-2',
+      miniGameId: 'hungry-rook',
+    });
+
+    await repo.saveMiniGame(rook);
+    await repo.saveMiniGame(bishop);
+    await repo.saveMiniGame(otherProfile);
+
+    expect(await repo.getMiniGame('profile-1', 'hungry-rook')).toEqual(rook);
+    expect(await repo.getMiniGame('profile-1', 'unknown-game')).toBeUndefined();
+    expect(await repo.listMiniGames('profile-1')).toEqual(expect.arrayContaining([rook, bishop]));
+    expect(await repo.listMiniGames('profile-1')).toHaveLength(2);
+
+    const updated: MiniGameProgress = { ...rook, bestStars: 1, plays: 5 };
+    await repo.saveMiniGame(updated);
+    expect(await repo.getMiniGame('profile-1', 'hungry-rook')).toEqual(updated);
+  });
+
+  it('rejects with StorageError on a corrupt stored shape', async () => {
+    const store = openLocalStore(localStorage);
+    store.write('minigame-progress', { 'profile-1:hungry-rook': { nope: true } });
+    const repo = new LocalStorageProgressRepository(store);
+
+    await expect(repo.listMiniGames('profile-1')).rejects.toThrow(StorageError);
   });
 });
 

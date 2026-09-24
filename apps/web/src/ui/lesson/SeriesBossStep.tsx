@@ -26,6 +26,8 @@ import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
 import { useNarratedText } from '../useNarratedText.ts';
+import type { BossPlaySession } from './BossStep.tsx';
+import { SECONDARY_BUTTON } from './button-styles.ts';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
 import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
 import { buildExercisePlayArea } from './exercise-play-area.tsx';
@@ -36,6 +38,7 @@ export interface SeriesBossStepProps {
   readonly lesson: Lesson;
   readonly game: SeriesMiniGame;
   readonly nextStepIndex: number;
+  readonly session?: BossPlaySession;
 }
 
 /** Round counter + mistakes-so-far card, shared by a round in progress and the result screen. */
@@ -149,6 +152,7 @@ export function SeriesBossStep({
   lesson,
   game: minigame,
   nextStepIndex,
+  session,
 }: SeriesBossStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -157,8 +161,10 @@ export function SeriesBossStep({
   const refreshProgress = useAppStore((state) => state.refreshProgress);
 
   const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame));
-  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
-  const [startedAt] = useState(() => Date.now());
+  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
+  // exists because "Play again" needs to reset the clock later, which `useState` can't do.
+  const [initialStartedAt] = useState(() => Date.now());
+  const startedAtRef = useRef(initialStartedAt);
   const savedRef = useRef(false);
   const [saved, setSaved] = useState(false);
 
@@ -170,21 +176,34 @@ export function SeriesBossStep({
   useEffect(() => {
     if (result === 'playing' || savedRef.current || !profile) return;
     savedRef.current = true;
-    void recordBossResult(services.deps, {
-      profileId: profile.id,
-      lesson,
-      state: series,
-      durationMs: Date.now() - startedAt,
-      nextStep: nextStepIndex,
-    }).then(() => {
+    const durationMs = Date.now() - startedAtRef.current;
+    const persist = session
+      ? session.save(series, durationMs)
+      : recordBossResult(services.deps, {
+          profileId: profile.id,
+          lesson,
+          state: series,
+          durationMs,
+          nextStep: nextStepIndex,
+        }).then(() => {
+          // Keeps the store's `progress` current: the Complete step reads it straight from the store.
+          void refreshProgress();
+        });
+    void persist.then(() => {
       setSaved(true);
-      // Keeps the store's `progress` current: the Complete step reads it straight from the store.
-      void refreshProgress();
     });
-  }, [result, profile, services.deps, lesson, nextStepIndex, series, startedAt, refreshProgress]);
+  }, [result, profile, services.deps, lesson, nextStepIndex, series, refreshProgress, session]);
 
   function handleRoundNext(roundState: ExerciseState): void {
     setSeries((current) => completeRound(current, roundState));
+  }
+
+  /** Standalone-only: restarts the series at its first round (a lesson boss never restarts inline). */
+  function handlePlayAgain(): void {
+    setSeries(startSeries(minigame));
+    startedAtRef.current = Date.now();
+    savedRef.current = false;
+    setSaved(false);
   }
 
   return (
@@ -220,17 +239,30 @@ export function SeriesBossStep({
                 total={minigame.rounds.length}
                 mistakes={series.mistakes}
               />
-              {/* Autosave (recordBossResult) completes before the Next button appears. */}
+              {/* Autosave (recordBossResult, or `session.save` standalone) completes before the
+                  Next/primary button appears. A standalone session also offers "Play again". */}
               <div className="mt-auto flex flex-col items-center gap-4">
                 <StarsRow earned={stars} animate />
-                {saved && (
-                  <NextButton
-                    onClick={() => {
-                      goToStep(nextStepIndex);
-                    }}
-                    className="w-full"
-                  />
-                )}
+                {saved &&
+                  (session ? (
+                    <div className="flex w-full gap-3">
+                      <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
+                        {t('play-again')}
+                      </button>
+                      <NextButton
+                        onClick={session.onPrimary}
+                        label={session.primaryLabel}
+                        className="flex-1"
+                      />
+                    </div>
+                  ) : (
+                    <NextButton
+                      onClick={() => {
+                        goToStep(nextStepIndex);
+                      }}
+                      className="w-full"
+                    />
+                  ))}
               </div>
             </>
           }

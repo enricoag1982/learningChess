@@ -22,7 +22,13 @@ export type {
   VersusMiniGame,
   CompiledContent,
 } from './domain/lesson.ts';
-export type { Stars, LessonProgress, Attempt, LessonStatus } from './domain/progress.ts';
+export type {
+  Stars,
+  LessonProgress,
+  Attempt,
+  LessonStatus,
+  MiniGameProgress,
+} from './domain/progress.ts';
 export {
   newLessonProgress,
   recordExerciseStars,
@@ -31,7 +37,14 @@ export {
   lessonStatus,
   lessonStars,
   totalStars,
+  recordMiniGamePlay,
 } from './domain/progress.ts';
+
+export type { AnimalFriend, RankState, RankLadderEntry } from './domain/rewards.ts';
+export { animalFriends, rankLadder } from './domain/rewards.ts';
+
+export type { UnlockedMiniGame } from './domain/play.ts';
+export { unlockedMiniGames } from './domain/play.ts';
 
 export type { LessonStep, LessonPhase } from './domain/lesson-session.ts';
 export { lessonSteps, stepPhase } from './domain/lesson-session.ts';
@@ -80,6 +93,9 @@ export {
   recordBossResult,
   saveResumeStep,
 } from './app/use-cases.ts';
+
+export type { RecordMiniGameResultInput } from './app/minigames.ts';
+export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
 
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
@@ -156,6 +172,7 @@ export type {
   VersusState,
   VersusStatus,
   VersusMoveOutcome,
+  BossResultSummary,
 } from './domain/exercise/index.ts';
 export {
   startExercise,
@@ -190,6 +207,8 @@ export {
   canTakeBack,
   takeBackVersusMove,
   versusStars,
+  summarizeBossResult,
+  isBossResultWin,
 } from './domain/exercise/index.ts';
 
 // Variant game rules (standard chess and kingless mini-games, played against the bot below) and
