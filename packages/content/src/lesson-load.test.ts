@@ -113,6 +113,94 @@ function validSetupExercise(overrides: Record<string, unknown> = {}): Record<str
   };
 }
 
+/** Pawn on e4 (own pawn on d5, enemy pawn on f5): a select-squares exercise deriving attacked-by. */
+function validAttackedByExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'select-squares',
+    text: 'demo-01',
+    board: diagram({ e4: 'P', d5: 'P', f5: 'p', g8: 'k', e1: 'K' }),
+    derive: 'attacked-by',
+    from: 'e4',
+    ...overrides,
+  };
+}
+
+/** White king g1 in check from the black rook on g8, escaping to f1 or h1. */
+function validCheckEscapesExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'select-squares',
+    text: 'demo-01',
+    board: diagram({ g1: 'K', f2: 'P', h2: 'P', g8: 'r', a8: 'k' }),
+    derive: 'check-escapes',
+    ...overrides,
+  };
+}
+
+/** Two rooks (b1, d1) plus Ra7 cutting off the 7th rank: either rook mates the lone black king. */
+function validMateInOneExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'mate-in-n',
+    text: 'demo-01',
+    board: diagram({ h8: 'k', a7: 'R', b1: 'R', d1: 'R', g2: 'K' }),
+    n: 1,
+    line: ['Rb8#'],
+    ...overrides,
+  };
+}
+
+/** 1.Ne7+ Kh8 2.Qa8# — a mate-in-2 with a scripted opponent reply. */
+function validMateInTwoExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'mate-in-n',
+    text: 'demo-01',
+    board: diagram({ g8: 'k', f7: 'p', g7: 'p', h7: 'p', c6: 'N', a1: 'Q', b1: 'K' }),
+    n: 2,
+    line: ['Ne7+', 'Kh8', 'Qa8#'],
+    ...overrides,
+  };
+}
+
+/** A black pawn on e4, attacked by the white pawn on d3 and undefended: a "hanging" yes-no exercise. */
+function validYesNoHangingExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'yes-no',
+    text: 'demo-01',
+    board: diagram({ e4: 'p', d3: 'P', a1: 'K', h8: 'k' }),
+    answer: 'yes',
+    focus: 'e4',
+    verify: 'hanging e4',
+    ...overrides,
+  };
+}
+
+/** Rook vs. queen options: a "higher-value" choice exercise (queen is worth more). */
+function validChoiceHigherValueExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'choice',
+    text: 'demo-01',
+    board: diagram({ a1: 'R' }),
+    options: [
+      { id: 'rook', piece: 'R' },
+      { id: 'queen', piece: 'Q' },
+    ],
+    answer: 'queen',
+    verify: 'higher-value',
+    ...overrides,
+  };
+}
+
 function validLesson(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 'demo-lesson',
@@ -683,6 +771,256 @@ describe('loadContent', () => {
 
       const issues = issuesOf();
       expect(issues.some((issue) => issue.includes('exercises.0.target'))).toBe(true);
+    });
+  });
+
+  describe('select-squares: attacked-by', () => {
+    it('loads a valid attacked-by exercise with no issues', () => {
+      writeLesson({ exercises: [validAttackedByExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports a "from" square with no piece at all (either colour is fine otherwise)', () => {
+      writeLesson({ exercises: [validAttackedByExercise({ from: 'h1' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('"from" square has no piece'))).toBe(true);
+    });
+
+    it('rejects "from" together with "derive: check-escapes"', () => {
+      writeLesson({
+        exercises: [validAttackedByExercise({ derive: 'check-escapes' })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('check-escapes') && issue.includes('must not set')),
+      ).toBe(true);
+    });
+  });
+
+  describe('select-squares: check-escapes', () => {
+    it('loads a valid check-escapes exercise with no issues', () => {
+      writeLesson({ exercises: [validCheckEscapesExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('reports a king that is not actually in check', () => {
+      writeLesson({
+        exercises: [validCheckEscapesExercise({ board: diagram({ g1: 'K', a8: 'k' }) })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('king to be in check'))).toBe(true);
+    });
+
+    it('reports a checked king with no legal move of its own (a piece could still block)', () => {
+      // King g1 fully boxed by its own pieces (f1/f2/h1/h2); g2 stays empty (still on the
+      // checked g-file, so moving there would not escape check either) but the bishop on f1
+      // could still block on g2 — the king itself simply has no legal move.
+      writeLesson({
+        exercises: [
+          validCheckEscapesExercise({
+            board: diagram({ g1: 'K', f1: 'B', h1: 'N', f2: 'P', h2: 'P', g8: 'r', a8: 'k' }),
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('no legal king move'))).toBe(true);
+    });
+
+    it('requires "derive" when "from" is set without "answer"', () => {
+      writeLesson({
+        exercises: [
+          {
+            id: 'demo-01',
+            type: 'select-squares',
+            text: 'demo-01',
+            board: diagram({ a1: 'R' }),
+            from: 'a1',
+          },
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('"from" requires "derive"'))).toBe(true);
+    });
+  });
+
+  describe('mate-in-n', () => {
+    it('loads a valid mate-in-1 exercise with no issues', () => {
+      writeLesson({ exercises: [validMateInOneExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid mate-in-2 exercise (kid move, scripted reply, mating move) with no issues', () => {
+      writeLesson({ exercises: [validMateInTwoExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a line whose length does not match 2*n-1', () => {
+      writeLesson({ exercises: [validMateInOneExercise({ n: 2 })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('line') && issue.includes('2*n-1'))).toBe(true);
+    });
+
+    it('reports an illegal move in the line', () => {
+      writeLesson({ exercises: [validMateInTwoExercise({ line: ['Ne7+', 'Kh8', 'Qc2'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('line[2]') && issue.includes('not a legal move')),
+      ).toBe(true);
+    });
+
+    it('reports a final move that does not deliver checkmate', () => {
+      writeLesson({ exercises: [validMateInOneExercise({ line: ['Rb2'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('does not deliver checkmate'))).toBe(true);
+    });
+
+    it('requires both kings on the board', () => {
+      writeLesson({
+        exercises: [
+          validMateInOneExercise({ board: diagram({ a7: 'R', b1: 'R', d1: 'R', g2: 'K' }) }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('requires both kings'))).toBe(true);
+    });
+  });
+
+  describe('yes-no: verify', () => {
+    it('loads a valid "hanging" verify with no issues', () => {
+      writeLesson({ exercises: [validYesNoHangingExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an answer contradicting the computed fact', () => {
+      writeLesson({ exercises: [validYesNoHangingExercise({ answer: 'no' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) => issue.includes('verify "hanging e4"') && issue.includes('answer is "no"'),
+        ),
+      ).toBe(true);
+    });
+
+    it('accepts "in-check" with no square', () => {
+      writeLesson({
+        exercises: [
+          validYesNoHangingExercise({
+            board: diagram({ g1: 'K', f2: 'P', h2: 'P', g8: 'r', a8: 'k' }),
+            focus: undefined,
+            verify: 'in-check',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+  });
+
+  describe('choice: verify higher-value', () => {
+    it('loads a valid higher-value verify with no issues', () => {
+      writeLesson({ exercises: [validChoiceHigherValueExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an answer that is not the higher-value option', () => {
+      writeLesson({ exercises: [validChoiceHigherValueExercise({ answer: 'rook' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('answer should be "queen"'))).toBe(true);
+    });
+
+    it('rejects a text-only option (no piece to value)', () => {
+      writeLesson({
+        exercises: [
+          validChoiceHigherValueExercise({
+            options: [
+              { id: 'rook', piece: 'R' },
+              { id: 'other', text: 'demo-01' },
+            ],
+            answer: 'rook',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('requires every option to be a piece'))).toBe(
+        true,
+      );
+    });
+
+    it('rejects a tie for the highest value', () => {
+      writeLesson({
+        exercises: [
+          validChoiceHigherValueExercise({
+            options: [
+              { id: 'bishop', piece: 'B' },
+              { id: 'knight', piece: 'N' },
+            ],
+            answer: 'bishop',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('requires a unique highest-value option'))).toBe(
+        true,
+      );
     });
   });
 

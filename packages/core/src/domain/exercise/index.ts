@@ -7,6 +7,7 @@ export type {
   ChoiceDef,
   BestMoveDef,
   SetupDef,
+  MateInNDef,
   ExerciseDef,
 } from './types.ts';
 
@@ -17,6 +18,7 @@ export type {
   PlaceOutcome,
   PalettePiece,
   Hint,
+  MateInNOutcome,
 } from './engine.ts';
 export {
   startExercise,
@@ -24,6 +26,7 @@ export {
   playMove,
   toggleSquare,
   submitSelection,
+  selectSquaresAnswer,
   answerYesNo,
   answerChoice,
   placePiece,
@@ -31,10 +34,21 @@ export {
   undo,
   requestHint,
   starsFor,
+  playMateInN,
 } from './engine.ts';
 
 export type { SolverMove } from './solver.ts';
 export { solve, optimalMoves } from './solver.ts';
+
+export {
+  kingSquare,
+  isAttacked,
+  isDefended,
+  isHanging,
+  isInCheck,
+  isCheckmate,
+  isStalemate,
+} from './facts.ts';
 
 export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
 export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';

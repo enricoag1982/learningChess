@@ -1,5 +1,5 @@
 import type { ChessRules, Move, MoveInput } from '../chess/rules.ts';
-import type { Piece, Position, Square } from '../chess/types.ts';
+import type { Color, Piece, Position, Square } from '../chess/types.ts';
 
 /** Lesson-variant behaviour layered on top of standard chess rules. */
 export interface VariantOptions {
@@ -17,6 +17,8 @@ export interface VariantRules {
     options: VariantOptions,
     move: MoveInput,
   ): { readonly position: Position; readonly move: Move } | null;
+  /** Squares of `by` pieces attacking `square` (real board geometry; walls block sliding as usual). */
+  attackers(position: Position, square: Square, by: Color): Square[];
 }
 
 /**
@@ -69,6 +71,10 @@ export function createVariantRules(rules: ChessRules): VariantRules {
         ? { ...stripped, toMove: position.toMove, enPassant: null }
         : stripped;
       return { position: result, move: played.move };
+    },
+
+    attackers(position, square, by) {
+      return rules.attackers(wrapWalls(position), square, by);
     },
   };
 }

@@ -2,7 +2,13 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseDef, Lesson, Piece } from '@chess-kids/core';
-import { recordExerciseResult, starsFor } from '@chess-kids/core';
+import {
+  chessJsRules,
+  isInCheck,
+  kingSquare,
+  recordExerciseResult,
+  starsFor,
+} from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
@@ -22,6 +28,18 @@ export interface ExerciseStepProps {
   readonly guided: boolean;
   readonly nextStepIndex: number;
 }
+
+function prefersReducedMotion(): boolean {
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+/** mate-in-n: how long the scripted opponent reply stays hidden before it is shown and narrated. */
+const REPLY_DELAY_MS = 600;
+const REPLY_DELAY_REDUCED_MS = 150;
 
 /** One guided try or scored exercise, of any of the exercise types. */
 export function ExerciseStep({
@@ -53,8 +71,28 @@ export function ExerciseStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // mate-in-n: reveals the scripted opponent reply — held back in `state.pendingReply` — after a
+  // short delay, so the kid sees their own move complete first (teaching-process.md §3.3).
+  useEffect(() => {
+    if (!state.pendingReply) return;
+    const delay = prefersReducedMotion() ? REPLY_DELAY_REDUCED_MS : REPLY_DELAY_MS;
+    const timer = setTimeout(() => {
+      dispatch({ type: 'reveal-reply' });
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [state.pendingReply, dispatch]);
+
   const solved = state.core.solved;
   const stars = starsFor(state.core);
+
+  // The board's own displayed position (mate-in-n stages the reply behind `pendingReply`; every
+  // other type always shows `state.core.position`), for the check ring — "all exercise types".
+  const displayedPosition = state.pendingReply ? state.pendingReply.position : state.core.position;
+  const checkSquare = isInCheck(displayedPosition, chessJsRules)
+    ? kingSquare(displayedPosition, displayedPosition.toMove)
+    : undefined;
 
   useEffect(() => {
     if (!solved || savedRef.current || !profile) return;
@@ -98,6 +136,7 @@ export function ExerciseStep({
     selectedPiece,
     onSelectPiece: setSelectedPiece,
     isStacked,
+    checkSquare,
   });
 
   const panel = (

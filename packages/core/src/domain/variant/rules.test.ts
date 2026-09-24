@@ -133,6 +133,44 @@ describe('stars', () => {
   });
 });
 
+describe('attackers', () => {
+  it('reports real board geometry, ignoring whose turn it is', () => {
+    const position = parseDiagram(
+      [
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . r . . .',
+        '. . . . R . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+      ].join('\n'),
+      { toMove: 'b' }, // black to move; the white rook's attack does not depend on that
+    );
+
+    expect(rules.attackers(position, 'e5', 'w')).toEqual(['e4']);
+    expect(rules.attackers(position, 'e4', 'b')).toEqual(['e5']);
+  });
+
+  it('blocks a sliding attacker behind a wall', () => {
+    const position = parseDiagram(
+      [
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . x . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . R . . . .',
+      ].join('\n'),
+    );
+
+    expect(rules.attackers(position, 'd8', 'w')).toEqual([]);
+  });
+});
+
 describe('staticOpponent', () => {
   // A black pawn on d4 gives chess.js an actual en passant capture to report after e2-e4.
   const position: Position = {

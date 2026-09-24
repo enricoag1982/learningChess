@@ -1,10 +1,18 @@
-import type { Move, MoveInput } from '../chess/rules.ts';
+import type { ChessRules, Move, MoveInput } from '../chess/rules.ts';
 import { SQUARES } from '../chess/types.ts';
 import type { Color, Piece, PieceType, Position, Square } from '../chess/types.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
+import { kingSquare } from './facts.ts';
 import { solve } from './solver.ts';
-import type { BestMoveDef, ChoiceDef, ExerciseDef, SelectSquaresDef, SetupDef } from './types.ts';
+import type {
+  BestMoveDef,
+  ChoiceDef,
+  ExerciseDef,
+  MateInNDef,
+  SelectSquaresDef,
+  SetupDef,
+} from './types.ts';
 
 /** Immutable exercise progress. */
 export interface ExerciseState {
@@ -61,6 +69,16 @@ export interface PlaceOutcome {
   readonly square: Square;
   readonly piece: Piece;
 }
+
+/** Result of a kid move in a `mate-in-n` exercise. */
+export type MateInNOutcome =
+  | { readonly kind: 'illegal' }
+  /** A legal move that neither mates nor matches the scripted line for this ply. Position unchanged. */
+  | { readonly kind: 'wrong'; readonly move: Move }
+  /** The scripted kid move was played and its scripted opponent reply was applied too. */
+  | { readonly kind: 'moved'; readonly move: Move; readonly reply: Move }
+  /** Delivered checkmate — any mating move, not only the scripted one. */
+  | { readonly kind: 'solved'; readonly move: Move };
 
 /** One remaining piece in a `setup` exercise's palette. */
 export interface PalettePiece {
@@ -124,7 +142,7 @@ const NON_MOVE_TYPES = new Set<ExerciseDef['type']>([
   'setup',
 ]);
 
-/** Legal kid moves right now (collect-stars / capture / best-move only; `[]` otherwise or once solved). */
+/** Legal kid moves right now (collect-stars / capture / best-move / mate-in-n only; `[]` otherwise or once solved). */
 export function exerciseMoves(state: ExerciseState, rules: VariantRules, from?: Square): Move[] {
   if (state.solved || NON_MOVE_TYPES.has(state.def.type)) {
     return [];
@@ -153,6 +171,9 @@ export function playMove(
   move: MoveInput,
 ): { readonly state: ExerciseState; readonly outcome: MoveOutcome } {
   if (NON_MOVE_TYPES.has(state.def.type)) {
+    throw new Error(`playMove: ${state.def.type} exercises use a different action`);
+  }
+  if (state.def.type === 'mate-in-n') {
     throw new Error(`playMove: ${state.def.type} exercises use a different action`);
   }
   if (state.solved) {
@@ -221,13 +242,34 @@ export function toggleSquare(state: ExerciseState, square: Square): ExerciseStat
 }
 
 /** Resolves a select-squares exercise's answer squares. */
-function answerSquares(def: SelectSquaresDef, rules: VariantRules): readonly Square[] {
+export function selectSquaresAnswer(def: SelectSquaresDef, rules: VariantRules): readonly Square[] {
   if ('squares' in def.answer) {
     return def.answer.squares;
   }
-  return rules
-    .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
+  if (def.answer.derive === 'legal-moves') {
+    // A promoting pawn's legal moves include one entry per promotion piece, all sharing the same
+    // `to` (e.g. 4 pushes to d8): de-duplicated, or toggling that square an even number of times
+    // would end it unselected instead of selected.
+    const targets = rules
+      .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
+      .map((move) => move.to);
+    return [...new Set(targets)];
+  }
+  if (def.answer.derive === 'attacked-by') {
+    const { from } = def.answer;
+    const piece = def.position.pieces[from];
+    if (piece === undefined) return [];
+    return SQUARES.filter((square) =>
+      rules.attackers(def.position, square, piece.color).includes(from),
+    );
+  }
+  // check-escapes: every square the side to move's king can legally move to.
+  const king = kingSquare(def.position, def.position.toMove);
+  if (king === undefined) return [];
+  const targets = rules
+    .legalMoves(def.position, { staticOpponent: true }, king)
     .map((move) => move.to);
+  return [...new Set(targets)];
 }
 
 /** Checks the current selection against the answer (select-squares). */
@@ -238,7 +280,7 @@ export function submitSelection(
   if (state.def.type !== 'select-squares') {
     throw new Error('submitSelection: exercise is not select-squares');
   }
-  const answer = answerSquares(state.def, rules);
+  const answer = selectSquaresAnswer(state.def, rules);
   const wrong = state.selected.filter((square) => !answer.includes(square));
   const missing = answer.filter((square) => !state.selected.includes(square)).length;
   const correct = wrong.length === 0 && missing === 0;
@@ -374,6 +416,74 @@ export function undo(state: ExerciseState): ExerciseState {
   };
 }
 
+/**
+ * Plays a kid move for a `mate-in-n` exercise, under real chess rules (both kings, real turn
+ * alternation — never a static opponent, unlike every other move-playing exercise type). A move
+ * that delivers checkmate always solves it, even when it is not the scripted one; otherwise the
+ * move must match the scripted line for this ply, and its scripted opponent reply (if any) is
+ * applied automatically so the kid's turn comes right back around. `undo` is not offered for this
+ * type (like `best-move`).
+ */
+export function playMateInN(
+  state: ExerciseState,
+  rules: ChessRules,
+  move: MoveInput,
+): { readonly state: ExerciseState; readonly outcome: MateInNOutcome } {
+  if (state.def.type !== 'mate-in-n') {
+    throw new Error('playMateInN: exercise is not mate-in-n');
+  }
+  if (state.solved) {
+    return { state, outcome: { kind: 'illegal' } };
+  }
+  const def = state.def;
+
+  const played = rules.play(state.position, move);
+  if (played === null) {
+    return { state: { ...state, errors: state.errors + 1 }, outcome: { kind: 'illegal' } };
+  }
+
+  if (rules.status(played.position).checkmate) {
+    const nextState: ExerciseState = {
+      ...state,
+      position: played.position,
+      history: [...state.history, state.position],
+      moves: state.moves + 1,
+      solved: true,
+    };
+    return { state: nextState, outcome: { kind: 'solved', move: played.move } };
+  }
+
+  const plyIndex = state.history.length;
+  const scriptedSan = def.line[plyIndex];
+  if (scriptedSan === undefined || normalizeSan(played.move.san) !== normalizeSan(scriptedSan)) {
+    return {
+      state: { ...state, errors: state.errors + 1 },
+      outcome: { kind: 'wrong', move: played.move },
+    };
+  }
+
+  const replySan = def.line[plyIndex + 1];
+  if (replySan === undefined) {
+    // The content loader guarantees the line's last move always delivers checkmate; reaching here
+    // means it did not, which is a content bug, not a kid error.
+    throw new Error(`playMateInN: scripted final move "${scriptedSan}" did not deliver checkmate`);
+  }
+  const repliedPlay = rules.play(played.position, replySan);
+  if (repliedPlay === null) {
+    throw new Error(`playMateInN: scripted reply "${replySan}" is illegal`);
+  }
+  const nextState: ExerciseState = {
+    ...state,
+    position: repliedPlay.position,
+    history: [...state.history, state.position, played.position],
+    moves: state.moves + 2,
+  };
+  return {
+    state: nextState,
+    outcome: { kind: 'moved', move: played.move, reply: repliedPlay.move },
+  };
+}
+
 function goalMove(state: ExerciseState, rules: VariantRules): { from: Square; to: Square } | null {
   const goal = state.def.type === 'collect-stars' ? 'collect-stars' : 'capture';
   const line = solve(state.position, rules, goal);
@@ -386,10 +496,15 @@ function selectSquaresHint(
   rules: VariantRules,
   level: 1 | 2 | 3,
 ): Hint {
-  const answer = answerSquares(def, rules);
+  const answer = selectSquaresAnswer(def, rules);
   if (level === 1) {
-    const from = 'derive' in def.answer ? [def.answer.from] : [];
-    return { kind: 'squares', level: 1, squares: from };
+    const from =
+      'derive' in def.answer
+        ? def.answer.derive === 'check-escapes'
+          ? kingSquare(def.position, def.position.toMove)
+          : def.answer.from
+        : undefined;
+    return { kind: 'squares', level: 1, squares: from === undefined ? [] : [from] };
   }
   if (level === 2) {
     const next = answer.find((square) => !state.selected.includes(square));
@@ -427,6 +542,33 @@ function bestMoveHint(
     solutionSan === undefined
       ? undefined
       : candidates.find((candidate) => normalizeSan(candidate.san) === normalizeSan(solutionSan));
+  if (level === 1) {
+    return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
+  }
+  if (level === 2) {
+    return { kind: 'squares', level: 2, squares: move === undefined ? [] : [move.to] };
+  }
+  return {
+    kind: 'squares',
+    level: 3,
+    squares: move === undefined ? [] : [move.from, move.to],
+    ...(move === undefined ? {} : { move: { from: move.from, to: move.to } }),
+  };
+}
+
+/** mate-in-n hint: piece → target square → the move, from the scripted line's move for this ply. */
+function mateInNHint(
+  state: ExerciseState,
+  def: MateInNDef,
+  rules: VariantRules,
+  level: 1 | 2 | 3,
+): Hint {
+  const san = def.line[state.history.length];
+  const candidates = rules.legalMoves(state.position, { staticOpponent: true });
+  const move =
+    san === undefined
+      ? undefined
+      : candidates.find((candidate) => normalizeSan(candidate.san) === normalizeSan(san));
   if (level === 1) {
     return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
   }
@@ -523,6 +665,9 @@ export function requestHint(
   if (bumped.def.type === 'setup') {
     return setupHint(bumped, bumped.def, level);
   }
+  if (bumped.def.type === 'mate-in-n') {
+    return { state: bumped, hint: mateInNHint(state, bumped.def, rules, level) };
+  }
   return { state: bumped, hint: moveHint(state, rules, level) };
 }
 
@@ -573,7 +718,8 @@ export function starsFor(state: ExerciseState): 0 | 1 | 2 | 3 {
     state.def.type === 'select-squares' ||
     state.def.type === 'yes-no' ||
     state.def.type === 'choice' ||
-    state.def.type === 'best-move'
+    state.def.type === 'best-move' ||
+    state.def.type === 'mate-in-n'
   ) {
     return errorHintStars(state.hintLevel, state.errors);
   }

@@ -73,10 +73,19 @@ const selectSquaresSchema = z
     ...exerciseCommonFields,
     type: z.literal('select-squares'),
     answer: z.array(squareSchema).optional(),
-    derive: z.literal('legal-moves').optional(),
+    derive: z.enum(['legal-moves', 'attacked-by', 'check-escapes']).optional(),
     from: squareSchema.optional(),
   })
   .strict();
+
+/**
+ * A `yes-no` exercise's optional load-time-only check: the loader computes the named rule fact on
+ * the exercise's own position and fails the build if it contradicts `answer`, so a "safe?" /
+ * "in check?" answer can never be authored wrong. Never compiled into the runtime `ExerciseDef`.
+ */
+const yesNoVerifySchema = z
+  .string()
+  .regex(/^(?:hanging|attacked|defended) [a-h][1-8]$|^(?:in-check|checkmate|stalemate)$/);
 
 const yesNoSchema = z
   .object({
@@ -84,6 +93,7 @@ const yesNoSchema = z
     type: z.literal('yes-no'),
     answer: z.enum(['yes', 'no']),
     focus: squareSchema.optional(),
+    verify: yesNoVerifySchema.optional(),
   })
   .strict();
 
@@ -111,6 +121,12 @@ const choiceSchema = z
     answer: z.string(),
     /** Hides the board (default: shown). Named apart from `board`, the position diagram field. */
     showBoard: z.boolean().optional(),
+    /**
+     * Load-time-only check: options must all be pieces, and `answer` must be the option with the
+     * higher standard value (P1 N3 B3 R5 Q9), which must be unique. Never compiled into the
+     * runtime `ExerciseDef`.
+     */
+    verify: z.literal('higher-value').optional(),
   })
   .strict();
 
@@ -121,6 +137,25 @@ const bestMoveSchema = z
     solutions: z.array(z.string()).min(1),
   })
   .strict();
+
+const mateInNSchema = z
+  .object({
+    ...exerciseCommonFields,
+    type: z.literal('mate-in-n'),
+    n: z.number().int().positive(),
+    line: z.array(z.string()).min(1),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    const expected = 2 * value.n - 1;
+    if (value.line.length !== expected) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['line'],
+        message: `"line" must have exactly 2*n-1 = ${String(expected)} moves for n=${String(value.n)}`,
+      });
+    }
+  });
 
 /** A setup exercise's goal position: same shape as `positionFields`, minus `toMove` (unused). */
 const targetSchema = z
@@ -146,6 +181,7 @@ export const exerciseSchema = z
     choiceSchema,
     bestMoveSchema,
     setupSchema,
+    mateInNSchema,
   ])
   .superRefine((value, ctx) => {
     checkExactlyOnePosition(value, ctx);
@@ -159,11 +195,26 @@ export const exerciseSchema = z
         });
         return;
       }
-      if (hasDerive && (value.derive === undefined || value.from === undefined)) {
-        ctx.addIssue({ code: 'custom', message: '"derive" requires both "derive" and "from"' });
-      }
       if (hasAnswer && value.answer?.length === 0) {
         ctx.addIssue({ code: 'custom', path: ['answer'], message: '"answer" must not be empty' });
+      }
+      if (hasDerive) {
+        const needsFrom = value.derive === 'legal-moves' || value.derive === 'attacked-by';
+        if (value.derive === undefined) {
+          ctx.addIssue({ code: 'custom', path: ['derive'], message: '"from" requires "derive"' });
+        } else if (needsFrom && value.from === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['from'],
+            message: `"derive: ${value.derive}" requires "from"`,
+          });
+        } else if (!needsFrom && value.from !== undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['from'],
+            message: `"derive: ${value.derive}" must not set "from"`,
+          });
+        }
       }
     }
     if (value.type === 'choice') {
