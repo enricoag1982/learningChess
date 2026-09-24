@@ -162,3 +162,6 @@ stars2: 5
 | PWA updates | Service worker without skip-waiting: new version activates at next app start |
 | Hosting | `deploy.yml`: push to `master` → build with base `/<repo>/` → GitHub Pages |
 | App state | Zustand added in M1 (first shared state) |
+| Ports in adapters | Synchronous storage adapters return promises (port contract async) without `async` bodies |
+| Animations | CSS transitions in M1; Motion library only if CSS is not enough |
+| Test layers (web) | Vitest + jsdom + Testing Library (components, adapters); Playwright on the production build (desktop + tablet 1024×768 touch) |

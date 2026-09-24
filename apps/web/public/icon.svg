@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Chess for Kids">
+  <rect width="100" height="100" rx="20" fill="#FBF6EC" />
+  <circle cx="48" cy="33" r="12" fill="#2E7D5B" />
+  <path d="M36 50 L60 50 L64 60 L32 60 Z" fill="#2E7D5B" />
+  <rect x="30" y="61" width="36" height="9" rx="3" fill="#2E7D5B" />
+  <rect x="24" y="72" width="48" height="11" rx="3" fill="#2E7D5B" />
+  <path
+    d="M77 18 L79.8 24.3 86.7 25.1 81.5 29.7 83 36.5 77 32.9 71 36.5 72.5 29.7 67.3 25.1 74.2 24.3 Z"
+    fill="#E9A92B"
+  />
+</svg>

@@ -19,3 +19,6 @@ updates:
       # typescript-eslint 8.70 supports TypeScript < 6.1
       - dependency-name: typescript
         versions: ['>=6.1.0']
+      # Types follow the Node runtime major (CI: Node 22)
+      - dependency-name: '@types/node'
+        versions: ['>=23']

@@ -11,7 +11,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
   - `model: "sonnet"`: implementation tasks with a clear spec (files, interfaces, tests to write).
   - `model: "haiku"`: running lint / typecheck / tests, mechanical edits, dependency checks.
   - Main agent: plans, writes precise task specs, reviews diffs, decides, commits.
-- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Milestone branches from `master` (current: `m0-scaffold`); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: annotated tag `m<N>.<i>` + log row in `docs/validation.md` (checks run, manual checks).
+- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Milestone branches from `master` (current: `m0-scaffold`); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: log row in `docs/validation.md` (checks run, manual checks) + squash title `M<N>.<i>: …` → CI creates annotated tag `m<N>.<i>` (session cannot push tags: HTTP 403).
 
 ## Docs (read the relevant one before working on an area)
 
@@ -37,10 +37,11 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 - Animal theme; English first (i18n); narration = Web Speech API (device voices) until v3.
 - Parent password kept in a simple plain-text file; password screen reminds where the file is (web: copy in Downloads; store apps: editable file in app Documents). Daily time limit in v1.
 
-## Next step: M0 scaffold (see `docs/roadmap.md`)
+## Status and next step
 
-Scope: pnpm workspace (`packages/core`, `packages/content`, `apps/web`), TS strict, ESLint, Prettier, Vitest, Playwright smoke test, React + Vite + Tailwind + vite-plugin-pwa shell, i18next, localStorage adapter, board diagram parser + chess.js adapter with tests, GitHub Pages deploy workflow. Root scripts used by CI `quality` job: `format:check`, `lint`, `typecheck`, `test`, `build`; add an e2e step to the `quality` job; add `npm` ecosystem to `.github/dependabot.yml`.
-Exit: CI green; empty PWA deployed; rules tests pass.
+- M0 done (tags `m0.1`, `m0.2`, `m0`). Pending user action: Settings → Pages → Source = GitHub Actions (then `deploy.yml` publishes `master`).
+- Next: M1 vertical slice, iterations `m1.1`–`m1.5` in `docs/roadmap.md` §3.1. Branch `m1-vertical-slice`.
+- Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path).
 
 Version notes (checked 2026-09-24):
 

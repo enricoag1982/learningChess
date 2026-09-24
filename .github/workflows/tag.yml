@@ -1,0 +1,69 @@
+name: Tag
+
+# Annotated tag per merged iteration. Squash title `M<N>.<i>: …` → tag `m<N>.<i>`; message = the
+# tag's row in docs/validation.md. A row for `m<N>` in the same commit also tags the milestone.
+# Manual run (tag + ref) backfills a tag on an earlier commit.
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag name, e.g. m0.1
+        required: true
+      ref:
+        description: Full commit SHA to tag
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
+
+      - name: Create tags
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          TITLE: ${{ github.event.head_commit.message }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -n "$INPUT_TAG" ]; then
+            tags="$INPUT_TAG"
+          else
+            iteration=$(printf '%s\n' "$TITLE" | head -n 1 | sed -nE 's/^M([0-9]+)\.([0-9]+):.*/m\1.\2/p')
+            [ -n "$iteration" ] || { echo "Title is not 'M<N>.<i>: …': no tag."; exit 0; }
+            tags="$iteration ${iteration%%.*}"
+          fi
+
+          for tag in $tags; do
+            row=$(grep -F "| \`$tag\` |" docs/validation.md || true)
+            if [ -z "$row" ]; then
+              if [ -z "$INPUT_TAG" ] && [ "$tag" = "${tag%%.*}" ]; then
+                echo "No milestone row for $tag: skipped."
+                continue
+              fi
+              echo "::error::No row for $tag in docs/validation.md"
+              exit 1
+            fi
+            if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+              echo "Tag $tag exists: skipped."
+              continue
+            fi
+            printf '%s\n\n%s\n\nRef: docs/validation.md\n' "$tag" "$row" | git tag -a "$tag" -F -
+            git push origin "refs/tags/$tag"
+            echo "Created $tag at $(git rev-parse --short HEAD)."
+          done

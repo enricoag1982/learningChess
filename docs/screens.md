@@ -16,17 +16,21 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
 | Parent area | Adult style (smaller text, denser); behind parent password |
 
-### 1.1 Design tokens (Tailwind `@theme`, `apps/web/src/index.css`)
+### 1.1 Design tokens (from sketches; Tailwind `@theme` in `apps/web/src/index.css`)
 
 | Token | Hex | Use |
 |---|---|---|
-| `cream` | `#FFF8E7` | Background |
-| `ink` | `#2B2A33` | Text (all body text; ≥ 4.5:1 on cream) |
-| `go` | `#2E7D32` | Go / done |
-| `today` | `#E8710A` | Today / current, errors (fills + icons; text on it = `ink`) |
-| `star` | `#F5B700` | Stars |
-| `info` | `#1E6FD9` | Computer / info |
-| `locked` | `#8A8A8A` | Locked (always with lock icon) |
+| `cream` | `#FBF6EC` | Background |
+| `ink` | `#22313A` | Text |
+| `muted` | `#55636B` | Secondary text |
+| `line` | `#E6DCC8` | Card borders (2 px) |
+| `card` | `#FFFFFF` | Cards (radius 24–28 px) |
+| `go` | `#2E7D5B` | Go / done; primary buttons (white text) |
+| `today` | `#B8561A` | Today / current, errors (white text) |
+| `star` | `#E9A92B` | Stars |
+| `info` | `#2F5E9E` | Computer / info |
+| `locked` | `#8C8C8C` | Locked (always with lock icon) |
+| `board-light` / `board-dark` / `board-frame` | `#F1E4C8` / `#C49A6C` / `#8A6A48` | Board squares, frame |
 
 ## 2. Screen list
 

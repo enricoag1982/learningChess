@@ -12,11 +12,20 @@
 | Merge | Squash merge only; PR title = commit message; branch deleted after merge |
 | History | Linear; no force push or deletion of `master` |
 | Decisions | Recorded in `docs/` in the same PR |
-| Tags | Each merged iteration: annotated tag `m<N>.<i>` on `master` (milestone done: `m<N>`); message = scope + checks run; checks defined and logged in [docs/validation.md](docs/validation.md) |
+| Tags | Each merged iteration: annotated tag `m<N>.<i>` (milestone done: also `m<N>`), created by `.github/workflows/tag.yml` from the squash title `M<N>.<i>: …`; message = the tag's row in [docs/validation.md](docs/validation.md) (checks run). Backfill: run the workflow manually with `tag` + `ref` |
 
 ## Quality gate (`quality` job, `.github/workflows/ci.yml`)
 
 Format check → lint → typecheck → unit + content tests → build → E2E smoke test (Playwright). New checks are added as steps of the same job, so the required check name never changes.
+
+## Local commands
+
+| Command | Does |
+|---|---|
+| `pnpm install` | Install; builds content JSON (`prepare`) |
+| `pnpm dev` | Web app dev server |
+| `pnpm format` / `pnpm lint` / `pnpm typecheck` / `pnpm test` | Same checks as CI |
+| `pnpm build && pnpm test:e2e` | Production build + Playwright smoke (first time: `pnpm --filter @chess-kids/web exec playwright install chromium`) |
 
 ## Repository settings (manual, GitHub UI)
 
