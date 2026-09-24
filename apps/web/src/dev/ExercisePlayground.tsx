@@ -5,7 +5,9 @@ import type {
   ChoiceDef,
   ExerciseDef,
   Lesson,
+  MateInNDef,
   Position,
+  SelectSquaresDef,
   SetupDef,
   YesNoDef,
 } from '@chess-kids/core';
@@ -102,11 +104,75 @@ const SETUP_EXERCISE: SetupDef = {
   target: SETUP_TARGET,
 };
 
+// 1.Ne7+ Kh8 2.Qa8# — mate in 2, kid = White; Kf8 is also legal but the line scripts Kh8, so the
+// reply's ~600ms reveal (ExerciseStep.tsx) and its "Black moved the king." narration show up here.
+const MATE_IN_2_EXERCISE: MateInNDef = {
+  id: 'dev-mate2',
+  concept: 'mate-in-2',
+  textKey: 'fixtures:dev-mate2',
+  position: parseDiagram(`
+    . . . . . . k .
+    . . . . . p p p
+    . . N . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    Q K . . . . . .
+  `),
+  type: 'mate-in-n',
+  n: 2,
+  line: ['Ne7+', 'Kh8', 'Qa8#'],
+};
+
+// White king g1, in check from the rook on g8; f2/h2 are the kid's own pawns, so f1 and h1 are the
+// only legal king moves — the exact squares `derive: check-escapes` should select.
+const CHECK_ESCAPES_EXERCISE: SelectSquaresDef = {
+  id: 'dev-check-escapes',
+  concept: 'check-escape',
+  textKey: 'fixtures:dev-check-escapes',
+  position: parseDiagram(`
+    k . . . . . r .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . P . P
+    . . . . . . K .
+  `),
+  type: 'select-squares',
+  answer: { derive: 'check-escapes' },
+};
+
+// White pawn on e4 attacks d5 and f5 diagonally only, own piece (d5) or enemy (f5) alike — never
+// e5, straight ahead of it.
+const ATTACKED_BY_EXERCISE: SelectSquaresDef = {
+  id: 'dev-attacked-by',
+  concept: 'attack',
+  textKey: 'fixtures:dev-attacked-by',
+  position: parseDiagram(`
+    . . . . . . k .
+    . . . . . . . .
+    . . . . . . . .
+    . . . P . p . .
+    . . . . P . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . K . . .
+  `),
+  type: 'select-squares',
+  answer: { derive: 'attacked-by', from: 'e4' },
+};
+
 const EXERCISES: readonly { readonly label: string; readonly def: ExerciseDef }[] = [
   { label: 'yes-no', def: YES_NO_EXERCISE },
   { label: 'choice', def: CHOICE_EXERCISE },
   { label: 'best-move', def: BEST_MOVE_EXERCISE },
   { label: 'setup', def: SETUP_EXERCISE },
+  { label: 'mate-in-2', def: MATE_IN_2_EXERCISE },
+  { label: 'check-escapes', def: CHECK_ESCAPES_EXERCISE },
+  { label: 'attacked-by', def: ATTACKED_BY_EXERCISE },
 ];
 
 /**

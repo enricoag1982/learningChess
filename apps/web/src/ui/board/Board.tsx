@@ -31,6 +31,8 @@ export interface BoardHighlights {
   readonly lastMove?: { readonly from: Square; readonly to: Square };
   /** Steady (non-pulsing) ring, always shown: yes-no exercises' question square. */
   readonly focus?: readonly Square[];
+  /** Orange glow ring: the checked king's square (all exercise types, whenever it applies). */
+  readonly check?: Square;
   /**
    * best-move exercises: a legal-but-wrong move attempt. The piece at `from` slides to `to` and
    * bounces back; the position itself never changes, so this is a distinct field from `lastMove`.
@@ -76,6 +78,7 @@ function describeSquare(
   target: boolean,
   focus: boolean,
   danger: boolean,
+  check: boolean,
 ): string {
   const piece = position.pieces[square];
   let base: string;
@@ -96,6 +99,7 @@ function describeSquare(
   if (target) return t('board.square.possible-move', { base });
   if (focus) return t('board.square.focus', { base });
   if (danger) return t('board.square.danger', { base });
+  if (check) return t('board.square.check', { base });
   return base;
 }
 
@@ -413,6 +417,7 @@ export function Board({
                 const isWrong = highlights?.wrong?.includes(square) ?? false;
                 const isFocus = highlights?.focus?.includes(square) ?? false;
                 const isDanger = highlights?.danger?.includes(square) ?? false;
+                const isCheck = highlights?.check === square;
                 const isStar = position.markers.stars.includes(square);
                 const isBlocked = position.markers.blocked.includes(square);
                 const isDraggingThis = drag?.from === square && drag.dragging;
@@ -424,6 +429,7 @@ export function Board({
                   isTarget,
                   isFocus,
                   isDanger,
+                  isCheck,
                 );
 
                 return (
@@ -575,6 +581,12 @@ export function Board({
                         <span
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-[8%] rounded-full border-4 border-today"
+                        />
+                      )}
+                      {isCheck && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-[6%] rounded-full border-4 border-today shadow-[0_0_14px_4px_rgba(184,86,26,0.65)]"
                         />
                       )}
 

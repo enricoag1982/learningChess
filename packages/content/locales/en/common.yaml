@@ -128,6 +128,7 @@ board:
     possible-move: '{{base}}, possible move'
     focus: '{{base}}, look here'
     danger: '{{base}}, in danger'
+    check: '{{base}}, in check'
 story:
   listen-again: Listen again
   primary: Let me try
@@ -149,6 +150,11 @@ exercise:
   select-missing: Almost! Some squares are still missing.
   answer-wrong: Not quite! Try again.
   move-wrong: Not this one. Try again!
+  checkmate: Checkmate!
+  opponent-moved: '{{color}} moved the {{piece}}.'
+  opponent-color:
+    w: White
+    b: Black
   hint-piece: 'Look at {{name}}.'
   hint-target: Try the orange square.
   hint-answer: Here is the answer.

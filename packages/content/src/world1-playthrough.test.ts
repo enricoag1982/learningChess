@@ -8,6 +8,7 @@ import {
   createVariantRules,
   currentRound,
   placePiece,
+  selectSquaresAnswer,
   seriesResult,
   seriesStars,
   startExercise,
@@ -33,12 +34,7 @@ const WORLD1_LESSON_IDS = ['squares', 'lines', 'setup'];
 function playExerciseToCompletion(def: ExerciseDef): ExerciseState {
   const state = startExercise(def);
   if (def.type === 'select-squares') {
-    const answer =
-      'squares' in def.answer
-        ? def.answer.squares
-        : rules
-            .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
-            .map((move) => move.to);
+    const answer = selectSquaresAnswer(def, rules);
     const selected = answer.reduce((s, square) => toggleSquare(s, square), state);
     return submitSelection(selected, rules).state;
   }

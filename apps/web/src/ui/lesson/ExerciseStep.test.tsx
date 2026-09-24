@@ -4,6 +4,7 @@ import type {
   BestMoveDef,
   ChoiceDef,
   ExerciseDef,
+  MateInNDef,
   Position,
   SelectSquaresDef,
   SetupDef,
@@ -721,6 +722,106 @@ describe('ExerciseStep', () => {
       const profile = store.getState().profile;
       const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
       expect(saved?.bestStars['orig-me']).toBe(1);
+    });
+  });
+
+  describe('mate-in-n', () => {
+    // Black king h8 alone; two white rooks (b1, d1) can each independently deliver back-rank mate
+    // once Ra7 has cut off the 7th rank — Rb8# and Rd8# are both legal mating moves.
+    const mateIn1Position = parseDiagram(`
+      . . . . . . . k
+      R . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      . R . R . . . .
+    `);
+    const mateIn1: MateInNDef = {
+      id: 'mate1-me',
+      concept: 'mate-in-1',
+      textKey: 'fixtures:mate1',
+      position: mateIn1Position,
+      type: 'mate-in-n',
+      n: 1,
+      line: ['Rb8#'],
+    };
+
+    it('accepts any mating move, not only the scripted one', async () => {
+      const lesson = fixtureLesson({ exercises: [mateIn1] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={mateIn1} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /^d1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^d8,/ })); // Rd8#, not the scripted Rb8#
+
+      await screen.findByText(/Checkmate!/);
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars[mateIn1.id]).toBe(3);
+    });
+
+    it('a legal-but-wrong move bounces back without changing the position', async () => {
+      const lesson = fixtureLesson({ exercises: [mateIn1] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={mateIn1} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /^b1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^b2,/ })); // legal, not mate
+
+      await screen.findByText('Not this one. Try again!');
+      expect(screen.getByRole('button', { name: /^b1, white rook/ })).toBeTruthy();
+    });
+
+    it('shows the scripted opponent reply after a delay, then the kid finishes it', async () => {
+      const restoreMatchMedia = stubMatchMedia('(prefers-reduced-motion: reduce)');
+      try {
+        const position = parseDiagram(`
+          . . . . . . k .
+          . . . . . p p p
+          . . N . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          Q K . . . . . .
+        `);
+        const exercise: MateInNDef = {
+          id: 'mate2-me',
+          concept: 'mate-in-2',
+          textKey: 'fixtures:mate2',
+          position,
+          type: 'mate-in-n',
+          n: 2,
+          line: ['Ne7+', 'Kh8', 'Qa8#'],
+        };
+        const lesson = fixtureLesson({ exercises: [exercise] });
+        const services = createTestServices(fixtureContentSource(lesson));
+        await renderWithStore(
+          <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+          services,
+        );
+
+        fireEvent.click(screen.getByRole('button', { name: /^c6,/ }));
+        fireEvent.click(screen.getByRole('button', { name: /^e7,/ })); // Ne7+, the scripted move
+
+        // The reply (Kh8) is narrated once shown, after its (short, reduced-motion) delay.
+        await screen.findByText('Black moved the king.');
+        await screen.findByRole('button', { name: /^h8, black king/ });
+
+        fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+        fireEvent.click(screen.getByRole('button', { name: /^a8,/ })); // Qa8#
+        await screen.findByText(/Checkmate!/);
+      } finally {
+        restoreMatchMedia();
+      }
     });
   });
 });

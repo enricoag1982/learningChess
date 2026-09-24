@@ -29,6 +29,8 @@ export interface ExercisePlayAreaProps {
   /** Stacked layout (phone / iPad portrait, `GameLayout`'s `lg:` breakpoint): a `setup` exercise's
    * tray goes to `belowBoard` (directly under the board) instead of `controls` (M2.4 §2b). */
   readonly isStacked: boolean;
+  /** The checked king's square right now, if any (Board's check ring, all exercise types). */
+  readonly checkSquare?: Square;
 }
 
 export interface ExercisePlayArea {
@@ -53,9 +55,11 @@ export function buildExercisePlayArea({
   selectedPiece,
   onSelectPiece,
   isStacked,
+  checkSquare,
 }: ExercisePlayAreaProps): ExercisePlayArea {
   const isSelectSquares = exercise.type === 'select-squares';
   const isMoveCounted = exercise.type === 'collect-stars' || exercise.type === 'capture';
+  const checkHighlight = checkSquare === undefined ? {} : { check: checkSquare };
 
   function handleMove(move: MoveInput): void {
     dispatch({ type: 'move', move });
@@ -79,6 +83,7 @@ export function buildExercisePlayArea({
           selectedSquares: state.core.selected,
           wrong: state.wrongSquares,
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...checkHighlight,
         }}
         label={t('lesson.board-label')}
       />
@@ -91,13 +96,19 @@ export function buildExercisePlayArea({
         highlights={{
           focus: exercise.focus ? [exercise.focus] : [],
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...checkHighlight,
         }}
         label={t('lesson.board-label')}
       />
     );
   } else if (exercise.type === 'choice') {
     board = exercise.showBoard ? (
-      <Board position={state.core.position} legalMoves={[]} label={t('lesson.board-label')} />
+      <Board
+        position={state.core.position}
+        legalMoves={[]}
+        highlights={checkHighlight}
+        label={t('lesson.board-label')}
+      />
     ) : null;
   } else if (exercise.type === 'best-move') {
     board = (
@@ -118,6 +129,7 @@ export function buildExercisePlayArea({
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
           ...(state.lastMove ? { lastMove: state.lastMove } : {}),
           ...(state.wrongMove ? { wrongMove: state.wrongMove } : {}),
+          ...checkHighlight,
         }}
         label={t('lesson.board-label')}
       />
@@ -134,6 +146,38 @@ export function buildExercisePlayArea({
         highlights={{
           wrong: state.wrongSquares,
           ...(setupHint?.square ? { hint: [setupHint.square] } : {}),
+          ...checkHighlight,
+        }}
+        label={t('lesson.board-label')}
+      />
+    );
+  } else if (exercise.type === 'mate-in-n') {
+    // While the scripted reply is pending, the board keeps showing the position right after the
+    // kid's own move (not the reply, already applied in `state.core`) — and stays uninteractive —
+    // until `exercise-reducer.ts`'s `reveal-reply` fires, ~600ms later (150ms, reduced motion).
+    const displayPosition = state.pendingReply ? state.pendingReply.position : state.core.position;
+    const lastMoveHighlight = state.pendingReply
+      ? { from: state.pendingReply.move.from, to: state.pendingReply.move.to }
+      : state.lastMove;
+    board = (
+      <Board
+        position={displayPosition}
+        legalMoves={state.pendingReply ? [] : exerciseMoves(state.core, rules)}
+        onMove={({ from, to }) => {
+          handleMove({ from, to });
+        }}
+        onIllegal={(attempt) => {
+          if (attempt.from === null) {
+            dispatch({ type: 'tap-first' });
+          } else {
+            handleMove({ from: attempt.from, to: attempt.to });
+          }
+        }}
+        highlights={{
+          ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
+          ...(lastMoveHighlight ? { lastMove: lastMoveHighlight } : {}),
+          ...(state.wrongMove ? { wrongMove: state.wrongMove } : {}),
+          ...checkHighlight,
         }}
         label={t('lesson.board-label')}
       />
@@ -156,6 +200,7 @@ export function buildExercisePlayArea({
         highlights={{
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
           ...(state.lastMove ? { lastMove: state.lastMove } : {}),
+          ...checkHighlight,
         }}
         label={t('lesson.board-label')}
       />

@@ -167,6 +167,19 @@ describe('Board — highlights', () => {
     expect(cell('a1').getAttribute('aria-label')).toBe('a1, empty');
   });
 
+  it('marks the checked king\'s square with "in check"', () => {
+    render(
+      <Board
+        position={POSITION}
+        legalMoves={[]}
+        highlights={{ check: 'd5' }}
+        label="Chess board"
+      />,
+    );
+    expect(cell('d5').getAttribute('aria-label')).toBe('d5, white rook, in check');
+    expect(cell('a1').getAttribute('aria-label')).toBe('a1, empty');
+  });
+
   it('best-move: a new wrongMove bounces the piece to `to` and back, without moving it in the data', async () => {
     const { rerender } = render(
       <Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />,
