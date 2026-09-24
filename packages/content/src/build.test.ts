@@ -24,6 +24,7 @@ describe('build script', () => {
       common: readNamespace('common'),
       lessons: readNamespace('lessons'),
       characters: readNamespace('characters'),
+      journey: readNamespace('journey'),
     });
   });
 

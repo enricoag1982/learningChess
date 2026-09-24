@@ -1,3 +1,4 @@
+import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
@@ -63,6 +64,14 @@ export interface ContentSource {
   lesson(id: string): Lesson | undefined;
   minigames(): readonly MiniGame[];
   minigame(id: string): MiniGame | undefined;
+  /**
+   * Tracks/worlds/ranks catalog (built from `packages/content/tracks.yaml`), used by
+   * `loadJourney` (`app/journey.ts`). Optional so every existing `ContentSource` (real or test
+   * fixture) keeps typechecking unchanged.
+   * TODO(M2.5a): wire this into `apps/web/src/adapters/content/bundled-content-source.ts`
+   * (`import tracks from '@chess-kids/content/tracks.json'`) and into its test fixtures.
+   */
+  catalog?(): TracksCatalog;
 }
 
 /** Current time; injected for deterministic tests. */
