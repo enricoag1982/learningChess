@@ -81,7 +81,8 @@ export function buildExercisePlayArea({
         }}
         highlights={{
           selectedSquares: state.core.selected,
-          wrong: state.wrongSquares,
+          wrong: state.wrongSquares.filter((square) => state.core.selected.includes(square)),
+          missed: state.missedSquares.filter((square) => !state.core.selected.includes(square)),
           ...(hintSquares(state.hint) ? { hint: hintSquares(state.hint) } : {}),
           ...checkHighlight,
         }}

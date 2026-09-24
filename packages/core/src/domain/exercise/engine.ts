@@ -59,6 +59,8 @@ export interface SelectionResult {
   readonly correct: boolean;
   /** Count of answer squares not selected. */
   readonly missing: number;
+  /** Answer squares not selected (shown as "still missing" after a wrong check). */
+  readonly missingSquares: readonly Square[];
   /** Selected squares that are not part of the answer. */
   readonly wrong: readonly Square[];
 }
@@ -282,11 +284,12 @@ export function submitSelection(
   }
   const answer = selectSquaresAnswer(state.def, rules);
   const wrong = state.selected.filter((square) => !answer.includes(square));
-  const missing = answer.filter((square) => !state.selected.includes(square)).length;
+  const missingSquares = answer.filter((square) => !state.selected.includes(square));
+  const missing = missingSquares.length;
   const correct = wrong.length === 0 && missing === 0;
 
   const nextState = correct ? { ...state, solved: true } : { ...state, errors: state.errors + 1 };
-  return { state: nextState, result: { correct, missing, wrong } };
+  return { state: nextState, result: { correct, missing, missingSquares, wrong } };
 }
 
 /** Answers a yes-no exercise. Correct → solved; wrong → errors + 1. No-op once solved. */

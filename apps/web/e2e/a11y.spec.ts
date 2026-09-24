@@ -206,7 +206,7 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
     await clickSquare(page, wrongSquare);
     await expectKidTouchTarget(page, /Check/);
     await page.getByRole('button', { name: /Check/ }).click();
-    await expect(page.getByText('Not quite! Look at the orange squares.')).toBeVisible();
+    await expect(page.getByText(contentText('exercise.select-both'))).toBeVisible();
     await expectNoSeriousViolations(page, 'Exercise (select-squares, wrong pick)');
     await clickSquare(page, wrongSquare); // deselect the wrong pick
   }

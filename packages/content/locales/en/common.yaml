@@ -134,6 +134,8 @@ board:
     focus: '{{base}}, look here'
     danger: '{{base}}, in danger'
     check: '{{base}}, in check'
+    wrong: '{{base}}, not right'
+    missed: '{{base}}, still missing'
 story:
   listen-again: Listen again
   primary: Let me try
@@ -151,8 +153,9 @@ exercise:
   moves-target_one: 'in {{count}} move'
   moves-target_other: 'in {{count}} moves'
   tap-piece-first: 'Tap {{name}} first.'
-  select-wrong: Not quite! Look at the orange squares.
-  select-missing: Almost! Some squares are still missing.
+  select-wrong: Not quite! Tap the orange squares again to take them away.
+  select-missing: Almost! Tap the squares with a dashed orange line too.
+  select-both: Not quite! Take away the orange squares and tap the dashed ones.
   answer-wrong: Not quite! Try again.
   move-wrong: Not this one. Try again!
   checkmate: Checkmate!

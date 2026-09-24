@@ -82,6 +82,8 @@ export function exerciseNote(
       return { text: t('exercise.select-wrong'), tone: 'attention' };
     case 'select-missing':
       return { text: t('exercise.select-missing'), tone: 'attention' };
+    case 'select-both':
+      return { text: t('exercise.select-both'), tone: 'attention' };
     case 'wrong-answer':
       return { text: t('exercise.answer-wrong'), tone: 'attention' };
     case 'wrong-move':
@@ -110,6 +112,7 @@ const ERROR_FEEDBACK_KINDS = new Set<ExerciseFeedback['kind']>([
   'illegal',
   'select-wrong',
   'select-missing',
+  'select-both',
   'wrong-answer',
   'wrong-move',
   'wrong-placement',

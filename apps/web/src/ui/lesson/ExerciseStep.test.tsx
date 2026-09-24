@@ -179,7 +179,7 @@ describe('ExerciseStep', () => {
     expect(screen.getByText('note-instruction')).toBeTruthy();
   });
 
-  it('select-squares: a wrong pick shows the orange-squares message; the right set solves it', async () => {
+  it('select-squares: a wrong check marks wrong picks and missing squares; the right set solves it', async () => {
     const position = parseDiagram(`
       . . . . . . . .
       . . . . . . . .
@@ -211,11 +211,21 @@ describe('ExerciseStep', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /^e5,/ })); // not a legal rook move: wrong
     fireEvent.click(screen.getByRole('button', { name: /Check/ }));
-    await screen.findByText('Not quite! Look at the orange squares.');
-    const wrongSquareButton = screen.getByRole('button', { name: /^e5,/ });
+    await screen.findByText('Not quite! Take away the orange squares and tap the dashed ones.');
+    const wrongSquareButton = screen.getByRole('button', {
+      name: /^e5, empty, selected, not right/,
+    });
     expect(wrongSquareButton.querySelector('.border-today')).not.toBeNull();
+    // Every answer square not picked is marked "still missing" (dashed orange) after the check.
+    for (const square of answer) {
+      const missedButton = screen.getByRole('button', {
+        name: new RegExp(`^${square}, empty, still missing$`),
+      });
+      expect(missedButton.querySelector('.border-dashed.border-today')).not.toBeNull();
+    }
 
     fireEvent.click(wrongSquareButton); // deselect the wrong pick
+    expect(screen.getByRole('button', { name: /^e5, empty$/ })).toBeTruthy(); // marker gone
     for (const square of answer) {
       fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${square},`) }));
     }
