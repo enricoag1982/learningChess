@@ -7,6 +7,7 @@ import type { MiniGame } from '../domain/lesson.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
+import { seededRandom } from '../domain/random.ts';
 import { loadMiniGameProgress, recordMiniGameResult } from './minigames.ts';
 import type { AppDeps } from './use-cases.ts';
 import type {
@@ -104,6 +105,9 @@ function makeProgressRepo(): ProgressRepository {
       minigames.set(key(progress.profileId, progress.miniGameId), progress);
       return Promise.resolve();
     },
+    getConceptStats: () => Promise.resolve(undefined),
+    listConceptStats: () => Promise.resolve([]),
+    saveConceptStats: () => Promise.resolve(),
     deleteProfileData: () => Promise.resolve(),
   };
 }
@@ -138,6 +142,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
       get: () => Promise.resolve<AppSettings>({ lastProfileId: null }),
       save: () => Promise.resolve(),
     } satisfies SettingsRepository,
+    random: seededRandom(1),
     ...overrides,
   };
 }

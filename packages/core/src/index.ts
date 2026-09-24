@@ -43,6 +43,20 @@ export {
 export type { AnimalFriend, RankState, RankLadderEntry } from './domain/rewards.ts';
 export { animalFriends, rankLadder } from './domain/rewards.ts';
 
+export type { ReviewBox, ConceptStats, ConceptPoolEntry, ConceptTask } from './domain/review.ts';
+export {
+  newConceptStats,
+  appendResult,
+  accuracy,
+  isWeak,
+  enterReview,
+  applyReviewResult,
+  isDue,
+  conceptPool,
+  pickWarmUp,
+  pickPracticeTasks,
+} from './domain/review.ts';
+
 export type { UnlockedMiniGame } from './domain/play.ts';
 export { unlockedMiniGames } from './domain/play.ts';
 
@@ -101,13 +115,16 @@ export type {
   RecordAttemptInput,
   RecordExerciseResultInput,
   RecordBossResultInput,
+  RecordReviewResultInput,
 } from './app/use-cases.ts';
 export {
   loadProgress,
   getLessonProgress,
+  getConceptStats,
   recordAttempt,
   recordExerciseResult,
   recordBossResult,
+  recordReviewResult,
   saveResumeStep,
 } from './app/use-cases.ts';
 
@@ -116,6 +133,16 @@ export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
 
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
+
+export type { TodayActivity, TodaySessionPlan } from './app/session.ts';
+export {
+  PRACTICE_TASK_COUNT,
+  planWarmUp,
+  loadWarmUp,
+  loadPracticeTasks,
+  planTodaySession,
+  loadTodaySession,
+} from './app/session.ts';
 
 export type { PasswordFileLocation, VerifyPasswordResult } from './app/profiles.ts';
 export {

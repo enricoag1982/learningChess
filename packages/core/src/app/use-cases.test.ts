@@ -13,13 +13,17 @@ import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import { seededRandom } from '../domain/random.ts';
+import type { ConceptStats } from '../domain/review.ts';
 import type { AppDeps } from './use-cases.ts';
 import {
+  getConceptStats,
   getLessonProgress,
   loadProgress,
   recordAttempt,
   recordBossResult,
   recordExerciseResult,
+  recordReviewResult,
   saveResumeStep,
 } from './use-cases.ts';
 import type {
@@ -163,7 +167,8 @@ function makeProgressRepo(): ProgressRepository {
   const lessons = new Map<string, LessonProgress>();
   const attempts: Attempt[] = [];
   const minigames = new Map<string, MiniGameProgress>();
-  const key = (profileId: string, lessonId: string): string => `${profileId}:${lessonId}`;
+  const conceptStats = new Map<string, ConceptStats>();
+  const key = (profileId: string, id: string): string => `${profileId}:${id}`;
   return {
     listLessons: (profileId) =>
       Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
@@ -183,6 +188,14 @@ function makeProgressRepo(): ProgressRepository {
       Promise.resolve([...minigames.values()].filter((p) => p.profileId === profileId)),
     saveMiniGame: (progress) => {
       minigames.set(key(progress.profileId, progress.miniGameId), progress);
+      return Promise.resolve();
+    },
+    getConceptStats: (profileId, conceptId) =>
+      Promise.resolve(conceptStats.get(key(profileId, conceptId))),
+    listConceptStats: (profileId) =>
+      Promise.resolve([...conceptStats.values()].filter((s) => s.profileId === profileId)),
+    saveConceptStats: (stats) => {
+      conceptStats.set(key(stats.profileId, stats.conceptId), stats);
       return Promise.resolve();
     },
     deleteProfileData: (profileId) => {
@@ -237,6 +250,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     parentLock: makeParentLockRepo(),
     passwordFile: makePasswordFileWriter(),
     settings: makeSettingsRepo(),
+    random: seededRandom(1),
     ...overrides,
   };
 }
@@ -457,6 +471,78 @@ describe('recordExerciseResult', () => {
 
     expect(progress.bestStars).toEqual({ 'rook-01': 3 });
   });
+
+  it('enters review (box 1, due in 1 day) the moment the lesson first becomes complete', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+
+    const first = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(EXERCISE_1, { solved: true, moves: 1 }),
+      scored: true,
+      durationMs: 100,
+      nextStep: 1,
+    });
+    expect(first.completedAt).toBeUndefined();
+    expect(
+      await getConceptStats(deps, 'profile-1', 'rook-move').then((s) => s.box),
+    ).toBeUndefined();
+
+    const second = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(EXERCISE_2, { solved: true, moves: 1 }),
+      scored: true,
+      durationMs: 100,
+      nextStep: 2,
+    });
+    expect(second.completedAt).toBeDefined();
+
+    const stats = await getConceptStats(deps, 'profile-1', 'rook-move');
+    expect(stats.box).toBe(1);
+    expect(stats.dueAt).toBe(new Date('2026-01-02T00:00:00.000Z').toISOString());
+  });
+
+  it('an earlier wrong attempt in the lesson keeps the concept due now even once the lesson completes', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+
+    // Fails rook-01 once (not yet the 2-error easier-variant trigger), then solves it: still an
+    // overall "correct: false" first-try result once it needed >0 errors? No — here we force the
+    // wrong-attempt path directly via recordAttempt (as the easier-variant swap does), then solve
+    // both exercises normally.
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(EXERCISE_1, { solved: false, errors: 2 }),
+      scored: true,
+      durationMs: 100,
+    });
+    await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(makeExercise('rook-01-easy'), { solved: true, moves: 1 }),
+      scored: false,
+      standsInFor: 'rook-01',
+      durationMs: 100,
+      nextStep: 1,
+    });
+    const completed = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(EXERCISE_2, { solved: true, moves: 1 }),
+      scored: true,
+      durationMs: 100,
+      nextStep: 2,
+    });
+    expect(completed.completedAt).toBeDefined();
+
+    const stats = await getConceptStats(deps, 'profile-1', 'rook-move');
+    // Entered review immediately by the wrong attempt; the lesson completing afterwards must not
+    // push the due date out to +1 day.
+    expect(stats.dueAt).toBe('2026-01-01T00:00:00.000Z');
+  });
 });
 
 describe('recordAttempt', () => {
@@ -483,6 +569,80 @@ describe('recordAttempt', () => {
       errors: 2,
     });
     expect(await deps.progress.listLessons('profile-1')).toEqual([]);
+  });
+
+  it('a scored attempt with 2+ errors (EASIER_AFTER_ERRORS) appends to recent and puts the concept in review, due now', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    const state = exerciseState(EXERCISE_1, { solved: false, errors: 2 });
+
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: true,
+      durationMs: 500,
+    });
+
+    const stats = await getConceptStats(deps, 'profile-1', 'rook-move');
+    expect(stats.recent).toEqual([false]);
+    expect(stats.box).toBe(1);
+    expect(stats.dueAt).toBe('2026-01-01T00:00:00.000Z');
+  });
+
+  it('a scored attempt solved with only 1 error appends `false` to recent but does not enter review', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    // Below the easier-variant threshold: one stray error, then solved — counts against accuracy,
+    // but a single slip should not by itself schedule a review task for the very next session.
+    const state = exerciseState(EXERCISE_1, { solved: true, errors: 1, moves: 2 });
+
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: true,
+      durationMs: 500,
+    });
+
+    const stats = await getConceptStats(deps, 'profile-1', 'rook-move');
+    expect(stats.recent).toEqual([false]);
+    expect(stats.box).toBeUndefined();
+    expect(stats.dueAt).toBeUndefined();
+  });
+
+  it('a correct scored attempt appends to recent but does not enter review', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    const state = exerciseState(EXERCISE_1, { solved: true, moves: 1 });
+
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: true,
+      durationMs: 500,
+    });
+
+    const stats = await getConceptStats(deps, 'profile-1', 'rook-move');
+    expect(stats.recent).toEqual([true]);
+    expect(stats.box).toBeUndefined();
+  });
+
+  it('an unscored attempt (guided try) never touches concept stats', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    const state = exerciseState(GUIDED_1, { solved: false, errors: 2 });
+
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: false,
+      durationMs: 500,
+    });
+
+    expect(await deps.progress.listConceptStats('profile-1')).toEqual([]);
   });
 });
 
@@ -715,6 +875,69 @@ describe('recordBossResult', () => {
     // Exactly one attempt per play: the lesson's own boss attempt (no duplicate for the tile).
     expect(attempts).toHaveLength(1);
     expect(attempts[0]).toMatchObject({ scored: true, exerciseId: 'hungry-rook' });
+  });
+});
+
+describe('recordReviewResult', () => {
+  it('correct: moves the box up, reschedules dueAt, records a review Attempt, never touches bestStars', async () => {
+    const deps = makeDeps();
+    await deps.progress.saveConceptStats({
+      id: 'cs1',
+      profileId: 'profile-1',
+      conceptId: 'rook-move',
+      recent: [true],
+      box: 2,
+      dueAt: '2025-12-01T00:00:00.000Z',
+      createdAt: '2025-12-01T00:00:00.000Z',
+      updatedAt: '2025-12-01T00:00:00.000Z',
+    });
+
+    const stats = await recordReviewResult(deps, {
+      profileId: 'profile-1',
+      task: { conceptId: 'rook-move', lessonId: 'rook', exercise: EXERCISE_1 },
+      state: exerciseState(EXERCISE_1, { solved: true, moves: 1 }),
+      durationMs: 500,
+    });
+
+    expect(stats.box).toBe(3);
+    expect(stats.dueAt).toBe(new Date('2026-01-05T00:00:00.000Z').toISOString());
+    expect(stats.lastExerciseId).toBe('rook-01');
+    expect(stats.recent).toEqual([true, true]);
+
+    const [attempt] = await deps.progress.listAttempts('profile-1');
+    expect(attempt).toMatchObject({
+      lessonId: 'rook',
+      exerciseId: 'rook-01',
+      conceptId: 'rook-move',
+      scored: true,
+      review: true,
+      correct: true,
+    });
+    expect(await deps.progress.listLessons('profile-1')).toEqual([]);
+  });
+
+  it('wrong: resets the box to 1, due in 1 day', async () => {
+    const deps = makeDeps();
+    await deps.progress.saveConceptStats({
+      id: 'cs1',
+      profileId: 'profile-1',
+      conceptId: 'rook-move',
+      recent: [],
+      box: 4,
+      dueAt: '2025-12-01T00:00:00.000Z',
+      createdAt: '2025-12-01T00:00:00.000Z',
+      updatedAt: '2025-12-01T00:00:00.000Z',
+    });
+
+    const stats = await recordReviewResult(deps, {
+      profileId: 'profile-1',
+      task: { conceptId: 'rook-move', lessonId: 'rook', exercise: EXERCISE_1 },
+      state: exerciseState(EXERCISE_1, { solved: false, errors: 1 }),
+      durationMs: 500,
+    });
+
+    expect(stats.box).toBe(1);
+    expect(stats.dueAt).toBe(new Date('2026-01-02T00:00:00.000Z').toISOString());
   });
 });
 

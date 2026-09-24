@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
 import type {
   ContentSource,
@@ -208,8 +208,12 @@ describe('HomeScreen next step is a world boss', () => {
 
     fireEvent.click(button);
 
-    expect(store.getState().screen).toBe('minigame');
+    // "Start today" now opens the full Today session (M3.4): the world boss is its one activity,
+    // reached asynchronously (`loadTodaySession`).
+    await waitFor(() => {
+      expect(store.getState().screen).toBe('minigame');
+    });
     expect(store.getState().miniGameId).toBe('boss-mg');
-    expect(store.getState().miniGameOrigin).toBe('home');
+    expect(store.getState().miniGameOrigin).toBe('today');
   });
 });

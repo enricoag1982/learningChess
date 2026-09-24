@@ -4,7 +4,7 @@ import { summarizeBossResult } from '../domain/exercise/boss-result.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
 import type { VersusState } from '../domain/exercise/versus.ts';
 import type { Lesson } from '../domain/lesson.ts';
-import { EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
+import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { LessonProgress } from '../domain/progress.ts';
 import {
   newLessonProgress,
@@ -12,6 +12,8 @@ import {
   recordExerciseStars,
   withResumeStep,
 } from '../domain/progress.ts';
+import type { ConceptStats, ConceptTask } from '../domain/review.ts';
+import { appendResult, applyReviewResult, enterReview, newConceptStats } from '../domain/review.ts';
 import { saveMiniGamePlay } from './minigames.ts';
 import type {
   ContentSource,
@@ -20,6 +22,7 @@ import type {
   PasswordFileWriter,
   ProfileRepository,
   ProgressRepository,
+  Random,
   SettingsRepository,
 } from './ports.ts';
 import type { Clock } from './ports.ts';
@@ -34,6 +37,45 @@ export interface AppDeps {
   readonly parentLock: ParentLockRepository;
   readonly passwordFile: PasswordFileWriter;
   readonly settings: SettingsRepository;
+  /** Seeded in tests; drives warm-up/practice task selection (M3.4). */
+  readonly random: Random;
+}
+
+/** Existing concept stats, or fresh (unsaved) ones if this profile has no attempt for it yet. */
+export async function getConceptStats(
+  deps: AppDeps,
+  profileId: string,
+  conceptId: string,
+): Promise<ConceptStats> {
+  const existing = await deps.progress.getConceptStats(profileId, conceptId);
+  if (existing !== undefined) {
+    return existing;
+  }
+  return newConceptStats(deps.ids.next(), profileId, conceptId, deps.clock.now());
+}
+
+/**
+ * Folds one scored attempt's outcome into its concept's stats (domain-model.md §3.1): always
+ * appends `correct` to `recent`; an attempt that needed `EASIER_AFTER_ERRORS` errors or more —
+ * the same threshold the easier-variant offer uses, "the kid needed the easier variant / failed
+ * an exercise twice" — also puts the concept in review, due immediately. A single stray error (or
+ * a hint used with no error) still counts against accuracy but does not, on its own, schedule a
+ * review task for the very next session.
+ */
+async function recordConceptOutcome(
+  deps: AppDeps,
+  profileId: string,
+  conceptId: string,
+  correct: boolean,
+  errors: number,
+  now: Date,
+): Promise<void> {
+  let stats = await getConceptStats(deps, profileId, conceptId);
+  stats = appendResult(stats, correct, now);
+  if (errors >= EASIER_AFTER_ERRORS) {
+    stats = enterReview(stats, now, true);
+  }
+  await deps.progress.saveConceptStats(stats);
 }
 
 /** All saved lesson progress for a profile. */
@@ -66,13 +108,17 @@ export interface RecordAttemptInput {
 
 /**
  * Logs one `Attempt` without touching lesson progress. Used on its own when the kid leaves an
- * unsolved exercise for its easier variant: the failed attempt (`correct: false`) is what the M3
- * review scheduler reads to put the concept back into review.
+ * unsolved exercise for its easier variant: that failed attempt always has `errors >=
+ * EASIER_AFTER_ERRORS` by construction (the offer only appears past that threshold), which is
+ * what the M3.4 review scheduler reads to put the concept back into review, due immediately. Also
+ * folds a scored attempt's outcome into that concept's stats (`recordConceptOutcome`) — the single
+ * place both this and `recordExerciseResult` (which calls it) go through.
  */
 export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): Promise<void> {
   const { profileId, lesson, state, scored, durationMs } = input;
   const now = deps.clock.now();
   const stars = starsFor(state);
+  const correct = state.solved && state.errors === 0 && state.hintLevel === 0;
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),
@@ -81,7 +127,7 @@ export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): P
     exerciseId: state.def.id,
     conceptId: state.def.concept,
     scored,
-    correct: state.solved && state.errors === 0 && state.hintLevel === 0,
+    correct,
     stars,
     hints: state.hintLevel,
     errors: state.errors,
@@ -90,6 +136,10 @@ export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): P
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   });
+
+  if (scored) {
+    await recordConceptOutcome(deps, profileId, state.def.concept, correct, state.errors, now);
+  }
 }
 
 /** Result of an exercise attempt (guided try or scored exercise). */
@@ -112,7 +162,11 @@ export interface RecordExerciseResultInput {
 /**
  * Records an exercise attempt: always saves an `Attempt`; when solved, also updates the lesson's
  * best stars — for `standsInFor` if set, else for this exercise when `scored`. Always advances
- * `resumeStep` and saves progress.
+ * `resumeStep` and saves progress. The moment this call is what first completes the lesson (every
+ * exercise now >= 1 star — whether directly or via an easier variant crediting the original), the
+ * lesson's concept enters review (domain-model.md §3.1), due in 1 day unless an earlier
+ * `EASIER_AFTER_ERRORS`-or-more attempt already put it in sooner (`enterReview`'s non-immediate
+ * case never delays that).
  */
 export async function recordExerciseResult(
   deps: AppDeps,
@@ -125,6 +179,7 @@ export async function recordExerciseResult(
   await recordAttempt(deps, { profileId, lesson, state, scored, durationMs });
 
   let progress = await getLessonProgress(deps, profileId, lesson.id);
+  const wasComplete = progress.completedAt !== undefined;
   if (state.solved && stars !== 0) {
     if (standsInFor !== undefined) {
       progress = recordExerciseStars(progress, standsInFor, EASIER_VARIANT_STARS, lesson, now);
@@ -134,6 +189,12 @@ export async function recordExerciseResult(
   }
   progress = withResumeStep(progress, nextStep, now);
   await deps.progress.saveLesson(progress);
+
+  if (!wasComplete && progress.completedAt !== undefined) {
+    const stats = await getConceptStats(deps, profileId, lesson.concept);
+    await deps.progress.saveConceptStats(enterReview(stats, now, false));
+  }
+
   return progress;
 }
 
@@ -190,6 +251,55 @@ export async function recordBossResult(
   }
 
   return progress;
+}
+
+/** Result of one warm-up/practice review task (see `recordReviewResult`). */
+export interface RecordReviewResultInput {
+  readonly profileId: string;
+  readonly task: ConceptTask;
+  readonly state: ExerciseState;
+  readonly durationMs: number;
+}
+
+/**
+ * Records a warm-up or Practice review task (domain-model.md §3.1, §3.3): always saves a scored,
+ * `review: true` `Attempt` against the task's own lesson id — never touching that lesson's
+ * `bestStars` — then moves the concept's Leitner box (`applyReviewResult`): up on a first-try
+ * correct answer, back to box 1 otherwise, always rescheduling `dueAt` and remembering the task's
+ * exercise id so the next pick avoids repeating it.
+ */
+export async function recordReviewResult(
+  deps: AppDeps,
+  input: RecordReviewResultInput,
+): Promise<ConceptStats> {
+  const { profileId, task, state, durationMs } = input;
+  const now = deps.clock.now();
+  const stars = starsFor(state);
+  const correct = state.solved && state.errors === 0 && state.hintLevel === 0;
+
+  await deps.progress.addAttempt({
+    id: deps.ids.next(),
+    profileId,
+    lessonId: task.lessonId,
+    exerciseId: task.exercise.id,
+    conceptId: task.conceptId,
+    scored: true,
+    review: true,
+    correct,
+    stars,
+    hints: state.hintLevel,
+    errors: state.errors,
+    moves: state.moves,
+    durationMs,
+    createdAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+  });
+
+  let stats = await getConceptStats(deps, profileId, task.conceptId);
+  stats = appendResult(stats, correct, now);
+  stats = applyReviewResult(stats, correct, task.exercise.id, now);
+  await deps.progress.saveConceptStats(stats);
+  return stats;
 }
 
 /** Moves the resume point for a lesson without recording an attempt (e.g. leaving mid-story). */

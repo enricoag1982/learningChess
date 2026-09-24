@@ -13,7 +13,11 @@ import { NewPlayerScreen } from './ui/NewPlayerScreen.tsx';
 import { ParentAreaScreen } from './ui/ParentAreaScreen.tsx';
 import { PasswordScreen } from './ui/PasswordScreen.tsx';
 import { PlayScreen } from './ui/PlayScreen.tsx';
+import { PracticeRunScreen } from './ui/PracticeRunScreen.tsx';
+import { PracticeScreen } from './ui/PracticeScreen.tsx';
 import { ProfilePickerScreen } from './ui/ProfilePickerScreen.tsx';
+import { SessionSummaryScreen } from './ui/SessionSummaryScreen.tsx';
+import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
 function Screens(): JSX.Element {
   const screen = useAppStore((state) => state.screen);
@@ -40,6 +44,14 @@ function Screens(): JSX.Element {
       return <DenScreen />;
     case 'minigame':
       return <MiniGameSessionScreen />;
+    case 'warmup':
+      return <WarmUpScreen />;
+    case 'practice':
+      return <PracticeScreen />;
+    case 'practice-run':
+      return <PracticeRunScreen />;
+    case 'today-summary':
+      return <SessionSummaryScreen />;
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.

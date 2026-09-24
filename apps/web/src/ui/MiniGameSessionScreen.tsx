@@ -36,6 +36,7 @@ export function MiniGameSessionScreen(): JSX.Element {
   const miniGameId = useAppStore((state) => state.miniGameId);
   const miniGameOrigin = useAppStore((state) => state.miniGameOrigin);
   const exitMiniGame = useAppStore((state) => state.exitMiniGame);
+  const advanceToday = useAppStore((state) => state.advanceToday);
 
   const minigame = miniGameId ? services.deps.content.minigame(miniGameId) : undefined;
   const lesson = minigame ? services.deps.content.lesson(minigame.unlockAfter) : undefined;
@@ -45,11 +46,13 @@ export function MiniGameSessionScreen(): JSX.Element {
   }
 
   const primaryLabel =
-    miniGameOrigin === 'journey'
-      ? t('play.back-to-journey')
-      : miniGameOrigin === 'home'
-        ? t('play.back-to-home')
-        : t('play.back-to-play');
+    miniGameOrigin === 'today'
+      ? t('continue')
+      : miniGameOrigin === 'journey'
+        ? t('play.back-to-journey')
+        : miniGameOrigin === 'home'
+          ? t('play.back-to-home')
+          : t('play.back-to-play');
 
   const session: BossPlaySession = {
     save: (state, durationMs) =>
@@ -60,7 +63,7 @@ export function MiniGameSessionScreen(): JSX.Element {
         durationMs,
       }).then(() => undefined),
     primaryLabel,
-    onPrimary: exitMiniGame,
+    onPrimary: miniGameOrigin === 'today' ? () => void advanceToday() : exitMiniGame,
   };
 
   return (

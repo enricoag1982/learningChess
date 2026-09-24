@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Attempt, LessonProgress, MiniGameProgress } from '@chess-kids/core';
+import type { Attempt, ConceptStats, LessonProgress, MiniGameProgress } from '@chess-kids/core';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 
@@ -25,6 +25,20 @@ function makeMiniGameProgress(overrides: Partial<MiniGameProgress> = {}): MiniGa
     bestStars: 3,
     plays: 1,
     wins: 1,
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+function makeConceptStats(overrides: Partial<ConceptStats> = {}): ConceptStats {
+  return {
+    id: 'cs1',
+    profileId: 'profile-1',
+    conceptId: 'rook-move',
+    recent: [true, false],
+    box: 1,
+    dueAt: '2026-01-02T00:00:00.000Z',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
@@ -152,6 +166,55 @@ describe('LocalStorageProgressRepository — mini-game progress', () => {
     const repo = new LocalStorageProgressRepository(store);
 
     await expect(repo.listMiniGames('profile-1')).rejects.toThrow(StorageError);
+  });
+});
+
+describe('LocalStorageProgressRepository — concept stats', () => {
+  it('saves, gets and lists concept stats keyed by profile + concept, and updates in place', async () => {
+    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const rookMove = makeConceptStats({ id: 'a', conceptId: 'rook-move' });
+    const bishopMove = makeConceptStats({ id: 'b', conceptId: 'bishop-move' });
+    const otherProfile = makeConceptStats({
+      id: 'c',
+      profileId: 'profile-2',
+      conceptId: 'rook-move',
+    });
+
+    await repo.saveConceptStats(rookMove);
+    await repo.saveConceptStats(bishopMove);
+    await repo.saveConceptStats(otherProfile);
+
+    expect(await repo.getConceptStats('profile-1', 'rook-move')).toEqual(rookMove);
+    expect(await repo.getConceptStats('profile-1', 'unknown-concept')).toBeUndefined();
+    expect(await repo.listConceptStats('profile-1')).toEqual(
+      expect.arrayContaining([rookMove, bishopMove]),
+    );
+    expect(await repo.listConceptStats('profile-1')).toHaveLength(2);
+
+    const updated: ConceptStats = { ...rookMove, box: 2 };
+    await repo.saveConceptStats(updated);
+    expect(await repo.getConceptStats('profile-1', 'rook-move')).toEqual(updated);
+  });
+
+  it('rejects with StorageError on a corrupt stored shape', async () => {
+    const store = openLocalStore(localStorage);
+    store.write('concept-stats', { 'profile-1:rook-move': { nope: true } });
+    const repo = new LocalStorageProgressRepository(store);
+
+    await expect(repo.listConceptStats('profile-1')).rejects.toThrow(StorageError);
+  });
+});
+
+describe('LocalStorageProgressRepository — deleteProfileData also clears concept stats', () => {
+  it('removes concept stats for the profile, leaving other profiles untouched', async () => {
+    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    await repo.saveConceptStats(makeConceptStats({ id: 'a' }));
+    await repo.saveConceptStats(makeConceptStats({ id: 'b', profileId: 'profile-2' }));
+
+    await repo.deleteProfileData('profile-1');
+
+    expect(await repo.listConceptStats('profile-1')).toEqual([]);
+    expect(await repo.listConceptStats('profile-2')).toHaveLength(1);
   });
 });
 

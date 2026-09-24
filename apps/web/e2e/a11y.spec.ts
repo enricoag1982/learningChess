@@ -20,6 +20,7 @@ import {
   playSolveLine,
   playVersusBoss,
   selectSquaresAnswer,
+  solveExercise,
   waitForVersusTurnOrEnd,
   worldBossMiniGame,
   worldTabName,
@@ -27,6 +28,50 @@ import {
 
 const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
+
+/**
+ * Clears any concept stats this walk's own deep-scanning has produced (M3.4: an exercise scanned
+ * through its wrong-answer states reaches `EASIER_AFTER_ERRORS` and puts its concept in review,
+ * due immediately) so the next Home "Start/Continue" goes straight to its lesson/mini-game — this
+ * walk exists to scan lesson/exercise/boss/Practice/summary screens, not the warm-up run itself
+ * (covered on its own by `today-session.spec.ts`), and a warm-up's exact task is picked at random
+ * from the whole curriculum, too unpredictable to solve on sight reliably here.
+ */
+async function clearConceptStats(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    localStorage.removeItem('chess-kids:concept-stats');
+  });
+}
+
+/**
+ * A lesson finished via Home's Start/Continue may also be followed by one trailing mini-game
+ * (M3.4 session order: warm-up → lesson → mini-game → summary), whichever the session picked at
+ * its start. Plays it through like `completeBoss`, but its own final "Continue" (not "Next" —
+ * `BossPlaySession.primaryLabel`, `miniGameOrigin: 'today'`) leads to the session summary.
+ */
+async function passThroughTrailingMiniGame(page: Page): Promise<void> {
+  const summary = page.getByText('Great session!');
+  if (await summary.isVisible().catch(() => false)) return;
+
+  const title = await page.getByRole('heading', { level: 2 }).textContent();
+  const game = content.minigames.find((candidate) => contentText(candidate.titleKey) === title);
+  if (!game) {
+    throw new Error(`passThroughTrailingMiniGame: no mini-game titled "${title ?? ''}"`);
+  }
+  if (game.mode === 'series') {
+    for (const round of game.rounds) {
+      await solveExercise(page, round);
+      await page.getByRole('button', { name: /^Next/ }).click();
+    }
+  } else if (game.mode === 'versus') {
+    await playVersusBoss(page, game);
+  } else {
+    const goal = game.goal === 'collect-stars' ? 'collect-stars' : 'capture';
+    await playSolveLine(page, game.position, goal);
+  }
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await summary.waitFor();
+}
 
 /** Fails on `serious` / `critical` axe-core violations (non-functional.md §2: WCAG 2.2 AA). */
 async function expectNoSeriousViolations(page: Page, screen: string): Promise<void> {
@@ -189,6 +234,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   let completeScanned = false;
   let storyDemoScanned = false;
   let journeyScanned = false;
+  let summaryScanned = false;
   let currentWorldId: string | undefined;
 
   await completeFirstRun(page);
@@ -213,6 +259,13 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await page.getByRole('button', { name: 'My Den', exact: true }).click();
   await expectKidTouchTarget(page, 'Back to Home');
   await expectNoSeriousViolations(page, 'My Den');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
+
+  // Practice (M3.4): nothing complete yet, so the "All done for today!" / no-topics state.
+  await page.getByRole('button', { name: 'Practice', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await expectKidTouchTarget(page, /Daily warm-up/);
+  await expectNoSeriousViolations(page, 'Practice');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
   for (const lesson of orderedLessons) {
@@ -307,6 +360,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       }
       await page.getByRole('button', { name: journeyNodeName(lesson, 'current') }).click();
     } else {
+      await clearConceptStats(page);
       await page.getByRole('button', { name: /Start|Continue/ }).click();
     }
 
@@ -392,6 +446,18 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     if (enteringNewWorld) {
       // A lesson opened from the Journey returns to the Journey, not Home, on Continue.
       await page.getByRole('button', { name: /Back to Home/ }).click();
+    } else {
+      // A lesson opened via Home's Start/Continue is its own Today session (M3.4): Continue may
+      // first lead through a trailing mini-game, then lands on the session summary — not Home
+      // directly.
+      await passThroughTrailingMiniGame(page);
+      await expect(page.getByText('Great session!')).toBeVisible();
+      if (!summaryScanned) {
+        await expectKidTouchTarget(page, 'Done');
+        await expectNoSeriousViolations(page, 'Session summary');
+        summaryScanned = true;
+      }
+      await page.getByRole('button', { name: 'Done' }).click();
     }
   }
 
@@ -402,4 +468,5 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   expect(staticBossScanned, 'a static boss got a scan').toBe(true);
   expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
   expect(completeScanned, 'the Complete step got a scan').toBe(true);
+  expect(summaryScanned, 'the session summary got a scan').toBe(true);
 });

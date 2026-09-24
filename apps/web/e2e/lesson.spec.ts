@@ -46,6 +46,11 @@ test.describe('First lesson (whichever the Journey currently offers)', () => {
     await expect(page.getByText('Lesson complete!')).toBeVisible();
     await page.getByRole('button', { name: /Continue/ }).click();
 
+    // Opened via Home's Start today: its own Today session (M3.4), so Continue lands on the
+    // session summary first, not Home directly.
+    await expect(page.getByText('Great session!')).toBeVisible();
+    await page.getByRole('button', { name: 'Done' }).click();
+
     // Home shows the stars just earned…
     const starsPill = page.locator('[aria-label$=" stars"]');
     await expect(starsPill).toHaveAttribute('aria-label', /^(?!0 stars$).+/);

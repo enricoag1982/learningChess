@@ -1,7 +1,18 @@
 import { createContext, useContext } from 'react';
 import { create } from 'zustand';
-import type { Journey, Lesson, LessonProgress, MiniGameProgress, Profile } from '@chess-kids/core';
+import type {
+  AnimalFriend,
+  ConceptStats,
+  ConceptTask,
+  Journey,
+  Lesson,
+  LessonProgress,
+  MiniGameProgress,
+  Profile,
+  TodaySessionPlan,
+} from '@chess-kids/core';
 import {
+  animalFriends,
   createProfile,
   getLessonProgress,
   isFirstRun,
@@ -9,8 +20,12 @@ import {
   listProfiles,
   loadJourney,
   loadMiniGameProgress,
+  loadPracticeTasks,
   loadProgress,
+  loadTodaySession,
+  loadWarmUp,
   selectProfile,
+  totalStars,
 } from '@chess-kids/core';
 import type { Services } from './services.ts';
 
@@ -27,13 +42,19 @@ export type Screen =
   | 'lesson'
   | 'play'
   | 'den'
-  | 'minigame';
+  | 'minigame'
+  | 'warmup'
+  | 'practice'
+  | 'practice-run'
+  | 'today-summary';
 
-/** Where the current lesson was opened from: decides where "Continue"/Close returns to. */
-export type LessonOrigin = 'home' | 'journey';
+/** Where the current lesson was opened from: decides where "Continue"/Close returns to.
+ * `today`: opened as a Today session's lesson (or world-boss) activity — see `startToday`. */
+export type LessonOrigin = 'home' | 'journey' | 'today';
 
-/** Where the current standalone mini-game session was opened from: decides where its exit returns to. */
-export type MiniGameOrigin = 'play' | 'journey' | 'home';
+/** Where the current standalone mini-game session was opened from: decides where its exit returns to.
+ * `today`: opened as a Today session's world-boss or mini-game activity — see `startToday`. */
+export type MiniGameOrigin = 'play' | 'journey' | 'home' | 'today';
 
 /** Last-used profile first (docs/screens.md: picker shows it first), rest unchanged. */
 function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | null): Profile[] {
@@ -57,6 +78,9 @@ export interface AppState {
   readonly progress: readonly LessonProgress[];
   /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
   readonly miniGameProgress: readonly MiniGameProgress[];
+  /** This profile's concept mastery + review state (M3.4 Leitner scheduler): Home's "Start today"
+   * button and the Practice screen's due count / weak tags both read this. */
+  readonly conceptStats: readonly ConceptStats[];
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
   readonly lessonId: string | null;
@@ -69,6 +93,21 @@ export interface AppState {
   readonly miniGameId: string | null;
   /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
   readonly miniGameOrigin: MiniGameOrigin;
+
+  /** The Today session in progress (`startToday`), or `null` outside one. */
+  readonly todayPlan: TodaySessionPlan | null;
+  /** Index into `todayPlan.activities` of the activity currently showing. */
+  readonly todayActivityIndex: number;
+  /** `totalStars(progress)` snapshotted at `startToday`, so the summary can show the delta. */
+  readonly todaySessionStartTotalStars: number;
+  /** `animalFriends(...)` snapshotted at `startToday`, so the summary can show newly-earned ones. */
+  readonly todaySessionStartFriends: readonly AnimalFriend[];
+  /** `journey.rank.id` snapshotted at `startToday`, so the summary can show a rank-up. */
+  readonly todaySessionStartRankId: string | null;
+
+  /** The Practice topic run's concept (screen `practice-run`); `null` outside one. */
+  readonly practiceConceptId: string | null;
+  readonly practiceTasks: readonly ConceptTask[];
 
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
@@ -94,19 +133,23 @@ export interface AppState {
   /** Journey's back button. */
   readonly goToHome: () => void;
   /**
-   * Home's primary button: opens the Journey's next lesson (resuming at its saved step), if any.
-   * No-op once `journey.next` is `null` (nothing left to do).
-   */
-  readonly startNext: () => Promise<void>;
-  /**
    * Journey tap: opens `lessonId` (available / complete / mastered only — a no-op for a locked
    * one, which the Journey screen intercepts with a spoken "Finish … first" line instead). A
    * complete/mastered lesson restarts at the story; otherwise resumes at its saved step.
    */
   readonly startLesson: (lessonId: string) => Promise<void>;
   readonly goToStep: (index: number) => void;
-  /** Leaves the lesson screen for Home or the Journey, whichever it was opened from. */
+  /**
+   * Leaves the lesson screen (top-bar Close) for Home or the Journey, whichever it was opened
+   * from; a Today-session lesson (`lessonOrigin: 'today'`) abandons the whole session instead
+   * (`leaveToday` — "the kid can leave any time", domain-model.md §3.3).
+   */
   readonly exitLesson: () => void;
+  /**
+   * The lesson-complete screen's "Continue": a Today-session lesson advances to the session's next
+   * activity (`advanceToday`); otherwise identical to `exitLesson`.
+   */
+  readonly completeLessonActivity: () => Promise<void>;
   /**
    * Re-reads saved progress (lesson + mini-game) and the derived Journey from storage, e.g. after
    * a lesson or a standalone mini-game session updates it.
@@ -117,13 +160,39 @@ export interface AppState {
   /** Opens My Den. */
   readonly goToDen: () => void;
   /**
-   * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only), the
-   * Journey map's world boss node, or Home's "Today" tile when the next step is a world boss.
+   * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only) or the
+   * Journey map's world boss node. A Today session's world-boss / mini-game activity opens the
+   * same screen directly (`enterTodayActivity`), with `miniGameOrigin: 'today'`.
    * `origin` (default `'play'`) decides where `exitMiniGame` returns to.
    */
   readonly startMiniGame: (miniGameId: string, origin?: MiniGameOrigin) => void;
-  /** Leaves the standalone mini-game session for wherever it was opened from. */
+  /**
+   * Leaves the standalone mini-game session for wherever it was opened from; a Today-session
+   * mini-game (`miniGameOrigin: 'today'`) abandons the whole session instead (`leaveToday`).
+   */
   readonly exitMiniGame: () => void;
+
+  /**
+   * Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
+   * stars/friends/rank for the summary, and opens its first activity. No-op without a profile.
+   */
+  readonly startToday: () => Promise<void>;
+  /** Moves to the Today session's next activity, or the summary once there is none left. */
+  readonly advanceToday: () => Promise<void>;
+  /** Abandons the Today session in progress (if any) and returns to Home, refreshing progress. */
+  readonly leaveToday: () => void;
+  /** The summary screen's closing action: clears the session and returns to Home. */
+  readonly finishToday: () => void;
+
+  /** Opens the Practice screen. */
+  readonly goToPractice: () => void;
+  /** Practice's "Daily warm-up" card: loads today's warm-up tasks and opens the task-run screen
+   * (a no-op if nothing is due — the card is disabled by then, but this guards a stale click). */
+  readonly startPracticeWarmUp: () => Promise<void>;
+  /** Practice topic tap: loads that concept's review tasks and opens the task-run screen. */
+  readonly startPracticeTopic: (conceptId: string) => Promise<void>;
+  /** Leaves the Practice task run back to the topic list, refreshing progress. */
+  readonly exitPracticeRun: () => void;
 }
 
 /** A created store instance, as returned by `createAppStore` (one per `App`, for test isolation). */
@@ -132,7 +201,7 @@ export type AppStore = ReturnType<typeof createAppStore>;
 /** Builds a fresh Zustand store bound to `services`; call once per `App` instance. */
 export function createAppStore(services: Services) {
   return create<AppState>((set, get) => {
-    /** Enters `lessonId`, remembering `origin` for `exitLesson`. Shared by `startLesson`/`startNext`. */
+    /** Enters `lessonId`, remembering `origin` for `exitLesson`. Shared by `startLesson`/`enterTodayActivity`. */
     async function enterLesson(lessonId: string, origin: LessonOrigin): Promise<void> {
       const { profile, journey } = get();
       if (!profile) return;
@@ -145,6 +214,37 @@ export function createAppStore(services: Services) {
       set({ screen: 'lesson', lessonId, stepIndex: startIndex, lessonOrigin: origin });
     }
 
+    /**
+     * Opens a Today session's activity at `index` (`todayPlan.activities`), or the summary once
+     * `index` runs past the end. Shared by `startToday`/`advanceToday`.
+     */
+    async function enterTodayActivity(index: number): Promise<void> {
+      const plan = get().todayPlan;
+      const activity = plan?.activities[index];
+      if (!plan || !activity) {
+        set({ screen: 'today-summary', todayActivityIndex: index });
+        return;
+      }
+      set({ todayActivityIndex: index });
+      if (activity.kind === 'warmup') {
+        set({ screen: 'warmup' });
+        return;
+      }
+      if (activity.kind === 'lesson') {
+        await enterLesson(activity.lesson.id, 'today');
+        return;
+      }
+      const miniGameId =
+        activity.kind === 'world-boss' ? activity.world.boss : activity.miniGame.id;
+      if (miniGameId === undefined) {
+        // Defensive: `planTodaySession` only emits a `world-boss` activity once its boss mini-game
+        // is set, so this never fires in practice.
+        await enterTodayActivity(index + 1);
+        return;
+      }
+      set({ screen: 'minigame', miniGameId, miniGameOrigin: 'today' });
+    }
+
     return {
       services,
       screen: 'loading',
@@ -152,6 +252,7 @@ export function createAppStore(services: Services) {
       profile: null,
       progress: [],
       miniGameProgress: [],
+      conceptStats: [],
       journey: null,
       lessonId: null,
       stepIndex: 0,
@@ -159,6 +260,13 @@ export function createAppStore(services: Services) {
       newPlayerReturnsToParent: false,
       miniGameId: null,
       miniGameOrigin: 'play',
+      todayPlan: null,
+      todayActivityIndex: 0,
+      todaySessionStartTotalStars: 0,
+      todaySessionStartFriends: [],
+      todaySessionStartRankId: null,
+      practiceConceptId: null,
+      practiceTasks: [],
 
       async init() {
         if (await isFirstRun(services.deps)) {
@@ -179,12 +287,21 @@ export function createAppStore(services: Services) {
           // M1-upgrade path: an existing single profile with no parent lock yet skips profile
           // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
           await selectProfile(services.deps, only.id);
-          const [progress, miniGameProgress, journey] = await Promise.all([
+          const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
             loadProgress(services.deps, only.id),
             loadMiniGameProgress(services.deps, only.id),
+            services.deps.progress.listConceptStats(only.id),
             loadJourney(services.deps, only.id),
           ]);
-          set({ profile: only, progress, miniGameProgress, journey, profiles, screen: 'home' });
+          set({
+            profile: only,
+            progress,
+            miniGameProgress,
+            conceptStats,
+            journey,
+            profiles,
+            screen: 'home',
+          });
           return;
         }
         await get().goToPicker();
@@ -202,13 +319,22 @@ export function createAppStore(services: Services) {
           return;
         }
         await selectProfile(services.deps, profile.id);
-        const [profiles, progress, miniGameProgress, journey] = await Promise.all([
+        const [profiles, progress, miniGameProgress, conceptStats, journey] = await Promise.all([
           listProfiles(services.deps),
           loadProgress(services.deps, profile.id),
           loadMiniGameProgress(services.deps, profile.id),
+          services.deps.progress.listConceptStats(profile.id),
           loadJourney(services.deps, profile.id),
         ]);
-        set({ profile, progress, miniGameProgress, journey, profiles, screen: 'home' });
+        set({
+          profile,
+          progress,
+          miniGameProgress,
+          conceptStats,
+          journey,
+          profiles,
+          screen: 'home',
+        });
       },
 
       async goToPicker() {
@@ -223,12 +349,13 @@ export function createAppStore(services: Services) {
         const profile = await services.deps.profiles.get(profileId);
         if (!profile) return;
         await selectProfile(services.deps, profileId);
-        const [progress, miniGameProgress, journey] = await Promise.all([
+        const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
           loadProgress(services.deps, profileId),
           loadMiniGameProgress(services.deps, profileId),
+          services.deps.progress.listConceptStats(profileId),
           loadJourney(services.deps, profileId),
         ]);
-        set({ profile, progress, miniGameProgress, journey, screen: 'home' });
+        set({ profile, progress, miniGameProgress, conceptStats, journey, screen: 'home' });
       },
 
       goToPasswordScreen() {
@@ -253,12 +380,6 @@ export function createAppStore(services: Services) {
         set({ screen: 'home' });
       },
 
-      async startNext() {
-        const next = get().journey?.next;
-        if (!next) return;
-        await enterLesson(next.id, 'home');
-      },
-
       async startLesson(lessonId: string) {
         await enterLesson(lessonId, 'journey');
       },
@@ -269,19 +390,36 @@ export function createAppStore(services: Services) {
 
       exitLesson() {
         const origin = get().lessonOrigin;
-        set({ screen: origin === 'journey' ? 'journey' : 'home', lessonId: null, stepIndex: 0 });
+        set({ lessonId: null, stepIndex: 0 });
+        if (origin === 'today') {
+          get().leaveToday();
+          return;
+        }
+        set({ screen: origin === 'journey' ? 'journey' : 'home' });
+        void get().refreshProgress();
+      },
+
+      async completeLessonActivity() {
+        const origin = get().lessonOrigin;
+        set({ lessonId: null, stepIndex: 0 });
+        if (origin === 'today') {
+          await get().advanceToday();
+          return;
+        }
+        set({ screen: origin === 'journey' ? 'journey' : 'home' });
         void get().refreshProgress();
       },
 
       async refreshProgress() {
         const { profile } = get();
         if (!profile) return;
-        const [progress, miniGameProgress, journey] = await Promise.all([
+        const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
           loadProgress(services.deps, profile.id),
           loadMiniGameProgress(services.deps, profile.id),
+          services.deps.progress.listConceptStats(profile.id),
           loadJourney(services.deps, profile.id),
         ]);
-        set({ progress, miniGameProgress, journey });
+        set({ progress, miniGameProgress, conceptStats, journey });
       },
 
       goToPlay() {
@@ -298,10 +436,76 @@ export function createAppStore(services: Services) {
 
       exitMiniGame() {
         const origin = get().miniGameOrigin;
+        set({ miniGameId: null });
+        if (origin === 'today') {
+          get().leaveToday();
+          return;
+        }
+        set({ screen: origin === 'journey' ? 'journey' : origin === 'home' ? 'home' : 'play' });
+        void get().refreshProgress();
+      },
+
+      async startToday() {
+        const { profile, journey, progress } = get();
+        if (!profile || !journey) return;
+        const plan = await loadTodaySession(services.deps, profile.id);
         set({
-          screen: origin === 'journey' ? 'journey' : origin === 'home' ? 'home' : 'play',
-          miniGameId: null,
+          todayPlan: plan,
+          todayActivityIndex: 0,
+          todaySessionStartTotalStars: totalStars(progress),
+          todaySessionStartFriends: animalFriends(journey.lessons, progress),
+          todaySessionStartRankId: journey.rank?.id ?? null,
         });
+        await enterTodayActivity(0);
+      },
+
+      async advanceToday() {
+        const plan = get().todayPlan;
+        if (!plan) {
+          set({ screen: 'home' });
+          return;
+        }
+        await get().refreshProgress();
+        await enterTodayActivity(get().todayActivityIndex + 1);
+      },
+
+      leaveToday() {
+        set({
+          todayPlan: null,
+          todayActivityIndex: 0,
+          lessonId: null,
+          miniGameId: null,
+          screen: 'home',
+        });
+        void get().refreshProgress();
+      },
+
+      finishToday() {
+        set({ todayPlan: null, todayActivityIndex: 0, screen: 'home' });
+        void get().refreshProgress();
+      },
+
+      goToPractice() {
+        set({ screen: 'practice' });
+      },
+
+      async startPracticeWarmUp() {
+        const { profile } = get();
+        if (!profile) return;
+        const tasks = await loadWarmUp(services.deps, profile.id);
+        if (tasks.length === 0) return;
+        set({ practiceConceptId: null, practiceTasks: tasks, screen: 'practice-run' });
+      },
+
+      async startPracticeTopic(conceptId: string) {
+        const { profile } = get();
+        if (!profile) return;
+        const tasks = await loadPracticeTasks(services.deps, profile.id, conceptId);
+        set({ practiceConceptId: conceptId, practiceTasks: tasks, screen: 'practice-run' });
+      },
+
+      exitPracticeRun() {
+        set({ screen: 'practice', practiceConceptId: null, practiceTasks: [] });
         void get().refreshProgress();
       },
     };
