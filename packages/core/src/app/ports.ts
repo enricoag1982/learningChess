@@ -59,10 +59,15 @@ export interface PasswordFileWriter {
   write(password: string): Promise<{ location: string }>;
 }
 
-/** Device-wide settings, not tied to one profile. */
+/** Device-wide settings; `suggestedLevels` alone is keyed per profile within it (still one record
+ * per device — a second profile on the same device gets its own entry in the same map). */
 export interface AppSettings {
   /** Profile to show first at the next app start (picker orders it first); `null` if none yet. */
   readonly lastProfileId: string | null;
+  /** Play's vs Computer "Automatic level" (`docs/computer-opponent.md` §5): each profile's own
+   * suggested `BotLevel.level`, by profile id. Absent for a profile with no suggestion yet (its
+   * chip defaults to the highest currently unlocked level instead — `games.ts`'s `suggestedLevel`). */
+  readonly suggestedLevels: Readonly<Record<string, number>>;
 }
 
 /** Persistence of `AppSettings`. Async so cloud adapters can replace local ones. */

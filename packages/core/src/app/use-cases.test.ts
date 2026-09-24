@@ -232,7 +232,7 @@ function makePasswordFileWriter(): PasswordFileWriter {
 }
 
 function makeSettingsRepo(): SettingsRepository {
-  let settings: AppSettings = { lastProfileId: null };
+  let settings: AppSettings = { lastProfileId: null, suggestedLevels: {} };
   return {
     get: () => Promise.resolve(settings),
     save: (next) => {

@@ -1,15 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { getLessonProgress, solve } from '@chess-kids/core';
+import { getLessonProgress, recordGame, solve } from '@chess-kids/core';
 import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
+import { renderWithStore } from '../testing/render-with-store.tsx';
 import {
   pickProfileFromPicker,
   seedReturningProfile,
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
+import { PlayScreen } from './PlayScreen.tsx';
 
 afterEach(cleanup);
 
@@ -121,6 +123,8 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
     expect(screen.getByRole('button', { name: 'Mouse, locked, After World 4' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Rabbit, locked, Beat Mouse 3 times' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Fox, locked, Beat Rabbit 3 times' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Wolf, locked, Beat Fox 3 times' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Bear, locked, Beat Wolf 3 times' })).toBeTruthy();
     expect(
       screen.getByRole('button', {
         name: 'Play a full game, After World 4',
@@ -160,5 +164,68 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
     expect(await screen.findByText('Full Game vs Mouse')).toBeTruthy();
     expect(screen.getByText('Checkmate the other king!')).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Full Game' })).toBeTruthy();
+  });
+
+  it('preselects the vs Computer chip at the profile’s stored suggested level', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await seedWorldFourMastered(services, profile.id);
+    // 3 full-game wins vs Mouse unlock Rabbit; seeding the stored suggestion directly is the same
+    // end state `updateAutomaticLevel` would have persisted after a real 4-of-5 streak.
+    for (let i = 0; i < 3; i += 1) {
+      await recordGame(services.deps, {
+        profileId: profile.id,
+        game: 'full',
+        opponentLevel: 1,
+        result: 'win',
+        reason: 'checkmate',
+        moves: [],
+      });
+    }
+    const settings = await services.deps.settings.get();
+    await services.deps.settings.save({
+      ...settings,
+      suggestedLevels: { [profile.id]: 2 },
+    });
+
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+    fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
+    await screen.findByRole('heading', { name: 'Play' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^Rabbit,/ }).getAttribute('aria-pressed')).toBe(
+        'true',
+      );
+    });
+    expect(screen.getByRole('button', { name: /^Mouse,/ }).getAttribute('aria-pressed')).toBe(
+      'false',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Play a full game' }));
+    expect(await screen.findByText('Full Game vs Rabbit')).toBeTruthy();
+  });
+
+  it('shows Owl’s suggestion line once a finished full game moves the suggestion up a level', async () => {
+    const services = createServicesWithRealContent();
+    const { store } = await renderWithStore(<PlayScreen />, services);
+    const profile = store.getState().profile;
+    if (!profile) throw new Error('renderWithStore: no profile');
+    await seedWorldFourMastered(services, profile.id);
+
+    for (let i = 0; i < 5; i += 1) {
+      await recordGame(services.deps, {
+        profileId: profile.id,
+        game: 'full',
+        opponentLevel: 1,
+        result: 'win',
+        reason: 'checkmate',
+        moves: [],
+      });
+    }
+    await store.getState().refreshProgress();
+    await store.getState().updateAutomaticLevel(1);
+
+    expect(await screen.findByText('Ready for the Rabbit?')).toBeTruthy();
   });
 });

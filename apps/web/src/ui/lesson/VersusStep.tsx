@@ -77,17 +77,15 @@ function botThinkDelayMs(): number {
   return readTestSeed() !== null || prefersReducedMotion() ? 300 : 800 + Math.random() * 700;
 }
 
-/** Aids per bot level (`docs/computer-opponent.md` §4): Mouse/Rabbit, Fox, Wolf/Bear. */
-interface VersusAids {
-  readonly takeBack: 'unlimited' | 'limited' | 'none';
-  readonly takeBackLimit: number;
-  readonly danger: boolean;
-}
-
-function aidsForLevel(level: number): VersusAids {
-  if (level <= 2) return { takeBack: 'unlimited', takeBackLimit: Infinity, danger: true };
-  if (level === 3) return { takeBack: 'limited', takeBackLimit: 3, danger: true };
-  return { takeBack: 'none', takeBackLimit: 0, danger: false };
+/** Aids per bot level (`docs/computer-opponent.md` §4), from `BotLevel.aids` itself
+ * (`domain/bot/levels.ts`) — Mouse/Rabbit unlimited take-back + danger on, Fox 3 take-backs/game
+ * + danger off by default, Wolf/Bear no take-back + danger off. Falls back to Mouse's aids for an
+ * unknown level number, which should never actually happen (`opponentLevel` is always 1-5). */
+function aidsForLevel(level: number): bot.BotAids {
+  return (
+    bot.BOT_LEVELS.find((entry) => entry.level === level)?.aids ??
+    (bot.BOT_LEVELS[0] as (typeof bot.BOT_LEVELS)[number]).aids
+  );
 }
 
 function other(color: 'w' | 'b'): 'w' | 'b' {

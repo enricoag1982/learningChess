@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { ComputerLevelCondition, ComputerLevelStatus, MiniGame } from '@chess-kids/core';
-import { computerLevelStatus, unlockedMiniGames } from '@chess-kids/core';
+import { computerLevelStatus, suggestedLevel, unlockedMiniGames } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
@@ -113,14 +113,32 @@ export function PlayScreen(): JSX.Element {
   const miniGameProgress = useAppStore((state) => state.miniGameProgress);
   const gameRecords = useAppStore((state) => state.gameRecords);
   const journey = useAppStore((state) => state.journey);
+  const levelUpSuggestion = useAppStore((state) => state.levelUpSuggestion);
   const goToHome = useAppStore((state) => state.goToHome);
   const startMiniGame = useAppStore((state) => state.startMiniGame);
   const startFullGame = useAppStore((state) => state.startFullGame);
 
   const [lockedMessage, setLockedMessage] = useState<string | null>(null);
-  const [selectedLevel, setSelectedLevel] = useState(1);
+  // `null` = no manual pick yet this session: the level chips default to the profile's stored
+  // "Automatic level" suggestion (`docs/computer-opponent.md` §5), loaded once below.
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
+  const [storedSuggestion, setStoredSuggestion] = useState<number | undefined>(undefined);
   const bubbleText = t('play.owl-line');
   const replay = useNarratedText(services.narrator, bubbleText);
+
+  useEffect(() => {
+    if (!profile) return;
+    let cancelled = false;
+    void services.deps.settings.get().then((settings) => {
+      if (!cancelled) {
+        setStoredSuggestion(settings.suggestedLevels[profile.id]);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.id]);
 
   if (!profile || !journey) {
     return <main className="min-h-screen bg-cream" />;
@@ -139,8 +157,18 @@ export function PlayScreen(): JSX.Element {
   );
 
   const levelStatuses = computerLevelStatus(gameRecords, journey);
-  const mouseStatus = levelStatuses.find((status) => status.name === 'mouse');
-  const fullGameUnlocked = mouseStatus !== undefined && !mouseStatus.locked;
+  const effectiveLevel = selectedLevel ?? suggestedLevel(storedSuggestion, levelStatuses);
+  // The only level `effectiveLevel` can ever resolve to locked is Mouse (`suggestedLevel`'s own
+  // fallback, when nothing at all is unlocked yet) — `selectLevel` below never lets a manual pick
+  // land on a locked chip, and `suggestedLevel`'s other branches only ever return an unlocked one.
+  const selectedStatus = levelStatuses.find((status) => status.level === effectiveLevel);
+  const fullGameUnlocked = selectedStatus !== undefined && !selectedStatus.locked;
+  const levelUpStatus = levelUpSuggestion
+    ? levelStatuses.find((status) => status.level === levelUpSuggestion.level)
+    : undefined;
+  const levelUpBanner = levelUpStatus
+    ? t('play.level-up-suggestion', { name: t(`boss.versus.bot-name.${levelUpStatus.name}`) })
+    : null;
 
   function selectLevel(status: ComputerLevelStatus): void {
     if (status.locked) {
@@ -219,7 +247,7 @@ export function PlayScreen(): JSX.Element {
           <ul className="flex flex-wrap gap-2" aria-label={t('play.vs-computer')}>
             {levelStatuses.map((status) => {
               const name = t(`boss.versus.bot-name.${status.name}`);
-              const selected = !status.locked && status.level === selectedLevel;
+              const selected = !status.locked && status.level === effectiveLevel;
               const condition = status.condition ? levelConditionText(t, status.condition) : '';
               const accessibleName = status.locked
                 ? t('play.level-name-locked', { name, condition })
@@ -272,7 +300,7 @@ export function PlayScreen(): JSX.Element {
                 : `${t('play.full-game')}, ${t('play.full-game-locked')}`
             }
             onClick={() => {
-              startFullGame(selectedLevel);
+              startFullGame(effectiveLevel);
             }}
             className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
           >
@@ -353,12 +381,12 @@ export function PlayScreen(): JSX.Element {
         })}
       </ul>
 
-      {lockedMessage && (
+      {(lockedMessage ?? levelUpBanner) && (
         <div className="flex items-center gap-3 rounded-3xl border-2 border-line bg-card px-4 py-3 shadow">
           <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-[#E9DFF3] p-1.5">
             <OwlIcon />
           </div>
-          <p className="font-display text-lg text-ink">{lockedMessage}</p>
+          <p className="font-display text-lg text-ink">{lockedMessage ?? levelUpBanner}</p>
         </div>
       )}
     </main>

@@ -248,6 +248,7 @@ play:
   level-wins: 'Won {{wins}} of {{games}}'
   level-unplayed: Not played yet
   level-condition-beat: 'Beat {{name}} {{times}} times'
+  level-up-suggestion: 'Ready for the {{name}}?'
   close: Close
   back-to-play: Back to Play
   back-to-journey: Back to Journey

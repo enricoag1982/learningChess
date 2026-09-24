@@ -75,6 +75,13 @@ interface FastChess {
   _moves(options: { legal: true }): InternalMove[];
   _makeMove(move: InternalMove): void;
   _undoMove(): void;
+  /**
+   * chess.js's own incremental Zobrist hash (pieces + side to move + castling + en passant),
+   * XOR-updated in `_makeMove`/`_undoMove` — reading it is O(1), no recomputation. Same
+   * "reach into internals, fail loudly on a chess.js upgrade" trade-off as the members above;
+   * `hash()` (below) is the only place this is read.
+   */
+  readonly _hash: bigint;
 }
 
 // A separate view of the same instance, not intersected with `Chess`: TypeScript collapses an
@@ -222,6 +229,9 @@ export const chessJsRules: ChessRules = {
         return chess.isStalemate();
       },
       pieces,
+      hash() {
+        return fastChess._hash;
+      },
       position() {
         const parsed = parseFen(chess.fen());
         return {

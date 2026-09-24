@@ -1,0 +1,22 @@
+# Small opening book for Fox / Wolf / Bear (docs/computer-opponent.md §3): e4 / d4 main lines,
+# each at most 6 plies from the standard starting position, both colours (whoever is to move at a
+# given ply plays it — no per-line "colour", see domain/bot/book.ts). `pnpm build` (loadBotBook,
+# packages/content/src/bot-book-load.ts) checks every line is legal, ≤ 6 plies, and that its
+# authored SAN matches chess.js's own SAN.
+lines:
+  - name: e4-italian
+    moves: [e4, e5, Nf3, Nc6, Bc4, Bc5]
+  - name: e4-ruy-lopez
+    moves: [e4, e5, Nf3, Nc6, Bb5]
+  - name: e4-sicilian
+    moves: [e4, c5, Nf3, d6, d4, cxd4]
+  - name: e4-french
+    moves: [e4, e6, d4, d5, Nc3, Nf6]
+  - name: e4-caro-kann
+    moves: [e4, c6, d4, d5, Nc3, dxe4]
+  - name: d4-queens-gambit
+    moves: [d4, d5, c4, e6, Nc3, Nf6]
+  - name: d4-kings-indian
+    moves: [d4, Nf6, c4, g6, Nc3, Bg7]
+  - name: d4-slav
+    moves: [d4, d5, c4, c6, Nf3, Nf6]
