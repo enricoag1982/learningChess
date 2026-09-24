@@ -10,6 +10,8 @@ export interface SetupPaletteProps {
   /** Active hint, if any: highlights the suggested piece (levels 1–2). */
   readonly hint: Hint | null;
   readonly onSelect: (piece: Piece) => void;
+  /** One non-wrapping, horizontally scrollable row (phone / iPad portrait, under the board); default wraps for the side panel. */
+  readonly compact?: boolean;
 }
 
 function pieceKey(piece: { readonly color: string; readonly type: string }): string {
@@ -22,6 +24,7 @@ export function SetupPalette({
   selected,
   hint,
   onSelect,
+  compact = false,
 }: SetupPaletteProps): JSX.Element {
   const { t } = useTranslation();
   const hintedKey = hint?.kind === 'setup' && hint.piece ? pieceKey(hint.piece) : null;
@@ -31,7 +34,7 @@ export function SetupPalette({
       <span className="text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
         {t('exercise.setup.palette-label')}
       </span>
-      <div className="flex flex-wrap gap-3">
+      <div className={`flex gap-3 ${compact ? 'flex-nowrap overflow-x-auto pb-1' : 'flex-wrap'}`}>
         {palette.map((entry) => {
           const key = pieceKey(entry);
           const isSelected = selected !== null && pieceKey(selected) === key;

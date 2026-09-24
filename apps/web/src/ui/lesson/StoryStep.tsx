@@ -22,9 +22,12 @@ export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
   const services = useServices();
   const isCompact = useIsCompact();
   const { demo } = lesson;
-  const dots = services.rules
-    .legalMoves(demo.position, { staticOpponent: true }, demo.highlight.legalMovesFrom)
-    .map((move) => move.to);
+  const dots =
+    'legalMovesFrom' in demo.highlight
+      ? services.rules
+          .legalMoves(demo.position, { staticOpponent: true }, demo.highlight.legalMovesFrom)
+          .map((move) => move.to)
+      : demo.highlight.squares;
   const text = tContent(t, lesson.storyKey);
   const replay = useNarratedText(services.narrator, text);
 

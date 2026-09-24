@@ -10,6 +10,7 @@ import { BossStep } from './BossStep.tsx';
 
 function fixtureBoss(): MiniGame {
   return {
+    mode: 'static',
     id: 'fixture-boss',
     concept: 'fixture-move',
     position: parseDiagram(`
@@ -55,6 +56,7 @@ describe('BossStep', () => {
 
   it('a collect-stars goal shows a stars counter and wins by collecting every star', async () => {
     const boss: MiniGame = {
+      mode: 'static',
       id: 'fixture-boss-stars',
       concept: 'fixture-move',
       position: parseDiagram(`

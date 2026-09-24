@@ -1,19 +1,23 @@
 import { expect, test } from '@playwright/test';
-import {
-  completeExercise,
-  completeFirstRun,
-  findLesson,
-  pickProfileFromPicker,
-} from './helpers.ts';
+import type { CompiledContent, TracksCatalog } from '@chess-kids/core';
+import { nextLesson } from '@chess-kids/core';
+import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
+import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import { completeExercise, completeFirstRun, pickProfileFromPicker } from './helpers.ts';
+
+const content = rawContent as unknown as CompiledContent;
+const catalog = rawTracks as unknown as TracksCatalog;
 
 test('plays a guided try and an exercise fully offline, with progress saved', async ({
   page,
   context,
 }) => {
-  const lesson = findLesson('rook');
+  // Whichever lesson the Journey currently offers first (see `journey.spec.ts`), not a hardcoded id.
+  const lesson = nextLesson(catalog, content.lessons, []);
+  if (!lesson) throw new Error('bundled content/tracks: no first lesson found');
   const [firstExercise] = lesson.exercises;
   if (lesson.guided.length === 0 || !firstExercise) {
-    throw new Error('rook lesson fixture needs at least one guided try and one exercise');
+    throw new Error('first lesson fixture needs at least one guided try and one exercise');
   }
 
   await completeFirstRun(page, 'Kid');
@@ -28,7 +32,8 @@ test('plays a guided try and an exercise fully offline, with progress saved', as
   await page.getByRole('button', { name: /Let me try/ }).click(); // Story -> Demo
   await page.getByRole('button', { name: /^Next/ }).click(); // Demo -> first guided try
 
-  // All guided tries first (the lesson flow requires each in order), then one scored exercise.
+  // All guided tries first (the lesson flow requires each in order), then one scored exercise —
+  // of whichever type it is, `completeExercise` solves any of them.
   for (const guided of lesson.guided) {
     await completeExercise(page, guided);
   }

@@ -1,0 +1,53 @@
+id: setup-race
+concept: board-setup
+unlockAfter: setup
+mode: series
+title: setup-race.title
+goal: setup-race.goal
+errors3: 1
+errors2: 4
+rounds:
+  - id: setup-race-r1
+    type: setup
+    text: setup-race-r1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    target:
+      board: |
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        R N B Q K B N R
+  - id: setup-race-r2
+    type: setup
+    text: setup-race-r2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R N B Q K B N R
+    target:
+      board: |
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        P P P P P P P P
+        R N B Q K B N R

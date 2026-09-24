@@ -15,6 +15,7 @@ piece:
   p: Pawn
 home:
   owl-next: 'Today you meet {{character}}!'
+  owl-next-topic: "Hi! I'm Owl. Today: {{topic}}!"
   owl-resume: Let's keep going!
   owl-all-done: You finished everything for now. Come back soon for more!
   start-today: Start today
@@ -172,6 +173,10 @@ boss:
   stars-of: 'Stars {{current}} of {{total}}'
   moves-par: 'Moves {{moves}} · Par {{par}}'
   ended: Good try!
+  series:
+    round-of: 'Round {{current}} of {{total}}'
+    mistakes_one: '{{count}} mistake so far'
+    mistakes_other: '{{count}} mistakes so far'
 complete:
   title: Lesson complete!
   stars-pill: '+{{count}} stars'

@@ -1,0 +1,241 @@
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import type { JSX } from 'react';
+import { useTranslation } from 'react-i18next';
+import type {
+  ExerciseDef,
+  ExerciseState,
+  Lesson,
+  Piece,
+  SeriesGameState,
+  SeriesMiniGame,
+} from '@chess-kids/core';
+import {
+  completeRound,
+  currentRound,
+  recordBossResult,
+  seriesResult,
+  seriesStars,
+  starsFor,
+  startSeries,
+} from '@chess-kids/core';
+import { useAppStore, useServices } from '../../app/store.ts';
+import { tContent } from '../../content-text.ts';
+import { Board } from '../board/Board.tsx';
+import { ReplayButton } from '../ReplayButton.tsx';
+import { SpeechBubble } from '../SpeechBubble.tsx';
+import { StarsRow } from '../StarsRow.tsx';
+import { useIsStackedLayout } from '../useMediaQuery.ts';
+import { useNarratedText } from '../useNarratedText.ts';
+import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
+import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
+import { buildExercisePlayArea } from './exercise-play-area.tsx';
+import { GameLayout } from './GameLayout.tsx';
+import { NextButton } from './NextButton.tsx';
+
+export interface SeriesBossStepProps {
+  readonly lesson: Lesson;
+  readonly game: SeriesMiniGame;
+  readonly nextStepIndex: number;
+}
+
+/** Round counter + mistakes-so-far card, shared by a round in progress and the result screen. */
+function SeriesCounters({
+  current,
+  total,
+  mistakes,
+}: {
+  readonly current: number;
+  readonly total: number;
+  readonly mistakes: number;
+}): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-1 rounded-3xl border-2 border-line bg-card px-5 py-4 font-display text-lg text-ink">
+      <span>{t('boss.series.round-of', { current, total })}</span>
+      <span>{t('boss.series.mistakes', { count: mistakes })}</span>
+    </div>
+  );
+}
+
+interface SeriesRoundProps {
+  readonly character: string;
+  readonly exercise: ExerciseDef;
+  readonly roundNumber: number;
+  readonly totalRounds: number;
+  /** Mistakes already folded in from every round completed before this one. */
+  readonly priorMistakes: number;
+  /** Called once, the moment the kid taps Next after solving this round. */
+  readonly onNext: (roundState: ExerciseState) => void;
+}
+
+/**
+ * One round of a series boss: the same exercise UI as `ExerciseStep` (any exercise type, hints
+ * allowed), but scored only as part of the series' total mistakes — no per-round stars, and moving
+ * on is an explicit "Next" tap (never a timed auto-advance) once it is solved.
+ */
+function SeriesRound({
+  character,
+  exercise,
+  roundNumber,
+  totalRounds,
+  priorMistakes,
+  onNext,
+}: SeriesRoundProps): JSX.Element {
+  const { t } = useTranslation();
+  const services = useServices();
+  const isStacked = useIsStackedLayout();
+  const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
+  const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
+  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
+
+  const solved = state.core.solved;
+  const stars = starsFor(state.core);
+  const instructionText = exerciseInstructionText(t, exercise);
+  const note = exerciseNote(t, state.feedback, character, stars);
+  const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
+  const replay = useNarratedText(services.narrator, spokenText);
+
+  const { board, belowBoard, controls } = buildExercisePlayArea({
+    t,
+    rules: services.rules,
+    exercise,
+    state,
+    dispatch,
+    selectedPiece,
+    onSelectPiece: setSelectedPiece,
+    isStacked,
+  });
+
+  // Live running total: mistakes already folded in from earlier rounds, plus this round's own
+  // errors and hint level so far (folded in for real once it is solved — see `completeRound`).
+  const liveMistakes = priorMistakes + state.core.errors + state.core.hintLevel;
+
+  const panel = (
+    <>
+      <SpeechBubble text={instructionText} note={note} />
+      <ReplayButton onClick={replay} label={t('exercise.replay')} />
+      <SeriesCounters current={roundNumber} total={totalRounds} mistakes={liveMistakes} />
+      {solved ? (
+        <div className="mt-auto flex flex-col items-center gap-4">
+          <NextButton
+            onClick={() => {
+              onNext(state.core);
+            }}
+            className="w-full"
+          />
+        </div>
+      ) : (
+        <div className="mt-auto flex flex-col gap-4">{controls}</div>
+      )}
+    </>
+  );
+
+  return (
+    <GameLayout
+      board={board}
+      panel={panel}
+      belowBoard={solved ? undefined : (belowBoard ?? undefined)}
+    />
+  );
+}
+
+/**
+ * A `series` boss mini-game (Square Hunt, Setup Race, …): a fixed sequence of rounds, each played
+ * through the normal exercise engine and reusing `ExerciseStep`'s own UI building blocks
+ * (`buildExercisePlayArea`); scored on total mistakes (errors + hint levels) across every round,
+ * not a single win condition.
+ */
+export function SeriesBossStep({
+  lesson,
+  game: minigame,
+  nextStepIndex,
+}: SeriesBossStepProps): JSX.Element {
+  const { t } = useTranslation();
+  const services = useServices();
+  const profile = useAppStore((state) => state.profile);
+  const goToStep = useAppStore((state) => state.goToStep);
+  const refreshProgress = useAppStore((state) => state.refreshProgress);
+
+  const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame));
+  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
+  const [startedAt] = useState(() => Date.now());
+  const savedRef = useRef(false);
+  const [saved, setSaved] = useState(false);
+
+  const result = seriesResult(series);
+  const stars = seriesStars(series);
+  const goalText = tContent(t, minigame.goalKey);
+  const replay = useNarratedText(services.narrator, goalText);
+
+  useEffect(() => {
+    if (result === 'playing' || savedRef.current || !profile) return;
+    savedRef.current = true;
+    void recordBossResult(services.deps, {
+      profileId: profile.id,
+      lesson,
+      state: series,
+      durationMs: Date.now() - startedAt,
+      nextStep: nextStepIndex,
+    }).then(() => {
+      setSaved(true);
+      // Keeps the store's `progress` current: the Complete step reads it straight from the store.
+      void refreshProgress();
+    });
+  }, [result, profile, services.deps, lesson, nextStepIndex, series, startedAt, refreshProgress]);
+
+  function handleRoundNext(roundState: ExerciseState): void {
+    setSeries((current) => completeRound(current, roundState));
+  }
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
+      <h2 className="text-center font-display text-xl text-ink sm:text-3xl">
+        {tContent(t, minigame.titleKey)}
+      </h2>
+      {result === 'playing' ? (
+        <SeriesRound
+          key={series.roundIndex}
+          character={lesson.character}
+          exercise={currentRound(series)}
+          roundNumber={series.roundIndex + 1}
+          totalRounds={minigame.rounds.length}
+          priorMistakes={series.mistakes}
+          onNext={handleRoundNext}
+        />
+      ) : (
+        <GameLayout
+          board={
+            <Board
+              position={series.round.position}
+              legalMoves={[]}
+              label={t('lesson.board-label')}
+            />
+          }
+          panel={
+            <>
+              <SpeechBubble text={goalText} />
+              <ReplayButton onClick={replay} label={t('exercise.replay')} />
+              <SeriesCounters
+                current={minigame.rounds.length}
+                total={minigame.rounds.length}
+                mistakes={series.mistakes}
+              />
+              {/* Autosave (recordBossResult) completes before the Next button appears. */}
+              <div className="mt-auto flex flex-col items-center gap-4">
+                <StarsRow earned={stars} animate />
+                {saved && (
+                  <NextButton
+                    onClick={() => {
+                      goToStep(nextStepIndex);
+                    }}
+                    className="w-full"
+                  />
+                )}
+              </div>
+            </>
+          }
+        />
+      )}
+    </div>
+  );
+}

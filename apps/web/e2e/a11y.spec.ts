@@ -1,15 +1,26 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import type { CompiledContent, ExerciseDef, MiniGame, TracksCatalog } from '@chess-kids/core';
+import { SQUARES } from '@chess-kids/core';
+import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
+import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   clickSquare,
   completeBoss,
   completeExercise,
   completeFirstRun,
-  findLesson,
+  contentText,
   findMiniGame,
+  isMoveCountedExercise,
+  journeyNodeName,
+  lessonsInJourneyOrder,
+  playSolveLine,
   selectSquaresAnswer,
 } from './helpers.ts';
+
+const content = rawContent as unknown as CompiledContent;
+const catalog = rawTracks as unknown as TracksCatalog;
 
 /** Fails on `serious` / `critical` axe-core violations (non-functional.md §2: WCAG 2.2 AA). */
 async function expectNoSeriousViolations(page: Page, screen: string): Promise<void> {
@@ -93,85 +104,192 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectNoSeriousViolations(page, 'Parent area');
 });
 
+/** Every exercise type actually authored in the bundled content (scored exercises only). */
+function allExerciseTypes(): ReadonlySet<string> {
+  return new Set(
+    content.lessons.flatMap((lesson) => lesson.exercises.map((exercise) => exercise.type)),
+  );
+}
+
+/**
+ * Full a11y + touch-target scan of one exercise definition, tailored to its type's own controls
+ * (Hint always; Undo only for a move-counted type; Check only for select-squares; Yes/No for
+ * yes-no; choice tiles for choice), then solves and advances past it. For select-squares, also
+ * exercises a wrong pick (orange note, never red — non-functional.md §2).
+ */
+async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
+  await expectKidTouchTarget(page, /Hint/);
+  if (isMoveCountedExercise(def)) {
+    await expectKidTouchTarget(page, /Undo/);
+  }
+  await expectKidTouchTarget(page, /Say it again/);
+
+  // With a hint note under the instruction the panel is at its tallest: targets must not shrink.
+  await page.getByRole('button', { name: /Hint/ }).click();
+  await expectKidTouchTarget(page, /Say it again/);
+  await expectKidTouchTarget(page, /Hint/);
+  await expectNoSeriousViolations(page, `Exercise (${def.type}, hint shown)`);
+
+  if (def.type === 'yes-no') {
+    await expectKidTouchTarget(page, contentText('exercise.yes'));
+    await expectKidTouchTarget(page, contentText('exercise.no'));
+  } else if (def.type === 'choice') {
+    for (const option of def.options) {
+      if (option.textKey !== undefined) {
+        await expectKidTouchTarget(page, contentText(option.textKey));
+        continue;
+      }
+      if (!option.piece) {
+        throw new Error(`choice exercise "${def.id}" option has neither text nor piece`);
+      }
+      const color = contentText(`board.color.${option.piece.color}`);
+      const piece = contentText(`board.piece.${option.piece.type}`);
+      await expectKidTouchTarget(page, `${color} ${piece}`);
+    }
+  } else if (def.type === 'select-squares') {
+    const answer = new Set(selectSquaresAnswer(def));
+    const wrongSquare = SQUARES.find((square) => !answer.has(square));
+    if (wrongSquare === undefined) {
+      throw new Error(`select-squares exercise "${def.id}": every square is a correct answer`);
+    }
+    await clickSquare(page, wrongSquare);
+    await expectKidTouchTarget(page, /Check/);
+    await page.getByRole('button', { name: /Check/ }).click();
+    await expect(page.getByText('Not quite! Look at the orange squares.')).toBeVisible();
+    await expectNoSeriousViolations(page, 'Exercise (select-squares, wrong pick)');
+    await clickSquare(page, wrongSquare); // deselect the wrong pick
+  }
+
+  await completeExercise(page, def);
+}
+
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
 }) => {
-  const lesson = findLesson('rook');
-  const boss = findMiniGame(lesson.boss ?? '');
+  // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
+  // exists in content, the first series boss (mid-round) and first static boss, and the Complete
+  // step — whichever lessons those turn out to be, so this stays correct as content grows.
+  const orderedLessons = lessonsInJourneyOrder(catalog, content.lessons);
+  const wantedTypes = allExerciseTypes();
+  const scannedTypes = new Set<string>();
+  let seriesBossScanned = false;
+  let staticBossScanned = false;
+  let completeScanned = false;
+  let storyDemoScanned = false;
+  let journeyScanned = false;
+  let currentWorldId: string | undefined;
 
-  // 1. Home.
   await completeFirstRun(page);
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
 
-  // 1b. Journey map, then back to Home.
-  await page.getByRole('button', { name: /Journey/ }).click();
-  await expectKidTouchTarget(page, /Back to Home/);
-  await expectKidTouchTarget(page, /Rhino the Rook/);
-  await expectNoSeriousViolations(page, 'Journey');
-  await page.getByRole('button', { name: /Back to Home/ }).click();
+  for (const lesson of orderedLessons) {
+    const allScanned =
+      scannedTypes.size === wantedTypes.size &&
+      seriesBossScanned &&
+      staticBossScanned &&
+      completeScanned;
+    if (allScanned) break;
 
-  // 2. Story.
-  await page.getByRole('button', { name: /Start/ }).click();
-  await expectKidTouchTarget(page, 'Close lesson');
-  await expectKidTouchTarget(page, /Listen again/);
-  await expectKidTouchTarget(page, /Let me try/);
-  await expectNoSeriousViolations(page, 'Story');
+    // Enter the lesson: via the Journey for the first lesson of a new world (the case where a
+    // static boss, say, is only reachable later), else via Home's Start/Continue button.
+    const enteringNewWorld = lesson.world !== currentWorldId;
+    currentWorldId = lesson.world;
 
-  // 3. Demo.
-  await page.getByRole('button', { name: /Let me try/ }).click();
-  await expectKidTouchTarget(page, /^Next/);
-  await expectNoSeriousViolations(page, 'Demo');
-  await page.getByRole('button', { name: /^Next/ }).click();
+    if (enteringNewWorld) {
+      await page.getByRole('button', { name: /Journey/ }).click();
+      await expectKidTouchTarget(page, journeyNodeName(lesson, 'current'));
+      if (!journeyScanned) {
+        await expectKidTouchTarget(page, /Back to Home/);
+        await expectNoSeriousViolations(page, 'Journey');
+        journeyScanned = true;
+      }
+      await page.getByRole('button', { name: journeyNodeName(lesson, 'current') }).click();
+    } else {
+      await page.getByRole('button', { name: /Start|Continue/ }).click();
+    }
 
-  // 4. Guided tries (not scanned individually; part of "an exercise" below).
-  for (const guided of lesson.guided) {
-    await expectKidTouchTarget(page, /Hint/);
-    await expectKidTouchTarget(page, /Undo/);
-    await completeExercise(page, guided);
+    // Story.
+    if (!storyDemoScanned) {
+      await expectKidTouchTarget(page, 'Close lesson');
+      await expectKidTouchTarget(page, /Listen again/);
+      await expectKidTouchTarget(page, /Let me try/);
+      await expectNoSeriousViolations(page, 'Story');
+    }
+    await page.getByRole('button', { name: /Let me try/ }).click();
+
+    // Demo.
+    if (!storyDemoScanned) {
+      await expectKidTouchTarget(page, /^Next/);
+      await expectNoSeriousViolations(page, 'Demo');
+      storyDemoScanned = true;
+    }
+    await page.getByRole('button', { name: /^Next/ }).click();
+
+    // Guided tries (not individually a11y-scanned; deep-scanned scored exercises cover the UI).
+    for (const guided of lesson.guided) {
+      await expectKidTouchTarget(page, /Hint/);
+      if (isMoveCountedExercise(guided)) {
+        await expectKidTouchTarget(page, /Undo/);
+      }
+      await completeExercise(page, guided);
+    }
+
+    // Scored exercises: deep-scan the first occurrence of each not-yet-seen type.
+    for (const exercise of lesson.exercises) {
+      if (scannedTypes.has(exercise.type)) {
+        await completeExercise(page, exercise);
+      } else {
+        await deepScanExercise(page, exercise);
+        scannedTypes.add(exercise.type);
+      }
+    }
+
+    // Boss: deep-scan the first series boss mid-round, and the first static boss before solving.
+    if (lesson.boss) {
+      const boss: MiniGame = findMiniGame(lesson.boss);
+      if (boss.mode === 'series' && !seriesBossScanned) {
+        const [firstRound, ...restRounds] = boss.rounds;
+        if (!firstRound) throw new Error(`mini-game "${boss.id}" has no rounds`);
+        await completeExercise(page, firstRound);
+        await expectNoSeriousViolations(page, 'Boss (series, mid-round)');
+        for (const round of restRounds) {
+          await completeExercise(page, round);
+        }
+        await page.getByRole('button', { name: /^Next/ }).click();
+        seriesBossScanned = true;
+      } else if (boss.mode === 'static' && !staticBossScanned) {
+        await expectNoSeriousViolations(page, 'Boss (static)');
+        const goal = boss.goal === 'collect-stars' ? 'collect-stars' : 'capture';
+        await playSolveLine(page, boss.position, goal);
+        await page.getByRole('button', { name: /^Next/ }).click();
+        staticBossScanned = true;
+      } else {
+        await completeBoss(page, boss);
+      }
+    }
+
+    // Complete.
+    await expect(page.getByText('Lesson complete!')).toBeVisible();
+    if (!completeScanned) {
+      await expectKidTouchTarget(page, /Play again/);
+      await expectKidTouchTarget(page, /Continue/);
+      await expectNoSeriousViolations(page, 'Complete');
+      completeScanned = true;
+    }
+    await page.getByRole('button', { name: /Continue/ }).click();
+
+    if (enteringNewWorld) {
+      // A lesson opened from the Journey returns to the Journey, not Home, on Continue.
+      await page.getByRole('button', { name: /Back to Home/ }).click();
+    }
   }
 
-  // 5. An exercise (first scored one): full scan with the instruction/hint UI on screen.
-  const [first, second, third, ...rest] = lesson.exercises;
-  if (!first || !second || third?.type !== 'select-squares') {
-    throw new Error('rook lesson fixture shape changed: expected exercise 3 to be select-squares');
-  }
-  await expectKidTouchTarget(page, /Hint/);
-  await expectKidTouchTarget(page, /Undo/);
-  await expectKidTouchTarget(page, /Say it again/);
-  // With a hint note under the instruction the panel is at its tallest: targets must not shrink.
-  await page.getByRole('button', { name: /Hint/ }).click();
-  await expectKidTouchTarget(page, /Say it again/);
-  await expectKidTouchTarget(page, /Hint/);
-  await expectNoSeriousViolations(page, 'Exercise');
-  await completeExercise(page, first);
-  await completeExercise(page, second);
-
-  // 6. Select-squares, including a wrong pick (orange note, never red — non-functional.md §2).
-  await clickSquare(page, 'e5'); // not a legal rook move from d4: a wrong pick
-  await expectKidTouchTarget(page, /Check/);
-  await page.getByRole('button', { name: /Check/ }).click();
-  await expect(page.getByText('Not quite! Look at the orange squares.')).toBeVisible();
-  await expectNoSeriousViolations(page, 'Select-squares (wrong)');
-  await clickSquare(page, 'e5'); // deselect the wrong pick
-  for (const square of selectSquaresAnswer(third)) {
-    await clickSquare(page, square);
-  }
-  await page.getByRole('button', { name: /Check/ }).click();
-  await page.getByRole('button', { name: /^Next/ }).click();
-
-  for (const exercise of rest) {
-    await completeExercise(page, exercise);
-  }
-
-  // 7. Boss.
-  await expectNoSeriousViolations(page, 'Boss');
-  await completeBoss(page, boss);
-
-  // 8. Complete.
-  await expect(page.getByText('Lesson complete!')).toBeVisible();
-  await expectKidTouchTarget(page, /Play again/);
-  await expectKidTouchTarget(page, /Continue/);
-  await expectNoSeriousViolations(page, 'Complete');
+  expect([...scannedTypes].sort(), 'every exercise type in content got a deep scan').toEqual(
+    [...wantedTypes].sort(),
+  );
+  expect(seriesBossScanned, 'a series boss got a mid-round scan').toBe(true);
+  expect(staticBossScanned, 'a static boss got a scan').toBe(true);
+  expect(completeScanned, 'the Complete step got a scan').toBe(true);
 });

@@ -17,6 +17,8 @@ export type {
   LessonDemo,
   Lesson,
   MiniGame,
+  StaticMiniGame,
+  SeriesMiniGame,
   CompiledContent,
 } from './domain/lesson.ts';
 export type { Stars, LessonProgress, Attempt, LessonStatus } from './domain/progress.ts';
@@ -146,6 +148,8 @@ export type {
   MiniGameGoal,
   GameState,
   GameOutcome,
+  SeriesGameDef,
+  SeriesGameState,
 } from './domain/exercise/index.ts';
 export {
   startExercise,
@@ -166,6 +170,11 @@ export {
   playGameMove,
   gameResult,
   gameStars,
+  startSeries,
+  currentRound,
+  completeRound,
+  seriesResult,
+  seriesStars,
 } from './domain/exercise/index.ts';
 
 // Variant game rules (standard chess and kingless mini-games, played against the bot below) and

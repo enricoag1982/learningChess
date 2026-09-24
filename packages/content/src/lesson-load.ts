@@ -6,6 +6,7 @@ import type {
   ChoiceOption,
   CollectStarsDef,
   CompiledContent,
+  DemoHighlight,
   ExerciseDef,
   Lesson,
   MiniGame,
@@ -24,7 +25,7 @@ import {
   parseFen,
 } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
-import type { ZodError } from 'zod';
+import type { z, ZodError } from 'zod';
 import { ContentError, type Locales } from './load.ts';
 import type { LocaleTree } from './schema.ts';
 import {
@@ -192,6 +193,15 @@ function compileExercises(
   return allOk ? compiled : null;
 }
 
+/** Parses a demo's `highlight` string (schema-validated) into a `DemoHighlight`. */
+function compileDemoHighlight(raw: string): DemoHighlight {
+  if (raw.startsWith('legal-moves ')) {
+    return { legalMovesFrom: raw.slice('legal-moves '.length) as Square };
+  }
+  const rest = raw.slice('squares'.length).trim();
+  return { squares: rest === '' ? [] : (rest.split(' ') as Square[]) };
+}
+
 function compileLessonFile(filePath: string, relPath: string, issues: string[]): Lesson | null {
   let raw: string;
   try {
@@ -234,8 +244,8 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
     demo: {
       position: demoPosition,
       textKey: `lessons:${data.demo.text}`,
-      // `demoSchema` already validated the "legal-moves <square>" shape.
-      highlight: { legalMovesFrom: data.demo.highlight.slice('legal-moves '.length) as Square },
+      // `demoSchema` already validated the "legal-moves <square>" / "squares [<sq> …]" shape.
+      highlight: compileDemoHighlight(data.demo.highlight),
     },
     guided,
     exercises,
@@ -267,12 +277,31 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
   }
   const data = result.data;
 
+  if (data.mode === 'series') {
+    const rounds = compileExercises(relPath, 'rounds', data.rounds, data.concept, issues);
+    if (rounds === null) {
+      return null;
+    }
+    return {
+      mode: 'series',
+      id: data.id,
+      concept: data.concept,
+      rounds,
+      errors3: data.errors3,
+      errors2: data.errors2,
+      titleKey: `lessons:${data.title}`,
+      goalKey: `lessons:${data.goal}`,
+      unlockAfter: data.unlockAfter,
+    };
+  }
+
   const position = compilePosition(relPath, 'board', data, issues);
   if (position === null) {
     return null;
   }
 
   return {
+    mode: 'static',
     id: data.id,
     concept: data.concept,
     position,
@@ -406,6 +435,12 @@ function checkOptimalMoves(
 }
 
 function checkMiniGame(miniGame: MiniGame, where: string, issues: string[]): void {
+  if (miniGame.mode === 'series') {
+    for (const [index, round] of miniGame.rounds.entries()) {
+      checkExerciseShape(round, `${where}: rounds[${String(index)}]`, issues);
+    }
+    return;
+  }
   const shared = {
     id: miniGame.id,
     concept: miniGame.concept,
@@ -546,21 +581,45 @@ function validateSemantics(
     claimId(minigame.id, where);
     checkTextKey(minigame.titleKey, locales, `${where}: title`, issues);
     checkTextKey(minigame.goalKey, locales, `${where}: goal`, issues);
-    if (!hasKidPiece(minigame.position)) {
-      issues.push(`${where}: side to move has no piece`);
-    }
     if (!lessonIds.has(minigame.unlockAfter)) {
       issues.push(`${where}: unlockAfter references unknown lesson "${minigame.unlockAfter}"`);
     }
+
+    if (minigame.mode === 'series') {
+      for (const [index, round] of minigame.rounds.entries()) {
+        const roundWhere = `${where}: rounds[${String(index)}]`;
+        claimId(round.id, roundWhere);
+        checkTextKey(round.textKey, locales, roundWhere, issues);
+        // setup rounds typically start from an empty board: no piece for the side to move yet.
+        if (round.type !== 'setup' && !hasKidPiece(round.position)) {
+          issues.push(`${roundWhere}: side to move has no piece`);
+        }
+      }
+    } else if (!hasKidPiece(minigame.position)) {
+      issues.push(`${where}: side to move has no piece`);
+    }
+
     checkMiniGame(minigame, where, issues);
   }
 }
 
+/**
+ * One issue, formatted `<file>: <path>: <message>`. A mini-game's `mode` makes its schema a union
+ * (static / series): an invalid document fails both branches, so `invalid_union` is flattened into
+ * every branch's own issues instead of one generic "invalid input" line.
+ */
+function formatZodIssue(relPath: string, issue: z.core.$ZodIssue): string[] {
+  if (issue.code === 'invalid_union') {
+    return issue.errors.flatMap((branchIssues) =>
+      branchIssues.flatMap((branchIssue) => formatZodIssue(relPath, branchIssue)),
+    );
+  }
+  const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
+  return [`${relPath}: ${path}: ${issue.message}`];
+}
+
 function formatZodIssues(relPath: string, error: ZodError): string[] {
-  return error.issues.map((issue) => {
-    const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
-    return `${relPath}: ${path}: ${issue.message}`;
-  });
+  return error.issues.flatMap((issue) => formatZodIssue(relPath, issue));
 }
 
 function readEntries(dir: string, issues: string[], description: string): string[] {

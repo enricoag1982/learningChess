@@ -16,8 +16,7 @@ const catalog = rawTracks as unknown as TracksCatalog;
 /**
  * The Journey's very first lesson for a brand-new profile (no progress, nothing unlocked) — the
  * same `nextLesson` the app's store calls via `loadJourney`. Computed from the bundled content so
- * this spec stays correct whichever lesson that turns out to be (currently the Rook; World 1 has
- * no lessons yet, so it is skipped as "coming soon" and World 2's first lesson is offered).
+ * this spec stays correct whichever lesson that turns out to be (currently World 1's Squares).
  */
 function firstJourneyLesson(): Lesson {
   const lesson = nextLesson(catalog, content.lessons, []);

@@ -1,0 +1,117 @@
+id: squares
+world: board
+order: 1
+concept: board-squares
+character: owl
+title: squares.title
+story: squares.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . K . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: squares.demo
+  highlight: squares a1 h1
+guided:
+  - id: squares-g1
+    type: yes-no
+    text: squares-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . K
+    answer: 'yes'
+    focus: h1
+  - id: squares-g2
+    type: yes-no
+    text: squares-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    answer: 'no'
+    focus: a1
+exercises:
+  - id: squares-01
+    type: yes-no
+    text: squares-01
+    board: |
+      . . . . . . . K
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: h8
+  - id: squares-02
+    type: yes-no
+    text: squares-02
+    board: |
+      K . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: a8
+  - id: squares-03
+    type: yes-no
+    text: squares-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: e4
+  - id: squares-04
+    type: select-squares
+    text: squares-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [b1, d1, f1, h1]
+  - id: squares-05
+    type: select-squares
+    text: squares-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a1, c1, e1, g1]

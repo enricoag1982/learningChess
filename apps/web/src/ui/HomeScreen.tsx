@@ -3,7 +3,8 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { lessonStatus, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { avatarName, characterName } from '../content-text.ts';
+import { avatarName, characterName, tContent } from '../content-text.ts';
+import { characterPieceOrNull } from './art/character-meta.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { RankPill } from './RankPill.tsx';
@@ -96,7 +97,9 @@ export function HomeScreen(): JSX.Element {
       ? t('home.owl-all-done')
       : isResuming
         ? t('home.owl-resume')
-        : t('home.owl-next', { character: characterName(t, next.character) });
+        : characterPieceOrNull(next.character) === null
+          ? t('home.owl-next-topic', { topic: tContent(t, next.titleKey) })
+          : t('home.owl-next', { character: characterName(t, next.character) });
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {

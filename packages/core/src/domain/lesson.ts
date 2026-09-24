@@ -2,10 +2,12 @@ import type { Position, Square } from './chess/types.ts';
 import type { StaticCaptureGameDef } from './exercise/minigame.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 
-/** A demo's legal-move highlight: every square one piece can reach from `legalMovesFrom`. */
-export interface DemoHighlight {
-  readonly legalMovesFrom: Square;
-}
+/**
+ * A demo's board highlight: every square one piece can reach from `legalMovesFrom` (most lessons),
+ * or an explicit list of `squares` (World 1: a row/column/diagonal, a corner, or nothing at all).
+ */
+export type DemoHighlight =
+  { readonly legalMovesFrom: Square } | { readonly squares: readonly Square[] };
 
 /** Legal-moves demo shown before the guided tries. */
 export interface LessonDemo {
@@ -34,13 +36,33 @@ export interface Lesson {
   readonly boss?: string;
 }
 
-/** Mini-game content: a static-capture game plus its lesson-facing text and unlock rule. */
-export interface MiniGame extends StaticCaptureGameDef {
+/** Fields every mini-game's content shares, regardless of `mode`. */
+interface MiniGameBase {
   readonly titleKey: string;
   readonly goalKey: string;
   /** Lesson id that unlocks this mini-game. */
   readonly unlockAfter: string;
 }
+
+/** Static-opponent mini-game (Hungry Piece, Knight Maze, King Walk, …): unchanged since M1.2. */
+export interface StaticMiniGame extends StaticCaptureGameDef, MiniGameBase {
+  readonly mode: 'static';
+}
+
+/** Series mini-game (Square Hunt, Setup Race, and M3's Safe or Not? / Escape the Check / …). */
+export interface SeriesMiniGame extends MiniGameBase {
+  readonly mode: 'series';
+  readonly id: string;
+  readonly concept: string;
+  readonly rounds: readonly ExerciseDef[];
+  /** Total mistakes (errors + hint levels) across all rounds at/under which the boss earns 3 stars. */
+  readonly errors3: number;
+  /** …2 stars threshold; `errors2 >= errors3`. */
+  readonly errors2: number;
+}
+
+/** Mini-game content: `static` (existing capture-all / collect-stars) or `series` (M2.4). */
+export type MiniGame = StaticMiniGame | SeriesMiniGame;
 
 /** Whole compiled content bundle written to `content.json`. */
 export interface CompiledContent {

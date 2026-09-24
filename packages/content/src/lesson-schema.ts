@@ -29,12 +29,16 @@ function checkExactlyOnePosition(
   }
 }
 
-/** A lesson's demo: position, spoken text, and the square whose legal moves are highlighted. */
+/**
+ * A lesson's demo: position, spoken text, and its board highlight — either `legal-moves <square>`
+ * (most lessons: every square that piece can reach) or `squares [<sq> …]` (World 1: an explicit
+ * list, e.g. a row/diagonal or a corner; zero squares highlights nothing).
+ */
 export const demoSchema = z
   .object({
     ...positionFields,
     text: textRefSchema,
-    highlight: z.string().regex(/^legal-moves [a-h][1-8]$/),
+    highlight: z.string().regex(/^legal-moves [a-h][1-8]$|^squares(?: [a-h][1-8])*$/),
   })
   .strict()
   .superRefine(checkExactlyOnePosition);
@@ -207,18 +211,24 @@ export const lessonSchema = z
 
 export type LessonYaml = z.infer<typeof lessonSchema>;
 
+const miniGameCommonFields = {
+  id: keySchema,
+  concept: keySchema,
+  unlockAfter: keySchema,
+  title: textRefSchema,
+  goal: textRefSchema,
+};
+
 /**
- * One mini-game file (`minigames/<id>.yaml`). `type` is the win condition (`capture-all`, the
- * default, or `collect-stars`); `goal` is the spoken-text key for the goal line shown in-game — two
- * different things that happen to share the English word "goal".
+ * A `static` mini-game (default `mode`, back-compat with every file authored before M2.4): `type`
+ * is the win condition (`capture-all`, the default, or `collect-stars`); `goal` is the spoken-text
+ * key for the goal line shown in-game — two different things that happen to share the English word
+ * "goal".
  */
-export const miniGameSchema = z
+const staticMiniGameSchema = z
   .object({
-    id: keySchema,
-    concept: keySchema,
-    unlockAfter: keySchema,
-    title: textRefSchema,
-    goal: textRefSchema,
+    ...miniGameCommonFields,
+    mode: z.literal('static').optional(),
     type: z.enum(['capture-all', 'collect-stars']).optional(),
     ...positionFields,
     par: z.number().int().positive(),
@@ -227,4 +237,33 @@ export const miniGameSchema = z
   .strict()
   .superRefine(checkExactlyOnePosition);
 
+/**
+ * A `series` mini-game (Square Hunt, Setup Race, M3's Safe or Not? / …): a fixed sequence of
+ * `rounds`, each an exercise of any type (validated the same way as a lesson's own exercises),
+ * scored on total mistakes (errors + hint levels) across every round.
+ */
+const seriesMiniGameSchema = z
+  .object({
+    ...miniGameCommonFields,
+    mode: z.literal('series'),
+    rounds: z.array(exerciseSchema).min(1),
+    errors3: z.number().int().nonnegative(),
+    errors2: z.number().int().nonnegative(),
+  })
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.errors2 < value.errors3) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['errors2'],
+        message: '"errors2" must be >= "errors3"',
+      });
+    }
+  });
+
+/** One mini-game file (`minigames/<id>.yaml`), `static` or `series` (`mode`, default `static`). */
+export const miniGameSchema = z.union([staticMiniGameSchema, seriesMiniGameSchema]);
+
 export type MiniGameYaml = z.infer<typeof miniGameSchema>;
+export type StaticMiniGameYaml = z.infer<typeof staticMiniGameSchema>;
+export type SeriesMiniGameYaml = z.infer<typeof seriesMiniGameSchema>;

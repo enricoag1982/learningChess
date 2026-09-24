@@ -13,7 +13,7 @@ import type {
 import { lessonStars, worldLessons } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';
-import { characterPiece } from './art/character-meta.ts';
+import { characterPieceOrNull } from './art/character-meta.ts';
 import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { useMediaQuery } from './useMediaQuery.ts';
@@ -204,9 +204,11 @@ export function JourneyScreen(): JSX.Element {
       const index = lessons.findIndex((entry) => entry.id === lesson.id);
       const previous = index > 0 ? lessons[index - 1] : undefined;
       if (!previous) return;
-      const name = isWorldOne(world)
-        ? tContent(t, 'characters:owl.name')
-        : characterName(t, previous.character);
+      // Owl-taught lessons (no piece character) are named by their title.
+      const name =
+        characterPieceOrNull(previous.character) === null
+          ? tContent(t, previous.titleKey)
+          : characterName(t, previous.character);
       const message = tContent(t, 'journey:ui.finish-first', { name });
       setLockedMessage(message);
       services.narrator.cancel();
@@ -479,14 +481,17 @@ function LessonNode({
   const rating = status === 'complete' ? ratingStars(earned, max) : 0;
   const bossWon = (progress?.bossStars ?? 0) >= 2;
 
-  const characterLabel = isWorldOne
-    ? tContent(t, 'characters:owl.name')
-    : characterName(t, lesson.character);
-  const pieceLabel = tContent(t, `piece.${characterPiece(lesson.character)}`);
-  const nameLabel = tContent(t, 'journey:ui.character-piece', {
-    character: characterLabel,
-    piece: pieceLabel,
-  });
+  // Owl-taught lessons (World 1: no piece character) are labelled by their title, e.g. "Squares".
+  const piece = characterPieceOrNull(lesson.character);
+  const characterLabel =
+    piece === null ? tContent(t, lesson.titleKey) : characterName(t, lesson.character);
+  const nameLabel =
+    piece === null
+      ? characterLabel
+      : tContent(t, 'journey:ui.character-piece', {
+          character: characterLabel,
+          piece: tContent(t, `piece.${piece}`),
+        });
   const statusWord = tContent(t, `journey:ui.status-${status}`);
   const accessibleName =
     status === 'complete'
@@ -536,7 +541,7 @@ function LessonNode({
           </span>
         )}
       </button>
-      <span className="max-w-[7rem] truncate rounded-full bg-white px-2 py-0.5 text-xs font-extrabold text-ink">
+      <span className="max-w-[8rem] rounded-2xl bg-white px-2 py-0.5 text-center text-xs leading-tight font-extrabold text-ink">
         {characterLabel}
       </span>
       {status === 'complete' && <StarsRow earned={rating} size="1rem" />}

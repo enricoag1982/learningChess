@@ -39,3 +39,12 @@ export function useMediaQuery(query: string): boolean {
 export function useIsCompact(): boolean {
   return !useMediaQuery('(min-width: 640px)');
 }
+
+/**
+ * Below Tailwind's `lg` breakpoint (1024px): `GameLayout` stacks the board over the panel (phone
+ * and iPad portrait) instead of placing them side by side. In a jsdom test (no `matchMedia`) this
+ * defaults to `true`, matching a stacked layout.
+ */
+export function useIsStackedLayout(): boolean {
+  return !useMediaQuery('(min-width: 1024px)');
+}

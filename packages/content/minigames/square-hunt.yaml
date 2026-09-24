@@ -1,0 +1,87 @@
+id: square-hunt
+concept: board-lines
+unlockAfter: lines
+mode: series
+title: square-hunt.title
+goal: square-hunt.goal
+errors3: 1
+errors2: 3
+rounds:
+  - id: square-hunt-r1
+    type: select-squares
+    text: square-hunt-r1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a5, b5, c5, d5, e5, f5, g5, h5]
+  - id: square-hunt-r2
+    type: select-squares
+    text: square-hunt-r2
+    board: |
+      . . . . . . . .
+      . . K . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [c1, c2, c3, c4, c5, c6, c7, c8]
+  - id: square-hunt-r3
+    type: select-squares
+    text: square-hunt-r3
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a3, b3, c3, d3, e3, f3, g3, h3]
+  - id: square-hunt-r4
+    type: select-squares
+    text: square-hunt-r4
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+    answer: [g1, g2, g3, g4, g5, g6, g7, g8]
+  - id: square-hunt-r5
+    type: select-squares
+    text: square-hunt-r5
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . K . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a1, b2, c3, d4, e5, f6, g7, h8]
+  - id: square-hunt-r6
+    type: select-squares
+    text: square-hunt-r6
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . K . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [h1, g2, f3, e4, d5, c6, b7, a8]

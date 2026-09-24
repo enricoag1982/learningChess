@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { starsFor } from '../domain/exercise/engine.ts';
-import type { GameState } from '../domain/exercise/minigame.ts';
-import { gameStars } from '../domain/exercise/minigame.ts';
+import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
+import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
 import type { ExerciseDef, CaptureDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
@@ -100,9 +100,25 @@ function gameState(id: string, overrides: Partial<GameState> = {}): GameState {
     stars2: 2,
   };
   return {
+    mode: 'static',
     def,
     exercise: exerciseState(captureDef),
     ended: false,
+    ...overrides,
+  };
+}
+
+function seriesGameState(id: string, overrides: Partial<SeriesGameState> = {}): SeriesGameState {
+  const round1: ExerciseDef = makeExercise(`${id}-r1`);
+  const round2: ExerciseDef = makeExercise(`${id}-r2`);
+  const def = { id, concept: 'rook-move', rounds: [round1, round2], errors3: 1, errors2: 3 };
+  return {
+    mode: 'series',
+    def,
+    roundIndex: 0,
+    round: exerciseState(round1),
+    mistakes: 0,
+    done: false,
     ...overrides,
   };
 }
@@ -421,6 +437,41 @@ describe('recordBossResult', () => {
       stars: 3,
       moves: 2,
       durationMs: 4000,
+    });
+  });
+
+  it('records a series boss attempt (total mistakes across rounds), raising bossStars', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson({ boss: 'square-hunt' });
+    const state = seriesGameState('square-hunt', {
+      roundIndex: 1,
+      mistakes: 1,
+      done: true,
+      round: exerciseState(makeExercise('square-hunt-r2'), { solved: true }),
+    });
+    expect(seriesStars(state)).toBe(3);
+
+    const progress = await recordBossResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      durationMs: 9000,
+      nextStep: 8,
+    });
+
+    expect(progress.bossStars).toBe(3);
+    expect(progress.resumeStep).toBe(8);
+
+    const [attempt] = await deps.progress.listAttempts('profile-1');
+    expect(attempt).toMatchObject({
+      exerciseId: 'square-hunt',
+      conceptId: 'rook-move',
+      scored: true,
+      correct: false,
+      stars: 3,
+      errors: 1,
+      moves: 2,
+      durationMs: 9000,
     });
   });
 });
