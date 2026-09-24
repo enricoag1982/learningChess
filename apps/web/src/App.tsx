@@ -5,6 +5,7 @@ import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
 import { HomeScreen } from './ui/HomeScreen.tsx';
+import { JourneyScreen } from './ui/JourneyScreen.tsx';
 import { LessonScreen } from './ui/LessonScreen.tsx';
 import { NewPlayerScreen } from './ui/NewPlayerScreen.tsx';
 import { ParentAreaScreen } from './ui/ParentAreaScreen.tsx';
@@ -28,6 +29,8 @@ function Screens(): JSX.Element {
       return <LessonScreen />;
     case 'home':
       return <HomeScreen />;
+    case 'journey':
+      return <JourneyScreen />;
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.

@@ -1,5 +1,6 @@
-import type { CompiledContent, ContentSource } from '@chess-kids/core';
+import type { CompiledContent, ContentSource, TracksCatalog } from '@chess-kids/core';
 import bundled from '@chess-kids/content/content.json';
+import bundledTracks from '@chess-kids/content/tracks.json';
 
 /**
  * The only place the raw JSON import is treated as `CompiledContent`: the content build
@@ -7,6 +8,9 @@ import bundled from '@chess-kids/content/content.json';
  * conversion, not a runtime check.
  */
 const content = bundled as unknown as CompiledContent;
+
+/** Same conversion as `content` above, for `packages/content/tracks.yaml`'s compiled output. */
+const tracks = bundledTracks as unknown as TracksCatalog;
 
 /** `ContentSource` over the content package's build-time compiled bundle. */
 export function createBundledContentSource(): ContentSource {
@@ -18,5 +22,6 @@ export function createBundledContentSource(): ContentSource {
     lesson: (id: string) => lessonsById.get(id),
     minigames: () => content.minigames,
     minigame: (id: string) => minigamesById.get(id),
+    catalog: () => tracks,
   };
 }

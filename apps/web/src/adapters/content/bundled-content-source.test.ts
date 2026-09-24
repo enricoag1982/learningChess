@@ -19,4 +19,15 @@ describe('createBundledContentSource', () => {
     expect(content.minigame('hungry-rook')?.id).toBe('hungry-rook');
     expect(content.minigame('does-not-exist')).toBeUndefined();
   });
+
+  it('exposes the tracks/worlds/ranks catalog from the compiled tracks bundle', () => {
+    const content = createBundledContentSource();
+
+    const catalog = content.catalog?.();
+    expect(catalog).toBeDefined();
+    const basics = catalog?.tracks.find((track) => track.kind === 'main');
+    expect(basics?.id).toBe('basics');
+    expect(basics?.worlds.map((world) => world.id)).toContain('pieces');
+    expect(catalog?.ranks.map((rank) => rank.id)).toContain('pawn');
+  });
 });

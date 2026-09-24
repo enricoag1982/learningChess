@@ -9,23 +9,25 @@ import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test
 
 afterEach(cleanup);
 
-/** The real (bundled) Rook lesson content, with test adapters otherwise (fake password writer). */
+/** The real (bundled) content, with test adapters otherwise (fake password writer). */
 function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
   return createTestServices(createBundledContentSource());
 }
 
 describe('HomeScreen', () => {
-  it('new lesson: Owl greets by character, primary button says Start', async () => {
+  it('new lesson: Owl greets by character, primary button says Start today', async () => {
     const services = createServicesWithRealContent();
     await seedReturningProfile(services, 'Mia');
     render(<App services={services} />);
     await pickProfileFromPicker('Mia');
 
-    await screen.findByText("Hi! I'm Owl. Today you meet Rhino!");
-    expect(screen.getByRole('button', { name: /Start/ })).toBeTruthy();
+    await screen.findByText('Today you meet Rhino!');
+    expect(screen.getByRole('button', { name: /Start today/ })).toBeTruthy();
+    // Rank pill shows the starting rank.
+    expect(screen.getByText('Pawn rank')).toBeTruthy();
   });
 
-  it('in-progress lesson: Owl welcomes back, primary button says Continue', async () => {
+  it('in-progress lesson: Owl invites to keep going, primary button says Continue', async () => {
     const services = createServicesWithRealContent();
     const profile = await seedReturningProfile(services, 'Mia');
     const saved = await getLessonProgress(services.deps, profile.id, 'rook');
@@ -34,26 +36,27 @@ describe('HomeScreen', () => {
     render(<App services={services} />);
     await pickProfileFromPicker('Mia');
 
-    await screen.findByText("Welcome back! Let's keep going.");
+    await screen.findByText("Let's keep going!");
     expect(screen.getByRole('button', { name: /Continue/ })).toBeTruthy();
   });
 
-  it('complete lesson: Owl invites a replay, primary button says Play again', async () => {
+  it('every lesson done: Owl says so, no primary button', async () => {
     const services = createServicesWithRealContent();
     const profile = await seedReturningProfile(services, 'Mia');
-    const lesson = services.deps.content.lesson('rook');
-    if (!lesson) throw new Error('rook lesson missing from bundled content');
-    const saved = await getLessonProgress(services.deps, profile.id, lesson.id);
-    const bestStars = Object.fromEntries(
-      lesson.exercises.map((exercise) => [exercise.id, 1 as const]),
-    );
-    await services.deps.progress.saveLesson({ ...saved, bestStars });
+    for (const lesson of services.deps.content.lessons()) {
+      const saved = await getLessonProgress(services.deps, profile.id, lesson.id);
+      const bestStars = Object.fromEntries(
+        lesson.exercises.map((exercise) => [exercise.id, 3 as const]),
+      );
+      await services.deps.progress.saveLesson({ ...saved, bestStars });
+    }
 
     render(<App services={services} />);
     await pickProfileFromPicker('Mia');
 
-    await screen.findByText("You finished Rhino's lesson! Want to play again?");
-    expect(screen.getByRole('button', { name: /Play again/ })).toBeTruthy();
+    await screen.findByText('You finished everything for now. Come back soon for more!');
+    expect(screen.queryByRole('button', { name: /Start today/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Continue/ })).toBeNull();
   });
 
   it('switch-player button returns to the picker', async () => {
@@ -65,5 +68,16 @@ describe('HomeScreen', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Switch player' }));
 
     await screen.findByRole('heading', { name: "Who's playing today?" });
+  });
+
+  it('Journey tile opens the Journey screen', async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
+
+    await screen.findByRole('button', { name: /Back to Home/ });
   });
 });

@@ -44,7 +44,8 @@ describe('App', () => {
     await screen.findByText('+3 stars');
     fireEvent.click(screen.getByRole('button', { name: /Continue/ }));
 
-    await screen.findByRole('button', { name: /Play again/ });
+    // Back at Home: the fixture's only lesson is done, so the Journey has nothing left to offer.
+    await screen.findByText('You finished everything for now. Come back soon for more!');
     expect(container.querySelector('[aria-label="3 stars"]')).not.toBeNull();
   });
 });

@@ -32,3 +32,18 @@ ui:
   coming-soon: Coming soon
   locked: Locked
   show-you-know-it: Show you know it
+  back: Back to Home
+  rank-pill: '{{rank}} rank'
+  world-heading: 'World {{order}} · {{name}}'
+  world-stars: '{{earned}} of {{max}} stars'
+  paths-after-basics: Paths after Basics
+  locked-world-message: Finish the earlier worlds first to unlock this one.
+  coming-soon-title: Coming soon!
+  coming-soon-message: More lessons are on their way here.
+  finish-first: 'Finish {{name}} first!'
+  character-piece: '{{character}} the {{piece}}'
+  node-name: '{{name}}, {{status}}'
+  node-name-stars: '{{name}}, {{status}}, {{count}} stars'
+  status-current: current
+  status-complete: complete
+  status-locked: locked
