@@ -2,7 +2,7 @@
 
 Related: [roadmap.md](roadmap.md), [../CONTRIBUTING.md](../CONTRIBUTING.md).
 
-Every merged iteration gets an annotated tag `m<N>.<i>` (milestone done: `m<N>`). Tag message = scope + checks run (IDs below) + result; details logged in §2.
+Every merged iteration gets an annotated tag `m<N>.<i>` (milestone done: also `m<N>`), created on merge by `.github/workflows/tag.yml`. Tag message = the tag's row in §2: scope, checks run (IDs below), notes.
 
 ## 1. Checks
 
