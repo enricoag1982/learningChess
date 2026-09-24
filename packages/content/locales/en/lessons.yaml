@@ -1,0 +1,19 @@
+rook:
+  title: Meet Rhino the Rook
+  story: >-
+    Rhino loves charging straight ahead! He runs up, down, left, or right, as far
+    as he wants. He can never jump over another piece.
+  demo: Watch Rhino run to every green dot. Straight lines, any distance!
+rook-g1: Move Rhino straight up to the star.
+rook-g2: Move Rhino straight across to the star.
+rook-01: Help Rhino grab both stars in the corners.
+rook-02: Collect every star. Plan Rhino's path first!
+rook-03: Tap every square Rhino can reach from here.
+rook-04: A rock blocks the way! Find another path to the star.
+rook-05: Rhino is hungry. Gobble up the pawn!
+rook-06: A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.
+rook-07: Three pawns, three captures. Get them all!
+rook-08: Rhino's biggest challenge yet. Collect every star around the rock.
+hungry-rook:
+  title: Hungry Rook
+  goal: Rhino is starving! Capture every piece before the moves run out.

@@ -1,0 +1,16 @@
+id: hungry-rook
+concept: rook-move
+unlockAfter: rook
+title: hungry-rook.title
+goal: hungry-rook.goal
+board: |
+  n . . p . . . b
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . R . . . p
+  . . . . . . . .
+  . . . . . . . .
+  p . . p . . . n
+par: 7
+moveLimit: 17
