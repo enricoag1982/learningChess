@@ -1,5 +1,10 @@
 import { expect, test } from '@playwright/test';
-import { completeExercise, findLesson } from './helpers.ts';
+import {
+  completeExercise,
+  completeFirstRun,
+  findLesson,
+  pickProfileFromPicker,
+} from './helpers.ts';
 
 test('plays a guided try and an exercise fully offline, with progress saved', async ({
   page,
@@ -11,11 +16,13 @@ test('plays a guided try and an exercise fully offline, with progress saved', as
     throw new Error('rook lesson fixture needs at least one guided try and one exercise');
   }
 
-  await page.goto('/');
+  await completeFirstRun(page, 'Kid');
   await expect(page.getByText('Ready to play offline.')).toBeVisible({ timeout: 15_000 });
 
   await context.setOffline(true);
   await page.reload();
+  await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+  await pickProfileFromPicker(page, 'Kid');
 
   await page.getByRole('button', { name: /Start/ }).click();
   await page.getByRole('button', { name: /Let me try/ }).click(); // Story -> Demo
@@ -33,5 +40,7 @@ test('plays a guided try and an exercise fully offline, with progress saved', as
   await expect(starsPill).toHaveAttribute('aria-label', /^(?!0 stars$).+/);
 
   await page.reload();
+  await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+  await pickProfileFromPicker(page, 'Kid');
   await expect(starsPill).toHaveAttribute('aria-label', /^(?!0 stars$).+/);
 });

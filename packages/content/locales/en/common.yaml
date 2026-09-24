@@ -18,7 +18,80 @@ home:
   owl-in-progress: Welcome back! Let's keep going.
   owl-done: "You finished {{name}}'s lesson! Want to play again?"
   start: Start
-  avatar-alt: Fox avatar
+  avatar-alt: '{{name}} avatar'
+  switch-player: Switch player
+avatar:
+  fox: Fox
+  bear: Bear
+  rabbit: Rabbit
+  cat: Cat
+  panda: Panda
+  penguin: Penguin
+  frog: Frog
+  elephant: Elephant
+first-run:
+  welcome:
+    owl: A grown-up helps set things up first.
+    primary: Start setup
+  password:
+    title: Set a parent password
+    body: "You'll need this to open the parent area later."
+    label: Password
+    repeat-label: Repeat password
+    show: Show
+    hide: Hide
+    rules: At least 4 characters. Numbers are OK.
+    mismatch: Passwords do not match.
+    too-short: Use at least 4 characters.
+    primary: Save password
+  saved:
+    title: Password saved!
+    body: 'Saved a copy: {{location}}'
+    download-again: Download again
+    primary: Next
+new-player:
+  nickname:
+    title: What is your name?
+    placeholder: Your name
+    invalid: Use 1-12 letters or numbers.
+    primary: Next
+  avatar:
+    title: Pick your animal!
+    primary: Let's play!
+picker:
+  title: "Who's playing today?"
+  new-player: New player
+  grown-ups: Grown-ups
+  grown-ups-hint: Parent password
+password-screen:
+  title: Grown-ups
+  label: Password
+  primary: Open
+  back: Back
+  forgot: 'Forgot it? It is in the file {{location}}.'
+  wrong: 'Wrong password ({{attempt}} of {{max}})'
+  locked: 'Try again in {{time}}'
+parent:
+  title: Parent area
+  done: Done
+  children: Children
+  add-child: Add child
+  stars-total_one: '{{count}} star'
+  stars-total_other: '{{count}} stars'
+  lessons-complete_one: '{{count}} lesson complete'
+  lessons-complete_other: '{{count}} lessons complete'
+  rename: Rename
+  rename-label: Nickname
+  change-avatar: Change avatar
+  delete: Delete
+  delete-confirm-title: 'Delete {{name}} and all progress?'
+  delete-confirm-body: This removes all saved progress for this child. This cannot be undone.
+  delete-cancel: Cancel
+  delete-confirm: Delete
+  change-password: Change password
+  new-password-label: New password
+  save: Save
+  cancel: Cancel
 lesson:
   close: Close lesson
   steps:

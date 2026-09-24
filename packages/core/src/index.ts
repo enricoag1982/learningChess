@@ -1,4 +1,17 @@
 export type * from './domain/profile.ts';
+export { validateNickname, newProfile } from './domain/profile.ts';
+
+export type { Avatar } from './domain/avatars.ts';
+export { AVATARS, isAvatar } from './domain/avatars.ts';
+
+export type { ParentLock, CheckPasswordResult } from './domain/parent-lock.ts';
+export {
+  isValidPassword,
+  newParentLock,
+  changePassword,
+  checkPassword,
+} from './domain/parent-lock.ts';
+
 export type {
   DemoHighlight,
   LessonDemo,
@@ -23,6 +36,10 @@ export { lessonSteps, stepPhase } from './domain/lesson-session.ts';
 export type {
   ProfileRepository,
   ProgressRepository,
+  ParentLockRepository,
+  PasswordFileWriter,
+  AppSettings,
+  SettingsRepository,
   IdGenerator,
   Narrator,
   ContentSource,
@@ -34,13 +51,26 @@ export { v1FeatureFlags } from './app/ports.ts';
 
 export type { AppDeps, RecordExerciseResultInput, RecordBossResultInput } from './app/use-cases.ts';
 export {
-  ensureProfile,
   loadProgress,
   getLessonProgress,
   recordExerciseResult,
   recordBossResult,
   saveResumeStep,
 } from './app/use-cases.ts';
+
+export type { PasswordFileLocation, VerifyPasswordResult } from './app/profiles.ts';
+export {
+  isFirstRun,
+  setupParentPassword,
+  changeParentPassword,
+  verifyParentPassword,
+  listProfiles,
+  createProfile,
+  renameProfile,
+  changeAvatar,
+  deleteProfile,
+  selectProfile,
+} from './app/profiles.ts';
 
 export type {
   Color,

@@ -3,10 +3,13 @@ import { chessJsRules, createVariantRules } from '@chess-kids/core';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
+import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
+import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
 import { openLocalStore } from '../adapters/storage/local-store.ts';
 import type { Services } from '../app/services.ts';
+import { createFakePasswordFileWriter } from './fake-password-file-writer.ts';
 import { createMemoryStorage } from './memory-storage.ts';
 
 /**
@@ -26,6 +29,9 @@ export function createTestServices(
     clock: createSystemClock(),
     ids: createCryptoIds(),
     content,
+    parentLock: new LocalStorageParentLockRepository(store),
+    passwordFile: createFakePasswordFileWriter(),
+    settings: new LocalStorageSettingsRepository(store),
   };
 
   return {

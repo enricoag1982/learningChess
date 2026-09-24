@@ -29,6 +29,8 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Content text keys | Content ids are plain strings in core; UI resolves them through one helper (`tContent`); all other UI keys are type-checked |
 | Plural text | i18next plural suffixes (`_one`, `_other`, …) allowed on text leaves; languages compared by base key |
 | Layout | Tablet landscape: board left, panel right; below 1024 px wide: board on top, panel below; phone: one-row top bar with phase chip |
+| Profiles | App start: first run while no parent lock exists, else profile picker (last used first); avatars = 8 fixed animal ids; nickname 1–12 characters |
+| Parent lock | Plain-text password (kid-gate) in localStorage + downloaded copy `chess-for-kids-parent-password.txt`; lockout state persisted; `PasswordFileWriter` port (store apps: Documents file, M6) |
 | Web delivery | PWA (vite-plugin-pwa / Workbox) | Browser + home-screen install; everything precached, fully offline ([non-functional.md](non-functional.md)) |
 | Fonts | Self-hosted | Offline, no third-party requests |
 | Mobile | Capacitor (Android + iPad) | Same web app packaged for stores |

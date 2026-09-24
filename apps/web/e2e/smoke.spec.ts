@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { completeFirstRun, pickProfileFromPicker } from './helpers.ts';
 
 interface Manifest {
   readonly name: string;
@@ -11,7 +12,7 @@ test('loads the app shell with a valid manifest and no console errors', async ({
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
 
-  await page.goto('/');
+  await completeFirstRun(page, 'Mia');
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Chess for Kids' })).toBeVisible();
@@ -33,11 +34,14 @@ test('keeps showing the app once offline, after the service worker is ready', as
   page,
   context,
 }) => {
-  await page.goto('/');
+  await completeFirstRun(page, 'Mia');
   await expect(page.getByText('Ready to play offline.')).toBeVisible({ timeout: 15_000 });
 
   await context.setOffline(true);
   await page.reload();
 
+  // Every reload shows the picker first (app-structure.md §3), even offline (all local storage).
+  await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+  await pickProfileFromPicker(page, 'Mia');
   await expect(page.getByRole('heading', { level: 1, name: 'Chess for Kids' })).toBeVisible();
 });

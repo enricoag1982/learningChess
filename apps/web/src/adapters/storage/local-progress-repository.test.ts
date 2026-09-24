@@ -79,6 +79,23 @@ describe('LocalStorageProgressRepository — lesson progress', () => {
   });
 });
 
+describe('LocalStorageProgressRepository — deleteProfileData', () => {
+  it('removes lesson progress and attempts for the profile, leaving other profiles untouched', async () => {
+    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    await repo.saveLesson(makeProgress({ id: 'a', lessonId: 'rook' }));
+    await repo.saveLesson(makeProgress({ id: 'b', profileId: 'profile-2', lessonId: 'rook' }));
+    await repo.addAttempt(makeAttempt({ id: 'a1' }));
+    await repo.addAttempt(makeAttempt({ id: 'a2', profileId: 'profile-2' }));
+
+    await repo.deleteProfileData('profile-1');
+
+    expect(await repo.listLessons('profile-1')).toEqual([]);
+    expect(await repo.listAttempts('profile-1')).toEqual([]);
+    expect(await repo.listLessons('profile-2')).toHaveLength(1);
+    expect(await repo.listAttempts('profile-2')).toHaveLength(1);
+  });
+});
+
 describe('LocalStorageProgressRepository — attempts', () => {
   it('appends attempts newest last and filters by profile', async () => {
     const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));

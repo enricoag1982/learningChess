@@ -75,9 +75,41 @@ export async function completeBoss(page: Page, game: MiniGame): Promise<void> {
   await page.getByRole('button', { name: /^Next/ }).click();
 }
 
+/**
+ * Drives a fresh install through first run (Welcome → parent password → Saved → new player) up
+ * to Home. Every Playwright test starts with empty browser storage, so specs that just need Home
+ * or a lesson call this first instead of `page.goto('/')` directly (`profiles.spec.ts` is the one
+ * spec that exercises first run's own screens in detail).
+ */
+export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<void> {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Start setup' }).click();
+
+  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Repeat password').fill('1234');
+  await page.getByRole('button', { name: 'Save password' }).click();
+
+  await page.getByRole('button', { name: 'Next' }).click(); // Saved -> new player
+  await page.getByPlaceholder('Your name').fill(nickname);
+  await page.getByRole('button', { name: 'Next' }).click(); // nickname -> avatar
+  await page.getByRole('button', { name: "Let's play!" }).click();
+
+  await page.getByRole('heading', { level: 1, name: 'Chess for Kids' }).waitFor();
+}
+
+/**
+ * From the profile picker (a parent lock already exists), taps the tile named `nickname` and
+ * waits for Home. Every reload shows the picker again (app-structure.md §3), so specs that reload
+ * mid-flow call this to get back to Home.
+ */
+export async function pickProfileFromPicker(page: Page, nickname: string): Promise<void> {
+  await page.getByRole('button', { name: new RegExp(nickname) }).click();
+  await page.getByRole('heading', { level: 1, name: 'Chess for Kids' }).waitFor();
+}
+
 /** From Home, opens today's lesson and advances Story -> Demo -> first guided try. */
 export async function startLessonToFirstGuided(page: Page): Promise<void> {
-  await page.goto('/');
+  await completeFirstRun(page);
   await page.getByRole('button', { name: /Start/ }).click();
   await page.getByRole('button', { name: /Let me try/ }).click(); // Story -> Demo
   await page.getByRole('button', { name: /^Next/ }).click(); // Demo -> first guided try

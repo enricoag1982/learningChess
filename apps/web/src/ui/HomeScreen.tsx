@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { lessonStatus, totalStars } from '@chess-kids/core';
 import { pickCurrentLesson } from '../app/current-lesson.ts';
 import { useAppStore, useServices } from '../app/store.ts';
-import { characterName } from '../content-text.ts';
-import { FoxIcon } from './art/characters.tsx';
+import { avatarName, characterName } from '../content-text.ts';
+import { avatarBackground } from './art/avatar-meta.ts';
+import { AvatarIcon } from './art/avatars.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
@@ -19,6 +20,27 @@ function PlayIcon(): JSX.Element {
   );
 }
 
+function SwitchPlayerIcon(): JSX.Element {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+      <path d="M18 14a6 6 0 0 1 3.5 6" />
+    </svg>
+  );
+}
+
 /** Home: greeting, total stars, and the one primary action into today's lesson. */
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
@@ -26,6 +48,7 @@ export function HomeScreen(): JSX.Element {
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const startLesson = useAppStore((state) => state.startLesson);
+  const goToPicker = useAppStore((state) => state.goToPicker);
   const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
@@ -71,14 +94,27 @@ export function HomeScreen(): JSX.Element {
         <div className="flex items-center gap-3">
           <div
             role="img"
-            aria-label={t('home.avatar-alt')}
-            className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full bg-[#F9D9C2] p-2 sm:h-16 sm:w-16"
+            aria-label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
+            className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full p-2 sm:h-16 sm:w-16"
+            style={{ backgroundColor: avatarBackground(profile.avatar) }}
           >
-            <FoxIcon />
+            <AvatarIcon avatar={profile.avatar} />
           </div>
           <span className="font-display text-2xl text-ink sm:text-3xl">{profile.nickname}</span>
         </div>
-        <StarsPill count={stars} />
+        <div className="flex items-center gap-3">
+          <StarsPill count={stars} />
+          <button
+            type="button"
+            aria-label={t('home.switch-player')}
+            onClick={() => {
+              void goToPicker();
+            }}
+            className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          >
+            <SwitchPlayerIcon />
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col items-stretch justify-center gap-8 sm:flex-row sm:items-center">

@@ -5,6 +5,7 @@ import {
   clickSquare,
   completeBoss,
   completeExercise,
+  completeFirstRun,
   findLesson,
   findMiniGame,
   selectSquaresAnswer,
@@ -27,6 +28,71 @@ async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<
   expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(64);
 }
 
+/** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). */
+async function expectParentTouchTarget(page: Page, name: RegExp | string): Promise<void> {
+  const box = await page.getByRole('button', { name }).boundingBox();
+  expect(box, `no bounding box for button matching ${String(name)}`).not.toBeNull();
+  expect(box?.width ?? 0, `${String(name)} width`).toBeGreaterThanOrEqual(44);
+  expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(44);
+}
+
+test('onboarding and profile screens have no serious/critical violations and correctly sized touch targets', async ({
+  page,
+}) => {
+  // 1. First run: Welcome (kid style).
+  await page.goto('/');
+  await expectKidTouchTarget(page, 'Start setup');
+  await expectNoSeriousViolations(page, 'First run: Welcome');
+
+  // 2. First run: parent password (parent style).
+  await page.getByRole('button', { name: 'Start setup' }).click();
+  await expectParentTouchTarget(page, 'Save password');
+  await expectNoSeriousViolations(page, 'First run: Password');
+
+  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Repeat password').fill('1234');
+  await Promise.all([
+    page.waitForEvent('download'),
+    page.getByRole('button', { name: 'Save password' }).click(),
+  ]);
+
+  // 3. First run: Saved (parent style).
+  await expectParentTouchTarget(page, 'Next');
+  await expectNoSeriousViolations(page, 'First run: Saved');
+  await page.getByRole('button', { name: 'Next' }).click();
+
+  // 4. New player: nickname (kid style).
+  await expectKidTouchTarget(page, 'Next');
+  await expectNoSeriousViolations(page, 'New player: nickname');
+  await page.getByPlaceholder('Your name').fill('Mia');
+  await page.getByRole('button', { name: 'Next' }).click();
+
+  // 5. New player: avatar (kid style).
+  await expectKidTouchTarget(page, 'Fox');
+  await expectKidTouchTarget(page, "Let's play!");
+  await expectNoSeriousViolations(page, 'New player: avatar');
+  await page.getByRole('button', { name: "Let's play!" }).click();
+
+  // 6. Home's switch-player button, then the picker (kid style).
+  await expectKidTouchTarget(page, 'Switch player');
+  await page.getByRole('button', { name: 'Switch player' }).click();
+  await expectKidTouchTarget(page, 'Mia');
+  await expectKidTouchTarget(page, /Grown-ups/);
+  await expectNoSeriousViolations(page, 'Picker');
+
+  // 7. Password screen (parent style).
+  await page.getByRole('button', { name: /Grown-ups/ }).click();
+  await expectParentTouchTarget(page, 'Open');
+  await expectNoSeriousViolations(page, 'Password screen');
+
+  // 8. Parent area (parent style).
+  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByRole('button', { name: 'Open' }).click();
+  await expectParentTouchTarget(page, 'Add child');
+  await expectParentTouchTarget(page, 'Rename');
+  await expectNoSeriousViolations(page, 'Parent area');
+});
+
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
 }) => {
@@ -34,7 +100,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   const boss = findMiniGame(lesson.boss ?? '');
 
   // 1. Home.
-  await page.goto('/');
+  await completeFirstRun(page);
   await expectKidTouchTarget(page, /Start/);
   await expectNoSeriousViolations(page, 'Home');
 
