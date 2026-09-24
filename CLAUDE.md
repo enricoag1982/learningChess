@@ -39,7 +39,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 
 ## Status and next step
 
-- Done: M0 (`m0`), M1 (`m1`), M2 (`m2`), M3 (`m3`). Pending user actions: Settings → Pages → Source = GitHub Actions; playtests 1–3 (`docs/roadmap.md` §5).
+- Done: M0 (`m0`), M1 (`m1`), M2 (`m2`), M3 (`m3`). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–3 (`docs/roadmap.md` §5).
 - Next: M4 iterations `m4.1`–`m4.5` (`docs/roadmap.md` §3.1). Branch `m4-rules-play`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
@@ -60,4 +60,4 @@ Version notes (checked 2026-09-24):
 | zustand | 5.x | |
 | @playwright/test | 1.63.x | Cloud sandbox: use `executablePath: /opt/pw-browsers/chromium` locally (preinstalled chromium-1194); CI installs its own browser |
 
-GitHub Pages: free plan needs a public repo; user must set Pages source to "GitHub Actions" in repo settings.
+GitHub Pages: free plan needs a public repo; Pages source = GitHub Actions (set 2026-09-24).
