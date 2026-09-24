@@ -1,0 +1,17 @@
+id: knight-maze
+concept: knight-move
+unlockAfter: knight
+title: knight-maze.title
+goal: knight-maze.goal
+type: collect-stars
+board: |
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . * x x x * . .
+  . . x N x . . .
+  . * x x x * . .
+  . . . . . . . .
+  . . . . . . . .
+par: 7
+moveLimit: 13

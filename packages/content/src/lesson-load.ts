@@ -276,6 +276,7 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
     id: data.id,
     concept: data.concept,
     position,
+    goal: data.type ?? 'capture-all',
     par: data.par,
     moveLimit: data.moveLimit,
     titleKey: `lessons:${data.title}`,
@@ -405,16 +406,23 @@ function checkOptimalMoves(
 }
 
 function checkMiniGame(miniGame: MiniGame, where: string, issues: string[]): void {
-  const asCapture: CaptureDef = {
+  const shared = {
     id: miniGame.id,
     concept: miniGame.concept,
     textKey: miniGame.titleKey,
     position: miniGame.position,
-    type: 'capture',
     stars3: miniGame.par,
     stars2: miniGame.par,
-  };
-  const optimal = optimalMoves(asCapture, rules);
+  } as const;
+  const asExercise: CaptureDef | CollectStarsDef =
+    (miniGame.goal ?? 'capture-all') === 'collect-stars'
+      ? { ...shared, type: 'collect-stars' }
+      : { ...shared, type: 'capture' };
+  if (asExercise.type === 'collect-stars' && miniGame.position.markers.stars.length === 0) {
+    issues.push(`${where}: collect-stars mini-game has no star`);
+    return;
+  }
+  const optimal = optimalMoves(asExercise, rules);
   if (optimal === null) {
     issues.push(`${where}: no solution found (not solvable within the search depth)`);
     return;

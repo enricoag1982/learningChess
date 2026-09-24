@@ -28,7 +28,7 @@ describe('build script', () => {
     });
   });
 
-  it('builds dist/content.json matching CompiledContent, with the rook lesson first', () => {
+  it('builds dist/content.json matching CompiledContent, including the rook lesson', () => {
     const content = JSON.parse(
       readFileSync(join(packageDir, 'dist', 'content.json'), 'utf8'),
     ) as CompiledContent;
@@ -36,6 +36,8 @@ describe('build script', () => {
     expect(content.version).toBe(1);
     expect(Array.isArray(content.lessons)).toBe(true);
     expect(Array.isArray(content.minigames)).toBe(true);
-    expect(content.lessons[0]?.id).toBe('rook');
+    // Files are read in directory order (alphabetical), not curriculum order: check by id,
+    // not position.
+    expect(content.lessons.some((lesson) => lesson.id === 'rook')).toBe(true);
   });
 });

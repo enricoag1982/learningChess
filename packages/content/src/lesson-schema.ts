@@ -207,7 +207,11 @@ export const lessonSchema = z
 
 export type LessonYaml = z.infer<typeof lessonSchema>;
 
-/** One mini-game file (`minigames/<id>.yaml`); static capture only in M1. */
+/**
+ * One mini-game file (`minigames/<id>.yaml`). `type` is the win condition (`capture-all`, the
+ * default, or `collect-stars`); `goal` is the spoken-text key for the goal line shown in-game — two
+ * different things that happen to share the English word "goal".
+ */
 export const miniGameSchema = z
   .object({
     id: keySchema,
@@ -215,6 +219,7 @@ export const miniGameSchema = z
     unlockAfter: keySchema,
     title: textRefSchema,
     goal: textRefSchema,
+    type: z.enum(['capture-all', 'collect-stars']).optional(),
     ...positionFields,
     par: z.number().int().positive(),
     moveLimit: z.number().int().positive(),

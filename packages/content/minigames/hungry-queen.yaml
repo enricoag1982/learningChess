@@ -1,0 +1,16 @@
+id: hungry-queen
+concept: queen-move
+unlockAfter: queen
+title: hungry-queen.title
+goal: hungry-queen.goal
+board: |
+  n . . p . . . b
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . Q . . . p
+  . . . . . . . .
+  . . . . . . . .
+  p . . p . . . n
+par: 7
+moveLimit: 16

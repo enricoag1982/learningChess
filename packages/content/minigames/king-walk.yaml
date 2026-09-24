@@ -1,0 +1,17 @@
+id: king-walk
+concept: king-move
+unlockAfter: king
+title: king-walk.title
+goal: king-walk.goal
+type: collect-stars
+board: |
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  * . . . . . . .
+  . . . . . . . .
+  . p . . . p . .
+  . . . . . . . .
+  K . . . . . . *
+par: 11
+moveLimit: 16

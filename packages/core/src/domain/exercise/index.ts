@@ -36,5 +36,5 @@ export {
 export type { SolverMove } from './solver.ts';
 export { solve, optimalMoves } from './solver.ts';
 
-export type { StaticCaptureGameDef, GameState, GameOutcome } from './minigame.ts';
+export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
 export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';

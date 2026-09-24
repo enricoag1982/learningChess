@@ -166,6 +166,7 @@ exercise:
     hint-square: Put it on the orange square.
 boss:
   captured-of: 'Captured {{current}} of {{total}}'
+  stars-of: 'Stars {{current}} of {{total}}'
   moves-par: 'Moves {{moves}} · Par {{par}}'
   ended: Good try!
 complete:

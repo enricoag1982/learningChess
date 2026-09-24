@@ -1,4 +1,12 @@
 rhino:
   name: Rhino
+elephant:
+  name: Elephant
+lioness:
+  name: Lioness
+lion:
+  name: Lion
+horse:
+  name: Horse
 owl:
   name: Owl

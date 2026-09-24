@@ -94,3 +94,73 @@ describe('static capture mini-game', () => {
     expect(gameStars(state)).toBe(0);
   });
 });
+
+const TWO_STARS = parseDiagram(
+  [
+    '. . . . . . . .',
+    '. . . . . . . .',
+    '. . . . . . . .',
+    '. . . * . . . .',
+    '. . . * . . . .',
+    '. . . R . . . .',
+    '. . . . . . . .',
+    '. . . . . . . .',
+  ].join('\n'),
+);
+
+describe('collect-stars mini-game (King Walk / Knight Maze)', () => {
+  it('wins within par for 3 stars once every star is collected', () => {
+    const def: StaticCaptureGameDef = {
+      id: 'g5',
+      concept: 'knight-move',
+      position: TWO_STARS,
+      goal: 'collect-stars',
+      par: 2,
+    };
+    let state = startStaticCaptureGame(def);
+
+    const first = playGameMove(state, rules, { from: 'd3', to: 'd4' });
+    state = first.state;
+    expect(first.outcome.kind).toBe('playing');
+
+    const second = playGameMove(state, rules, { from: 'd4', to: 'd5' });
+    state = second.state;
+
+    expect(second.outcome.kind).toBe('won');
+    expect(gameResult(state)).toBe('won');
+    expect(gameStars(state)).toBe(3);
+  });
+
+  it('defaults to capture-all when `goal` is omitted', () => {
+    const def: StaticCaptureGameDef = {
+      id: 'g6',
+      concept: 'rook-move',
+      position: TWO_PAWNS,
+      par: 2,
+    };
+    let state = startStaticCaptureGame(def);
+    // Landing on a star (none here) would solve a collect-stars game after 1 move; capture-all
+    // instead needs both pawns taken, confirming the default is still capture-all.
+    state = playGameMove(state, rules, { from: 'd3', to: 'd4' }).state;
+    expect(gameResult(state)).toBe('playing');
+  });
+
+  it('ends at the move limit without collecting every star, for 1 star', () => {
+    const def: StaticCaptureGameDef = {
+      id: 'g7',
+      concept: 'knight-move',
+      position: TWO_STARS,
+      goal: 'collect-stars',
+      par: 2,
+      moveLimit: 1,
+    };
+    let state = startStaticCaptureGame(def);
+
+    const result = playGameMove(state, rules, { from: 'd3', to: 'd4' }); // only 1 of 2 stars
+    state = result.state;
+
+    expect(result.outcome.kind).toBe('ended');
+    expect(gameResult(state)).toBe('ended');
+    expect(gameStars(state)).toBe(1);
+  });
+});
