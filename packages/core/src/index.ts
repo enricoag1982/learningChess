@@ -85,6 +85,7 @@ export type {
   MoveInput,
   PositionStatus,
   ChessRules,
+  SearchBoard,
 } from './domain/chess/index.ts';
 export {
   SQUARES,
@@ -132,3 +133,9 @@ export {
   gameResult,
   gameStars,
 } from './domain/exercise/index.ts';
+
+// Variant game rules (standard chess and kingless mini-games, played against the bot below) and
+// the computer opponent. Namespaced: both reuse names already taken by the static-capture
+// mini-game API above (`GameState`, `playGameMove`, `gameResult`), for a different kind of game.
+export * as game from './domain/game/index.ts';
+export * as bot from './domain/bot/index.ts';

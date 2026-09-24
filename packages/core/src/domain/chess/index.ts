@@ -5,7 +5,7 @@ export { parseDiagram, toDiagram, DiagramError } from './diagram.ts';
 
 export { parseFen, toFen, FenError } from './fen.ts';
 
-export type { Move, MoveInput, PositionStatus, ChessRules } from './rules.ts';
+export type { Move, MoveInput, PositionStatus, ChessRules, SearchBoard } from './rules.ts';
 export { InvalidPositionError } from './rules.ts';
 
 export { chessJsRules } from './chessjs-rules.ts';
