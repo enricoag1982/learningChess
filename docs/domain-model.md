@@ -70,6 +70,7 @@ Character 1─1 piece type
 | Entity | Fields |
 |---|---|
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
+| ParentLock | `passwordHash`, `salt` (PBKDF2 via WebCrypto), `recoveryHash`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
 | Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
@@ -80,6 +81,9 @@ Character 1─1 piece type
 | Badge | `badgeId`, `tier`, `at`, `seen` |
 | Streak | `current`, `best`, `lastDay`, `skipsUsedThisWeek` |
 | SessionLog | `date`, `minutes` |
+| TimeEntry (v2) | `start`, `end`, `activity` (`lesson` / `practice` / `play`) |
+| TimePolicy (v2) | `perWeekday` (minutes), `allowedHours`, `playLimit`, `learnLimit` |
+| TimeException (v2) | `date`, `extraMinutes` or policy override, `note` |
 
 - All stored records: UUID `id`, `createdAt`, `updatedAt` (sync-ready).
 - Derived, not stored: total stars, rank, world status, weak concepts.

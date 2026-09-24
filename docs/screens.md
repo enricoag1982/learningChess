@@ -14,13 +14,13 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Colour roles | Cream background · green = go / done · orange = today / current · gold = stars · blue = computer / info · grey + lock = locked |
 | Errors | Never red; orange + spoken explanation |
 | Type | Rounded display face (Fredoka) + Nunito body (proposal) |
-| Parent area | Adult style (smaller text, denser); behind parent gate (hold 3 s + simple question) |
+| Parent area | Adult style (smaller text, denser); behind parent password |
 
 ## 2. Screen list
 
 | # | Screen | Purpose | Key elements | Goes to |
 |---|---|---|---|---|
-| 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (hold 3 s) | Home, Parent area |
+| 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (password) | Home, Parent area |
 | 2 | Home | Start | Rank, stars, Owl message, **Start today**, tiles: Journey, Practice, Play, My Den | Lesson story (session), Journey, Practice, Play, My Den, Profile picker |
 | 3 | Journey map | Path | World list + paths, lesson nodes (done / current / locked), **Show you know it** | Lesson story, test-out |
 | 4 | Lesson story | Introduce concept | Step pills (Story → Demo → Try → Exercises → Boss), character, speech bubble, mini demo board, Listen again, **Let me try** | Exercise |
@@ -33,7 +33,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 
 ## 3. Not sketched yet
 
-Reuse the Exercise / board layout: Practice warm-up, placement test, test-out, game vs computer, mini-game screens. Separate: new-player creation, adult gate.
+Reuse the Exercise / board layout: Practice warm-up, placement test, test-out, game vs computer, mini-game screens. Separate: first-run setup (parent password + recovery code), new-player creation, password screen, "See you tomorrow" screen.
 
 ## 4. New proposals in sketches
 

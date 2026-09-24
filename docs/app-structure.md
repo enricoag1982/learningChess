@@ -16,7 +16,13 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 ## 2. Modes
 
 - **Kid mode** (default): icons + voice, no reading required.
-- **Parent mode**: behind parent gate (hold 3 s + simple question). All profiles, progress, settings.
+- **Parent mode**: behind parent password. All profiles, progress, settings.
+
+### Parent password
+- First run: welcome → set parent password (≥ 4 characters, numeric PIN allowed) → recovery code shown once (write it down) → first child profile.
+- Asked for: parent area, unlock lessons, change limits, extra time, reset / delete, external links.
+- 5 wrong attempts → 1-minute wait.
+- Forgotten: enter recovery code → set new password. Code also lost: reset app (backup file can be imported).
 
 ## 3. Profiles
 
@@ -133,6 +139,16 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 - **In:** profiles, placement test + test-out, Basics (worlds 1–5), Today session + warm-up, 6 mini-games + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
 - **Next:** tracks Openings, Tactics, Checkmates & Endgames; puzzle library. Later: Strategy track.
 - **v2 (online):** parent login, cloud sync, online play with friends (invite code, no chat, preset emojis).
+- **v2 (time controls):** explore detailed time log, limits and exceptions (below).
+
+### Time controls
+| Feature | v1 | v2 (explore) |
+|---|---|---|
+| Time log | Minutes per day per profile (parent report, streaks) | Sessions: start, end, activity (lesson / practice / play); week and month views |
+| Limits | One daily limit per profile | Per weekday; allowed hours (e.g. not after 20:00); separate limits for Play vs Learning |
+| Exceptions | — | One-off extra time ("+15 min today"); date overrides (holidays, weekends); kid "Ask for more time" → parent enters password |
+| Limit reached | Current activity finishes → "See you tomorrow" screen; parent password to continue | Owl warns 2 min before; same end flow |
+| Across devices | — | With login + sync: one limit across all devices |
 
 ### Online hooks in v1
 | Hook | v1 | v2 |
