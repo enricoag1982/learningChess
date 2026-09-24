@@ -47,7 +47,14 @@ export type { UnlockedMiniGame } from './domain/play.ts';
 export { unlockedMiniGames } from './domain/play.ts';
 
 export type { LessonStep, LessonPhase } from './domain/lesson-session.ts';
-export { lessonSteps, stepPhase } from './domain/lesson-session.ts';
+export {
+  EASIER_AFTER_ERRORS,
+  EASIER_VARIANT_STARS,
+  lessonSteps,
+  stepPhase,
+  easierVariant,
+  shouldOfferEasier,
+} from './domain/lesson-session.ts';
 
 export type {
   Habitat,
@@ -85,10 +92,16 @@ export type {
 } from './app/ports.ts';
 export { v1FeatureFlags } from './app/ports.ts';
 
-export type { AppDeps, RecordExerciseResultInput, RecordBossResultInput } from './app/use-cases.ts';
+export type {
+  AppDeps,
+  RecordAttemptInput,
+  RecordExerciseResultInput,
+  RecordBossResultInput,
+} from './app/use-cases.ts';
 export {
   loadProgress,
   getLessonProgress,
+  recordAttempt,
   recordExerciseResult,
   recordBossResult,
   saveResumeStep,

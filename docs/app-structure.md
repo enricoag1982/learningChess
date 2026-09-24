@@ -69,7 +69,7 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 
 - **Session:** warm-up (3 review tasks) → next lesson → mini-game → rewards → stop at time limit.
 - **Lesson:** story → demo → guided → exercises → boss → stars → unlock next.
-- **Error:** undo + spoken explanation → hint ladder (piece → target squares → move) → after 2 failures easier variant + concept to review. Never blocked.
+- **Error:** undo + spoken explanation → hint ladder (piece → target squares → move) → after 2 failures easier variant offered ("Easier one"; kid may keep trying) + concept to review. Never blocked.
 - **Skip (kid):** tap locked lesson/world → "Show you know it" test (5–8 mixed tasks) → ≥80% = mastered, unlocked; <80% = back to path, no penalty.
 - **Skip (parent):** unlock any lesson/world directly.
 - Skipped concepts enter the review pool like completed ones.

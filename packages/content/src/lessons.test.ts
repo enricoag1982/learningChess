@@ -45,7 +45,7 @@ describe('real content', () => {
 
   it('every collect-stars / capture exercise (guided and scored) is solvable at its stars3', () => {
     for (const lesson of content.lessons) {
-      for (const exercise of [...lesson.guided, ...lesson.exercises]) {
+      for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
         if (exercise.type !== 'collect-stars' && exercise.type !== 'capture') {
           continue;
         }
@@ -57,7 +57,7 @@ describe('real content', () => {
 
   it('every exercise position has a piece for the side to move (setup exercises excepted: they typically start empty)', () => {
     for (const lesson of content.lessons) {
-      for (const exercise of [...lesson.guided, ...lesson.exercises]) {
+      for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
         if (exercise.type === 'setup') {
           continue;
         }

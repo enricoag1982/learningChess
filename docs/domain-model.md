@@ -22,9 +22,9 @@ Character 1─1 piece type
 |---|---|
 | Track | `id`, `kind` (`main` / `branch`), `category`, `order`, `titleKey`, `worlds[]` |
 | World | `id`, `track`, `order`, `habitat`, `titleKey`, `lessons[]`, `test` (assessment id) |
-| Lesson | `id`, `world`, `order`, `concept`, `character`, `storyKey`, `demo`, `guided[]`, `exercises[]`, `boss` (mini-game id) |
+| Lesson | `id`, `world`, `order`, `concept`, `character`, `storyKey`, `demo`, `guided[]`, `exercises[]`, `variants[]` (easier variants), `boss` (mini-game id) |
 | Concept | `id`, `category` (`basics` / `openings` / `tactics` / `endgames` / `strategy`), `titleKey` (e.g. `rook-move`, `hanging-piece`, `check-escape`, `mate-in-1`) |
-| Exercise | `id`, `concept`, `type`, `board`, `textKey`, type-specific fields, optional `easier` (exercise id) |
+| Exercise | `id`, `concept`, `type`, `board`, `textKey`, type-specific fields, optional `easier` (id of a `variants` entry of the same lesson) |
 | MiniGame | `id`, `concept`, `unlockAfter` (lesson id), `board`, `rules`, `win`, `opponent`, `moveLimit`, `kidColor` |
 | Assessment | `id`, `kind` (`placement` / `test-out` / `world-test`), `scope`, `tasksPerConcept`, `pass` (default 0.8) |
 | Character | `id` (`rhino`, …), `piece`, `nameKey`, `storyKey` |
@@ -101,7 +101,7 @@ Character 1─1 piece type
 | Track available | Main track: always. Branch tracks: main track mastered |
 | Concept accuracy | First-try correct ratio over last 10 attempts |
 | Weak concept | Accuracy < 60% |
-| Easier variant | 2 wrong attempts on one exercise → its `easier` exercise, if defined |
+| Easier variant | Scored exercise, unsolved, ≥ 2 errors, `easier` set → variant offered (§3.4) |
 | Rank | Highest rank whose `after` is mastered |
 | Full game vs computer | Available after World 4 mastered |
 
@@ -109,6 +109,7 @@ Character 1─1 piece type
 - Concept enters box 1 when its lesson is complete.
 - Intervals: box 1 = 1 day, 2 = 2, 3 = 4, 4 = 8, 5 = 16.
 - Correct → box + 1; wrong → box 1. `dueAt = now + interval`.
+- Wrong = scored `Attempt` with `correct: false`, incl. an exercise left for its easier variant (§3.4).
 - Warm-up: 3 tasks, oldest due first, max 1 per concept; none due → weakest concepts.
 - Task source: concept's exercise pool (lesson exercises + puzzles), avoiding the last one shown.
 
@@ -126,6 +127,17 @@ Failing any assessment: no penalty, no data lost.
 - Order: warm-up → next available lesson (resume if in progress) → mini-game → rewards.
 - After Basics: next lesson from the least advanced track.
 - Time limit checked between activities only; never interrupts an exercise.
+
+### 3.4 Easier variant
+
+| Topic | Rule |
+|---|---|
+| Content | Lesson `variants[]`: same exercise schema; not stepped, not scored, not in exercise counts, completion or mastery. `easier` only on scored exercises, must name a variant of the same lesson; variants have no `easier`; every variant referenced (build fails otherwise) |
+| Trigger | Scored exercise, unsolved, `errors` ≥ 2 (illegal / wrong moves, wrong answers, selections, placements; hints not counted). Guided tries: never |
+| Offer | Owl note on the error: "This one is tricky. Want an easier one?" + button **Easier one** (next to "Say it again"). Not forced: kid may keep trying the original (normal stars) |
+| Swap | Same lesson step (stage dots unchanged); failed original logged as `Attempt` (`scored`, `correct: false`) → review scheduler (`m3.4`) puts the concept in box 1 (= "concept added to review"); no separate queue |
+| Result | Variant solved → original exercise credited 1 star (= "completed"); variant `Attempt` logged with `scored: false`. Replaying the lesson can raise the stars |
+| Resume | App closed mid-variant → resumes at the original exercise |
 
 ## 4. Use cases (app layer)
 

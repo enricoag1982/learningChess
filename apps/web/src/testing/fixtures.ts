@@ -31,6 +31,28 @@ export function fixtureExercise(id = 'fixture-ex'): ExerciseDef {
   };
 }
 
+/** A second tiny collect-stars exercise (rook a1, star a8): an easier variant of `fixtureExercise`. */
+export function fixtureVariantExercise(id = 'fixture-ex-easy'): ExerciseDef {
+  return {
+    id,
+    concept: 'fixture-move',
+    textKey: `fixtures:${id}`,
+    position: parseDiagram(`
+      * . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    `),
+    type: 'collect-stars',
+    stars3: 1,
+    stars2: 2,
+  };
+}
+
 /** A minimal, otherwise-content-shaped lesson for tests that don't need the real Rook content. */
 export function fixtureLesson(overrides: Partial<Lesson> = {}): Lesson {
   return {

@@ -354,7 +354,8 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
   const demoPosition = compilePosition(relPath, 'demo.board', data.demo, issues);
   const guided = compileExercises(relPath, 'guided', data.guided, data.concept, issues);
   const exercises = compileExercises(relPath, 'exercises', data.exercises, data.concept, issues);
-  if (demoPosition === null || guided === null || exercises === null) {
+  const variants = compileExercises(relPath, 'variants', data.variants ?? [], data.concept, issues);
+  if (demoPosition === null || guided === null || exercises === null || variants === null) {
     return null;
   }
 
@@ -374,6 +375,7 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
     },
     guided,
     exercises,
+    ...(variants.length > 0 ? { variants } : {}),
     ...(data.boss === undefined ? {} : { boss: data.boss }),
   };
 }
@@ -782,6 +784,43 @@ function checkTextKey(fullKey: string, locales: Locales, where: string, issues: 
   }
 }
 
+/**
+ * Per-lesson `easier` / `variants` rules (teaching-process.md §3.3): `easier` only on a scored
+ * exercise, referencing a variant id of the same lesson; a variant has no `easier` of its own; and
+ * every variant is referenced by at least one exercise.
+ */
+function checkEasierVariants(lesson: Lesson, where: string, issues: string[]): void {
+  const variants = lesson.variants ?? [];
+  const variantIds = new Set(variants.map((variant) => variant.id));
+  const referenced = new Set<string>();
+
+  for (const exercise of lesson.guided) {
+    if (exercise.easier !== undefined) {
+      issues.push(`${where}: ${exercise.id}: easier is only for scored exercises`);
+    }
+  }
+  for (const exercise of lesson.exercises) {
+    if (exercise.easier === undefined) {
+      continue;
+    }
+    if (!variantIds.has(exercise.easier)) {
+      issues.push(
+        `${where}: ${exercise.id}: easier references unknown variant "${exercise.easier}" (must be in this lesson's variants)`,
+      );
+      continue;
+    }
+    referenced.add(exercise.easier);
+  }
+  for (const variant of variants) {
+    if (variant.easier !== undefined) {
+      issues.push(`${where}: ${variant.id}: a variant cannot have its own easier`);
+    }
+    if (!referenced.has(variant.id)) {
+      issues.push(`${where}: ${variant.id}: variant is not referenced by any exercise's easier`);
+    }
+  }
+}
+
 function validateSemantics(
   lessons: readonly Lesson[],
   minigames: readonly MiniGame[],
@@ -799,7 +838,6 @@ function validateSemantics(
   };
 
   const lessonIds = new Set(lessons.map((lesson) => lesson.id));
-  const exerciseIds = new Set<string>();
   const minigameIds = new Set(minigames.map((minigame) => minigame.id));
 
   for (const lesson of lessons) {
@@ -818,9 +856,8 @@ function validateSemantics(
       issues.push(`${lessonWhere}: demo: side to move has no piece`);
     }
 
-    for (const exercise of [...lesson.guided, ...lesson.exercises]) {
+    for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
       const exerciseWhere = `${lessonWhere}: ${exercise.id}`;
-      exerciseIds.add(exercise.id);
       claimId(exercise.id, exerciseWhere);
       checkTextKey(exercise.textKey, locales, exerciseWhere, issues);
       // setup exercises typically start from an empty board: "side to move has a piece" doesn't apply.
@@ -845,16 +882,8 @@ function validateSemantics(
     if (lesson.boss !== undefined && !minigameIds.has(lesson.boss)) {
       issues.push(`${lessonWhere}: boss references unknown mini-game "${lesson.boss}"`);
     }
-  }
 
-  for (const lesson of lessons) {
-    for (const exercise of [...lesson.guided, ...lesson.exercises]) {
-      if (exercise.easier !== undefined && !exerciseIds.has(exercise.easier)) {
-        issues.push(
-          `lessons/${lesson.world}/${lesson.id}.yaml: ${exercise.id}: easier references unknown exercise "${exercise.easier}"`,
-        );
-      }
-    }
+    checkEasierVariants(lesson, lessonWhere, issues);
   }
 
   for (const minigame of minigames) {

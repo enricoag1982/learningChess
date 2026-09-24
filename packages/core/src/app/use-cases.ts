@@ -4,6 +4,7 @@ import { summarizeBossResult } from '../domain/exercise/boss-result.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
 import type { VersusState } from '../domain/exercise/versus.ts';
 import type { Lesson } from '../domain/lesson.ts';
+import { EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { LessonProgress } from '../domain/progress.ts';
 import {
   newLessonProgress,
@@ -53,27 +54,23 @@ export async function getLessonProgress(
   return newLessonProgress(deps.ids.next(), profileId, lessonId, deps.clock.now());
 }
 
-/** Result of an exercise attempt (guided try or scored exercise). */
-export interface RecordExerciseResultInput {
+/** Input to log one exercise attempt (see `recordAttempt`). */
+export interface RecordAttemptInput {
   readonly profileId: string;
   readonly lesson: Lesson;
   readonly state: ExerciseState;
   /** `false` for guided tries and the demo: recorded as an attempt but never scored. */
   readonly scored: boolean;
   readonly durationMs: number;
-  /** Step index to resume at next (see `lessonSteps`). */
-  readonly nextStep: number;
 }
 
 /**
- * Records an exercise attempt: always saves an `Attempt`; when `scored` and solved, also updates
- * the lesson's best stars for that exercise. Always advances `resumeStep` and saves progress.
+ * Logs one `Attempt` without touching lesson progress. Used on its own when the kid leaves an
+ * unsolved exercise for its easier variant: the failed attempt (`correct: false`) is what the M3
+ * review scheduler reads to put the concept back into review.
  */
-export async function recordExerciseResult(
-  deps: AppDeps,
-  input: RecordExerciseResultInput,
-): Promise<LessonProgress> {
-  const { profileId, lesson, state, scored, durationMs, nextStep } = input;
+export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): Promise<void> {
+  const { profileId, lesson, state, scored, durationMs } = input;
   const now = deps.clock.now();
   const stars = starsFor(state);
 
@@ -93,10 +90,47 @@ export async function recordExerciseResult(
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   });
+}
+
+/** Result of an exercise attempt (guided try or scored exercise). */
+export interface RecordExerciseResultInput {
+  readonly profileId: string;
+  readonly lesson: Lesson;
+  readonly state: ExerciseState;
+  /** `false` for guided tries and the demo: recorded as an attempt but never scored. */
+  readonly scored: boolean;
+  readonly durationMs: number;
+  /** Step index to resume at next (see `lessonSteps`). */
+  readonly nextStep: number;
+  /**
+   * Set when `state` is an easier variant: the scored exercise id it replaces; solving credits that
+   * exercise `EASIER_VARIANT_STARS` (domain-model.md §3.4).
+   */
+  readonly standsInFor?: string;
+}
+
+/**
+ * Records an exercise attempt: always saves an `Attempt`; when solved, also updates the lesson's
+ * best stars — for `standsInFor` if set, else for this exercise when `scored`. Always advances
+ * `resumeStep` and saves progress.
+ */
+export async function recordExerciseResult(
+  deps: AppDeps,
+  input: RecordExerciseResultInput,
+): Promise<LessonProgress> {
+  const { profileId, lesson, state, scored, durationMs, nextStep, standsInFor } = input;
+  const now = deps.clock.now();
+  const stars = starsFor(state);
+
+  await recordAttempt(deps, { profileId, lesson, state, scored, durationMs });
 
   let progress = await getLessonProgress(deps, profileId, lesson.id);
-  if (scored && state.solved && stars !== 0) {
-    progress = recordExerciseStars(progress, state.def.id, stars, lesson, now);
+  if (state.solved && stars !== 0) {
+    if (standsInFor !== undefined) {
+      progress = recordExerciseStars(progress, standsInFor, EASIER_VARIANT_STARS, lesson, now);
+    } else if (scored) {
+      progress = recordExerciseStars(progress, state.def.id, stars, lesson, now);
+    }
   }
   progress = withResumeStep(progress, nextStep, now);
   await deps.progress.saveLesson(progress);
