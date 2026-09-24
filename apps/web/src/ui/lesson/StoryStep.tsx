@@ -33,7 +33,7 @@ export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
   );
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 overflow-y-auto py-2 sm:flex-row sm:gap-12">
+    <div className="flex flex-1 flex-col items-center justify-center-safe gap-6 overflow-y-auto py-2 sm:flex-row sm:gap-12">
       <CharacterCard character={lesson.character} />
       <div className="flex w-full max-w-xl flex-col gap-4 sm:gap-6">
         <SpeechBubble text={text} />

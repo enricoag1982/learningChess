@@ -31,5 +31,16 @@ export default defineConfig({
         hasTouch: true,
       },
     },
+    // Layout checks (accessibility + kid touch-target sizes) on the stacked layouts.
+    {
+      name: 'tablet-portrait',
+      testMatch: /a11y\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 768, height: 1024 }, hasTouch: true },
+    },
+    {
+      name: 'phone',
+      testMatch: /a11y\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 }, hasTouch: true },
+    },
   ],
 });

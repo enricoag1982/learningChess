@@ -1,7 +1,14 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
-import { keySchema, langSchema, textLeafSchema, type LocaleTree } from './schema.ts';
+import {
+  keySchema,
+  langSchema,
+  leafKeySchema,
+  PLURAL_SUFFIX_PATTERN,
+  textLeafSchema,
+  type LocaleTree,
+} from './schema.ts';
 
 /** All namespaces of all languages, keyed by language then namespace name. */
 export type Locales = Record<string, Record<string, LocaleTree>>;
@@ -121,7 +128,12 @@ function validateNode(
   for (const [key, child] of Object.entries(node)) {
     const keyPath = [...path, key].join('.');
 
-    if (!keySchema.safeParse(key).success) {
+    // Plural suffixes (`_one`, `_other`, …) are allowed on text leaves only.
+    const validKey =
+      typeof child === 'string'
+        ? leafKeySchema.safeParse(key).success
+        : keySchema.safeParse(key).success;
+    if (!validKey) {
       issues.push(`${relPath}: ${keyPath}: invalid key name`);
       continue;
     }
@@ -192,8 +204,9 @@ export function compareToReference(locales: Locales, reference = 'en'): string[]
       const langTree = namespaces[ns];
       if (refTree === undefined || langTree === undefined) continue;
 
-      const refKeys = new Set(keyPaths(refTree));
-      const langKeys = new Set(keyPaths(langTree));
+      // Languages have different plural forms, so compare keys without plural suffixes.
+      const refKeys = new Set(keyPaths(refTree).map(withoutPluralSuffix));
+      const langKeys = new Set(keyPaths(langTree).map(withoutPluralSuffix));
 
       for (const key of refKeys) {
         if (!langKeys.has(key)) {
@@ -209,6 +222,11 @@ export function compareToReference(locales: Locales, reference = 'en'): string[]
   }
 
   return issues;
+}
+
+/** Key path without an i18next plural suffix (`a.moves_one` → `a.moves`). */
+function withoutPluralSuffix(path: string): string {
+  return path.replace(PLURAL_SUFFIX_PATTERN, '');
 }
 
 /** Reads a directory's entry names, reporting an issue (and returning `[]`) if it cannot be read. */

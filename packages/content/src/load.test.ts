@@ -46,6 +46,25 @@ describe('loadLocales', () => {
     expect(compareToReference(locales)).toEqual([]);
   });
 
+  it('accepts i18next plural suffixes on text leaves and compares keys without them', () => {
+    write('en/common.yaml', 'moves_one: "{{count}} move"\nmoves_other: "{{count}} moves"\n');
+    // Polish-style plural forms differ from English; the base key is what must match.
+    write('pl/common.yaml', 'moves_one: a\nmoves_few: b\nmoves_many: c\n');
+
+    const locales = loadLocales(dir);
+
+    expect(compareToReference(locales)).toEqual([]);
+  });
+
+  it('rejects a plural suffix on a map key and an unknown suffix', () => {
+    write('en/common.yaml', 'group_one:\n  a: x\nmoves_lots: y\n');
+
+    const issues = issuesOf();
+
+    expect(issues).toContainEqual(expect.stringContaining('group_one: invalid key name'));
+    expect(issues).toContainEqual(expect.stringContaining('moves_lots: invalid key name'));
+  });
+
   it('rejects an invalid key name', () => {
     write('en/common.yaml', 'Bad_Key: Hi\n');
 

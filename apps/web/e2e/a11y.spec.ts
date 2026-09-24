@@ -65,6 +65,11 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   }
   await expectKidTouchTarget(page, /Hint/);
   await expectKidTouchTarget(page, /Undo/);
+  await expectKidTouchTarget(page, /Say it again/);
+  // With a hint note under the instruction the panel is at its tallest: targets must not shrink.
+  await page.getByRole('button', { name: /Hint/ }).click();
+  await expectKidTouchTarget(page, /Say it again/);
+  await expectKidTouchTarget(page, /Hint/);
   await expectNoSeriousViolations(page, 'Exercise');
   await completeExercise(page, first);
   await completeExercise(page, second);

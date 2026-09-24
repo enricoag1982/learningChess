@@ -34,7 +34,7 @@ export function CharacterCard({ character }: { readonly character: string }): JS
   const piece = characterPiece(character);
 
   return (
-    <div className="flex w-full items-center gap-3 sm:w-auto sm:flex-col sm:justify-center sm:gap-3">
+    <div className="flex w-full shrink-0 items-center gap-3 sm:w-auto sm:flex-col sm:justify-center sm:gap-3">
       <div
         className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-2 sm:h-32 sm:w-32 sm:p-5 md:h-44 md:w-44"
         style={{ backgroundColor: characterColor(character) }}

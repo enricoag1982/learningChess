@@ -59,7 +59,8 @@ exercise:
   check: Check
   moves-label: Moves
   moves-of: '{{current}} of {{total}}'
-  moves-target: 'in {{count}} moves'
+  moves-target_one: 'in {{count}} move'
+  moves-target_other: 'in {{count}} moves'
   tap-piece-first: 'Tap {{name}} first.'
   select-wrong: Not quite! Look at the orange squares.
   select-missing: Almost! Some squares are still missing.
