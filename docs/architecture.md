@@ -167,4 +167,6 @@ stars2: 5
 | Variant rules | Walls = blocked squares occupied by a piece of the side to move during move generation (sliders stop, knights jump over, nothing lands); static opponent = turn returns to kid after each move |
 | Exercise engine | Pure immutable state + transitions (`startExercise`, `playMove`, `toggleSquare`, `submitSelection`, `undo`, `requestHint`, `starsFor`); stars only when landing on a star |
 | Solver | BFS over kid moves, state = placement + castling + en passant + stars; fast replay of known-legal moves except castling; used for hints, content checks (`stars3` = optimal) |
+| Lesson content | `lessons/<world>/<id>.yaml`, `minigames/<id>.yaml`; build compiles boards to `Position` and fails on: invalid board, unsolvable exercise, `stars3` ≠ solver optimum, `stars2` < `stars3`, mini-game `par` ≠ optimum, unknown id reference, missing text key; output `dist/content.json` (`CompiledContent`) |
+| Text namespaces | `common` (UI), `lessons` (lesson, exercise, mini-game texts), `characters` (`<id>.name`) |
 | Test layers (web) | Vitest + jsdom + Testing Library (components, adapters); Playwright on the production build (desktop + tablet 1024×768 touch) |
