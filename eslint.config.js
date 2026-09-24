@@ -33,6 +33,24 @@ export default defineConfig([
     },
   },
   {
+    // Separate rule instance (typescript-eslint's) so it does not override the domain rule below.
+    files: ['packages/**', 'apps/**'],
+    ignores: ['packages/core/src/domain/chess/chessjs-rules*.ts'],
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'chess.js',
+              message: 'use ChessRules from @chess-kids/core; chess.js stays behind the adapter',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ['packages/core/src/domain/**'],
     rules: {
       'no-restricted-imports': [
