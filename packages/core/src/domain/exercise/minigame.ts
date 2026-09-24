@@ -1,0 +1,104 @@
+import type { Move, MoveInput } from '../chess/rules.ts';
+import type { PieceType, Position } from '../chess/types.ts';
+import type { VariantRules } from '../variant/rules.ts';
+import { playMove, startExercise } from './engine.ts';
+import type { ExerciseState } from './engine.ts';
+import type { CaptureDef } from './types.ts';
+
+/** Hungry-piece style mini-game: kid pieces vs static enemies, win = capture all. */
+export interface StaticCaptureGameDef {
+  readonly id: string;
+  readonly concept: string;
+  readonly position: Position;
+  /** Move count within which a win earns 3 stars. */
+  readonly par: number;
+  /** Optional cap on kid moves; reaching it without winning ends the game. */
+  readonly moveLimit?: number;
+}
+
+/** Immutable mini-game progress. */
+export interface GameState {
+  readonly def: StaticCaptureGameDef;
+  readonly exercise: ExerciseState;
+  readonly ended: boolean;
+}
+
+/** Result of a mini-game move attempt. */
+export type GameOutcome =
+  | { readonly kind: 'illegal' }
+  | { readonly kind: 'playing'; readonly move: Move; readonly captured?: PieceType }
+  | { readonly kind: 'won'; readonly move: Move; readonly captured?: PieceType }
+  | { readonly kind: 'ended'; readonly move: Move; readonly captured?: PieceType };
+
+function toCaptureDef(def: StaticCaptureGameDef): CaptureDef {
+  return {
+    id: def.id,
+    concept: def.concept,
+    textKey: def.id,
+    position: def.position,
+    type: 'capture',
+    stars3: def.par,
+    stars2: def.par,
+  };
+}
+
+/** Starts a fresh mini-game at its authored position. */
+export function startStaticCaptureGame(def: StaticCaptureGameDef): GameState {
+  return { def, exercise: startExercise(toCaptureDef(def)), ended: false };
+}
+
+/** Plays one kid move. Reuses the capture exercise engine for legality and win detection. */
+export function playGameMove(
+  state: GameState,
+  rules: VariantRules,
+  move: MoveInput,
+): { readonly state: GameState; readonly outcome: GameOutcome } {
+  if (state.ended || state.exercise.solved) {
+    return { state, outcome: { kind: 'illegal' } };
+  }
+
+  const { state: exercise, outcome } = playMove(state.exercise, rules, move);
+  if (outcome.kind === 'illegal') {
+    return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
+  }
+
+  const captured = outcome.captured === undefined ? {} : { captured: outcome.captured };
+  if (outcome.kind === 'solved') {
+    return {
+      state: { ...state, exercise },
+      outcome: { kind: 'won', move: outcome.move, ...captured },
+    };
+  }
+
+  const limitReached = state.def.moveLimit !== undefined && exercise.moves >= state.def.moveLimit;
+  if (limitReached) {
+    return {
+      state: { ...state, exercise, ended: true },
+      outcome: { kind: 'ended', move: outcome.move, ...captured },
+    };
+  }
+  return {
+    state: { ...state, exercise },
+    outcome: { kind: 'playing', move: outcome.move, ...captured },
+  };
+}
+
+/** Current mini-game status. */
+export function gameResult(state: GameState): 'playing' | 'won' | 'ended' {
+  if (state.exercise.solved) {
+    return 'won';
+  }
+  return state.ended ? 'ended' : 'playing';
+}
+
+/** Stars for the mini-game: 3 = win within par, 2 = win, 1 = played to the move limit. */
+export function gameStars(state: GameState): 0 | 1 | 2 | 3 {
+  const result = gameResult(state);
+  if (result === 'playing') {
+    return 0;
+  }
+  if (result === 'ended') {
+    return 1;
+  }
+  return state.exercise.moves <= state.def.par ? 3 : 2;
+}
