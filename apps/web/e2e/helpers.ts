@@ -209,6 +209,58 @@ export async function seedLessonMastered(
   );
 }
 
+/**
+ * Seeds one lesson's progress with explicit `bestStars` and `resumeStep` (same real storage
+ * key/shape as `seedLessonMastered`), for a spec that needs to land mid-lesson — e.g. right at a
+ * scored exercise that offers an easier variant — instead of at a freshly mastered or brand-new one.
+ */
+export async function seedLessonProgress(
+  page: Page,
+  profileId: string,
+  lesson: Lesson,
+  bestStars: Readonly<Record<string, 1 | 2 | 3>>,
+  resumeStep: number,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, lessonId, bestStars, resumeStep }) => {
+      const key = 'chess-kids:lesson-progress';
+      const raw = localStorage.getItem(key);
+      const all = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      const now = new Date().toISOString();
+      all[`${pid}:${lessonId}`] = {
+        id: `seed-${lessonId}`,
+        profileId: pid,
+        lessonId,
+        bestStars,
+        bossStars: 0,
+        resumeStep,
+        createdAt: now,
+        updatedAt: now,
+      };
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    { profileId, lessonId: lesson.id, bestStars, resumeStep },
+  );
+}
+
+/** Reads one lesson's saved `bestStars` straight from localStorage's real storage shape, or `{}` if the lesson has no saved progress yet. */
+export async function readLessonBestStars(
+  page: Page,
+  profileId: string,
+  lessonId: string,
+): Promise<Readonly<Record<string, number>>> {
+  return page.evaluate(
+    ({ profileId: pid, lessonId }) => {
+      const raw = localStorage.getItem('chess-kids:lesson-progress');
+      const all = raw
+        ? (JSON.parse(raw) as Record<string, { bestStars?: Record<string, number> }>)
+        : {};
+      return all[`${pid}:${lessonId}`]?.bestStars ?? {};
+    },
+    { profileId, lessonId },
+  );
+}
+
 /** `seedLessonMastered` for every lesson in `lessons` (order doesn't matter, each is independent). */
 export async function seedLessonsMastered(
   page: Page,

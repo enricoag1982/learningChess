@@ -17,6 +17,7 @@ import type { AppDeps } from './use-cases.ts';
 import {
   getLessonProgress,
   loadProgress,
+  recordAttempt,
   recordBossResult,
   recordExerciseResult,
   saveResumeStep,
@@ -407,6 +408,81 @@ describe('recordExerciseResult', () => {
     });
 
     expect(second.bestStars).toEqual({ 'rook-01': 3 });
+  });
+
+  it('for an easier variant (standsInFor, scored: false): credits EASIER_VARIANT_STARS to the original, not the variant', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    const variant = makeExercise('rook-01-easy');
+    const state = exerciseState(variant, { solved: true, moves: 1 });
+
+    const progress = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: false,
+      standsInFor: 'rook-01',
+      durationMs: 1000,
+      nextStep: 2,
+    });
+
+    expect(progress.bestStars).toEqual({ 'rook-01': 1 });
+    expect(progress.bestStars['rook-01-easy']).toBeUndefined();
+
+    const [attempt] = await deps.progress.listAttempts('profile-1');
+    expect(attempt).toMatchObject({ exerciseId: 'rook-01-easy', scored: false, correct: true });
+  });
+
+  it('keeps a higher previous best for the original when its easier variant is solved afterwards', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+
+    await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(EXERCISE_1, { solved: true, moves: 1 }), // 3 stars
+      scored: true,
+      durationMs: 100,
+      nextStep: 1,
+    });
+    const progress = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state: exerciseState(makeExercise('rook-01-easy'), { solved: true, moves: 1 }),
+      scored: false,
+      standsInFor: 'rook-01',
+      durationMs: 100,
+      nextStep: 2,
+    });
+
+    expect(progress.bestStars).toEqual({ 'rook-01': 3 });
+  });
+});
+
+describe('recordAttempt', () => {
+  it('logs an attempt and leaves lesson progress untouched', async () => {
+    const deps = makeDeps();
+    const lesson = makeLesson();
+    const state = exerciseState(EXERCISE_1, { solved: false, errors: 2 });
+
+    await recordAttempt(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: true,
+      durationMs: 500,
+    });
+
+    const attempts = await deps.progress.listAttempts('profile-1');
+    expect(attempts).toHaveLength(1);
+    expect(attempts[0]).toMatchObject({
+      exerciseId: 'rook-01',
+      conceptId: 'rook-move',
+      scored: true,
+      correct: false,
+      errors: 2,
+    });
+    expect(await deps.progress.listLessons('profile-1')).toEqual([]);
   });
 });
 

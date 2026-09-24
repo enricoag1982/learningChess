@@ -14,6 +14,8 @@ rook-05: Rhino is hungry. Gobble up the pawn!
 rook-06: A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.
 rook-07: Three pawns, three captures. Get them all!
 rook-08: Rhino's biggest challenge yet. Collect every star around the rock.
+rook-04-easy: A rock blocks the way! Go around it to reach the star.
+rook-08-easy: Collect both stars. The rock is in the way!
 hungry-rook:
   title: Hungry Rook
   goal: Rhino is starving! Capture every piece before the moves run out.

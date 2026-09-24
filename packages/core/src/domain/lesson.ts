@@ -33,6 +33,8 @@ export interface Lesson {
   /** Easy tries shown before the exercises; hints on, not scored. */
   readonly guided: readonly ExerciseDef[];
   readonly exercises: readonly ExerciseDef[];
+  /** Easier variants, reachable only via a scored exercise's `easier`; never stepped through, scored or counted in completion / mastery. Absent = none. */
+  readonly variants?: readonly ExerciseDef[];
   /** Id of the mini-game unlocked by completing this lesson. */
   readonly boss?: string;
 }

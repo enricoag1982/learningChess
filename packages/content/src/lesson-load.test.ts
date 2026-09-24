@@ -505,15 +505,88 @@ describe('loadContent', () => {
     expect(issues[0]).toContain('demo-lesson.yaml');
   });
 
-  it('reports an unknown easier reference', () => {
-    writeLesson({ exercises: [validExercise({ easier: 'no-such-exercise' })] });
-    writeMiniGame();
-    writeDefaultLocales();
+  describe('easier / variants', () => {
+    it('reports an unknown variant reference', () => {
+      writeLesson({ exercises: [validExercise({ easier: 'no-such-variant' })] });
+      writeMiniGame();
+      writeDefaultLocales();
 
-    const issues = issuesOf();
-    expect(issues.some((issue) => issue.includes('unknown exercise "no-such-exercise"'))).toBe(
-      true,
-    );
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes(
+            'easier references unknown variant "no-such-variant" (must be in this lesson\'s variants)',
+          ),
+        ),
+      ).toBe(true);
+    });
+
+    it('rejects easier on a guided try', () => {
+      writeLesson({
+        guided: [validExercise({ id: 'demo-g1', easier: 'demo-01-easy' })],
+        exercises: [validExercise()],
+        variants: [validExercise({ id: 'demo-01-easy' })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('demo-g1: easier is only for scored exercises')),
+      ).toBe(true);
+    });
+
+    it('rejects a variant with its own easier', () => {
+      writeLesson({
+        exercises: [validExercise({ easier: 'demo-01-easy' })],
+        variants: [validExercise({ id: 'demo-01-easy', easier: 'demo-01' })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('demo-01-easy: a variant cannot have its own easier'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports a variant referenced by no exercise', () => {
+      writeLesson({
+        exercises: [validExercise()],
+        variants: [validExercise({ id: 'demo-01-easy' })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes("demo-01-easy: variant is not referenced by any exercise's easier"),
+        ),
+      ).toBe(true);
+    });
+
+    it('loads a scored exercise with easier and its matching variant with no issues', () => {
+      writeLesson({
+        exercises: [validExercise({ easier: 'demo-01-easy' })],
+        variants: [validExercise({ id: 'demo-01-easy' })],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      const lesson = content.lessons.find((entry) => entry.id === 'demo-lesson');
+      if (lesson === undefined) {
+        throw new Error('demo-lesson not found');
+      }
+      expect(lesson.exercises[0]?.easier).toBe('demo-01-easy');
+      expect(lesson.variants?.map((variant) => variant.id)).toEqual(['demo-01-easy']);
+    });
   });
 
   it('reports an unknown unlockAfter reference', () => {

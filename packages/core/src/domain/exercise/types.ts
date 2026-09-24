@@ -8,7 +8,7 @@ interface ExerciseBase {
   /** i18n key for the exercise's instruction text. */
   readonly textKey: string;
   readonly position: Position;
-  /** Id of an easier exercise, offered after 2 wrong attempts. */
+  /** Id of an entry in the lesson's `variants`, offered after `EASIER_AFTER_ERRORS` errors on this (scored) exercise. */
   readonly easier?: string;
 }
 

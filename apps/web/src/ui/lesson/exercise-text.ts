@@ -104,3 +104,28 @@ export function exerciseNote(
       };
   }
 }
+
+/** Error feedback kinds the easier-variant offer piggybacks on (teaching-process.md §3.3). */
+const ERROR_FEEDBACK_KINDS = new Set<ExerciseFeedback['kind']>([
+  'illegal',
+  'select-wrong',
+  'select-missing',
+  'wrong-answer',
+  'wrong-move',
+  'wrong-placement',
+]);
+
+/**
+ * Appends the "want an easier one?" sentence to `note`'s text when `feedback` is an error (never on
+ * a hint, toggle or undo, so those don't re-narrate the offer); `note` unchanged otherwise.
+ */
+export function withEasierOffer(
+  t: TFunction,
+  note: SpeechBubbleNote | undefined,
+  feedback: ExerciseFeedback,
+): SpeechBubbleNote | undefined {
+  if (note === undefined || !ERROR_FEEDBACK_KINDS.has(feedback.kind)) {
+    return note;
+  }
+  return { ...note, text: `${note.text} ${t('exercise.easier-offer')}` };
+}
