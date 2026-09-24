@@ -1,9 +1,23 @@
 import { expect, test } from '@playwright/test';
-import { completeFirstRun, pickProfileFromPicker } from './helpers.ts';
+import type { CompiledContent, TracksCatalog } from '@chess-kids/core';
+import { nextLesson } from '@chess-kids/core';
+import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
+import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import { completeFirstRun, homeGreeting, pickProfileFromPicker } from './helpers.ts';
+
+const content = rawContent as unknown as CompiledContent;
+const catalog = rawTracks as unknown as TracksCatalog;
 
 interface Manifest {
   readonly name: string;
   readonly icons: readonly unknown[];
+}
+
+/** The Journey's very first lesson for a brand-new profile — whichever one that turns out to be. */
+function firstJourneyLesson() {
+  const lesson = nextLesson(catalog, content.lessons, []);
+  if (!lesson) throw new Error('bundled content/tracks: no first lesson found');
+  return lesson;
 }
 
 test('loads the app shell with a valid manifest and no console errors', async ({ page }) => {
@@ -16,7 +30,7 @@ test('loads the app shell with a valid manifest and no console errors', async ({
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Chess for Kids' })).toBeVisible();
-  await expect(page.getByText('Today you meet Rhino!')).toBeVisible();
+  await expect(page.getByText(homeGreeting(firstJourneyLesson()))).toBeVisible();
 
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(manifestHref).toBeTruthy();

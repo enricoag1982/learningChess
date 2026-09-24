@@ -10,10 +10,11 @@ import type {
   SelectSquaresDef,
   SetupDef,
   Square,
+  TracksCatalog,
   VariantRules,
   YesNoDef,
 } from '@chess-kids/core';
-import { chessJsRules, createVariantRules, SQUARES, solve } from '@chess-kids/core';
+import { chessJsRules, createVariantRules, SQUARES, solve, worldLessons } from '@chess-kids/core';
 // Node's ESM loader requires this attribute for a JSON import; the content build validates the
 // shape (see `bundled-content-source.ts`), so the cast below is a type conversion, not a check.
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
@@ -43,6 +44,156 @@ export function contentText(key: string): string {
     node = node[segment];
   }
   return typeof node === 'string' ? node : key;
+}
+
+/** Escapes regex metacharacters so `text` can be embedded literally in a `RegExp` source. */
+function escapeRegExp(text: string): string {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * True for a lesson the Owl teaches directly, not yet tied to one piece (docs/app-structure.md:
+ * Owl is the guide/narrator). Every other lesson's `character` stands for one piece
+ * (`character-meta.ts`'s map, which this e2e helper doesn't duplicate).
+ */
+export function isOwlTaught(lesson: Lesson): boolean {
+  return lesson.character === 'owl';
+}
+
+/** True for an exercise/guided-try type that moves one piece across the board (has a slide animation). */
+export function isMoveCountedExercise(def: ExerciseDef): boolean {
+  return def.type === 'collect-stars' || def.type === 'capture' || def.type === 'best-move';
+}
+
+/** Replaces every `{{key}}` in a compiled text template with `String(vars[key])`. */
+export function interpolate(
+  template: string,
+  vars: Readonly<Record<string, string | number>>,
+): string {
+  return Object.entries(vars).reduce(
+    (text, [key, value]) => text.replaceAll(`{{${key}}}`, String(value)),
+    template,
+  );
+}
+
+/**
+ * A lesson's plain display label — its title when Owl-taught, else its character's name — same as
+ * `JourneyScreen`'s `characterLabel`, and the `name` `activateLesson` puts in the Journey's
+ * "Finish X first!" message.
+ */
+export function lessonLabel(lesson: Lesson): string {
+  return isOwlTaught(lesson)
+    ? contentText(lesson.titleKey)
+    : contentText(`characters:${lesson.character}.name`);
+}
+
+/**
+ * Accessible name of a lesson's Journey node for `status` (matches `JourneyScreen`'s
+ * `LessonNode`). For a piece lesson, the piece word is wildcarded: only app UI code
+ * (`character-meta.ts`) maps character -> piece, which this e2e helper doesn't duplicate.
+ */
+export function journeyNodeName(lesson: Lesson, status: 'current' | 'locked'): RegExp {
+  const statusWord = escapeRegExp(contentText(`journey:ui.status-${status}`));
+  const label = escapeRegExp(lessonLabel(lesson));
+  const namePart = isOwlTaught(lesson) ? label : `${label} the .+`;
+  const pattern = contentText('journey:ui.node-name')
+    .replace('{{name}}', namePart)
+    .replace('{{status}}', statusWord);
+  return new RegExp(`^${pattern}$`);
+}
+
+/** The Journey's "Finish X first!" message for the lesson right before a locked one. */
+export function finishFirstMessage(previousLesson: Lesson): string {
+  return interpolate(contentText('journey:ui.finish-first'), { name: lessonLabel(previousLesson) });
+}
+
+/** Home's Owl greeting for a freshly offered (not resumed, not all-done) lesson (`HomeScreen`). */
+export function homeGreeting(lesson: Lesson): string {
+  return isOwlTaught(lesson)
+    ? interpolate(contentText('home.owl-next-topic'), { topic: contentText(lesson.titleKey) })
+    : interpolate(contentText('home.owl-next'), {
+        character: contentText(`characters:${lesson.character}.name`),
+      });
+}
+
+/**
+ * Every lesson of the main track, in Journey/session order (worlds sorted by `order`, each
+ * world's lessons via `worldLessons`). Branch tracks are left out: they only ever open once the
+ * whole main track is mastered, well past anything these specs need.
+ */
+export function lessonsInJourneyOrder(
+  catalog: TracksCatalog,
+  lessons: readonly Lesson[],
+): readonly Lesson[] {
+  const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
+  if (!mainTrack) throw new Error('lessonsInJourneyOrder: catalog has no main track');
+  return mainTrack.worlds
+    .slice()
+    .sort((a, b) => a.order - b.order)
+    .flatMap((world) => worldLessons(world, lessons));
+}
+
+/**
+ * The single seeded profile's id, read straight from localStorage's real storage shape (the same
+ * one the app itself writes) — for specs that seed progress directly instead of playing through it.
+ */
+export async function getSoleProfileId(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const raw = localStorage.getItem('chess-kids:profiles');
+    const profiles = raw ? (JSON.parse(raw) as Record<string, { id: string }>) : {};
+    const [profile] = Object.values(profiles);
+    if (!profile) throw new Error('no seeded profile found in localStorage');
+    return profile.id;
+  });
+}
+
+/**
+ * Seeds one lesson's progress directly into localStorage (same real storage key/shape the app
+ * itself writes), marking it mastered: every exercise at 3 stars, and — for a lesson with a boss —
+ * the boss "won" at 3 stars. Used to unlock a later world/lesson from the Journey without playing
+ * through everything before it.
+ */
+export async function seedLessonMastered(
+  page: Page,
+  profileId: string,
+  lesson: Lesson,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, lessonId, exerciseIds, hasBoss }) => {
+      const key = 'chess-kids:lesson-progress';
+      const raw = localStorage.getItem(key);
+      const all = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      const now = new Date().toISOString();
+      all[`${pid}:${lessonId}`] = {
+        id: `seed-${lessonId}`,
+        profileId: pid,
+        lessonId,
+        bestStars: Object.fromEntries(exerciseIds.map((id) => [id, 3])),
+        bossStars: hasBoss ? 3 : 0,
+        resumeStep: 0,
+        createdAt: now,
+        updatedAt: now,
+      };
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    {
+      profileId,
+      lessonId: lesson.id,
+      exerciseIds: lesson.exercises.map((exercise) => exercise.id),
+      hasBoss: lesson.boss !== undefined,
+    },
+  );
+}
+
+/** `seedLessonMastered` for every lesson in `lessons` (order doesn't matter, each is independent). */
+export async function seedLessonsMastered(
+  page: Page,
+  profileId: string,
+  lessons: readonly Lesson[],
+): Promise<void> {
+  for (const lesson of lessons) {
+    await seedLessonMastered(page, profileId, lesson);
+  }
 }
 
 export function findLesson(id: string): Lesson {
