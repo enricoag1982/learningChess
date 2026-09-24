@@ -907,6 +907,7 @@ describe('recordReviewResult', () => {
       task: { conceptId: 'rook-move', lessonId: 'rook', exercise: EXERCISE_1 },
       state: exerciseState(EXERCISE_1, { solved: true, moves: 1 }),
       durationMs: 500,
+      reviewSource: 'warmup',
     });
 
     expect(stats.box).toBe(3);
@@ -944,6 +945,7 @@ describe('recordReviewResult', () => {
       task: { conceptId: 'rook-move', lessonId: 'rook', exercise: EXERCISE_1 },
       state: exerciseState(EXERCISE_1, { solved: false, errors: 1 }),
       durationMs: 500,
+      reviewSource: 'practice',
     });
 
     expect(stats.box).toBe(1);

@@ -117,5 +117,6 @@ export function fixtureContentSource(
     minigames: () => minigames,
     minigame: (id) => minigames.find((game) => game.id === id),
     catalog: () => fixtureCatalog,
+    badges: () => [],
   };
 }

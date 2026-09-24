@@ -23,6 +23,7 @@ export function WarmUpScreen(): JSX.Element {
       tasks={tasks}
       headerText={(current, total) => t('session.warmup-of', { current, total })}
       closeAriaLabel={t('session.leave')}
+      reviewSource="warmup"
       onDone={() => {
         void advanceToday();
       }}

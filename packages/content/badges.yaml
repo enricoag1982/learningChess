@@ -1,0 +1,87 @@
+# Badge catalogue (docs/rewards.md §3-4). MVP = 25 badges: every milestone/skill/play/habit badge
+# except the 3 path (branch-track) milestones and Fork Finder, whose tracks/concept are not
+# authored yet. Name/condition text live in locales/en/rewards.yaml under `badges.<id>.name` /
+# `.condition` (derived from `id`, not authored here).
+badges:
+  # Milestones
+  - id: board-explorer
+    category: milestone
+    condition: { type: mastered, scope: 'world:board', thresholds: [1] }
+  - id: piece-master
+    category: milestone
+    condition: { type: mastered, scope: 'world:pieces', thresholds: [1] }
+  - id: guardian
+    category: milestone
+    condition: { type: mastered, scope: 'world:attack', thresholds: [1] }
+  - id: checkmate-champion
+    category: milestone
+    condition: { type: mastered, scope: 'world:check', thresholds: [1] }
+  - id: rule-master
+    category: milestone
+    condition: { type: mastered, scope: 'world:rules', thresholds: [1] }
+  - id: basics-graduate
+    category: milestone
+    condition: { type: mastered, scope: 'track:basics', thresholds: [1] }
+
+  # Skills
+  - id: perfect-lesson
+    category: skill
+    condition: { type: perfect-lessons, thresholds: [1, 5, 15] }
+  - id: star-collector
+    category: skill
+    condition: { type: stars-total, thresholds: [50, 150, 400] }
+  - id: sharp-eyes
+    category: skill
+    condition: { type: concept-correct, concept: hanging-piece, inARow: true, thresholds: [10] }
+  - id: escape-artist
+    category: skill
+    condition: { type: concept-correct, concept: check-escape, noHints: true, thresholds: [10] }
+  - id: mate-master
+    category: skill
+    condition: { type: concept-correct, concept: mate-in-1, thresholds: [10, 25, 50] }
+  - id: butterfly-maker
+    category: skill
+    condition: { type: game-event, event: promotion, thresholds: [10] }
+  - id: castle-builder
+    category: skill
+    condition: { type: game-event, event: castling, thresholds: [5] }
+
+  # Play
+  - id: first-win
+    category: play
+    condition: { type: game-win, opponent: any, thresholds: [1] }
+  - id: mouse-tamer
+    category: play
+    condition: { type: game-win, opponent: 'computer:1', thresholds: [1] }
+  - id: rabbit-catcher
+    category: play
+    condition: { type: game-win, opponent: 'computer:2', thresholds: [1] }
+  - id: fox-outsmarter
+    category: play
+    condition: { type: game-win, opponent: 'computer:3', thresholds: [1] }
+  - id: wolf-tamer
+    category: play
+    condition: { type: game-win, opponent: 'computer:4', thresholds: [1] }
+  - id: bear-buddy
+    category: play
+    condition: { type: game-win, opponent: 'computer:5', thresholds: [1] }
+  - id: queen-keeper
+    category: play
+    condition: { type: game-win, extra: queen-kept, thresholds: [1] }
+  - id: pawn-wars-winner
+    category: play
+    condition: { type: game-win, opponent: pawn-wars, thresholds: [3] }
+  - id: friendly-match
+    category: play
+    condition: { type: game-played, mode: local, thresholds: [1] }
+
+  # Habits
+  - id: daily-player
+    category: habit
+    condition: { type: streak-days, thresholds: [3, 7, 30] }
+  - id: warm-up-champ
+    category: habit
+    condition: { type: warmups, thresholds: [10, 30] }
+  - id: never-give-up
+    category: habit
+    condition: { type: comeback, thresholds: [1, 10, 25] }

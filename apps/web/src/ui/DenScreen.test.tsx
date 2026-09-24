@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
 import '../i18n.ts';
 import App from '../App.tsx';
@@ -51,5 +51,79 @@ describe('DenScreen', () => {
     expect(
       screen.getByRole('listitem', { name: 'Elephant, locked, finish the Bishop lesson' }),
     ).toBeTruthy();
+  });
+
+  it('shows every badge locked with its condition, and no streak yet, on a fresh profile', async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
+    await screen.findByText("Mia's Den");
+
+    expect(screen.getByText('Badges')).toBeTruthy();
+    expect(screen.getByText('Milestones')).toBeTruthy();
+    expect(screen.getByText('Skills')).toBeTruthy();
+    expect(screen.getByText('Play')).toBeTruthy();
+    expect(screen.getByText('Habits')).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'First Win, locked. Win a game vs the computer' }),
+    ).toBeTruthy();
+    expect(screen.getByText('Play today to start a streak!')).toBeTruthy();
+  });
+
+  it('shows an earned badge in colour, with its tier, and a "new" dot until tapped', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    const now = new Date().toISOString();
+    await services.deps.rewards?.addEarnedBadge({
+      id: 'eb1',
+      profileId: profile.id,
+      badgeId: 'star-collector',
+      tier: 'bronze',
+      at: now,
+      seen: false,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+    fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
+    await screen.findByText("Mia's Den");
+
+    const tile = screen.getByRole('button', { name: 'Star Collector, Bronze tier, earned' });
+    expect(tile).toBeTruthy();
+    expect(screen.getByText('New')).toBeTruthy();
+
+    fireEvent.click(tile);
+    await waitFor(() => {
+      expect(screen.queryByText('New')).toBeNull();
+    });
+  });
+
+  it('shows the streak pill with current + best once a streak exists', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    const now = new Date().toISOString();
+    await services.deps.rewards?.saveStreak({
+      id: 's1',
+      profileId: profile.id,
+      current: 4,
+      best: 7,
+      lastDay: '2026-01-05',
+      skipsUsedThisWeek: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+    fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
+    await screen.findByText("Mia's Den");
+
+    expect(screen.getByRole('img', { name: '4 day streak' })).toBeTruthy();
+    expect(screen.getByText('Best: 7')).toBeTruthy();
   });
 });

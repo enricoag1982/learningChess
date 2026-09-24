@@ -137,6 +137,46 @@ describe('HomeScreen', () => {
 
     await screen.findByText("Mia's Den");
   });
+
+  it('shows the streak pill once the streak reaches 2 days, not for 0 or 1', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    const now = new Date().toISOString();
+    await services.deps.rewards?.saveStreak({
+      id: 's1',
+      profileId: profile.id,
+      current: 1,
+      best: 1,
+      lastDay: '2026-01-05',
+      skipsUsedThisWeek: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+    expect(screen.queryByRole('img', { name: '1 day streak' })).toBeNull();
+  });
+
+  it('shows the streak pill at 2+ days', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    const now = new Date().toISOString();
+    await services.deps.rewards?.saveStreak({
+      id: 's1',
+      profileId: profile.id,
+      current: 3,
+      best: 3,
+      lastDay: '2026-01-05',
+      skipsUsedThisWeek: 0,
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+    expect(await screen.findByRole('img', { name: '3 day streak' })).toBeTruthy();
+  });
 });
 
 // A one-lesson world with its own boss (M3.2a dev fixture, not the real tracks.yaml).

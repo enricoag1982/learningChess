@@ -95,6 +95,7 @@ export function FullGameScreen(): JSX.Element {
   const level = useAppStore((state) => state.fullGameLevel);
   const exitFullGame = useAppStore((state) => state.exitFullGame);
   const updateAutomaticLevel = useAppStore((state) => state.updateAutomaticLevel);
+  const checkForCelebrations = useAppStore((state) => state.checkForCelebrations);
 
   const [current, setCurrent] = useState<VersusState | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
@@ -140,16 +141,21 @@ export function FullGameScreen(): JSX.Element {
         return Promise.resolve();
       }
       const { result, reason } = versusGameRecordResult(state);
-      return recordGame(services.deps, {
-        profileId: profile.id,
-        game: 'full',
-        opponentLevel: level,
-        result,
-        reason,
-        moves: versusGameState(state).history.map((move) => move.san),
-      })
-        .then(() => updateAutomaticLevel(level))
-        .then(() => undefined);
+      return (
+        recordGame(services.deps, {
+          profileId: profile.id,
+          game: 'full',
+          opponentLevel: level,
+          result,
+          reason,
+          moves: versusGameState(state).history.map((move) => move.san),
+        })
+          .then(() => updateAutomaticLevel(level))
+          // rewards.md §4 "game result" celebration moment: `recordGame` (app layer) already ran
+          // `checkRewards` for a non-abandoned finish, so this just picks up anything newly earned.
+          .then(() => checkForCelebrations())
+          .then(() => undefined)
+      );
     },
     primaryLabel: t('play.back-to-play'),
     onPrimary: exitFullGame,

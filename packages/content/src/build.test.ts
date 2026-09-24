@@ -25,6 +25,7 @@ describe('build script', () => {
       lessons: readNamespace('lessons'),
       characters: readNamespace('characters'),
       journey: readNamespace('journey'),
+      rewards: readNamespace('rewards'),
     });
   });
 
@@ -39,5 +40,14 @@ describe('build script', () => {
     // Files are read in directory order (alphabetical), not curriculum order: check by id,
     // not position.
     expect(content.lessons.some((lesson) => lesson.id === 'rook')).toBe(true);
+  });
+
+  it('builds dist/badges.json with the 25-badge MVP catalogue', () => {
+    const badges = JSON.parse(readFileSync(join(packageDir, 'dist', 'badges.json'), 'utf8')) as {
+      readonly id: string;
+    }[];
+
+    expect(badges).toHaveLength(25);
+    expect(badges.map((badge) => badge.id)).toContain('first-win');
   });
 });

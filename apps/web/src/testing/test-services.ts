@@ -8,6 +8,7 @@ import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game
 import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
+import { LocalStorageRewardsRepository } from '../adapters/storage/local-rewards-repository.ts';
 import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
 import { openLocalStore } from '../adapters/storage/local-store.ts';
 import { MIGRATIONS } from '../adapters/storage/migrations.ts';
@@ -30,6 +31,7 @@ export function createTestServices(
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
     gameRecords: new LocalStorageGameRecordRepository(store),
+    rewards: new LocalStorageRewardsRepository(store),
     clock: createSystemClock(),
     ids: createCryptoIds(),
     content,

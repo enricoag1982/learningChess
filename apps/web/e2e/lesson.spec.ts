@@ -5,6 +5,7 @@ import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   completeExercise,
+  dismissCelebrationIfShown,
   pickProfileFromPicker,
   playLesson,
   startLessonToFirstGuided,
@@ -44,6 +45,8 @@ test.describe('First lesson (whichever the Journey currently offers)', () => {
     await playLesson(page, lesson, content.minigames);
 
     await expect(page.getByText('Lesson complete!')).toBeVisible();
+    // M4.4: a newly earned badge celebrates first, its own "Continue" sharing this screen's text.
+    await dismissCelebrationIfShown(page);
     await page.getByRole('button', { name: /Continue/ }).click();
 
     // Opened via Home's Start today: its own Today session (M3.4), so Continue lands on the

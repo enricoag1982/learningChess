@@ -7,7 +7,8 @@
     "./locales/*": "./dist/locales/*",
     "./content.json": "./dist/content.json",
     "./tracks.json": "./dist/tracks.json",
-    "./bot-book.json": "./dist/bot-book.json"
+    "./bot-book.json": "./dist/bot-book.json",
+    "./badges.json": "./dist/badges.json"
   },
   "scripts": {
     "build": "node scripts/build.ts",
