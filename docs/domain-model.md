@@ -29,6 +29,7 @@ Character 1─1 piece type
 | Assessment | `id`, `kind` (`placement` / `test-out` / `world-test`), `scope`, `tasksPerConcept`, `pass` (default 0.8) |
 | Character | `id` (`rhino`, …), `piece`, `nameKey`, `storyKey` |
 | Rank | `id` (`pawn` … `king`), `after` (world id, track id, or `all-tracks`) |
+| BotLevel | `level` (1–5), `name` (`mouse` … `bear`), `random`, `shallow`, `depth`, `book`, `queenHomeMoves`, `aids` — see [computer-opponent.md](computer-opponent.md) |
 
 ### 1.1 Position
 - Authored as board diagram or FEN; parsed to `Position { pieces, markers { stars, blocked }, toMove }`.
@@ -69,7 +70,7 @@ Character 1─1 piece type
 |---|---|
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
-| Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (override), `pieceStyle` |
+| Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 results), `box` (1–5), `dueAt` |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
@@ -152,6 +153,7 @@ Failing any assessment: no penalty, no data lost.
 packages/content/
   tracks.yaml                  tracks, worlds, habitats, ranks
   characters.yaml
+  bot-levels.yaml              computer opponent levels
   assessments.yaml
   lessons/<world>/<lesson>.yaml
   minigames/<id>.yaml

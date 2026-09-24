@@ -19,7 +19,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Styling / motion | Tailwind CSS + Motion | Consistent design, smooth animations |
 | Board | Own SVG component | Full control: stars, blocked squares, animal badges, arrows, tap-tap; crisp on tablets |
 | Chess rules | chess.js (BSD-2) + own variant layer | Standard rules from chess.js; variants (no kings, custom win conditions) in own layer |
-| Computer opponent | Own engine (minimax depth 1–3 + controlled mistakes) | Weak human-like play for kids; no GPL |
+| Computer opponent | Own engine (minimax depth 1–4 + controlled mistakes) in a Web Worker | Weak human-like play for kids; no GPL; UI stays smooth. Details: [computer-opponent.md](computer-opponent.md) |
 | App state | Zustand | Minimal; logic stays in domain |
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
