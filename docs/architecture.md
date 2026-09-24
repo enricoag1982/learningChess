@@ -21,7 +21,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Chess rules | chess.js (BSD-2) + own variant layer | Standard rules from chess.js; variants (no kings, custom win conditions) in own layer |
 | Computer opponent | Own engine (minimax depth 1–3 + controlled mistakes) | Weak human-like play for kids; no GPL |
 | App state | Zustand | Minimal; logic stays in domain |
-| Content | JSON + Zod schemas | Lessons as data, validated |
+| Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
 | Narration | Port with 2 adapters: Web Speech API (prototype) → recorded audio (release) | Fast start; recorded voices for quality/consistency |
 | Web delivery | PWA | Browser + home-screen install, offline |
@@ -35,7 +35,7 @@ ui (React screens, Board) ──> app (use cases, state) ──> domain (pure TS
                                      │ ports
                                      ▼
                      adapters: storage, narration, platform
-content (JSON lessons + schemas) ──> loaded by app, validated against domain
+content (YAML lessons ─build─> JSON) ──> loaded by app, validated against domain
 ```
 
 | Layer | Contains | Depends on |
@@ -50,7 +50,7 @@ content (JSON lessons + schemas) ──> loaded by app, validated against domain
 
 ```
 packages/core      domain + ports
-packages/content   lessons, schemas, i18n strings
+packages/content   lessons (YAML), schemas, locales, build + import scripts
 apps/web           React UI + web adapters (PWA; Capacitor wraps it)
 apps/native        only if a native UI is ever needed; reuses core
 ```
@@ -68,7 +68,37 @@ apps/native        only if a native UI is ever needed; reuses core
 - All repository methods async (cloud-ready).
 - iOS Safari may evict website storage after 7 days without use; home-screen PWA / Capacitor avoid it.
 
-## 6. Mobile path
+## 6. Content format
+
+| Element | Format |
+|---|---|
+| Lesson | YAML, one file per lesson |
+| Build | Zod schema validation → compiled JSON; no YAML parser at runtime |
+| Text | Per-language locale files, referenced by key; translators never edit lesson structure |
+| Position | Board diagram (`*` star, `x` blocked) or FEN |
+| Moves | SAN (e.g. `Rxa8#`) |
+| Bulk puzzles | Import script from Lichess puzzle database (CSV, CC0), filtered by theme/rating |
+
+Example:
+```yaml
+id: rook-02
+concept: rook-move
+type: collect-stars
+text: rook-02          # key in locales/<lang>/lessons.yaml
+board: |               # rank 8 on top; * = star, x = blocked
+  . . . . * . . .
+  . . . . . . . .
+  . . . . . . . .
+  * . . . * . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  R . . . . . . .
+stars3: 3              # moves for 3 stars
+stars2: 5
+```
+
+## 7. Mobile path
 
 | Option | Reuse | Pros | Cons |
 |---|---|---|---|
@@ -76,29 +106,31 @@ apps/native        only if a native UI is ever needed; reuses core
 | **Capacitor** (chosen) | ~100% | Stores; native storage/audio | Web-view (fine for 2D board) |
 | React Native | core only | Native feel | Second UI; only if web-view insufficient |
 
-## 7. Tests
+## 8. Tests
 
 | Level | Tool | Scope |
 |---|---|---|
 | Domain | Vitest | Rules, variants, mastery, scheduler, bot |
-| Content | Vitest | Every exercise: valid position, legal solution, solution reaches goal; all strings translated |
+| Content | Vitest | Every exercise: schema valid, valid position, legal solution, solution reaches goal within star limits; all text keys present in every locale |
 | Components | React Testing Library | Board interaction, lesson flow |
 | End-to-end | Playwright | Create profile → lesson → mini-game → progress persisted |
 | Static | `tsc --strict`, ESLint, Prettier | Every commit via GitHub Actions |
 
-## 8. Rejected
+## 9. Rejected
 
 | Option | Reason |
 |---|---|
+| JSON for authoring | No comments, no multi-line text, error-prone by hand |
 | Flutter | Heavy web build, few chess libraries, Dart-only |
 | Unity / Godot | Overkill for 2D board; heavy web builds |
 | chessground, Stockfish | GPL-3.0 (license would propagate); Stockfish too strong for target |
 | React Native first | Slower browser start |
 
-## 9. Decisions
+## 10. Decisions
 
 | Topic | Decision |
 |---|---|
 | Languages | Multi-language via i18n; English first |
 | Narration | Web Speech API for prototype → recorded voices for release |
 | Mobile | PWA first → Capacitor |
+| Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |
