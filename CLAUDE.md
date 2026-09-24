@@ -11,7 +11,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
   - `model: "sonnet"`: implementation tasks with a clear spec (files, interfaces, tests to write).
   - `model: "haiku"`: running lint / typecheck / tests, mechanical edits, dependency checks.
   - Main agent: plans, writes precise task specs, reviews diffs, decides, commits.
-- Branch: `claude/chess-learning-app-kids-9vozmt`. Commit and push after each completed step.
+- Branching: `master` holds merged work; one feature branch per milestone from `master` (current: `m0-scaffold`). Commit and push after each completed step; merge to `master` when the milestone is done and the user approves.
 
 ## Docs (read the relevant one before working on an area)
 
