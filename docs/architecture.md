@@ -4,6 +4,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 
 ## 1. Requirements
 
+- **Offline app**: v1 has no server; everything runs and stores on the device. Network only to install / update the app.
 - Browser first; Android / iPad later.
 - Storage abstracted; simplest implementation first, cloud later.
 - Rich interaction, polished UI; per-platform variants possible.
@@ -24,7 +25,8 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
 | Narration | Port with 2 adapters: Web Speech API (prototype) → recorded audio (release) | Fast start; recorded voices for quality/consistency |
-| Web delivery | PWA | Browser + home-screen install, offline |
+| Web delivery | PWA (vite-plugin-pwa / Workbox) | Browser + home-screen install; everything precached, fully offline ([non-functional.md](non-functional.md)) |
+| Fonts | Self-hosted | Offline, no third-party requests |
 | Mobile | Capacitor (Android + iPad) | Same web app packaged for stores |
 | Package manager | pnpm workspaces | Shared core across apps |
 

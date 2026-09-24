@@ -16,7 +16,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 ## 2. Modes
 
 - **Kid mode** (default): icons + voice, no reading required.
-- **Parent mode**: behind adult check. All profiles, progress, settings.
+- **Parent mode**: behind parent gate (hold 3 s + simple question). All profiles, progress, settings.
 
 ## 3. Profiles
 
@@ -122,6 +122,7 @@ Tap square(s) · Move piece to goal · Collect stars · Capture target · Safe? 
 - Per profile: progress by track/world/concept, weak concepts, time per day.
 - Settings per profile: session limit, voice/sound, hints on/off, computer level, unlock lessons/worlds, reset.
 - Profile management: add, rename, delete.
+- Backup: export / import progress file (data is only on the device).
 
 ## 12. Data per profile
 

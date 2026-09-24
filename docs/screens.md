@@ -14,7 +14,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Colour roles | Cream background · green = go / done · orange = today / current · gold = stars · blue = computer / info · grey + lock = locked |
 | Errors | Never red; orange + spoken explanation |
 | Type | Rounded display face (Fredoka) + Nunito body (proposal) |
-| Parent area | Adult style (smaller text, denser); behind "hold 3 seconds" gate |
+| Parent area | Adult style (smaller text, denser); behind parent gate (hold 3 s + simple question) |
 
 ## 2. Screen list
 
