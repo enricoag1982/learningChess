@@ -27,6 +27,8 @@ export interface BoardHighlights {
   readonly hint?: readonly Square[];
   /** Orange mark for a wrong try — never red. */
   readonly wrong?: readonly Square[];
+  /** Dashed orange mark (steady): select-squares answer squares still missing after a check. */
+  readonly missed?: readonly Square[];
   /** Squares of the move just played, for the slide/fade animation and a soft tint. */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
   /** Steady (non-pulsing) ring, always shown: yes-no exercises' question square. */
@@ -79,6 +81,8 @@ function describeSquare(
   focus: boolean,
   danger: boolean,
   check: boolean,
+  wrong = false,
+  missed = false,
 ): string {
   const piece = position.pieces[square];
   let base: string;
@@ -94,6 +98,10 @@ function describeSquare(
     base = t('board.square.blocked', { square });
   } else {
     base = t('board.square.empty', { square });
+  }
+  if (missed) return t('board.square.missed', { base });
+  if (selected && wrong) {
+    return t('board.square.wrong', { base: t('board.square.selected', { base }) });
   }
   if (selected) return t('board.square.selected', { base });
   if (target) return t('board.square.possible-move', { base });
@@ -417,6 +425,7 @@ export function Board({
                   lastMove !== undefined && (lastMove.from === square || lastMove.to === square);
                 const isHint = highlights?.hint?.includes(square) ?? false;
                 const isWrong = highlights?.wrong?.includes(square) ?? false;
+                const isMissed = highlights?.missed?.includes(square) ?? false;
                 const isFocus = highlights?.focus?.includes(square) ?? false;
                 const isDanger = highlights?.danger?.includes(square) ?? false;
                 const isCheck = highlights?.check === square;
@@ -432,6 +441,8 @@ export function Board({
                   isFocus,
                   isDanger,
                   isCheck,
+                  isWrong,
+                  isMissed,
                 );
 
                 return (
@@ -571,6 +582,12 @@ export function Board({
                         <span
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-[6%] rounded-md border-4 border-today"
+                        />
+                      )}
+                      {isMissed && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-[6%] rounded-md border-4 border-dashed border-today"
                         />
                       )}
                       {isFocus && (

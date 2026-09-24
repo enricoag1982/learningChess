@@ -28,8 +28,12 @@ export type ExerciseFeedback =
   | { readonly kind: 'instruction' }
   | { readonly kind: 'tap-first' }
   | { readonly kind: 'illegal' }
+  /** select-squares: only wrong picks. */
   | { readonly kind: 'select-wrong' }
+  /** select-squares: only missing squares. */
   | { readonly kind: 'select-missing' }
+  /** select-squares: wrong picks and missing squares. */
+  | { readonly kind: 'select-both' }
   /** yes-no / choice: a wrong pick. */
   | { readonly kind: 'wrong-answer' }
   /** best-move: a legal move that is not in `solutions`. */
@@ -50,6 +54,11 @@ export interface ExerciseUIState {
   readonly feedback: ExerciseFeedback;
   /** Squares wrongly selected/placed in the last try; orange, never red. */
   readonly wrongSquares: readonly Square[];
+  /**
+   * select-squares, after a wrong check: answer squares the kid had not selected (dashed orange
+   * until tapped). Kept across toggles; the play area hides the ones since selected.
+   */
+  readonly missedSquares: readonly Square[];
   /** The last played kid move, for the board's slide animation (collect-stars / capture / best-move). */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
   /** best-move: a legal-but-wrong attempt, for the board's slide-and-bounce-back animation. */
@@ -90,6 +99,7 @@ export function initExerciseState(def: ExerciseDef): ExerciseUIState {
     hint: null,
     feedback: { kind: 'instruction' },
     wrongSquares: [],
+    missedSquares: [],
   };
 }
 
@@ -194,23 +204,37 @@ export function createExerciseReducer(
       case 'tap-first':
         return { ...state, feedback: { kind: 'tap-first' } };
       case 'toggle':
+        // Markers from the last check stay until the next one; the play area hides each one as
+        // soon as the kid fixes that square (wrong one untapped, missed one tapped).
         return {
           ...state,
           core: toggleSquare(state.core, action.square),
           feedback: { kind: 'instruction' },
-          wrongSquares: [],
         };
       case 'submit': {
         const { state: core, result } = submitSelection(state.core, rules);
         if (result.correct) {
-          return { ...state, core, hint: null, feedback: { kind: 'solved' }, wrongSquares: [] };
+          return {
+            ...state,
+            core,
+            hint: null,
+            feedback: { kind: 'solved' },
+            wrongSquares: [],
+            missedSquares: [],
+          };
         }
-        const onlyMissing = result.wrong.length === 0 && result.missing > 0;
+        const kind =
+          result.wrong.length === 0
+            ? 'select-missing'
+            : result.missing === 0
+              ? 'select-wrong'
+              : 'select-both';
         return {
           ...state,
           core,
-          feedback: { kind: onlyMissing ? 'select-missing' : 'select-wrong' },
-          wrongSquares: onlyMissing ? [] : result.wrong,
+          feedback: { kind },
+          wrongSquares: result.wrong,
+          missedSquares: result.missingSquares,
         };
       }
       case 'answer-yes-no': {

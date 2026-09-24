@@ -55,10 +55,13 @@ describe('real content', () => {
     }
   });
 
-  it('every exercise position has a piece for the side to move (setup exercises excepted: they typically start empty)', () => {
+  it('every exercise position has a piece for the side to move (setup and fixed-squares select-squares excepted: board-geometry tasks may start empty)', () => {
     for (const lesson of content.lessons) {
       for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
-        if (exercise.type === 'setup') {
+        if (
+          exercise.type === 'setup' ||
+          (exercise.type === 'select-squares' && 'squares' in exercise.answer)
+        ) {
           continue;
         }
         const hasKidPiece = Object.values(exercise.position.pieces).some(

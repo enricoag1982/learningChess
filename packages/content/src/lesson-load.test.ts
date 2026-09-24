@@ -719,6 +719,23 @@ describe('loadContent', () => {
     expect(issues.some((issue) => issue.includes('side to move has no piece'))).toBe(true);
   });
 
+  it('allows an empty board for select-squares with explicit squares (board geometry)', () => {
+    writeLesson({
+      exercises: [
+        validSelectSquaresExercise({
+          board: diagram({}),
+          derive: undefined,
+          from: undefined,
+          answer: ['b1', 'd1', 'f1', 'h1'],
+        }),
+      ],
+    });
+    writeMiniGame();
+    writeDefaultLocales();
+
+    expect(issuesOf()).toEqual([]);
+  });
+
   it('reports a mini-game moveLimit that does not exceed par', () => {
     writeLesson();
     writeMiniGame({ moveLimit: 1 });

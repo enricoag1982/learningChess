@@ -271,7 +271,7 @@ describe('select-squares', () => {
     }
     const { result, state: submitted } = submitSelection(state, rules);
 
-    expect(result).toEqual({ correct: true, missing: 0, wrong: [] });
+    expect(result).toEqual({ correct: true, missing: 0, missingSquares: [], wrong: [] });
     expect(submitted.solved).toBe(true);
   });
 
@@ -335,6 +335,9 @@ describe('select-squares', () => {
     expect(result.correct).toBe(false);
     expect(result.wrong).toEqual(['e5']);
     expect(result.missing).toBe(13);
+    expect(result.missingSquares).toHaveLength(13);
+    expect(result.missingSquares).not.toContain('d5');
+    expect(result.missingSquares).toContain('d8');
     expect(submitted.errors).toBe(1);
     expect(submitted.solved).toBe(false);
   });
@@ -433,7 +436,7 @@ describe('select-squares', () => {
     state = toggleSquare(state, 'f5');
     const { result, state: submitted } = submitSelection(state, rules);
 
-    expect(result).toEqual({ correct: true, missing: 0, wrong: [] });
+    expect(result).toEqual({ correct: true, missing: 0, missingSquares: [], wrong: [] });
     expect(submitted.solved).toBe(true);
   });
 
@@ -492,7 +495,7 @@ describe('select-squares', () => {
     state = toggleSquare(state, 'h1');
     const { result, state: submitted } = submitSelection(state, rules);
 
-    expect(result).toEqual({ correct: true, missing: 0, wrong: [] });
+    expect(result).toEqual({ correct: true, missing: 0, missingSquares: [], wrong: [] });
     expect(submitted.solved).toBe(true);
   });
 

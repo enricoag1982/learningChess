@@ -823,6 +823,16 @@ function hasKidPiece(position: Position): boolean {
   return Object.values(position.pieces).some((piece) => piece.color === position.toMove);
 }
 
+/**
+ * Exercises that need no piece of the side to move: `setup` (starts from an empty board) and
+ * `select-squares` with explicit `squares` (a board-geometry question, e.g. "tap every light
+ * square in the bottom row" — a piece there would only distract).
+ */
+function needsKidPiece(exercise: ExerciseDef): boolean {
+  if (exercise.type === 'setup') return false;
+  return !(exercise.type === 'select-squares' && 'squares' in exercise.answer);
+}
+
 /** True when `position` has a `color` king on the board. */
 function hasKing(position: Position, color: Color): boolean {
   return Object.values(position.pieces).some(
@@ -1173,8 +1183,7 @@ function validateSemantics(
       const exerciseWhere = `${lessonWhere}: ${exercise.id}`;
       claimId(exercise.id, exerciseWhere);
       checkTextKey(exercise.textKey, locales, exerciseWhere, issues);
-      // setup exercises typically start from an empty board: "side to move has a piece" doesn't apply.
-      if (exercise.type !== 'setup' && !hasKidPiece(exercise.position)) {
+      if (needsKidPiece(exercise) && !hasKidPiece(exercise.position)) {
         issues.push(`${exerciseWhere}: side to move has no piece`);
       }
       if (exercise.type === 'choice') {
@@ -1213,8 +1222,7 @@ function validateSemantics(
         const roundWhere = `${where}: rounds[${String(index)}]`;
         claimId(round.id, roundWhere);
         checkTextKey(round.textKey, locales, roundWhere, issues);
-        // setup rounds typically start from an empty board: no piece for the side to move yet.
-        if (round.type !== 'setup' && !hasKidPiece(round.position)) {
+        if (needsKidPiece(round) && !hasKidPiece(round.position)) {
           issues.push(`${roundWhere}: side to move has no piece`);
         }
       }

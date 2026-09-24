@@ -206,7 +206,7 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
     await clickSquare(page, wrongSquare);
     await expectKidTouchTarget(page, /Check/);
     await page.getByRole('button', { name: /Check/ }).click();
-    await expect(page.getByText('Not quite! Look at the orange squares.')).toBeVisible();
+    await expect(page.getByText(contentText('exercise.select-both'))).toBeVisible();
     await expectNoSeriousViolations(page, 'Exercise (select-squares, wrong pick)');
     await clickSquare(page, wrongSquare); // deselect the wrong pick
   }
@@ -220,7 +220,8 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
   // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
   // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
-  test.setTimeout(150_000);
+  // Walks the whole curriculum: grows with every world (2.3–2.5 min at World 4 under load).
+  test.setTimeout(300_000);
 
   // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
   // exists in content, the first series boss (mid-round) and first static boss, and the Complete
