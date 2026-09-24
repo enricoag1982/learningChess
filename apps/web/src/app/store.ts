@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import { create } from 'zustand';
-import type { Journey, Lesson, LessonProgress, Profile } from '@chess-kids/core';
+import type { Journey, Lesson, LessonProgress, MiniGameProgress, Profile } from '@chess-kids/core';
 import {
   createProfile,
   getLessonProgress,
@@ -8,6 +8,7 @@ import {
   lessonStatus,
   listProfiles,
   loadJourney,
+  loadMiniGameProgress,
   loadProgress,
   selectProfile,
 } from '@chess-kids/core';
@@ -23,7 +24,10 @@ export type Screen =
   | 'parent'
   | 'home'
   | 'journey'
-  | 'lesson';
+  | 'lesson'
+  | 'play'
+  | 'den'
+  | 'minigame';
 
 /** Where the current lesson was opened from: decides where "Continue"/Close returns to. */
 export type LessonOrigin = 'home' | 'journey';
@@ -48,6 +52,8 @@ export interface AppState {
   /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
   readonly progress: readonly LessonProgress[];
+  /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
+  readonly miniGameProgress: readonly MiniGameProgress[];
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
   readonly lessonId: string | null;
@@ -56,6 +62,8 @@ export interface AppState {
   readonly lessonOrigin: LessonOrigin;
   /** New-player wizard: return to Parent area instead of Home once it creates the profile. */
   readonly newPlayerReturnsToParent: boolean;
+  /** The mini-game open in a standalone Play session (screen `minigame`); `null` otherwise. */
+  readonly miniGameId: string | null;
 
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
@@ -94,8 +102,19 @@ export interface AppState {
   readonly goToStep: (index: number) => void;
   /** Leaves the lesson screen for Home or the Journey, whichever it was opened from. */
   readonly exitLesson: () => void;
-  /** Re-reads saved progress (and the derived Journey) from storage, e.g. after a lesson updates it. */
+  /**
+   * Re-reads saved progress (lesson + mini-game) and the derived Journey from storage, e.g. after
+   * a lesson or a standalone mini-game session updates it.
+   */
   readonly refreshProgress: () => Promise<void>;
+  /** Opens the Play screen. */
+  readonly goToPlay: () => void;
+  /** Opens My Den. */
+  readonly goToDen: () => void;
+  /** Opens a mini-game's standalone session (Play screen tile tap), unlocked ones only. */
+  readonly startMiniGame: (miniGameId: string) => void;
+  /** Leaves the standalone mini-game session for the Play screen. */
+  readonly exitMiniGame: () => void;
 }
 
 /** A created store instance, as returned by `createAppStore` (one per `App`, for test isolation). */
@@ -123,11 +142,13 @@ export function createAppStore(services: Services) {
       profiles: [],
       profile: null,
       progress: [],
+      miniGameProgress: [],
       journey: null,
       lessonId: null,
       stepIndex: 0,
       lessonOrigin: 'home',
       newPlayerReturnsToParent: false,
+      miniGameId: null,
 
       async init() {
         if (await isFirstRun(services.deps)) {
@@ -148,11 +169,12 @@ export function createAppStore(services: Services) {
           // M1-upgrade path: an existing single profile with no parent lock yet skips profile
           // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
           await selectProfile(services.deps, only.id);
-          const [progress, journey] = await Promise.all([
+          const [progress, miniGameProgress, journey] = await Promise.all([
             loadProgress(services.deps, only.id),
+            loadMiniGameProgress(services.deps, only.id),
             loadJourney(services.deps, only.id),
           ]);
-          set({ profile: only, progress, journey, profiles, screen: 'home' });
+          set({ profile: only, progress, miniGameProgress, journey, profiles, screen: 'home' });
           return;
         }
         await get().goToPicker();
@@ -170,12 +192,13 @@ export function createAppStore(services: Services) {
           return;
         }
         await selectProfile(services.deps, profile.id);
-        const [profiles, progress, journey] = await Promise.all([
+        const [profiles, progress, miniGameProgress, journey] = await Promise.all([
           listProfiles(services.deps),
           loadProgress(services.deps, profile.id),
+          loadMiniGameProgress(services.deps, profile.id),
           loadJourney(services.deps, profile.id),
         ]);
-        set({ profile, progress, journey, profiles, screen: 'home' });
+        set({ profile, progress, miniGameProgress, journey, profiles, screen: 'home' });
       },
 
       async goToPicker() {
@@ -190,11 +213,12 @@ export function createAppStore(services: Services) {
         const profile = await services.deps.profiles.get(profileId);
         if (!profile) return;
         await selectProfile(services.deps, profileId);
-        const [progress, journey] = await Promise.all([
+        const [progress, miniGameProgress, journey] = await Promise.all([
           loadProgress(services.deps, profileId),
+          loadMiniGameProgress(services.deps, profileId),
           loadJourney(services.deps, profileId),
         ]);
-        set({ profile, progress, journey, screen: 'home' });
+        set({ profile, progress, miniGameProgress, journey, screen: 'home' });
       },
 
       goToPasswordScreen() {
@@ -242,11 +266,29 @@ export function createAppStore(services: Services) {
       async refreshProgress() {
         const { profile } = get();
         if (!profile) return;
-        const [progress, journey] = await Promise.all([
+        const [progress, miniGameProgress, journey] = await Promise.all([
           loadProgress(services.deps, profile.id),
+          loadMiniGameProgress(services.deps, profile.id),
           loadJourney(services.deps, profile.id),
         ]);
-        set({ progress, journey });
+        set({ progress, miniGameProgress, journey });
+      },
+
+      goToPlay() {
+        set({ screen: 'play' });
+      },
+
+      goToDen() {
+        set({ screen: 'den' });
+      },
+
+      startMiniGame(miniGameId: string) {
+        set({ screen: 'minigame', miniGameId });
+      },
+
+      exitMiniGame() {
+        set({ screen: 'play', miniGameId: null });
+        void get().refreshProgress();
       },
     };
   });

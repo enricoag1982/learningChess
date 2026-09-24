@@ -105,4 +105,26 @@ describe('HomeScreen', () => {
 
     await screen.findByRole('button', { name: /Back to Home/ });
   });
+
+  it('Play tile opens the Play screen', async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
+
+    await screen.findByRole('heading', { name: 'Play' });
+  });
+
+  it("My Den tile opens Mia's Den", async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
+
+    await screen.findByText("Mia's Den");
+  });
 });

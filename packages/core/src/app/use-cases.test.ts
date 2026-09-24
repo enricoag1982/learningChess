@@ -9,10 +9,10 @@ import type { ExerciseDef, CaptureDef } from '../domain/exercise/types.ts';
 import { playVersusMove, startVersus, versusStars } from '../domain/exercise/versus.ts';
 import type { VersusGameDef } from '../domain/exercise/versus.ts';
 import type { GameRulesDef } from '../domain/game/types.ts';
-import type { Lesson } from '../domain/lesson.ts';
+import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress } from '../domain/progress.ts';
+import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { AppDeps } from './use-cases.ts';
 import {
   getLessonProgress,
@@ -162,6 +162,7 @@ function makeProfileRepo(initial: readonly Profile[] = []): ProfileRepository {
 function makeProgressRepo(): ProgressRepository {
   const lessons = new Map<string, LessonProgress>();
   const attempts: Attempt[] = [];
+  const minigames = new Map<string, MiniGameProgress>();
   const key = (profileId: string, lessonId: string): string => `${profileId}:${lessonId}`;
   return {
     listLessons: (profileId) =>
@@ -176,6 +177,14 @@ function makeProgressRepo(): ProgressRepository {
       return Promise.resolve();
     },
     listAttempts: (profileId) => Promise.resolve(attempts.filter((a) => a.profileId === profileId)),
+    getMiniGame: (profileId, miniGameId) =>
+      Promise.resolve(minigames.get(key(profileId, miniGameId))),
+    listMiniGames: (profileId) =>
+      Promise.resolve([...minigames.values()].filter((p) => p.profileId === profileId)),
+    saveMiniGame: (progress) => {
+      minigames.set(key(progress.profileId, progress.miniGameId), progress);
+      return Promise.resolve();
+    },
     deleteProfileData: (profileId) => {
       for (const [k, progress] of lessons) {
         if (progress.profileId === profileId) lessons.delete(k);
@@ -656,6 +665,56 @@ describe('recordBossResult', () => {
     expect(progress.bossStars).toBe(1);
     const [attempt] = await deps.progress.listAttempts('profile-1');
     expect(attempt).toMatchObject({ correct: false, stars: 1, moves: 0 });
+  });
+
+  it("also folds the play into that mini-game's own MiniGameProgress, for the Play tile", async () => {
+    const hungryRook: MiniGame = {
+      mode: 'static',
+      id: 'hungry-rook',
+      concept: 'rook-move',
+      position: EMPTY_POSITION,
+      par: 2,
+      titleKey: 'fixtures:title',
+      goalKey: 'fixtures:goal',
+      unlockAfter: 'rook',
+    };
+    const deps = makeDeps({
+      content: {
+        ...stubContent,
+        minigame: (id) => (id === 'hungry-rook' ? hungryRook : undefined),
+      },
+    });
+    const lesson = makeLesson({ boss: 'hungry-rook' });
+    const state = gameState('hungry-rook', {
+      exercise: exerciseState(
+        {
+          id: 'hungry-rook',
+          concept: 'rook-move',
+          textKey: 'hungry-rook',
+          position: EMPTY_POSITION,
+          type: 'capture',
+          stars3: 2,
+          stars2: 2,
+        },
+        { solved: true, moves: 2 },
+      ),
+    });
+
+    await recordBossResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      durationMs: 4000,
+      nextStep: 8,
+    });
+
+    const miniGameProgress = await deps.progress.getMiniGame('profile-1', 'hungry-rook');
+    expect(miniGameProgress).toMatchObject({ bestStars: 3, plays: 1, wins: 1 });
+
+    const attempts = await deps.progress.listAttempts('profile-1');
+    // Exactly one attempt per play: the lesson's own boss attempt (no duplicate for the tile).
+    expect(attempts).toHaveLength(1);
+    expect(attempts[0]).toMatchObject({ scored: true, exerciseId: 'hungry-rook' });
   });
 });
 

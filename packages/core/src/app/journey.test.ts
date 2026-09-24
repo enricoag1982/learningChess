@@ -4,7 +4,7 @@ import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
-import type { Attempt, LessonProgress } from '../domain/progress.ts';
+import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import { loadJourney } from './journey.ts';
@@ -115,6 +115,9 @@ function makeProgressRepo(initial: readonly LessonProgress[] = []): ProgressRepo
     },
     addAttempt: () => Promise.resolve(),
     listAttempts: () => Promise.resolve<Attempt[]>([]),
+    getMiniGame: () => Promise.resolve(undefined),
+    listMiniGames: () => Promise.resolve<MiniGameProgress[]>([]),
+    saveMiniGame: () => Promise.resolve(),
     deleteProfileData: () => Promise.resolve(),
   };
 }

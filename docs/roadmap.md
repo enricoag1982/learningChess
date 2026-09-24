@@ -69,6 +69,11 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m2.5` | Journey map (Worlds 1–2, habitats, lesson nodes done / current / locked), availability rules, Home: next lesson + tiles (Journey, Play) |
 | `m2.6` | Mouse bot (level 1) in a worker; variant vs computer mode; Pawn + Promotion lessons; Pawn Wars |
 | `m2.7` | Animal friends, stars totals, basic My Den; Play screen (unlocked mini-games) → `m2` (playtest 2 by user) |
+| `m3.1` | `mate-in-n` type, select-squares `attacked-by` / `check-escapes`, rule-verified yes-no / choice answers, check highlight |
+| `m3.2` | World 3 lessons (Attack, Defend, Safe or not?, Piece values, Trades) + Queen vs Pawns, Safe or Not?, Army Battle; world boss Win the Queen (world-level boss in the catalog) |
+| `m3.3` | World 4 lessons (Check, Escape check, Checkmate, Mate in 1, Stalemate) + Escape the Check, Mate in 1; world boss: first full game vs Mouse |
+| `m3.4` | Mastery + review: concept stats, Leitner scheduler, warm-up, Today session (warm-up → lesson → mini-game → rewards), Practice screen |
+| `m3.5` | Full game vs computer in Play (after World 4), game records, polish → `m3` (playtest 3 by user) |
 
 ### 3.2 Follow-ups (not yet scheduled in an iteration)
 

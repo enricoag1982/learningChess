@@ -54,3 +54,6 @@ export {
   takeBackVersusMove,
   versusStars,
 } from './versus.ts';
+
+export type { BossResultSummary } from './boss-result.ts';
+export { summarizeBossResult, isBossResultWin } from './boss-result.ts';

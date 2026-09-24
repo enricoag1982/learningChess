@@ -198,6 +198,20 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
 
+  // Play and My Den (app-structure.md §4): a fresh install, so every mini-game is locked and no
+  // rank/friend is earned yet — still worth their own a11y + touch-target pass.
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await expectKidTouchTarget(page, /Play a full game/);
+  await expectKidTouchTarget(page, /^Hungry Rook,/);
+  await expectNoSeriousViolations(page, 'Play');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
+
+  await page.getByRole('button', { name: 'My Den', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await expectNoSeriousViolations(page, 'My Den');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
+
   for (const lesson of orderedLessons) {
     const allScanned =
       scannedTypes.size === wantedTypes.size &&

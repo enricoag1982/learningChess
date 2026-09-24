@@ -23,6 +23,7 @@ import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useNarratedText } from '../useNarratedText.ts';
+import type { BossPlaySession } from './BossStep.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { UndoIcon } from './exercise-icons.tsx';
 import { GameLayout } from './GameLayout.tsx';
@@ -32,6 +33,7 @@ export interface VersusStepProps {
   readonly lesson: Lesson;
   readonly game: VersusMiniGame;
   readonly nextStepIndex: number;
+  readonly session?: BossPlaySession;
 }
 
 /** localStorage key for a deterministic bot seed and a shortened "thinking" pause (tests only). */
@@ -108,6 +110,7 @@ export function VersusStep({
   lesson,
   game: minigame,
   nextStepIndex,
+  session,
 }: VersusStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -143,17 +146,22 @@ export function VersusStep({
   useEffect(() => {
     if (versus.status === 'playing' || savedRef.current || !profile) return;
     savedRef.current = true;
-    void recordBossResult(services.deps, {
-      profileId: profile.id,
-      lesson,
-      state: versus,
-      durationMs: Date.now() - startedAtRef.current,
-      nextStep: nextStepIndex,
-    }).then(() => {
+    const durationMs = Date.now() - startedAtRef.current;
+    const persist = session
+      ? session.save(versus, durationMs)
+      : recordBossResult(services.deps, {
+          profileId: profile.id,
+          lesson,
+          state: versus,
+          durationMs,
+          nextStep: nextStepIndex,
+        }).then(() => {
+          void refreshProgress();
+        });
+    void persist.then(() => {
       setSaved(true);
-      void refreshProgress();
     });
-  }, [versus, profile, services.deps, lesson, nextStepIndex, refreshProgress]);
+  }, [versus, profile, services.deps, lesson, nextStepIndex, refreshProgress, session]);
 
   function pieceLabel(type: PieceType): string {
     return t(`board.piece.${type}`);
@@ -309,14 +317,26 @@ export function VersusStep({
             {versus.status === 'won' && (
               <div className="mt-auto flex flex-col items-center gap-4">
                 <StarsRow earned={stars} animate />
-                {saved && (
-                  <NextButton
-                    onClick={() => {
-                      goToStep(nextStepIndex);
-                    }}
-                    className="w-full"
-                  />
-                )}
+                {saved &&
+                  (session ? (
+                    <div className="flex w-full gap-3">
+                      <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
+                        {t('play-again')}
+                      </button>
+                      <NextButton
+                        onClick={session.onPrimary}
+                        label={session.primaryLabel}
+                        className="flex-1"
+                      />
+                    </div>
+                  ) : (
+                    <NextButton
+                      onClick={() => {
+                        goToStep(nextStepIndex);
+                      }}
+                      className="w-full"
+                    />
+                  ))}
               </div>
             )}
             {(versus.status === 'lost' || versus.status === 'draw') && (
@@ -328,9 +348,14 @@ export function VersusStep({
                       {t('play-again')}
                     </button>
                     <NextButton
-                      onClick={() => {
-                        goToStep(nextStepIndex);
-                      }}
+                      onClick={
+                        session
+                          ? session.onPrimary
+                          : () => {
+                              goToStep(nextStepIndex);
+                            }
+                      }
+                      label={session?.primaryLabel}
                       className="flex-1"
                     />
                   </div>
