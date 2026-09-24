@@ -1,6 +1,7 @@
 import type { Move } from '../chess/rules.ts';
 import type { Piece, Position, Square } from '../chess/types.ts';
 import type { VariantRules } from '../variant/rules.ts';
+import { applyKidMove } from './apply-move.ts';
 import type { ExerciseDef } from './types.ts';
 
 /** One step of a solution line. */
@@ -19,17 +20,21 @@ function isGoalReached(position: Position, goal: Goal): boolean {
   return !Object.values(position.pieces).some((piece) => piece.color !== kidColor);
 }
 
-/** Deterministic key for a piece placement (square + colour + type, sorted by square). */
-function placementKey(pieces: Position['pieces']): string {
-  return Object.entries(pieces)
+/**
+ * Deterministic key for everything move generation depends on: piece placement (square + colour +
+ * type, sorted by square), castling rights and en passant square.
+ */
+function placementKey(position: Position): string {
+  const placement = Object.entries(position.pieces)
     .sort(([a], [b]) => (a < b ? -1 : 1))
     .map(([square, piece]) => `${square}${piece.color}${piece.type}`)
     .join(',');
+  return `${placement}|${position.castling}|${position.enPassant ?? '-'}`;
 }
 
 /** Full search state key: piece placement plus remaining stars. */
 function stateKey(position: Position): string {
-  return `${placementKey(position.pieces)}|${[...position.markers.stars].sort().join(',')}`;
+  return `${placementKey(position)}|${[...position.markers.stars].sort().join(',')}`;
 }
 
 /**
@@ -41,7 +46,19 @@ function stateKey(position: Position): string {
  * the piece map directly instead of paying for a full chess.js round trip. That keeps the search
  * fast enough for lesson-sized positions (see the performance test).
  */
-function applyForSearch(position: Position, move: Move): Position {
+function applyForSearch(position: Position, move: Move, rules: VariantRules): Position {
+  if (position.castling !== '-') {
+    // Castling moves the rook and changes rights: replay through the rules instead.
+    const applied = applyKidMove(position, rules, {
+      from: move.from,
+      to: move.to,
+      ...(move.promotion === undefined ? {} : { promotion: move.promotion }),
+    });
+    if (applied === null) {
+      throw new Error(`solver: legal move rejected: ${move.san}`);
+    }
+    return applied.position;
+  }
   const pieces: Partial<Record<Square, Piece>> = { ...position.pieces };
   if (move.captured !== undefined && pieces[move.to] === undefined) {
     // En passant: the captured pawn sits beside the destination, on the mover's own start rank.
@@ -95,7 +112,7 @@ export function solve(
 
   const legalMovesCache = new Map<string, Move[]>();
   function legalMoves(pos: Position): Move[] {
-    const key = placementKey(pos.pieces);
+    const key = placementKey(pos);
     const cached = legalMovesCache.get(key);
     if (cached !== undefined) {
       return cached;
@@ -113,7 +130,7 @@ export function solve(
     const next: Node[] = [];
     for (const node of frontier) {
       for (const move of legalMoves(node.position)) {
-        const nextPosition = applyForSearch(node.position, move);
+        const nextPosition = applyForSearch(node.position, move, rules);
         if (isGoalReached(nextPosition, goal)) {
           return pathTo({
             position: nextPosition,
