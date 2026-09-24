@@ -87,6 +87,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | No README yet; `docs/` are compact specs, not for casual readers |
 | F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Engine, UI, Rook variants (`rook-04`, `rook-08`) done; rules: domain-model.md §3.4 |
 | F3 | Tappable vs not tappable (owner, playtest) | Today info boxes (e.g. "Your moves: 48", stars pill, Owl bubble) look like buttons (same card, border). Proposal: tappable = raised card (border + bottom shadow, pressed state, icon or chevron); info = flat tinted panel, no border, no shadow; audit every screen | Design pass in M5 (accessibility + polish); rule goes to screens.md §1 |
+| F4 | Bear stronger than Wolf | Calibration (M4.2): bear vs wolf 26.7% (target ≥ 70%); Bear = depth 4 with a 250 ms cap rarely completes depth 4 in quiet positions | Options: null-move pruning, richer eval, wider book, or Bear = Wolf depth + quiescence; decide with M5 performance work |
 
 ## 4. After MVP
 

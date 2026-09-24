@@ -24,6 +24,20 @@ For every move, the level's profile picks one of three modes:
 
 Evaluation: material (P1 N3 B3 R5 Q9) + simple bonuses (centre, development, king safety, pawn advance). Level 5 adds a capture-sequence check at the end of the search.
 
+**Opening book (M4.2):** before the mode roll, a level with `book: true` (Fox/Wolf/Bear) checks
+`packages/content/bot-book.yaml` — e4/d4 main lines, ≤ 6 plies, both colours (a line is a shared
+move sequence; whoever is to move at a given ply plays it, not "White's" or "Black's" book).
+`domain/bot/book.ts`'s `bookCandidates` matches the game's own SAN history so far against every
+line's prefix, offers each matching line's next move (deduped, and only if it is still legal in the
+current position — defensive, in case a non-standard start coincides with a prefix by pure text
+accident), and `bookMove` picks uniformly among them with the seeded `Random`. `chooseMove` takes
+the compiled book as an optional parameter (kept out of `domain`'s own dependencies — `apps/web`'s
+bot worker/in-thread fallback import `@chess-kids/content/bot-book.json` and pass it in) so a
+forced mate-in-1 (`alwaysMateInOne`) still always wins outright, book or not. `pnpm build`
+(`packages/content/src/bot-book-load.ts`, its own module — not `lesson-load.ts`) checks every
+line is legal, ≤ 6 plies, and that its authored SAN matches chess.js's own SAN, failing the build
+otherwise.
+
 ## 3. Levels
 
 | Level | Name | `random` | `shallow` | `search` depth | Always plays mate in 1 | Opening | Unlock |
@@ -34,27 +48,49 @@ Evaluation: material (P1 N3 B3 R5 Q9) + simple bonuses (centre, development, kin
 | 4 | Wolf | 5% | 5% | 3 (90%) | Yes | Small book | Beat Fox 3× |
 | 5 | Bear | 0% | 0% | 4 + capture check | Yes | Small book | Beat Wolf 3× |
 
-All values in `bot-levels.yaml` (content), tunable without code changes.
+All values in `packages/core/src/domain/bot/levels.ts` (`BOT_LEVELS`) — plain TS, not
+`bot-levels.yaml`: no such content file exists in this codebase; `BotLevel` (`level`, `name`,
+`random`, `shallow`, `depth`, `searchShare`, `alwaysMateInOne`, `queenHomeMoves`, `book`, `aids`) is
+domain-layer data, and this doc's own §1 goal ("Testable") is met the same way either way — this
+note replaces the earlier, inaccurate "content, tunable without code changes" one.
 
-**Unlock, M3 scope (M3.5):** `computerLevelStatus(records, journey)` (`packages/core/src/app/games.ts`) computes each level's lock state for the Play screen's vs Computer card. Mouse: unlocked once World 4 ("check") is mastered (same rule the pre-M3.5 "Full game" button already used, `app-structure.md` §7). Rabbit: unlocked once the kid has 3 full-game (`GameRecord.game === 'full'`) wins vs Mouse — winning World 4's own `first-game` boss counts (it maps to `game: 'full'` too, §6 below), so mastering World 4 (which requires winning it once) is already 1 of the 3. Fox / Wolf / Bear stay **locked in M3** regardless of record count — their real unlock rule (the Openings-world alternative for Fox; "beat the previous level 3×" for all three, using the table's `Unlock` column above) is M4 work, once World 5 and the Openings track exist — but are shown on the card with that condition text, greyed, so the kid can see what is coming.
+**Unlock (M3.5 + M4.2):** `computerLevelStatus(records, journey)` (`packages/core/src/app/games.ts`)
+computes each level's lock state for the Play screen's vs Computer card. Mouse: unlocked once
+World 4 ("check") is mastered (same rule the pre-M3.5 "Full game" button already used,
+`app-structure.md` §7). Every level above it unlocks with 3 full-game wins vs the level right below
+(Rabbit vs Mouse, Fox vs Rabbit, Wolf vs Fox, Bear vs Wolf) — *or*, once there is already any
+recorded full-game win directly against that level itself, it stays unlocked regardless of that
+count. That second path exists so a level fought directly before the strict tally catches up (a
+world boss pitting the kid against it, or Fox's own Openings-world boss alternative once that
+content exists — both content, not yet authored for Fox/Wolf/Bear as of M4.2) never shows "locked"
+again afterwards — winning World 4's own `first-game` boss already works this way for Mouse/Rabbit
+(it is a full-game win vs Mouse, one of Rabbit's 3).
 
 ## 4. Kid aids per level
 
 | Aid | Mouse / Rabbit | Fox | Wolf / Bear |
 |---|---|---|---|
 | Take back | Unlimited | 3 per game | None |
-| Danger highlight (own unprotected attacked pieces) | On | Optional | Off |
-| Legal-move dots | On | On | Optional |
+| Danger highlight (own unprotected attacked pieces) | On | Off by default (optional) | Off |
+| Legal-move dots | On | On | On (default; parent override later) |
 
-Parent settings can override each aid.
+Parent settings can override each aid; only the default is implemented as of M4.2 (`BotLevel.aids`,
+`packages/core/src/domain/bot/levels.ts` — read by `VersusStep.tsx`'s `aidsForLevel`), no parent
+settings screen for it yet.
 
 ## 5. Automatic level
 
 - Default parent setting: `Automatic`.
 - After each game vs computer, look at the last 5 games at that level:
-  - ≥ 4 wins → suggest next level (Owl: "Ready for the Fox?").
+  - ≥ 4 wins → suggest next level (Owl: "Ready for the Fox?"), only if that level is unlocked.
   - ≤ 1 win → drop one level silently.
 - Never skips more than one level at a time.
+- Computed only once 5 full games have actually been played at that level (`nextSuggestedLevel`,
+  `packages/core/src/app/games.ts`) — a single early result cannot swing it either way.
+- Stored per profile in `AppSettings.suggestedLevels` (device-wide settings, keyed by profile id);
+  `suggestedLevel` (same module) is what the Play screen's chips actually default to: the stored
+  suggestion if it still names an unlocked level, else the highest level already unlocked (a fresh
+  profile, or one that has not played 5 games at any level yet, has no stored suggestion at all).
 
 ## 6. Game flow
 
@@ -77,6 +113,53 @@ Parent settings can override each aid.
   (`packages/core/src/app/games.ts`) and the `GameRecordRepository` port persist it (localStorage
   adapter: `apps/web/src/adapters/storage/local-game-record-repository.ts`, schema v3).
 
+## 6.5 Bear speed (M4.2)
+
+`architecture.md` §11 flagged Bear (depth 4) at ≈ 0.5-1 s in Node vs the 300 ms target. Fixed by,
+all in `packages/core/src/domain/bot/search.ts`, **Bear only** (see below for why): a
+transposition table keyed by `SearchBoard.hash()` (chess.js's own incrementally-maintained Zobrist
+hash — O(1) per `play`/`undo`, no FEN ever built in the hot loop), with the standard mate-score
+ply adjustment on store/probe so a mate found through one transposition is not misapplied through
+another; killer moves (quiet moves that caused a beta cutoff at the same ply, tried early); MVV
+capture ordering; quiescence (captures only, depth-capped at 4 plies) at the leaves in place of a
+single static evaluation, so a trade started right at the horizon is judged by where it settles;
+and iterative deepening with a 250 ms budget, checked roughly every 256 visited nodes (not only
+between depths — a single depth-4 pass can itself run for seconds) via a `SearchAborted` throw that
+unwinds cleanly (every `board.play` is undone on the way out) back to the last depth that fully
+completed. Every depth actually *used* is therefore a complete, exact alpha-beta pass — the move
+picked stays a deterministic function of the position and seed; only *how many* depths a given
+call completes can vary with machine load.
+
+**Scoped to Bear only:** the transposition table and killer moves also reorder equally-scored quiet
+moves at Rabbit/Fox/Wolf's own (unhurried, never over budget) depths — the *value* alpha-beta
+returns is unaffected, but *which* tied move ends up in the near-best pool can shift, and doing so
+measurably (if narrowly) changed Fox's own endgame conversion rate in `packages/content`'s
+`first-game` winnability check (80% → 75% over 40 seeds) for no offsetting benefit, since those
+levels were never the ones flagged as slow. Reverted for them; `chooseMove`/`chooseBySearch` gate
+all three (`tt`, `killers`, `quiesce`) on `level.level === 5` (`negamax`'s own `useTt`). Bear's own
+near-best margin (`nearBestMargin`) is also tighter than the other levels' (0.05 vs 0.3): calibration
+(below) showed the shared 0.3 was far too loose once real Bear self-play was fast enough to test for
+the first time — in one measured quiet position it swept in 25 of ~29 legal moves as "near-best",
+outright bad ones included.
+
+Measured (this machine; CI/real devices vary): before, p50 ≈ 1.85 s / p95 ≈ 4.1 s on a 10-position
+middlegame reference set; after, p50 ≈ 270-295 ms / p95 ≈ 300-330 ms — the ≤ 300 ms(local) /
+≤ 600 ms (CI) test bounds (`search.test.ts`, "Bear on the reference set") hold comfortably on that
+set. **Known limitation:** those reference positions are past the opening; a wide-open, still-quiet
+position (few captures, most legal moves scoring near-identically under this deliberately simple
+`staticEval`) is the worst case for alpha-beta's branching factor, and Bear's 250 ms budget often
+does not reach a genuinely complete depth 4 there — falling back gracefully to whatever depth (2-3)
+did complete, by design, but weaker than intended in exactly that phase. The calibration script
+(below) surfaced this as a real self-play weakness: `bear vs wolf`, 15 seeded games alternating
+colours — 4/15 (26.7%, 11 losses, 0 draws) — well short of the ≥ 70% target, even after tightening
+`nearBestMargin` for Bear. `fox vs rabbit` (93.3%) and `wolf vs fox` (86.7%) meet it comfortably;
+`rabbit vs mouse` (40.0%, 0 losses, 9 draws) does not either, but for a different, lower-stakes
+reason — Rabbit never *loses*, it just does not always convert a won position to checkmate within
+the self-play move limit (150 full moves) against Mouse's wandering king, and a kid's own real games
+never run anywhere near that long. Bear's shortfall is the real one: a bigger algorithmic change
+(null-move pruning, a richer evaluation, or wider opening-book coverage so fewer games leave it)
+would address it; out of scope for M4.2, left for a later iteration.
+
 ## 7. Mini-games and exercises
 
 | Use | Opponent |
@@ -91,11 +174,13 @@ Parent settings can override each aid.
 |---|---|
 | Legality | 10,000 random positions: every move legal (standard + variants) |
 | Tactics | Fox+: takes a free queen; Rabbit+: plays mate in 1; Fox+: stops kid's mate in 1 |
-| Determinism | Same position + seed → same move |
-| Performance | Bear ≤ 300 ms per move on reference position set |
-| Calibration (nightly) | Self-play: each level beats the previous ≥ 70% over 200 games |
+| Determinism | Same position + seed → same move (Bear's own case, `search.test.ts`, given §6.5's mid-search time cap) |
+| Performance | Bear ≤ 300 ms per move (p50) / ≤ 600 ms (p95, CI) on a 10-position reference set |
+| Book | `bookCandidates`/`bookMove` (`book.test.ts`): prefix matching, ply cap, dedup, determinism; `chooseMove` wiring (`search.test.ts`) |
+| Calibration (manual, not in CI) | `pnpm --filter @chess-kids/core calibrate [games]` (default 40): self-play, each level vs the previous, target ≥ 70% win rate. Run once for M4.2 (§6.5's numbers); not a nightly job (no CI schedule wired up) |
 | Mate hint (M3.5) | `mateHint` returns a legal move for the side to move; finds a mate-in-1 when one exists; `null` only with no legal move at all |
 
 ## 9. Later
 
 - **Game review:** after a game, Owl shows up to 3 key moments (material swing ≥ 3), e.g. "Here the Horse could take the Rook".
+- **Bear strength (M4.2 known limitation, §6.5):** a genuinely complete depth-4 search within the 250 ms budget, in the wide-open positions where it matters most — null-move pruning, a richer `staticEval`, or wider opening-book coverage are the likely levers; the calibration script (§8) is how to check progress.

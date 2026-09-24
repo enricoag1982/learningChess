@@ -1,5 +1,6 @@
 import type { Move, game } from '@chess-kids/core';
 import { bot, chessJsRules } from '@chess-kids/core';
+import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
 /**
@@ -15,7 +16,7 @@ function chooseMove(state: game.GameState, level: number, seed: number): Move | 
   if (botLevel === undefined) {
     throw new Error(`bot.worker: unknown bot level ${String(level)}`);
   }
-  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed));
+  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
 }
 
 ctx.onmessage = (event: MessageEvent<BotRequest>) => {

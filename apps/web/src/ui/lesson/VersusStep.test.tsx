@@ -200,6 +200,96 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     expect(screen.getByRole('button', { name: /^a2, white pawn$/ })).toBeTruthy();
   });
 
+  // Aids per level (M4.2, docs/computer-opponent.md §4): Mouse/Rabbit unlimited take-back + danger
+  // ring on; Fox 3 take-backs/game, danger off by default; Wolf/Bear no take-back, danger off.
+  describe('aids by level', () => {
+    it('Fox: danger ring is off by default (Mouse/Rabbit: on)', async () => {
+      const boss = racingPawnsGame({
+        id: 'fixture-danger-fox',
+        opponentLevel: 3,
+        position: parseDiagram(`
+          . . . . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          . . . . p . . .
+          . . . P . . . .
+          . . . . . . . .
+          P . . . . . . .
+          . . . . . . . .
+        `),
+      });
+      const lesson = fixtureLesson({ boss: boss.id });
+      const services = {
+        ...createTestServices(fixtureContentSource(lesson, [boss])),
+        botPlayer: scriptedBotPlayer([]),
+      };
+      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+
+      // Same "d4 attacked and undefended" position as the Mouse-level test above, but Fox's own
+      // danger ring is off by default: d4's accessible name carries no "in danger".
+      expect(screen.getByRole('button', { name: /^d4, white pawn$/ })).toBeTruthy();
+    });
+
+    it('Fox: take back is limited to 3 per game', async () => {
+      const boss = kingsGame({ id: 'fixture-take-back-fox', opponentLevel: 3 });
+      const lesson = fixtureLesson({ boss: boss.id });
+      const services = {
+        ...createTestServices(fixtureContentSource(lesson, [boss])),
+        // Each round's take-back resets the position to the same start, so the black king is on
+        // g8 again every time — the bot's correct reply is g8-h8 every round, not alternating.
+        botPlayer: scriptedBotPlayer([
+          { from: 'g8', to: 'h8' },
+          { from: 'g8', to: 'h8' },
+          { from: 'g8', to: 'h8' },
+          { from: 'g8', to: 'h8' },
+        ]),
+      };
+      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+
+      async function playRoundAndTakeBack(kidFrom: string, kidTo: string): Promise<void> {
+        fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${kidFrom},`) }));
+        fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${kidTo},`) }));
+        await waitFor(() => {
+          expect(screen.getByRole('button', { name: /Take back/ })).toHaveProperty(
+            'disabled',
+            false,
+          );
+        });
+        fireEvent.click(screen.getByRole('button', { name: /Take back/ }));
+      }
+
+      // Rounds 1-3: take back is still available (Fox's own 3/game limit).
+      await playRoundAndTakeBack('c1', 'b1');
+      await playRoundAndTakeBack('c1', 'b1');
+      await playRoundAndTakeBack('c1', 'b1');
+      // Round 4: the kid plays on (no more take backs to spend), and the bot replies.
+      fireEvent.click(screen.getByRole('button', { name: /^c1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^b1,/ }));
+      await screen.findByRole('button', { name: /^g8, black king/ });
+
+      expect(screen.getByRole('button', { name: /Take back/ })).toHaveProperty('disabled', true);
+    });
+
+    it('Wolf: no take back at all, from the very first move', async () => {
+      const boss = kingsGame({ id: 'fixture-take-back-wolf', opponentLevel: 4 });
+      const lesson = fixtureLesson({ boss: boss.id });
+      const services = {
+        ...createTestServices(fixtureContentSource(lesson, [boss])),
+        botPlayer: scriptedBotPlayer([{ from: 'g8', to: 'h8' }]),
+      };
+      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+
+      // Disabled even before any move is played.
+      expect(screen.getByRole('button', { name: /Take back/ })).toHaveProperty('disabled', true);
+
+      fireEvent.click(screen.getByRole('button', { name: /^c1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^b1,/ }));
+      await screen.findByRole('button', { name: /^h8, black king/ });
+
+      expect(screen.getByRole('button', { name: /Take back/ })).toHaveProperty('disabled', true);
+    });
+  });
+
   // M3.3: `first-game` is the first `versus` boss with real check rules (every earlier boss is
   // kingless), so this is the first place check/checkmate/stalemate and castling/en passant/
   // promotion ever reach a `versus` game through the UI, not just the exercise engine.

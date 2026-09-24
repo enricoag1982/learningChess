@@ -130,7 +130,9 @@ function makePasswordFileWriter(): PasswordFileWriter & { readonly writes: strin
   };
 }
 
-function makeSettingsRepo(initial: AppSettings = { lastProfileId: null }): SettingsRepository {
+function makeSettingsRepo(
+  initial: AppSettings = { lastProfileId: null, suggestedLevels: {} },
+): SettingsRepository {
   let settings = initial;
   return {
     get: () => Promise.resolve(settings),
@@ -290,7 +292,7 @@ describe('selectProfile / deleteProfile', () => {
     const deps = makeDeps();
     const profile = await createProfile(deps, 'Mia', 'panda');
     await selectProfile(deps, profile.id);
-    expect(await deps.settings.get()).toEqual({ lastProfileId: profile.id });
+    expect(await deps.settings.get()).toEqual({ lastProfileId: profile.id, suggestedLevels: {} });
   });
 
   it('deleteProfile cascades progress and game-record data and clears lastProfileId when it was selected', async () => {
@@ -305,7 +307,7 @@ describe('selectProfile / deleteProfile', () => {
     expect(await deps.profiles.get(profile.id)).toBeUndefined();
     expect(progress.deletedFor).toEqual([profile.id]);
     expect(gameRecords.deletedFor).toEqual([profile.id]);
-    expect(await deps.settings.get()).toEqual({ lastProfileId: null });
+    expect(await deps.settings.get()).toEqual({ lastProfileId: null, suggestedLevels: {} });
   });
 
   it('deleteProfile leaves lastProfileId alone when a different profile is selected', async () => {
@@ -316,6 +318,6 @@ describe('selectProfile / deleteProfile', () => {
 
     await deleteProfile(deps, mia.id);
 
-    expect(await deps.settings.get()).toEqual({ lastProfileId: leo.id });
+    expect(await deps.settings.get()).toEqual({ lastProfileId: leo.id, suggestedLevels: {} });
   });
 });

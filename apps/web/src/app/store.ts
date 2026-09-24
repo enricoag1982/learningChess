@@ -14,6 +14,7 @@ import type {
 } from '@chess-kids/core';
 import {
   animalFriends,
+  computerLevelStatus,
   createProfile,
   getLessonProgress,
   isFirstRun,
@@ -28,6 +29,7 @@ import {
   loadWarmUp,
   selectProfile,
   totalStars,
+  updateSuggestedLevel,
 } from '@chess-kids/core';
 import type { Services } from './services.ts';
 
@@ -100,6 +102,10 @@ export interface AppState {
   readonly miniGameOrigin: MiniGameOrigin;
   /** The bot level (1 Mouse .. 5 Bear) of the full game open (screen `full-game`); Play's default selection otherwise. */
   readonly fullGameLevel: number;
+  /** Owl's "Ready for the Fox?" line (`docs/computer-opponent.md` §5 "Automatic level"), set once
+   * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
+   * it once (`goToHome`/`startFullGame` clear it so it never lingers past the game it is about). */
+  readonly levelUpSuggestion: { readonly level: number } | null;
 
   /** The Today session in progress (`startToday`), or `null` outside one. */
   readonly todayPlan: TodaySessionPlan | null;
@@ -182,6 +188,14 @@ export interface AppState {
   readonly startFullGame: (level: number) => void;
   /** Leaves the full-game screen back to Play, refreshing progress (game records included). */
   readonly exitFullGame: () => void;
+  /**
+   * Recomputes and persists the "Automatic level" suggestion (`docs/computer-opponent.md` §5)
+   * after one full game vs computer at `level` is recorded (finished or left — an abandoned game
+   * never counts toward the last-5 tally itself, so this is a no-op either way for those). Sets
+   * `levelUpSuggestion` when it moves the suggestion up a level. Called by `FullGameScreen` right
+   * after its own `recordGame`.
+   */
+  readonly updateAutomaticLevel: (level: number) => Promise<void>;
 
   /**
    * Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
@@ -273,6 +287,7 @@ export function createAppStore(services: Services) {
       miniGameId: null,
       miniGameOrigin: 'play',
       fullGameLevel: 1,
+      levelUpSuggestion: null,
       todayPlan: null,
       todayActivityIndex: 0,
       todaySessionStartTotalStars: 0,
@@ -405,7 +420,7 @@ export function createAppStore(services: Services) {
       },
 
       goToHome() {
-        set({ screen: 'home' });
+        set({ screen: 'home', levelUpSuggestion: null });
       },
 
       async startLesson(lessonId: string) {
@@ -475,12 +490,29 @@ export function createAppStore(services: Services) {
       },
 
       startFullGame(level: number) {
-        set({ screen: 'full-game', fullGameLevel: level });
+        set({ screen: 'full-game', fullGameLevel: level, levelUpSuggestion: null });
       },
 
       exitFullGame() {
         set({ screen: 'play' });
         void get().refreshProgress();
+      },
+
+      async updateAutomaticLevel(level: number) {
+        const { profile, journey } = get();
+        if (!profile || !journey) return;
+        const records = await loadGameRecords(services.deps, profile.id);
+        const statuses = computerLevelStatus(records, journey);
+        const update = await updateSuggestedLevel(
+          services.deps,
+          profile.id,
+          level as 1 | 2 | 3 | 4 | 5,
+          records,
+          statuses,
+        );
+        if (update?.leveledUp) {
+          set({ levelUpSuggestion: { level: update.level } });
+        }
       },
 
       async startToday() {

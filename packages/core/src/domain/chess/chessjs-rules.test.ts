@@ -156,6 +156,31 @@ describe('attackers', () => {
   });
 });
 
+describe('searchBoard hash', () => {
+  it('is stable for the same position, and changes with the position', () => {
+    const boardA = chessJsRules.searchBoard(START);
+    const boardB = chessJsRules.searchBoard(START);
+    expect(boardA.hash()).toBe(boardB.hash());
+
+    const after = play(START, 'e4');
+    const boardC = chessJsRules.searchBoard(after);
+    expect(boardC.hash()).not.toBe(boardA.hash());
+  });
+
+  it('round-trips through play/undo back to the same hash', () => {
+    const board = chessJsRules.searchBoard(START);
+    const before = board.hash();
+    const [move] = board.moves();
+    if (move === undefined) {
+      throw new Error('test setup error: no legal moves from the start position');
+    }
+    board.play(move);
+    expect(board.hash()).not.toBe(before);
+    board.undo();
+    expect(board.hash()).toBe(before);
+  });
+});
+
 describe('invalid positions', () => {
   it('rejects two white kings', () => {
     const position: Position = {
