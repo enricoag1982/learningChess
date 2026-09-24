@@ -28,3 +28,37 @@ export {
   InvalidPositionError,
   chessJsRules,
 } from './domain/chess/index.ts';
+
+export type { VariantOptions, VariantRules } from './domain/variant/index.ts';
+export { createVariantRules } from './domain/variant/index.ts';
+
+export type {
+  CollectStarsDef,
+  CaptureDef,
+  SelectSquaresDef,
+  ExerciseDef,
+  ExerciseState,
+  MoveOutcome,
+  SelectionResult,
+  Hint,
+  SolverMove,
+  StaticCaptureGameDef,
+  GameState,
+  GameOutcome,
+} from './domain/exercise/index.ts';
+export {
+  startExercise,
+  exerciseMoves,
+  playMove,
+  toggleSquare,
+  submitSelection,
+  undo,
+  requestHint,
+  starsFor,
+  solve,
+  optimalMoves,
+  startStaticCaptureGame,
+  playGameMove,
+  gameResult,
+  gameStars,
+} from './domain/exercise/index.ts';
