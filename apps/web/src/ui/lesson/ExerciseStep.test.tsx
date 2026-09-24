@@ -636,6 +636,41 @@ describe('ExerciseStep', () => {
       });
     });
 
+    it('leaving the original for its easier variant puts the concept in review, due now (M3.4)', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+      fireEvent.click(await screen.findByRole('button', { name: 'Easier one' }));
+      await screen.findByRole('button', { name: /^a8, star/ });
+
+      const profile = store.getState().profile;
+      const stats = await services.deps.progress.getConceptStats(
+        profile?.id ?? '',
+        original.concept,
+      );
+      expect(stats?.box).toBe(1);
+      // "Due now": not scheduled into the future (`enterReview`'s `immediate` case), not the
+      // 1-day-out default a lesson simply completing would give it.
+      expect(stats?.dueAt).toBeDefined();
+      expect(new Date(stats?.dueAt ?? 0).getTime()).toBeLessThanOrEqual(Date.now());
+      expect(stats?.recent).toEqual([false]);
+
+      // Solving the variant itself must not add a second (unscored) result to `recent`.
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^a8,/ }));
+      await screen.findByText('Good try!');
+      const afterVariant = await services.deps.progress.getConceptStats(
+        profile?.id ?? '',
+        original.concept,
+      );
+      expect(afterVariant?.recent).toEqual([false]);
+    });
+
     it('solving the variant credits the original with 1 star; the variant itself earns none', async () => {
       const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
       const services = createTestServices(fixtureContentSource(lesson));

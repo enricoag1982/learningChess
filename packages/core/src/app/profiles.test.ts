@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import { seededRandom } from '../domain/random.ts';
 import {
   changeAvatar,
   changeParentPassword,
@@ -74,6 +75,9 @@ function makeProgressRepo(): ProgressRepository & { readonly deletedFor: string[
     getMiniGame: () => Promise.resolve(undefined),
     listMiniGames: () => Promise.resolve<MiniGameProgress[]>([]),
     saveMiniGame: () => Promise.resolve(),
+    getConceptStats: () => Promise.resolve(undefined),
+    listConceptStats: () => Promise.resolve([]),
+    saveConceptStats: () => Promise.resolve(),
     deleteProfileData: (profileId) => {
       deletedFor.push(profileId);
       for (const [key, progress] of lessons) {
@@ -135,6 +139,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     parentLock: makeParentLockRepo(),
     passwordFile: makePasswordFileWriter(),
     settings: makeSettingsRepo(),
+    random: seededRandom(1),
     ...overrides,
   };
 }

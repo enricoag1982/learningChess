@@ -26,6 +26,8 @@ export interface Attempt extends StoredRecord {
   readonly conceptId: string;
   /** `false` for guided tries and the demo: not counted towards mastery. */
   readonly scored: boolean;
+  /** `true` for a warm-up/practice review task; absent/`false` for a lesson exercise or mini-game. */
+  readonly review?: boolean;
   /** First-try correct: solved with no error and no hint. */
   readonly correct: boolean;
   readonly stars: Stars;

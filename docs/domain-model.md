@@ -74,7 +74,7 @@ Character 1─1 piece type
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
 | Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
-| ConceptStats | `conceptId`, `recent[]` (last 10 results), `box` (1–5), `dueAt` |
+| ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
 | Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` |
 | GameRecord | `miniGameId` or `full`, `opponent` (`computer:<level>` / `profile:<id>` / `guest`), `matchId`, `result`, `moves[]` (SAN), `at` |
@@ -108,12 +108,14 @@ Character 1─1 piece type
 | Next step (Home "Today" / Journey highlight) | Next available lesson; once a world's lessons are all done and its world boss is available but unwon, the world boss |
 
 ### 3.1 Review scheduler (Leitner)
-- Concept enters box 1 when its lesson is complete.
+- Concept enters box 1, due in 1 day, when its lesson becomes complete (every exercise ≥ 1 star, incl. via an easier variant crediting the original).
+- Concept enters (or re-enters) box 1, due **now**, the moment a scored exercise attempt reaches `errors ≥ EASIER_AFTER_ERRORS` (2) — the same threshold the easier-variant offer itself uses (§3.4): "the kid needed the easier variant / failed an exercise twice". Covers both the exercise left unsolved for its variant (`recordAttempt`, always ≥ 2 errors by construction) and one pushed through to a self-solve with 2+ errors along the way. A single stray error, or a hint used with none, still counts against accuracy (`recent`) but does not by itself schedule a review task. This "immediate" entry never gets pushed back out: a lesson completing afterwards (the non-immediate case above) leaves an already-due date alone.
 - Intervals: box 1 = 1 day, 2 = 2, 3 = 4, 4 = 8, 5 = 16.
-- Correct → box + 1; wrong → box 1. `dueAt = now + interval`.
-- Wrong = scored `Attempt` with `correct: false`, incl. an exercise left for its easier variant (§3.4).
-- Warm-up: 3 tasks, oldest due first, max 1 per concept; none due → weakest concepts.
-- Task source: concept's exercise pool (lesson exercises + puzzles), avoiding the last one shown.
+- A warm-up/practice review task's result moves the box: correct (first try, no hint) → box + 1 (max 5); else → box 1. Always reschedules `dueAt` and remembers `lastExerciseId`. Only these review-task results move boxes — a lesson exercise's own result only appends to `recent` and (on a wrong first try) triggers the immediate entry above, never a box move by itself.
+- `recent`: every scored exercise attempt (lesson, warm-up, practice) appends its first-try `correct`; an easier variant's own attempt (`scored: false`) never counts.
+- Warm-up: due concepts oldest `dueAt` first, max 1 task per concept, up to 3; short of 3, fills with the weakest concepts still in review (lowest accuracy, then oldest `dueAt`); no concept in review → no warm-up.
+- Task source (`conceptPool`): a concept's scored exercises across every lesson that teaches it (not only the one that first taught it), never a guided try or a variant; picked via the seeded `Random` port, avoiding `lastExerciseId` when another candidate exists.
+- Review tasks are scored for stats but never change a lesson's own `bestStars` (`recordReviewResult` logs a `review: true` `Attempt` against the task's own lesson id, separate from `recordExerciseResult`).
 
 ### 3.2 Assessments
 
@@ -126,9 +128,14 @@ Character 1─1 piece type
 Failing any assessment: no penalty, no data lost.
 
 ### 3.3 Session
-- Order: warm-up → next available lesson (resume if in progress) → mini-game → rewards.
+- Order: warm-up (if any concept is due; else skipped) → the Journey's next step (a lesson, resumed if in progress, or a pending world boss — same as `nextStep`, §3 table) → one mini-game → session summary (stars earned this session, new animal friends / rank, Owl's closing line) → Home.
+- Mini-game pick (`pickSessionMiniGame`): the most recently unlocked one (world order, then lesson order) with best stars < 3, else the most recently unlocked one regardless of stars; excludes the world boss already playing as this session's lesson-step substitute, if any; `undefined` when nothing is unlocked.
+- Home's **Start today** shows whenever the Journey has a next step (lesson or world boss) or any concept is due; hidden only once both are exhausted (a mini-game-only remainder with nothing else due is not offered from Home — a known gap, tracked for a later milestone).
+- The kid can leave any time: closing mid-activity (warm-up, lesson, mini-game) abandons the whole session straight to Home, without a summary; finishing an activity normally advances to the next one; the summary's "Done" is the only way out of it.
 - After Basics: next lesson from the least advanced track.
 - Time limit checked between activities only; never interrupts an exercise.
+
+**Practice screen** (reuses the exercise layout, `docs/screens.md`): a "Daily warm-up" card (due count; disabled "All done for today!" when none due — same `loadWarmUp`/`recordReviewResult` as the Today session's warm-up, just reachable on its own) + a topic list. One row per concept that any complete/mastered lesson teaches, using its earliest such lesson (world then lesson order) for the title/character; accuracy dots from `ConceptStats.recent` (last 10); a "Needs practice" tag when `isWeak`. Tapping a topic runs 5 tasks from `loadPracticeTasks`.
 
 ### 3.4 Easier variant
 
@@ -147,7 +154,7 @@ Failing any assessment: no penalty, no data lost.
 |---|---|
 | Profiles | `createProfile`, `selectProfile`, `updateSettings`, `deleteProfile` |
 | Assessment | `startPlacement`, `startTestOut`, `submitAssessment` |
-| Session | `startSession`, `nextActivity`, `endSession` |
+| Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
 | Friend play | `startLocalMatch`, `playMatchMove`, `requestTakeback`, `finishMatch` |
@@ -157,7 +164,7 @@ Failing any assessment: no penalty, no data lost.
 
 | Port | Purpose |
 |---|---|
-| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async) |
+| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`) |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |

@@ -1,5 +1,5 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
-import { chessJsRules, createVariantRules } from '@chess-kids/core';
+import { bot, chessJsRules, createVariantRules } from '@chess-kids/core';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
@@ -9,6 +9,7 @@ import { LocalStorageProfileRepository } from '../adapters/storage/local-profile
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
 import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
 import { openLocalStore } from '../adapters/storage/local-store.ts';
+import { MIGRATIONS } from '../adapters/storage/migrations.ts';
 import type { Services } from '../app/services.ts';
 import { createFakePasswordFileWriter } from './fake-password-file-writer.ts';
 import { createMemoryStorage } from './memory-storage.ts';
@@ -23,7 +24,7 @@ export function createTestServices(
   content: ContentSource,
   storage: Storage = createMemoryStorage(),
 ): Services {
-  const store = openLocalStore(storage);
+  const store = openLocalStore(storage, { migrations: MIGRATIONS });
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -33,6 +34,8 @@ export function createTestServices(
     parentLock: new LocalStorageParentLockRepository(store),
     passwordFile: createFakePasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),
+    // Deterministic (M3.4 warm-up/practice task picking): RTL tests can assert exact tasks shown.
+    random: bot.seededRandom(1),
   };
 
   return {

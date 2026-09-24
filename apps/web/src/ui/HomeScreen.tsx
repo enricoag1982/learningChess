@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { lessonStatus, totalStars } from '@chess-kids/core';
+import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
@@ -58,6 +58,25 @@ function JourneyIcon(): JSX.Element {
       <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" />
       <path d="M9 4v14" />
       <path d="M15 6v14" />
+    </svg>
+  );
+}
+
+function PracticeTileIcon(): JSX.Element {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#B8561A"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
+      <circle cx={12} cy={16} r={5} />
     </svg>
   );
 }
@@ -137,10 +156,11 @@ export function HomeScreen(): JSX.Element {
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const journey = useAppStore((state) => state.journey);
-  const startNext = useAppStore((state) => state.startNext);
-  const startMiniGame = useAppStore((state) => state.startMiniGame);
+  const conceptStats = useAppStore((state) => state.conceptStats);
+  const startToday = useAppStore((state) => state.startToday);
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToJourney = useAppStore((state) => state.goToJourney);
+  const goToPractice = useAppStore((state) => state.goToPractice);
   const goToPlay = useAppStore((state) => state.goToPlay);
   const goToDen = useAppStore((state) => state.goToDen);
   const [offlineReady, setOfflineReady] = useState(false);
@@ -169,11 +189,16 @@ export function HomeScreen(): JSX.Element {
     nextStep?.kind === 'world-boss' && nextStep.world.boss !== undefined
       ? services.deps.content.minigame(nextStep.world.boss)
       : undefined;
+  // Today's warm-up (M3.4, domain-model.md §3.1): shown even once every lesson is done, so the
+  // "Start today" button still has something to offer (review-only sessions).
+  const hasWarmUp = conceptStats.some((entry) => isDue(entry, services.deps.clock.now()));
 
   const bubbleText = !journey
     ? ''
     : !nextStep
-      ? t('home.owl-all-done')
+      ? hasWarmUp
+        ? t('home.owl-warmup-only')
+        : t('home.owl-all-done')
       : nextStep.kind === 'world-boss'
         ? t('home.owl-world-boss', {
             title: nextBossMiniGame ? tContent(t, nextBossMiniGame.titleKey) : '',
@@ -190,21 +215,16 @@ export function HomeScreen(): JSX.Element {
     return <main className="min-h-screen bg-cream" />;
   }
 
+  const showStartButton = nextStep !== null || hasWarmUp;
   const buttonLabel = isResuming ? t('continue') : t('home.start-today');
   const subtitle =
     nextStep?.kind === 'world-boss'
       ? t('home.subtitle-world-boss')
-      : next?.boss
-        ? t('home.subtitle-with-minigame')
-        : t('home.subtitle-lesson-only');
-
-  function startNextStep(): void {
-    if (nextStep?.kind === 'world-boss' && nextStep.world.boss !== undefined) {
-      startMiniGame(nextStep.world.boss, 'home');
-      return;
-    }
-    void startNext();
-  }
+      : nextStep
+        ? next?.boss
+          ? t('home.subtitle-with-minigame')
+          : t('home.subtitle-lesson-only')
+        : t('home.subtitle-warmup');
 
   return (
     <main className="flex min-h-screen flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
@@ -243,10 +263,12 @@ export function HomeScreen(): JSX.Element {
           <SpeechBubble text={bubbleText} />
           <ReplayButton onClick={replay} label={t('exercise.replay')} />
         </div>
-        {nextStep && (
+        {showStartButton && (
           <button
             type="button"
-            onClick={startNextStep}
+            onClick={() => {
+              void startToday();
+            }}
             className="flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
           >
             <span className="flex items-center gap-3 font-display text-2xl font-semibold sm:text-3xl">
@@ -258,13 +280,20 @@ export function HomeScreen(): JSX.Element {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-6">
         <HomeTile
           icon={<JourneyIcon />}
           label={t('home.journey-tile')}
           bg="#DCEFE3"
           fg="#1F5A41"
           onClick={goToJourney}
+        />
+        <HomeTile
+          icon={<PracticeTileIcon />}
+          label={t('home.practice-tile')}
+          bg="#FBE3D2"
+          fg="#7A3A10"
+          onClick={goToPractice}
         />
         <HomeTile
           icon={<PlayTileIcon />}

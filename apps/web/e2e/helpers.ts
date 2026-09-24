@@ -338,6 +338,44 @@ export async function seedLessonsMastered(
   }
 }
 
+/**
+ * Seeds one concept's review state directly into localStorage (same real storage key/shape
+ * `LocalStorageProgressRepository` writes), due now by default — the M3.4 Leitner scheduler's
+ * `ConceptStats`. Used to put a concept in today's warm-up / Practice's due count without playing
+ * an exercise wrong first.
+ */
+export async function seedConceptStats(
+  page: Page,
+  profileId: string,
+  conceptId: string,
+  overrides: Partial<{
+    readonly box: 1 | 2 | 3 | 4 | 5;
+    readonly dueAt: string;
+    readonly recent: readonly boolean[];
+  }> = {},
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, conceptId, overrides }) => {
+      const key = 'chess-kids:concept-stats';
+      const raw = localStorage.getItem(key);
+      const all = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      const now = new Date().toISOString();
+      all[`${pid}:${conceptId}`] = {
+        id: `seed-${conceptId}`,
+        profileId: pid,
+        conceptId,
+        recent: overrides.recent ?? [],
+        box: overrides.box ?? 1,
+        dueAt: overrides.dueAt ?? now,
+        createdAt: now,
+        updatedAt: now,
+      };
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    { profileId, conceptId, overrides },
+  );
+}
+
 export function findLesson(id: string): Lesson {
   const lesson = content.lessons.find((entry) => entry.id === id);
   if (!lesson) throw new Error(`fixture content is missing lesson "${id}"`);
@@ -469,7 +507,7 @@ async function solveMateInN(page: Page, def: MateInNDef): Promise<void> {
 }
 
 /** Solves any exercise definition's core interaction, leaving it on its success panel. */
-async function solveExercise(page: Page, def: ExerciseDef): Promise<void> {
+export async function solveExercise(page: Page, def: ExerciseDef): Promise<void> {
   switch (def.type) {
     case 'select-squares':
       for (const square of selectSquaresAnswer(def)) {
@@ -502,6 +540,25 @@ async function solveExercise(page: Page, def: ExerciseDef): Promise<void> {
 export async function completeExercise(page: Page, def: ExerciseDef): Promise<void> {
   await solveExercise(page, def);
   await page.getByRole('button', { name: /^Next/ }).click();
+}
+
+/**
+ * Solves whichever of `candidates` is currently on screen, then advances past its success panel;
+ * returns the matched definition. For a review task (M3.4 warm-up / Practice), whose exact
+ * exercise the app picks at random from a concept's pool — each candidate's own instruction text
+ * (never interpolated, so a plain equality match) tells them apart.
+ */
+export async function solveWhicheverExercise(
+  page: Page,
+  candidates: readonly ExerciseDef[],
+): Promise<ExerciseDef> {
+  for (const candidate of candidates) {
+    if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
+      await completeExercise(page, candidate);
+      return candidate;
+    }
+  }
+  throw new Error('solveWhicheverExercise: no candidate instruction text matched what is shown');
 }
 
 /** Reverse-lookup maps (rendered English word → chess letter) for `readVersusPieces`. */

@@ -7,6 +7,7 @@ import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
+import { seededRandom } from '../domain/random.ts';
 import { loadJourney } from './journey.ts';
 import type {
   AppSettings,
@@ -126,6 +127,9 @@ function makeProgressRepo(
       miniGames.set(progress.miniGameId, progress);
       return Promise.resolve();
     },
+    getConceptStats: () => Promise.resolve(undefined),
+    listConceptStats: () => Promise.resolve([]),
+    saveConceptStats: () => Promise.resolve(),
     deleteProfileData: () => Promise.resolve(),
   };
 }
@@ -181,6 +185,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     parentLock: makeParentLockRepo(),
     passwordFile: makePasswordFileWriter(),
     settings: makeSettingsRepo(),
+    random: seededRandom(1),
     ...overrides,
   };
 }

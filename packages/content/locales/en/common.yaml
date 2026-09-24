@@ -19,13 +19,16 @@ home:
   owl-resume: Let's keep going!
   owl-world-boss: 'World boss time: {{title}}!'
   owl-all-done: You finished everything for now. Come back soon for more!
+  owl-warmup-only: Let's warm up what you know!
   start-today: Start today
   subtitle-with-minigame: New lesson · Mini-game
   subtitle-lesson-only: New lesson
   subtitle-world-boss: World boss
+  subtitle-warmup: Warm-up
   avatar-alt: '{{name}} avatar'
   switch-player: Switch player
   journey-tile: Journey
+  practice-tile: Practice
   play-tile: Play
   den-tile: My Den
 avatar:
@@ -228,6 +231,27 @@ play:
   back-to-play: Back to Play
   back-to-journey: Back to Journey
   back-to-home: Back to Home
+session:
+  warmup-of: 'Warm-up {{current}}/{{total}}'
+  leave: Leave
+  summary-title: Great session!
+  summary-new-rank: New rank!
+  summary-new-friend: New friend!
+  summary-closing: See you tomorrow!
+  summary-done: Done
+practice:
+  title: Practice
+  owl-line: Pick a topic, or start your warm-up!
+  back: Back to Home
+  warmup-card-title: Daily warm-up
+  warmup-due_one: '{{count}} due today'
+  warmup-due_other: '{{count}} due today'
+  warmup-all-done: All done for today!
+  topics-heading: Topics
+  topics-empty: Finish a lesson to see it here!
+  weak-tag: Needs practice
+  topic-accuracy: '{{correct}} of {{total}} correct'
+  topic-of: 'Practice {{current}}/{{total}}'
 den:
   title: "{{name}}'s Den"
   owl-line: Look at all your friends!

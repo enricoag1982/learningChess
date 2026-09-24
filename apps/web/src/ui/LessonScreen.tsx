@@ -79,6 +79,7 @@ export function LessonScreen(): JSX.Element {
   const stepIndex = useAppStore((state) => state.stepIndex);
   const goToStep = useAppStore((state) => state.goToStep);
   const exitLesson = useAppStore((state) => state.exitLesson);
+  const completeLessonActivity = useAppStore((state) => state.completeLessonActivity);
 
   const lesson = lessonId ? services.deps.content.lesson(lessonId) : undefined;
   const steps = useMemo(
@@ -98,7 +99,9 @@ export function LessonScreen(): JSX.Element {
         onPlayAgain={() => {
           goToStep(0);
         }}
-        onContinue={exitLesson}
+        onContinue={() => {
+          void completeLessonActivity();
+        }}
       />
     );
   }

@@ -5,6 +5,7 @@ import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import type { ConceptStats } from '../domain/review.ts';
 
 /** Persistence of child profiles. Async so cloud adapters can replace local ones. */
 export interface ProfileRepository {
@@ -27,7 +28,11 @@ export interface ProgressRepository {
   getMiniGame(profileId: string, miniGameId: string): Promise<MiniGameProgress | undefined>;
   listMiniGames(profileId: string): Promise<MiniGameProgress[]>;
   saveMiniGame(progress: MiniGameProgress): Promise<void>;
-  /** Deletes every lesson-progress, attempt, and mini-game record for a profile (parent area "Delete"). */
+  /** One concept's mastery + review state (M3.4 Leitner scheduler), if any attempt has touched it. */
+  getConceptStats(profileId: string, conceptId: string): Promise<ConceptStats | undefined>;
+  listConceptStats(profileId: string): Promise<ConceptStats[]>;
+  saveConceptStats(stats: ConceptStats): Promise<void>;
+  /** Deletes every lesson-progress, attempt, mini-game, and concept-stats record for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 
