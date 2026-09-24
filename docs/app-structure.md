@@ -9,6 +9,8 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | Path | Fixed order; skippable via test-out (kid) or unlock (parent) |
 | Profiles | Multiple per device |
 | Theme | Animals |
+| Play vs person | Same device only in v1 |
+| Login / online | Off in v1; hooks in place (see §13) |
 
 ## 2. Modes
 
@@ -30,7 +32,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | **Today** (home button) | One-tap guided session | Warm-up → next lesson → mini-game → rewards |
 | **Journey** (map) | Main learning path | Habitat per world, node per lesson, next node highlighted |
 | **Practice** | Review | Daily warm-up; puzzles on unlocked topics |
-| **Play** | Application | Unlocked mini-games; full game vs computer |
+| **Play** | Application | Unlocked mini-games; full game vs computer; vs Friend (same device) |
 | **My Den** | Motivation | Stars, badges, animal collection, rank |
 
 ## 5. Content hierarchy
@@ -57,6 +59,11 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 - **Skip (kid):** tap locked lesson/world → "Show you know it" test (5–8 mixed tasks) → ≥80% = mastered, unlocked; <80% = back to path, no penalty.
 - **Skip (parent):** unlock any lesson/world directly.
 - Skipped concepts enter the review pool like completed ones.
+- **Play vs Friend (same device):** Play → vs Friend → second player (other profile or guest) → game (full game, Pawn Wars, Win the Queen) → board mode → play → result saved to each profile involved.
+  - Board modes: pass-and-play (board turns each move) / face-to-face (tablet flat, pieces upright for both).
+  - Options: takeback by agreement, legal-move highlights on/off.
+  - Availability: same as vs computer (full game after World 4, mini-games after their lesson); parent can unlock earlier.
+  - No effect on mastery or stars.
 
 ## 7. Progression rules
 
@@ -118,8 +125,17 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 ## 13. MVP
 
-- **In:** profiles, placement test + test-out, Worlds 1–5, Today session + warm-up, 6 mini-games + computer, My Den (basic), parent progress + limits + unlock.
-- **Next:** Worlds 6–7, puzzle library, pass-and-play between profiles, online play, sync.
+- **In:** profiles, placement test + test-out, Worlds 1–5, Today session + warm-up, 6 mini-games + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
+- **Next:** Worlds 6–7, puzzle library.
+- **v2 (online):** parent login, cloud sync, online play with friends (invite code, no chat, preset emojis).
+
+### Online hooks in v1
+| Hook | v1 | v2 |
+|---|---|---|
+| Login | Guest; implicit local account owns profiles | Parent account (email link / Google / Apple) |
+| Sync | None | Device ↔ cloud |
+| Matches | Same-device matches | Online matches via invite code |
+| Feature flags | `login: false`, `online: false` → no online entries in UI | Flags on |
 
 ## 14. Open
 

@@ -64,8 +64,14 @@ apps/native        only if a native UI is ever needed; reuses core
 | `SettingsRepository` | localStorage | same |
 | `Narrator` | Web Speech API | Recorded audio files per language |
 | `Platform` | Web | Capacitor (haptics, native storage) |
+| `AuthService` | Guest (local account) | Parent login (e.g. Supabase Auth) |
+| `SyncService` | No-op | Device ↔ cloud |
+| `MatchService` | Local (same device) | Online realtime (e.g. Supabase Realtime) |
+| `FeatureFlags` | Static config (`login`, `online` = false) | Remote config |
 
 - All repository methods async (cloud-ready).
+- All records: UUID ids, `createdAt` / `updatedAt` (sync-ready).
+- Online disabled in v1: ports exist, only local adapters implemented.
 - iOS Safari may evict website storage after 7 days without use; home-screen PWA / Capacitor avoid it.
 
 ## 6. Content format
@@ -133,4 +139,5 @@ stars2: 5
 | Languages | Multi-language via i18n; English first |
 | Narration | Web Speech API for prototype → recorded voices for release |
 | Mobile | PWA first → Capacitor |
+| Online (login, sync, remote play) | Off in v1; ports + local adapters only |
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |

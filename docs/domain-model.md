@@ -66,16 +66,19 @@ Character 1─1 piece type
 
 | Entity | Fields |
 |---|---|
-| Profile | `id`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
+| Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
+| Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
 | Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (override), `pieceStyle` |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 results), `box` (1–5), `dueAt` |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
-| GameRecord | `miniGameId` or `full`, `result`, `moves[]` (SAN), `at` |
+| Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` |
+| GameRecord | `miniGameId` or `full`, `opponent` (`computer:<level>` / `profile:<id>` / `guest`), `matchId`, `result`, `moves[]` (SAN), `at` |
 | Badge | `badgeId`, `at` |
 | SessionLog | `date`, `minutes` |
 
-Derived, not stored: total stars, rank, world status, weak concepts.
+- All stored records: UUID `id`, `createdAt`, `updatedAt` (sync-ready).
+- Derived, not stored: total stars, rank, world status, weak concepts.
 
 ## 3. Rules
 
@@ -122,6 +125,7 @@ Failing any assessment: no penalty, no data lost.
 | Session | `startSession`, `nextActivity`, `endSession` |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
+| Friend play | `startLocalMatch`, `playMatchMove`, `requestTakeback`, `finishMatch` |
 | Parent | `getReport`, `unlock`, `resetProgress` |
 
 ## 5. Ports
@@ -133,6 +137,10 @@ Failing any assessment: no penalty, no data lost.
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |
 | `Random` | Seeded randomness (deterministic tests for bot, task picking) |
+| `AuthService` | v1 guest; v2 parent login |
+| `SyncService` | v1 no-op; v2 cloud sync |
+| `MatchService` | v1 local matches; v2 online |
+| `FeatureFlags` | `login`, `online` (false in v1) |
 
 ## 6. Content files
 
