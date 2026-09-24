@@ -62,6 +62,74 @@ function JourneyIcon(): JSX.Element {
   );
 }
 
+function PlayTileIcon(): JSX.Element {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#B8561A"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x={3} y={3} width={18} height={18} rx={3} />
+      <path d="M3 12h18M12 3v18" />
+    </svg>
+  );
+}
+
+function DenTileIcon(): JSX.Element {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#5B3F7A"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 11l9-7 9 7" />
+      <path d="M5 10v10h14V10" />
+      <path d="M10 20v-5h4v5" />
+    </svg>
+  );
+}
+
+/** One Home tile (Journey / Play / My Den): icon in a white circle over a coloured label. */
+function HomeTile({
+  icon,
+  label,
+  bg,
+  fg,
+  onClick,
+}: {
+  readonly icon: JSX.Element;
+  readonly label: string;
+  readonly bg: string;
+  readonly fg: string;
+  readonly onClick: () => void;
+}): JSX.Element {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{ backgroundColor: bg, color: fg }}
+      className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4"
+    >
+      <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white sm:h-16 sm:w-16">
+        {icon}
+      </span>
+      <span className="font-display text-lg font-semibold sm:text-2xl">{label}</span>
+    </button>
+  );
+}
+
 /** Home: greeting, rank, total stars, and the one primary action into the Journey's next lesson. */
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
@@ -72,6 +140,8 @@ export function HomeScreen(): JSX.Element {
   const startNext = useAppStore((state) => state.startNext);
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToJourney = useAppStore((state) => state.goToJourney);
+  const goToPlay = useAppStore((state) => state.goToPlay);
+  const goToDen = useAppStore((state) => state.goToDen);
   const [offlineReady, setOfflineReady] = useState(false);
 
   useEffect(() => {
@@ -164,17 +234,28 @@ export function HomeScreen(): JSX.Element {
         )}
       </div>
 
-      <div className="flex justify-center sm:justify-start">
-        <button
-          type="button"
+      <div className="grid grid-cols-3 gap-3 sm:gap-6">
+        <HomeTile
+          icon={<JourneyIcon />}
+          label={t('home.journey-tile')}
+          bg="#DCEFE3"
+          fg="#1F5A41"
           onClick={goToJourney}
-          className="flex h-24 items-center gap-4 rounded-[2rem] bg-[#DCEFE3] px-8 text-[#1F5A41]"
-        >
-          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-white">
-            <JourneyIcon />
-          </div>
-          <span className="font-display text-2xl font-semibold">{t('home.journey-tile')}</span>
-        </button>
+        />
+        <HomeTile
+          icon={<PlayTileIcon />}
+          label={t('home.play-tile')}
+          bg="#FBE3D2"
+          fg="#7A3A10"
+          onClick={goToPlay}
+        />
+        <HomeTile
+          icon={<DenTileIcon />}
+          label={t('home.den-tile')}
+          bg="#EFE4F7"
+          fg="#4B3A63"
+          onClick={goToDen}
+        />
       </div>
 
       <p className="min-h-[1.75rem] text-center text-base text-go">

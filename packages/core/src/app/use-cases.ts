@@ -1,17 +1,17 @@
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { starsFor } from '../domain/exercise/engine.ts';
+import { summarizeBossResult } from '../domain/exercise/boss-result.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
-import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
 import type { VersusState } from '../domain/exercise/versus.ts';
-import { kidMoveCount, versusStars } from '../domain/exercise/versus.ts';
 import type { Lesson } from '../domain/lesson.ts';
-import type { LessonProgress, Stars } from '../domain/progress.ts';
+import type { LessonProgress } from '../domain/progress.ts';
 import {
   newLessonProgress,
   recordBossStars,
   recordExerciseStars,
   withResumeStep,
 } from '../domain/progress.ts';
+import { saveMiniGamePlay } from './minigames.ts';
 import type {
   ContentSource,
   IdGenerator,
@@ -113,59 +113,12 @@ export interface RecordBossResultInput {
   readonly nextStep: number;
 }
 
-/** The attempt-log fields a boss result reduces to, whichever mode played it. */
-interface BossAttemptSummary {
-  readonly exerciseId: string;
-  readonly conceptId: string;
-  readonly stars: Stars;
-  readonly correct: boolean;
-  readonly hints: number;
-  readonly errors: number;
-  readonly moves: number;
-}
-
-function bossAttemptSummary(state: GameState | SeriesGameState | VersusState): BossAttemptSummary {
-  if (state.mode === 'series') {
-    return {
-      exerciseId: state.def.id,
-      conceptId: state.def.concept,
-      stars: seriesStars(state),
-      correct: state.mistakes === 0,
-      // A series' mistakes already fold errors and hint levels together per round; logged as
-      // `errors` (there is no single hint level to report once several rounds are involved).
-      hints: 0,
-      errors: state.mistakes,
-      moves: state.def.rounds.length,
-    };
-  }
-  if (state.mode === 'versus') {
-    // No hints or wrong tries in a versus boss (it is a real game against the bot, not a scored
-    // exercise): "correct" is simply a win, and "errors" has no equivalent — logged as 0.
-    return {
-      exerciseId: state.def.id,
-      conceptId: state.def.concept,
-      stars: versusStars(state),
-      correct: state.status === 'won',
-      hints: 0,
-      errors: 0,
-      moves: kidMoveCount(state),
-    };
-  }
-  const { exercise } = state;
-  return {
-    exerciseId: state.def.id,
-    conceptId: state.def.concept,
-    stars: gameStars(state),
-    correct: exercise.solved && exercise.errors === 0 && exercise.hintLevel === 0,
-    hints: exercise.hintLevel,
-    errors: exercise.errors,
-    moves: exercise.moves,
-  };
-}
-
 /**
  * Records a boss mini-game attempt: always saves an `Attempt` (bosses are always scored), updates
- * the lesson's best boss stars, advances `resumeStep`, and saves progress.
+ * the lesson's best boss stars, advances `resumeStep`, and saves progress. A boss is always also
+ * one mini-game in content (`lesson.boss`'s id): this also folds the play into that mini-game's
+ * own `MiniGameProgress` (`saveMiniGamePlay`, no second attempt), so the Play screen's tile reflects a win made
+ * from inside the lesson too, not only from a standalone Play session.
  */
 export async function recordBossResult(
   deps: AppDeps,
@@ -173,13 +126,13 @@ export async function recordBossResult(
 ): Promise<LessonProgress> {
   const { profileId, lesson, state, durationMs, nextStep } = input;
   const now = deps.clock.now();
-  const summary = bossAttemptSummary(state);
+  const summary = summarizeBossResult(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),
     profileId,
     lessonId: lesson.id,
-    exerciseId: summary.exerciseId,
+    exerciseId: state.def.id,
     conceptId: summary.conceptId,
     scored: true,
     correct: summary.correct,
@@ -196,6 +149,12 @@ export async function recordBossResult(
   progress = recordBossStars(progress, summary.stars, now);
   progress = withResumeStep(progress, nextStep, now);
   await deps.progress.saveLesson(progress);
+
+  const minigame = lesson.boss !== undefined ? deps.content.minigame(lesson.boss) : undefined;
+  if (minigame !== undefined) {
+    await saveMiniGamePlay(deps, { profileId, game: minigame, state });
+  }
+
   return progress;
 }
 

@@ -9,6 +9,7 @@ import {
   newLessonProgress,
   recordBossStars,
   recordExerciseStars,
+  recordMiniGamePlay,
   totalStars,
   withResumeStep,
 } from './progress.ts';
@@ -182,6 +183,36 @@ describe('lessonStars', () => {
     progress = recordExerciseStars(progress, 'rook-01', 3, lesson, NOW);
     progress = recordBossStars(progress, 2, NOW);
     expect(lessonStars(lesson, progress)).toEqual({ earned: 5, max: 12 });
+  });
+});
+
+describe('recordMiniGamePlay', () => {
+  it('starts a fresh record on the first play', () => {
+    const progress = recordMiniGamePlay(undefined, 'mg1', 'profile-1', 'hungry-rook', 2, true, NOW);
+    expect(progress).toMatchObject({
+      id: 'mg1',
+      profileId: 'profile-1',
+      miniGameId: 'hungry-rook',
+      bestStars: 2,
+      plays: 1,
+      wins: 1,
+    });
+  });
+
+  it('keeps the higher of the two best-stars, and always bumps plays', () => {
+    const first = recordMiniGamePlay(undefined, 'mg1', 'profile-1', 'hungry-rook', 3, true, NOW);
+    const second = recordMiniGamePlay(first, 'mg2', 'profile-1', 'hungry-rook', 1, false, LATER);
+    expect(second.id).toBe('mg1'); // the fresh id is only used the first time
+    expect(second.bestStars).toBe(3);
+    expect(second.plays).toBe(2);
+    expect(second.wins).toBe(1); // the second play did not win
+    expect(second.updatedAt).toBe(LATER.toISOString());
+    expect(second.createdAt).toBe(NOW.toISOString());
+  });
+
+  it('counts a loss as a play without a win', () => {
+    const progress = recordMiniGamePlay(undefined, 'mg1', 'p1', 'pawn-wars', 1, false, NOW);
+    expect(progress).toMatchObject({ plays: 1, wins: 0 });
   });
 });
 

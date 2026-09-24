@@ -142,3 +142,46 @@ export function totalStars(progresses: readonly LessonProgress[]): number {
     return sum + exerciseStars + progress.bossStars;
   }, 0);
 }
+
+/**
+ * One profile's saved progress on one mini-game, played outside a lesson from the Play screen
+ * (rewards.md §2 "Play" tile). Kept separate from `LessonProgress.bossStars`, which only tracks
+ * the best play made from inside that mini-game's own lesson boss slot; a boss win also updates
+ * this record (`recordBossResult`), so the two stay in sync going forward.
+ */
+export interface MiniGameProgress extends StoredRecord {
+  readonly profileId: string;
+  readonly miniGameId: string;
+  readonly bestStars: Stars;
+  /** Times played, from the Play screen or as a lesson boss. */
+  readonly plays: number;
+  /** Times ended in a win (a finished `series` mini-game always counts, it has no losing state). */
+  readonly wins: number;
+}
+
+/**
+ * Folds one more play into `existing` (or starts a fresh record, `id` only used then): keeps the
+ * higher of the two `bestStars`, and always bumps `plays` (+ `wins` when `won`).
+ */
+export function recordMiniGamePlay(
+  existing: MiniGameProgress | undefined,
+  id: string,
+  profileId: string,
+  miniGameId: string,
+  stars: Stars,
+  won: boolean,
+  now: Date,
+): MiniGameProgress {
+  const nowIso = now.toISOString();
+  const bestStars = Math.max(existing?.bestStars ?? 0, stars) as Stars;
+  return {
+    id: existing?.id ?? id,
+    profileId,
+    miniGameId,
+    bestStars,
+    plays: (existing?.plays ?? 0) + 1,
+    wins: (existing?.wins ?? 0) + (won ? 1 : 0),
+    createdAt: existing?.createdAt ?? nowIso,
+    updatedAt: nowIso,
+  };
+}

@@ -4,7 +4,7 @@ import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress } from '../domain/progress.ts';
+import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 
 /** Persistence of child profiles. Async so cloud adapters can replace local ones. */
 export interface ProfileRepository {
@@ -14,14 +14,20 @@ export interface ProfileRepository {
   delete(id: string): Promise<void>;
 }
 
-/** Persistence of lesson progress and attempts. Async so cloud adapters can replace local ones. */
+/**
+ * Persistence of lesson progress, attempts, and standalone mini-game progress (Play screen).
+ * Async so cloud adapters can replace local ones.
+ */
 export interface ProgressRepository {
   listLessons(profileId: string): Promise<LessonProgress[]>;
   getLesson(profileId: string, lessonId: string): Promise<LessonProgress | undefined>;
   saveLesson(progress: LessonProgress): Promise<void>;
   addAttempt(attempt: Attempt): Promise<void>;
   listAttempts(profileId: string): Promise<Attempt[]>;
-  /** Deletes every lesson-progress and attempt record for a profile (parent area "Delete"). */
+  getMiniGame(profileId: string, miniGameId: string): Promise<MiniGameProgress | undefined>;
+  listMiniGames(profileId: string): Promise<MiniGameProgress[]>;
+  saveMiniGame(progress: MiniGameProgress): Promise<void>;
+  /** Deletes every lesson-progress, attempt, and mini-game record for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 
