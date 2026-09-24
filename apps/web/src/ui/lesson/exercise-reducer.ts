@@ -92,7 +92,11 @@ export type ExerciseAction =
   /** mate-in-n: reveals the scripted opponent reply once its short delay has elapsed. */
   | { readonly type: 'reveal-reply' };
 
-/** Fresh reducer state for a newly-started exercise (guided or scored). */
+/**
+ * Fresh reducer state for a newly-started exercise (guided or scored). `def.lastMove` (M4.1: the
+ * opponent's last move, e.g. the double step before an en passant capture) seeds the board's
+ * last-move highlight from the very start, before the kid's own first move replaces it.
+ */
 export function initExerciseState(def: ExerciseDef): ExerciseUIState {
   return {
     core: startExercise(def),
@@ -100,6 +104,7 @@ export function initExerciseState(def: ExerciseDef): ExerciseUIState {
     feedback: { kind: 'instruction' },
     wrongSquares: [],
     missedSquares: [],
+    ...(def.lastMove ? { lastMove: def.lastMove } : {}),
   };
 }
 

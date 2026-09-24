@@ -180,6 +180,20 @@ describe('Board — highlights', () => {
     expect(cell('a1').getAttribute('aria-label')).toBe('a1, empty');
   });
 
+  it('marks both last-move squares with a highlight tint from the very start (M4.1: an authored `lastMove`, before any move is played)', () => {
+    render(
+      <Board
+        position={POSITION}
+        legalMoves={[]}
+        highlights={{ lastMove: { from: 'b1', to: 'd5' } }}
+        label="Chess board"
+      />,
+    );
+    expect(cell('d5').querySelector('[class*="F4D35E"]')).not.toBeNull();
+    expect(cell('b1').querySelector('[class*="F4D35E"]')).not.toBeNull();
+    expect(cell('a1').querySelector('[class*="F4D35E"]')).toBeNull();
+  });
+
   it('best-move: a new wrongMove bounces the piece to `to` and back, without moving it in the data', async () => {
     const { rerender } = render(
       <Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />,

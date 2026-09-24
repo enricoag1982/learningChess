@@ -359,6 +359,108 @@ function validChoiceTradeExercise(
   };
 }
 
+/**
+ * White king e1, rooks a1/h1, both castling rights, black king far away on e8: both `O-O` and
+ * `O-O-O` are legal right now (M4.1 `castle` verify).
+ */
+function validCastleVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    fen: '4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1',
+    solutions: ['O-O', 'O-O-O'],
+    verify: 'castle',
+    ...overrides,
+  };
+}
+
+/**
+ * White pawn e5, black pawn d5 (just double-stepped from d7, en passant square d6): `exd6` is the
+ * only legal en passant capture (M4.1 `en-passant` verify).
+ */
+function validEnPassantVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'best-move',
+    text: 'demo-01',
+    fen: '4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1',
+    solutions: ['exd6'],
+    verify: 'en-passant',
+    ...overrides,
+  };
+}
+
+/** Same castling position as `validCastleVerifyExercise`, asked as a yes-no about kingside rights. */
+function validCanCastleVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'yes-no',
+    text: 'demo-01',
+    fen: '4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1',
+    answer: 'yes',
+    focus: 'e1',
+    verify: 'can-castle kingside',
+    ...overrides,
+  };
+}
+
+/** Same en passant position as `validEnPassantVerifyExercise`, asked as a yes-no. */
+function validCanEnPassantVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'yes-no',
+    text: 'demo-01',
+    fen: '4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1',
+    answer: 'yes',
+    focus: 'e5',
+    verify: 'can-en-passant',
+    ...overrides,
+  };
+}
+
+/** Lone kings: a dead draw by material (M4.1 `insufficient-material` verify). */
+function validInsufficientMaterialVerifyExercise(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'yes-no',
+    text: 'demo-01',
+    board: diagram({ e1: 'K', e8: 'k' }),
+    answer: 'yes',
+    verify: 'insufficient-material',
+    ...overrides,
+  };
+}
+
+/** Textbook stalemate (queen b8, kings f2/h1, black to move): a `draw-kind` choice exercise. */
+function validDrawKindExercise(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'demo-01',
+    type: 'choice',
+    text: 'demo-01',
+    board: diagram({ b8: 'Q', f2: 'K', h1: 'k' }),
+    toMove: 'b',
+    options: [
+      { id: 'stalemate', text: 'demo-01' },
+      { id: 'insufficient-material', text: 'demo-01' },
+      { id: 'not-a-draw', text: 'demo-01' },
+    ],
+    answer: 'stalemate',
+    verify: 'draw-kind',
+    ...overrides,
+  };
+}
+
 function validLesson(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     id: 'demo-lesson',
@@ -1268,6 +1370,123 @@ describe('loadContent', () => {
 
       expect(issuesOf()).toEqual([]);
     });
+
+    it('loads a valid "can-castle kingside" verify with no issues', () => {
+      writeLesson({ exercises: [validCanCastleVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid "can-castle queenside" verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validCanCastleVerifyExercise({ focus: undefined, verify: 'can-castle queenside' }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('accepts "can-castle kingside" answer "no" once the right is gone', () => {
+      writeLesson({
+        exercises: [
+          validCanCastleVerifyExercise({
+            fen: '4k3/8/8/8/8/8/8/R3K2R w - - 0 1',
+            answer: 'no',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an answer contradicting "can-castle kingside"', () => {
+      writeLesson({ exercises: [validCanCastleVerifyExercise({ answer: 'no' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "can-castle kingside" is true') &&
+            issue.includes('answer is "no"'),
+        ),
+      ).toBe(true);
+    });
+
+    it('loads a valid "can-en-passant" verify (right after the double step) with no issues', () => {
+      writeLesson({ exercises: [validCanEnPassantVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('accepts "can-en-passant" answer "no" once the double step was not the last move', () => {
+      writeLesson({
+        exercises: [
+          validCanEnPassantVerifyExercise({
+            fen: '4k3/8/8/3pP3/8/8/8/4K3 w - - 0 1',
+            answer: 'no',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an answer contradicting "can-en-passant"', () => {
+      writeLesson({ exercises: [validCanEnPassantVerifyExercise({ answer: 'no' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "can-en-passant" is true') && issue.includes('answer is "no"'),
+        ),
+      ).toBe(true);
+    });
+
+    it('loads a valid "insufficient-material" verify with no issues', () => {
+      writeLesson({ exercises: [validInsufficientMaterialVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects an answer contradicting "insufficient-material"', () => {
+      writeLesson({
+        exercises: [
+          validInsufficientMaterialVerifyExercise({
+            board: diagram({ e1: 'K', e8: 'k', a1: 'R' }),
+            answer: 'yes',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "insufficient-material" is false') &&
+            issue.includes('answer is "yes"'),
+        ),
+      ).toBe(true);
+    });
   });
 
   describe('choice: verify higher-value', () => {
@@ -1664,6 +1883,90 @@ describe('loadContent', () => {
     });
   });
 
+  describe('best-move: verify castle', () => {
+    it('loads a valid "castle" verify (both directions legal) with no issues', () => {
+      writeLesson({ exercises: [validCastleVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a solutions set missing one of the legal castling moves', () => {
+      writeLesson({ exercises: [validCastleVerifyExercise({ solutions: ['O-O'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "castle"') && issue.includes('solutions should be [O-O, O-O-O]'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports an empty computed set when neither castling move is legal', () => {
+      writeLesson({
+        exercises: [
+          validCastleVerifyExercise({
+            fen: '4k3/8/8/8/8/8/8/R3K2R w - - 0 1',
+            solutions: ['Ke2'],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "castle" computed no matching move')),
+      ).toBe(true);
+    });
+  });
+
+  describe('best-move: verify en-passant', () => {
+    it('loads a valid "en-passant" verify with no issues', () => {
+      writeLesson({ exercises: [validEnPassantVerifyExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a solutions set that is not the legal en passant capture', () => {
+      writeLesson({ exercises: [validEnPassantVerifyExercise({ solutions: ['Ke2'] })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "en-passant"') && issue.includes('solutions should be [exd6]'),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports an empty computed set when no en passant capture is legal', () => {
+      writeLesson({
+        exercises: [
+          validEnPassantVerifyExercise({
+            fen: '4k3/8/8/3pP3/8/8/8/4K3 w - - 0 1',
+            solutions: ['Ke2'],
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) => issue.includes('verify "en-passant" computed no matching move')),
+      ).toBe(true);
+    });
+  });
+
   describe('choice: verify worth', () => {
     it('loads a valid "worth" verify with no issues', () => {
       writeLesson({ exercises: [validChoiceWorthExercise()] });
@@ -1810,6 +2113,128 @@ describe('loadContent', () => {
           (issue) =>
             issue.includes('verify "trade Rxh1" classifies as "good"') &&
             issue.includes('answer is "bad"'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('choice: verify draw-kind', () => {
+    it('loads a valid "stalemate" draw-kind verify with no issues', () => {
+      writeLesson({ exercises: [validDrawKindExercise()] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid "insufficient-material" draw-kind verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validDrawKindExercise({
+            board: diagram({ e1: 'K', e8: 'k' }),
+            toMove: undefined,
+            answer: 'insufficient-material',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('loads a valid "not-a-draw" draw-kind verify with no issues', () => {
+      writeLesson({
+        exercises: [
+          validDrawKindExercise({
+            board: diagram({ a1: 'R', h2: 'P', a8: 'k', h8: 'K' }),
+            toMove: undefined,
+            answer: 'not-a-draw',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects options that are not exactly "stalemate"/"insufficient-material"/"not-a-draw"', () => {
+      writeLesson({
+        exercises: [
+          validDrawKindExercise({
+            options: [
+              { id: 'stalemate', text: 'demo-01' },
+              { id: 'meh', text: 'demo-01' },
+            ],
+            answer: 'stalemate',
+          }),
+        ],
+      });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes(
+            'verify "draw-kind" requires options ids "stalemate", "insufficient-material", "not-a-draw"',
+          ),
+        ),
+      ).toBe(true);
+    });
+
+    it('reports a mismatch between the classification and the authored answer', () => {
+      writeLesson({ exercises: [validDrawKindExercise({ answer: 'not-a-draw' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some(
+          (issue) =>
+            issue.includes('verify "draw-kind" classifies as "stalemate"') &&
+            issue.includes('answer is "not-a-draw"'),
+        ),
+      ).toBe(true);
+    });
+  });
+
+  describe('lastMove field', () => {
+    it('loads a valid lastMove (piece on "to") with no issues', () => {
+      writeLesson({ exercises: [validBestMoveExercise({ lastMove: 'a2a1' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a lastMove with no piece on "to"', () => {
+      writeLesson({ exercises: [validBestMoveExercise({ lastMove: 'a2a3' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(issues.some((issue) => issue.includes('lastMove "a2a3": no piece on a3'))).toBe(true);
+    });
+
+    it('loads a valid lastMove matching the en passant double step with no issues', () => {
+      writeLesson({ exercises: [validEnPassantVerifyExercise({ lastMove: 'd7d5' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+    });
+
+    it('rejects a lastMove that is not the double step matching the en passant square', () => {
+      writeLesson({ exercises: [validEnPassantVerifyExercise({ lastMove: 'c7d5' })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      const issues = issuesOf();
+      expect(
+        issues.some((issue) =>
+          issue.includes('lastMove "c7d5" is not the double step matching en passant square d6'),
         ),
       ).toBe(true);
     });

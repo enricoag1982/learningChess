@@ -16,6 +16,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
 | Parent area | Adult style (smaller text, denser); behind parent password |
 | Owl row | Speech bubble + "Say it again": side by side from `sm` up, stacked on phones (bubble full width, button below) |
+| Tappable vs info (open, roadmap F3) | Tappable and non-tappable elements must look different; rule to be set in the M5 design pass |
 
 ### 1.1 Design tokens (from sketches; Tailwind `@theme` in `apps/web/src/index.css`)
 

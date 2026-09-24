@@ -1,0 +1,17 @@
+id: full-game-rabbit
+concept: full-game
+unlockAfter: draws
+mode: versus
+title: full-game-rabbit.title
+goal: full-game-rabbit.goal
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+rules:
+  kings: true
+  noMoves: draw
+  win:
+    kid: [checkmate]
+    opponent: [checkmate]
+moveLimit: 100
+opponent:
+  bot: 2
+par: 41

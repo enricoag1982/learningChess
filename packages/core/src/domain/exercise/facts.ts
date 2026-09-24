@@ -80,3 +80,38 @@ export function isCheckmate(position: Position, rules: ChessRules): boolean {
 export function isStalemate(position: Position, rules: ChessRules): boolean {
   return rules.status(position).stalemate;
 }
+
+/** True when the position is a dead draw by material (chess.js's own insufficient-material rule). */
+export function isInsufficientMaterial(position: Position, rules: ChessRules): boolean {
+  return rules.status(position).insufficientMaterial;
+}
+
+/** Strips a trailing check/mate mark, matching the SAN comparison used elsewhere (`lesson-load.ts`). */
+function stripCheckMark(san: string): string {
+  return san.replace(/[+#]+$/, '');
+}
+
+/** True when the side to move can castle `side` right now (a legal `O-O` / `O-O-O` move exists). */
+export function canCastle(
+  position: Position,
+  side: 'kingside' | 'queenside',
+  rules: ChessRules,
+): boolean {
+  const target = side === 'kingside' ? 'O-O' : 'O-O-O';
+  return rules.legalMoves(position).some((move) => stripCheckMark(move.san) === target);
+}
+
+/**
+ * True when the side to move has at least one legal en passant capture right now. A pawn move
+ * landing on the position's own en passant square is always an en passant capture (that square is
+ * otherwise empty — no ordinary pawn move, capture or not, can end there): chess.js only ever
+ * generates such a move when the capture is actually legal.
+ */
+export function canEnPassant(position: Position, rules: ChessRules): boolean {
+  if (position.enPassant === null) return false;
+  return rules
+    .legalMoves(position)
+    .some(
+      (move) => move.piece === 'p' && move.captured !== undefined && move.to === position.enPassant,
+    );
+}

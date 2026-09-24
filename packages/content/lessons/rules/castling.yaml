@@ -1,0 +1,79 @@
+id: castling
+world: rules
+order: 1
+concept: castling
+character: owl
+title: castling.title
+story: castling.story
+demo:
+  fen: 5k2/8/8/8/8/8/8/R3K2R w KQ - 0 1
+  text: castling.demo
+  highlight: legal-moves e1
+guided:
+  - id: castling-g1
+    type: yes-no
+    text: castling-g1
+    fen: 4k3/8/8/8/8/8/8/R3K2R w KQ - 0 1
+    answer: 'yes'
+    focus: e1
+    verify: can-castle kingside
+  - id: castling-g2
+    type: best-move
+    text: castling-g2
+    fen: 4k3/8/8/8/8/8/8/4K2R w K - 0 1
+    solutions: [O-O]
+    verify: castle
+exercises:
+  - id: castling-01
+    type: yes-no
+    text: castling-01
+    fen: 6k1/8/8/8/8/8/PPP5/R3K2R w KQ - 0 1
+    answer: 'yes'
+    focus: e1
+    verify: can-castle queenside
+  - id: castling-02
+    type: yes-no
+    text: castling-02
+    fen: 4k3/8/8/8/8/7R/8/R3K3 w Q - 0 1
+    answer: 'no'
+    focus: e1
+    verify: can-castle kingside
+  - id: castling-03
+    type: yes-no
+    text: castling-03
+    fen: 4k3/8/8/8/8/8/4r3/R3K2R w KQ - 0 1
+    answer: 'no'
+    focus: e1
+    verify: can-castle kingside
+  - id: castling-04
+    type: yes-no
+    text: castling-04
+    fen: 4k3/8/8/8/8/8/8/R3KN1R w KQ - 0 1
+    answer: 'no'
+    focus: e1
+    verify: can-castle kingside
+  - id: castling-05
+    type: yes-no
+    text: castling-05
+    fen: 4k3/8/8/8/b7/8/8/R3K2R w KQ - 0 1
+    answer: 'no'
+    focus: e1
+    verify: can-castle queenside
+  - id: castling-06
+    type: best-move
+    text: castling-06
+    fen: 4k3/8/8/8/8/8/8/R3K3 w Q - 0 1
+    solutions: [O-O-O]
+    verify: castle
+  - id: castling-07
+    type: best-move
+    text: castling-07
+    fen: 6k1/8/8/8/8/8/1P6/4K2R w K - 0 1
+    solutions: [O-O]
+    verify: castle
+  - id: castling-08
+    type: best-move
+    text: castling-08
+    fen: 3k4/8/8/8/8/6P1/8/R3K2R w KQ - 0 1
+    solutions: [O-O, O-O-O]
+    verify: castle

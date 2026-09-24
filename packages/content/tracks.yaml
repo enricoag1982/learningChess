@@ -7,7 +7,7 @@ tracks:
       - { id: pieces, order: 2, habitat: savannah, title: worlds.pieces }
       - { id: attack, order: 3, habitat: jungle, title: worlds.attack, boss: win-the-queen }
       - { id: check, order: 4, habitat: mountains, title: worlds.check, boss: first-game }
-      - { id: rules, order: 5, habitat: river, title: worlds.rules }
+      - { id: rules, order: 5, habitat: river, title: worlds.rules, boss: full-game-rabbit }
   - id: openings
     kind: branch
     title: tracks.openings
