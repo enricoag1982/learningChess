@@ -237,7 +237,7 @@ play:
   full-game-vs: 'Full Game vs {{name}}'
   vs-friend: vs Friend
   vs-friend-note: On this tablet
-  vs-friend-locked: Coming soon
+  vs-friend-locked: Finish more lessons first
   minigames-heading: Mini-games
   locked-condition: 'After {{label}} lesson'
   minigame-name-stars: '{{title}}, {{stars}}'
@@ -253,6 +253,28 @@ play:
   back-to-play: Back to Play
   back-to-journey: Back to Journey
   back-to-home: Back to Home
+friend-play:
+  setup-title: vs Friend
+  setup-owl-line: Who's playing?
+  guest: Guest
+  second-player-heading: Second player
+  no-other-profiles: Add another player to play against them, or pick Guest.
+  game-heading: Game
+  no-games-yet: Finish more lessons to unlock a game to play together!
+  board-mode-heading: Board
+  board-mode-pass-and-play: Pass and play
+  board-mode-face-to-face: Face to face
+  legal-move-dots-on: Move dots on
+  legal-move-dots-off: Move dots off
+  swap-colours: Swap colours
+  start: Start
+  take-back: Take back
+  stop: Stop
+  take-back-ask-title: Allow take back?
+  take-back-ask: 'Ask {{name}}: Allow take back?'
+  turn: Turn now
+  result-win: '{{name}} wins!'
+  result-draw: "It's a draw!"
 session:
   warmup-of: 'Warm-up {{current}}/{{total}}'
   leave: Leave
@@ -279,6 +301,8 @@ den:
   owl-line: Look at all your friends!
   games-won_one: '{{count}} game won'
   games-won_other: '{{count}} games won'
+  games-with-friends_one: '{{count}} game with friends'
+  games-with-friends_other: '{{count}} games with friends'
   rank-heading: My rank
   rank-current: You are here
   rank-start: Start

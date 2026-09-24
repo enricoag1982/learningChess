@@ -150,6 +150,14 @@ export {
   versusGameRecordResult,
 } from './app/games.ts';
 
+export type { LocalPlayer, FriendGameOption, RecordLocalMatchInput } from './app/friend-play.ts';
+export {
+  friendGameOptions,
+  isFriendOpponent,
+  friendGamesPlayed,
+  recordLocalMatch,
+} from './app/friend-play.ts';
+
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
 

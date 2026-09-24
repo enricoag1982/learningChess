@@ -73,11 +73,15 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 - **Skip (kid):** tap locked lesson/world → "Show you know it" test (5–8 mixed tasks) → ≥80% = mastered, unlocked; <80% = back to path, no penalty.
 - **Skip (parent):** unlock any lesson/world directly.
 - Skipped concepts enter the review pool like completed ones.
-- **Play vs Friend (same device):** Play → vs Friend → second player (other profile or guest) → game (full game, Pawn Wars, Win the Queen) → board mode → play → result saved to each profile involved.
-  - Board modes: pass-and-play (board turns each move) / face-to-face (tablet flat, pieces upright for both).
-  - Options: takeback by agreement, legal-move highlights on/off.
-  - Availability: same as vs computer (full game after World 4, mini-games after their lesson); parent can unlock earlier.
-  - No effect on mastery or stars.
+- **Play vs Friend (same device, M4.3):** Play → vs Friend → setup sheet (second player, game, board mode, legal-move dots, swap colours) → friend game screen → result → Play.
+  - Availability: vs Friend card unlocked once the active profile has any game unlocked (full game after World 4; Pawn Wars after Promotion; Win the Queen after Trades); only games unlocked for the active profile are offered; parent unlock is a later milestone.
+  - Second player: pick another profile (avatar list) or **Guest**; no password. Active profile plays White by default; **Swap colours** toggle.
+  - Games: Full game, Pawn Wars, Win the Queen — their versus rules, a human instead of the bot on the other side.
+  - Board modes: pass-and-play (board flips to face the mover after every move; default on phones) / face-to-face (tablet flat, fixed orientation; the top side's pieces, labels and controls rotated 180°; default on tablets ≥ 768 px wide).
+  - Controls: per player, **Take back** (asks the player now to move: "Allow take back?" Yes / No) and **Stop** (confirms, same as leaving a vs-computer game); turn indicator (avatar + nickname); legal-move dots on by default, toggle in the setup sheet.
+  - Result: win / loss / draw screen naming the winner by nickname ("Guest" for a guest); **Play again** (colours swapped) / **Back to Play**.
+  - Records: one `GameRecord` per profile involved (`opponent`: `profile:<id>` or `guest`); a guest gets none. No stars, mastery or review effects.
+  - `Match` entity not stored in v1 (only the `GameRecord`s); `MatchService` port stays a hook for v2 (online play).
 
 ## 7. Progression rules
 

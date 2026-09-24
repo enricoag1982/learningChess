@@ -364,6 +364,50 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
           await page.getByRole('heading', { name: 'Play' }).waitFor();
           await page.getByRole('button', { name: 'Back to Home' }).click();
+
+          // M4.3: vs Friend — Pawn Wars and Win the Queen unlocked earlier already, so this is the
+          // full choice of games. Only one profile exists in this walk, so the second player is
+          // Guest (no second `GameRecord`, decision log). Pass-and-play (not face-to-face) keeps
+          // every control to a single on-screen instance for the touch-target checks below.
+          await page.getByRole('button', { name: 'Play', exact: true }).click();
+          await expectKidTouchTarget(page, 'vs Friend');
+          await page.getByRole('button', { name: 'vs Friend' }).click();
+          await page.getByRole('heading', { name: 'vs Friend' }).waitFor();
+          await expectKidTouchTarget(page, 'Guest');
+          await expectKidTouchTarget(page, 'Full Game');
+          await expectNoSeriousViolations(page, 'vs Friend (setup sheet)');
+
+          await page.getByRole('button', { name: 'Guest' }).click();
+          await page.getByRole('button', { name: 'Full Game' }).click();
+          await page.getByRole('button', { name: 'Pass and play' }).click();
+          await page.getByRole('button', { name: 'Start' }).click();
+          await page.getByRole('button', { name: /^e2,/ }).waitFor();
+          await expectKidTouchTarget(page, 'Take back');
+          await expectKidTouchTarget(page, 'Stop');
+          await expectNoSeriousViolations(page, 'vs Friend (game, start)');
+
+          await clickSquare(page, 'e2');
+          await clickSquare(page, 'e4');
+          await page.getByRole('button', { name: /^e4, white pawn/ }).waitFor();
+          await expectNoSeriousViolations(page, 'vs Friend (game, after a move)');
+
+          await page.getByRole('button', { name: 'Take back' }).click();
+          await page.getByRole('alertdialog', { name: 'Allow take back?' }).waitFor();
+          await expectKidTouchTarget(page, 'Yes');
+          await expectKidTouchTarget(page, 'No');
+          await expectNoSeriousViolations(page, 'vs Friend (take-back ask)');
+          await page.getByRole('button', { name: 'Yes' }).click();
+          await page.getByRole('button', { name: /^e2, white pawn/ }).waitFor();
+
+          await page.getByRole('button', { name: 'Stop' }).click();
+          await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
+          await expectKidTouchTarget(page, 'Stop game');
+          await expectKidTouchTarget(page, 'Keep playing');
+          await expectNoSeriousViolations(page, 'vs Friend (stop confirm)');
+          await page.getByRole('button', { name: 'Stop game' }).click();
+
+          await page.getByRole('heading', { name: 'Play' }).waitFor();
+          await page.getByRole('button', { name: 'Back to Home' }).click();
           await page.getByRole('button', { name: /Journey/ }).click();
         }
       }

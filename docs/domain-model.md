@@ -76,8 +76,8 @@ Character 1─1 piece type
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
-| Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` |
-| GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` in v1; `profile:<id>` / `guest` v2), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
+| Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` — **not stored in v1** (M4.3 decision log): only the `GameRecord`s below are saved; `MatchService` stays a hook for v2 online play |
+| GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend, same device, M4.3), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
 | Badge | `badgeId`, `tier`, `at`, `seen` |
 | Streak | `current`, `best`, `lastDay`, `skipsUsedThisWeek` |
 | SessionLog | `date`, `minutes` |
@@ -105,7 +105,7 @@ Character 1─1 piece type
 | Easier variant | Scored exercise, unsolved, ≥ 2 errors, `easier` set → variant offered (§3.4) |
 | Rank | Highest rank whose `after` is mastered |
 | Full game vs computer | Available after World 4 mastered (Mouse); Rabbit after 3 full-game wins vs Mouse (`GameRecord`s, `opponent: computer:1`, `game: 'full'`) — Fox/Wolf/Bear locked with their own condition until M4. Kid plays White (M3); colour choice is M4 |
-| Game record | Every full game and `versus` mini-game (standalone or a lesson's boss) saves a `GameRecord`; leaving mid-game (`versus` UI, "Stop game?" confirm) saves it `abandoned`, never a loss |
+| Game record | Every full game and `versus` mini-game (standalone, a lesson's boss, or vs Friend, M4.3) saves a `GameRecord` — one per profile involved for vs Friend, none for a guest; leaving mid-game ("Stop game?" confirm) saves it `abandoned`, never a loss |
 | Next step (Home "Today" / Journey highlight) | Next available lesson; once a world's lessons are all done and its world boss is available but unwon, the world boss |
 
 ### 3.1 Review scheduler (Leitner)
@@ -159,7 +159,7 @@ Failing any assessment: no penalty, no data lost.
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
 | Full game (M3.5) | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
-| Friend play | `startLocalMatch`, `playMatchMove`, `requestTakeback`, `finishMatch` |
+| Friend play (M4.3) | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
 | Parent | `getReport`, `unlock`, `resetProgress` |
 
 ## 5. Ports

@@ -58,6 +58,20 @@ export interface BoardProps {
   readonly highlights?: BoardHighlights;
   /** Show file/rank labels on the edge squares. Default `false` (kids: no notation). */
   readonly showCoordinates?: boolean;
+  /**
+   * Face-to-face vs Friend (docs/app-structure.md §6): draws the side opposite `orientation`'s
+   * pieces rotated 180°, so the player sitting at that edge of a flat tablet reads their own
+   * pieces upright. Default `false` (pass-and-play, every other board). Purely visual — square
+   * a11y labels (`describeSquare`) are unaffected either way.
+   */
+  readonly rotateTopPieces?: boolean;
+  /**
+   * vs Friend's "legal-move dots" setting (default on): when `false`, hides the possible-move
+   * dot/ring but leaves every square exactly as draggable/tappable as `legalMoves` allows — a
+   * difficulty toggle, not an interactivity one. Screen-reader square names still say "possible
+   * move" either way. Default `true`.
+   */
+  readonly showLegalMoveDots?: boolean;
   /** Accessible name of the board, e.g. "Chess board". */
   readonly label: string;
 }
@@ -159,10 +173,13 @@ export function Board({
   onSquareTap,
   highlights,
   showCoordinates = false,
+  rotateTopPieces = false,
+  showLegalMoveDots = true,
   label,
 }: BoardProps): JSX.Element {
   const { t } = useTranslation();
   const squareMode = onSquareTap !== undefined;
+  const topColor: Color = orientation === 'w' ? 'b' : 'w';
 
   const [selected, setSelected] = useState<Square | null>(null);
   const [focusSquare, setFocusSquare] = useState<Square>('a8');
@@ -490,7 +507,15 @@ export function Board({
                             setCaptureFade(null);
                           }}
                         >
-                          <PieceIcon piece={captureFade.piece} />
+                          <span
+                            className={
+                              rotateTopPieces && captureFade.piece.color === topColor
+                                ? 'block rotate-180'
+                                : 'block'
+                            }
+                          >
+                            <PieceIcon piece={captureFade.piece} />
+                          </span>
                         </span>
                       )}
 
@@ -520,7 +545,15 @@ export function Board({
                             setBounce((current) => (current?.square === square ? null : current));
                           }}
                         >
-                          <PieceIcon piece={piece} />
+                          <span
+                            className={
+                              rotateTopPieces && piece.color === topColor
+                                ? 'block rotate-180'
+                                : 'block'
+                            }
+                          >
+                            <PieceIcon piece={piece} />
+                          </span>
                         </span>
                       )}
 
@@ -553,7 +586,7 @@ export function Board({
                         </span>
                       )}
 
-                      {isTarget && (
+                      {isTarget && showLegalMoveDots && (
                         <span
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-0 flex items-center justify-center"
@@ -639,7 +672,13 @@ export function Board({
             className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 scale-110 drop-shadow-xl"
             style={{ left: drag.x, top: drag.y, width: drag.squareSize, height: drag.squareSize }}
           >
-            <PieceIcon piece={draggedPiece} />
+            <span
+              className={
+                rotateTopPieces && draggedPiece.color === topColor ? 'block rotate-180' : 'block'
+              }
+            >
+              <PieceIcon piece={draggedPiece} />
+            </span>
           </div>
         )}
       </div>

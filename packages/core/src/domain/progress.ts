@@ -165,15 +165,16 @@ export interface MiniGameProgress extends StoredRecord {
 export type GameRecordResult = 'win' | 'loss' | 'draw' | 'abandoned';
 
 /**
- * One played (or abandoned) game vs the computer (v1) or a friend (v2) — domain-model.md §2
- * `GameRecord`. Saved for a full game (`game: 'full'`) and every `versus` mini-game (`game`: its
- * content id), whether played standalone from Play or as a lesson's own boss.
+ * One played (or abandoned) game vs the computer or a friend (same device, M4.3) —
+ * domain-model.md §2 `GameRecord`. Saved for a full game (`game: 'full'`) and every `versus`
+ * mini-game (`game`: its content id), whether played standalone from Play or as a lesson's own
+ * boss (vs computer), or from the vs Friend setup sheet (vs a friend).
  */
 export interface GameRecord extends StoredRecord {
   readonly profileId: string;
   /** `'full'` for a full standard game, else the `versus` mini-game's content id (Pawn Wars, …). */
   readonly game: string;
-  /** `computer:<level>` in v1; `profile:<id>` / `guest` (vs Friend) are v2. */
+  /** `computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend (M4.3, same device — online play itself is v2). */
   readonly opponent: string;
   readonly result: GameRecordResult;
   /** A `GameResult.reason` (checkmate, stalemate, threefold-repetition, fifty-move, …), or `left` when abandoned. */

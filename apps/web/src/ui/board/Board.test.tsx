@@ -250,3 +250,74 @@ describe('Board — keyboard', () => {
     expect(cell('a8').tabIndex).toBe(0);
   });
 });
+
+describe('Board — rotateTopPieces (vs Friend face-to-face)', () => {
+  // White rook d5, black knight e8: orientation stays 'w' (white at the bottom), so the black
+  // knight is the "top side" piece that should end up rotated.
+  const MIXED_DIAGRAM = `
+. . . . n . . .
+. . . . . . . .
+. . . . . . . .
+. . . R . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+. . . . . . . .
+`;
+  const mixedPosition = parseDiagram(MIXED_DIAGRAM);
+  const mixedLegalMoves: readonly Move[] = chessJsRules.legalMoves(mixedPosition);
+
+  it('rotates only the top-side (black) piece when set', () => {
+    render(
+      <Board
+        position={mixedPosition}
+        legalMoves={mixedLegalMoves}
+        orientation="w"
+        rotateTopPieces
+        label="Chess board"
+      />,
+    );
+    expect(cell('e8').querySelector('.rotate-180')).not.toBeNull();
+    expect(cell('d5').querySelector('.rotate-180')).toBeNull();
+  });
+
+  it('rotates neither piece by default (pass-and-play)', () => {
+    render(
+      <Board
+        position={mixedPosition}
+        legalMoves={mixedLegalMoves}
+        orientation="w"
+        label="Chess board"
+      />,
+    );
+    expect(cell('e8').querySelector('.rotate-180')).toBeNull();
+    expect(cell('d5').querySelector('.rotate-180')).toBeNull();
+  });
+});
+
+describe('Board — showLegalMoveDots', () => {
+  it('hides the possible-move dot but keeps the move playable when false', () => {
+    const onMove = vi.fn();
+    render(
+      <Board
+        position={POSITION}
+        legalMoves={LEGAL_MOVES}
+        onMove={onMove}
+        showLegalMoveDots={false}
+        label="Chess board"
+      />,
+    );
+    fireEvent.click(cell('d5'));
+    expect(cell('d1').querySelector('.bg-go\\/60')).toBeNull();
+    expect(cell('d1').getAttribute('aria-label')).toBe('d1, empty, possible move');
+
+    fireEvent.click(cell('d1'));
+    expect(onMove).toHaveBeenCalledWith({ from: 'd5', to: 'd1' });
+  });
+
+  it('shows the possible-move dot by default', () => {
+    render(<Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />);
+    fireEvent.click(cell('d5'));
+    expect(cell('d1').querySelector('.bg-go\\/60')).not.toBeNull();
+  });
+});
