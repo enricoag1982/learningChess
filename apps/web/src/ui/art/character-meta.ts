@@ -10,9 +10,14 @@ const CHARACTER_PIECE: Readonly<Record<string, PieceType>> = {
   caterpillar: 'p',
 };
 
-/** Piece type for a lesson character; defaults to rook (M1 only ships the Rook lesson). */
+/** Piece type for a lesson character, or `null` for one that doesn't stand for a single piece (Owl: World 1 is about the board itself, not one piece). */
+export function characterPieceOrNull(character: string): PieceType | null {
+  return CHARACTER_PIECE[character] ?? null;
+}
+
+/** Piece type for a lesson character; defaults to rook where none is mapped. */
 export function characterPiece(character: string): PieceType {
-  return CHARACTER_PIECE[character] ?? 'r';
+  return characterPieceOrNull(character) ?? 'r';
 }
 
 /** Pastel badge colour per character, echoing its habitat in the sketches. */

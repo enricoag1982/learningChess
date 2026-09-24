@@ -32,6 +32,7 @@ function makeGameDef(id: string): StaticCaptureGameDef {
 function makeMiniGame(id: string): MiniGame {
   return {
     ...makeGameDef(id),
+    mode: 'static',
     titleKey: `lessons:${id}.title`,
     goalKey: `lessons:${id}.goal`,
     unlockAfter: 'rook',

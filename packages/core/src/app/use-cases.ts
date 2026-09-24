@@ -1,9 +1,9 @@
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { starsFor } from '../domain/exercise/engine.ts';
-import type { GameState } from '../domain/exercise/minigame.ts';
-import { gameStars } from '../domain/exercise/minigame.ts';
+import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
+import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
 import type { Lesson } from '../domain/lesson.ts';
-import type { LessonProgress } from '../domain/progress.ts';
+import type { LessonProgress, Stars } from '../domain/progress.ts';
 import {
   newLessonProgress,
   recordBossStars,
@@ -101,14 +101,51 @@ export async function recordExerciseResult(
   return progress;
 }
 
-/** Result of playing a lesson's boss mini-game. */
+/** Result of playing a lesson's boss mini-game: a `static` capture game or a `series` of rounds. */
 export interface RecordBossResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
-  readonly state: GameState;
+  readonly state: GameState | SeriesGameState;
   readonly durationMs: number;
   /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
+}
+
+/** The attempt-log fields a boss result reduces to, whichever mode played it. */
+interface BossAttemptSummary {
+  readonly exerciseId: string;
+  readonly conceptId: string;
+  readonly stars: Stars;
+  readonly correct: boolean;
+  readonly hints: number;
+  readonly errors: number;
+  readonly moves: number;
+}
+
+function bossAttemptSummary(state: GameState | SeriesGameState): BossAttemptSummary {
+  if (state.mode === 'series') {
+    return {
+      exerciseId: state.def.id,
+      conceptId: state.def.concept,
+      stars: seriesStars(state),
+      correct: state.mistakes === 0,
+      // A series' mistakes already fold errors and hint levels together per round; logged as
+      // `errors` (there is no single hint level to report once several rounds are involved).
+      hints: 0,
+      errors: state.mistakes,
+      moves: state.def.rounds.length,
+    };
+  }
+  const { exercise } = state;
+  return {
+    exerciseId: state.def.id,
+    conceptId: state.def.concept,
+    stars: gameStars(state),
+    correct: exercise.solved && exercise.errors === 0 && exercise.hintLevel === 0,
+    hints: exercise.hintLevel,
+    errors: exercise.errors,
+    moves: exercise.moves,
+  };
 }
 
 /**
@@ -121,28 +158,27 @@ export async function recordBossResult(
 ): Promise<LessonProgress> {
   const { profileId, lesson, state, durationMs, nextStep } = input;
   const now = deps.clock.now();
-  const stars = gameStars(state);
-  const { exercise } = state;
+  const summary = bossAttemptSummary(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),
     profileId,
     lessonId: lesson.id,
-    exerciseId: state.def.id,
-    conceptId: state.def.concept,
+    exerciseId: summary.exerciseId,
+    conceptId: summary.conceptId,
     scored: true,
-    correct: exercise.solved && exercise.errors === 0 && exercise.hintLevel === 0,
-    stars,
-    hints: exercise.hintLevel,
-    errors: exercise.errors,
-    moves: exercise.moves,
+    correct: summary.correct,
+    stars: summary.stars,
+    hints: summary.hints,
+    errors: summary.errors,
+    moves: summary.moves,
     durationMs,
     createdAt: now.toISOString(),
     updatedAt: now.toISOString(),
   });
 
   let progress = await getLessonProgress(deps, profileId, lesson.id);
-  progress = recordBossStars(progress, stars, now);
+  progress = recordBossStars(progress, summary.stars, now);
   progress = withResumeStep(progress, nextStep, now);
   await deps.progress.saveLesson(progress);
   return progress;

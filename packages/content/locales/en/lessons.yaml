@@ -91,3 +91,59 @@ knight-08: Collect both stars. Plan Horse's jumps!
 knight-maze:
   title: Knight Maze
   goal: Horse must collect every star by jumping over the rocks!
+squares:
+  title: Meet the Squares
+  story: >-
+    Every chessboard is a checkerboard: light squares and dark squares, side by side. Here's Owl's
+    favourite trick — the corner near your right hand is always light!
+  demo: Look at your two corners. The one near your right hand is light. The one near your left hand is dark.
+squares-g1: Your king is standing in your right-hand corner. Is that square light?
+squares-g2: Now he hopped to your left-hand corner. Is that square light?
+squares-01: Your king found the far corner, near your right hand. Is that square light too?
+squares-02: He hopped all the way to the far corner on your left. Is that square light?
+squares-03: Now he's out in the middle of the board. Is his square light?
+squares-04: Tap every light square in the row closest to you.
+squares-05: Now tap every dark square in that same row.
+lines:
+  title: Rows, Columns, and Diagonals
+  story: >-
+    A row runs from side to side, a column runs from you to Owl, and a diagonal runs corner to
+    corner. Every line is straight, and every square on it belongs together!
+  demo: See this whole row, edge to edge? Every square on it is part of the same line.
+lines-g1: Tap every square in the same row as your king.
+lines-g2: Tap every square in the same column as your king.
+lines-01: Tap every square in your king's row.
+lines-02: This time, tap every square in your king's column.
+lines-03: Your king moved closer to you. Tap his whole row.
+lines-04: Tap every square in your king's column, all the way across the board.
+lines-05: This line runs corner to corner. Tap every square on your king's diagonal.
+lines-06: Here's the other diagonal. Tap every square your king shares with it.
+square-hunt:
+  title: Square Hunt
+  goal: Tap every square in each highlighted line, as fast as you can!
+square-hunt-r1: Tap every square in your king's row.
+square-hunt-r2: Tap every square in your king's column.
+square-hunt-r3: Tap every square in your king's row.
+square-hunt-r4: Tap every square in your king's column.
+square-hunt-r5: Tap every square on your king's diagonal.
+square-hunt-r6: Tap every square on this diagonal.
+setup:
+  title: Setting Up the Board
+  story: >-
+    Every game starts the same way. Rooks stand in the corners, knights right beside them, then
+    bishops, and the queen and king share the middle. Pawns line up in front to protect them all.
+  demo: Here is the whole starting line-up, ready to play.
+setup-g1: Let's start easy. Place the king in the middle of the back row.
+setup-g2: Now put the queen right next to him.
+setup-01: Place both rooks in their corners.
+setup-02: Now add the knights, right next to the rooks.
+setup-03: Next come the bishops, next to the knights.
+setup-04: >-
+  Finally the queen and king share the middle. Remember: the queen always stands on a square of
+  her own colour!
+setup-05: All that's left is the pawns — line up all eight, standing guard in front.
+setup-race:
+  title: Setup Race
+  goal: Race to place every piece in its starting spot!
+setup-race-r1: Place every piece on the back row, all in their starting spots.
+setup-race-r2: Now add all eight pawns, standing guard in front.

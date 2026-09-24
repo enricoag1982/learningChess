@@ -73,6 +73,9 @@ describe('World 2 lessons play to completion via the engine, using solver lines'
       if (minigame === undefined) {
         throw new Error(`${lesson.boss} mini-game not found`);
       }
+      if (minigame.mode !== 'static') {
+        throw new Error(`${lesson.boss} mini-game is not static`);
+      }
 
       const goal = minigame.goal === 'collect-stars' ? 'collect-stars' : 'capture';
       const line = solve(minigame.position, rules, goal);

@@ -38,3 +38,6 @@ export { solve, optimalMoves } from './solver.ts';
 
 export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
 export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';
+
+export type { SeriesGameDef, SeriesGameState } from './minigame.ts';
+export { startSeries, currentRound, completeRound, seriesResult, seriesStars } from './minigame.ts';

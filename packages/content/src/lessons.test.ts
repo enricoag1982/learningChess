@@ -55,9 +55,12 @@ describe('real content', () => {
     }
   });
 
-  it('every exercise position has a piece for the side to move', () => {
+  it('every exercise position has a piece for the side to move (setup exercises excepted: they typically start empty)', () => {
     for (const lesson of content.lessons) {
       for (const exercise of [...lesson.guided, ...lesson.exercises]) {
+        if (exercise.type === 'setup') {
+          continue;
+        }
         const hasKidPiece = Object.values(exercise.position.pieces).some(
           (piece) => piece.color === exercise.position.toMove,
         );
@@ -70,6 +73,9 @@ describe('real content', () => {
     const hungryRook = content.minigames.find((minigame) => minigame.id === 'hungry-rook');
     if (hungryRook === undefined) {
       throw new Error('hungry-rook mini-game not found');
+    }
+    if (hungryRook.mode !== 'static') {
+      throw new Error('hungry-rook mini-game is not static');
     }
 
     expect(hungryRook.unlockAfter).toBe('rook');
@@ -192,6 +198,9 @@ describe('real content', () => {
       if (minigame === undefined) {
         throw new Error(`${id} mini-game not found`);
       }
+      if (minigame.mode !== 'static') {
+        throw new Error(`${id} mini-game is not static`);
+      }
 
       expect(minigame.unlockAfter).toBe(unlockAfter);
       expect(minigame.moveLimit).toBeGreaterThan(minigame.par);
@@ -226,6 +235,9 @@ describe('real content', () => {
     if (kingWalk === undefined) {
       throw new Error('king-walk mini-game not found');
     }
+    if (kingWalk.mode !== 'static') {
+      throw new Error('king-walk mini-game is not static');
+    }
     expect(kingWalk.position.markers.stars.length).toBeGreaterThan(0);
     // Solvability (via optimalMoves above) already proves a legal path exists; legalMoves always
     // excludes squares attacked by the static enemy pieces (standard chess king-safety rule).
@@ -237,6 +249,9 @@ describe('real content', () => {
     const knightMaze = content.minigames.find((minigame) => minigame.id === 'knight-maze');
     if (knightMaze === undefined) {
       throw new Error('knight-maze mini-game not found');
+    }
+    if (knightMaze.mode !== 'static') {
+      throw new Error('knight-maze mini-game is not static');
     }
     expect(knightMaze.position.markers.blocked.length).toBeGreaterThan(0);
     const moves = rules.legalMoves(knightMaze.position, { staticOpponent: true });

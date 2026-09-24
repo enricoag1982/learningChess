@@ -12,6 +12,7 @@ import type {
 import { parseDiagram } from '@chess-kids/core';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';
+import { stubMatchMedia } from '../../testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
 import { ExerciseStep } from './ExerciseStep.tsx';
@@ -482,6 +483,57 @@ describe('ExerciseStep', () => {
       await screen.findByText('Here is the answer.');
 
       await screen.findByRole('button', { name: /^h8, black rook/ });
+    });
+
+    it('on a stacked layout (phone / iPad portrait), the piece tray sits directly under the board, before the Owl bubble (M2.4 §2b)', async () => {
+      // jsdom has no `matchMedia` (see useMediaQuery.ts), so `useIsStackedLayout()` defaults to
+      // `true` here — the same "no room beside the board" layout as phone and iPad portrait.
+      const lesson = fixtureLesson({ exercises: [exercise] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      const board = screen.getByLabelText('Chess board');
+      const trayTile = screen.getByRole('button', { name: /black rook, \d+ left/ });
+      const hintButton = screen.getByRole('button', { name: /Hint/ });
+
+      // Tray comes after the board (directly under it)...
+      expect(
+        board.compareDocumentPosition(trayTile) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      // ...and before the rest of the panel (the Owl bubble, hint/undo controls).
+      expect(
+        trayTile.compareDocumentPosition(hintButton) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      // Only one tray renders (not one hidden copy per layout): exactly one tile per palette piece.
+      expect(screen.getAllByRole('button', { name: /black rook, \d+ left/ })).toHaveLength(1);
+    });
+
+    it('on a side-by-side layout (tablet landscape, desktop), the tray stays in the side panel', async () => {
+      // `useIsStackedLayout()` reads false once `(min-width: 1024px)` matches.
+      const restoreMatchMedia = stubMatchMedia('(min-width: 1024px)');
+
+      try {
+        const lesson = fixtureLesson({ exercises: [exercise] });
+        const services = createTestServices(fixtureContentSource(lesson));
+        await renderWithStore(
+          <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+          services,
+        );
+
+        const hintButton = screen.getByRole('button', { name: /Hint/ });
+        const trayTile = screen.getByRole('button', { name: /black rook, \d+ left/ });
+        // Now the tray comes after the panel's other controls (its usual side-panel spot), not
+        // before them.
+        expect(
+          hintButton.compareDocumentPosition(trayTile) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy();
+        expect(screen.getAllByRole('button', { name: /black rook, \d+ left/ })).toHaveLength(1);
+      } finally {
+        restoreMatchMedia();
+      }
     });
   });
 });

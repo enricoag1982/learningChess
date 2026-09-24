@@ -1,0 +1,126 @@
+id: lines
+world: board
+order: 2
+concept: board-lines
+character: owl
+title: lines.title
+story: lines.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . K . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: lines.demo
+  highlight: squares a4 b4 c4 d4 e4 f4 g4 h4
+guided:
+  - id: lines-g1
+    type: select-squares
+    text: lines-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a4, b4, c4, d4, e4, f4, g4, h4]
+  - id: lines-g2
+    type: select-squares
+    text: lines-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [d1, d2, d3, d4, d5, d6, d7, d8]
+exercises:
+  - id: lines-01
+    type: select-squares
+    text: lines-01
+    board: |
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a7, b7, c7, d7, e7, f7, g7, h7]
+  - id: lines-02
+    type: select-squares
+    text: lines-02
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . K . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [f1, f2, f3, f4, f5, f6, f7, f8]
+  - id: lines-03
+    type: select-squares
+    text: lines-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . K . . . . .
+      . . . . . . . .
+    answer: [a2, b2, c2, d2, e2, f2, g2, h2]
+  - id: lines-04
+    type: select-squares
+    text: lines-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [b1, b2, b3, b4, b5, b6, b7, b8]
+  - id: lines-05
+    type: select-squares
+    text: lines-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a1, b2, c3, d4, e5, f6, g7, h8]
+  - id: lines-06
+    type: select-squares
+    text: lines-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [h1, g2, f3, e4, d5, c6, b7, a8]
+boss: square-hunt

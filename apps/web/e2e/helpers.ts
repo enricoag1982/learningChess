@@ -166,14 +166,20 @@ export async function completeExercise(page: Page, def: ExerciseDef): Promise<vo
 }
 
 /**
- * Solves a lesson's boss mini-game, then advances past its success panel. Today every boss is a
- * static-capture game, `capture-all` (default) or `collect-stars` (e.g. King Walk, Knight Maze —
- * `game.goal`). A future series boss (several rounds, each an `ExerciseDef`) extends here: solve
- * each round with `completeExercise`'s `solveExercise` step before the final success panel.
+ * Solves a lesson's boss mini-game, then advances past its result panel. `static` games are
+ * solved with the solver line for their goal (`capture-all` or `collect-stars`); `series` games
+ * play each round like an exercise, tapping Next between rounds.
  */
 export async function completeBoss(page: Page, game: MiniGame): Promise<void> {
-  const goal = game.goal === 'collect-stars' ? 'collect-stars' : 'capture';
-  await playSolveLine(page, game.position, goal);
+  if (game.mode === 'series') {
+    for (const round of game.rounds) {
+      await solveExercise(page, round);
+      await page.getByRole('button', { name: /^Next/ }).click();
+    }
+  } else {
+    const goal = game.goal === 'collect-stars' ? 'collect-stars' : 'capture';
+    await playSolveLine(page, game.position, goal);
+  }
   await page.getByRole('button', { name: /^Next/ }).click();
 }
 

@@ -64,7 +64,7 @@ function StepPreview({
   );
 }
 
-const LESSON_IDS = ['rook', 'bishop', 'queen', 'king', 'knight'];
+const LESSON_IDS = ['squares', 'lines', 'setup', 'rook', 'bishop', 'queen', 'king', 'knight'];
 
 function parseHash(): { readonly lessonId: string; readonly view: string } {
   const raw = location.hash.startsWith('#lesson=') ? location.hash.slice('#lesson='.length) : '';

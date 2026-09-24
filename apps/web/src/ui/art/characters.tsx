@@ -103,6 +103,9 @@ export function CharacterIcon({ character }: { readonly character: string }): JS
   if (character === 'horse') {
     return <HorseFace />;
   }
+  if (character === 'owl') {
+    return <OwlIcon />;
+  }
   return (
     <svg viewBox="0 0 100 100" aria-hidden="true" className="h-full w-full">
       <circle cx={50} cy={50} r={40} fill="#B7C4B2" />
