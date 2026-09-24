@@ -134,6 +134,7 @@ export async function changeAvatar(
  */
 export async function deleteProfile(deps: AppDeps, profileId: string): Promise<void> {
   await deps.progress.deleteProfileData(profileId);
+  await deps.gameRecords.deleteProfileData(profileId);
   await deps.profiles.delete(profileId);
   const settings = await deps.settings.get();
   if (settings.lastProfileId === profileId) {

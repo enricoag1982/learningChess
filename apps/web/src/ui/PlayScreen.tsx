@@ -2,11 +2,11 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { MiniGame } from '@chess-kids/core';
-import { unlockedMiniGames } from '@chess-kids/core';
+import type { ComputerLevelCondition, ComputerLevelStatus, MiniGame } from '@chess-kids/core';
+import { computerLevelStatus, unlockedMiniGames } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
-import { characterPieceOrNull } from './art/character-meta.ts';
+import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { OwlIcon } from './art/characters.tsx';
@@ -93,42 +93,15 @@ function FriendIcon(): JSX.Element {
   );
 }
 
-const BOT_LEVELS = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'] as const;
-
-/**
- * The condition text for a locked mini-game: the piece word for the first lesson of a piece
- * character ("Pawn"), else the lesson's title (Owl-taught lessons, and later lessons of the same
- * character such as "Caterpillar Transforms!").
- */
-function unlockLabel(
-  t: TFunction,
-  lesson: { readonly id: string; readonly character: string; readonly titleKey: string },
-  firstLessonOfCharacter: ReadonlyMap<string, string>,
-): string {
-  const piece = characterPieceOrNull(lesson.character);
-  return piece !== null && firstLessonOfCharacter.get(lesson.character) === lesson.id
-    ? t(`piece.${piece}`)
-    : tContent(t, lesson.titleKey);
-}
-
-/** First lesson id per character, in curriculum order (world order is encoded in lesson order within a world). */
-function firstLessonsByCharacter(
-  lessons: readonly {
-    readonly id: string;
-    readonly character: string;
-    readonly world: string;
-    readonly order: number;
-  }[],
-  worldOrder: ReadonlyMap<string, number>,
-): Map<string, string> {
-  const sorted = [...lessons].sort(
-    (a, b) => (worldOrder.get(a.world) ?? 0) - (worldOrder.get(b.world) ?? 0) || a.order - b.order,
-  );
-  const first = new Map<string, string>();
-  for (const lesson of sorted) {
-    if (!first.has(lesson.character)) first.set(lesson.character, lesson.id);
+/** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
+function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
+  if (condition.kind === 'world-mastered') {
+    return t('play.full-game-locked');
   }
-  return first;
+  return t('play.level-condition-beat', {
+    name: t(`boss.versus.bot-name.${condition.level}`),
+    times: condition.times,
+  });
 }
 
 /** Play: vs Computer (locked in M2), vs Friend (locked), and the unlocked mini-games grid. */
@@ -138,11 +111,14 @@ export function PlayScreen(): JSX.Element {
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const miniGameProgress = useAppStore((state) => state.miniGameProgress);
+  const gameRecords = useAppStore((state) => state.gameRecords);
   const journey = useAppStore((state) => state.journey);
   const goToHome = useAppStore((state) => state.goToHome);
   const startMiniGame = useAppStore((state) => state.startMiniGame);
+  const startFullGame = useAppStore((state) => state.startFullGame);
 
   const [lockedMessage, setLockedMessage] = useState<string | null>(null);
+  const [selectedLevel, setSelectedLevel] = useState(1);
   const bubbleText = t('play.owl-line');
   const replay = useNarratedText(services.narrator, bubbleText);
 
@@ -162,8 +138,25 @@ export function PlayScreen(): JSX.Element {
     miniGameProgress.map((entry) => [entry.miniGameId, entry.bestStars]),
   );
 
-  const checkWorld = journey.worlds.find((w) => w.world.id === 'check');
-  const fullGameUnlocked = checkWorld?.status === 'mastered';
+  const levelStatuses = computerLevelStatus(gameRecords, journey);
+  const mouseStatus = levelStatuses.find((status) => status.name === 'mouse');
+  const fullGameUnlocked = mouseStatus !== undefined && !mouseStatus.locked;
+
+  function selectLevel(status: ComputerLevelStatus): void {
+    if (status.locked) {
+      if (status.condition === undefined) return;
+      const message = t('play.level-name-locked', {
+        name: t(`boss.versus.bot-name.${status.name}`),
+        condition: levelConditionText(t, status.condition),
+      });
+      setLockedMessage(message);
+      services.narrator.cancel();
+      void services.narrator.speak(message);
+      return;
+    }
+    setLockedMessage(null);
+    setSelectedLevel(status.level);
+  }
 
   function activateGame(game: MiniGame, unlocked: boolean): void {
     if (!unlocked) {
@@ -208,7 +201,7 @@ export function PlayScreen(): JSX.Element {
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
       </div>
@@ -223,19 +216,53 @@ export function PlayScreen(): JSX.Element {
               {t('play.vs-computer')}
             </span>
           </div>
-          <div className="flex flex-wrap gap-2" role="list" aria-label={t('play.vs-computer')}>
-            {BOT_LEVELS.map((level, index) => (
-              <span
-                key={level}
-                role="listitem"
-                className={`rounded-full px-4 py-2 text-sm font-extrabold ${
-                  index === 0 ? 'bg-info text-white' : 'bg-[#EEF3FA] text-[#24497D]'
-                }`}
-              >
-                {t(`boss.versus.bot-name.${level}`)}
-              </span>
-            ))}
-          </div>
+          <ul className="flex flex-wrap gap-2" aria-label={t('play.vs-computer')}>
+            {levelStatuses.map((status) => {
+              const name = t(`boss.versus.bot-name.${status.name}`);
+              const selected = !status.locked && status.level === selectedLevel;
+              const condition = status.condition ? levelConditionText(t, status.condition) : '';
+              const accessibleName = status.locked
+                ? t('play.level-name-locked', { name, condition })
+                : status.games > 0
+                  ? t('play.level-name-wins', { name, wins: status.wins, games: status.games })
+                  : t('play.level-name-unplayed', { name });
+              return (
+                <li key={status.name}>
+                  <button
+                    type="button"
+                    aria-pressed={selected}
+                    aria-label={accessibleName}
+                    onClick={() => {
+                      selectLevel(status);
+                    }}
+                    className={`flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 text-left ${
+                      status.locked
+                        ? 'bg-[#F3EDE0] text-muted'
+                        : selected
+                          ? 'bg-info text-white'
+                          : 'bg-[#EEF3FA] text-[#24497D]'
+                    }`}
+                  >
+                    <span className="text-sm font-extrabold" aria-hidden="true">
+                      {name}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs font-bold" aria-hidden="true">
+                      {status.locked ? (
+                        <>
+                          <LockIcon />
+                          {condition}
+                        </>
+                      ) : status.games > 0 ? (
+                        t('play.level-wins', { wins: status.wins, games: status.games })
+                      ) : (
+                        t('play.level-unplayed')
+                      )}
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
           <button
             type="button"
             disabled={!fullGameUnlocked}
@@ -244,6 +271,9 @@ export function PlayScreen(): JSX.Element {
                 ? t('play.full-game')
                 : `${t('play.full-game')}, ${t('play.full-game-locked')}`
             }
+            onClick={() => {
+              startFullGame(selectedLevel);
+            }}
             className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
           >
             {!fullGameUnlocked && <LockIcon />}

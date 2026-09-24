@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import { seededRandom } from '../domain/random.ts';
 import {
   changeAvatar,
@@ -20,6 +20,7 @@ import type {
   AppSettings,
   Clock,
   ContentSource,
+  GameRecordRepository,
   IdGenerator,
   ParentLockRepository,
   PasswordFileWriter,
@@ -89,6 +90,24 @@ function makeProgressRepo(): ProgressRepository & { readonly deletedFor: string[
   };
 }
 
+function makeGameRecordRepo(): GameRecordRepository & { readonly deletedFor: string[] } {
+  const records: GameRecord[] = [];
+  const deletedFor: string[] = [];
+  return {
+    add: (record) => {
+      records.push(record);
+      return Promise.resolve();
+    },
+    listByProfile: (profileId) =>
+      Promise.resolve(records.filter((record) => record.profileId === profileId)),
+    deleteProfileData: (profileId) => {
+      deletedFor.push(profileId);
+      return Promise.resolve();
+    },
+    deletedFor,
+  };
+}
+
 function makeParentLockRepo(initial?: ParentLock): ParentLockRepository {
   let lock = initial;
   return {
@@ -133,6 +152,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     profiles: makeProfileRepo(),
     progress: makeProgressRepo(),
+    gameRecords: makeGameRecordRepo(),
     clock: makeClock('2026-01-01T00:00:00.000Z'),
     ids: makeIds(),
     content: stubContent,
@@ -273,9 +293,10 @@ describe('selectProfile / deleteProfile', () => {
     expect(await deps.settings.get()).toEqual({ lastProfileId: profile.id });
   });
 
-  it('deleteProfile cascades progress data and clears lastProfileId when it was selected', async () => {
+  it('deleteProfile cascades progress and game-record data and clears lastProfileId when it was selected', async () => {
     const progress = makeProgressRepo();
-    const deps = makeDeps({ progress });
+    const gameRecords = makeGameRecordRepo();
+    const deps = makeDeps({ progress, gameRecords });
     const profile = await createProfile(deps, 'Mia', 'panda');
     await selectProfile(deps, profile.id);
 
@@ -283,6 +304,7 @@ describe('selectProfile / deleteProfile', () => {
 
     expect(await deps.profiles.get(profile.id)).toBeUndefined();
     expect(progress.deletedFor).toEqual([profile.id]);
+    expect(gameRecords.deletedFor).toEqual([profile.id]);
     expect(await deps.settings.get()).toEqual({ lastProfileId: null });
   });
 

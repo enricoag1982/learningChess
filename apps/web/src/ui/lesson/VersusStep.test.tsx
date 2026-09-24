@@ -271,6 +271,29 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       fireEvent.click(screen.getByRole('button', { name: /^d6,/ }));
 
       await screen.findByText("It's a draw! Want to try again?");
+      // M3.5: Owl explains *which* draw, alongside the existing generic result text.
+      expect(screen.getByText("No safe moves left for anyone — that's a stalemate.")).toBeTruthy();
+    });
+
+    it('a draw by insufficient material names that reason', async () => {
+      // The kid's king captures the last black pawn, leaving a bare king vs king — neither side can
+      // ever force checkmate, an instant draw the moment the position is reached.
+      const boss = kingsGame({
+        id: 'fixture-insufficient-material',
+        position: parseFen('k7/8/8/8/8/8/p7/K7 w - - 0 1'),
+      });
+      const lesson = fixtureLesson({ boss: boss.id });
+      const services = {
+        ...createTestServices(fixtureContentSource(lesson, [boss])),
+        botPlayer: scriptedBotPlayer([]),
+      };
+      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^a2,/ }));
+
+      await screen.findByText("It's a draw! Want to try again?");
+      expect(screen.getByText('Not enough pieces left for either side to checkmate.')).toBeTruthy();
     });
 
     it('the kid can castle kingside', async () => {

@@ -4,7 +4,7 @@ import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
 
 /** Persistence of child profiles. Async so cloud adapters can replace local ones. */
@@ -33,6 +33,18 @@ export interface ProgressRepository {
   listConceptStats(profileId: string): Promise<ConceptStats[]>;
   saveConceptStats(stats: ConceptStats): Promise<void>;
   /** Deletes every lesson-progress, attempt, mini-game, and concept-stats record for a profile (parent area "Delete"). */
+  deleteProfileData(profileId: string): Promise<void>;
+}
+
+/**
+ * Persistence of `GameRecord` (domain-model.md §2): full games and versus mini-games, vs the
+ * computer (v1) or a friend (v2). Kept separate from `ProgressRepository` — records here are an
+ * append-only game log, not lesson/mastery state.
+ */
+export interface GameRecordRepository {
+  add(record: GameRecord): Promise<void>;
+  listByProfile(profileId: string): Promise<GameRecord[]>;
+  /** Deletes every game record for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 

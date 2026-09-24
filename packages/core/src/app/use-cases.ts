@@ -17,6 +17,7 @@ import { appendResult, applyReviewResult, enterReview, newConceptStats } from '.
 import { saveMiniGamePlay } from './minigames.ts';
 import type {
   ContentSource,
+  GameRecordRepository,
   IdGenerator,
   ParentLockRepository,
   PasswordFileWriter,
@@ -31,6 +32,8 @@ import type { Clock } from './ports.ts';
 export interface AppDeps {
   readonly profiles: ProfileRepository;
   readonly progress: ProgressRepository;
+  /** Full games and versus mini-games played vs the computer (M3.5). */
+  readonly gameRecords: GameRecordRepository;
   readonly clock: Clock;
   readonly ids: IdGenerator;
   readonly content: ContentSource;

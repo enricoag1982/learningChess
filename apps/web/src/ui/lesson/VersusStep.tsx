@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { Lesson, PieceType, Square, VersusMiniGame, VersusState } from '@chess-kids/core';
 import {
+  bot,
   canTakeBack,
   chessJsRules,
   isInCheck,
@@ -14,6 +15,7 @@ import {
   recordBossResult,
   startVersus,
   takeBackVersusMove,
+  versusEndReason,
   versusGameState,
   versusPosition,
   versusStars,
@@ -36,6 +38,10 @@ export interface VersusStepProps {
   readonly game: VersusMiniGame;
   readonly nextStepIndex: number;
   readonly session?: BossPlaySession;
+  /** Fired after every ply (kid, bot, take back, play again) with the latest state — a caller that
+   * needs the in-progress game outside `session.save`'s terminal-only call (the Play screen's full
+   * game, to record an abandoned `GameRecord` on Leave) reads it from here. */
+  readonly onStateChange?: (state: VersusState) => void;
 }
 
 /** localStorage key for a deterministic bot seed and a shortened "thinking" pause (tests only). */
@@ -113,6 +119,7 @@ export function VersusStep({
   game: minigame,
   nextStepIndex,
   session,
+  onStateChange,
 }: VersusStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -125,6 +132,15 @@ export function VersusStep({
   const [thinking, setThinking] = useState(false);
   const [takeBacksUsed, setTakeBacksUsed] = useState(0);
   const [spokenText, setSpokenText] = useState(() => tContent(t, minigame.goalKey));
+  const [hint, setHint] = useState<{ from: Square; to: Square } | null>(null);
+
+  useEffect(() => {
+    onStateChange?.(versus);
+    // Only the state itself should re-trigger this; `onStateChange` is an optional callback the
+    // caller may not memoize (e.g. a `useState` setter, always stable, but not guaranteed for every
+    // caller), and re-running on identity churn alone would be surprising.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [versus]);
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
   // exists because "Play again" needs to reset the clock later, which `useState` can't do.
   const [initialStartedAt] = useState(() => Date.now());
@@ -192,6 +208,7 @@ export function VersusStep({
           setVersus(afterBot);
           setLastMove({ from: botMove.from, to: botMove.to });
           setThinking(false);
+          setHint(null);
           if (outcome.kind === 'ended') {
             setSpokenText(resultText(t, outcome.status));
           } else if (botMove.captured) {
@@ -222,6 +239,7 @@ export function VersusStep({
     if (outcome.kind === 'illegal') return;
     setVersus(afterKid);
     setLastMove(move);
+    setHint(null);
     if (outcome.kind === 'ended') {
       setSpokenText(resultText(t, outcome.status));
       return;
@@ -238,6 +256,7 @@ export function VersusStep({
     setLastMove(undefined);
     setTakeBacksUsed((count) => count + 1);
     setSpokenText(tContent(t, minigame.goalKey));
+    setHint(null);
   }
 
   function canTakeBackNow(): boolean {
@@ -252,12 +271,21 @@ export function VersusStep({
     setThinking(false);
     setTakeBacksUsed(0);
     setSpokenText(tContent(t, minigame.goalKey));
+    setHint(null);
     startedAtRef.current = Date.now();
     savedRef.current = false;
     setSaved(false);
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
+    }
+  }
+
+  /** Owl's mate hint (docs/computer-opponent.md §6): the best kid move by a depth-2 search. */
+  function handleMateHint(): void {
+    const found = bot.mateHint(versusGameState(versus), chessJsRules);
+    if (found !== null) {
+      setHint(found);
     }
   }
 
@@ -272,6 +300,8 @@ export function VersusStep({
   const checkSquare = isInCheck(position, chessJsRules)
     ? kingSquare(position, position.toMove)
     : undefined;
+  const showHintOffer = kidTurn && bot.shouldOfferMateHint(moves);
+  const drawReasonKey = drawReasonI18nKey(versusEndReason(versus));
 
   return (
     <div
@@ -293,6 +323,7 @@ export function VersusStep({
               ...(lastMove ? { lastMove } : {}),
               ...(danger.length > 0 ? { danger } : {}),
               ...(checkSquare === undefined ? {} : { check: checkSquare }),
+              ...(hint ? { hint: [hint.from, hint.to] } : {}),
             }}
             label={t('lesson.board-label')}
           />
@@ -310,7 +341,7 @@ export function VersusStep({
               // Hint + Undo sharing a row's width); wrapped here in its own row so that `flex-1`
               // governs width, not this column's main axis, which would otherwise let the
               // button's height shrink to share space with everything above it.
-              <div className="flex">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={handleTakeBack}
@@ -320,6 +351,11 @@ export function VersusStep({
                   <UndoIcon />
                   {t('boss.versus.take-back')}
                 </button>
+                {showHintOffer && (
+                  <button type="button" onClick={handleMateHint} className={SECONDARY_BUTTON}>
+                    {t('boss.versus.hint-offer')}
+                  </button>
+                )}
               </div>
             )}
             {versus.status === 'won' && (
@@ -349,6 +385,9 @@ export function VersusStep({
             )}
             {(versus.status === 'lost' || versus.status === 'draw') && (
               <div className="mt-auto flex flex-col items-center gap-4">
+                {versus.status === 'draw' && drawReasonKey && (
+                  <p className="text-center text-base font-bold text-muted">{t(drawReasonKey)}</p>
+                )}
                 <StarsRow earned={stars} animate />
                 {saved && (
                   <div className="flex w-full gap-3">
@@ -389,4 +428,31 @@ function resultText(t: TFunction, status: 'won' | 'lost' | 'draw'): string {
   if (status === 'won') return t('boss.versus.won');
   if (status === 'draw') return t('boss.versus.draw');
   return t('boss.versus.lost');
+}
+
+/**
+ * A second, explaining line for a draw result (docs/computer-opponent.md §6 "which draw"): a
+ * `GameResult.reason` (`domain/game/rules.ts`) that has a kid-friendly explanation, or `undefined`
+ * for a reason with none (e.g. a kingless mini-game's `move-limit`/`no-moves`) or no draw at all.
+ */
+function drawReasonI18nKey(
+  reason: string | undefined,
+):
+  | 'boss.versus.draw-reason.stalemate'
+  | 'boss.versus.draw-reason.insufficient-material'
+  | 'boss.versus.draw-reason.threefold-repetition'
+  | 'boss.versus.draw-reason.fifty-move'
+  | undefined {
+  switch (reason) {
+    case 'stalemate':
+      return 'boss.versus.draw-reason.stalemate';
+    case 'insufficient-material':
+      return 'boss.versus.draw-reason.insufficient-material';
+    case 'threefold-repetition':
+      return 'boss.versus.draw-reason.threefold-repetition';
+    case 'fifty-move':
+      return 'boss.versus.draw-reason.fifty-move';
+    default:
+      return undefined;
+  }
 }

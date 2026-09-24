@@ -14,6 +14,7 @@ import type {
   AppSettings,
   Clock,
   ContentSource,
+  GameRecordRepository,
   IdGenerator,
   ParentLockRepository,
   PasswordFileWriter,
@@ -22,6 +23,14 @@ import type {
   SettingsRepository,
 } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
+
+function makeGameRecordRepo(): GameRecordRepository {
+  return {
+    add: () => Promise.resolve(),
+    listByProfile: () => Promise.resolve([]),
+    deleteProfileData: () => Promise.resolve(),
+  };
+}
 
 const EMPTY_POSITION = {
   pieces: {},
@@ -209,6 +218,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     profiles: makeProfileRepo(),
     progress: makeProgressRepo(),
+    gameRecords: makeGameRecordRepo(),
     clock: makeClock(),
     ids: makeIds(),
     content: makeContent(),

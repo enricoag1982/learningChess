@@ -16,6 +16,7 @@ import { lessonStars, worldLessons } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
+import { firstLessonsByCharacter, journeyNodeLabel } from './lesson-character-labels.ts';
 import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { useMediaQuery } from './useMediaQuery.ts';
@@ -218,6 +219,12 @@ export function JourneyScreen(): JSX.Element {
   const mainWorlds = journey.worlds.filter((w) => w.world.track === mainTrack?.id);
   const branchWorlds = journey.worlds.filter((w) => w.world.track !== mainTrack?.id);
   const isWorldOne = (world: World): boolean => world.track === mainTrack?.id && world.order === 1;
+  const worldOrder = new Map(
+    journey.catalog.tracks.flatMap((track) =>
+      track.worlds.map((world) => [world.id, world.order] as const),
+    ),
+  );
+  const firstLessonOfCharacter = firstLessonsByCharacter(journey.lessons, worldOrder);
 
   function selectWorld(id: string): void {
     setSelectedWorldId(id);
@@ -362,6 +369,7 @@ export function JourneyScreen(): JSX.Element {
               statuses={journey.statuses}
               progress={progress}
               isWorldOne={isWorldOne(current.world)}
+              firstLessonOfCharacter={firstLessonOfCharacter}
               onActivate={(lesson) => {
                 activateLesson(lesson, current.world, lessonsOfCurrent, journey.statuses);
               }}
@@ -456,6 +464,7 @@ function WorldMap({
   statuses,
   progress,
   isWorldOne,
+  firstLessonOfCharacter,
   onActivate,
   bossMiniGame,
   bossStatus,
@@ -465,6 +474,8 @@ function WorldMap({
   readonly statuses: ReadonlyMap<string, JourneyLessonStatus>;
   readonly progress: readonly LessonProgress[];
   readonly isWorldOne: boolean;
+  /** First lesson id per character (curriculum order), for a repeated character's node label. */
+  readonly firstLessonOfCharacter: ReadonlyMap<string, string>;
   readonly onActivate: (lesson: Lesson) => void;
   /** This world's boss content, when it has one (`bossStatus` is then not `'none'`). */
   readonly bossMiniGame: MiniGame | undefined;
@@ -506,6 +517,7 @@ function WorldMap({
             status={statuses.get(lesson.id) ?? 'locked'}
             progress={progress.find((p) => p.lessonId === lesson.id)}
             isWorldOne={isWorldOne}
+            firstLessonOfCharacter={firstLessonOfCharacter}
             point={point}
             onActivate={() => {
               onActivate(lesson);
@@ -530,6 +542,7 @@ function LessonNode({
   status: statusValue,
   progress,
   isWorldOne,
+  firstLessonOfCharacter,
   point,
   onActivate,
 }: {
@@ -537,6 +550,8 @@ function LessonNode({
   readonly status: JourneyLessonStatus;
   readonly progress: LessonProgress | undefined;
   readonly isWorldOne: boolean;
+  /** First lesson id per character (curriculum order), for a repeated character's node label. */
+  readonly firstLessonOfCharacter: ReadonlyMap<string, string>;
   readonly point: NodePoint;
   readonly onActivate: () => void;
 }): JSX.Element {
@@ -546,17 +561,20 @@ function LessonNode({
   const rating = status === 'complete' ? ratingStars(earned, max) : 0;
   const bossWon = (progress?.bossStars ?? 0) >= 2;
 
-  // Owl-taught lessons (World 1: no piece character) are labelled by their title, e.g. "Squares".
+  // Owl-taught lessons (World 1: no piece character) are labelled by their title, e.g. "Squares";
+  // a piece character's first lesson by the character's name ("Rhino"), a later lesson of the same
+  // character (M3.5: "Promotion") by its own title ("Caterpillar Transforms!"), so two nodes never
+  // show the same label (`journeyNodeLabel`, like Play's `unlockLabel`).
   const piece = characterPieceOrNull(lesson.character);
-  const characterLabel =
-    piece === null ? tContent(t, lesson.titleKey) : characterName(t, lesson.character);
+  const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
+  const characterLabel = journeyNodeLabel(t, lesson, firstLessonOfCharacter);
   const nameLabel =
-    piece === null
-      ? characterLabel
-      : tContent(t, 'journey:ui.character-piece', {
+    piece !== null && isFirstOfCharacter
+      ? tContent(t, 'journey:ui.character-piece', {
           character: characterLabel,
           piece: tContent(t, `piece.${piece}`),
-        });
+        })
+      : characterLabel;
   const statusWord = tContent(t, `journey:ui.status-${status}`);
   const accessibleName =
     status === 'complete'
@@ -606,7 +624,7 @@ function LessonNode({
           </span>
         )}
       </button>
-      <span className="max-w-[8rem] rounded-2xl bg-white px-2 py-0.5 text-center text-xs leading-tight font-extrabold text-ink">
+      <span className="line-clamp-2 max-w-[8rem] rounded-2xl bg-white px-2 py-0.5 text-center text-xs leading-tight font-extrabold text-ink">
         {characterLabel}
       </span>
       {status === 'complete' && <StarsRow earned={rating} size="1rem" />}

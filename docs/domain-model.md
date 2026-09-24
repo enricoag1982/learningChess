@@ -77,7 +77,7 @@ Character 1─1 piece type
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
 | Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` |
-| GameRecord | `miniGameId` or `full`, `opponent` (`computer:<level>` / `profile:<id>` / `guest`), `matchId`, `result`, `moves[]` (SAN), `at` |
+| GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` in v1; `profile:<id>` / `guest` v2), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
 | Badge | `badgeId`, `tier`, `at`, `seen` |
 | Streak | `current`, `best`, `lastDay`, `skipsUsedThisWeek` |
 | SessionLog | `date`, `minutes` |
@@ -104,7 +104,8 @@ Character 1─1 piece type
 | Weak concept | Accuracy < 60% |
 | Easier variant | Scored exercise, unsolved, ≥ 2 errors, `easier` set → variant offered (§3.4) |
 | Rank | Highest rank whose `after` is mastered |
-| Full game vs computer | Available after World 4 mastered |
+| Full game vs computer | Available after World 4 mastered (Mouse); Rabbit after 3 full-game wins vs Mouse (`GameRecord`s, `opponent: computer:1`, `game: 'full'`) — Fox/Wolf/Bear locked with their own condition until M4. Kid plays White (M3); colour choice is M4 |
+| Game record | Every full game and `versus` mini-game (standalone or a lesson's boss) saves a `GameRecord`; leaving mid-game (`versus` UI, "Stop game?" confirm) saves it `abandoned`, never a loss |
 | Next step (Home "Today" / Journey highlight) | Next available lesson; once a world's lessons are all done and its world boss is available but unwon, the world boss |
 
 ### 3.1 Review scheduler (Leitner)
@@ -157,6 +158,7 @@ Failing any assessment: no penalty, no data lost.
 | Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
+| Full game (M3.5) | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
 | Friend play | `startLocalMatch`, `playMatchMove`, `requestTakeback`, `finishMatch` |
 | Parent | `getReport`, `unlock`, `resetProgress` |
 
@@ -165,6 +167,7 @@ Failing any assessment: no penalty, no data lost.
 | Port | Purpose |
 |---|---|
 | `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`) |
+| `GameRecordRepository` (M3.5) | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |

@@ -337,6 +337,34 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
         }
         await playVersusBoss(page, previousWorldBoss);
         await page.getByRole('button', { name: contentText('play.back-to-journey') }).click();
+
+        if (previousWorldBoss.id === 'first-game') {
+          // M3.5: Play's own "Full game" entry (vs Computer card) — reachable only once World 4
+          // is mastered, which winning `first-game` above just did. Scans the level-picked start,
+          // a mid-game position, and the "Stop this game?" leave confirm, then returns to Journey
+          // (this block's exit invariant, same as the plain mini-game-won path above).
+          await page.getByRole('button', { name: 'Back to Home' }).click();
+          await page.getByRole('button', { name: 'Play', exact: true }).click();
+          await expectKidTouchTarget(page, /Play a full game/);
+          await page.getByRole('button', { name: 'Play a full game' }).click();
+          await expectKidTouchTarget(page, 'Close');
+          await expectNoSeriousViolations(page, 'Full game (start)');
+
+          await playOneKidVersusMove(page, previousWorldBoss);
+          await waitForVersusTurnOrEnd(page);
+          await expectNoSeriousViolations(page, 'Full game (mid-game)');
+
+          await page.getByRole('button', { name: 'Close' }).click();
+          await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
+          await expectKidTouchTarget(page, 'Stop game');
+          await expectKidTouchTarget(page, 'Keep playing');
+          await expectNoSeriousViolations(page, 'Full game (leave confirm)');
+          await page.getByRole('button', { name: 'Stop game' }).click();
+
+          await page.getByRole('heading', { name: 'Play' }).waitFor();
+          await page.getByRole('button', { name: 'Back to Home' }).click();
+          await page.getByRole('button', { name: /Journey/ }).click();
+        }
       }
     }
 

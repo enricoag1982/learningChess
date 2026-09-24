@@ -28,6 +28,8 @@ export type {
   Attempt,
   LessonStatus,
   MiniGameProgress,
+  GameRecord,
+  GameRecordResult,
 } from './domain/progress.ts';
 export {
   newLessonProgress,
@@ -96,6 +98,7 @@ export {
 export type {
   ProfileRepository,
   ProgressRepository,
+  GameRecordRepository,
   ParentLockRepository,
   PasswordFileWriter,
   AppSettings,
@@ -130,6 +133,14 @@ export {
 
 export type { RecordMiniGameResultInput } from './app/minigames.ts';
 export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
+
+export type { RecordGameInput, ComputerLevelCondition, ComputerLevelStatus } from './app/games.ts';
+export {
+  recordGame,
+  loadGameRecords,
+  computerLevelStatus,
+  versusGameRecordResult,
+} from './app/games.ts';
 
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
@@ -257,6 +268,7 @@ export {
   seriesStars,
   startVersus,
   versusPosition,
+  versusEndReason,
   versusGameState,
   isKidTurn,
   kidMoveCount,

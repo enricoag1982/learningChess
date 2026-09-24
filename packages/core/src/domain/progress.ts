@@ -161,6 +161,27 @@ export interface MiniGameProgress extends StoredRecord {
   readonly wins: number;
 }
 
+/** Outcome of one finished (or left) game vs the computer or a friend, from the kid's side. */
+export type GameRecordResult = 'win' | 'loss' | 'draw' | 'abandoned';
+
+/**
+ * One played (or abandoned) game vs the computer (v1) or a friend (v2) — domain-model.md §2
+ * `GameRecord`. Saved for a full game (`game: 'full'`) and every `versus` mini-game (`game`: its
+ * content id), whether played standalone from Play or as a lesson's own boss.
+ */
+export interface GameRecord extends StoredRecord {
+  readonly profileId: string;
+  /** `'full'` for a full standard game, else the `versus` mini-game's content id (Pawn Wars, …). */
+  readonly game: string;
+  /** `computer:<level>` in v1; `profile:<id>` / `guest` (vs Friend) are v2. */
+  readonly opponent: string;
+  readonly result: GameRecordResult;
+  /** A `GameResult.reason` (checkmate, stalemate, threefold-repetition, fifty-move, …), or `left` when abandoned. */
+  readonly reason: string;
+  /** SAN moves played, in order (both sides). */
+  readonly moves: readonly string[];
+}
+
 /**
  * Folds one more play into `existing` (or starts a fresh record, `id` only used then): keeps the
  * higher of the two `bestStars`, and always bumps `plays` (+ `wins` when `won`).

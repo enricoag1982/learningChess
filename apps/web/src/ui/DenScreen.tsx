@@ -61,6 +61,7 @@ export function DenScreen(): JSX.Element {
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
+  const gameRecords = useAppStore((state) => state.gameRecords);
   const journey = useAppStore((state) => state.journey);
   const goToHome = useAppStore((state) => state.goToHome);
 
@@ -74,6 +75,7 @@ export function DenScreen(): JSX.Element {
   const friends = animalFriends(journey.lessons, progress);
   const ladder = rankLadder(journey.catalog, journey.lessons, progress);
   const stars = totalStars(progress);
+  const gamesWon = gameRecords.filter((record) => record.result === 'win').length;
 
   return (
     <main className="flex min-h-screen flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
@@ -92,9 +94,17 @@ export function DenScreen(): JSX.Element {
         <StarsPill count={stars} />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
+      </div>
+
+      <div
+        role="img"
+        aria-label={t('den.games-won', { count: gamesWon })}
+        className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
+      >
+        <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">

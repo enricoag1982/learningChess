@@ -5,7 +5,11 @@ import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import {
+  pickProfileFromPicker,
+  seedReturningProfile,
+  seedWorldFourMastered,
+} from '../testing/app-test-helpers.ts';
 
 afterEach(cleanup);
 
@@ -101,5 +105,60 @@ describe('PlayScreen', () => {
     expect(miniGameProgress?.plays).toBe(1);
     expect(miniGameProgress?.wins).toBe(1);
     expect(miniGameProgress?.bestStars).toBeGreaterThan(0);
+  });
+});
+
+describe('PlayScreen: vs Computer (M3.5)', () => {
+  it('shows every level locked, Mouse with its own condition, before World 4 is mastered', async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
+    await screen.findByRole('heading', { name: 'Play' });
+
+    expect(screen.getByRole('button', { name: 'Mouse, locked, After World 4' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Rabbit, locked, Beat Mouse 3 times' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Fox, locked, Beat Rabbit 3 times' })).toBeTruthy();
+    expect(
+      screen.getByRole('button', {
+        name: 'Play a full game, After World 4',
+      }),
+    ).toHaveProperty('disabled', true);
+  });
+
+  it('unlocks Mouse once World 4 is mastered; Rabbit stays locked until 3 full-game wins', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await seedWorldFourMastered(services, profile.id);
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
+    await screen.findByRole('heading', { name: 'Play' });
+
+    expect(screen.getByRole('button', { name: 'Mouse, not played yet' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Rabbit, locked, Beat Mouse 3 times' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Play a full game' })).toHaveProperty(
+      'disabled',
+      false,
+    );
+  });
+
+  it('the Full game button starts a full game vs the selected (unlocked) level', async () => {
+    const services = createServicesWithRealContent();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await seedWorldFourMastered(services, profile.id);
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
+    await screen.findByRole('heading', { name: 'Play' });
+    fireEvent.click(screen.getByRole('button', { name: 'Play a full game' }));
+
+    expect(await screen.findByText('Full Game vs Mouse')).toBeTruthy();
+    expect(screen.getByText('Checkmate the other king!')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Full Game' })).toBeTruthy();
   });
 });

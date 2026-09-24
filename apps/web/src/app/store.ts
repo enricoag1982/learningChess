@@ -4,6 +4,7 @@ import type {
   AnimalFriend,
   ConceptStats,
   ConceptTask,
+  GameRecord,
   Journey,
   Lesson,
   LessonProgress,
@@ -18,6 +19,7 @@ import {
   isFirstRun,
   lessonStatus,
   listProfiles,
+  loadGameRecords,
   loadJourney,
   loadMiniGameProgress,
   loadPracticeTasks,
@@ -43,6 +45,7 @@ export type Screen =
   | 'play'
   | 'den'
   | 'minigame'
+  | 'full-game'
   | 'warmup'
   | 'practice'
   | 'practice-run'
@@ -78,6 +81,8 @@ export interface AppState {
   readonly progress: readonly LessonProgress[];
   /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
   readonly miniGameProgress: readonly MiniGameProgress[];
+  /** This profile's full-game / versus mini-game records (Play's vs Computer tally, My Den). */
+  readonly gameRecords: readonly GameRecord[];
   /** This profile's concept mastery + review state (M3.4 Leitner scheduler): Home's "Start today"
    * button and the Practice screen's due count / weak tags both read this. */
   readonly conceptStats: readonly ConceptStats[];
@@ -93,6 +98,8 @@ export interface AppState {
   readonly miniGameId: string | null;
   /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
   readonly miniGameOrigin: MiniGameOrigin;
+  /** The bot level (1 Mouse .. 5 Bear) of the full game open (screen `full-game`); Play's default selection otherwise. */
+  readonly fullGameLevel: number;
 
   /** The Today session in progress (`startToday`), or `null` outside one. */
   readonly todayPlan: TodaySessionPlan | null;
@@ -171,6 +178,10 @@ export interface AppState {
    * mini-game (`miniGameOrigin: 'today'`) abandons the whole session instead (`leaveToday`).
    */
   readonly exitMiniGame: () => void;
+  /** Play's vs Computer "Full game" button: opens a full game vs `level` (1 Mouse .. 5 Bear). */
+  readonly startFullGame: (level: number) => void;
+  /** Leaves the full-game screen back to Play, refreshing progress (game records included). */
+  readonly exitFullGame: () => void;
 
   /**
    * Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
@@ -252,6 +263,7 @@ export function createAppStore(services: Services) {
       profile: null,
       progress: [],
       miniGameProgress: [],
+      gameRecords: [],
       conceptStats: [],
       journey: null,
       lessonId: null,
@@ -260,6 +272,7 @@ export function createAppStore(services: Services) {
       newPlayerReturnsToParent: false,
       miniGameId: null,
       miniGameOrigin: 'play',
+      fullGameLevel: 1,
       todayPlan: null,
       todayActivityIndex: 0,
       todaySessionStartTotalStars: 0,
@@ -287,16 +300,19 @@ export function createAppStore(services: Services) {
           // M1-upgrade path: an existing single profile with no parent lock yet skips profile
           // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
           await selectProfile(services.deps, only.id);
-          const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
-            loadProgress(services.deps, only.id),
-            loadMiniGameProgress(services.deps, only.id),
-            services.deps.progress.listConceptStats(only.id),
-            loadJourney(services.deps, only.id),
-          ]);
+          const [progress, miniGameProgress, gameRecords, conceptStats, journey] =
+            await Promise.all([
+              loadProgress(services.deps, only.id),
+              loadMiniGameProgress(services.deps, only.id),
+              loadGameRecords(services.deps, only.id),
+              services.deps.progress.listConceptStats(only.id),
+              loadJourney(services.deps, only.id),
+            ]);
           set({
             profile: only,
             progress,
             miniGameProgress,
+            gameRecords,
             conceptStats,
             journey,
             profiles,
@@ -319,17 +335,20 @@ export function createAppStore(services: Services) {
           return;
         }
         await selectProfile(services.deps, profile.id);
-        const [profiles, progress, miniGameProgress, conceptStats, journey] = await Promise.all([
-          listProfiles(services.deps),
-          loadProgress(services.deps, profile.id),
-          loadMiniGameProgress(services.deps, profile.id),
-          services.deps.progress.listConceptStats(profile.id),
-          loadJourney(services.deps, profile.id),
-        ]);
+        const [profiles, progress, miniGameProgress, gameRecords, conceptStats, journey] =
+          await Promise.all([
+            listProfiles(services.deps),
+            loadProgress(services.deps, profile.id),
+            loadMiniGameProgress(services.deps, profile.id),
+            loadGameRecords(services.deps, profile.id),
+            services.deps.progress.listConceptStats(profile.id),
+            loadJourney(services.deps, profile.id),
+          ]);
         set({
           profile,
           progress,
           miniGameProgress,
+          gameRecords,
           conceptStats,
           journey,
           profiles,
@@ -349,13 +368,22 @@ export function createAppStore(services: Services) {
         const profile = await services.deps.profiles.get(profileId);
         if (!profile) return;
         await selectProfile(services.deps, profileId);
-        const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
+        const [progress, miniGameProgress, gameRecords, conceptStats, journey] = await Promise.all([
           loadProgress(services.deps, profileId),
           loadMiniGameProgress(services.deps, profileId),
+          loadGameRecords(services.deps, profileId),
           services.deps.progress.listConceptStats(profileId),
           loadJourney(services.deps, profileId),
         ]);
-        set({ profile, progress, miniGameProgress, conceptStats, journey, screen: 'home' });
+        set({
+          profile,
+          progress,
+          miniGameProgress,
+          gameRecords,
+          conceptStats,
+          journey,
+          screen: 'home',
+        });
       },
 
       goToPasswordScreen() {
@@ -413,13 +441,14 @@ export function createAppStore(services: Services) {
       async refreshProgress() {
         const { profile } = get();
         if (!profile) return;
-        const [progress, miniGameProgress, conceptStats, journey] = await Promise.all([
+        const [progress, miniGameProgress, gameRecords, conceptStats, journey] = await Promise.all([
           loadProgress(services.deps, profile.id),
           loadMiniGameProgress(services.deps, profile.id),
+          loadGameRecords(services.deps, profile.id),
           services.deps.progress.listConceptStats(profile.id),
           loadJourney(services.deps, profile.id),
         ]);
-        set({ progress, miniGameProgress, conceptStats, journey });
+        set({ progress, miniGameProgress, gameRecords, conceptStats, journey });
       },
 
       goToPlay() {
@@ -442,6 +471,15 @@ export function createAppStore(services: Services) {
           return;
         }
         set({ screen: origin === 'journey' ? 'journey' : origin === 'home' ? 'home' : 'play' });
+        void get().refreshProgress();
+      },
+
+      startFullGame(level: number) {
+        set({ screen: 'full-game', fullGameLevel: level });
+      },
+
+      exitFullGame() {
+        set({ screen: 'play' });
         void get().refreshProgress();
       },
 

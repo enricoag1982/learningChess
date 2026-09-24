@@ -3,8 +3,13 @@ import { describe, expect, it } from 'vitest';
 import type { CaptureDef } from '../domain/exercise/types.ts';
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import type { GameState } from '../domain/exercise/minigame.ts';
+import { playVersusMove, startVersus } from '../domain/exercise/versus.ts';
+import type { VersusState } from '../domain/exercise/versus.ts';
+import type { VersusMiniGame } from '../domain/lesson.ts';
 import type { MiniGame } from '../domain/lesson.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
+import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
+import { parseFen } from '../domain/chess/fen.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import { seededRandom } from '../domain/random.ts';
@@ -14,6 +19,7 @@ import type {
   AppSettings,
   Clock,
   ContentSource,
+  GameRecordRepository,
   IdGenerator,
   ParentLockRepository,
   PasswordFileWriter,
@@ -112,6 +118,24 @@ function makeProgressRepo(): ProgressRepository {
   };
 }
 
+function makeGameRecordRepo(): GameRecordRepository {
+  const records: GameRecord[] = [];
+  return {
+    add: (record) => {
+      records.push(record);
+      return Promise.resolve();
+    },
+    listByProfile: (profileId) =>
+      Promise.resolve(records.filter((record) => record.profileId === profileId)),
+    deleteProfileData: (profileId) => {
+      for (let i = records.length - 1; i >= 0; i -= 1) {
+        if (records[i]?.profileId === profileId) records.splice(i, 1);
+      }
+      return Promise.resolve();
+    },
+  };
+}
+
 const stubContent: ContentSource = {
   lessons: () => [],
   lesson: () => undefined,
@@ -128,6 +152,7 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
       delete: () => Promise.resolve(),
     } satisfies ProfileRepository,
     progress: makeProgressRepo(),
+    gameRecords: makeGameRecordRepo(),
     clock: makeClock('2026-01-01T00:00:00.000Z'),
     ids: makeIds(),
     content: stubContent,
@@ -206,6 +231,102 @@ describe('recordMiniGameResult', () => {
     });
 
     expect(second).toMatchObject({ bestStars: 3, plays: 2, wins: 1 });
+  });
+});
+
+/** A tiny kings-both-sides `versus` mini-game: kid mates in one with `Ra8#` (a back-rank mate). */
+const CHECKMATE_VERSUS: VersusMiniGame = {
+  mode: 'versus',
+  id: 'first-game',
+  concept: 'full-game',
+  position: parseFen('7k/6pp/8/8/8/8/8/R3K3 w - - 0 1'),
+  rules: {
+    kings: true,
+    checkRules: true,
+    noMoves: 'draw',
+    win: { w: [{ kind: 'checkmate' }], b: [{ kind: 'checkmate' }] },
+  },
+  opponentLevel: 1,
+  kidColor: 'w',
+  titleKey: 'fixtures:title',
+  goalKey: 'fixtures:goal',
+  unlockAfter: 'stalemate',
+};
+
+describe('recordMiniGameResult (versus): GameRecord', () => {
+  it('saves a won versus play as a GameRecord under its own id (not a standard start)', async () => {
+    const deps = makeDeps();
+    const { state } = playVersusMove(startVersus(CHECKMATE_VERSUS), chessJsRules, {
+      from: 'a1',
+      to: 'a8',
+    });
+
+    await recordMiniGameResult(deps, {
+      profileId: 'profile-1',
+      game: CHECKMATE_VERSUS,
+      state,
+      durationMs: 2000,
+    });
+
+    const [record] = await deps.gameRecords.listByProfile('profile-1');
+    expect(record).toMatchObject({
+      profileId: 'profile-1',
+      game: 'first-game',
+      opponent: 'computer:1',
+      result: 'win',
+      reason: 'checkmate',
+      moves: ['Ra8#'],
+    });
+  });
+
+  it('records a versus game from the standard start with kings as a "full" game', async () => {
+    const deps = makeDeps();
+    const fullGame: VersusMiniGame = {
+      ...CHECKMATE_VERSUS,
+      id: 'full-game-rabbit',
+      position: parseFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
+    };
+    // Only the start position decides "full": a finished state is enough (no real game needed).
+    const state: VersusState = { ...startVersus(fullGame), status: 'draw', endReason: 'stalemate' };
+
+    await recordMiniGameResult(deps, {
+      profileId: 'profile-1',
+      game: fullGame,
+      state,
+      durationMs: 2000,
+    });
+
+    const [record] = await deps.gameRecords.listByProfile('profile-1');
+    expect(record?.game).toBe('full');
+  });
+
+  it('keeps a non-full versus mini-game\'s own id as "game"', async () => {
+    const deps = makeDeps();
+    const pawnWars: VersusMiniGame = { ...CHECKMATE_VERSUS, id: 'pawn-wars' };
+    const { state } = playVersusMove(startVersus(pawnWars), chessJsRules, { from: 'a1', to: 'a8' });
+
+    await recordMiniGameResult(deps, {
+      profileId: 'profile-1',
+      game: pawnWars,
+      state,
+      durationMs: 2000,
+    });
+
+    const [record] = await deps.gameRecords.listByProfile('profile-1');
+    expect(record?.game).toBe('pawn-wars');
+  });
+
+  it('writes no GameRecord for a static mini-game (no computer-opponent game played)', async () => {
+    const deps = makeDeps();
+
+    await recordMiniGameResult(deps, {
+      profileId: 'profile-1',
+      game: HUNGRY_ROOK,
+      state: wonGame(),
+      durationMs: 500,
+    });
+
+    expect(await deps.gameRecords.listByProfile('profile-1')).toEqual([]);
   });
 });
 
