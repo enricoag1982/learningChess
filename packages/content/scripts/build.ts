@@ -1,11 +1,16 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { CompiledContent } from '@chess-kids/core';
 import { ContentError, compareToReference, loadLocales, type Locales } from '../src/load.ts';
+import { loadContent } from '../src/lesson-load.ts';
 
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const localesDir = join(packageDir, 'locales');
+const lessonsDir = join(packageDir, 'lessons');
+const minigamesDir = join(packageDir, 'minigames');
 const distDir = join(packageDir, 'dist', 'locales');
+const contentPath = join(packageDir, 'dist', 'content.json');
 
 function fail(issues: readonly string[]): never {
   for (const issue of issues) {
@@ -43,4 +48,19 @@ for (const [lang, namespaces] of Object.entries(locales)) {
 const languageCount = Object.keys(locales).length;
 console.log(
   `content: ${String(languageCount)} language(s), ${String(namespaceNames.size)} namespace(s) → dist/locales`,
+);
+
+let content: CompiledContent;
+try {
+  content = loadContent(lessonsDir, minigamesDir, locales);
+} catch (error) {
+  if (error instanceof ContentError) {
+    fail(error.issues);
+  }
+  throw error;
+}
+
+await writeFile(contentPath, JSON.stringify(content), 'utf8');
+console.log(
+  `content: ${String(content.lessons.length)} lesson(s), ${String(content.minigames.length)} mini-game(s) → dist/content.json`,
 );

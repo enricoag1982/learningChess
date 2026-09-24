@@ -1,0 +1,162 @@
+id: rook
+world: pieces
+order: 1
+concept: rook-move
+character: rhino
+title: rook.title
+story: rook.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . R . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: rook.demo
+  highlight: legal-moves d4
+guided:
+  - id: rook-g1
+    type: collect-stars
+    text: rook-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . * . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . R . . . .
+    stars3: 1
+    stars2: 2
+  - id: rook-g2
+    type: collect-stars
+    text: rook-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . R . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    stars3: 1
+    stars2: 2
+exercises:
+  - id: rook-01
+    type: collect-stars
+    text: rook-01
+    board: |
+      * . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    stars3: 2
+    stars2: 3
+  - id: rook-02
+    type: collect-stars
+    text: rook-02
+    board: |
+      . . . . * . . .
+      . . . . . . . .
+      . . . . . . . .
+      * . . . * . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    stars3: 3
+    stars2: 5
+  - id: rook-03
+    type: select-squares
+    text: rook-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . R . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: rook-04
+    type: collect-stars
+    text: rook-04
+    board: |
+      * . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      x . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    stars3: 3
+    stars2: 4
+  - id: rook-05
+    type: capture
+    text: rook-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      p . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    stars3: 1
+    stars2: 2
+  - id: rook-06
+    type: select-squares
+    text: rook-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . P . . . .
+      . . . . . . . .
+      p . . R . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d4
+  - id: rook-07
+    type: capture
+    text: rook-07
+    board: |
+      p . . . p . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . R . . .
+      . . . . . . . .
+      . . . . . . . .
+      p . . . . . . .
+    stars3: 3
+    stars2: 4
+  - id: rook-08
+    type: collect-stars
+    text: rook-08
+    board: |
+      * . . . . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . x . . . .
+      . . . R . . . .
+      . . . . . . . .
+      . . . . . . . .
+      * . . . . . . *
+    stars3: 5
+    stars2: 7
+boss: hungry-rook

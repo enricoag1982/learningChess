@@ -105,6 +105,9 @@ importers:
 
   packages/content:
     dependencies:
+      '@chess-kids/core':
+        specifier: workspace:*
+        version: link:../core
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
