@@ -25,6 +25,8 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
 | Narration | `Narrator` port: Web Speech API (v1, device voices) → generated audio files (v3) | No audio production in v1; nicer voices later without code changes elsewhere |
+| App state | Zustand store: screen, profile, progress, current lesson + step; exercise / game state local to the step component (reducer over core engine functions); services injected (`createServices`) for tests |
+| Content text keys | Content ids are plain strings in core; UI resolves them through one helper (`tContent`); all other UI keys are type-checked |
 | Web delivery | PWA (vite-plugin-pwa / Workbox) | Browser + home-screen install; everything precached, fully offline ([non-functional.md](non-functional.md)) |
 | Fonts | Self-hosted | Offline, no third-party requests |
 | Mobile | Capacitor (Android + iPad) | Same web app packaged for stores |
@@ -161,7 +163,6 @@ stars2: 5
 | Storage | localStorage keys `chess-kids:<name>`; stored schema version + ordered migrations; data from a newer version → refused, never overwritten |
 | PWA updates | Service worker without skip-waiting: new version activates at next app start |
 | Hosting | `deploy.yml`: push to `master` → build with base `/<repo>/` → GitHub Pages |
-| App state | Zustand added in M1 (first shared state) |
 | Ports in adapters | Synchronous storage adapters return promises (port contract async) without `async` bodies |
 | Animations | CSS transitions in M1; Motion library only if CSS is not enough |
 | Variant rules | Walls = blocked squares occupied by a piece of the side to move during move generation (sliders stop, knights jump over, nothing lands); static opponent = turn returns to kid after each move |
