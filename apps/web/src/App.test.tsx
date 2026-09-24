@@ -4,23 +4,31 @@ import './i18n.ts';
 import App from './App.tsx';
 import { fixtureContentSource, fixtureLesson } from './testing/fixtures.ts';
 import { createTestServices } from './testing/test-services.ts';
+import { pickProfileFromPicker, seedReturningProfile } from './testing/app-test-helpers.ts';
 
 afterEach(cleanup);
 
 describe('App', () => {
-  it('renders the Home screen, title visible, offline status hidden until a service worker is ready', async () => {
+  it('picker → Home: title visible, offline status hidden until a service worker is ready', async () => {
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
+    await seedReturningProfile(services, 'Mia');
     render(<App services={services} />);
 
+    await screen.findByRole('heading', { name: "Who's playing today?" });
+    await pickProfileFromPicker('Mia');
+
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
-    // jsdom has no `serviceWorker`: the status line never appears there (see e2e for the real case).
+    // jsdom (unit tests) has no `serviceWorker`: the status line never appears there (see e2e).
     expect(screen.queryByText('Ready to play offline.')).toBeNull();
   });
 
   it('plays a whole lesson through to Complete; Continue then shows updated total stars at Home', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
+    await seedReturningProfile(services, 'Mia');
     const { container } = render(<App services={services} />);
+
+    await pickProfileFromPicker('Mia');
 
     fireEvent.click(await screen.findByRole('button', { name: /Start/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Let me try/ })); // Story -> Demo

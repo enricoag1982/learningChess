@@ -121,4 +121,17 @@ export class LocalStorageProgressRepository implements ProgressRepository {
       this.readAttempts().filter((attempt) => attempt.profileId === profileId),
     );
   }
+
+  deleteProfileData(profileId: string): Promise<void> {
+    return toPromise(() => {
+      const lessons = this.readLessons();
+      for (const [key, progress] of lessons) {
+        if (progress.profileId === profileId) lessons.delete(key);
+      }
+      this.writeLessons(lessons);
+
+      const attempts = this.readAttempts().filter((attempt) => attempt.profileId !== profileId);
+      this.store.write(ATTEMPTS_RECORD, attempts);
+    });
+  }
 }

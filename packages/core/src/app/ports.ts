@@ -1,4 +1,5 @@
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
+import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress } from '../domain/progress.ts';
 
@@ -17,6 +18,31 @@ export interface ProgressRepository {
   saveLesson(progress: LessonProgress): Promise<void>;
   addAttempt(attempt: Attempt): Promise<void>;
   listAttempts(profileId: string): Promise<Attempt[]>;
+  /** Deletes every lesson-progress and attempt record for a profile (parent area "Delete"). */
+  deleteProfileData(profileId: string): Promise<void>;
+}
+
+/** Persistence of the single parent gate (non-functional.md §3). One lock per device. */
+export interface ParentLockRepository {
+  get(): Promise<ParentLock | undefined>;
+  save(lock: ParentLock): Promise<void>;
+}
+
+/** Writes the parent password somewhere the parent can find again (app-structure.md §2). */
+export interface PasswordFileWriter {
+  write(password: string): Promise<{ location: string }>;
+}
+
+/** Device-wide settings, not tied to one profile. */
+export interface AppSettings {
+  /** Profile to show first at the next app start (picker orders it first); `null` if none yet. */
+  readonly lastProfileId: string | null;
+}
+
+/** Persistence of `AppSettings`. Async so cloud adapters can replace local ones. */
+export interface SettingsRepository {
+  get(): Promise<AppSettings>;
+  save(settings: AppSettings): Promise<void>;
 }
 
 /** New record ids (UUID v4). */

@@ -21,3 +21,8 @@ export function tContent(
 export function characterName(t: TFunction, character: string): string {
   return tContent(t, `characters:${character}.name`);
 }
+
+/** Display name for a profile avatar, e.g. `avatar.fox` → "Fox". */
+export function avatarName(t: TFunction, avatar: string): string {
+  return tContent(t, `avatar.${avatar}`);
+}

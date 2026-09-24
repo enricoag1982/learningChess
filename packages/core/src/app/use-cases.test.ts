@@ -6,11 +6,11 @@ import type { GameState } from '../domain/exercise/minigame.ts';
 import { gameStars } from '../domain/exercise/minigame.ts';
 import type { ExerciseDef, CaptureDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
+import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress } from '../domain/progress.ts';
 import type { AppDeps } from './use-cases.ts';
 import {
-  ensureProfile,
   getLessonProgress,
   loadProgress,
   recordBossResult,
@@ -18,11 +18,15 @@ import {
   saveResumeStep,
 } from './use-cases.ts';
 import type {
+  AppSettings,
   Clock,
   ContentSource,
   IdGenerator,
+  ParentLockRepository,
+  PasswordFileWriter,
   ProfileRepository,
   ProgressRepository,
+  SettingsRepository,
 } from './ports.ts';
 
 const EMPTY_POSITION = {
@@ -151,6 +155,38 @@ function makeProgressRepo(): ProgressRepository {
       return Promise.resolve();
     },
     listAttempts: (profileId) => Promise.resolve(attempts.filter((a) => a.profileId === profileId)),
+    deleteProfileData: (profileId) => {
+      for (const [k, progress] of lessons) {
+        if (progress.profileId === profileId) lessons.delete(k);
+      }
+      return Promise.resolve();
+    },
+  };
+}
+
+function makeParentLockRepo(): ParentLockRepository {
+  let lock: ParentLock | undefined;
+  return {
+    get: () => Promise.resolve(lock),
+    save: (next) => {
+      lock = next;
+      return Promise.resolve();
+    },
+  };
+}
+
+function makePasswordFileWriter(): PasswordFileWriter {
+  return { write: (password) => Promise.resolve({ location: `fake/${password}.txt` }) };
+}
+
+function makeSettingsRepo(): SettingsRepository {
+  let settings: AppSettings = { lastProfileId: null };
+  return {
+    get: () => Promise.resolve(settings),
+    save: (next) => {
+      settings = next;
+      return Promise.resolve();
+    },
   };
 }
 
@@ -168,30 +204,12 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     clock: makeClock('2026-01-01T00:00:00.000Z'),
     ids: makeIds(),
     content: stubContent,
+    parentLock: makeParentLockRepo(),
+    passwordFile: makePasswordFileWriter(),
+    settings: makeSettingsRepo(),
     ...overrides,
   };
 }
-
-describe('ensureProfile', () => {
-  it('creates a default local profile once, then reuses it', async () => {
-    const deps = makeDeps();
-
-    const created = await ensureProfile(deps);
-    expect(created).toEqual({
-      id: 'id-1',
-      accountId: 'local',
-      nickname: 'Player',
-      avatar: 'fox',
-      locale: 'en',
-      createdAt: '2026-01-01T00:00:00.000Z',
-      updatedAt: '2026-01-01T00:00:00.000Z',
-    });
-
-    const reused = await ensureProfile(deps);
-    expect(reused).toEqual(created);
-    expect(await deps.profiles.list()).toEqual([created]);
-  });
-});
 
 describe('getLessonProgress', () => {
   it('returns fresh, unsaved progress when none exists', async () => {

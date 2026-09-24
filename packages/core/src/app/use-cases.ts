@@ -3,7 +3,6 @@ import { starsFor } from '../domain/exercise/engine.ts';
 import type { GameState } from '../domain/exercise/minigame.ts';
 import { gameStars } from '../domain/exercise/minigame.ts';
 import type { Lesson } from '../domain/lesson.ts';
-import type { Profile } from '../domain/profile.ts';
 import type { LessonProgress } from '../domain/progress.ts';
 import {
   newLessonProgress,
@@ -11,7 +10,15 @@ import {
   recordExerciseStars,
   withResumeStep,
 } from '../domain/progress.ts';
-import type { ContentSource, IdGenerator, ProfileRepository, ProgressRepository } from './ports.ts';
+import type {
+  ContentSource,
+  IdGenerator,
+  ParentLockRepository,
+  PasswordFileWriter,
+  ProfileRepository,
+  ProgressRepository,
+  SettingsRepository,
+} from './ports.ts';
 import type { Clock } from './ports.ts';
 
 /** Everything a use case needs, gathered in one place so call sites pass a single `deps` object. */
@@ -21,26 +28,9 @@ export interface AppDeps {
   readonly clock: Clock;
   readonly ids: IdGenerator;
   readonly content: ContentSource;
-}
-
-/** First stored profile, or a fresh local one (M1 has exactly one profile per device). */
-export async function ensureProfile(deps: AppDeps): Promise<Profile> {
-  const [first] = await deps.profiles.list();
-  if (first !== undefined) {
-    return first;
-  }
-  const now = deps.clock.now().toISOString();
-  const profile: Profile = {
-    id: deps.ids.next(),
-    accountId: 'local',
-    nickname: 'Player',
-    avatar: 'fox',
-    locale: 'en',
-    createdAt: now,
-    updatedAt: now,
-  };
-  await deps.profiles.save(profile);
-  return profile;
+  readonly parentLock: ParentLockRepository;
+  readonly passwordFile: PasswordFileWriter;
+  readonly settings: SettingsRepository;
 }
 
 /** All saved lesson progress for a profile. */

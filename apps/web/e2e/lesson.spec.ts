@@ -4,6 +4,7 @@ import {
   completeExercise,
   findLesson,
   findMiniGame,
+  pickProfileFromPicker,
   startLessonToFirstGuided,
 } from './helpers.ts';
 
@@ -42,6 +43,8 @@ test.describe('Rook lesson', () => {
     await expect(starsPill).toHaveAttribute('aria-label', /^(?!0 stars$).+/);
 
     await page.reload();
+    await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+    await pickProfileFromPicker(page, 'Kid');
     await expect(page.getByRole('button', { name: /Play again/ })).toBeVisible();
     await expect(starsPill).toHaveAttribute('aria-label', /^(?!0 stars$).+/);
 
@@ -74,6 +77,8 @@ test.describe('Rook lesson', () => {
     await expect(page.getByRole('button', { name: /Continue/ })).toBeVisible();
 
     await page.reload();
+    await expect(page.getByRole('heading', { name: "Who's playing today?" })).toBeVisible();
+    await pickProfileFromPicker(page, 'Kid');
     await page.getByRole('button', { name: /Continue/ }).click();
 
     // Resumed at the same exercise (3 of N), not back at the story or an earlier one.

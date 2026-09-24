@@ -3,9 +3,12 @@ import { chessJsRules, createVariantRules } from '@chess-kids/core';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
+import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
+import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
+import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
 import { openLocalStore } from '../adapters/storage/local-store.ts';
 
 /** The app's wired-up use-case dependencies, plus the pieces the UI reaches for directly. */
@@ -24,6 +27,9 @@ export function createServices(storage: Storage = window.localStorage): Services
     clock: createSystemClock(),
     ids: createCryptoIds(),
     content: createBundledContentSource(),
+    parentLock: new LocalStorageParentLockRepository(store),
+    passwordFile: createDownloadPasswordFileWriter(),
+    settings: new LocalStorageSettingsRepository(store),
   };
 
   return {
