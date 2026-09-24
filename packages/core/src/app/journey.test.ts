@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';
-import type { Lesson } from '../domain/lesson.ts';
+import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { Profile } from '../domain/profile.ts';
@@ -103,8 +103,12 @@ function makeContent(catalog: TracksCatalog | undefined): ContentSource {
   };
 }
 
-function makeProgressRepo(initial: readonly LessonProgress[] = []): ProgressRepository {
+function makeProgressRepo(
+  initial: readonly LessonProgress[] = [],
+  initialMiniGames: readonly MiniGameProgress[] = [],
+): ProgressRepository {
   const lessons = new Map(initial.map((progress) => [progress.lessonId, progress]));
+  const miniGames = new Map(initialMiniGames.map((progress) => [progress.miniGameId, progress]));
   return {
     listLessons: (profileId) =>
       Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
@@ -115,9 +119,13 @@ function makeProgressRepo(initial: readonly LessonProgress[] = []): ProgressRepo
     },
     addAttempt: () => Promise.resolve(),
     listAttempts: () => Promise.resolve<Attempt[]>([]),
-    getMiniGame: () => Promise.resolve(undefined),
-    listMiniGames: () => Promise.resolve<MiniGameProgress[]>([]),
-    saveMiniGame: () => Promise.resolve(),
+    getMiniGame: (_profileId, miniGameId) => Promise.resolve(miniGames.get(miniGameId)),
+    listMiniGames: (profileId) =>
+      Promise.resolve([...miniGames.values()].filter((p) => p.profileId === profileId)),
+    saveMiniGame: (progress) => {
+      miniGames.set(progress.miniGameId, progress);
+      return Promise.resolve();
+    },
     deleteProfileData: () => Promise.resolve(),
   };
 }
@@ -193,9 +201,10 @@ describe('loadJourney', () => {
     expect(journey.statuses.get('l1')).toBe('available');
     expect(journey.statuses.get('l2')).toBe('locked');
     expect(journey.next?.id).toBe('l1');
+    expect(journey.nextStep).toEqual({ kind: 'lesson', lesson: L1 });
     expect(journey.rank?.id).toBe('pawn');
     expect(journey.totalStars).toBe(0);
-    expect(journey.worlds).toEqual([{ world: W1, status: 'available' }]);
+    expect(journey.worlds).toEqual([{ world: W1, status: 'available', bossStatus: 'none' }]);
   });
 
   it('advances once w1 is mastered: next is null, rank is knight, stars counted', async () => {
@@ -207,9 +216,10 @@ describe('loadJourney', () => {
     expect(journey.statuses.get('l1')).toBe('mastered');
     expect(journey.statuses.get('l2')).toBe('mastered');
     expect(journey.next).toBeNull();
+    expect(journey.nextStep).toBeNull();
     expect(journey.rank?.id).toBe('knight');
     expect(journey.totalStars).toBe(6);
-    expect(journey.worlds).toEqual([{ world: W1, status: 'mastered' }]);
+    expect(journey.worlds).toEqual([{ world: W1, status: 'mastered', bossStatus: 'none' }]);
   });
 
   it("only counts this profile's progress", async () => {
@@ -229,5 +239,91 @@ describe('loadJourney', () => {
     await expect(loadJourney(deps, 'profile-1')).rejects.toThrow(
       'ContentSource.catalog() is not implemented',
     );
+  });
+});
+
+// World with its own boss (M3.2a): w1's lessons plus a `boss-mg` mini-game unlocked by l2.
+const W1_BOSS: World = { ...W1, boss: 'boss-mg' };
+const BASICS_BOSS: Track = { ...BASICS, worlds: [W1_BOSS] };
+const CATALOG_BOSS: TracksCatalog = { ...CATALOG, tracks: [BASICS_BOSS] };
+const BOSS_MINIGAME: MiniGame = {
+  mode: 'static',
+  id: 'boss-mg',
+  concept: 'boss-concept',
+  titleKey: 'fixtures:boss-mg.title',
+  goalKey: 'fixtures:boss-mg.goal',
+  unlockAfter: 'l2',
+  position: EMPTY_POSITION,
+  par: 5,
+};
+
+function makeContentWithBoss(): ContentSource {
+  const lessonsById = new Map(LESSONS.map((lesson) => [lesson.id, lesson]));
+  return {
+    lessons: () => LESSONS,
+    lesson: (id) => lessonsById.get(id),
+    minigames: () => [BOSS_MINIGAME],
+    minigame: (id) => (id === BOSS_MINIGAME.id ? BOSS_MINIGAME : undefined),
+    catalog: () => CATALOG_BOSS,
+  };
+}
+
+function bossMiniGameProgress(wins: number): MiniGameProgress {
+  const nowIso = NOW.toISOString();
+  return {
+    id: 'mg-1',
+    profileId: 'profile-1',
+    miniGameId: BOSS_MINIGAME.id,
+    bestStars: wins > 0 ? 3 : 0,
+    plays: Math.max(wins, 1),
+    wins,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  };
+}
+
+describe('loadJourney with a world boss', () => {
+  it('boss locked while lessons are unfinished; world not mastered even once lessons are', async () => {
+    const deps = makeDeps({
+      content: makeContentWithBoss(),
+      progress: makeProgressRepo([masteredProgress(L1)]),
+    });
+
+    const journey = await loadJourney(deps, 'profile-1');
+
+    expect(journey.worlds).toEqual([{ world: W1_BOSS, status: 'available', bossStatus: 'locked' }]);
+    expect(journey.nextStep).toEqual({ kind: 'lesson', lesson: L2 });
+  });
+
+  it('boss available once every lesson is complete, and is the next step (not a lesson)', async () => {
+    const deps = makeDeps({
+      content: makeContentWithBoss(),
+      progress: makeProgressRepo([masteredProgress(L1), masteredProgress(L2)]),
+    });
+
+    const journey = await loadJourney(deps, 'profile-1');
+
+    expect(journey.worlds).toEqual([
+      { world: W1_BOSS, status: 'available', bossStatus: 'available' },
+    ]);
+    expect(journey.next).toBeNull(); // no lesson left — the boss is next, not a lesson
+    expect(journey.nextStep).toEqual({ kind: 'world-boss', world: W1_BOSS });
+    expect(journey.rank?.id).toBe('pawn'); // world:w1 rank not reached: boss unwon
+  });
+
+  it('boss won (from Play or the Journey node) masters the world and advances the rank', async () => {
+    const deps = makeDeps({
+      content: makeContentWithBoss(),
+      progress: makeProgressRepo(
+        [masteredProgress(L1), masteredProgress(L2)],
+        [bossMiniGameProgress(1)],
+      ),
+    });
+
+    const journey = await loadJourney(deps, 'profile-1');
+
+    expect(journey.worlds).toEqual([{ world: W1_BOSS, status: 'mastered', bossStatus: 'won' }]);
+    expect(journey.nextStep).toBeNull();
+    expect(journey.rank?.id).toBe('knight');
   });
 });

@@ -2,11 +2,15 @@ import {
   currentRank,
   lessonAvailability,
   nextLesson,
+  nextStep,
+  worldBossStatus,
   worldStatus,
   type JourneyLessonStatus,
+  type NextStep,
   type RankDef,
   type TracksCatalog,
   type World,
+  type WorldBossStatus,
   type WorldStatus,
 } from '../domain/journey.ts';
 import type { Lesson } from '../domain/lesson.ts';
@@ -14,10 +18,11 @@ import { totalStars } from '../domain/progress.ts';
 import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** One world's place on the Journey map, alongside its derived status. */
+/** One world's place on the Journey map, alongside its derived status and its boss's, if any. */
 export interface JourneyWorld {
   readonly world: World;
   readonly status: WorldStatus;
+  readonly bossStatus: WorldBossStatus;
 }
 
 /** Everything the Journey screen (map, next-lesson banner, rank badge) needs for one profile. */
@@ -27,7 +32,10 @@ export interface Journey {
   readonly statuses: ReadonlyMap<string, JourneyLessonStatus>;
   /** Every world across every track, in track then world order. */
   readonly worlds: readonly JourneyWorld[];
+  /** Next lesson to do, ignoring any world boss (see `nextStep` for the full next-thing-to-do). */
   readonly next: Lesson | null;
+  /** The next thing to do: a lesson, or a world boss once its world's lessons are all done. */
+  readonly nextStep: NextStep | null;
   readonly rank: RankDef | undefined;
   readonly totalStars: number;
 }
@@ -49,22 +57,30 @@ function requireCatalog(content: ContentSource): TracksCatalog {
 export async function loadJourney(deps: AppDeps, profileId: string): Promise<Journey> {
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();
-  const progresses = await deps.progress.listLessons(profileId);
+  const [progresses, miniGames] = await Promise.all([
+    deps.progress.listLessons(profileId),
+    deps.progress.listMiniGames(profileId),
+  ]);
 
   const worlds: JourneyWorld[] = [];
   for (const track of catalog.tracks) {
     for (const world of [...track.worlds].sort((a, b) => a.order - b.order)) {
-      worlds.push({ world, status: worldStatus(catalog, world, lessons, progresses) });
+      worlds.push({
+        world,
+        status: worldStatus(catalog, world, lessons, progresses, undefined, miniGames),
+        bossStatus: worldBossStatus(catalog, world, lessons, progresses, undefined, miniGames),
+      });
     }
   }
 
   return {
     catalog,
     lessons,
-    statuses: lessonAvailability(catalog, lessons, progresses),
+    statuses: lessonAvailability(catalog, lessons, progresses, undefined, miniGames),
     worlds,
-    next: nextLesson(catalog, lessons, progresses),
-    rank: currentRank(catalog, lessons, progresses),
+    next: nextLesson(catalog, lessons, progresses, undefined, miniGames),
+    nextStep: nextStep(catalog, lessons, progresses, undefined, miniGames),
+    rank: currentRank(catalog, lessons, progresses, undefined, miniGames),
     totalStars: totalStars(progresses),
   };
 }

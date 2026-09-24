@@ -7,7 +7,9 @@ import type {
   JourneyLessonStatus,
   Lesson,
   LessonProgress,
+  MiniGame,
   World,
+  WorldBossStatus,
   WorldStatus,
 } from '@chess-kids/core';
 import { lessonStars, worldLessons } from '@chess-kids/core';
@@ -112,6 +114,26 @@ function FlagIcon(): JSX.Element {
   );
 }
 
+/** World boss node icon: outline while its boss is available, filled gold once it is won. */
+function CrownIcon({ filled }: { readonly filled: boolean }): JSX.Element {
+  return (
+    <svg
+      width="30"
+      height="30"
+      viewBox="0 0 24 24"
+      fill={filled ? '#E9A92B' : 'none'}
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 18h16l1-9-5 4-4-6-4 6-5-4z" />
+      <path d="M4 18v2h16v-2" />
+    </svg>
+  );
+}
+
 /** A point in a 0–100 normalized coordinate space, matching the map's `viewBox`. */
 interface NodePoint {
   readonly x: number;
@@ -126,15 +148,19 @@ interface NodePoint {
 function layoutNodes(count: number, wide: boolean): readonly NodePoint[] {
   if (count <= 0) return [];
   if (count === 1) return [{ x: 50, y: 50 }];
+  // Neighbours alternate sides (zig-zag) so consecutive nodes never overlap, even with 8 nodes on
+  // a phone; a small wiggle keeps the path organic.
   return Array.from({ length: count }, (_, i) => {
     const t = i / (count - 1);
+    const side = i % 2 === 0 ? -1 : 1;
+    const wiggle = 5 * Math.sin(i * 1.7);
     if (wide) {
       const x = 12 + 76 * t;
-      const y = Math.min(86, Math.max(16, 55 + 26 * Math.sin(i * 2.3)));
+      const y = Math.min(84, Math.max(18, 52 - side * 20 + wiggle));
       return { x, y };
     }
     const y = 88 - 76 * t;
-    const x = Math.min(84, Math.max(16, 50 + 26 * Math.sin(i * 2.3)));
+    const x = Math.min(80, Math.max(20, 50 + side * 22 + wiggle));
     return { x, y };
   });
 }
@@ -159,9 +185,13 @@ function smoothPath(points: readonly NodePoint[]): string {
   return d;
 }
 
-/** Default world to show: the one holding `journey.next`, else the first open one, else the first. */
+/**
+ * Default world to show: the one holding `journey.nextStep` (a lesson or a world boss), else the
+ * first open one, else the first.
+ */
 function defaultWorldId(journey: Journey): string | undefined {
-  if (journey.next) return journey.next.world;
+  if (journey.nextStep?.kind === 'lesson') return journey.nextStep.lesson.world;
+  if (journey.nextStep?.kind === 'world-boss') return journey.nextStep.world.id;
   const open = journey.worlds.find((w) => w.status === 'available' || w.status === 'mastered');
   return (open ?? journey.worlds[0])?.world.id;
 }
@@ -172,6 +202,7 @@ export function JourneyScreen(): JSX.Element {
   const journey = useAppStore((state) => state.journey);
   const progress = useAppStore((state) => state.progress);
   const startLesson = useAppStore((state) => state.startLesson);
+  const startMiniGame = useAppStore((state) => state.startMiniGame);
   const goToHome = useAppStore((state) => state.goToHome);
 
   const [selectedWorldId, setSelectedWorldId] = useState<string | undefined>(undefined);
@@ -219,7 +250,17 @@ export function JourneyScreen(): JSX.Element {
     void startLesson(lesson.id);
   }
 
+  function activateBoss(bossStatus: WorldBossStatus, miniGameId: string): void {
+    if (bossStatus !== 'available' && bossStatus !== 'won') return;
+    setLockedMessage(null);
+    startMiniGame(miniGameId, 'journey');
+  }
+
   const lessonsOfCurrent = current ? worldLessons(current.world, journey.lessons) : [];
+  const bossMiniGame: MiniGame | undefined =
+    current?.world.boss !== undefined
+      ? services.deps.content.minigame(current.world.boss)
+      : undefined;
   const worldTitle = current
     ? tContent(t, 'journey:ui.world-heading', {
         order: current.world.order,
@@ -324,6 +365,13 @@ export function JourneyScreen(): JSX.Element {
               onActivate={(lesson) => {
                 activateLesson(lesson, current.world, lessonsOfCurrent, journey.statuses);
               }}
+              bossMiniGame={bossMiniGame}
+              bossStatus={current.bossStatus}
+              onActivateBoss={() => {
+                if (current.world.boss !== undefined) {
+                  activateBoss(current.bossStatus, current.world.boss);
+                }
+              }}
             />
           )}
 
@@ -409,16 +457,25 @@ function WorldMap({
   progress,
   isWorldOne,
   onActivate,
+  bossMiniGame,
+  bossStatus,
+  onActivateBoss,
 }: {
   readonly lessons: readonly Lesson[];
   readonly statuses: ReadonlyMap<string, JourneyLessonStatus>;
   readonly progress: readonly LessonProgress[];
   readonly isWorldOne: boolean;
   readonly onActivate: (lesson: Lesson) => void;
+  /** This world's boss content, when it has one (`bossStatus` is then not `'none'`). */
+  readonly bossMiniGame: MiniGame | undefined;
+  readonly bossStatus: WorldBossStatus;
+  readonly onActivateBoss: () => void;
 }): JSX.Element {
   const wide = useMediaQuery('(min-width: 1024px)');
-  const points = layoutNodes(lessons.length, wide);
+  const hasBoss = bossMiniGame !== undefined && bossStatus !== 'none';
+  const points = layoutNodes(lessons.length + (hasBoss ? 1 : 0), wide);
   const pathD = smoothPath(points);
+  const bossPoint = hasBoss ? points[points.length - 1] : undefined;
 
   return (
     <div className="absolute inset-0">
@@ -456,6 +513,14 @@ function WorldMap({
           />
         );
       })}
+      {hasBoss && bossPoint && (
+        <BossNode
+          miniGame={bossMiniGame}
+          status={bossStatus}
+          point={bossPoint}
+          onActivate={onActivateBoss}
+        />
+      )}
     </div>
   );
 }
@@ -545,6 +610,68 @@ function LessonNode({
         {characterLabel}
       </span>
       {status === 'complete' && <StarsRow earned={rating} size="1rem" />}
+    </div>
+  );
+}
+
+/**
+ * A world boss's node, shown after its world's last lesson node (crown badge). Status style
+ * mirrors `LessonNode`: `locked` (grey, lock icon), `available` (pulsing "current" style — this is
+ * always the Journey's next step while unwon, since a world's lessons gate its boss), `won`
+ * (solid, filled gold crown). Tapping a locked boss does nothing; `available`/`won` calls
+ * `onActivate` (starts the mini-game session, same as the Play screen).
+ */
+function BossNode({
+  miniGame,
+  status,
+  point,
+  onActivate,
+}: {
+  readonly miniGame: MiniGame;
+  readonly status: Exclude<WorldBossStatus, 'none'>;
+  readonly point: NodePoint;
+  readonly onActivate: () => void;
+}): JSX.Element {
+  const { t } = useTranslation();
+  const title = tContent(t, miniGame.titleKey);
+  const statusWord = tContent(t, `journey:ui.boss-status-${status}`);
+  const accessibleName = tContent(t, 'journey:ui.world-boss-name', { title, status: statusWord });
+
+  const nodeStatusValue: NodeStatus =
+    status === 'locked' ? 'locked' : status === 'won' ? 'complete' : 'current';
+  const size = nodeStatusValue === 'current' ? 'h-24 w-24' : 'h-20 w-20';
+  const colors =
+    nodeStatusValue === 'complete'
+      ? 'bg-go text-white'
+      : nodeStatusValue === 'current'
+        ? 'bg-today text-white'
+        : 'bg-[#E8DFC9] text-muted';
+
+  return (
+    <div
+      className="absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1"
+      style={{ left: `${String(point.x)}%`, top: `${String(point.y)}%` }}
+    >
+      {nodeStatusValue === 'current' && (
+        <span className="pointer-events-none absolute h-28 w-28 animate-ping rounded-full border-4 border-today/50" />
+      )}
+      <button
+        type="button"
+        onClick={onActivate}
+        aria-label={accessibleName}
+        className={`relative flex flex-shrink-0 items-center justify-center rounded-full border-4 border-cream ${size} ${colors}`}
+      >
+        {status === 'locked' ? (
+          <LockIcon />
+        ) : (
+          <span className="h-12 w-12">
+            <CrownIcon filled={status === 'won'} />
+          </span>
+        )}
+      </button>
+      <span className="max-w-[8rem] rounded-2xl bg-white px-2 py-0.5 text-center text-xs leading-tight font-extrabold text-ink">
+        {title}
+      </span>
     </div>
   );
 }

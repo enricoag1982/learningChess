@@ -17,10 +17,12 @@ home:
   owl-next: 'Today you meet {{character}}!'
   owl-next-topic: "Hi! I'm Owl. Today: {{topic}}!"
   owl-resume: Let's keep going!
+  owl-world-boss: 'World boss time: {{title}}!'
   owl-all-done: You finished everything for now. Come back soon for more!
   start-today: Start today
   subtitle-with-minigame: New lesson · Mini-game
   subtitle-lesson-only: New lesson
+  subtitle-world-boss: World boss
   avatar-alt: '{{name}} avatar'
   switch-player: Switch player
   journey-tile: Journey
@@ -224,6 +226,8 @@ play:
   minigame-name-locked: '{{title}}, locked, {{condition}}'
   close: Close
   back-to-play: Back to Play
+  back-to-journey: Back to Journey
+  back-to-home: Back to Home
 den:
   title: "{{name}}'s Den"
   owl-line: Look at all your friends!

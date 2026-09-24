@@ -1,0 +1,159 @@
+id: safe-or-not
+concept: hanging-piece
+unlockAfter: safe-pieces
+mode: series
+title: safe-or-not.title
+goal: safe-or-not.goal
+errors3: 0
+errors2: 2
+rounds:
+  - id: safe-or-not-r1
+    type: yes-no
+    text: safe-or-not-r1
+    board: |
+      . . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . B . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: e4
+    verify: hanging e4
+  - id: safe-or-not-r2
+    type: yes-no
+    text: safe-or-not-r2
+    board: |
+      . . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . B . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: e4
+    verify: hanging e4
+  - id: safe-or-not-r3
+    type: yes-no
+    text: safe-or-not-r3
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . N
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: h4
+    verify: hanging h4
+  - id: safe-or-not-r4
+    type: yes-no
+    text: safe-or-not-r4
+    board: |
+      . b . . . . . .
+      P . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: a7
+    verify: hanging a7
+  - id: safe-or-not-r5
+    type: yes-no
+    text: safe-or-not-r5
+    board: |
+      . b . . . . . .
+      P . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    answer: 'no'
+    focus: a7
+    verify: hanging a7
+  - id: safe-or-not-r6
+    type: yes-no
+    text: safe-or-not-r6
+    board: |
+      . . . q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d4
+    verify: hanging d4
+  - id: safe-or-not-r7
+    type: yes-no
+    text: safe-or-not-r7
+    board: |
+      . . . q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . P . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: d4
+    verify: hanging d4
+  - id: safe-or-not-r8
+    type: yes-no
+    text: safe-or-not-r8
+    board: |
+      . . . . . . . q
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    answer: 'yes'
+    focus: a1
+    verify: hanging a1
+  - id: safe-or-not-r9
+    type: yes-no
+    text: safe-or-not-r9
+    board: |
+      . . . . . . . q
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    answer: 'no'
+    focus: a1
+    verify: hanging a1
+  - id: safe-or-not-r10
+    type: yes-no
+    text: safe-or-not-r10
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . q . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    answer: 'yes'
+    focus: f4
+    verify: hanging f4

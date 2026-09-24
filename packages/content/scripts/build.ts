@@ -70,7 +70,7 @@ console.log(
 
 let tracks: TracksCatalog;
 try {
-  tracks = loadTracks(tracksPath, locales);
+  tracks = loadTracks(tracksPath, locales, content.minigames, content.lessons);
 } catch (error) {
   if (error instanceof ContentError) {
     fail(error.issues);

@@ -1,0 +1,165 @@
+id: defend
+world: attack
+order: 2
+concept: defend
+character: owl
+title: defend.title
+story: defend.story
+demo:
+  board: |
+    . . . r . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . N . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: defend.demo
+  highlight: legal-moves d4
+guided:
+  - id: defend-g1
+    type: yes-no
+    text: defend-g1
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . P . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d4
+    verify: defended d4
+  - id: defend-g2
+    type: best-move
+    text: defend-g2
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [Nb3, Nc2, Nb5, Nc6, Ne6, Nf5, Nf3, Ne2]
+    verify: save d4
+exercises:
+  - id: defend-01
+    type: yes-no
+    text: defend-01
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: d5
+    verify: defended d5
+  - id: defend-02
+    type: yes-no
+    text: defend-02
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . P . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d5
+    verify: defended d5
+  - id: defend-03
+    type: yes-no
+    text: defend-03
+    board: |
+      . . . . . . . .
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . . . . . . .
+      . . . R . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d4
+    verify: defended d4
+  - id: defend-04
+    type: best-move
+    text: defend-04
+    board: |
+      . r . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . N . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [Na3, Nc3, Na7, Nc7, Nd4, Nd6]
+    verify: save b5
+  - id: defend-05
+    type: best-move
+    text: defend-05
+    board: |
+      r . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . B .
+      . . . . . . . .
+      . P . . . . . .
+      . . P . . . . .
+      N . . . . . . .
+    solutions: [Bf6]
+    verify: save a1
+  - id: defend-06
+    type: best-move
+    text: defend-06
+    board: |
+      r . . . . . . .
+      . . . . . . . .
+      . N . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . P . . . . . .
+      . . P . . . . .
+      N . . . . . . .
+    solutions: [Na4, Nxa8]
+    verify: save a1
+  - id: defend-07
+    type: best-move
+    text: defend-07
+    board: |
+      . . r . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    solutions: [Ba3, Bb2, Bd2, Be3, Bf4, Bg5, Bh6]
+    verify: save c1
+  - id: defend-08
+    type: best-move
+    text: defend-08
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . P . . .
+      . . . P R P . .
+      . . . . P . . .
+      . . b . . . . .
+      N . . . . . . .
+      . . . . . . . .
+    solutions: [Nxc3]
+    verify: save e5

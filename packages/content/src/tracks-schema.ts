@@ -6,13 +6,18 @@ import { KEY_PATTERN, keySchema } from './schema.ts';
 /** One of the fixed habitats a world can be set in (`@chess-kids/core` `HABITATS`). */
 export const habitatSchema = z.enum(HABITATS);
 
-/** One world: authored order within its track, habitat, and title key (namespace `journey`). */
+/**
+ * One world: authored order within its track, habitat, title key (namespace `journey`), and an
+ * optional world boss (`boss`: a mini-game id, validated against the compiled mini-games and
+ * lessons in `loadTracks` — a schema alone cannot check that cross-reference).
+ */
 export const worldSchema = z
   .object({
     id: keySchema,
     order: z.number().int().positive(),
     habitat: habitatSchema,
     title: textRefSchema,
+    boss: keySchema.optional(),
   })
   .strict();
 

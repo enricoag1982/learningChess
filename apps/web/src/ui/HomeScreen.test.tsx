@@ -1,6 +1,14 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
+import type {
+  ContentSource,
+  Lesson,
+  MiniGame,
+  Track,
+  TracksCatalog,
+  World,
+} from '@chess-kids/core';
 import i18n from '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
@@ -8,6 +16,8 @@ import { tContent } from '../content-text.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderWithStore } from '../testing/render-with-store.tsx';
+import { HomeScreen } from './HomeScreen.tsx';
 
 afterEach(cleanup);
 
@@ -126,5 +136,80 @@ describe('HomeScreen', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
 
     await screen.findByText("Mia's Den");
+  });
+});
+
+// A one-lesson world with its own boss (M3.2a dev fixture, not the real tracks.yaml).
+const WORLD_BOSS: World = {
+  id: 'test',
+  track: 'test',
+  order: 1,
+  habitat: 'meadow',
+  titleKey: 'fixtures:world',
+  boss: 'boss-mg',
+};
+const TRACK_BOSS: Track = {
+  id: 'test',
+  kind: 'main',
+  titleKey: 'fixtures:track',
+  worlds: [WORLD_BOSS],
+};
+const CATALOG_BOSS: TracksCatalog = {
+  tracks: [TRACK_BOSS],
+  ranks: [{ id: 'pawn', after: 'start' }],
+};
+const BOSS_MINIGAME: MiniGame = {
+  mode: 'static',
+  id: 'boss-mg',
+  concept: 'boss-concept',
+  titleKey: 'fixtures:boss-mg.title',
+  goalKey: 'fixtures:boss-mg.goal',
+  unlockAfter: 'bl',
+  position: {
+    pieces: {},
+    markers: { stars: [], blocked: [] },
+    toMove: 'w',
+    castling: '-',
+    enPassant: null,
+  },
+  par: 5,
+};
+
+function contentSourceWithBoss(lesson: Lesson): ContentSource {
+  return {
+    lessons: () => [lesson],
+    lesson: (id) => (id === lesson.id ? lesson : undefined),
+    minigames: () => [BOSS_MINIGAME],
+    minigame: (id) => (id === BOSS_MINIGAME.id ? BOSS_MINIGAME : undefined),
+    catalog: () => CATALOG_BOSS,
+  };
+}
+
+describe('HomeScreen next step is a world boss', () => {
+  it('Owl announces the world boss and "Start today" starts its mini-game session', async () => {
+    const lesson = fixtureLesson({ id: 'bl', character: 'rhino' });
+    const services = createTestServices(contentSourceWithBoss(lesson));
+    const { store } = await renderWithStore(<HomeScreen />, services);
+    const profileId = store.getState().profile?.id ?? '';
+
+    const saved = await getLessonProgress(services.deps, profileId, lesson.id);
+    const bestStars = Object.fromEntries(
+      lesson.exercises.map((exercise) => [exercise.id, 1 as const]),
+    );
+    await services.deps.progress.saveLesson({ ...saved, bestStars });
+    await act(async () => {
+      await store.getState().refreshProgress();
+    });
+
+    const title = tContent(i18n.t, BOSS_MINIGAME.titleKey);
+    await screen.findByText(i18n.t('home.owl-world-boss', { title }));
+    await screen.findByText(i18n.t('home.subtitle-world-boss'));
+    const button = screen.getByRole('button', { name: /Start today/ });
+
+    fireEvent.click(button);
+
+    expect(store.getState().screen).toBe('minigame');
+    expect(store.getState().miniGameId).toBe('boss-mg');
+    expect(store.getState().miniGameOrigin).toBe('home');
   });
 });

@@ -1,0 +1,162 @@
+id: attack
+world: attack
+order: 1
+concept: attack
+character: owl
+title: attack.title
+story: attack.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . n . b . . .
+    . . . P . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: attack.demo
+  highlight: squares c5 e5
+guided:
+  - id: attack-g1
+    type: select-squares
+    text: attack-g1
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . n . . . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: attacked-by
+    from: d4
+  - id: attack-g2
+    type: best-move
+    text: attack-g2
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . b . . . .
+      . . . . . . . .
+      . . . . . . . .
+      N . . . . . . .
+    solutions: [Nb3, Nc2]
+    verify: attack d4
+exercises:
+  - id: attack-01
+    type: select-squares
+    text: attack-01
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . n . b . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: attacked-by
+    from: d4
+  - id: attack-02
+    type: select-squares
+    text: attack-02
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . p . . . . . .
+      . . . N . . . .
+      . . . . . n . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: attacked-by
+    from: d4
+  - id: attack-03
+    type: select-squares
+    text: attack-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . p . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . R . . n .
+    derive: attacked-by
+    from: d1
+  - id: attack-04
+    type: best-move
+    text: attack-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . b . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . N . . . . . .
+    solutions: [Na3, Nd2]
+    verify: attack c4
+  - id: attack-05
+    type: best-move
+    text: attack-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . n . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    solutions: [Rd1, Ra4]
+    verify: attack d4
+  - id: attack-06
+    type: best-move
+    text: attack-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      n . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B . . . . .
+    solutions: [Bd2]
+    verify: attack a5
+  - id: attack-07
+    type: best-move
+    text: attack-07
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . r . . . . . .
+      . . . . N . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [Nc3, Nd6]
+    verify: attack b5
+  - id: attack-08
+    type: best-move
+    text: attack-08
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+    solutions: [Qf1, Qf3, Qd6, Qa1, Qd4, Qd8]
+    verify: attack f6
+boss: queen-vs-pawns

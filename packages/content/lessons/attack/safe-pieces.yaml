@@ -1,0 +1,197 @@
+id: safe-pieces
+world: attack
+order: 3
+concept: hanging-piece
+character: owl
+title: safe-pieces.title
+story: safe-pieces.story
+demo:
+  board: |
+    . . . r . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . N . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: safe-pieces.demo
+  highlight: squares d5
+guided:
+  - id: safe-pieces-g1
+    type: yes-no
+    text: safe-pieces-g1
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d5
+    verify: hanging d5
+  - id: safe-pieces-g2
+    type: best-move
+    text: safe-pieces-g2
+    board: |
+      p . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    solutions: [Rxa8]
+    verify: take-free
+exercises:
+  - id: safe-pieces-01
+    type: yes-no
+    text: safe-pieces-01
+    board: |
+      . . . . . . . .
+      . b . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . N . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: e4
+    verify: hanging e4
+  - id: safe-pieces-02
+    type: yes-no
+    text: safe-pieces-02
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . N . . . .
+      . . P . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: d5
+    verify: hanging d5
+  - id: safe-pieces-03
+    type: yes-no
+    text: safe-pieces-03
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . B . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: f5
+    verify: hanging f5
+  - id: safe-pieces-04
+    type: yes-no
+    text: safe-pieces-04
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      n . . . . . . .
+      . . P . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: c4
+    verify: hanging c4
+  - id: safe-pieces-05
+    type: yes-no
+    text: safe-pieces-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . r
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    answer: 'no'
+    focus: a4
+    verify: hanging a4
+  - id: safe-pieces-06
+    type: yes-no
+    text: safe-pieces-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . n . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'yes'
+    focus: d4
+    verify: hanging d4
+  - id: safe-pieces-07
+    type: best-move
+    text: safe-pieces-07
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . b .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+    solutions: [Qxg4]
+    verify: take-free
+  - id: safe-pieces-08
+    type: best-move
+    text: safe-pieces-08
+    board: |
+      p . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      R . . . . . . p
+    solutions: [Rxa8]
+    verify: take-free
+  - id: safe-pieces-09
+    type: best-move
+    text: safe-pieces-09
+    board: |
+      . . . . . . . .
+      . . . . . . r .
+      . n . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [Bxb6, Bxg7]
+    verify: take-free
+  - id: safe-pieces-10
+    type: best-move
+    text: safe-pieces-10
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      r . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      . . . Q . . . r
+    solutions: [Qxa4]
+    verify: take-free
+boss: safe-or-not

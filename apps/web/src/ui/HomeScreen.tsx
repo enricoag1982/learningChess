@@ -138,6 +138,7 @@ export function HomeScreen(): JSX.Element {
   const progress = useAppStore((state) => state.progress);
   const journey = useAppStore((state) => state.journey);
   const startNext = useAppStore((state) => state.startNext);
+  const startMiniGame = useAppStore((state) => state.startMiniGame);
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToJourney = useAppStore((state) => state.goToJourney);
   const goToPlay = useAppStore((state) => state.goToPlay);
@@ -161,15 +162,27 @@ export function HomeScreen(): JSX.Element {
   const isResuming = next !== null && lessonStatus(next, nextProgress) === 'in-progress';
   const stars = totalStars(progress);
 
+  // The next thing to do (domain-model.md §3): a lesson, or — once a world's lessons are all done
+  // — its world boss. `next` above stays lesson-only, for the resume/character-greeting text.
+  const nextStep = journey?.nextStep ?? null;
+  const nextBossMiniGame =
+    nextStep?.kind === 'world-boss' && nextStep.world.boss !== undefined
+      ? services.deps.content.minigame(nextStep.world.boss)
+      : undefined;
+
   const bubbleText = !journey
     ? ''
-    : !next
+    : !nextStep
       ? t('home.owl-all-done')
-      : isResuming
-        ? t('home.owl-resume')
-        : characterPieceOrNull(next.character) === null
-          ? t('home.owl-next-topic', { topic: tContent(t, next.titleKey) })
-          : t('home.owl-next', { character: characterName(t, next.character) });
+      : nextStep.kind === 'world-boss'
+        ? t('home.owl-world-boss', {
+            title: nextBossMiniGame ? tContent(t, nextBossMiniGame.titleKey) : '',
+          })
+        : isResuming
+          ? t('home.owl-resume')
+          : characterPieceOrNull(nextStep.lesson.character) === null
+            ? t('home.owl-next-topic', { topic: tContent(t, nextStep.lesson.titleKey) })
+            : t('home.owl-next', { character: characterName(t, nextStep.lesson.character) });
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
@@ -178,7 +191,20 @@ export function HomeScreen(): JSX.Element {
   }
 
   const buttonLabel = isResuming ? t('continue') : t('home.start-today');
-  const subtitle = next?.boss ? t('home.subtitle-with-minigame') : t('home.subtitle-lesson-only');
+  const subtitle =
+    nextStep?.kind === 'world-boss'
+      ? t('home.subtitle-world-boss')
+      : next?.boss
+        ? t('home.subtitle-with-minigame')
+        : t('home.subtitle-lesson-only');
+
+  function startNextStep(): void {
+    if (nextStep?.kind === 'world-boss' && nextStep.world.boss !== undefined) {
+      startMiniGame(nextStep.world.boss, 'home');
+      return;
+    }
+    void startNext();
+  }
 
   return (
     <main className="flex min-h-screen flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
@@ -217,12 +243,10 @@ export function HomeScreen(): JSX.Element {
           <SpeechBubble text={bubbleText} />
           <ReplayButton onClick={replay} label={t('exercise.replay')} />
         </div>
-        {next && (
+        {nextStep && (
           <button
             type="button"
-            onClick={() => {
-              void startNext();
-            }}
+            onClick={startNextStep}
             className="flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
           >
             <span className="flex items-center gap-3 font-display text-2xl font-semibold sm:text-3xl">

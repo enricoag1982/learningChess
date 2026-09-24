@@ -186,3 +186,108 @@ setup-race:
   goal: Race to place every piece in its starting spot!
 setup-race-r1: Place every piece on the back row, all in their starting spots.
 setup-race-r2: Now add all eight pawns, standing guard in front.
+attack:
+  title: What Does It Attack?
+  story: >-
+    A piece "attacks" every square it could capture on right now, even the empty ones! Before you
+    move, Owl wants you to spot every attack on the board.
+  demo: Watch Caterpillar the Pawn. She attacks both diagonal squares in front of her!
+attack-g1: Tap every square Caterpillar the Pawn attacks.
+attack-g2: 'Horse wants to attack the bishop on d4. Which move lets him attack it?'
+attack-01: Tap every square Caterpillar the Pawn attacks — the knight and the bishop are both there.
+attack-02: 'Horse jumps in an L. Tap every square he attacks from d4 — some are empty, some have pieces!'
+attack-03: Rhino attacks in straight lines. Tap every square he attacks from d1.
+attack-04: Move Horse so he attacks the bishop on c4.
+attack-05: Move Rhino so he attacks the knight on d4.
+attack-06: Move Elephant so he attacks the knight on a5.
+attack-07: 'Horse has more than one jump. Which move attacks the rook on b5?'
+attack-08: Lioness is very powerful. Find a move that attacks the knight on f6.
+defend:
+  title: Defend Your Pieces
+  story: >-
+    When an enemy attacks your piece, you can move it away, bring a friend to guard it, block the
+    attack, or capture the attacker. Owl calls all of these "defending"!
+  demo: Rhino is coming for Horse! Horse can hop away to safety, or a friend could guard him.
+defend-g1: 'Is Horse defended by the pawn on c3?'
+defend-g2: Rhino is coming for Horse! Move Horse to safety.
+defend-01: 'Is the knight on d5 defended?'
+defend-02: 'A pawn now guards d5. Is the knight defended?'
+defend-03: 'Rhino (black) is attacking Horse. Is Horse defended by the white rook on d2?'
+defend-04: Rhino (black) is coming for Horse on b5! Move Horse to safety.
+defend-05: Horse (a1) is trapped and Rhino is attacking him! Move Elephant so he guards Horse.
+defend-06: Horse (a1) still can't move. Save him — block the attack, or capture the attacking rook!
+defend-07: Rhino (black) is attacking Elephant. Move Elephant to safety.
+defend-08: The bishop on c3 is attacking Rhino! Move Horse to capture it.
+safe-pieces:
+  title: Safe or Not?
+  story: >-
+    A piece is "hanging" when it is attacked and nothing protects it — the enemy could take it for
+    free! Owl's #1 safety habit is always asking, "Is my piece safe?"
+  demo: Look at Horse. Rhino attacks him and nothing guards him — Horse is hanging!
+safe-pieces-g1: 'Is Horse hanging?'
+safe-pieces-g2: Caterpillar (black) is undefended. Capture her for free!
+safe-pieces-01: 'The bishop (black) attacks Horse and nothing guards him. Is Horse hanging?'
+safe-pieces-02: 'A pawn now guards Horse. Is he still hanging?'
+safe-pieces-03: 'Nothing attacks Elephant. Is he hanging?'
+safe-pieces-04: 'The knight (black) attacks Caterpillar and nothing guards her. Is she hanging?'
+safe-pieces-05: 'The rook (black) attacks Rhino on a4, but your other rook guards him. Is he hanging?'
+safe-pieces-06: 'The knight (black) attacks Lioness and nothing guards her. Is she hanging?'
+safe-pieces-07: The bishop (black) is undefended. Capture it for free with Lioness!
+safe-pieces-08: Two pawns (black) are waiting. Only one is undefended — capture that one for free!
+safe-pieces-09: Two pieces (black) are undefended. Find a move that captures one for free.
+safe-pieces-10: One rook (black) is undefended, the other is guarded. Capture the free one!
+piece-values:
+  title: How Much Is Each Piece Worth?
+  story: >-
+    Every piece has a value: Caterpillar is worth 1, Horse and Elephant are worth 3, Rhino is worth
+    5, and Lioness is worth a mighty 9! Knowing this helps you decide if a trade is worth it.
+  demo: 'Here they are in order: Caterpillar 1, Horse or Elephant 3, Rhino 5, Lioness 9.'
+piece-values-g1: 'Which is worth more: the pawn or the rook?'
+piece-values-g2: 'Which is worth more: the knight or the queen?'
+piece-values-01: 'Which is worth more: the pawn or the knight?'
+piece-values-02: 'Which is worth more: the bishop or the rook?'
+piece-values-03: 'Which is worth more: the rook or the queen?'
+piece-values-04: Which piece is worth exactly 5?
+piece-values-05: Which piece is worth exactly 9?
+piece-values-06: Which piece is worth exactly 1?
+trades:
+  title: Good Trade or Bad Trade?
+  story: >-
+    Before you capture, ask what you give up and what you get. Taking a bigger piece, or an
+    undefended one, is good — losing more than you gain is bad!
+  demo: Rhino captures the queen! He gives up a rook (worth 5) to win a queen (worth 9) — a great trade!
+trade-good: Good trade
+trade-equal: Equal trade
+trade-bad: Bad trade
+trades-g1: 'Rhino captures the queen on h1. Is this trade good, equal, or bad?'
+trades-g2: The knight (black) is undefended. Capture it with Elephant — a free piece is always a good trade!
+trades-01: 'Horse captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?'
+trades-02: 'The pawn on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?'
+trades-03: 'The rook on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?'
+trades-04: 'The pawn on f4 is undefended. If Elephant captures it, good, equal, or bad trade?'
+trades-05: 'The pawn on c3 is guarded by another pawn. If Horse captures it, good, equal, or bad trade?'
+trades-06: 'The knight on c3 is guarded by a pawn. If Horse captures it, good, equal, or bad trade?'
+trades-07: 'Find the good trade: capture a piece worth more than Rhino.'
+trades-08: Elephant can capture two different pieces. Find a good trade.
+queen-vs-pawns:
+  title: Queen vs Pawns
+  goal: Lioness must capture every caterpillar before one of them transforms!
+army-battle:
+  title: Army Battle
+  goal: Pawns and knights on both sides! Capture every enemy piece, or be first to transform.
+win-the-queen:
+  title: Win the Queen
+  goal: No kings today — the first side to capture the enemy queen wins!
+safe-or-not:
+  title: Safe or Not?
+  goal: 'Ten pieces, ten questions: is each one safe, or in danger?'
+safe-or-not-r1: 'Is the bishop on e4 in danger?'
+safe-or-not-r2: 'A pawn now guards the bishop on e4. Is it in danger?'
+safe-or-not-r3: 'Nothing attacks the knight on h4. Is it in danger?'
+safe-or-not-r4: 'Is the pawn on a7 in danger?'
+safe-or-not-r5: 'A rook now guards the pawn on a7. Is it in danger?'
+safe-or-not-r6: 'Is the knight on d4 in danger?'
+safe-or-not-r7: 'A pawn now guards the knight on d4. Is it in danger?'
+safe-or-not-r8: 'Is the rook on a1 in danger?'
+safe-or-not-r9: 'A bishop now blocks the attack on a1. Is the rook in danger?'
+safe-or-not-r10: 'Is the queen on f4 in danger?'

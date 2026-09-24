@@ -64,14 +64,18 @@ export type {
   TracksCatalog,
   JourneyLessonStatus,
   WorldStatus,
+  WorldBossStatus,
+  NextStep,
 } from './domain/journey.ts';
 export {
   HABITATS,
   isHabitat,
   worldLessons,
   worldStatus,
+  worldBossStatus,
   lessonAvailability,
   nextLesson,
+  nextStep,
   currentRank,
 } from './domain/journey.ts';
 
@@ -210,6 +214,8 @@ export {
   isAttacked,
   isDefended,
   isHanging,
+  isSafe,
+  pieceValue,
   isInCheck,
   isCheckmate,
   isStalemate,

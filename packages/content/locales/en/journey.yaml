@@ -47,3 +47,8 @@ ui:
   status-current: current
   status-complete: complete
   status-locked: locked
+  world-boss: World boss
+  world-boss-name: 'World boss: {{title}}, {{status}}'
+  boss-status-locked: locked
+  boss-status-available: available
+  boss-status-won: won

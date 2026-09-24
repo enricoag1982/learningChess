@@ -32,6 +32,9 @@ export type Screen =
 /** Where the current lesson was opened from: decides where "Continue"/Close returns to. */
 export type LessonOrigin = 'home' | 'journey';
 
+/** Where the current standalone mini-game session was opened from: decides where its exit returns to. */
+export type MiniGameOrigin = 'play' | 'journey' | 'home';
+
 /** Last-used profile first (docs/screens.md: picker shows it first), rest unchanged. */
 function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | null): Profile[] {
   const ordered = [...profiles];
@@ -64,6 +67,8 @@ export interface AppState {
   readonly newPlayerReturnsToParent: boolean;
   /** The mini-game open in a standalone Play session (screen `minigame`); `null` otherwise. */
   readonly miniGameId: string | null;
+  /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
+  readonly miniGameOrigin: MiniGameOrigin;
 
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
@@ -111,9 +116,13 @@ export interface AppState {
   readonly goToPlay: () => void;
   /** Opens My Den. */
   readonly goToDen: () => void;
-  /** Opens a mini-game's standalone session (Play screen tile tap), unlocked ones only. */
-  readonly startMiniGame: (miniGameId: string) => void;
-  /** Leaves the standalone mini-game session for the Play screen. */
+  /**
+   * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only), the
+   * Journey map's world boss node, or Home's "Today" tile when the next step is a world boss.
+   * `origin` (default `'play'`) decides where `exitMiniGame` returns to.
+   */
+  readonly startMiniGame: (miniGameId: string, origin?: MiniGameOrigin) => void;
+  /** Leaves the standalone mini-game session for wherever it was opened from. */
   readonly exitMiniGame: () => void;
 }
 
@@ -149,6 +158,7 @@ export function createAppStore(services: Services) {
       lessonOrigin: 'home',
       newPlayerReturnsToParent: false,
       miniGameId: null,
+      miniGameOrigin: 'play',
 
       async init() {
         if (await isFirstRun(services.deps)) {
@@ -282,12 +292,16 @@ export function createAppStore(services: Services) {
         set({ screen: 'den' });
       },
 
-      startMiniGame(miniGameId: string) {
-        set({ screen: 'minigame', miniGameId });
+      startMiniGame(miniGameId: string, origin: MiniGameOrigin = 'play') {
+        set({ screen: 'minigame', miniGameId, miniGameOrigin: origin });
       },
 
       exitMiniGame() {
-        set({ screen: 'play', miniGameId: null });
+        const origin = get().miniGameOrigin;
+        set({
+          screen: origin === 'journey' ? 'journey' : origin === 'home' ? 'home' : 'play',
+          miniGameId: null,
+        });
         void get().refreshProgress();
       },
     };

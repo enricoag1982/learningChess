@@ -8,8 +8,10 @@ import {
   isDefended,
   isHanging,
   isInCheck,
+  isSafe,
   isStalemate,
   kingSquare,
+  pieceValue,
 } from './facts.ts';
 
 const rules = chessJsRules;
@@ -67,6 +69,58 @@ describe('isAttacked / isDefended / isHanging', () => {
 
   it('an empty square is never hanging', () => {
     expect(isHanging(position, 'a1', rules)).toBe(false);
+  });
+});
+
+describe('pieceValue', () => {
+  it('reports the standard values: P1 N3 B3 R5 Q9', () => {
+    expect(pieceValue('p')).toBe(1);
+    expect(pieceValue('n')).toBe(3);
+    expect(pieceValue('b')).toBe(3);
+    expect(pieceValue('r')).toBe(5);
+    expect(pieceValue('q')).toBe(9);
+  });
+
+  it('reports 0 for the king (no trade value)', () => {
+    expect(pieceValue('k')).toBe(0);
+  });
+});
+
+describe('isSafe', () => {
+  it('a piece with no attacker is safe', () => {
+    // White knight b5, nothing attacks it.
+    const position = parseFen('4k3/8/8/1N6/8/8/8/4K3 w - - 0 1');
+    expect(isSafe(position, 'b5', rules)).toBe(true);
+  });
+
+  it('a piece attacked only by an equal-or-higher-value piece and defended is safe', () => {
+    // White knight d5 attacked by the black rook on d8, defended by the white pawn on e4.
+    const position = parseFen('3r2k1/8/8/3N4/4P3/8/8/4K3 w - - 0 1');
+    expect(isSafe(position, 'd5', rules)).toBe(true);
+  });
+
+  it('a piece attacked by a higher-value piece is still unsafe when undefended', () => {
+    // White knight d5 attacked by the black queen on d8, nothing defends it: not a lower-value
+    // attacker, but still attacked-and-undefended, so not safe either way.
+    const position = parseFen('3q2k1/8/8/3N4/8/8/8/4K3 w - - 0 1');
+    expect(isSafe(position, 'd5', rules)).toBe(false);
+  });
+
+  it('a piece attacked by a lower-value piece is unsafe even when defended', () => {
+    // White knight d5 attacked by the black pawn on e6, defended by the white queen on d1: still a
+    // bad trade for white (loses N3 to win P1), so not safe.
+    const position = parseFen('6k1/8/4p3/3N4/8/8/8/3QK3 w - - 0 1');
+    expect(isSafe(position, 'd5', rules)).toBe(false);
+  });
+
+  it('an attacked, undefended piece is unsafe', () => {
+    const position = parseFen('3r2k1/8/8/3N4/8/8/8/4K3 w - - 0 1');
+    expect(isSafe(position, 'd5', rules)).toBe(false);
+  });
+
+  it('an empty square is never safe', () => {
+    const position = parseFen('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+    expect(isSafe(position, 'd5', rules)).toBe(false);
   });
 });
 

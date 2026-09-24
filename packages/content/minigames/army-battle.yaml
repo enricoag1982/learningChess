@@ -1,0 +1,25 @@
+id: army-battle
+concept: exchange
+unlockAfter: trades
+mode: versus
+title: army-battle.title
+goal: army-battle.goal
+board: |
+  . n . . . . n .
+  p p p p p p p p
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  P P P P P P P P
+  . N . . . . N .
+rules:
+  kings: false
+  noMoves: lose
+  win:
+    kid: [capture-all, promote]
+    opponent: [capture-all, promote]
+moveLimit: 30
+opponent:
+  bot: 1
+par: 20

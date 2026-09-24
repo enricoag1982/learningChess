@@ -1,9 +1,17 @@
 import type { ChessRules } from '../chess/rules.ts';
 import { SQUARES } from '../chess/types.ts';
-import type { Color, Position, Square } from '../chess/types.ts';
+import type { Color, PieceType, Position, Square } from '../chess/types.ts';
 
 function opponentOf(color: Color): Color {
   return color === 'w' ? 'b' : 'w';
+}
+
+/** Standard piece values (`docs/curriculum.md` World 3 "Piece values"): P1 N3 B3 R5 Q9, king unused. */
+const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+/** Standard value of a piece type (P1 N3 B3 R5 Q9); `k` has no trade value, reported as `0`. */
+export function pieceValue(type: PieceType): number {
+  return PIECE_VALUE[type];
 }
 
 /** Square holding the `color` king, if any. */
@@ -37,6 +45,25 @@ export function isHanging(position: Position, square: Square, rules: ChessRules)
   const occupant = position.pieces[square];
   if (occupant === undefined) return false;
   return isAttacked(position, square, rules) && !isDefended(position, square, rules);
+}
+
+/**
+ * True when the piece on `square` is safe: not attacked by a lower-value enemy piece, and either
+ * not attacked at all or defended by its own side. Stricter than `!isHanging`: a piece defended
+ * only by lower-value pieces than the attacker is still "safe" there, but one an enemy pawn (say)
+ * attacks is never safe even when defended — trading it away would still be a bad trade for its
+ * owner (`docs/curriculum.md` World 3 "Safe or not?" / "Trades"). `false` if empty.
+ */
+export function isSafe(position: Position, square: Square, rules: ChessRules): boolean {
+  const occupant = position.pieces[square];
+  if (occupant === undefined) return false;
+  const attackerSquares = rules.attackers(position, square, opponentOf(occupant.color));
+  const lowerValueAttacker = attackerSquares.some((attackerSquare) => {
+    const attacker = position.pieces[attackerSquare];
+    return attacker !== undefined && pieceValue(attacker.type) < pieceValue(occupant.type);
+  });
+  if (lowerValueAttacker) return false;
+  return attackerSquares.length === 0 || isDefended(position, square, rules);
 }
 
 /** True when the side to move is in check. */

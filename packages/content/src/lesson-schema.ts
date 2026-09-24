@@ -122,19 +122,39 @@ const choiceSchema = z
     /** Hides the board (default: shown). Named apart from `board`, the position diagram field. */
     showBoard: z.boolean().optional(),
     /**
-     * Load-time-only check: options must all be pieces, and `answer` must be the option with the
-     * higher standard value (P1 N3 B3 R5 Q9), which must be unique. Never compiled into the
-     * runtime `ExerciseDef`.
+     * Load-time-only check (M3.1 `higher-value`; M3.2b `worth <n>` / `trade <SAN>`): `higher-value`
+     * requires every option to be a piece and `answer` to be the (unique) higher-value one;
+     * `worth <n>` requires every option to be a piece and `answer` to be the (unique) option worth
+     * exactly `<n>`; `trade <SAN>` requires options ids `good`/`equal`/`bad` and `answer` to match
+     * the loader's classification of the kid capture `<SAN>` in the position. Never compiled into
+     * the runtime `ExerciseDef`.
      */
-    verify: z.literal('higher-value').optional(),
+    verify: z
+      .string()
+      .regex(/^higher-value$|^worth [0-9]+$|^trade \S+$/)
+      .optional(),
   })
   .strict();
+
+/**
+ * A `best-move` exercise's optional load-time-only check (M3.2b): the loader computes the exact
+ * set of legal kid moves satisfying the named rule and fails the build unless `solutions` equals
+ * that set (order-insensitive, by SAN) — `attack <sq>` (the moved piece newly attacks the enemy
+ * piece on `<sq>`), `save <sq>` (the kid piece on `<sq>`, not safe now, is safe after the move, on
+ * its new square if it moved), `take-free` (captures of an undefended enemy piece), `good-trade`
+ * (captures worth more than the capturer, or of an undefended piece). Never compiled into the
+ * runtime `BestMoveDef`.
+ */
+const bestMoveVerifySchema = z
+  .string()
+  .regex(/^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$/);
 
 const bestMoveSchema = z
   .object({
     ...exerciseCommonFields,
     type: z.literal('best-move'),
     solutions: z.array(z.string()).min(1),
+    verify: bestMoveVerifySchema.optional(),
   })
   .strict();
 

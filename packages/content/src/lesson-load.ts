@@ -14,7 +14,6 @@ import type {
   MateInNDef,
   MiniGame,
   Piece,
-  PieceType,
   Position,
   Square,
   SelectSquaresDef,
@@ -33,10 +32,12 @@ import {
   isDefended,
   isHanging,
   isInCheck,
+  isSafe,
   isStalemate,
   optimalMoves,
   parseDiagram,
   parseFen,
+  pieceValue,
   selectSquaresAnswer,
 } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
@@ -145,36 +146,75 @@ function checkYesNoVerify(
   if (actual !== exercise.answer) {
     const answerWord = exercise.answer ? 'yes' : 'no';
     issues.push(`${where}: verify "${verify}" is ${String(actual)}, but answer is "${answerWord}"`);
+    return;
+  }
+  // "Not hanging" must also mean safe in real chess: a defended piece attacked by a cheaper one
+  // still loses material, so such a position would teach "defended = safe" wrongly.
+  if (
+    fact.kind === 'hanging' &&
+    !actual &&
+    isAttacked(exercise.position, fact.square, chessJsRules) &&
+    !isSafe(exercise.position, fact.square, chessJsRules)
+  ) {
+    issues.push(
+      `${where}: verify "${verify}": the piece is defended but attacked by a cheaper piece (not safe); use another position`,
+    );
   }
 }
 
-/** Standard piece values (curriculum.md World 3 "Piece values"), for `choice`'s `higher-value` verify. */
-const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-
 /**
- * A `choice` exercise's optional `verify: higher-value` (`lesson-schema.ts`): every option must be
- * a piece, and `answer` must be the option with the higher standard value, which must be unique.
- * Load-time only: never affects the compiled `ChoiceDef`.
+ * Classifies a kid capture (M3.2b `docs/curriculum.md` World 3 "Trades"): `good` when the captured
+ * piece is worth more than the capturer or is undefended (a free or winning capture either way),
+ * `equal` when same value and defended, `bad` when worth less than the capturer and defended (a
+ * losing trade even though it looks like "getting" a piece). Shared by `choice`'s `trade <SAN>`
+ * verify and `best-move`'s `good-trade` verify.
  */
-function checkChoiceVerify(
+function classifyTrade(
+  capturedValue: number,
+  capturerValue: number,
+  defended: boolean,
+): 'good' | 'equal' | 'bad' {
+  if (!defended || capturedValue > capturerValue) return 'good';
+  if (capturedValue === capturerValue) return 'equal';
+  return 'bad';
+}
+
+/** A `choice` exercise's optional `verify` (`lesson-schema.ts`'s regex already restricts the shape). */
+type ChoiceVerify =
+  | { readonly kind: 'higher-value' }
+  | { readonly kind: 'worth'; readonly value: number }
+  | { readonly kind: 'trade'; readonly san: string };
+
+function parseChoiceVerify(raw: string): ChoiceVerify {
+  if (raw === 'higher-value') return { kind: 'higher-value' };
+  if (raw.startsWith('worth ')) {
+    return { kind: 'worth', value: Number(raw.slice('worth '.length)) };
+  }
+  return { kind: 'trade', san: raw.slice('trade '.length) };
+}
+
+/** Every option's piece value, or `null` (with an issue pushed) if any option is not a piece. */
+function optionValues(
   exercise: ChoiceDef,
-  verify: string | undefined,
+  verifyLabel: string,
   where: string,
   issues: string[],
-): void {
-  if (verify !== 'higher-value') {
-    return;
-  }
+): readonly number[] | null {
   const values = exercise.options.map((option) =>
-    option.piece === undefined ? undefined : PIECE_VALUE[option.piece.type],
+    option.piece === undefined ? undefined : pieceValue(option.piece.type),
   );
   if (values.some((value) => value === undefined)) {
-    issues.push(`${where}: verify "higher-value" requires every option to be a piece`);
-    return;
+    issues.push(`${where}: verify "${verifyLabel}" requires every option to be a piece`);
+    return null;
   }
-  const known = values as number[];
-  const max = Math.max(...known);
-  const winners = exercise.options.filter((_, index) => known[index] === max);
+  return values as number[];
+}
+
+function checkChoiceHigherValue(exercise: ChoiceDef, where: string, issues: string[]): void {
+  const values = optionValues(exercise, 'higher-value', where, issues);
+  if (values === null) return;
+  const max = Math.max(...values);
+  const winners = exercise.options.filter((_, index) => values[index] === max);
   const winner = winners[0];
   if (winners.length !== 1 || winner === undefined) {
     issues.push(`${where}: verify "higher-value" requires a unique highest-value option`);
@@ -183,6 +223,206 @@ function checkChoiceVerify(
   if (winner.id !== exercise.answer) {
     issues.push(
       `${where}: verify "higher-value": answer should be "${winner.id}", the higher-value option`,
+    );
+  }
+}
+
+function checkChoiceWorth(
+  exercise: ChoiceDef,
+  target: number,
+  where: string,
+  issues: string[],
+): void {
+  const label = `worth ${String(target)}`;
+  const values = optionValues(exercise, label, where, issues);
+  if (values === null) return;
+  const winners = exercise.options.filter((_, index) => values[index] === target);
+  const winner = winners[0];
+  if (winners.length !== 1 || winner === undefined) {
+    issues.push(`${where}: verify "${label}" requires exactly one option worth ${String(target)}`);
+    return;
+  }
+  if (winner.id !== exercise.answer) {
+    issues.push(`${where}: verify "${label}": answer should be "${winner.id}"`);
+  }
+}
+
+const TRADE_OPTION_IDS: ReadonlySet<string> = new Set(['good', 'equal', 'bad']);
+
+function checkChoiceTrade(exercise: ChoiceDef, san: string, where: string, issues: string[]): void {
+  const label = `trade ${san}`;
+  const ids = new Set(exercise.options.map((option) => option.id));
+  if (ids.size !== TRADE_OPTION_IDS.size || ![...TRADE_OPTION_IDS].every((id) => ids.has(id))) {
+    issues.push(`${where}: verify "${label}" requires options ids "good", "equal", "bad"`);
+    return;
+  }
+  const played = chessJsRules.play(exercise.position, san);
+  if (played === null || played.move.captured === undefined) {
+    issues.push(`${where}: verify "${label}" is not a legal capture in the position`);
+    return;
+  }
+  const classification = classifyTrade(
+    pieceValue(played.move.captured),
+    pieceValue(played.move.piece),
+    isDefended(exercise.position, played.move.to, chessJsRules),
+  );
+  if (classification !== exercise.answer) {
+    issues.push(
+      `${where}: verify "${label}" classifies as "${classification}", but answer is "${exercise.answer}"`,
+    );
+  }
+}
+
+/**
+ * A `choice` exercise's optional `verify` (`lesson-schema.ts`): `higher-value` / `worth <n>` need
+ * every option to be a piece; `trade <SAN>` classifies a kid capture. Load-time only: never affects
+ * the compiled `ChoiceDef`.
+ */
+function checkChoiceVerify(
+  exercise: ChoiceDef,
+  verify: string | undefined,
+  where: string,
+  issues: string[],
+): void {
+  if (verify === undefined) {
+    return;
+  }
+  const parsed = parseChoiceVerify(verify);
+  if (parsed.kind === 'higher-value') {
+    checkChoiceHigherValue(exercise, where, issues);
+    return;
+  }
+  if (parsed.kind === 'worth') {
+    checkChoiceWorth(exercise, parsed.value, where, issues);
+    return;
+  }
+  checkChoiceTrade(exercise, parsed.san, where, issues);
+}
+
+/** A `best-move` exercise's optional `verify` (`lesson-schema.ts`'s regex already restricts the shape). */
+type BestMoveVerify =
+  | { readonly kind: 'attack' | 'save'; readonly square: Square }
+  | { readonly kind: 'take-free' | 'good-trade' };
+
+function parseBestMoveVerify(raw: string): BestMoveVerify {
+  const [kind, square] = raw.split(' ');
+  if (kind === 'attack' || kind === 'save') {
+    return { kind, square: square as Square };
+  }
+  return { kind: kind as 'take-free' | 'good-trade' };
+}
+
+/**
+ * The exact set of legal kid moves (SAN) satisfying a `best-move` `verify` rule in `position`, or
+ * `null` (with an issue pushed) when the rule's own precondition is not met — `attack <sq>` needs
+ * an enemy piece on `<sq>`, `save <sq>` needs the kid's own, not-yet-safe piece there. `take-free`
+ * and `good-trade` have no precondition of their own (an empty result is instead reported by the
+ * caller, alongside a mismatch, as the general "empty computed set" issue).
+ */
+function computeVerifiedBestMoves(
+  verify: BestMoveVerify,
+  position: Position,
+  where: string,
+  verifyLabel: string,
+  issues: string[],
+): readonly string[] | null {
+  const kidColor = position.toMove;
+  const candidates = rules.legalMoves(position, { staticOpponent: true });
+
+  if (verify.kind === 'attack') {
+    const target = position.pieces[verify.square];
+    if (target === undefined || target.color === kidColor) {
+      issues.push(`${where}: verify "${verifyLabel}" requires an enemy piece on ${verify.square}`);
+      return null;
+    }
+    const beforeAttackers = new Set(chessJsRules.attackers(position, verify.square, kidColor));
+    return candidates
+      .filter((move) => {
+        const played = rules.play(position, { staticOpponent: true }, move.san);
+        if (played === null) return false;
+        const occupant = played.position.pieces[verify.square];
+        if (occupant === undefined || occupant.color === kidColor) return false;
+        const afterAttackers = chessJsRules.attackers(played.position, verify.square, kidColor);
+        return afterAttackers.includes(move.to) && !beforeAttackers.has(move.from);
+      })
+      .map((move) => move.san);
+  }
+
+  if (verify.kind === 'save') {
+    const target = position.pieces[verify.square];
+    if (target === undefined || target.color !== kidColor) {
+      issues.push(
+        `${where}: verify "${verifyLabel}" requires the kid's own piece on ${verify.square}`,
+      );
+      return null;
+    }
+    if (isSafe(position, verify.square, chessJsRules)) {
+      issues.push(`${where}: verify "${verifyLabel}" requires that piece to not be safe yet`);
+      return null;
+    }
+    return candidates
+      .filter((move) => {
+        const played = rules.play(position, { staticOpponent: true }, move.san);
+        if (played === null) return false;
+        const finalSquare = move.from === verify.square ? move.to : verify.square;
+        return isSafe(played.position, finalSquare, chessJsRules);
+      })
+      .map((move) => move.san);
+  }
+
+  if (verify.kind === 'take-free') {
+    return candidates
+      .filter((move) => move.captured !== undefined && !isDefended(position, move.to, chessJsRules))
+      .map((move) => move.san);
+  }
+
+  // good-trade
+  return candidates
+    .filter((move) => {
+      if (move.captured === undefined) return false;
+      const classification = classifyTrade(
+        pieceValue(move.captured),
+        pieceValue(move.piece),
+        isDefended(position, move.to, chessJsRules),
+      );
+      return classification === 'good';
+    })
+    .map((move) => move.san);
+}
+
+/**
+ * A `best-move` exercise's optional `verify` (`lesson-schema.ts`): computes the exact set of legal
+ * kid moves satisfying the named rule and fails the build unless `solutions` equals that set,
+ * order-insensitive (SAN, check/mate marks ignored like the engine's own comparison). Load-time
+ * only: never affects the compiled `BestMoveDef`.
+ */
+function checkBestMoveVerify(
+  exercise: BestMoveDef,
+  verify: string | undefined,
+  where: string,
+  issues: string[],
+): void {
+  if (verify === undefined) {
+    return;
+  }
+  const parsed = parseBestMoveVerify(verify);
+  const computed = computeVerifiedBestMoves(parsed, exercise.position, where, verify, issues);
+  if (computed === null) {
+    return; // precondition issue already pushed
+  }
+  if (computed.length === 0) {
+    issues.push(`${where}: verify "${verify}" computed no matching move (unsolvable as authored)`);
+    return;
+  }
+  const computedSet = new Set(computed.map(normalizeSan));
+  const authoredSet = new Set(exercise.solutions.map(normalizeSan));
+  const matches =
+    computedSet.size === authoredSet.size && [...computedSet].every((san) => authoredSet.has(san));
+  if (!matches) {
+    const expected = [...computedSet].sort().join(', ');
+    const authored = [...authoredSet].sort().join(', ');
+    issues.push(
+      `${where}: verify "${verify}": solutions should be [${expected}], authored [${authored}]`,
     );
   }
 }
@@ -262,7 +502,7 @@ function compileExercise(
     return exercise;
   }
   if (raw.type === 'best-move') {
-    return {
+    const exercise: BestMoveDef = {
       id: raw.id,
       concept,
       textKey,
@@ -271,6 +511,8 @@ function compileExercise(
       solutions: raw.solutions,
       ...easier,
     };
+    checkBestMoveVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
+    return exercise;
   }
   if (raw.type === 'setup') {
     const target = compilePosition(relPath, `${fieldPath}.target.board`, raw.target, issues);
