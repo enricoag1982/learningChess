@@ -13,19 +13,19 @@ const PALETTE = {
   b: { fill: '#2B2F36', stroke: '#111418', detail: 'rgba(255,255,255,0.45)' },
 } as const;
 
-const STROKE_WIDTH = 1.8;
+const STROKE_WIDTH = 2;
 
-/** Rounded base every piece stands on. */
+/** Rounded base every piece stands on (chunky: ~31 wide, sits at the very bottom of the viewBox). */
 function Base(): JSX.Element {
-  return <rect x={9} y={35.5} width={27} height={5} rx={2.5} />;
+  return <rect x={7} y={37} width={31} height={5} rx={2.5} />;
 }
 
 function Pawn(): JSX.Element {
   return (
     <>
       <Base />
-      <path d="M16,34 C15,27 16.5,23 22.5,20 C28.5,23 30,27 29,34 Z" />
-      <circle cx={22.5} cy={13.5} r={6} />
+      <path d="M12.5,38 C11,28.5 14,21.5 22.5,17.5 C31,21.5 34,28.5 32.5,38 Z" />
+      <circle cx={22.5} cy={11.5} r={7.5} />
     </>
   );
 }
@@ -34,28 +34,29 @@ function Rook(): JSX.Element {
   return (
     <>
       <Base />
-      <rect x={12.5} y={17} width={20} height={17} rx={2} />
-      <rect x={12} y={15} width={21} height={5} rx={1.5} />
-      <rect x={11.5} y={9} width={6} height={8} rx={1.8} />
-      <rect x={19.5} y={9} width={6} height={8} rx={1.8} />
-      <rect x={27.5} y={9} width={6} height={8} rx={1.8} />
+      <rect x={10} y={19} width={25} height={19} rx={2} />
+      <rect x={9.5} y={15.5} width={26} height={5.5} rx={1.5} />
+      <rect x={9.5} y={5} width={7} height={11} rx={1.8} />
+      <rect x={19} y={5} width={7} height={11} rx={1.8} />
+      <rect x={28.5} y={5} width={7} height={11} rx={1.8} />
     </>
   );
 }
 
 function Bishop({ color }: { readonly color: Color }): JSX.Element {
-  // The mitre slit is a light cut into the fill: dark line on white, pale line on black.
+  // The mitre slit is a single diagonal chord cut across the ball: dark line on white, pale on
+  // black. It must never cross another drawn line, or it reads as an X.
   const slitStroke = color === 'w' ? PALETTE.w.stroke : PALETTE.b.detail;
   return (
     <>
       <Base />
-      <path d="M14.5,34 C13.5,25 14.5,20 18,17 C15.5,15 15.5,12.5 18,11 C20,13 22,13 22.5,10.5 C23,13 25,13 27,11 C29.5,12.5 29.5,15 27,17 C30.5,20 31.5,25 30.5,34 Z" />
-      <circle cx={22.5} cy={7.5} r={3} />
+      <path d="M13,38 C11,28 13.5,21 18,17.5 C15.5,15 15.5,11.5 18.5,9.5 L26.5,9.5 C29.5,11.5 29.5,15 27,17.5 C31.5,21 34,28 32,38 Z" />
+      <circle cx={22.5} cy={6.5} r={3.6} />
       <path
-        d="M19,16.5 L26,20.5"
+        d="M19.5,8 L25,4.3"
         fill="none"
         stroke={slitStroke}
-        strokeWidth={1.6}
+        strokeWidth={1.8}
         strokeLinecap="round"
       />
     </>
@@ -63,30 +64,71 @@ function Bishop({ color }: { readonly color: Color }): JSX.Element {
 }
 
 function Knight({ color }: { readonly color: Color }): JSX.Element {
-  // Eye/nostril read as shapes cut into the fill, so they show on both colours: dark ink on
+  // Eye/nostril/mane read as marks cut into the fill, so they show on both colours: dark ink on
   // white, a pale line on black.
   const markStroke = color === 'w' ? PALETTE.w.stroke : PALETTE.b.detail;
   return (
     <>
       <Base />
-      {/* Horse head + neck, facing left: a sharp muzzle at the left, arched mane over the top. */}
+      {/* Horse head + neck in profile, facing left: a separate pointed ear sits on the poll; the
+          head/neck silhouette reads (front to back) a long, slightly convex nose bridge down to
+          a sharp muzzle point, a straight mouth edge back to the jaw, a concave throat notch (the
+          classic knight "waist"), a convex chest down to the base, then a convex mane-side neck
+          arching back up to the poll. */}
       <path
-        d="M8,20
-           C7,18.5 7.5,16.5 9,15
-           C11,12.5 13,10.5 16,9
-           C20,7 25,7 29,9.5
-           C33,12 34,16 33,21
-           C32,26 31.5,30.5 31,35
-           L14,35
-           C13,31 11.5,27.5 10.5,24
-           C9.5,22.5 8.5,21 8,20
+        d="M23,7
+           C26,7.5 29,9.5 31.5,13
+           C34,16.5 35,20 35,24
+           C35,27.5 34.5,31 34,34
+           C33.8,35.5 34,36.8 34,38
+           L22,38
+           C20,34 18,31 17,27
+           C17,24 15,21.5 12,23
+           L7,19.5
+           L2,16
+           C5,12.5 9,9.5 14,7.5
+           C15.5,6.5 17,6 18.5,5.5
+           C20,4 21.5,4.5 23,7
            Z"
       />
-      {/* pointed ear */}
-      <path d="M21,9 C19,5.5 22,1.5 26,3 C28,4.5 27,8 23,9.5 Z" />
-      <circle cx={14} cy={13.5} r={1.4} fill={markStroke} stroke="none" />
+      {/* pointed ear, on top of the poll */}
+      <path d="M18.5,6.5 C16.8,3 20,0.5 23,3 C24,5 22.5,7.8 19.5,8.8 Z" />
+      {/* eye */}
+      <circle cx={11} cy={9} r={1.8} fill={markStroke} stroke="none" />
+      {/* nostril, near the muzzle tip */}
+      <circle cx={4.5} cy={16.5} r={1.2} fill={markStroke} stroke="none" />
+      {/* mouth line, from the muzzle tip back to the jaw corner */}
       <path
-        d="M9.5,17.5 C10.3,18.3 11.3,18.4 12,17.9"
+        d="M5,18.5 L9,20.8"
+        fill="none"
+        stroke={markStroke}
+        strokeWidth={1.4}
+        strokeLinecap="round"
+      />
+      {/* mane ridge along the back of the neck */}
+      <path
+        d="M28,10 L25,11"
+        fill="none"
+        stroke={markStroke}
+        strokeWidth={1.3}
+        strokeLinecap="round"
+      />
+      <path
+        d="M32,14.5 L29,16"
+        fill="none"
+        stroke={markStroke}
+        strokeWidth={1.3}
+        strokeLinecap="round"
+      />
+      <path
+        d="M34.5,20 L31.5,21.5"
+        fill="none"
+        stroke={markStroke}
+        strokeWidth={1.3}
+        strokeLinecap="round"
+      />
+      <path
+        d="M34.5,27 L31,28.5"
         fill="none"
         stroke={markStroke}
         strokeWidth={1.3}
@@ -99,14 +141,22 @@ function Knight({ color }: { readonly color: Color }): JSX.Element {
 function Queen({ color }: { readonly color: Color }): JSX.Element {
   // The band under the crown is a shadow cut into the fill: dark on white, pale on black.
   const bandFill = color === 'w' ? PALETTE.w.stroke : PALETTE.b.detail;
-  const bandOpacity = color === 'w' ? 0.25 : 0.55;
+  const bandOpacity = color === 'w' ? 0.35 : 0.55;
   return (
     <>
       <Base />
-      <path d="M14,34 C13,26 14,21 17,18 C14.5,16 14.5,13.5 17,12 C19,14 21,14 22.5,11.5 C24,14 26,14 28,12 C30.5,13.5 30.5,16 28,18 C31,21 32,26 31,34 Z" />
-      <rect x={13} y={16} width={19} height={2.4} rx={1.2} fill={bandFill} opacity={bandOpacity} />
-      {[13.5, 18.5, 22.5, 26.5, 31.5].map((cx, index) => (
-        <circle key={cx} cx={cx} cy={9.5} r={index === 2 ? 3.4 : 2.7} />
+      <path d="M10.5,38 C8.5,28.5 10.5,22 12.5,18.5 L31.5,18.5 C33.5,22 35.5,28.5 33.5,38 Z" />
+      <rect
+        x={12.5}
+        y={16}
+        width={19}
+        height={3.2}
+        rx={1.6}
+        fill={bandFill}
+        opacity={bandOpacity}
+      />
+      {[12.5, 17.4, 22.5, 27.6, 32.5].map((cx, index) => (
+        <circle key={cx} cx={cx} cy={9} r={index === 2 ? 3.3 : 2.6} />
       ))}
     </>
   );
@@ -119,18 +169,18 @@ function King({ color }: { readonly color: Color }): JSX.Element {
   return (
     <>
       <Base />
-      <path d="M15,34 C14,26 15,21.5 18,18.5 C16,16.5 16,14.5 18,13 C20,15 22,15 22.5,13 C23,15 25,15 27,13 C29,14.5 29,16.5 27,18.5 C30,21.5 31,26 30,34 Z" />
+      <path d="M11,38 C9,28 11.5,21 16,17.5 L29,17.5 C33.5,21 36,28 34,38 Z" />
       <rect
-        x={13.5}
-        y={17}
-        width={18}
-        height={5}
+        x={15}
+        y={15}
+        width={15}
+        height={5.5}
         rx={1.8}
         fill={accentFill}
         opacity={bandOpacity}
       />
-      <rect x={21} y={5} width={3} height={9} rx={1.2} fill={accentFill} />
-      <rect x={17.5} y={7.5} width={10} height={3} rx={1.2} fill={accentFill} />
+      <rect x={21} y={3} width={3} height={12} rx={1.2} fill={accentFill} />
+      <rect x={17} y={6} width={10} height={3} rx={1.2} fill={accentFill} />
     </>
   );
 }
@@ -167,7 +217,7 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
         <Shape color={piece.color} />
       </g>
       {piece.color === 'b' && (
-        <g fill="none" stroke={colours.detail} strokeWidth={1.1} strokeLinecap="round">
+        <g fill="none" stroke={colours.detail} strokeWidth={1.3} strokeLinecap="round">
           <ShadeLines type={piece.type} />
         </g>
       )}
@@ -179,22 +229,22 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
 function ShadeLines({ type }: { readonly type: PieceType }): JSX.Element {
   switch (type) {
     case 'p':
-      return <path d="M19,26 C19,22.5 20.5,20.5 22.5,19.5" />;
+      return <path d="M17,33 C17,26.5 19.5,22.5 22.5,20" />;
     case 'r':
       return (
         <>
-          <path d="M15,20 L15,32" />
-          <path d="M30,20 L30,32" />
+          <path d="M16,22 L16,35" />
+          <path d="M29,22 L29,35" />
         </>
       );
     case 'b':
-      return <path d="M18.5,25 C18,20 19.5,15.5 22.5,12.5" />;
+      return <path d="M17.5,32 C16,23 18,16 22,11" />;
     case 'n':
-      return <path d="M12,29 C10.5,24 11,19 14.5,15" />;
+      return <path d="M15,29 C12,25 9,20 5,17" />;
     case 'q':
-      return <path d="M18,27 C17,20 18.5,15 22.5,12.5" />;
+      return <path d="M13.5,32 C11.5,24 13,19 15,18.5" />;
     case 'k':
-      return <path d="M18.5,27 C17.5,21 18.5,16.5 21,14" />;
+      return <path d="M14,32 C12,24 14,18.5 16,17.5" />;
   }
 }
 

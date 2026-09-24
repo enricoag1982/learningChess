@@ -425,7 +425,7 @@ export function Board({
                       {captureFade && captureFade.square === square && (
                         <span
                           aria-hidden="true"
-                          className="chess-capture-fade pointer-events-none absolute inset-[8%]"
+                          className="chess-capture-fade pointer-events-none absolute inset-[2%]"
                           onAnimationEnd={() => {
                             setCaptureFade(null);
                           }}
@@ -437,7 +437,7 @@ export function Board({
                       {piece && !isDraggingThis && (
                         <span
                           aria-hidden="true"
-                          className={`pointer-events-none absolute inset-[6%] ${
+                          className={`pointer-events-none absolute inset-[2%] ${
                             slide?.square === square ? 'chess-piece-slide' : ''
                           }`}
                           style={
@@ -458,7 +458,7 @@ export function Board({
                       {!piece && isStar && (
                         <span
                           aria-hidden="true"
-                          className="pointer-events-none absolute inset-[22%]"
+                          className="pointer-events-none absolute inset-[15%]"
                         >
                           <StarIcon />
                         </span>
@@ -475,7 +475,7 @@ export function Board({
                       {starPop === square && (
                         <span
                           aria-hidden="true"
-                          className="chess-star-pop pointer-events-none absolute inset-[22%]"
+                          className="chess-star-pop pointer-events-none absolute inset-[15%]"
                           onAnimationEnd={() => {
                             setStarPop(null);
                           }}
