@@ -86,6 +86,30 @@ function HorseFace(): JSX.Element {
   );
 }
 
+/** Flat caterpillar head: round segments and small antennae (pawn's story: creeps forward, transforms at the last row). */
+function CaterpillarFace(): JSX.Element {
+  return (
+    <svg viewBox="0 0 100 100" aria-hidden="true" className="h-full w-full">
+      <circle cx={30} cy={70} r={16} fill="#8FBB8A" />
+      <circle cx={54} cy={66} r={19} fill="#9FC99A" />
+      <circle cx={50} cy={40} r={24} fill="#AFDBA9" />
+      <path d="M40 22 L34 8" stroke="#6E9C69" strokeWidth={4} strokeLinecap="round" fill="none" />
+      <path d="M58 22 L66 9" stroke="#6E9C69" strokeWidth={4} strokeLinecap="round" fill="none" />
+      <circle cx={34} cy={8} r={4} fill="#6E9C69" />
+      <circle cx={66} cy={9} r={4} fill="#6E9C69" />
+      <circle cx={41} cy={38} r={5} fill="#33463A" />
+      <circle cx={59} cy={38} r={5} fill="#33463A" />
+      <path
+        d="M42 50 Q50 56 58 50"
+        stroke="#33463A"
+        strokeWidth={3}
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 /** Placeholder character portrait, keyed by character id; falls back to a plain badge. */
 export function CharacterIcon({ character }: { readonly character: string }): JSX.Element {
   if (character === 'rhino') {
@@ -102,6 +126,9 @@ export function CharacterIcon({ character }: { readonly character: string }): JS
   }
   if (character === 'horse') {
     return <HorseFace />;
+  }
+  if (character === 'caterpillar') {
+    return <CaterpillarFace />;
   }
   if (character === 'owl') {
     return <OwlIcon />;

@@ -2,16 +2,21 @@ import type { Page } from '@playwright/test';
 import type {
   BestMoveDef,
   ChoiceDef,
+  Color,
   CompiledContent,
   ExerciseDef,
   Lesson,
   MiniGame,
+  Move,
+  Piece,
+  PieceType,
   Position,
   SelectSquaresDef,
   SetupDef,
   Square,
   TracksCatalog,
   VariantRules,
+  VersusMiniGame,
   YesNoDef,
 } from '@chess-kids/core';
 import { chessJsRules, createVariantRules, SQUARES, solve, worldLessons } from '@chess-kids/core';
@@ -60,9 +65,20 @@ export function isOwlTaught(lesson: Lesson): boolean {
   return lesson.character === 'owl';
 }
 
-/** True for an exercise/guided-try type that moves one piece across the board (has a slide animation). */
+/**
+ * True for an exercise/guided-try type that moves one piece across the board (has a slide
+ * animation). `best-move` is deliberately excluded: unlike collect-stars/capture, a wrong attempt
+ * there bounces back without changing the position (nothing to undo), so `exercise-play-area.tsx`
+ * shows no Undo button or moves counter for it — only `firstMoveOf`-style single-move solving.
+ */
 export function isMoveCountedExercise(def: ExerciseDef): boolean {
-  return def.type === 'collect-stars' || def.type === 'capture' || def.type === 'best-move';
+  return def.type === 'collect-stars' || def.type === 'capture';
+}
+
+/** True for a type whose solved position is reached by playing exactly one piece move (a slide or
+ * bounce-back animation): `collect-stars`/`capture` (via a solver line) plus `best-move`. */
+export function movesAPiece(def: ExerciseDef): boolean {
+  return isMoveCountedExercise(def) || def.type === 'best-move';
 }
 
 /** Replaces every `{{key}}` in a compiled text template with `String(vars[key])`. */
@@ -211,9 +227,13 @@ export function findMiniGame(id: string): MiniGame {
 /** Answer squares for a select-squares exercise, the same way the engine resolves them. */
 export function selectSquaresAnswer(def: SelectSquaresDef): readonly Square[] {
   if ('squares' in def.answer) return def.answer.squares;
-  return rules
+  const targets = rules
     .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
     .map((move) => move.to);
+  // A promoting pawn's legal moves include one entry per promotion piece, all sharing the same
+  // `to` (e.g. 4 pushes to d8): de-duplicated, or a caller clicking every entry toggles that
+  // square an even number of times (ending unselected) instead of once.
+  return [...new Set(targets)];
 }
 
 /** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
@@ -316,10 +336,143 @@ export async function completeExercise(page: Page, def: ExerciseDef): Promise<vo
   await page.getByRole('button', { name: /^Next/ }).click();
 }
 
+/** Reverse-lookup maps (rendered English word → chess letter) for `readVersusPieces`. */
+const COLOR_WORDS: Readonly<Record<string, Color>> = {
+  [contentText('board.color.w')]: 'w',
+  [contentText('board.color.b')]: 'b',
+};
+const PIECE_WORDS: Readonly<Record<string, PieceType>> = {
+  [contentText('board.piece.p')]: 'p',
+  [contentText('board.piece.n')]: 'n',
+  [contentText('board.piece.b')]: 'b',
+  [contentText('board.piece.r')]: 'r',
+  [contentText('board.piece.q')]: 'q',
+  [contentText('board.piece.k')]: 'k',
+};
+
+/**
+ * Reads the current board straight from the rendered squares' accessible names (Board.tsx's
+ * `describeSquare`: `"<square>, <color> <piece>[, <state>]"`), the only way a Playwright spec can
+ * see a `versus` boss's position — it evolves live against the real bot, so there is no content
+ * definition to read it from partway through, unlike every other exercise type.
+ */
+async function readVersusPieces(page: Page): Promise<Partial<Record<Square, Piece>>> {
+  // One round trip for every square's aria-label (`page.evaluate`), not 64 (one `getAttribute`
+  // each) — the difference between a `versus` boss finishing in seconds or in minutes, since this
+  // runs once per kid move for as long as the game against the bot lasts.
+  const labels = await page.evaluate(() =>
+    [...document.querySelectorAll('[role="gridcell"] button')].map((element) =>
+      element.getAttribute('aria-label'),
+    ),
+  );
+  const pieces: Partial<Record<Square, Piece>> = {};
+  for (const label of labels) {
+    // `\w+` (not `\S+`): a danger/selected/etc. suffix follows as ", in danger" — a comma right
+    // after the piece word, which `\S+` would swallow (e.g. "pawn," failing every colour/piece
+    // lookup below and silently dropping that square, exactly the pieces a versus boss most
+    // needs — its own attacked, undefended ones).
+    const match = label === null ? null : /^([a-h][1-8]), (\w+) (\w+)/.exec(label);
+    if (match === null) continue;
+    const [, square, colorWord, pieceWord] = match;
+    const color = colorWord === undefined ? undefined : COLOR_WORDS[colorWord];
+    const type = pieceWord === undefined ? undefined : PIECE_WORDS[pieceWord];
+    if (square !== undefined && color !== undefined && type !== undefined) {
+      pieces[square as Square] = { color, type };
+    }
+  }
+  return pieces;
+}
+
+/** Ranks advanced toward promotion (0 = still on the back rank). */
+function pawnAdvance(move: Move, color: Color): number {
+  const rank = Number(move.to[1]);
+  return color === 'w' ? rank - 1 : 8 - rank;
+}
+
+/** True when no enemy pawn attacks `move.to` once `move` is played. */
+function isSafeAfter(position: Position, move: Move, kidColor: Color): boolean {
+  const played = chessJsRules.play(position, move);
+  if (played === null) return false;
+  const opponent: Color = kidColor === 'w' ? 'b' : 'w';
+  return chessJsRules.attackers(played.position, move.to, opponent).length === 0;
+}
+
+/**
+ * The e2e kid policy for a `versus` boss (Pawn Wars): capture if possible, else push the most
+ * advanced pawn that stays safe (no enemy pawn would then attack it), else any legal move.
+ */
+function chooseKidVersusMove(
+  pieces: Partial<Record<Square, Piece>>,
+  kidColor: Color,
+): { readonly from: Square; readonly to: Square } {
+  const position: Position = {
+    pieces,
+    markers: { stars: [], blocked: [] },
+    toMove: kidColor,
+    castling: '-',
+    enPassant: null,
+  };
+  const legalMoves = chessJsRules.legalMoves(position);
+  const capture = legalMoves.find((move) => move.captured !== undefined);
+  if (capture !== undefined) return capture;
+
+  const byAdvance = [...legalMoves].sort(
+    (a, b) => pawnAdvance(b, kidColor) - pawnAdvance(a, kidColor),
+  );
+  const safe = byAdvance.find((move) => isSafeAfter(position, move, kidColor));
+  const chosen = safe ?? byAdvance[0];
+  if (chosen === undefined) {
+    throw new Error('chooseKidVersusMove: no legal move for the kid');
+  }
+  return chosen;
+}
+
+/** Blocks until the versus panel shows the kid's turn, or the game has ended either way. */
+export async function waitForVersusTurnOrEnd(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const panel = document.querySelector('[data-versus-status]');
+      if (panel === null) return true;
+      const status = panel.getAttribute('data-versus-status');
+      const turn = panel.getAttribute('data-versus-turn');
+      return status !== 'playing' || turn === 'kid';
+    },
+    undefined,
+    { timeout: 15000 },
+  );
+}
+
+/**
+ * Plays exactly one kid move in a `versus` boss (the a11y walk's mid-game deep scan needs this on
+ * its own; `playVersusBoss` below just loops it to the end). Assumes it is already the kid's turn.
+ */
+export async function playOneKidVersusMove(page: Page, game: VersusMiniGame): Promise<void> {
+  const pieces = await readVersusPieces(page);
+  const move = chooseKidVersusMove(pieces, game.kidColor);
+  await clickSquare(page, move.from);
+  await clickSquare(page, move.to);
+}
+
+/**
+ * Plays a `versus` boss (Pawn Wars) to its end against the real (seeded or not) bot, using
+ * `chooseKidVersusMove` for every kid move. Leaves the page on the result panel, before its
+ * "Next" tap (`completeBoss` does that once, for every mini-game mode).
+ */
+export async function playVersusBoss(page: Page, game: VersusMiniGame): Promise<void> {
+  for (;;) {
+    await waitForVersusTurnOrEnd(page);
+    const status = await page.locator('[data-versus-status]').getAttribute('data-versus-status');
+    if (status !== 'playing') return;
+
+    await playOneKidVersusMove(page, game);
+  }
+}
+
 /**
  * Solves a lesson's boss mini-game, then advances past its result panel. `static` games are
  * solved with the solver line for their goal (`capture-all` or `collect-stars`); `series` games
- * play each round like an exercise, tapping Next between rounds.
+ * play each round like an exercise, tapping Next between rounds; `versus` games are played out
+ * against the real bot via `playVersusBoss`.
  */
 export async function completeBoss(page: Page, game: MiniGame): Promise<void> {
   if (game.mode === 'series') {
@@ -327,6 +480,8 @@ export async function completeBoss(page: Page, game: MiniGame): Promise<void> {
       await solveExercise(page, round);
       await page.getByRole('button', { name: /^Next/ }).click();
     }
+  } else if (game.mode === 'versus') {
+    await playVersusBoss(page, game);
   } else {
     const goal = game.goal === 'collect-stars' ? 'collect-stars' : 'capture';
     await playSolveLine(page, game.position, goal);

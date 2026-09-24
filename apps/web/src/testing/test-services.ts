@@ -1,5 +1,6 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
 import { chessJsRules, createVariantRules } from '@chess-kids/core';
+import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
@@ -38,5 +39,6 @@ export function createTestServices(
     deps,
     rules: createVariantRules(chessJsRules),
     narrator: createWebSpeechNarrator(),
+    botPlayer: createWorkerBotPlayer(),
   };
 }

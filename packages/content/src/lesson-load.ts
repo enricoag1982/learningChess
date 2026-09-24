@@ -5,6 +5,7 @@ import type {
   CaptureDef,
   ChoiceOption,
   CollectStarsDef,
+  Color,
   CompiledContent,
   DemoHighlight,
   ExerciseDef,
@@ -14,12 +15,14 @@ import type {
   Position,
   SetupDef,
   Square,
+  VersusMiniGame,
 } from '@chess-kids/core';
 import {
   DiagramError,
   FenError,
   chessJsRules,
   createVariantRules,
+  game,
   optimalMoves,
   parseDiagram,
   parseFen,
@@ -31,6 +34,7 @@ import type { LocaleTree } from './schema.ts';
 import {
   type ChoiceOptionYaml,
   type ExerciseYaml,
+  type WinConditionYaml,
   lessonSchema,
   miniGameSchema,
 } from './lesson-schema.ts';
@@ -253,6 +257,49 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
   };
 }
 
+/** One authored win condition (`lesson-schema.ts`'s `winConditionSchema`) → domain `WinCondition`. */
+function compileWinCondition(raw: WinConditionYaml): game.WinCondition {
+  if (typeof raw === 'string') {
+    return { kind: raw };
+  }
+  if ('capture' in raw) {
+    return { kind: 'capture', piece: raw.capture as Piece['type'] };
+  }
+  if ('reach' in raw) {
+    return { kind: 'reach', squares: raw.reach as readonly Square[] };
+  }
+  return { kind: 'survive', moves: raw.survive };
+}
+
+/**
+ * A `versus` mini-game's authored `rules` (kid/opponent win lists) → `GameRulesDef` (`w`/`b` win
+ * lists), by `kidColor`. `checkRules` is derived from `kings`: check/checkmate/stalemate only ever
+ * apply when both kings are on the board (`domain-model.md` §1.4).
+ */
+function compileVersusRules(
+  raw: {
+    readonly kings: boolean;
+    readonly noMoves: 'lose' | 'draw';
+    readonly win: {
+      readonly kid: readonly WinConditionYaml[];
+      readonly opponent: readonly WinConditionYaml[];
+    };
+  },
+  kidColor: Color,
+  moveLimit: number | undefined,
+): game.GameRulesDef {
+  const kidWin = raw.win.kid.map(compileWinCondition);
+  const opponentWin = raw.win.opponent.map(compileWinCondition);
+  const win = kidColor === 'w' ? { w: kidWin, b: opponentWin } : { w: opponentWin, b: kidWin };
+  return {
+    kings: raw.kings,
+    checkRules: raw.kings,
+    noMoves: raw.noMoves,
+    win,
+    ...(moveLimit === undefined ? {} : { moveLimit }),
+  };
+}
+
 function compileMiniGameFile(filePath: string, relPath: string, issues: string[]): MiniGame | null {
   let raw: string;
   try {
@@ -289,6 +336,27 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
       rounds,
       errors3: data.errors3,
       errors2: data.errors2,
+      titleKey: `lessons:${data.title}`,
+      goalKey: `lessons:${data.goal}`,
+      unlockAfter: data.unlockAfter,
+    };
+  }
+
+  if (data.mode === 'versus') {
+    const versusPosition = compilePosition(relPath, 'board', data, issues);
+    if (versusPosition === null) {
+      return null;
+    }
+    const kidColor = data.kidColor ?? 'w';
+    return {
+      mode: 'versus',
+      id: data.id,
+      concept: data.concept,
+      rules: compileVersusRules(data.rules, kidColor, data.moveLimit),
+      position: versusPosition,
+      opponentLevel: data.opponent.bot as 1 | 2 | 3 | 4 | 5,
+      kidColor,
+      ...(data.par === undefined ? {} : { par: data.par }),
       titleKey: `lessons:${data.title}`,
       goalKey: `lessons:${data.goal}`,
       unlockAfter: data.unlockAfter,
@@ -434,11 +502,38 @@ function checkOptimalMoves(
   }
 }
 
+/**
+ * `versus` mini-game checks (domain-model.md §1.4: "position valid, win conditions valid"): the
+ * board matches `rules.kings` (both present / both absent), and the game is not already over at
+ * its own start position (an instant win/draw there means the boss is unplayable).
+ */
+function checkVersusMiniGame(miniGame: VersusMiniGame, where: string, issues: string[]): void {
+  const hasKing = (color: 'w' | 'b'): boolean =>
+    Object.values(miniGame.position.pieces).some(
+      (piece) => piece.type === 'k' && piece.color === color,
+    );
+  if (miniGame.rules.kings && (!hasKing('w') || !hasKing('b'))) {
+    issues.push(`${where}: rules.kings is true but the start position is missing a king`);
+  }
+  if (!miniGame.rules.kings && (hasKing('w') || hasKing('b'))) {
+    issues.push(`${where}: rules.kings is false but the start position has a king`);
+  }
+  const started = game.startGame(miniGame.rules, miniGame.position);
+  const result = game.gameResult(started, chessJsRules);
+  if (result.kind !== 'ongoing') {
+    issues.push(`${where}: the game is already over at its start position (${result.kind})`);
+  }
+}
+
 function checkMiniGame(miniGame: MiniGame, where: string, issues: string[]): void {
   if (miniGame.mode === 'series') {
     for (const [index, round] of miniGame.rounds.entries()) {
       checkExerciseShape(round, `${where}: rounds[${String(index)}]`, issues);
     }
+    return;
+  }
+  if (miniGame.mode === 'versus') {
+    checkVersusMiniGame(miniGame, where, issues);
     return;
   }
   const shared = {

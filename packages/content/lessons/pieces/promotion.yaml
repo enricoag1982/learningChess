@@ -1,0 +1,125 @@
+id: promotion
+world: pieces
+order: 7
+concept: promotion
+character: caterpillar
+title: promotion.title
+story: promotion.story
+demo:
+  board: |
+    . . . . . . . .
+    . . . P . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+  text: promotion.demo
+  highlight: legal-moves d7
+guided:
+  - id: promotion-g1
+    type: best-move
+    text: promotion-g1
+    board: |
+      . . . . . . . .
+      . . . . P . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [e8=Q]
+  - id: promotion-g2
+    type: choice
+    text: promotion-g2
+    board: |
+      . . . . . . . .
+      . . . . P . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    options:
+      - { id: queen, piece: Q }
+      - { id: rook, piece: R }
+      - { id: bishop, piece: B }
+      - { id: knight, piece: N }
+    answer: queen
+exercises:
+  - id: promotion-01
+    type: best-move
+    text: promotion-01
+    board: |
+      . . . . . . . .
+      . P . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [b8=Q]
+  - id: promotion-02
+    type: choice
+    text: promotion-02
+    board: |
+      . . . . . . . .
+      . . . . . . P .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    options:
+      - { id: queen, piece: Q }
+      - { id: rook, piece: R }
+      - { id: bishop, piece: B }
+      - { id: knight, piece: N }
+    answer: queen
+  - id: promotion-03
+    type: best-move
+    text: promotion-03
+    board: |
+      . . . n r . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [dxe8=Q]
+  - id: promotion-04
+    type: select-squares
+    text: promotion-04
+    board: |
+      . . . . r . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    derive: legal-moves
+    from: d7
+  - id: promotion-05
+    type: yes-no
+    text: promotion-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: 'no'
+    focus: d5
+boss: pawn-wars

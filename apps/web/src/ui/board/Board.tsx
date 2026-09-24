@@ -36,6 +36,8 @@ export interface BoardHighlights {
    * bounces back; the position itself never changes, so this is a distinct field from `lastMove`.
    */
   readonly wrongMove?: { readonly from: Square; readonly to: Square };
+  /** Steady orange ring: a `versus` boss's own piece that is attacked and undefended. */
+  readonly danger?: readonly Square[];
 }
 
 export interface BoardProps {
@@ -73,6 +75,7 @@ function describeSquare(
   selected: boolean,
   target: boolean,
   focus: boolean,
+  danger: boolean,
 ): string {
   const piece = position.pieces[square];
   let base: string;
@@ -92,6 +95,7 @@ function describeSquare(
   if (selected) return t('board.square.selected', { base });
   if (target) return t('board.square.possible-move', { base });
   if (focus) return t('board.square.focus', { base });
+  if (danger) return t('board.square.danger', { base });
   return base;
 }
 
@@ -408,6 +412,7 @@ export function Board({
                 const isHint = highlights?.hint?.includes(square) ?? false;
                 const isWrong = highlights?.wrong?.includes(square) ?? false;
                 const isFocus = highlights?.focus?.includes(square) ?? false;
+                const isDanger = highlights?.danger?.includes(square) ?? false;
                 const isStar = position.markers.stars.includes(square);
                 const isBlocked = position.markers.blocked.includes(square);
                 const isDraggingThis = drag?.from === square && drag.dragging;
@@ -418,6 +423,7 @@ export function Board({
                   tapSelected || squareModeSelected,
                   isTarget,
                   isFocus,
+                  isDanger,
                 );
 
                 return (
@@ -563,6 +569,12 @@ export function Board({
                         <span
                           aria-hidden="true"
                           className="pointer-events-none absolute inset-[6%] rounded-md border-4 border-info"
+                        />
+                      )}
+                      {isDanger && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-[8%] rounded-full border-4 border-today"
                         />
                       )}
 

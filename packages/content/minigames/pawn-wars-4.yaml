@@ -1,0 +1,25 @@
+id: pawn-wars-4
+concept: pawn-move
+unlockAfter: pawn
+mode: versus
+title: pawn-wars-4.title
+goal: pawn-wars-4.goal
+board: |
+  . . . . . . . .
+  . . p p p p . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . . . . . . .
+  . . P P P P . .
+  . . . . . . . .
+rules:
+  kings: false
+  noMoves: lose
+  win:
+    kid: [promote, capture-all]
+    opponent: [promote, capture-all]
+moveLimit: 20
+opponent:
+  bot: 1
+par: 8

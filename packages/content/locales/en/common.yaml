@@ -125,6 +125,7 @@ board:
     selected: '{{base}}, selected'
     possible-move: '{{base}}, possible move'
     focus: '{{base}}, look here'
+    danger: '{{base}}, in danger'
 story:
   listen-again: Listen again
   primary: Let me try
@@ -177,6 +178,23 @@ boss:
     round-of: 'Round {{current}} of {{total}}'
     mistakes_one: '{{count}} mistake so far'
     mistakes_other: '{{count}} mistakes so far'
+  versus:
+    bot-name:
+      mouse: Mouse
+      rabbit: Rabbit
+      fox: Fox
+      wolf: Wolf
+      bear: Bear
+    moves: 'Your moves: {{count}}'
+    take-back: Take back
+    thinking: '{{name}} is thinking…'
+    bot-moved: '{{name}} moved a {{piece}}.'
+    bot-captured: '{{name}} took your {{piece}}!'
+    kid-captured: 'You took a {{piece}}!'
+    your-turn: Your turn!
+    won: You won!
+    lost: Good game! Want to try again?
+    draw: "It's a draw! Want to try again?"
 complete:
   title: Lesson complete!
   stars-pill: '+{{count}} stars'

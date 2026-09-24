@@ -1,5 +1,6 @@
-import type { AppDeps, Narrator, VariantRules } from '@chess-kids/core';
+import type { AppDeps, BotPlayer, Narrator, VariantRules } from '@chess-kids/core';
 import { chessJsRules, createVariantRules } from '@chess-kids/core';
+import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
@@ -16,6 +17,7 @@ export interface Services {
   readonly deps: AppDeps;
   readonly rules: VariantRules;
   readonly narrator: Narrator;
+  readonly botPlayer: BotPlayer;
 }
 
 /** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
@@ -36,5 +38,6 @@ export function createServices(storage: Storage = window.localStorage): Services
     deps,
     rules: createVariantRules(chessJsRules),
     narrator: createWebSpeechNarrator(),
+    botPlayer: createWorkerBotPlayer(),
   };
 }
