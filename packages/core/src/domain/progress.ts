@@ -28,6 +28,8 @@ export interface Attempt extends StoredRecord {
   readonly scored: boolean;
   /** `true` for a warm-up/practice review task; absent/`false` for a lesson exercise or mini-game. */
   readonly review?: boolean;
+  /** Set alongside `review`: which screen the task came from (rewards.md §4 "Warm-up Champ" counts `'warmup'` only — Today's inline warm-up and Practice's own "Daily warm-up" card, never a Practice topic run). */
+  readonly reviewSource?: 'warmup' | 'practice';
   /** First-try correct: solved with no error and no hint. */
   readonly correct: boolean;
   readonly stars: Stars;
@@ -181,6 +183,8 @@ export interface GameRecord extends StoredRecord {
   readonly reason: string;
   /** SAN moves played, in order (both sides). */
   readonly moves: readonly string[];
+  /** Colour this profile played; absent = White (every game vs the computer in v1). */
+  readonly color?: 'w' | 'b';
 }
 
 /**

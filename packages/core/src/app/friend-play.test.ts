@@ -154,7 +154,9 @@ describe('recordLocalMatch', () => {
       opponent: 'profile:alice',
       result: 'loss',
       reason: 'checkmate',
+      color: 'b',
     });
+    expect(alice?.color).toBe('w');
     expect(gameRecords.all).toHaveLength(2);
   });
 

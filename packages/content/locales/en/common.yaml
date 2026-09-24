@@ -313,3 +313,28 @@ den:
   friend-name: '{{character}}, friend'
   friend-name-locked: '{{character}}, locked, finish the {{piece}} lesson'
   friend-condition: 'Finish the {{piece}} lesson'
+badges:
+  heading: Badges
+  category-milestone: Milestones
+  category-skill: Skills
+  category-play: Play
+  category-habit: Habits
+  tile-earned: '{{name}}, earned'
+  tile-earned-tier: '{{name}}, {{tier}} tier, earned'
+  tile-locked: '{{name}}, locked. {{condition}}'
+  new-dot: New
+tier:
+  bronze: Bronze
+  silver: Silver
+  gold: Gold
+streak:
+  pill: '{{count}} day streak'
+  heading: Streak
+  current_one: '{{count}} day'
+  current_other: '{{count}} days'
+  best: 'Best: {{count}}'
+  none: Play today to start a streak!
+celebration:
+  heading: New badge!
+  owl-line: 'You earned the {{name}} badge!'
+  continue: Continue

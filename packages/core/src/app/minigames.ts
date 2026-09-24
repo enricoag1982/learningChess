@@ -7,6 +7,7 @@ import type { MiniGameProgress } from '../domain/progress.ts';
 import { recordMiniGamePlay } from '../domain/progress.ts';
 import { toFen } from '../domain/chess/fen.ts';
 import { recordGame, versusGameRecordResult } from './games.ts';
+import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** Board part of the standard chess start position's FEN. */
@@ -76,6 +77,11 @@ export async function saveMiniGamePlay(
       reason,
       moves: versusGameState(state).history.map((move) => move.san),
     });
+  } else {
+    // A `versus` play's own finish already runs this via `recordGame` above; `static`/`series`
+    // finishes have no `GameRecord` of their own, so this is their only "game finished" check
+    // (rewards.md §4) — also today's counted activity even for a mini-game with no badge riding on it.
+    await checkRewards(deps, profileId);
   }
 
   return updated;

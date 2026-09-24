@@ -11,6 +11,7 @@ import {
   completeExercise,
   completeFirstRun,
   contentText,
+  dismissCelebrationIfShown,
   findMiniGame,
   isMoveCountedExercise,
   journeyNodeName,
@@ -508,6 +509,10 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
     // Complete.
     await expect(page.getByText('Lesson complete!')).toBeVisible();
+    // M4.4: a newly earned badge celebrates first, its own "Continue" sharing this screen's own
+    // button text — dismissed here (scanned on its own in `rewards.spec.ts`) so the checks below,
+    // and the plain Continue click past them, see this screen alone, unambiguously.
+    await dismissCelebrationIfShown(page);
     if (!completeScanned) {
       await expectKidTouchTarget(page, /Play again/);
       await expectKidTouchTarget(page, /Continue/);

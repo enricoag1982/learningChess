@@ -1,3 +1,4 @@
+import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { Move } from '../domain/chess/rules.ts';
 import type { GameState } from '../domain/game/types.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
@@ -6,6 +7,8 @@ import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
+import type { SessionLog } from '../domain/session-log.ts';
+import type { Streak } from '../domain/streak.ts';
 
 /** Persistence of child profiles. Async so cloud adapters can replace local ones. */
 export interface ProfileRepository {
@@ -45,6 +48,23 @@ export interface GameRecordRepository {
   add(record: GameRecord): Promise<void>;
   listByProfile(profileId: string): Promise<GameRecord[]>;
   /** Deletes every game record for a profile (parent area "Delete"). */
+  deleteProfileData(profileId: string): Promise<void>;
+}
+
+/**
+ * Persistence of `EarnedBadge` / `Streak` / `SessionLog` (domain-model.md §2, M4.4). Kept separate
+ * from `ProgressRepository` — same reasoning as `GameRecordRepository`: these are reward/habit
+ * records, not lesson/mastery state.
+ */
+export interface RewardsRepository {
+  addEarnedBadge(badge: EarnedBadge): Promise<void>;
+  listEarnedBadges(profileId: string): Promise<EarnedBadge[]>;
+  saveEarnedBadge(badge: EarnedBadge): Promise<void>;
+  getStreak(profileId: string): Promise<Streak | undefined>;
+  saveStreak(streak: Streak): Promise<void>;
+  getSessionLog(profileId: string, date: string): Promise<SessionLog | undefined>;
+  saveSessionLog(log: SessionLog): Promise<void>;
+  /** Deletes every earned badge, the streak, and every session-log row for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 
@@ -102,6 +122,12 @@ export interface ContentSource {
    * (`import tracks from '@chess-kids/content/tracks.json'`) and into its test fixtures.
    */
   catalog?(): TracksCatalog;
+  /**
+   * The badge catalogue (built from `packages/content/badges.yaml`, M4.4). Optional for the same
+   * reason `catalog` is: every existing `ContentSource` (real or test fixture) keeps typechecking
+   * unchanged; a fixture that never calls `evaluateBadges` simply never wires this up.
+   */
+  badges?(): readonly BadgeDef[];
 }
 
 /** Current time; injected for deterministic tests. */

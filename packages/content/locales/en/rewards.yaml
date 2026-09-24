@@ -1,0 +1,90 @@
+badges:
+  board-explorer:
+    name: Board Explorer
+    condition: 'Master World 1: The Board'
+  piece-master:
+    name: Piece Master
+    condition: 'Master World 2: The Pieces'
+  guardian:
+    name: Guardian
+    condition: 'Master World 3: Attack & Defence'
+  checkmate-champion:
+    name: Checkmate Champion
+    condition: 'Master World 4: Check & Mate'
+  rule-master:
+    name: Rule Master
+    condition: 'Master World 5: Full Rules'
+  basics-graduate:
+    name: Basics Graduate
+    condition: Master all of Basics
+
+  perfect-lesson:
+    name: Perfect Lesson
+    condition_one: 'Get 3 stars on every exercise in {{count}} lesson'
+    condition_other: 'Get 3 stars on every exercise in {{count}} lessons'
+  star-collector:
+    name: Star Collector
+    condition_one: 'Earn {{count}} star'
+    condition_other: 'Earn {{count}} stars'
+  sharp-eyes:
+    name: Sharp Eyes
+    condition_one: 'Answer "Safe or not?" right {{count}} time in a row'
+    condition_other: 'Answer "Safe or not?" right {{count}} times in a row'
+  escape-artist:
+    name: Escape Artist
+    condition_one: 'Escape check without a hint {{count}} time in a row'
+    condition_other: 'Escape check without a hint {{count}} times in a row'
+  mate-master:
+    name: Mate Master
+    condition_one: 'Solve {{count}} mate in 1'
+    condition_other: 'Solve {{count}} mates in 1'
+  butterfly-maker:
+    name: Butterfly Maker
+    condition_one: 'Promote {{count}} pawn in games'
+    condition_other: 'Promote {{count}} pawns in games'
+  castle-builder:
+    name: Castle Builder
+    condition_one: 'Castle in {{count}} game'
+    condition_other: 'Castle in {{count}} games'
+
+  first-win:
+    name: First Win
+    condition: Win a game vs the computer
+  mouse-tamer:
+    name: Mouse Tamer
+    condition: Win a game vs Mouse
+  rabbit-catcher:
+    name: Rabbit Catcher
+    condition: Win a game vs Rabbit
+  fox-outsmarter:
+    name: Fox Outsmarter
+    condition: Win a game vs Fox
+  wolf-tamer:
+    name: Wolf Tamer
+    condition: Win a game vs Wolf
+  bear-buddy:
+    name: Bear Buddy
+    condition: Win a game vs Bear
+  queen-keeper:
+    name: Queen Keeper
+    condition: Win a game without losing your queen
+  pawn-wars-winner:
+    name: Pawn Wars Winner
+    condition_one: 'Win Pawn Wars {{count}} time'
+    condition_other: 'Win Pawn Wars {{count}} times'
+  friendly-match:
+    name: Friendly Match
+    condition: Play a game vs a friend
+
+  daily-player:
+    name: Daily Player
+    condition_one: 'Play {{count}} day in a row'
+    condition_other: 'Play {{count}} days in a row'
+  warm-up-champ:
+    name: Warm-up Champ
+    condition_one: 'Finish {{count}} warm-up task'
+    condition_other: 'Finish {{count}} warm-up tasks'
+  never-give-up:
+    name: Never Give Up
+    condition_one: 'Come back from 2 or more wrong tries {{count}} time'
+    condition_other: 'Come back from 2 or more wrong tries {{count}} times'

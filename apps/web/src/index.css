@@ -46,6 +46,22 @@
   animation: reward-star-pop 320ms ease-out backwards;
 }
 
+/* Badge celebration card (M4.4): pops in over its dimmed backdrop. Scale only, never opacity — an
+   opacity ramp would leave its (already AA-checked) text under-contrast for the animation's own
+   duration, which an a11y scan can catch mid-flight. */
+@keyframes celebration-pop {
+  0% {
+    transform: scale(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.celebration-pop {
+  animation: celebration-pop 260ms ease-out backwards;
+}
+
 /* The rule below zeroes durations for reduced motion, so this rule only matters otherwise. */
 @media (prefers-reduced-motion: reduce) {
   *,

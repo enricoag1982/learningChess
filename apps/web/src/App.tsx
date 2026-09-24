@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
+import { Celebration } from './ui/Celebration.tsx';
 import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
 import { FriendGameScreen } from './ui/FriendGameScreen.tsx';
@@ -84,6 +85,7 @@ export default function App({ services }: AppProps): JSX.Element {
   return (
     <StoreProvider value={store}>
       <Screens />
+      <Celebration />
     </StoreProvider>
   );
 }

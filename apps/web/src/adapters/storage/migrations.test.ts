@@ -3,6 +3,7 @@ import { openLocalStore, SCHEMA_VERSION } from './local-store.ts';
 import { MIGRATIONS } from './migrations.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 import { LocalStorageGameRecordRepository } from './local-game-record-repository.ts';
+import { LocalStorageRewardsRepository } from './local-rewards-repository.ts';
 
 beforeEach(() => {
   localStorage.clear();
@@ -58,5 +59,33 @@ describe('MIGRATIONS (v2 -> v3, M3.5 game records)', () => {
     const repo = new LocalStorageGameRecordRepository(store);
 
     expect(await repo.listByProfile('profile-1')).toEqual([]);
+  });
+});
+
+describe('MIGRATIONS (v3 -> v4, M4.4 badges/streak/session log)', () => {
+  it('brings v3 storage up to the current version without touching existing data', () => {
+    localStorage.setItem('chess-kids:schema-version', '3');
+    localStorage.setItem(
+      'chess-kids:lesson-progress',
+      JSON.stringify({ 'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' } }),
+    );
+
+    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+
+    expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
+    expect(store.read('lesson-progress')).toEqual({
+      'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' },
+    });
+  });
+
+  it('a profile upgraded from v1-v3 (no rewards keys yet) reads as no badges/streak/session log', async () => {
+    localStorage.setItem('chess-kids:schema-version', '1');
+
+    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const repo = new LocalStorageRewardsRepository(store);
+
+    expect(await repo.listEarnedBadges('profile-1')).toEqual([]);
+    expect(await repo.getStreak('profile-1')).toBeUndefined();
+    expect(await repo.getSessionLog('profile-1', '2026-01-01')).toBeUndefined();
   });
 });
