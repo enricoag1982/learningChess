@@ -5,9 +5,12 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 - Each lesson: story → demo → 2 guided tries → exercises → boss.
 - Exercise counts exclude guided tries and easier variants.
 - Source: **A** = authored, **L** = imported from Lichess puzzle database (CC0) by theme.
+- Structure: **Basics** (main road, worlds 1–5, fixed order) → 3 **tracks** (Openings, Tactics, Checkmates & Endgames), unlocked after Basics, any order. Strategy track later.
 - Exercise types: `sel` select-squares · `star` collect-stars · `cap` capture · `yn` yes-no · `ch` choice · `best` best-move · `mate` mate-in-n · `set` setup.
 
-## World 1 — Board (Meadow)
+## Basics (main road)
+
+### World 1 — Board (Meadow)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
@@ -15,7 +18,7 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 | 2 | Lines | `board-lines` | Rows, columns, diagonals | sel | 6 | A | Square Hunt |
 | 3 | Setup | `board-setup` | Starting position; queen on her colour | set | 5 | A | Setup Race |
 
-## World 2 — Pieces (Savannah)
+### World 2 — Pieces (Savannah)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
@@ -27,7 +30,7 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 | 9 | Pawn (Caterpillar) | `pawn-move` | Forward only; double first step; diagonal capture; blocked | star, sel, cap | 8 | A | Pawn Wars (4 pawns) |
 | 10 | Promotion | `promotion` | Last row → transform; choose piece | best, ch | 5 | A | Pawn Wars (8 pawns) |
 
-## World 3 — Attack & Defence (Jungle)
+### World 3 — Attack & Defence (Jungle)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
@@ -38,7 +41,7 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 | 15 | Trades | `exchange` | Good / equal / bad trade | ch, best | 8 | A | Army Battle |
 | — | World boss | — | — | — | — | — | Win the Queen |
 
-## World 4 — Check & Mate (Mountains)
+### World 4 — Check & Mate (Mountains)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
@@ -49,7 +52,7 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 | 20 | Stalemate | `stalemate` | Recognise; avoid giving stalemate | yn, best | 6 | A | — |
 | — | World boss | — | — | — | — | — | First full game vs computer L1 |
 
-## World 5 — Full Rules (River)
+### World 5 — Full Rules (River)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
@@ -58,39 +61,52 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 | 23 | Draws | `draw` | Stalemate recap, repetition, insufficient material; 50-move rule mentioned | yn, ch | 5 | A | — |
 | — | World boss | — | — | — | — | — | Full game vs computer L2 |
 
-## World 6 — First Games (Forest)
+## Tracks (after Basics)
+
+### Openings (Forest)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
-| 24 | Opening | `opening` | Centre pawns; develop knights and bishops; queen not early | best, ch | 8 | A | — |
+| 24 | Opening rules | `opening` | Centre pawns; develop knights and bishops; queen not early | best, ch | 8 | A | — |
 | 25 | King safety | `king-safety` | Castle early; keep pawns in front of king | best, yn | 6 | A | — |
-| 26 | Safety check | `blunder-check` | Before moving: checks, captures, threats | best, yn | 8 | A+L | — |
-| — | World boss | — | — | — | — | — | Full game vs computer L3 |
+| 26 | Scholar's mate defence | `scholars-mate` | Queen + bishop attack on f7; defend it | best, yn | 6 | A | Full game vs computer L3 |
 
-## World 7 — Winning (Arctic)
+### Tactics (Ocean)
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
-| 27 | Rook ladder | `mate-2r` | K + 2R vs K | best, mate | 6 | A | Lonely King (2R) |
-| 28 | Queen mate | `mate-q` | K + Q vs K | best, mate | 6 | A | Lonely King (Q) |
-| 29 | Rook mate | `mate-r` | K + R vs K | best, mate | 6 | A | Lonely King (R) |
-| 30 | Fork | `fork` | Double attack; knight fork | best | 10 | L | — |
-| 31 | Pin | `pin` | Piece cannot move without exposing a bigger one | best | 10 | L | — |
-| 32 | Skewer | `skewer` | Attack through a big piece to the one behind | best | 8 | L | — |
-| 33 | Discovered attack | `discovered-attack` | Moving one piece opens another's attack | best | 8 | L | Tactic streak |
+| 27 | Safety check | `blunder-check` | Before moving: checks, captures, threats | best, yn | 8 | A+L | — |
+| 28 | Fork | `fork` | Double attack; knight fork | best | 10 | L | — |
+| 29 | Pin | `pin` | Piece cannot move without exposing a bigger one | best | 10 | L | — |
+| 30 | Skewer | `skewer` | Attack through a big piece to the one behind | best | 8 | L | — |
+| 31 | Discovered attack | `discovered-attack` | Moving one piece opens another's attack | best | 8 | L | Tactic streak |
+
+### Checkmates & Endgames (Arctic)
+
+| # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
+|---|---|---|---|---|---|---|---|
+| 32 | Rook ladder | `mate-2r` | K + 2R vs K | best, mate | 6 | A | Lonely King (2R) |
+| 33 | Queen mate | `mate-q` | K + Q vs K | best, mate | 6 | A | Lonely King (Q) |
+| 34 | Rook mate | `mate-r` | K + R vs K | best, mate | 6 | A | Lonely King (R) |
+
+Later: king + pawn endgames.
+
+### Strategy (later)
+
+Piece activity, pawn structure.
 
 ## Totals
 
-| Scope | Worlds | Lessons | Exercises | Authored (approx.) |
+| Scope | Content | Lessons | Exercises | Authored (approx.) |
 |---|---|---|---|---|
-| MVP | 1–5 | 23 | 169 | ~160 |
-| Full | 1–7 | 33 | 245 | ~195 |
+| MVP | Basics (worlds 1–5) | 23 | 169 | ~160 |
+| Full | Basics + 3 tracks | 34 | 251 | ~200 |
 
 Guided tries (~2 per lesson) and easier variants add ~30% authoring.
 
 ## Mini-game catalogue
 
-| Mini-game | World | Setup | Win (kid) | Opponent |
+| Mini-game | Where | Setup | Win (kid) | Opponent |
 |---|---|---|---|---|
 | Square Hunt | 1 | Empty board | Tap all target squares | — |
 | Setup Race | 1 | Pieces off board | Correct setup | — |
@@ -104,5 +120,5 @@ Guided tries (~2 per lesson) and easier variants add ~30% authoring.
 | Win the Queen | 3 | Full set, no kings | Capture the queen | bot 1 |
 | Escape the Check | 4 | Series of check positions | 10 escapes | — |
 | Mate in 1 | 4 | Series of positions | 10 mates | — |
-| Lonely King | 7 | K + Q / 2R / R vs K | Mate within move limit | bot |
-| Tactic streak | 7 | Series of tactic puzzles | 10 in a row | — |
+| Lonely King | Endgames | K + Q / 2R / R vs K | Mate within move limit | bot |
+| Tactic streak | Tactics | Series of tactic puzzles | 10 in a row | — |

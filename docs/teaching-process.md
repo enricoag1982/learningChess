@@ -59,6 +59,8 @@ Warm-up review (2 min) → 1 new concept (5–8 min) → 1 mini-game (5 min).
 | 6. First games | Opening rules: centre, develop knights/bishops, castle early, queen not too early. Pre-move check: checks, captures, threats | Full game vs computer |
 | 7. Winning | K+Q vs K, K+2R vs K (ladder), K+R vs K. Tactics: fork, pin, skewer, discovered attack | Lonely King, tactic puzzles |
 
+Phases 1–5 = Basics (fixed order). Phases 6–7 delivered as parallel tracks: Openings, Tactics, Checkmates & Endgames ([curriculum.md](curriculum.md)).
+
 **Milestones**
 - After phase 4: plays a full legal game with help.
 - After phase 6: plays independently.

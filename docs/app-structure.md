@@ -9,6 +9,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | Path | Fixed order; skippable via test-out (kid) or unlock (parent) |
 | Profiles | Multiple per device |
 | Theme | Animals |
+| Categories | Basics linear (worlds 1–5); then tracks: Openings, Tactics, Checkmates & Endgames (any order); Strategy later |
 | Play vs person | Same device only in v1 |
 | Login / online | Off in v1; hooks in place (see §13) |
 
@@ -30,8 +31,8 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | Area | Purpose | Content |
 |---|---|---|
 | **Today** (home button) | One-tap guided session | Warm-up → next lesson → mini-game → rewards |
-| **Journey** (map) | Main learning path | Habitat per world, node per lesson, next node highlighted |
-| **Practice** | Review | Daily warm-up; puzzles on unlocked topics |
+| **Journey** (map) | Main learning path | Main road (Basics) splitting into 3 tracks; habitat per world, node per lesson, next node highlighted |
+| **Practice** | Review | Daily warm-up; puzzles by category on unlocked topics |
 | **Play** | Application | Unlocked mini-games; full game vs computer; vs Friend (same device) |
 | **My Den** | Motivation | Stars, badges, animal collection, rank |
 
@@ -39,14 +40,15 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 
 ```
 Journey
-└─ World (phase, one habitat)
-   ├─ Lesson (one concept)
-   │  ├─ Story card (animal + rule)
-   │  ├─ Demo
-   │  ├─ Guided tries (hints on)
-   │  ├─ Exercises (5–10 stages, 1–3 stars)
-   │  └─ Boss = mini-game
-   └─ World test (test-out / final check)
+└─ Track (Basics = main road; Openings / Tactics / Checkmates & Endgames)
+   └─ World (one habitat)
+      ├─ Lesson (one concept)
+      │  ├─ Story card (animal + rule)
+      │  ├─ Demo
+      │  ├─ Guided tries (hints on)
+      │  ├─ Exercises (5–10 stages, 1–3 stars)
+      │  └─ Boss = mini-game
+      └─ World test (test-out / final check)
 ```
 
 Exercise definition: position + task type + goal + answer check + hints + star criteria.
@@ -69,9 +71,11 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 
 - Lesson complete = all stages done. Mastered = ≥80% of max stars or test-out passed.
 - Next lesson unlocks on completion; next world on mastery of all lessons + boss win.
+- Tracks unlock when Basics is mastered; any order; worlds within a track in order.
+- Today session after Basics: next lesson from the least advanced track.
 - Mini-game appears in Play after its lesson.
 - Full game vs computer unlocks after World 4 (Check & Mate).
-- Rank per world: Pawn → Knight → Bishop → Rook → Queen → King.
+- Rank: Pawn → Knight (World 2) → Bishop (World 3) → Rook (World 4) → Queen (Basics) → King (all tracks).
 - Finished lessons always replayable.
 
 ## 8. Animal theme
@@ -115,7 +119,7 @@ Tap square(s) · Move piece to goal · Collect stars · Capture target · Safe? 
 ## 11. Parent area
 
 - Overview of all profiles.
-- Per profile: progress by world/concept, weak concepts, time per day.
+- Per profile: progress by track/world/concept, weak concepts, time per day.
 - Settings per profile: session limit, voice/sound, hints on/off, computer level, unlock lessons/worlds, reset.
 - Profile management: add, rename, delete.
 
@@ -125,8 +129,8 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 ## 13. MVP
 
-- **In:** profiles, placement test + test-out, Worlds 1–5, Today session + warm-up, 6 mini-games + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
-- **Next:** Worlds 6–7, puzzle library.
+- **In:** profiles, placement test + test-out, Basics (worlds 1–5), Today session + warm-up, 6 mini-games + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
+- **Next:** tracks Openings, Tactics, Checkmates & Endgames; puzzle library. Later: Strategy track.
 - **v2 (online):** parent login, cloud sync, online play with friends (invite code, no chat, preset emojis).
 
 ### Online hooks in v1
