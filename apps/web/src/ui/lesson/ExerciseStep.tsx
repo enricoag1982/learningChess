@@ -2,15 +2,23 @@ import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseDef, Lesson, Piece } from '@chess-kids/core';
-import { recordExerciseResult, starsFor } from '@chess-kids/core';
+import {
+  EASIER_VARIANT_STARS,
+  easierVariant,
+  recordAttempt,
+  recordExerciseResult,
+  shouldOfferEasier,
+  starsFor,
+} from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
 import { useNarratedText } from '../useNarratedText.ts';
+import { SECONDARY_BUTTON } from './button-styles.ts';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
-import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
+import { exerciseInstructionText, exerciseNote, withEasierOffer } from './exercise-text.ts';
 import { buildExercisePlayArea } from './exercise-play-area.tsx';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
@@ -23,13 +31,25 @@ export interface ExerciseStepProps {
   readonly nextStepIndex: number;
 }
 
-/** One guided try or scored exercise, of any of the exercise types. */
-export function ExerciseStep({
+interface ExerciseAttemptProps extends ExerciseStepProps {
+  /** The scored exercise's easier variant, if it has one — offered once errors pile up. */
+  readonly easier?: ExerciseDef;
+  /** Swaps the board to `easier`'s variant; only ever passed alongside `easier`. */
+  readonly onTakeEasier?: () => void;
+  /** Set when `exercise` is itself an easier variant: the original exercise id it stands in for. */
+  readonly standsInFor?: string;
+}
+
+/** One attempt at a guided try, scored exercise, or its easier variant, of any exercise type. */
+function ExerciseAttempt({
   lesson,
   exercise,
   guided,
   nextStepIndex,
-}: ExerciseStepProps): JSX.Element {
+  easier,
+  onTakeEasier,
+  standsInFor,
+}: ExerciseAttemptProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
@@ -55,6 +75,8 @@ export function ExerciseStep({
 
   const solved = state.core.solved;
   const stars = starsFor(state.core);
+  const shownStars = standsInFor === undefined ? stars : EASIER_VARIANT_STARS;
+  const offerEasier = easier !== undefined && shouldOfferEasier(state.core);
 
   useEffect(() => {
     if (!solved || savedRef.current || !profile) return;
@@ -63,9 +85,10 @@ export function ExerciseStep({
       profileId: profile.id,
       lesson,
       state: state.core,
-      scored: !guided,
+      scored: !guided && standsInFor === undefined,
       durationMs: Date.now() - startedAt,
       nextStep: nextStepIndex,
+      ...(standsInFor === undefined ? {} : { standsInFor }),
     }).then(() => {
       setSaved(true);
       // Keeps the store's `progress` current through the lesson, not just when it's re-read on
@@ -78,14 +101,29 @@ export function ExerciseStep({
     services.deps,
     lesson,
     guided,
+    standsInFor,
     nextStepIndex,
     state.core,
     startedAt,
     refreshProgress,
   ]);
 
+  function handleTakeEasier(): void {
+    if (profile) {
+      void recordAttempt(services.deps, {
+        profileId: profile.id,
+        lesson,
+        state: state.core,
+        scored: true,
+        durationMs: Date.now() - startedAt,
+      });
+    }
+    onTakeEasier?.();
+  }
+
   const instructionText = exerciseInstructionText(t, exercise);
-  const note = exerciseNote(t, state.feedback, lesson.character, stars);
+  const baseNote = exerciseNote(t, state.feedback, lesson.character, shownStars);
+  const note = offerEasier ? withEasierOffer(t, baseNote, state.feedback) : baseNote;
   const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
   const replay = useNarratedText(services.narrator, spokenText);
 
@@ -103,11 +141,21 @@ export function ExerciseStep({
   const panel = (
     <>
       <SpeechBubble text={instructionText} note={note} />
-      <ReplayButton onClick={replay} label={t('exercise.replay')} />
+      {/* The easier-variant offer shares the replay row (not a row of its own) so Hint / Undo stay
+          on screen for the kid who is stuck (tablet 1024×768, desktop 1280×720). Offered, never
+          forced (teaching-process.md §3.3): the kid may keep trying the original. */}
+      <div className="flex gap-3">
+        <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
+        {offerEasier && (
+          <button type="button" onClick={handleTakeEasier} className={SECONDARY_BUTTON}>
+            {t('exercise.easier')}
+          </button>
+        )}
+      </div>
       {solved ? (
         <div className="mt-auto flex flex-col items-center gap-4">
           {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
-          {!guided && <StarsRow earned={stars} animate />}
+          {!guided && <StarsRow earned={shownStars} animate />}
           {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
           {saved && (
             <NextButton
@@ -134,6 +182,32 @@ export function ExerciseStep({
       board={board}
       panel={panel}
       belowBoard={solved ? undefined : (belowBoard ?? undefined)}
+    />
+  );
+}
+
+/**
+ * One lesson step's exercise: a guided try, a scored exercise, or — once the kid takes the offer —
+ * its easier variant, credited back to the original on solve (teaching-process.md §3.3).
+ */
+export function ExerciseStep(props: ExerciseStepProps): JSX.Element {
+  const { lesson, exercise, guided } = props;
+  const variant = guided ? undefined : easierVariant(lesson, exercise);
+  const [takenEasier, setTakenEasier] = useState(false);
+
+  if (takenEasier && variant) {
+    return (
+      <ExerciseAttempt key={variant.id} {...props} exercise={variant} standsInFor={exercise.id} />
+    );
+  }
+  return (
+    <ExerciseAttempt
+      key={exercise.id}
+      {...props}
+      easier={variant}
+      onTakeEasier={() => {
+        setTakenEasier(true);
+      }}
     />
   );
 }

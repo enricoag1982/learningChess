@@ -205,6 +205,7 @@ export const lessonSchema = z
     demo: demoSchema,
     guided: z.array(exerciseSchema),
     exercises: z.array(exerciseSchema).min(1),
+    variants: z.array(exerciseSchema).optional(),
     boss: keySchema.optional(),
   })
   .strict();

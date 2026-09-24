@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import type { ExerciseState } from './exercise/engine.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { StaticCaptureGameDef } from './exercise/minigame.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
-import { lessonSteps, stepPhase } from './lesson-session.ts';
+import { easierVariant, lessonSteps, shouldOfferEasier, stepPhase } from './lesson-session.ts';
 
 const EMPTY_POSITION = {
   pieces: {},
@@ -119,5 +120,68 @@ describe('lessonSteps', () => {
     const lesson = makeLesson({ boss: undefined, guided: [], exercises: [] });
     const steps = lessonSteps(lesson, []);
     expect(steps.map((step) => step.kind)).toEqual(['story', 'demo', 'complete']);
+  });
+});
+
+function exerciseState(def: ExerciseDef, overrides: Partial<ExerciseState> = {}): ExerciseState {
+  return {
+    def,
+    position: def.position,
+    history: [],
+    moves: 0,
+    selected: [],
+    errors: 0,
+    hintLevel: 0,
+    solved: false,
+    ...overrides,
+  };
+}
+
+describe('easierVariant', () => {
+  it('returns the named variant when the exercise has one and it exists in lesson.variants', () => {
+    const variant = makeExercise('rook-04-easy');
+    const exercise = { ...makeExercise('rook-04'), easier: 'rook-04-easy' };
+    const lesson = makeLesson({ exercises: [exercise], variants: [variant] });
+
+    expect(easierVariant(lesson, exercise)).toBe(variant);
+  });
+
+  it('returns undefined when the exercise has no easier', () => {
+    const exercise = makeExercise('rook-04');
+    const lesson = makeLesson({ exercises: [exercise], variants: [makeExercise('rook-04-easy')] });
+
+    expect(easierVariant(lesson, exercise)).toBeUndefined();
+  });
+
+  it('returns undefined when easier names an id missing from lesson.variants', () => {
+    const exercise = { ...makeExercise('rook-04'), easier: 'no-such-variant' };
+    const lesson = makeLesson({ exercises: [exercise], variants: [makeExercise('rook-04-easy')] });
+
+    expect(easierVariant(lesson, exercise)).toBeUndefined();
+  });
+
+  it('returns undefined when the lesson has no variants at all', () => {
+    const exercise = { ...makeExercise('rook-04'), easier: 'rook-04-easy' };
+    const lesson = makeLesson({ exercises: [exercise] });
+
+    expect(easierVariant(lesson, exercise)).toBeUndefined();
+  });
+});
+
+describe('shouldOfferEasier', () => {
+  const def = makeExercise('rook-04');
+
+  it('is false at 0 or 1 errors', () => {
+    expect(shouldOfferEasier(exerciseState(def, { errors: 0 }))).toBe(false);
+    expect(shouldOfferEasier(exerciseState(def, { errors: 1 }))).toBe(false);
+  });
+
+  it('is true at 2 or more errors while unsolved', () => {
+    expect(shouldOfferEasier(exerciseState(def, { errors: 2 }))).toBe(true);
+    expect(shouldOfferEasier(exerciseState(def, { errors: 3 }))).toBe(true);
+  });
+
+  it('is false once solved, even with 2 or more errors', () => {
+    expect(shouldOfferEasier(exerciseState(def, { errors: 2, solved: true }))).toBe(false);
   });
 });

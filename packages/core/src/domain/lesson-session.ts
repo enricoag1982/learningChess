@@ -1,3 +1,4 @@
+import type { ExerciseState } from './exercise/engine.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
 
@@ -40,6 +41,25 @@ export function lessonSteps(lesson: Lesson, minigames: readonly MiniGame[]): Les
     ...bossSteps,
     { kind: 'complete' },
   ];
+}
+
+/** Errors on one scored exercise after which its easier variant is offered (teaching-process.md §3.3). */
+export const EASIER_AFTER_ERRORS = 2;
+
+/** Stars an exercise is credited when the kid solves its easier variant instead (the "completed" tier). */
+export const EASIER_VARIANT_STARS = 1;
+
+/** `exercise`'s easier variant from `lesson.variants`, if it names one that exists. */
+export function easierVariant(lesson: Lesson, exercise: ExerciseDef): ExerciseDef | undefined {
+  if (exercise.easier === undefined) {
+    return undefined;
+  }
+  return lesson.variants?.find((variant) => variant.id === exercise.easier);
+}
+
+/** True once an unsolved exercise has `EASIER_AFTER_ERRORS` or more errors. */
+export function shouldOfferEasier(state: ExerciseState): boolean {
+  return !state.solved && state.errors >= EASIER_AFTER_ERRORS;
 }
 
 /** UI phase for a step; `null` for `complete` (no lesson chrome left to show). */

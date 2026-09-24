@@ -102,7 +102,7 @@ export function LessonPreview(): JSX.Element {
     return <p className="p-6">No lesson "{lessonId}" in the bundled content.</p>;
   }
   const boss = lesson.boss === undefined ? undefined : content.minigame(lesson.boss);
-  const exercises = [...lesson.guided, ...lesson.exercises];
+  const exercises = [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])];
 
   const view: View =
     viewId === 'story'

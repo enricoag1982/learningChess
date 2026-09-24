@@ -11,7 +11,12 @@ import type {
 } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
 import '../../i18n.ts';
-import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';
+import {
+  fixtureContentSource,
+  fixtureExercise,
+  fixtureLesson,
+  fixtureVariantExercise,
+} from '../../testing/fixtures.ts';
 import { stubMatchMedia } from '../../testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
@@ -534,6 +539,188 @@ describe('ExerciseStep', () => {
       } finally {
         restoreMatchMedia();
       }
+    });
+  });
+
+  describe('easier variant offer (teaching-process.md §3.3)', () => {
+    // best-move (not collect-stars): its stars depend on errors too, so the "declining" test below
+    // can show a real, error-driven star count on the original.
+    const originalPosition = parseDiagram(`
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    `);
+    const original: BestMoveDef = {
+      id: 'orig-me',
+      concept: 'fixture-move',
+      textKey: 'fixtures:orig',
+      position: originalPosition,
+      type: 'best-move',
+      solutions: ['Rh1'],
+      easier: 'orig-me-easy',
+    };
+    const variant = fixtureVariantExercise('orig-me-easy');
+
+    /**
+     * `count` illegal a1 → b2 attempts for a rook: tapping a1 selects it, then each `b2` tap is a
+     * fresh illegal attempt (the board keeps a1 selected after an illegal try, so it is tapped only
+     * once here — re-tapping the already-selected a1 would instead deselect it).
+     */
+    function makeIllegalMoves(count: number): void {
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      for (let i = 0; i < count; i += 1) {
+        fireEvent.click(screen.getByRole('button', { name: /^b2,/ }));
+      }
+    }
+
+    it('does not offer the easier variant after only 1 error', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(1);
+
+      await screen.findByText('Rhino only runs in straight lines!');
+      expect(screen.queryByText(/tricky/)).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Easier one' })).toBeNull();
+    });
+
+    it('offers the easier variant once errors reach 2: an extra sentence and a button', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+
+      await screen.findByText(
+        'Rhino only runs in straight lines! This one is tricky. Want an easier one?',
+      );
+      expect(screen.getByRole('button', { name: 'Easier one' })).toBeTruthy();
+    });
+
+    it('tapping the offer logs the failed original attempt and swaps the board to the variant', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+      fireEvent.click(await screen.findByRole('button', { name: 'Easier one' }));
+
+      // The variant's own instruction and board (a star at a8, which the original never has).
+      await screen.findByText('orig-me-easy');
+      expect(screen.getByRole('button', { name: /^a8, star/ })).toBeTruthy();
+
+      const profile = store.getState().profile;
+      const attempts = await services.deps.progress.listAttempts(profile?.id ?? '');
+      expect(attempts).toHaveLength(1);
+      expect(attempts[0]).toMatchObject({
+        exerciseId: 'orig-me',
+        scored: true,
+        correct: false,
+        errors: 2,
+      });
+    });
+
+    it('solving the variant credits the original with 1 star; the variant itself earns none', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+      fireEvent.click(await screen.findByRole('button', { name: 'Easier one' }));
+      await screen.findByRole('button', { name: /^a8, star/ });
+
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^a8,/ }));
+
+      await screen.findByText('Good try!');
+      const starsRow = screen.getByTestId('stars-row');
+      const filled = [...starsRow.children].filter(
+        (child) => !(child as HTMLElement).className.includes('opacity-25'),
+      );
+      expect(filled).toHaveLength(1);
+
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars['orig-me']).toBe(1);
+      expect(saved?.bestStars['orig-me-easy']).toBeUndefined();
+    });
+
+    it('a guided try never offers its easier variant, even past 2 errors', async () => {
+      const guidedOriginal: BestMoveDef = { ...original, id: 'guided-orig' };
+      const lesson = fixtureLesson({
+        guided: [guidedOriginal],
+        exercises: [],
+        variants: [variant],
+      });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={guidedOriginal} guided nextStepIndex={1} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+
+      expect(screen.queryByRole('button', { name: 'Easier one' })).toBeNull();
+    });
+
+    it('a scored exercise with no easier of its own never offers one, even past 2 errors', async () => {
+      const noEasier: BestMoveDef = {
+        id: 'no-easy-me',
+        concept: 'fixture-move',
+        textKey: 'fixtures:orig',
+        position: originalPosition,
+        type: 'best-move',
+        solutions: ['Rh1'],
+      };
+      const lesson = fixtureLesson({ exercises: [noEasier] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={noEasier} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+
+      expect(screen.queryByRole('button', { name: 'Easier one' })).toBeNull();
+    });
+
+    it('declining: the kid can keep trying the original, which still saves its own stars', async () => {
+      const lesson = fixtureLesson({ exercises: [original], variants: [variant] });
+      const services = createTestServices(fixtureContentSource(lesson));
+      const { store } = await renderWithStore(
+        <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
+        services,
+      );
+
+      makeIllegalMoves(2);
+      await screen.findByRole('button', { name: 'Easier one' }); // offer shown, ignored
+
+      // a1 is still selected (an illegal attempt doesn't deselect it): tap the solution directly.
+      fireEvent.click(screen.getByRole('button', { name: /^h1,/ })); // the solution
+
+      // 2 earlier errors cap a best-move solve at 1 star (engine.ts errorHintStars).
+      await screen.findByText('Good try!');
+      const profile = store.getState().profile;
+      const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
+      expect(saved?.bestStars['orig-me']).toBe(1);
     });
   });
 });

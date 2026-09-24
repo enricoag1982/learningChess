@@ -134,7 +134,7 @@ Failing any assessment: no penalty, no data lost.
 |---|---|
 | Content | Lesson `variants[]`: same exercise schema; not stepped, not scored, not in exercise counts, completion or mastery. `easier` only on scored exercises, must name a variant of the same lesson; variants have no `easier`; every variant referenced (build fails otherwise) |
 | Trigger | Scored exercise, unsolved, `errors` ≥ 2 (illegal / wrong moves, wrong answers, selections, placements; hints not counted). Guided tries: never |
-| Offer | Owl note on the error: "This one is tricky. Want an easier one?" + button **Try an easier one**. Not forced: kid may keep trying the original (normal stars) |
+| Offer | Owl note on the error: "This one is tricky. Want an easier one?" + button **Easier one** (next to "Say it again"). Not forced: kid may keep trying the original (normal stars) |
 | Swap | Same lesson step (stage dots unchanged); failed original logged as `Attempt` (`scored`, `correct: false`) → M3 review scheduler puts the concept in box 1 (= "concept added to review"); no separate queue |
 | Result | Variant solved → original exercise credited 1 star (= "completed"); variant `Attempt` logged with `scored: false`. Replaying the lesson can raise the stars |
 | Resume | App closed mid-variant → resumes at the original exercise |

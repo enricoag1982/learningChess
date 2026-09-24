@@ -92,6 +92,7 @@ exercises:
   - id: rook-04
     type: collect-stars
     text: rook-04
+    easier: rook-04-easy
     board: |
       * . . . . . . .
       . . . . . . . .
@@ -148,6 +149,7 @@ exercises:
   - id: rook-08
     type: collect-stars
     text: rook-08
+    easier: rook-08-easy
     board: |
       * . . . . . . *
       . . . . . . . .
@@ -159,4 +161,33 @@ exercises:
       * . . . . . . *
     stars3: 5
     stars2: 7
+variants:
+  - id: rook-04-easy
+    type: collect-stars
+    text: rook-04-easy
+    board: |
+      . * . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      x . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . .
+    stars3: 2
+    stars2: 3
+  - id: rook-08-easy
+    type: collect-stars
+    text: rook-08-easy
+    board: |
+      . . . * . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . x . . . .
+      . . . R . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    stars3: 3
+    stars2: 4
 boss: hungry-rook
