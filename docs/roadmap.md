@@ -73,7 +73,12 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m3.2` | World 3 lessons (Attack, Defend, Safe or not?, Piece values, Trades) + Queen vs Pawns, Safe or Not?, Army Battle; world boss Win the Queen (world-level boss in the catalog) |
 | `m3.3` | World 4 lessons (Check, Escape check, Checkmate, Mate in 1, Stalemate) + Escape the Check, Mate in 1; world boss: first full game vs Mouse |
 | `m3.4` | Mastery + review: concept stats, Leitner scheduler, warm-up, Today session (warm-up → lesson → mini-game → rewards), Practice screen |
-| `m3.5` | Full game vs computer in Play (after World 4), game records, polish → `m3` (playtest 3 by user) |
+| `m3.5` | Full game vs computer in Play (after World 4), game records, Rabbit level (beat Mouse 3×), draw rules (repetition, 50 moves), mate hint, polish → `m3` (playtest 3 by user) |
+| `m4.1` | World 5 lessons (Castling, En passant, Draws) with rule-verified answers; world boss: full game vs Rabbit |
+| `m4.2` | Fox, Wolf, Bear playable (unlock: beat previous level 3×), aids per level, automatic level, small opening book, Bear ≤ 300 ms |
+| `m4.3` | vs Friend (same device): second player (profile or guest), face-to-face board, take back per player; full game, Pawn Wars, Win the Queen; records to each profile |
+| `m4.4` | Badges (`badges.yaml`, badge engine on events, max 2 celebrations per session, My Den badges), streak (1 free skip per week), session log |
+| `m4.5` | Test-out ("Show you know it") on locked lessons / worlds, placement test at first run → `m4` |
 
 ### 3.2 Follow-ups (not yet scheduled in an iteration)
 
