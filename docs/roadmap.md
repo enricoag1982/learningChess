@@ -1,0 +1,83 @@
+# Roadmap — Chess for Kids
+
+Related: [app-structure.md](app-structure.md), [curriculum.md](curriculum.md), [architecture.md](architecture.md).
+
+Sizes: S ≈ days, M ≈ 1–2 weeks, L ≈ 3–4 weeks (one developer + AI assistance; content in parallel).
+
+## 1. MVP scope
+
+Basics (worlds 1–5, 23 lessons, 169 exercises), 12 mini-games on 5 game modes, computer levels 1–5, vs Friend on same device, rewards, profiles, parent area (password, report, daily limit, backup), offline web app (PWA). English.
+
+### Mini-game modes
+
+| Mode | Games |
+|---|---|
+| Tap squares | Square Hunt |
+| Setup | Setup Race |
+| Piece vs static board | Hungry Rook / Bishop / Queen, King Walk, Knight Maze |
+| Variant vs computer | Pawn Wars, Queen vs Pawns, Army Battle, Win the Queen |
+| Position series | Safe or Not?, Escape the Check, Mate in 1 |
+
+## 2. Epics
+
+| # | Epic | Content |
+|---|---|---|
+| E1 | Foundation | Workspace, tooling, CI, PWA shell, i18n, storage adapters, design tokens |
+| E2 | Chess core | chess.js adapter, variant rules, board diagram / FEN parser |
+| E3 | Board UI | SVG board, tap + drag, highlights, markers, animations, face-to-face mode |
+| E4 | Content pipeline | YAML → Zod → JSON, content tests (solvable, keys present), locale files, board editor tool |
+| E5 | Exercise engine | 8 task types, stars, hint ladder, easier variants |
+| E6 | Lesson & session | Story, demo, guided, exercises, boss; Today session; review scheduler; warm-up |
+| E7 | Progression | Mastery, unlocks, Journey map, test-out, placement test |
+| E8 | Mini-games | 5 modes, 12 games |
+| E9 | Computer opponent | Engine in worker, 5 levels, aids, automatic level, calibration test |
+| E10 | Play | vs Computer, vs Friend (local match), game records |
+| E11 | Rewards | Stars, rank, animal friends, badge engine + 25 badges, streak, My Den |
+| E12 | Profiles & parent | Profiles, first-run setup, parent password + recovery file, parent area, daily limit + "See you tomorrow", backup export / import |
+| E13 | Narration | Speech adapter (prototype), recorded audio pipeline (release) |
+| E14 | Release quality | Offline hardening, persistent storage, update flow, accessibility, performance budget, privacy policy, hosting |
+| C | Content (parallel) | 23 lessons YAML, stories, texts, audio, illustrations (animals, Owl, habitats) |
+
+## 3. Milestones
+
+| # | Milestone | Size | Scope | Exit criteria |
+|---|---|---|---|---|
+| M0 | Scaffold | S | E1, E2 base | CI green; empty PWA deployed; rules tests pass |
+| M1 | Vertical slice | M | E3, E4, E5 (3 types), E6 basic, 1 profile | Rook lesson end to end (story → exercises → Hungry Rook) on a tablet; progress saved; **playtest 1** |
+| M2 | Worlds 1–2 | L | Remaining board / piece lessons, 7 task types, game modes 1–4, Mouse level, Journey map, profiles, parent password, stars + animal friends | Kid completes Worlds 1–2 unaided; **playtest 2** |
+| M3 | Worlds 3–4 | L | Mate-in-n (8th task type), position series, review scheduler + Today, mastery / unlocks, Rabbit level, full game vs Mouse | Kid gives first checkmate; **playtest 3** |
+| M4 | World 5 + Play | M | World 5, vs Friend, Fox–Bear levels, automatic level, badges, streak, My Den, test-out, placement | Full legal game incl. castling; siblings play each other |
+| M5 | MVP release | M | Parent area complete, daily limit, backup, recorded audio, offline hardening, accessibility, performance, privacy policy | Works in flight mode on iPad + Android tablet; performance targets met; **playtest 4** |
+
+Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, audio by M5.
+
+## 4. After MVP
+
+| # | Milestone | Scope |
+|---|---|---|
+| M6 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M7 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions |
+
+## 5. Playtests
+
+- With 1–3 kids aged 7–9, 20 min each, parent present, no help unless stuck > 1 min.
+- Observe: starts alone? understands voice instructions? where stuck or bored? taps that miss?
+- Record: lesson completion, first-try accuracy, hints used, wants to continue (yes / no).
+
+## 6. MVP success metrics (on device, parent report)
+
+| Metric | Target |
+|---|---|
+| Lesson completion (started → complete) | ≥ 80% |
+| Sessions per week per child | ≥ 3 |
+| Basics finished | Within 8 weeks of regular use |
+| Kid plays full legal game unaided | At M4 playtest |
+
+## 7. Open decisions
+
+| Topic | Options | Recommendation |
+|---|---|---|
+| Illustrations | Illustrator / AI-generated / licensed pack | Licensed or commissioned set (clear license for stores) |
+| Voice | Parent recording / voice actor / TTS generated at build time into audio files | Build-time TTS audio files (consistent, offline, per language); re-record key lines later |
+| Web hosting | GitHub Pages / Netlify / Cloudflare Pages | GitHub Pages (repo already on GitHub, free, static) |
