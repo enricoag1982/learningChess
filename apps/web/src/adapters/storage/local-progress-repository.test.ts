@@ -95,8 +95,15 @@ describe('LocalStorageProgressRepository — attempts', () => {
   });
 
   it('caps stored attempts at 2000, dropping the oldest first', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
-    for (let i = 0; i < 2005; i += 1) {
+    // Seed 1998 directly (adding them one by one re-serialises the list each time), then cross
+    // the cap through the repository.
+    const store = openLocalStore(localStorage);
+    store.write(
+      'attempts',
+      Array.from({ length: 1998 }, (_, i) => makeAttempt({ id: `a${String(i)}` })),
+    );
+    const repo = new LocalStorageProgressRepository(store);
+    for (let i = 1998; i < 2005; i += 1) {
       await repo.addAttempt(makeAttempt({ id: `a${String(i)}` }));
     }
 
