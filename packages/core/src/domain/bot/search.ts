@@ -269,6 +269,34 @@ function chooseBySearch(
 }
 
 /**
+ * The single best move at `depth` plies for the side to move, by the same iterative-deepening
+ * alpha-beta search `chooseBySearch` uses — but no randomness and no near-best pool: exactly one,
+ * highest-scoring move. Used by `mateHint` (`domain/bot/hint.ts`), not by `chooseMove`'s own
+ * probability-weighted levels.
+ */
+export function searchBestMove(state: GameState, rules: ChessRules, depth: number): Move | null {
+  const legalMoves = rules.legalMoves(state.position);
+  if (legalMoves.length === 0) {
+    return null;
+  }
+  const board = rules.searchBoard(state.position);
+  const needsPieces = needsPiecesForTerminal(state.def);
+  let ordered = orderMoves(legalMoves);
+  let scored: ScoredMove[] = [];
+  for (let d = 1; d <= depth; d += 1) {
+    scored = searchRoot(ordered, board, state.def, needsPieces, d);
+    ordered = [...scored].sort((a, b) => b.score - a.score).map((entry) => entry.move);
+  }
+  let best: ScoredMove | undefined;
+  for (const entry of scored) {
+    if (best === undefined || entry.score > best.score) {
+      best = entry;
+    }
+  }
+  return best?.move ?? null;
+}
+
+/**
  * Picks the level's next move. `alwaysMateInOne` levels take a forced mate (or immediate variant
  * win) first; otherwise a die roll against `random` / `shallow` / the rest (search) picks the mode,
  * after the "queen stays home" window (if any) trims the candidate list. `null` only when there is

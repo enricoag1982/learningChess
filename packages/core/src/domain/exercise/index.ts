@@ -62,6 +62,7 @@ export type { VersusGameDef, VersusState, VersusStatus, VersusMoveOutcome } from
 export {
   startVersus,
   versusPosition,
+  versusEndReason,
   versusGameState,
   isKidTurn,
   kidMoveCount,

@@ -4,6 +4,7 @@ import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
+import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game-record-repository.ts';
 import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
@@ -28,6 +29,7 @@ export function createTestServices(
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
+    gameRecords: new LocalStorageGameRecordRepository(store),
     clock: createSystemClock(),
     ids: createCryptoIds(),
     content,

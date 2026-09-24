@@ -210,6 +210,15 @@ boss:
     won: You won!
     lost: Good game! Want to try again?
     draw: "It's a draw! Want to try again?"
+    draw-reason:
+      stalemate: No safe moves left for anyone — that's a stalemate.
+      insufficient-material: Not enough pieces left for either side to checkmate.
+      threefold-repetition: The same position happened three times.
+      fifty-move: 50 moves with no capture or pawn move.
+    hint-offer: Need a hint?
+    stop-game-title: Stop this game?
+    stop-game-cancel: Keep playing
+    stop-game-confirm: Stop game
 complete:
   title: Lesson complete!
   stars-pill: '+{{count}} stars'
@@ -220,6 +229,9 @@ play:
   vs-computer: vs Computer
   full-game: Play a full game
   full-game-locked: After World 4
+  full-game-title: Full Game
+  full-game-goal: Checkmate the other king!
+  full-game-vs: 'Full Game vs {{name}}'
   vs-friend: vs Friend
   vs-friend-note: On this tablet
   vs-friend-locked: Coming soon
@@ -227,6 +239,12 @@ play:
   locked-condition: 'After {{label}} lesson'
   minigame-name-stars: '{{title}}, {{stars}}'
   minigame-name-locked: '{{title}}, locked, {{condition}}'
+  level-name-wins: '{{name}}, won {{wins}} of {{games}}'
+  level-name-unplayed: '{{name}}, not played yet'
+  level-name-locked: '{{name}}, locked, {{condition}}'
+  level-wins: 'Won {{wins}} of {{games}}'
+  level-unplayed: Not played yet
+  level-condition-beat: 'Beat {{name}} {{times}} times'
   close: Close
   back-to-play: Back to Play
   back-to-journey: Back to Journey
@@ -255,6 +273,8 @@ practice:
 den:
   title: "{{name}}'s Den"
   owl-line: Look at all your friends!
+  games-won_one: '{{count}} game won'
+  games-won_other: '{{count}} games won'
   rank-heading: My rank
   rank-current: You are here
   rank-start: Start

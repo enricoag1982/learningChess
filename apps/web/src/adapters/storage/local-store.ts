@@ -29,11 +29,12 @@ export interface OpenLocalStoreOptions {
 
 /**
  * Current schema version for `chess-kids:*` storage, used when `options.version` is omitted.
- * v2 (M3.4) adds the `concept-stats` record (see `migrations.ts`); existing v1 data has none yet,
- * so the migration to v2 only bumps the version — `LocalStorageProgressRepository` reads a missing
- * `concept-stats` key as "no stats for anyone", same as a fresh profile.
+ * v2 (M3.4) adds the `concept-stats` record; v3 (M3.5) adds the `game-records` record (see
+ * `migrations.ts`) — existing v1/v2 data has none yet, so both migrations only bump the version:
+ * `LocalStorageProgressRepository`/`LocalStorageGameRecordRepository` read a missing key as "none
+ * yet", same as a fresh profile.
  */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 const KEY_PREFIX = 'chess-kids:';
 const VERSION_KEY = `${KEY_PREFIX}schema-version`;

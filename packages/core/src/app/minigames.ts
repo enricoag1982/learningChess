@@ -1,10 +1,27 @@
 import { isBossResultWin, summarizeBossResult } from '../domain/exercise/boss-result.ts';
 import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
+import { versusGameState } from '../domain/exercise/versus.ts';
 import type { VersusState } from '../domain/exercise/versus.ts';
 import type { MiniGame } from '../domain/lesson.ts';
 import type { MiniGameProgress } from '../domain/progress.ts';
 import { recordMiniGamePlay } from '../domain/progress.ts';
+import { toFen } from '../domain/chess/fen.ts';
+import { recordGame, versusGameRecordResult } from './games.ts';
 import type { AppDeps } from './use-cases.ts';
+
+/** Board part of the standard chess start position's FEN. */
+const START_BOARD = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+
+/**
+ * `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings on
+ * the board, standard start position — `first-game`, later world bosses vs stronger levels), the
+ * same id the Play screen's own "Full game" flow records; otherwise the mini-game's own id.
+ */
+function gameRecordId(state: VersusState): string {
+  const { def } = state;
+  const board = toFen(def.position).split(' ')[0];
+  return def.rules.kings && board === START_BOARD ? 'full' : def.id;
+}
 
 /** All saved mini-game progress for a profile (Play screen's best-stars tiles). */
 export async function loadMiniGameProgress(
@@ -45,6 +62,22 @@ export async function saveMiniGamePlay(
     now,
   );
   await deps.progress.saveMiniGame(updated);
+
+  // A `versus` play (vs the bot) also gets its own `GameRecord` (domain-model.md §2), whether
+  // played standalone from Play or as a lesson's own boss — `static`/`series` mini-games have no
+  // computer opponent to record one against.
+  if (state.mode === 'versus') {
+    const { result, reason } = versusGameRecordResult(state);
+    await recordGame(deps, {
+      profileId,
+      game: gameRecordId(state),
+      opponentLevel: state.def.opponentLevel,
+      result,
+      reason,
+      moves: versusGameState(state).history.map((move) => move.san),
+    });
+  }
+
   return updated;
 }
 

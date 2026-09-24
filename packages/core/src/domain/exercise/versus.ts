@@ -34,6 +34,13 @@ export interface VersusState {
   readonly def: VersusGameDef;
   readonly states: readonly VariantGameState[];
   readonly status: VersusStatus;
+  /**
+   * The `GameResult.reason` (checkmate, stalemate, threefold-repetition, fifty-move, …) the moment
+   * `status` left `'playing'`; unset while still playing. Lets the UI explain *which* draw
+   * (computer-opponent.md §6) without recomputing `gameResult` — and, alongside `result`/`opponent`,
+   * feeds a `GameRecord`'s own `reason` field once the game is saved.
+   */
+  readonly endReason?: string;
 }
 
 function current(state: VersusState): VariantGameState {
@@ -52,6 +59,11 @@ export function startVersus(def: VersusGameDef): VersusState {
 /** The position currently on the board. */
 export function versusPosition(state: VersusState): Position {
   return current(state).position;
+}
+
+/** Why the game ended (see `VersusState.endReason`), or `undefined` while still playing. */
+export function versusEndReason(state: VersusState): string | undefined {
+  return state.endReason;
 }
 
 /**
@@ -108,7 +120,13 @@ export function playVersusMove(
   const states = [...state.states, played.state];
   const result = variantGameResult(played.state, rules);
   const status = statusFor(result, state.def.kidColor);
-  const nextState: VersusState = { ...state, states, status };
+  const endReason = result.kind === 'ongoing' ? undefined : result.reason;
+  const nextState: VersusState = {
+    ...state,
+    states,
+    status,
+    ...(endReason === undefined ? {} : { endReason }),
+  };
   if (status === 'playing') {
     return { state: nextState, outcome: { kind: 'played', move: played.move } };
   }
@@ -130,7 +148,7 @@ export function takeBackVersusMove(state: VersusState): VersusState {
   if (!canTakeBack(state)) {
     return state;
   }
-  return { ...state, states: state.states.slice(0, -2), status: 'playing' };
+  return { ...state, states: state.states.slice(0, -2), status: 'playing', endReason: undefined };
 }
 
 /** Stars for a finished `versus` boss: 3 = win within par (or win at all, no par), 2 = win, 1 = played to the end. */

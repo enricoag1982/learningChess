@@ -39,8 +39,8 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 
 ## Status and next step
 
-- Done: M0 (`m0`), M1 (`m1`), M2 (`m2`). Pending user actions: Settings → Pages → Source = GitHub Actions; playtests 1–2 (`docs/roadmap.md` §5).
-- Next: M3, iterations `m3.1`–`m3.5` in `docs/roadmap.md` §3.1. Branch `m3-worlds-3-4`.
+- Done: M0 (`m0`), M1 (`m1`), M2 (`m2`), M3 (`m3`). Pending user actions: Settings → Pages → Source = GitHub Actions; playtests 1–3 (`docs/roadmap.md` §5).
+- Next: M4 iterations `m4.1`–`m4.5` (`docs/roadmap.md` §3.1). Branch `m4-rules-play`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N).
