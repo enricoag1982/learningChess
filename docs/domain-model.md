@@ -29,6 +29,7 @@ Character 1─1 piece type
 | Assessment | `id`, `kind` (`placement` / `test-out` / `world-test`), `scope`, `tasksPerConcept`, `pass` (default 0.8) |
 | Character | `id` (`rhino`, …), `piece`, `nameKey`, `storyKey` |
 | Rank | `id` (`pawn` … `king`), `after` (world id, track id, or `all-tracks`) |
+| BadgeDef | `id`, `category` (`milestone` / `skill` / `play` / `habit`), `nameKey`, `condition` (type + params), `tiers[]` — see [rewards.md](rewards.md) |
 | BotLevel | `level` (1–5), `name` (`mouse` … `bear`), `random`, `shallow`, `depth`, `book`, `queenHomeMoves`, `aids` — see [computer-opponent.md](computer-opponent.md) |
 
 ### 1.1 Position
@@ -76,7 +77,8 @@ Character 1─1 piece type
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at` |
 | Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` |
 | GameRecord | `miniGameId` or `full`, `opponent` (`computer:<level>` / `profile:<id>` / `guest`), `matchId`, `result`, `moves[]` (SAN), `at` |
-| Badge | `badgeId`, `at` |
+| Badge | `badgeId`, `tier`, `at`, `seen` |
+| Streak | `current`, `best`, `lastDay`, `skipsUsedThisWeek` |
 | SessionLog | `date`, `minutes` |
 
 - All stored records: UUID `id`, `createdAt`, `updatedAt` (sync-ready).
@@ -154,6 +156,7 @@ packages/content/
   tracks.yaml                  tracks, worlds, habitats, ranks
   characters.yaml
   bot-levels.yaml              computer opponent levels
+  badges.yaml                  badge catalogue
   assessments.yaml
   lessons/<world>/<lesson>.yaml
   minigames/<id>.yaml

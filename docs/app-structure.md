@@ -107,7 +107,7 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 | Assessment | Placement test, test-out, world test |
 | Mastery tracker | Accuracy per concept |
 | Review scheduler | Selects old-topic tasks for warm-up |
-| Rewards | Stars, badges, rank, collection |
+| Rewards | Stars, badges, rank, collection ([rewards.md](rewards.md)) |
 | Narration | Voice + subtitles for every text |
 | Content library | Worlds/lessons/exercises as data; new content without code changes |
 | Parent module | Reports, limits, settings, unlocks |
