@@ -7,13 +7,13 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Requirement | Solution |
 |---|---|
 | Whole app usable with no network (lessons, games, computer, profiles, progress) | v1 has no server calls; everything runs and stores locally |
-| Web / PWA | Service worker (vite-plugin-pwa / Workbox) precaches app shell, compiled content, images, fonts, audio of the selected language |
+| Web / PWA | Service worker (vite-plugin-pwa / Workbox) precaches app shell, compiled content, images, fonts |
 | Fonts | Self-hosted (no Google Fonts at runtime) |
-| Narration | Recorded audio precached; Web Speech API only in prototype (some browser voices need network) |
+| Narration | Web Speech API with on-device voices only (`localService`; some browser voices need network); subtitles always shown, so the app works without voice. v3: generated audio files, precached |
 | Capacitor apps | All assets bundled in the app → offline by default |
 | Updates | Checked when online; applied at next app start, never mid-session |
 | Storage eviction | Request persistent storage; prompt parent to "Add to Home Screen" on iPad (Safari may clear website data after 7 days without use); backup file (§5) |
-| Offline size budget | ≤ 50 MB per language (audio ≈ 500 clips × ~30 KB ≈ 15 MB) |
+| Offline size budget | ≤ 20 MB in v1 (no audio files); ≤ 50 MB per language in v3 with audio |
 
 ## 2. Accessibility
 
@@ -61,6 +61,6 @@ Reference devices: iPad (9th gen, 2021), mid-range Android tablet (e.g. Samsung 
 
 | Area | Requirement |
 |---|---|
-| Languages | English first; all text by key; audio per language; right-to-left not in scope |
+| Languages | English first; all text by key; device voice per language (v3: audio per language); right-to-left not in scope |
 | Security | Content Security Policy; no remote code; content validated at build |
 | Telemetry | None in v1; parent report computed on device |

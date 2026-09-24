@@ -24,7 +24,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | App state | Zustand | Minimal; logic stays in domain |
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
-| Narration | Port with 2 adapters: Web Speech API (prototype) → recorded audio (release) | Fast start; recorded voices for quality/consistency |
+| Narration | `Narrator` port: Web Speech API (v1, device voices) → generated audio files (v3) | No audio production in v1; nicer voices later without code changes elsewhere |
 | Web delivery | PWA (vite-plugin-pwa / Workbox) | Browser + home-screen install; everything precached, fully offline ([non-functional.md](non-functional.md)) |
 | Fonts | Self-hosted | Offline, no third-party requests |
 | Mobile | Capacitor (Android + iPad) | Same web app packaged for stores |
@@ -64,7 +64,7 @@ apps/native        only if a native UI is ever needed; reuses core
 | `ProfileRepository` | localStorage | IndexedDB / native storage → cloud (Supabase, Firebase) |
 | `ProgressRepository` | localStorage | same |
 | `SettingsRepository` | localStorage | same |
-| `Narrator` | Web Speech API | Recorded audio files per language |
+| `Narrator` | Web Speech API (prefers on-device voices: `localService`) | v3: generated audio files per language |
 | `Platform` | Web | Capacitor (haptics, native storage) |
 | `AuthService` | Guest (local account) | Parent login (e.g. Supabase Auth) |
 | `SyncService` | No-op | Device ↔ cloud |
@@ -139,7 +139,7 @@ stars2: 5
 | Topic | Decision |
 |---|---|
 | Languages | Multi-language via i18n; English first |
-| Narration | Web Speech API for prototype → recorded voices for release |
+| Narration | Web Speech API (browser / device voices) in v1 and v2; generated audio files in v3 |
 | Mobile | PWA first → Capacitor |
 | Online (login, sync, remote play) | Off in v1; ports + local adapters only |
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |

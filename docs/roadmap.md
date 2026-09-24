@@ -34,9 +34,9 @@ Basics (worlds 1–5, 23 lessons, 169 exercises), 12 mini-games on 5 game modes,
 | E10 | Play | vs Computer, vs Friend (local match), game records |
 | E11 | Rewards | Stars, rank, animal friends, badge engine + 25 badges, streak, My Den |
 | E12 | Profiles & parent | Profiles, first-run setup, parent password + recovery file, parent area, daily limit + "See you tomorrow", backup export / import |
-| E13 | Narration | Speech adapter (prototype), recorded audio pipeline (release) |
+| E13 | Narration | Web Speech adapter (on-device voices), voice picker in parent area |
 | E14 | Release quality | Offline hardening, persistent storage, update flow, accessibility, performance budget, privacy policy, hosting |
-| C | Content (parallel) | 23 lessons YAML, stories, texts, audio, illustrations (animals, Owl, habitats) |
+| C | Content (parallel) | 23 lessons YAML, stories, texts, basic AI illustrations (animals, Owl, habitats) |
 
 ## 3. Milestones
 
@@ -47,9 +47,9 @@ Basics (worlds 1–5, 23 lessons, 169 exercises), 12 mini-games on 5 game modes,
 | M2 | Worlds 1–2 | L | Remaining board / piece lessons, 7 task types, game modes 1–4, Mouse level, Journey map, profiles, parent password, stars + animal friends | Kid completes Worlds 1–2 unaided; **playtest 2** |
 | M3 | Worlds 3–4 | L | Mate-in-n (8th task type), position series, review scheduler + Today, mastery / unlocks, Rabbit level, full game vs Mouse | Kid gives first checkmate; **playtest 3** |
 | M4 | World 5 + Play | M | World 5, vs Friend, Fox–Bear levels, automatic level, badges, streak, My Den, test-out, placement | Full legal game incl. castling; siblings play each other |
-| M5 | MVP release | M | Parent area complete, daily limit, backup, recorded audio, offline hardening, accessibility, performance, privacy policy | Works in flight mode on iPad + Android tablet; performance targets met; **playtest 4** |
+| M5 | MVP release | M | Parent area complete, daily limit, backup, offline hardening, accessibility, performance, privacy policy | Works in flight mode on iPad + Android tablet; performance targets met; **playtest 4** |
 
-Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, audio by M5.
+Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by M5.
 
 ## 4. After MVP
 
@@ -58,6 +58,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, audio by M5.
 | M6 | Store apps | Capacitor Android + iPad, native storage, store listings |
 | M7 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions |
+| v3 | Nicer media | Generated voice audio files per language; nicer illustrations |
 
 ## 5. Playtests
 
@@ -80,9 +81,4 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, audio by M5.
 |---|---|
 | Illustrations | Very basic AI-generated images; one style prompt for consistency; tool terms must allow commercial use; stored in the app (offline) |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
-
-## 8. Open decisions
-
-| Topic | Options | Recommendation |
-|---|---|---|
-| Voice | Parent recording / voice actor / TTS generated at build time into audio files | Build-time TTS audio files (consistent, offline, per language); re-record key lines later |
+| Voice | Browser / device voices (Web Speech API) in v1–v2; generated audio files in v3 |
