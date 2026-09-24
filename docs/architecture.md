@@ -122,7 +122,7 @@ stars2: 5
 | Content | Vitest | Every exercise: schema valid, valid position, legal solution, solution reaches goal within star limits; all text keys present in every locale |
 | Components | React Testing Library | Board interaction, lesson flow |
 | End-to-end | Playwright | Create profile → lesson → mini-game → progress persisted |
-| Static | `tsc --strict`, ESLint, Prettier | Every commit via GitHub Actions |
+| Static | `tsc` strict, ESLint (typescript-eslint `strictTypeChecked` + layer rules), Prettier | Every PR via CI `quality` job |
 
 ## 9. Rejected
 
@@ -145,3 +145,20 @@ stars2: 5
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |
 | Web hosting | GitHub Pages (static files only: install + update checks) |
 | Illustrations | Very basic AI-generated images, bundled in the app |
+
+## 11. Implementation decisions (M0)
+
+| Topic | Decision |
+|---|---|
+| Tooling | pnpm 10 workspace; TypeScript 6.0 (`strict`, `noUncheckedIndexedAccess`, erasable syntax only); Vitest; Playwright (Chromium smoke test) |
+| Internal packages | Export TS source, no package build; relative imports carry `.ts` → same files run in Vite, Vitest, `tsc` and Node (native type stripping) |
+| Lint layer rules | `domain` imports no app / adapters / React; `chess.js` only in `chessjs-rules.ts` |
+| Formatting | Prettier for code, YAML, JSON; Markdown excluded (docs hand-formatted) |
+| Position | Plain JSON data: pieces, markers (stars, blocked), side to move, castling, en passant; no move clocks (50-move / repetition from game history, M4) |
+| Rules | `ChessRules` interface; chess.js adapter; positions without kings allowed (lessons, Pawn Wars); from/to promotion without piece → queen; variant layer (blocked squares, custom wins) in M1 |
+| Content build | Runs on `pnpm install` (`prepare`) and `pnpm build`; output `packages/content/dist/` (git-ignored) |
+| Locale files | `locales/<lang>/<namespace>.yaml`; keys lowercase kebab; `en` = reference; missing / extra keys fail build and tests; i18next keys type-checked |
+| Storage | localStorage keys `chess-kids:<name>`; stored schema version + ordered migrations; data from a newer version → refused, never overwritten |
+| PWA updates | Service worker without skip-waiting: new version activates at next app start |
+| Hosting | `deploy.yml`: push to `master` → build with base `/<repo>/` → GitHub Pages |
+| App state | Zustand added in M1 (first shared state) |

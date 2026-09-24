@@ -13,8 +13,20 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Board | ≥ 75% of screen height on game screens |
 | Colour roles | Cream background · green = go / done · orange = today / current · gold = stars · blue = computer / info · grey + lock = locked |
 | Errors | Never red; orange + spoken explanation |
-| Type | Rounded display face (Fredoka) + Nunito body (proposal) |
+| Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
 | Parent area | Adult style (smaller text, denser); behind parent password |
+
+### 1.1 Design tokens (Tailwind `@theme`, `apps/web/src/index.css`)
+
+| Token | Hex | Use |
+|---|---|---|
+| `cream` | `#FFF8E7` | Background |
+| `ink` | `#2B2A33` | Text (all body text; ≥ 4.5:1 on cream) |
+| `go` | `#2E7D32` | Go / done |
+| `today` | `#E8710A` | Today / current, errors (fills + icons; text on it = `ink`) |
+| `star` | `#F5B700` | Stars |
+| `info` | `#1E6FD9` | Computer / info |
+| `locked` | `#8A8A8A` | Locked (always with lock icon) |
 
 ## 2. Screen list
 
