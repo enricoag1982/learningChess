@@ -6,6 +6,7 @@ import type {
   CompiledContent,
   ExerciseDef,
   Lesson,
+  MateInNDef,
   MiniGame,
   Move,
   Piece,
@@ -19,7 +20,14 @@ import type {
   VersusMiniGame,
   YesNoDef,
 } from '@chess-kids/core';
-import { chessJsRules, createVariantRules, SQUARES, solve, worldLessons } from '@chess-kids/core';
+import {
+  chessJsRules,
+  createVariantRules,
+  selectSquaresAnswer as coreSelectSquaresAnswer,
+  SQUARES,
+  solve,
+  worldLessons,
+} from '@chess-kids/core';
 // Node's ESM loader requires this attribute for a JSON import; the content build validates the
 // shape (see `bundled-content-source.ts`), so the cast below is a type conversion, not a check.
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
@@ -224,16 +232,9 @@ export function findMiniGame(id: string): MiniGame {
   return game;
 }
 
-/** Answer squares for a select-squares exercise, the same way the engine resolves them. */
+/** Answer squares for a select-squares exercise (`answer`, or any `derive` kind), via core. */
 export function selectSquaresAnswer(def: SelectSquaresDef): readonly Square[] {
-  if ('squares' in def.answer) return def.answer.squares;
-  const targets = rules
-    .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
-    .map((move) => move.to);
-  // A promoting pawn's legal moves include one entry per promotion piece, all sharing the same
-  // `to` (e.g. 4 pushes to d8): de-duplicated, or a caller clicking every entry toggles that
-  // square an even number of times (ending unselected) instead of once.
-  return [...new Set(targets)];
+  return coreSelectSquaresAnswer(def, rules);
 }
 
 /** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
@@ -303,6 +304,49 @@ async function solveSetup(page: Page, def: SetupDef): Promise<void> {
   }
 }
 
+/** Strips a trailing check/mate mark, matching the engine's own SAN comparison (`engine.ts`). */
+function normalizeSan(san: string): string {
+  return san.replace(/[+#]+$/, '');
+}
+
+/**
+ * Plays every scripted kid move of a mate-in-n exercise (`playMateInN`'s "moved" outcome mirrored
+ * here without the app's state): after each ply with a scripted reply, waits out the reply's
+ * ~600ms reveal delay (`ExerciseStep.tsx`) before the board accepts the next kid move.
+ */
+async function solveMateInN(page: Page, def: MateInNDef): Promise<void> {
+  let position = def.position;
+  for (let i = 0; i < def.line.length; i += 2) {
+    const san = def.line[i];
+    if (san === undefined) {
+      throw new Error(`mate-in-n exercise "${def.id}": line is missing move ${String(i)}`);
+    }
+    const candidates = chessJsRules.legalMoves(position);
+    const move = candidates.find((candidate) => normalizeSan(candidate.san) === normalizeSan(san));
+    if (!move) {
+      throw new Error(`mate-in-n exercise "${def.id}": no legal move matches SAN "${san}"`);
+    }
+    await clickSquare(page, move.from);
+    await clickSquare(page, move.to);
+
+    const played = chessJsRules.play(position, san);
+    if (!played) {
+      throw new Error(`mate-in-n exercise "${def.id}": "${san}" is illegal from this position`);
+    }
+    position = played.position;
+
+    const replySan = def.line[i + 1];
+    if (replySan !== undefined) {
+      const repliedPlay = chessJsRules.play(position, replySan);
+      if (!repliedPlay) {
+        throw new Error(`mate-in-n exercise "${def.id}": scripted reply "${replySan}" is illegal`);
+      }
+      position = repliedPlay.position;
+      await page.waitForTimeout(700);
+    }
+  }
+}
+
 /** Solves any exercise definition's core interaction, leaving it on its success panel. */
 async function solveExercise(page: Page, def: ExerciseDef): Promise<void> {
   switch (def.type) {
@@ -324,6 +368,9 @@ async function solveExercise(page: Page, def: ExerciseDef): Promise<void> {
       return;
     case 'best-move':
       await solveBestMove(page, def);
+      return;
+    case 'mate-in-n':
+      await solveMateInN(page, def);
       return;
     case 'setup':
       await solveSetup(page, def);

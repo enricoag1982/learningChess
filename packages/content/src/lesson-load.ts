@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import type {
   BestMoveDef,
   CaptureDef,
+  ChoiceDef,
   ChoiceOption,
   CollectStarsDef,
   Color,
@@ -10,12 +11,16 @@ import type {
   DemoHighlight,
   ExerciseDef,
   Lesson,
+  MateInNDef,
   MiniGame,
   Piece,
+  PieceType,
   Position,
-  SetupDef,
   Square,
+  SelectSquaresDef,
+  SetupDef,
   VersusMiniGame,
+  YesNoDef,
 } from '@chess-kids/core';
 import {
   DiagramError,
@@ -23,9 +28,16 @@ import {
   chessJsRules,
   createVariantRules,
   game,
+  isAttacked,
+  isCheckmate,
+  isDefended,
+  isHanging,
+  isInCheck,
+  isStalemate,
   optimalMoves,
   parseDiagram,
   parseFen,
+  selectSquaresAnswer,
 } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
@@ -91,6 +103,90 @@ function compileChoiceOption(raw: ChoiceOptionYaml): ChoiceOption {
   };
 }
 
+/** A `yes-no` exercise's parsed `verify` field (`lesson-schema.ts`'s `yesNoVerifySchema`). */
+type VerifyFact =
+  | { readonly kind: 'hanging' | 'attacked' | 'defended'; readonly square: Square }
+  | { readonly kind: 'in-check' | 'checkmate' | 'stalemate' };
+
+function parseVerify(raw: string): VerifyFact {
+  const [kind, square] = raw.split(' ');
+  if (kind === 'in-check' || kind === 'checkmate' || kind === 'stalemate') {
+    return { kind };
+  }
+  return { kind: kind as 'hanging' | 'attacked' | 'defended', square: square as Square };
+}
+
+function computeVerifyFact(fact: VerifyFact, position: Position): boolean {
+  if (fact.kind === 'hanging') return isHanging(position, fact.square, chessJsRules);
+  if (fact.kind === 'attacked') return isAttacked(position, fact.square, chessJsRules);
+  if (fact.kind === 'defended') return isDefended(position, fact.square, chessJsRules);
+  if (fact.kind === 'in-check') return isInCheck(position, chessJsRules);
+  if (fact.kind === 'checkmate') return isCheckmate(position, chessJsRules);
+  return isStalemate(position, chessJsRules);
+}
+
+/**
+ * A `yes-no` exercise's optional `verify` (`lesson-schema.ts`): computes the named rule fact on the
+ * exercise's own position and fails the build if it contradicts `answer`, so a "safe?" / "in
+ * check?" answer authored by hand can never be wrong. Load-time only: never affects the compiled
+ * `YesNoDef`.
+ */
+function checkYesNoVerify(
+  exercise: YesNoDef,
+  verify: string | undefined,
+  where: string,
+  issues: string[],
+): void {
+  if (verify === undefined) {
+    return;
+  }
+  const fact = parseVerify(verify);
+  const actual = computeVerifyFact(fact, exercise.position);
+  if (actual !== exercise.answer) {
+    const answerWord = exercise.answer ? 'yes' : 'no';
+    issues.push(`${where}: verify "${verify}" is ${String(actual)}, but answer is "${answerWord}"`);
+  }
+}
+
+/** Standard piece values (curriculum.md World 3 "Piece values"), for `choice`'s `higher-value` verify. */
+const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+/**
+ * A `choice` exercise's optional `verify: higher-value` (`lesson-schema.ts`): every option must be
+ * a piece, and `answer` must be the option with the higher standard value, which must be unique.
+ * Load-time only: never affects the compiled `ChoiceDef`.
+ */
+function checkChoiceVerify(
+  exercise: ChoiceDef,
+  verify: string | undefined,
+  where: string,
+  issues: string[],
+): void {
+  if (verify !== 'higher-value') {
+    return;
+  }
+  const values = exercise.options.map((option) =>
+    option.piece === undefined ? undefined : PIECE_VALUE[option.piece.type],
+  );
+  if (values.some((value) => value === undefined)) {
+    issues.push(`${where}: verify "higher-value" requires every option to be a piece`);
+    return;
+  }
+  const known = values as number[];
+  const max = Math.max(...known);
+  const winners = exercise.options.filter((_, index) => known[index] === max);
+  const winner = winners[0];
+  if (winners.length !== 1 || winner === undefined) {
+    issues.push(`${where}: verify "higher-value" requires a unique highest-value option`);
+    return;
+  }
+  if (winner.id !== exercise.answer) {
+    issues.push(
+      `${where}: verify "higher-value": answer should be "${winner.id}", the higher-value option`,
+    );
+  }
+}
+
 function compileExercise(
   relPath: string,
   fieldPath: string,
@@ -106,17 +202,38 @@ function compileExercise(
   const easier = raw.easier === undefined ? {} : { easier: raw.easier };
 
   if (raw.type === 'select-squares') {
-    const answer =
-      raw.answer !== undefined
-        ? { squares: raw.answer as readonly Square[] }
-        : {
-            derive: 'legal-moves' as const,
-            from: assertValidated(raw.from, `${fieldPath}.from`) as Square,
-          };
+    let answer: SelectSquaresDef['answer'];
+    if (raw.answer !== undefined) {
+      answer = { squares: raw.answer as readonly Square[] };
+    } else if (raw.derive === 'check-escapes') {
+      answer = { derive: 'check-escapes' };
+    } else if (raw.derive === 'attacked-by') {
+      answer = {
+        derive: 'attacked-by',
+        from: assertValidated(raw.from, `${fieldPath}.from`) as Square,
+      };
+    } else {
+      answer = {
+        derive: 'legal-moves',
+        from: assertValidated(raw.from, `${fieldPath}.from`) as Square,
+      };
+    }
     return { id: raw.id, concept, textKey, position, type: 'select-squares', answer, ...easier };
   }
-  if (raw.type === 'yes-no') {
+  if (raw.type === 'mate-in-n') {
     return {
+      id: raw.id,
+      concept,
+      textKey,
+      position,
+      type: 'mate-in-n',
+      n: raw.n,
+      line: raw.line,
+      ...easier,
+    };
+  }
+  if (raw.type === 'yes-no') {
+    const exercise: YesNoDef = {
       id: raw.id,
       concept,
       textKey,
@@ -126,9 +243,11 @@ function compileExercise(
       ...(raw.focus === undefined ? {} : { focus: raw.focus as Square }),
       ...easier,
     };
+    checkYesNoVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
+    return exercise;
   }
   if (raw.type === 'choice') {
-    return {
+    const exercise: ChoiceDef = {
       id: raw.id,
       concept,
       textKey,
@@ -139,6 +258,8 @@ function compileExercise(
       showBoard: raw.showBoard ?? true,
       ...easier,
     };
+    checkChoiceVerify(exercise, raw.verify, `${relPath}: ${fieldPath}`, issues);
+    return exercise;
   }
   if (raw.type === 'best-move') {
     return {
@@ -387,6 +508,13 @@ function hasKidPiece(position: Position): boolean {
   return Object.values(position.pieces).some((piece) => piece.color === position.toMove);
 }
 
+/** True when `position` has a `color` king on the board. */
+function hasKing(position: Position, color: Color): boolean {
+  return Object.values(position.pieces).some(
+    (piece) => piece.type === 'k' && piece.color === color,
+  );
+}
+
 /** Strips a trailing check/mate mark, matching the engine's own SAN comparison (`engine.ts`). */
 function normalizeSan(san: string): string {
   return san.replace(/[+#]+$/, '');
@@ -438,6 +566,45 @@ function checkSetupShape(exercise: SetupDef, where: string, issues: string[]): v
   }
 }
 
+/**
+ * `select-squares` with `derive: check-escapes` (`lesson-schema.ts`): the side to move's king must
+ * actually be in check, and have at least one legal escape square (else the exercise is either
+ * unsolvable or not really about escaping check).
+ */
+function checkCheckEscapesShape(exercise: SelectSquaresDef, where: string, issues: string[]): void {
+  if (!isInCheck(exercise.position, chessJsRules)) {
+    issues.push(`${where}: check-escapes requires the side to move's king to be in check`);
+    return;
+  }
+  if (selectSquaresAnswer(exercise, rules).length === 0) {
+    issues.push(`${where}: check-escapes has no legal king move`);
+  }
+}
+
+/**
+ * `mate-in-n` (`lesson-schema.ts`): both kings on the board, every line entry a legal move played
+ * in sequence under real chess rules (turns alternate normally, never a static opponent), and the
+ * final (`n`th) kid move delivers checkmate. `n` matching `line.length` is already schema-enforced.
+ */
+function checkMateInNShape(exercise: MateInNDef, where: string, issues: string[]): void {
+  if (!hasKing(exercise.position, 'w') || !hasKing(exercise.position, 'b')) {
+    issues.push(`${where}: mate-in-n requires both kings on the board`);
+    return;
+  }
+  let position = exercise.position;
+  for (const [index, san] of exercise.line.entries()) {
+    const played = chessJsRules.play(position, san);
+    if (played === null) {
+      issues.push(`${where}: line[${String(index)}] "${san}" is not a legal move`);
+      return;
+    }
+    position = played.position;
+  }
+  if (!isCheckmate(position, chessJsRules)) {
+    issues.push(`${where}: the final move in "line" does not deliver checkmate`);
+  }
+}
+
 function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string[]): void {
   if (exercise.type === 'collect-stars') {
     if (exercise.position.markers.stars.length === 0) {
@@ -463,9 +630,20 @@ function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string
       }
       return;
     }
+    if (exercise.answer.derive === 'check-escapes') {
+      checkCheckEscapesShape(exercise, where, issues);
+      return;
+    }
     const fromPiece = exercise.position.pieces[exercise.answer.from];
-    if (fromPiece === undefined || fromPiece.color !== exercise.position.toMove) {
-      issues.push(`${where}: select-squares "from" square has no piece of the side to move`);
+    if (exercise.answer.derive === 'legal-moves') {
+      if (fromPiece === undefined || fromPiece.color !== exercise.position.toMove) {
+        issues.push(`${where}: select-squares "from" square has no piece of the side to move`);
+      }
+      return;
+    }
+    // attacked-by
+    if (fromPiece === undefined) {
+      issues.push(`${where}: select-squares "from" square has no piece`);
     }
     return;
   }
@@ -475,9 +653,15 @@ function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string
   }
   if (exercise.type === 'setup') {
     checkSetupShape(exercise, where, issues);
+    return;
   }
-  // choice: uniqueness, answer membership and "text or piece" are schema-level (lesson-schema.ts).
-  // yes-no: the schema already guarantees a boolean answer and a valid (optional) focus square.
+  if (exercise.type === 'mate-in-n') {
+    checkMateInNShape(exercise, where, issues);
+  }
+  // choice: uniqueness, answer membership and "text or piece" are schema-level (lesson-schema.ts);
+  // "higher-value" verify is checked at compile time (`checkChoiceVerify`).
+  // yes-no: the schema already guarantees a boolean answer and a valid (optional) focus square;
+  // its own `verify` is checked at compile time (`checkYesNoVerify`).
 }
 
 function checkOptimalMoves(
@@ -508,14 +692,16 @@ function checkOptimalMoves(
  * its own start position (an instant win/draw there means the boss is unplayable).
  */
 function checkVersusMiniGame(miniGame: VersusMiniGame, where: string, issues: string[]): void {
-  const hasKing = (color: 'w' | 'b'): boolean =>
-    Object.values(miniGame.position.pieces).some(
-      (piece) => piece.type === 'k' && piece.color === color,
-    );
-  if (miniGame.rules.kings && (!hasKing('w') || !hasKing('b'))) {
+  if (
+    miniGame.rules.kings &&
+    (!hasKing(miniGame.position, 'w') || !hasKing(miniGame.position, 'b'))
+  ) {
     issues.push(`${where}: rules.kings is true but the start position is missing a king`);
   }
-  if (!miniGame.rules.kings && (hasKing('w') || hasKing('b'))) {
+  if (
+    !miniGame.rules.kings &&
+    (hasKing(miniGame.position, 'w') || hasKing(miniGame.position, 'b'))
+  ) {
     issues.push(`${where}: rules.kings is false but the start position has a king`);
   }
   const started = game.startGame(miniGame.rules, miniGame.position);

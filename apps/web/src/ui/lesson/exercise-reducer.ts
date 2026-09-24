@@ -2,15 +2,19 @@ import type {
   ExerciseDef,
   ExerciseState,
   Hint,
+  Move,
   MoveInput,
   Piece,
+  Position,
   Square,
   VariantRules,
 } from '@chess-kids/core';
 import {
   answerChoice,
   answerYesNo,
+  chessJsRules,
   placePiece,
+  playMateInN,
   playMove,
   requestHint,
   startExercise,
@@ -33,7 +37,11 @@ export type ExerciseFeedback =
   /** setup: a piece placed on the wrong square (or an already-filled one). */
   | { readonly kind: 'wrong-placement' }
   | { readonly kind: 'hint'; readonly hint: Hint }
-  | { readonly kind: 'solved' };
+  | { readonly kind: 'solved' }
+  /** mate-in-n: delivered checkmate (any mating move, not only the scripted one). */
+  | { readonly kind: 'checkmate' }
+  /** mate-in-n: the scripted opponent reply, revealed after its short delay. */
+  | { readonly kind: 'opponent-reply'; readonly reply: Move };
 
 export interface ExerciseUIState {
   readonly core: ExerciseState;
@@ -48,6 +56,16 @@ export interface ExerciseUIState {
   readonly wrongMove?: { readonly from: Square; readonly to: Square };
   /** yes-no: the value last picked wrong, if any — that button turns orange and disables. */
   readonly wrongAnswer?: boolean;
+  /**
+   * mate-in-n only: the kid's move was accepted and its scripted opponent reply already applied
+   * in `core`, but not shown yet — `position` is the board right after the kid's own move (before
+   * the reply), for the board to render while the reply's short delay plays out.
+   */
+  readonly pendingReply?: {
+    readonly move: Move;
+    readonly reply: Move;
+    readonly position: Position;
+  };
 }
 
 export type ExerciseAction =
@@ -61,7 +79,9 @@ export type ExerciseAction =
   | { readonly type: 'hint' }
   /** Guided tries pre-show hint level 1 on mount; unlike 'hint', this leaves feedback untouched. */
   | { readonly type: 'auto-hint' }
-  | { readonly type: 'undo' };
+  | { readonly type: 'undo' }
+  /** mate-in-n: reveals the scripted opponent reply once its short delay has elapsed. */
+  | { readonly type: 'reveal-reply' };
 
 /** Fresh reducer state for a newly-started exercise (guided or scored). */
 export function initExerciseState(def: ExerciseDef): ExerciseUIState {
@@ -80,6 +100,66 @@ export function createExerciseReducer(
   return function exerciseReducer(state, action) {
     switch (action.type) {
       case 'move': {
+        if (state.core.def.type === 'mate-in-n') {
+          if (state.pendingReply) {
+            // The scripted reply has not been shown yet: ignore input until it is.
+            return state;
+          }
+          const { state: core, outcome } = playMateInN(state.core, chessJsRules, action.move);
+          if (outcome.kind === 'illegal') {
+            return {
+              ...state,
+              core,
+              hint: null,
+              feedback: { kind: 'illegal' },
+              wrongSquares: [],
+              wrongMove: undefined,
+              pendingReply: undefined,
+            };
+          }
+          if (outcome.kind === 'wrong') {
+            return {
+              ...state,
+              core,
+              hint: null,
+              feedback: { kind: 'wrong-move' },
+              wrongSquares: [],
+              wrongMove: { from: outcome.move.from, to: outcome.move.to },
+              pendingReply: undefined,
+            };
+          }
+          if (outcome.kind === 'solved') {
+            return {
+              ...state,
+              core,
+              hint: null,
+              feedback: { kind: 'checkmate' },
+              wrongSquares: [],
+              wrongMove: undefined,
+              lastMove: { from: outcome.move.from, to: outcome.move.to },
+              pendingReply: undefined,
+            };
+          }
+          // 'moved': the scripted reply is already applied in `core`; stage it for its delayed
+          // reveal. `core.history`'s last entry is the position right after the kid's own move
+          // (before the reply), pushed by `playMateInN` alongside the pre-move one.
+          const positionAfterMove = core.history[core.history.length - 1];
+          if (positionAfterMove === undefined) {
+            throw new Error(
+              'exercise-reducer: mate-in-n history is missing the pre-reply position',
+            );
+          }
+          return {
+            ...state,
+            core,
+            hint: null,
+            feedback: { kind: 'instruction' },
+            wrongSquares: [],
+            wrongMove: undefined,
+            lastMove: { from: outcome.move.from, to: outcome.move.to },
+            pendingReply: { move: outcome.move, reply: outcome.reply, position: positionAfterMove },
+          };
+        }
         const { state: core, outcome } = playMove(state.core, rules, action.move);
         if (outcome.kind === 'illegal') {
           return {
@@ -183,6 +263,18 @@ export function createExerciseReducer(
       case 'auto-hint': {
         const { state: core, hint } = requestHint(state.core, rules);
         return { ...state, core, hint };
+      }
+      case 'reveal-reply': {
+        if (!state.pendingReply) {
+          return state;
+        }
+        const { reply } = state.pendingReply;
+        return {
+          ...state,
+          pendingReply: undefined,
+          lastMove: { from: reply.from, to: reply.to },
+          feedback: { kind: 'opponent-reply', reply },
+        };
       }
       case 'undo':
         return {

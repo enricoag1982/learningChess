@@ -29,10 +29,17 @@ export interface CaptureDef extends ExerciseBase {
 /** Tap the correct set of squares. */
 export interface SelectSquaresDef extends ExerciseBase {
   readonly type: 'select-squares';
-  /** Explicit answer, or derived from the position. */
+  /**
+   * Explicit answer, or derived from the position: every legal destination of the piece on `from`
+   * (`legal-moves`), every square the piece on `from` attacks, own or enemy pieces included
+   * (`attacked-by`), or every square the side to move's king can legally move to, position must
+   * have that king in check (`check-escapes`).
+   */
   readonly answer:
     | { readonly squares: readonly Square[] }
-    | { readonly derive: 'legal-moves'; readonly from: Square };
+    | { readonly derive: 'legal-moves'; readonly from: Square }
+    | { readonly derive: 'attacked-by'; readonly from: Square }
+    | { readonly derive: 'check-escapes' };
 }
 
 /** Answer a yes/no question about the position; `focus`, if given, is the square the question is about. */
@@ -69,6 +76,24 @@ export interface SetupDef extends ExerciseBase {
   readonly target: Position;
 }
 
+/**
+ * Deliver checkmate under real chess rules (both kings, real turn alternation — never a static
+ * opponent). `line` is the full scripted sequence in SAN — kid move, opponent reply, kid move, …,
+ * final kid move (which mates) — so `line.length === 2 * n - 1`.
+ */
+export interface MateInNDef extends ExerciseBase {
+  readonly type: 'mate-in-n';
+  readonly n: number;
+  readonly line: readonly string[];
+}
+
 /** All exercise definitions. */
 export type ExerciseDef =
-  CollectStarsDef | SelectSquaresDef | CaptureDef | YesNoDef | ChoiceDef | BestMoveDef | SetupDef;
+  | CollectStarsDef
+  | SelectSquaresDef
+  | CaptureDef
+  | YesNoDef
+  | ChoiceDef
+  | BestMoveDef
+  | SetupDef
+  | MateInNDef;

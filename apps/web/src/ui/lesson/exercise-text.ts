@@ -92,5 +92,15 @@ export function exerciseNote(
       return { text: hintNoteText(t, feedback.hint, name), tone: 'attention' };
     case 'solved':
       return { text: praiseText(t, stars), tone: 'praise' };
+    case 'checkmate':
+      return { text: `${t('exercise.checkmate')} ${praiseText(t, stars)}`, tone: 'praise' };
+    case 'opponent-reply':
+      return {
+        text: t('exercise.opponent-moved', {
+          color: t(`exercise.opponent-color.${feedback.reply.color}`),
+          piece: t(`board.piece.${feedback.reply.piece}`),
+        }),
+        tone: 'attention',
+      };
   }
 }
