@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ExerciseDef, PieceType, Stars } from '@chess-kids/core';
 import { characterName, tContent } from '../../content-text.ts';
 import { characterPiece } from '../art/character-meta.ts';
+import type { SpeechBubbleNote } from '../SpeechBubble.tsx';
 import type { ExerciseFeedback } from './exercise-reducer.ts';
 
 /** The piece-specific "that's not how I move" line (docs/screens.md: errors are never red). */
@@ -29,31 +30,39 @@ function praiseText(t: TFunction, stars: Stars): string {
   return t('exercise.praise-1');
 }
 
-/** Resolves the Owl bubble's current line for an exercise step. */
-export function exerciseBubbleText(
+/** The exercise's instruction: always shown, never replaced by a hint / error / praise note. */
+export function exerciseInstructionText(t: TFunction, def: ExerciseDef): string {
+  return tContent(t, def.textKey);
+}
+
+/**
+ * The note under the instruction for the current feedback, or `undefined` while just reading the
+ * instruction (teaching-process.md §3.3: wrong move → explanation; hint ladder; praise on solve).
+ */
+export function exerciseNote(
   t: TFunction,
   feedback: ExerciseFeedback,
-  def: ExerciseDef,
   character: string,
   stars: Stars,
-): string {
+): SpeechBubbleNote | undefined {
   const name = characterName(t, character);
   switch (feedback.kind) {
     case 'instruction':
-      return tContent(t, def.textKey);
+      return undefined;
     case 'tap-first':
-      return t('exercise.tap-piece-first', { name });
+      return { text: t('exercise.tap-piece-first', { name }), tone: 'attention' };
     case 'illegal':
-      return illegalMoveText(t, characterPiece(character), name);
+      return { text: illegalMoveText(t, characterPiece(character), name), tone: 'attention' };
     case 'select-wrong':
-      return t('exercise.select-wrong');
+      return { text: t('exercise.select-wrong'), tone: 'attention' };
     case 'select-missing':
-      return t('exercise.select-missing');
+      return { text: t('exercise.select-missing'), tone: 'attention' };
     case 'hint':
-      if (feedback.level === 1) return t('exercise.hint-piece', { name });
-      if (feedback.level === 2) return t('exercise.hint-target');
-      return t('exercise.hint-answer');
+      if (feedback.level === 1)
+        return { text: t('exercise.hint-piece', { name }), tone: 'attention' };
+      if (feedback.level === 2) return { text: t('exercise.hint-target'), tone: 'attention' };
+      return { text: t('exercise.hint-answer'), tone: 'attention' };
     case 'solved':
-      return praiseText(t, stars);
+      return { text: praiseText(t, stars), tone: 'praise' };
   }
 }

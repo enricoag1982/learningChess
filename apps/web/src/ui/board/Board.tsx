@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, JSX, KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
-import type { Color, Move, Piece, PieceType, Position, Square } from '@chess-kids/core';
+import type { TFunction } from 'i18next';
+import { useTranslation } from 'react-i18next';
+import type { Color, Move, Piece, Position, Square } from '@chess-kids/core';
 import { BlockedIcon, PieceIcon, StarIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
@@ -47,17 +49,6 @@ export interface BoardProps {
   readonly label: string;
 }
 
-const PIECE_NAMES: Record<PieceType, string> = {
-  k: 'king',
-  q: 'queen',
-  r: 'rook',
-  b: 'bishop',
-  n: 'knight',
-  p: 'pawn',
-};
-
-const COLOR_NAMES: Record<Color, string> = { w: 'white', b: 'black' };
-
 const CELLS: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7];
 
 /** Real chess boards put a dark square on a1. */
@@ -67,7 +58,9 @@ function isLightSquare(square: Square): boolean {
   return (file + rank) % 2 === 0;
 }
 
+/** Screen-reader name for one square, e.g. "e4, white bishop, selected" (non-functional.md §2). */
 function describeSquare(
+  t: TFunction,
   square: Square,
   position: Position,
   selected: boolean,
@@ -76,16 +69,20 @@ function describeSquare(
   const piece = position.pieces[square];
   let base: string;
   if (piece) {
-    base = `${square}, ${COLOR_NAMES[piece.color]} ${PIECE_NAMES[piece.type]}`;
+    base = t('board.square.piece', {
+      square,
+      color: t(`board.color.${piece.color}`),
+      piece: t(`board.piece.${piece.type}`),
+    });
   } else if (position.markers.stars.includes(square)) {
-    base = `${square}, star`;
+    base = t('board.square.star', { square });
   } else if (position.markers.blocked.includes(square)) {
-    base = `${square}, blocked`;
+    base = t('board.square.blocked', { square });
   } else {
-    base = `${square}, empty`;
+    base = t('board.square.empty', { square });
   }
-  if (selected) return `${base}, selected`;
-  if (target) return `${base}, possible move`;
+  if (selected) return t('board.square.selected', { base });
+  if (target) return t('board.square.possible-move', { base });
   return base;
 }
 
@@ -131,6 +128,7 @@ export function Board({
   showCoordinates = false,
   label,
 }: BoardProps): JSX.Element {
+  const { t } = useTranslation();
   const squareMode = onSquareTap !== undefined;
 
   const [selected, setSelected] = useState<Square | null>(null);
@@ -379,6 +377,7 @@ export function Board({
                 const isBlocked = position.markers.blocked.includes(square);
                 const isDraggingThis = drag?.from === square && drag.dragging;
                 const accessibleName = describeSquare(
+                  t,
                   square,
                   position,
                   tapSelected || squareModeSelected,

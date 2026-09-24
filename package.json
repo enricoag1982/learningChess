@@ -15,7 +15,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "build": "pnpm -r build",
-    "test:e2e": "pnpm --filter @chess-kids/web test:e2e"
+    "test:e2e": "pnpm --filter @chess-kids/web test:e2e",
+    "size": "pnpm --filter @chess-kids/web size"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

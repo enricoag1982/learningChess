@@ -24,24 +24,28 @@ function pieceTypeName(t: TFunction, type: PieceType): string {
   }
 }
 
-/** Big character portrait + name, and a piece-icon badge naming the chess piece it stands for. */
+/**
+ * Character portrait + name, and a piece-icon badge naming the chess piece it stands for. A
+ * compact row on phone width (< 640px), a big portrait over a column from `sm` up
+ * (docs/screens.md §1, fix: phone Story as a compact row).
+ */
 export function CharacterCard({ character }: { readonly character: string }): JSX.Element {
   const { t } = useTranslation();
   const piece = characterPiece(character);
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="flex w-full items-center gap-3 sm:w-auto sm:flex-col sm:justify-center sm:gap-3">
       <div
-        className="h-32 w-32 overflow-hidden rounded-full p-5 sm:h-44 sm:w-44"
+        className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-2 sm:h-32 sm:w-32 sm:p-5 md:h-44 md:w-44"
         style={{ backgroundColor: characterColor(character) }}
       >
         <CharacterIcon character={character} />
       </div>
-      <span className="font-display text-xl text-ink sm:text-2xl">
+      <span className="font-display text-lg text-ink sm:text-xl md:text-2xl">
         {characterName(t, character)}
       </span>
-      <div className="flex items-center gap-2 rounded-full border-2 border-line bg-card px-4 py-2 font-bold text-ink">
-        <span className="h-7 w-7">
+      <div className="ml-auto flex items-center gap-2 rounded-full border-2 border-line bg-card px-3 py-1.5 font-bold text-ink sm:ml-0 sm:px-4 sm:py-2">
+        <span className="h-6 w-6 sm:h-7 sm:w-7">
           <PieceIcon piece={{ color: 'w', type: piece }} />
         </span>
         {pieceTypeName(t, piece)}

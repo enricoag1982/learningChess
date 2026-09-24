@@ -7,9 +7,11 @@ import { BossStep } from './lesson/BossStep.tsx';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
 import { DemoStep } from './lesson/DemoStep.tsx';
 import { ExerciseStep } from './lesson/ExerciseStep.tsx';
+import { PhaseChip } from './lesson/PhaseChip.tsx';
 import { StepPills } from './lesson/StepPills.tsx';
 import { StoryStep } from './lesson/StoryStep.tsx';
 import { StarsPill } from './StarsPill.tsx';
+import { useIsCompact } from './useMediaQuery.ts';
 
 function CloseIcon(): JSX.Element {
   return (
@@ -32,9 +34,12 @@ function CloseIcon(): JSX.Element {
 function StageDots({
   current,
   total,
+  showLabel = true,
 }: {
   readonly current: number;
   readonly total: number;
+  /** Hidden when the phone top-bar chip already states the count, to avoid saying it twice. */
+  readonly showLabel?: boolean;
 }): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -54,9 +59,11 @@ function StageDots({
           />
         );
       })}
-      <span className="ml-2 text-sm font-extrabold text-muted">
-        {t('lesson.stage-of', { current: current + 1, total })}
-      </span>
+      {showLabel && (
+        <span className="ml-2 text-sm font-extrabold text-muted">
+          {t('lesson.stage-of', { current: current + 1, total })}
+        </span>
+      )}
     </div>
   );
 }
@@ -65,6 +72,7 @@ function StageDots({
 export function LessonScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const isCompact = useIsCompact();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const lessonId = useAppStore((state) => state.lessonId);
@@ -104,6 +112,14 @@ export function LessonScreen(): JSX.Element {
 
   const phase = stepPhase(step);
   const stars = totalStars(progress);
+  // Scored exercises also show "N of M" via StageDots underneath; on the compact phone bar that
+  // row drops its own label (`showLabel={!isCompact}` below) so the count is stated once, not twice.
+  const chipCounts =
+    step.kind === 'guided'
+      ? { current: step.index + 1, total: lesson.guided.length }
+      : step.kind === 'exercise'
+        ? { current: step.index + 1, total: lesson.exercises.length }
+        : undefined;
 
   return (
     <main className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6">
@@ -116,12 +132,19 @@ export function LessonScreen(): JSX.Element {
         >
           <CloseIcon />
         </button>
-        <div className="flex-1 overflow-x-auto">{phase && <StepPills current={phase} />}</div>
+        <div className="min-w-0 flex-1 overflow-x-auto">
+          {phase &&
+            (isCompact ? (
+              <PhaseChip phase={phase} current={chipCounts?.current} total={chipCounts?.total} />
+            ) : (
+              <StepPills current={phase} />
+            ))}
+        </div>
         <StarsPill count={stars} />
       </div>
 
       {step.kind === 'exercise' && (
-        <StageDots current={step.index} total={lesson.exercises.length} />
+        <StageDots current={step.index} total={lesson.exercises.length} showLabel={!isCompact} />
       )}
 
       <div className="flex min-h-0 flex-1 flex-col">

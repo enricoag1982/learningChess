@@ -6,8 +6,10 @@ import { pickCurrentLesson } from '../app/current-lesson.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { characterName } from '../content-text.ts';
 import { FoxIcon } from './art/characters.tsx';
+import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
+import { useNarratedText } from './useNarratedText.ts';
 
 function PlayIcon(): JSX.Element {
   return (
@@ -43,18 +45,21 @@ export function HomeScreen(): JSX.Element {
   const status = lesson ? lessonStatus(lesson, lessonProgress) : 'new';
   const stars = totalStars(progress);
 
+  const name = lesson ? characterName(t, lesson.character) : '';
+  const bubbleText = !lesson
+    ? ''
+    : status === 'new'
+      ? t('home.owl-new', { name })
+      : status === 'in-progress'
+        ? t('home.owl-in-progress')
+        : t('home.owl-done', { name });
+  const replay = useNarratedText(services.narrator, bubbleText);
+
   if (!profile || !lesson) {
     // First render before `init()` resolves; a blank cream screen for an instant beats a flash.
     return <main className="min-h-screen bg-cream" />;
   }
 
-  const name = characterName(t, lesson.character);
-  const bubbleText =
-    status === 'new'
-      ? t('home.owl-new', { name })
-      : status === 'in-progress'
-        ? t('home.owl-in-progress')
-        : t('home.owl-done', { name });
   const buttonLabel =
     status === 'new' ? t('home.start') : status === 'in-progress' ? t('continue') : t('play-again');
 
@@ -77,12 +82,9 @@ export function HomeScreen(): JSX.Element {
       </div>
 
       <div className="flex flex-1 flex-col items-stretch justify-center gap-8 sm:flex-row sm:items-center">
-        <div className="flex-1">
-          <SpeechBubble
-            narrator={services.narrator}
-            text={bubbleText}
-            replayLabel={t('exercise.replay')}
-          />
+        <div className="flex flex-1 flex-col gap-3">
+          <SpeechBubble text={bubbleText} />
+          <ReplayButton onClick={replay} label={t('exercise.replay')} />
         </div>
         <button
           type="button"

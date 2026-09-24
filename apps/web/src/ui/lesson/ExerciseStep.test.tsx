@@ -112,6 +112,58 @@ describe('ExerciseStep', () => {
     await screen.findByRole('button', { name: /^a1, white rook/ });
   });
 
+  it('a guided try shows praise and Next only on success, never a stars row', async () => {
+    const exercise = fixtureExercise('guided-me');
+    const lesson = fixtureLesson({ guided: [exercise], exercises: [] });
+    const services = createTestServices(fixtureContentSource(lesson));
+    await renderWithStore(
+      <ExerciseStep lesson={lesson} exercise={exercise} guided nextStepIndex={1} />,
+      services,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^h1,/ }));
+
+    // Guided tries auto-show hint level 1 on mount, so this solves at less than 3 stars — the
+    // exact praise line isn't the point here, only that no stars row appears (fix #4).
+    await screen.findByRole('button', { name: /^Next/ });
+    expect(screen.queryByTestId('stars-row')).toBeNull();
+  });
+
+  it('keeps the instruction visible under a hint note, and replay speaks both', async () => {
+    const exercise: ExerciseDef = {
+      id: 'note-me',
+      concept: 'fixture-move',
+      textKey: 'fixtures:note-instruction',
+      position: parseDiagram(`
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        R . . . . . . *
+      `),
+      type: 'collect-stars',
+      stars3: 1,
+      stars2: 2,
+    };
+    const lesson = fixtureLesson({ exercises: [exercise] });
+    const services = createTestServices(fixtureContentSource(lesson));
+    await renderWithStore(
+      <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+      services,
+    );
+
+    // The instruction (the exercise's textKey, un-translated in this fixture setup) stays on
+    // screen even once a hint note appears under it.
+    await screen.findByText('note-instruction');
+    fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
+    await screen.findByText('Look at Rhino.');
+    expect(screen.getByText('note-instruction')).toBeTruthy();
+  });
+
   it('select-squares: a wrong pick shows the orange-squares message; the right set solves it', async () => {
     const position = parseDiagram(`
       . . . . . . . .

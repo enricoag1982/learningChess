@@ -29,6 +29,24 @@ lesson:
     boss: Boss
   stage-of: '{{current}} of {{total}}'
   board-label: Chess board
+board:
+  color:
+    w: white
+    b: black
+  piece:
+    k: king
+    q: queen
+    r: rook
+    b: bishop
+    n: knight
+    p: pawn
+  square:
+    piece: '{{square}}, {{color}} {{piece}}'
+    star: '{{square}}, star'
+    blocked: '{{square}}, blocked'
+    empty: '{{square}}, empty'
+    selected: '{{base}}, selected'
+    possible-move: '{{base}}, possible move'
 story:
   listen-again: Listen again
   primary: Let me try

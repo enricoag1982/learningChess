@@ -18,7 +18,7 @@ export function StarsRow({
   animate = false,
 }: StarsRowProps): JSX.Element {
   return (
-    <div className="flex items-end gap-2" aria-hidden="true">
+    <div className="flex items-end gap-2" aria-hidden="true" data-testid="stars-row">
       {Array.from({ length: max }, (_, index) => {
         const filled = index < earned;
         return (

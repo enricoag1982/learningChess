@@ -47,6 +47,9 @@ jobs:
       - name: Build
         run: pnpm run --if-present build
 
+      - name: Size budget
+        run: pnpm run --if-present size
+
       - name: Install Playwright browser
         run: pnpm --filter @chess-kids/web exec playwright install --with-deps chromium
 
