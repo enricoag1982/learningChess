@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     "./locales/*": "./dist/locales/*",
-    "./content.json": "./dist/content.json"
+    "./content.json": "./dist/content.json",
+    "./tracks.json": "./dist/tracks.json"
   },
   "scripts": {
     "build": "node scripts/build.ts",

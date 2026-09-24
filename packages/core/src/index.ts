@@ -34,6 +34,25 @@ export type { LessonStep, LessonPhase } from './domain/lesson-session.ts';
 export { lessonSteps, stepPhase } from './domain/lesson-session.ts';
 
 export type {
+  Habitat,
+  Track,
+  World,
+  RankDef,
+  TracksCatalog,
+  JourneyLessonStatus,
+  WorldStatus,
+} from './domain/journey.ts';
+export {
+  HABITATS,
+  isHabitat,
+  worldLessons,
+  worldStatus,
+  lessonAvailability,
+  nextLesson,
+  currentRank,
+} from './domain/journey.ts';
+
+export type {
   ProfileRepository,
   ProgressRepository,
   ParentLockRepository,
@@ -57,6 +76,9 @@ export {
   recordBossResult,
   saveResumeStep,
 } from './app/use-cases.ts';
+
+export type { Journey, JourneyWorld } from './app/journey.ts';
+export { loadJourney } from './app/journey.ts';
 
 export type { PasswordFileLocation, VerifyPasswordResult } from './app/profiles.ts';
 export {

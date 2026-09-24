@@ -1,0 +1,32 @@
+tracks:
+  - id: basics
+    kind: main
+    title: tracks.basics
+    worlds:
+      - { id: board, order: 1, habitat: meadow, title: worlds.board }
+      - { id: pieces, order: 2, habitat: savannah, title: worlds.pieces }
+      - { id: attack, order: 3, habitat: jungle, title: worlds.attack }
+      - { id: check, order: 4, habitat: mountains, title: worlds.check }
+      - { id: rules, order: 5, habitat: river, title: worlds.rules }
+  - id: openings
+    kind: branch
+    title: tracks.openings
+    worlds:
+      - { id: openings, order: 1, habitat: forest, title: worlds.openings }
+  - id: tactics
+    kind: branch
+    title: tracks.tactics
+    worlds:
+      - { id: tactics, order: 1, habitat: ocean, title: worlds.tactics }
+  - id: endgames
+    kind: branch
+    title: tracks.endgames
+    worlds:
+      - { id: endgames, order: 1, habitat: arctic, title: worlds.endgames }
+ranks:
+  - { id: pawn, after: start }
+  - { id: knight, after: world:pieces }
+  - { id: bishop, after: world:attack }
+  - { id: rook, after: world:check }
+  - { id: queen, after: track:basics }
+  - { id: king, after: all-tracks }
