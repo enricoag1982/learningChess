@@ -70,6 +70,13 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m2.6` | Mouse bot (level 1) in a worker; variant vs computer mode; Pawn + Promotion lessons; Pawn Wars |
 | `m2.7` | Animal friends, stars totals, basic My Den; Play screen (unlocked mini-games) → `m2` (playtest 2 by user) |
 
+### 3.2 Follow-ups (not yet scheduled in an iteration)
+
+| # | Item | Scope | Notes |
+|---|---|---|---|
+| F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | No README yet; `docs/` are compact specs, not for casual readers |
+| F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) | Engine + UI + Rook variants: E5 follow-up PR; see domain-model.md §3 |
+
 ## 4. After MVP
 
 | # | Milestone | Scope |
