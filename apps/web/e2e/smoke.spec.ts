@@ -15,7 +15,7 @@ test('loads the app shell with a valid manifest and no console errors', async ({
 
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Chess for Kids' })).toBeVisible();
-  await expect(page.getByText("Hi! I'm Owl. Let's learn chess together!")).toBeVisible();
+  await expect(page.getByText("Hi! I'm Owl. Today you meet Rhino!")).toBeVisible();
 
   const manifestHref = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(manifestHref).toBeTruthy();

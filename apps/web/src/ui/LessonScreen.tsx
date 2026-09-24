@@ -1,0 +1,150 @@
+import { useMemo } from 'react';
+import type { JSX } from 'react';
+import { useTranslation } from 'react-i18next';
+import { lessonSteps, saveResumeStep, stepPhase, totalStars } from '@chess-kids/core';
+import { useAppStore, useServices } from '../app/store.ts';
+import { BossStep } from './lesson/BossStep.tsx';
+import { CompleteStep } from './lesson/CompleteStep.tsx';
+import { DemoStep } from './lesson/DemoStep.tsx';
+import { ExerciseStep } from './lesson/ExerciseStep.tsx';
+import { StepPills } from './lesson/StepPills.tsx';
+import { StoryStep } from './lesson/StoryStep.tsx';
+import { StarsPill } from './StarsPill.tsx';
+
+function CloseIcon(): JSX.Element {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.6}
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  );
+}
+
+/** Exercise stage dots + "N of M", shown only while working through the scored exercises. */
+function StageDots({
+  current,
+  total,
+}: {
+  readonly current: number;
+  readonly total: number;
+}): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {Array.from({ length: total }, (_, index) => {
+        const state = index < current ? 'done' : index === current ? 'current' : 'upcoming';
+        return (
+          <span
+            key={index}
+            className={`h-3 w-3 rounded-full border-2 ${
+              state === 'done'
+                ? 'border-go bg-go'
+                : state === 'current'
+                  ? 'border-today bg-white'
+                  : 'border-[#E8DFC9] bg-[#E8DFC9]'
+            }`}
+          />
+        );
+      })}
+      <span className="ml-2 text-sm font-extrabold text-muted">
+        {t('lesson.stage-of', { current: current + 1, total })}
+      </span>
+    </div>
+  );
+}
+
+/** The whole lesson session: top chrome (close, step pills, stars) plus the current step. */
+export function LessonScreen(): JSX.Element {
+  const { t } = useTranslation();
+  const services = useServices();
+  const profile = useAppStore((state) => state.profile);
+  const progress = useAppStore((state) => state.progress);
+  const lessonId = useAppStore((state) => state.lessonId);
+  const stepIndex = useAppStore((state) => state.stepIndex);
+  const goToStep = useAppStore((state) => state.goToStep);
+  const exitLesson = useAppStore((state) => state.exitLesson);
+
+  const lesson = lessonId ? services.deps.content.lesson(lessonId) : undefined;
+  const steps = useMemo(
+    () => (lesson ? lessonSteps(lesson, services.deps.content.minigames()) : []),
+    [lesson, services],
+  );
+  const step = steps[stepIndex];
+
+  if (!lesson || !step || !profile) {
+    return <main className="min-h-screen bg-cream" />;
+  }
+
+  if (step.kind === 'complete') {
+    return (
+      <CompleteStep
+        lesson={lesson}
+        onPlayAgain={() => {
+          goToStep(0);
+        }}
+        onContinue={exitLesson}
+      />
+    );
+  }
+
+  function advanceFromCurrent(): void {
+    const next = stepIndex + 1;
+    goToStep(next);
+    if (!lesson || !profile) return;
+    void saveResumeStep(services.deps, profile.id, lesson.id, next);
+  }
+
+  const phase = stepPhase(step);
+  const stars = totalStars(progress);
+
+  return (
+    <main className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6">
+      <div className="flex items-center gap-3 sm:gap-4">
+        <button
+          type="button"
+          aria-label={t('lesson.close')}
+          onClick={exitLesson}
+          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+        >
+          <CloseIcon />
+        </button>
+        <div className="flex-1 overflow-x-auto">{phase && <StepPills current={phase} />}</div>
+        <StarsPill count={stars} />
+      </div>
+
+      {step.kind === 'exercise' && (
+        <StageDots current={step.index} total={lesson.exercises.length} />
+      )}
+
+      <div className="flex min-h-0 flex-1 flex-col">
+        {step.kind === 'story' && <StoryStep lesson={lesson} onNext={advanceFromCurrent} />}
+        {step.kind === 'demo' && <DemoStep lesson={lesson} onNext={advanceFromCurrent} />}
+        {(step.kind === 'guided' || step.kind === 'exercise') && (
+          <ExerciseStep
+            key={step.exercise.id}
+            lesson={lesson}
+            exercise={step.exercise}
+            guided={step.kind === 'guided'}
+            nextStepIndex={stepIndex + 1}
+          />
+        )}
+        {step.kind === 'boss' && (
+          <BossStep
+            key={step.game.id}
+            lesson={lesson}
+            game={step.game}
+            nextStepIndex={stepIndex + 1}
+          />
+        )}
+      </div>
+    </main>
+  );
+}

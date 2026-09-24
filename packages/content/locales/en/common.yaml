@@ -1,7 +1,68 @@
 app:
   title: Chess for Kids
-home:
-  greeting: Hi! I'm Owl. Let's learn chess together!
-  coming-soon: Lessons are coming soon.
 offline:
   ready: Ready to play offline.
+stars-count: '{{count}} stars'
+next: Next
+play-again: Play again
+continue: Continue
+piece:
+  r: Rook
+  b: Bishop
+  q: Queen
+  k: King
+  n: Knight
+  p: Pawn
+home:
+  owl-new: "Hi! I'm Owl. Today you meet {{name}}!"
+  owl-in-progress: Welcome back! Let's keep going.
+  owl-done: "You finished {{name}}'s lesson! Want to play again?"
+  start: Start
+  avatar-alt: Fox avatar
+lesson:
+  close: Close lesson
+  steps:
+    story: Story
+    demo: Demo
+    try: Try
+    exercises: Exercises
+    boss: Boss
+  stage-of: '{{current}} of {{total}}'
+  board-label: Chess board
+story:
+  listen-again: Listen again
+  primary: Let me try
+demo:
+  board-label: "{{name}}'s board"
+exercise:
+  replay: Say it again
+  hint: Hint
+  undo: Undo
+  check: Check
+  moves-label: Moves
+  moves-of: '{{current}} of {{total}}'
+  moves-target: 'in {{count}} moves'
+  tap-piece-first: 'Tap {{name}} first.'
+  select-wrong: Not quite! Look at the orange squares.
+  select-missing: Almost! Some squares are still missing.
+  hint-piece: 'Look at {{name}}.'
+  hint-target: Try the orange square.
+  hint-answer: Here is the answer.
+  praise-3: Amazing!
+  praise-2: Well done!
+  praise-1: Good try!
+  illegal:
+    r: '{{name}} only runs in straight lines!'
+    b: '{{name}} only walks on diagonal paths!'
+    q: '{{name}} moves straight or diagonal, not like that!'
+    k: '{{name}} only steps one square at a time!'
+    n: '{{name}} only jumps in an L shape!'
+    p: '{{name}} only moves straight ahead (and captures diagonally)!'
+boss:
+  captured-of: 'Captured {{current}} of {{total}}'
+  moves-par: 'Moves {{moves}} · Par {{par}}'
+  ended: Good try!
+complete:
+  title: Lesson complete!
+  stars-pill: '+{{count}} stars'
+  new-in-play: New in Play

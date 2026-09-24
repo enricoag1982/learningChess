@@ -26,7 +26,27 @@
   }
 }
 
-/* No animations yet, but keep the standard reduce-motion rule in place for M1+. */
+/* Reward stars pop in on the exercise/boss/lesson success panels. */
+@keyframes reward-star-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.reward-star-pop {
+  animation: reward-star-pop 320ms ease-out backwards;
+}
+
+/* The rule below zeroes durations for reduced motion, so this rule only matters otherwise. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
