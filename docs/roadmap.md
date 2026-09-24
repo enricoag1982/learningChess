@@ -74,10 +74,15 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, audio by M5.
 | Basics finished | Within 8 weeks of regular use |
 | Kid plays full legal game unaided | At M4 playtest |
 
-## 7. Open decisions
+## 7. Decisions
+
+| Topic | Decision |
+|---|---|
+| Illustrations | Very basic AI-generated images; one style prompt for consistency; tool terms must allow commercial use; stored in the app (offline) |
+| Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
+
+## 8. Open decisions
 
 | Topic | Options | Recommendation |
 |---|---|---|
-| Illustrations | Illustrator / AI-generated / licensed pack | Licensed or commissioned set (clear license for stores) |
 | Voice | Parent recording / voice actor / TTS generated at build time into audio files | Build-time TTS audio files (consistent, offline, per language); re-record key lines later |
-| Web hosting | GitHub Pages / Netlify / Cloudflare Pages | GitHub Pages (repo already on GitHub, free, static) |

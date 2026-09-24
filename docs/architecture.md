@@ -143,3 +143,5 @@ stars2: 5
 | Mobile | PWA first → Capacitor |
 | Online (login, sync, remote play) | Off in v1; ports + local adapters only |
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |
+| Web hosting | GitHub Pages (static files only: install + update checks) |
+| Illustrations | Very basic AI-generated images, bundled in the app |
