@@ -1,0 +1,166 @@
+id: check
+world: check
+order: 1
+concept: check
+character: owl
+title: check.title
+story: check.story
+demo:
+  board: |
+    . . . . k . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . r . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . K . . .
+  text: check.demo
+  highlight: squares e4
+guided:
+  - id: check-g1
+    type: yes-no
+    text: check-g1
+    board: |
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    answer: 'yes'
+    focus: e1
+    verify: in-check
+  - id: check-g2
+    type: best-move
+    text: check-g2
+    board: |
+      . . . k . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . K . . .
+    solutions: [Ra8, Rd1]
+    verify: check
+exercises:
+  - id: check-01
+    type: yes-no
+    text: check-01
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . b . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+    answer: 'yes'
+    focus: g2
+    verify: in-check
+  - id: check-02
+    type: yes-no
+    text: check-02
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . b . . . . .
+      . . . . . . . .
+      . . . . P . . .
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+    answer: 'no'
+    focus: g2
+    verify: in-check
+  - id: check-03
+    type: yes-no
+    text: check-03
+    board: |
+      k . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . n . . . .
+      . . . . . . . .
+      . . . . K . . .
+    answer: 'yes'
+    focus: e1
+    verify: in-check
+  - id: check-04
+    type: yes-no
+    text: check-04
+    board: |
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . r . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    answer: 'no'
+    focus: e1
+    verify: in-check
+  - id: check-05
+    type: best-move
+    text: check-05
+    board: |
+      . . . k . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . R .
+    solutions: [Rg8]
+    verify: check
+  - id: check-06
+    type: best-move
+    text: check-06
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . k . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . B K . . . .
+    solutions: [Be3]
+    verify: check
+  - id: check-07
+    type: best-move
+    text: check-07
+    board: |
+      . . . . . k . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      K Q . . . . . .
+    solutions: [Qb4, Qb8, Qf1, Qf5]
+    verify: check
+  - id: check-08
+    type: best-move
+    text: check-08
+    board: |
+      . . . . k . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . N . . .
+      . . . . . . . .
+      . . . . . . . .
+      K . . . . . . .
+    solutions: [Nd6, Nf6]
+    verify: check

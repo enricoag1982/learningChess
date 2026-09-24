@@ -15,11 +15,14 @@ import {
   isMoveCountedExercise,
   journeyNodeName,
   lessonsInJourneyOrder,
+  pickProfileFromPicker,
   playOneKidVersusMove,
   playSolveLine,
   playVersusBoss,
   selectSquaresAnswer,
   waitForVersusTurnOrEnd,
+  worldBossMiniGame,
+  worldTabName,
 } from './helpers.ts';
 
 const content = rawContent as unknown as CompiledContent;
@@ -224,10 +227,78 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     // Enter the lesson: via the Journey for the first lesson of a new world (the case where a
     // static boss, say, is only reachable later), else via Home's Start/Continue button.
     const enteringNewWorld = lesson.world !== currentWorldId;
+    const previousWorldId = currentWorldId;
     currentWorldId = lesson.world;
 
+    // Crossing into a new world requires the previous one to be fully "mastered"
+    // (docs/domain-model.md §3: every lesson mastered, incl. `bossStars >= 2` on any lesson with
+    // its own boss, plus the world's own `World.boss` — e.g. World 3's win-the-queen — won too).
+    // Every exercise and lesson boss above was already played for real, for its own a11y/touch-
+    // target scan; a lesson boss played against the bot can end in a loss or draw depending on the
+    // opponent's random draws though, same as a real kid's might, which would leave that one lesson
+    // short of "mastered" and so the whole world short of "mastered" even though nothing is wrong —
+    // this walk needs the world unlocked regardless to keep scanning, so `bossStars` (only) is
+    // force-corrected to 3 here for every lesson of the world just finished, never touching the
+    // real `bestStars` a kid earned answering each exercise (already scanned above). A full reload
+    // is the one reliable way to make the store pick the patch up (`refreshProgress` only fires on
+    // specific store actions, not a bare localStorage write), so the profile is re-picked after.
+    if (enteringNewWorld && previousWorldId !== undefined) {
+      const previousWorldLessons = content.lessons.filter(
+        (entry) => entry.world === previousWorldId,
+      );
+      await page.evaluate(
+        ({ lessonIds }: { lessonIds: readonly string[] }) => {
+          const raw = localStorage.getItem('chess-kids:profiles');
+          const profiles = raw ? (JSON.parse(raw) as Record<string, { id: string }>) : {};
+          const [profile] = Object.values(profiles);
+          if (!profile) return;
+          const key = 'chess-kids:lesson-progress';
+          const allRaw = localStorage.getItem(key);
+          const all = allRaw ? (JSON.parse(allRaw) as Record<string, { bossStars?: number }>) : {};
+          for (const lessonId of lessonIds) {
+            const record = all[`${profile.id}:${lessonId}`];
+            if (record) record.bossStars = 3;
+          }
+          localStorage.setItem(key, JSON.stringify(all));
+        },
+        { lessonIds: previousWorldLessons.map((entry) => entry.id) },
+      );
+      await page.reload();
+      await pickProfileFromPicker(page, 'Kid');
+
+      const previousWorldBoss = worldBossMiniGame(catalog, previousWorldId);
+      if (previousWorldBoss !== undefined) {
+        // The world's own boss (distinct from any lesson's own boss slot): win it for real, same
+        // route a kid uses from the Journey map. This leaves the page on the Journey screen.
+        await page.getByRole('button', { name: /Journey/ }).click();
+        await page.getByRole('button', { name: worldTabName(catalog, previousWorldId) }).click();
+        await page
+          .getByRole('button', {
+            name: new RegExp(`^World boss: ${contentText(previousWorldBoss.titleKey)},`),
+          })
+          .click();
+        if (previousWorldBoss.mode !== 'versus') {
+          throw new Error(
+            `world boss "${previousWorldBoss.id}" is expected to be a versus mini-game`,
+          );
+        }
+        await playVersusBoss(page, previousWorldBoss);
+        await page.getByRole('button', { name: contentText('play.back-to-journey') }).click();
+      }
+    }
+
     if (enteringNewWorld) {
-      await page.getByRole('button', { name: /Journey/ }).click();
+      // Already on the Journey screen when a world boss was just won above; otherwise get there
+      // from Home. Either way, the target world's own tab must be selected explicitly: the
+      // Journey's default map only follows `nextStep`, which does not always match this loop's own
+      // (purely content-order) walk.
+      if (
+        previousWorldId === undefined ||
+        worldBossMiniGame(catalog, previousWorldId) === undefined
+      ) {
+        await page.getByRole('button', { name: /Journey/ }).click();
+      }
+      await page.getByRole('button', { name: worldTabName(catalog, lesson.world) }).click();
       await expectKidTouchTarget(page, journeyNodeName(lesson, 'current'));
       if (!journeyScanned) {
         await expectKidTouchTarget(page, /Back to Home/);

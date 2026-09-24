@@ -1,0 +1,185 @@
+id: escape-check
+world: check
+order: 2
+concept: check-escape
+character: owl
+title: escape-check.title
+story: escape-check.story
+demo:
+  board: |
+    . . . r . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . . . . . .
+    . . . K . . . .
+    . . . . . . . .
+    . . . . . . . .
+    k . . . . . . .
+  text: escape-check.demo
+  highlight: squares c3 c4 c5 e3 e4 e5
+guided:
+  - id: escape-check-g1
+    type: select-squares
+    text: escape-check-g1
+    board: |
+      . . . r . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . K . . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    derive: check-escapes
+  - id: escape-check-g2
+    type: best-move
+    text: escape-check-g2
+    board: |
+      . . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    solutions: [Kd6, Kf6, Kf5, Kf4, Kd4, Kd5]
+    verify: escape-king
+exercises:
+  - id: escape-check-01
+    type: select-squares
+    text: escape-check-01
+    board: |
+      . . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    derive: check-escapes
+  - id: escape-check-02
+    type: select-squares
+    text: escape-check-02
+    board: |
+      . . . . . . . k
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      . b . . . . . .
+    derive: check-escapes
+  - id: escape-check-03
+    type: select-squares
+    text: escape-check-03
+    board: |
+      . . . . . . r .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . K .
+      k . . . . . . .
+    derive: check-escapes
+  - id: escape-check-04
+    type: select-squares
+    text: escape-check-04
+    board: |
+      k . . . . . . .
+      . . . . . . b .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . K . . . . . .
+      . . . . . . . .
+    derive: check-escapes
+  - id: escape-check-05
+    type: best-move
+    text: escape-check-05
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . n . .
+      . . . . . . . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    solutions: [Ke5, Kf5, Kf4, Kf3, Ke3, Kd3, Kd4]
+    verify: escape-king
+  - id: escape-check-06
+    type: best-move
+    text: escape-check-06
+    board: |
+      . . . . . . r .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . K .
+    solutions: [Kf2, Kh2, Kh1, Kf1]
+    verify: escape-king
+  - id: escape-check-07
+    type: best-move
+    text: escape-check-07
+    board: |
+      k . . . r . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . P . .
+      . . B . . . . .
+      . . . . . . . .
+      . . . . K . . .
+    solutions: [Be5]
+    verify: escape-block
+  - id: escape-check-08
+    type: best-move
+    text: escape-check-08
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      b . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . R
+      k . . . K . . .
+    solutions: [Rd2]
+    verify: escape-block
+  - id: escape-check-09
+    type: best-move
+    text: escape-check-09
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . n . . . .
+      . N . . . . . .
+      k . . . K . . .
+    solutions: [Nxd3]
+    verify: escape-capture
+  - id: escape-check-10
+    type: best-move
+    text: escape-check-10
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . b . .
+      . . . . K . . .
+      . . . . . . . .
+      . . . . . . . .
+      k . . . . . . .
+    solutions: [Kxf5]
+    verify: escape-capture
+boss: escape-the-check

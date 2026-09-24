@@ -98,8 +98,10 @@ function describeSquare(
   if (selected) return t('board.square.selected', { base });
   if (target) return t('board.square.possible-move', { base });
   if (focus) return t('board.square.focus', { base });
-  if (danger) return t('board.square.danger', { base });
+  // Check outranks danger: a versus boss with real check rules (M3.3) can flag the kid's own
+  // king as both (attacked, undefended) at once, and "in check" is the more urgent, specific one.
   if (check) return t('board.square.check', { base });
+  if (danger) return t('board.square.danger', { base });
   return base;
 }
 

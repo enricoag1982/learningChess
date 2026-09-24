@@ -6,8 +6,10 @@ import type { Lesson, PieceType, Square, VersusMiniGame, VersusState } from '@ch
 import {
   canTakeBack,
   chessJsRules,
+  isInCheck,
   isKidTurn,
   kidMoveCount,
+  kingSquare,
   playVersusMove,
   recordBossResult,
   startVersus,
@@ -265,6 +267,11 @@ export function VersusStep({
   const danger = aids.danger && versus.status === 'playing' ? dangerSquares(versus) : [];
   const stars = versusStars(versus);
   const moves = kidMoveCount(versus);
+  // The checked king's square, whichever side (kid or bot) — `Board`'s check ring applies to any
+  // exercise type, and a full game (M3.3) is the first `versus` boss where check is ever possible.
+  const checkSquare = isInCheck(position, chessJsRules)
+    ? kingSquare(position, position.toMove)
+    : undefined;
 
   return (
     <div
@@ -285,6 +292,7 @@ export function VersusStep({
             highlights={{
               ...(lastMove ? { lastMove } : {}),
               ...(danger.length > 0 ? { danger } : {}),
+              ...(checkSquare === undefined ? {} : { check: checkSquare }),
             }}
             label={t('lesson.board-label')}
           />

@@ -1,0 +1,17 @@
+id: first-game
+concept: full-game
+unlockAfter: stalemate
+mode: versus
+title: first-game.title
+goal: first-game.goal
+fen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
+rules:
+  kings: true
+  noMoves: draw
+  win:
+    kid: [checkmate]
+    opponent: [checkmate]
+moveLimit: 100
+opponent:
+  bot: 1
+par: 60

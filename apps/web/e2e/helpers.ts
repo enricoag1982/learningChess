@@ -126,6 +126,37 @@ export function journeyNodeName(lesson: Lesson, status: 'current' | 'locked'): R
   return new RegExp(`^${pattern}$`);
 }
 
+/**
+ * A world's own tab button on the Journey map (`JourneyScreen`'s `WorldRow`: `"<order> <title>"`,
+ * e.g. `"4 Check & Mate"`). The Journey defaults to whichever world `journey.nextStep` currently
+ * points to (`defaultWorldId`), which is the world holding its own unwon world boss — not
+ * necessarily the next world's first lesson — so a spec walking lesson to lesson across a world
+ * boundary must click this explicitly instead of assuming the right map is already showing.
+ */
+export function worldTabName(catalog: TracksCatalog, worldId: string): RegExp {
+  for (const track of catalog.tracks) {
+    const world = track.worlds.find((entry) => entry.id === worldId);
+    if (world !== undefined) {
+      // Anchored on the order digit a kid never sees written out (`"1 Board"`, `"4 Check & Mate"`):
+      // the title alone can also match an unrelated lesson node's own name (e.g. "Setting Up the
+      // Board, locked" contains "Board" too).
+      return new RegExp(`^${String(world.order)} ${escapeRegExp(contentText(world.titleKey))}`);
+    }
+  }
+  throw new Error(`worldTabName: world "${worldId}" not found in the tracks catalog`);
+}
+
+/** A world's own boss mini-game (`World.boss`, distinct from any lesson's own `boss`), if it has one. */
+export function worldBossMiniGame(catalog: TracksCatalog, worldId: string): MiniGame | undefined {
+  for (const track of catalog.tracks) {
+    const world = track.worlds.find((entry) => entry.id === worldId);
+    if (world !== undefined) {
+      return world.boss === undefined ? undefined : findMiniGame(world.boss);
+    }
+  }
+  return undefined;
+}
+
 /** The Journey's "Finish X first!" message for the lesson right before a locked one. */
 export function finishFirstMessage(previousLesson: Lesson): string {
   return interpolate(contentText('journey:ui.finish-first'), { name: lessonLabel(previousLesson) });
@@ -206,6 +237,41 @@ export async function seedLessonMastered(
       exerciseIds: lesson.exercises.map((exercise) => exercise.id),
       hasBoss: lesson.boss !== undefined,
     },
+  );
+}
+
+/**
+ * Seeds a world boss's own `MiniGameProgress` record (won, 3 stars) — the separate "played
+ * standalone" record (`docs/domain-model.md` §2/§3) a world boss needs, on top of its
+ * `LessonProgress.bossStars`, before `worldStatus`/`trackStatus` will call that world "mastered".
+ * Needed to reach a later world (e.g. World 4) via `seedLessonsMastered` alone: a world with its own
+ * `boss` (e.g. World 3's `win-the-queen`) is not "mastered" — and so does not unlock the next world
+ * on the Journey map — until this is seeded too, even though every one of its lessons is.
+ */
+export async function seedMiniGameWon(
+  page: Page,
+  profileId: string,
+  miniGameId: string,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, miniGameId }) => {
+      const key = 'chess-kids:minigame-progress';
+      const raw = localStorage.getItem(key);
+      const all = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      const now = new Date().toISOString();
+      all[`${pid}:${miniGameId}`] = {
+        id: `seed-${miniGameId}`,
+        profileId: pid,
+        miniGameId,
+        bestStars: 3,
+        plays: 1,
+        wins: 1,
+        createdAt: now,
+        updatedAt: now,
+      };
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    { profileId, miniGameId },
   );
 }
 
@@ -334,7 +400,10 @@ async function solveBestMove(page: Page, def: BestMoveDef): Promise<void> {
   const [san] = def.solutions;
   if (!san) throw new Error(`best-move exercise "${def.id}" has no solutions`);
   const moves = rules.legalMoves(def.position, { staticOpponent: true });
-  const move = moves.find((candidate) => candidate.san === san);
+  // Normalized (check/mate marks stripped), same as the engine's own SAN comparison
+  // (`engine.ts`'s `isSolutionMove`): a `verify: check`/`escape-*` solution (M3.3) is always a
+  // checking move, so chess.js's own SAN for it always carries a "+"/"#" the authored SAN may not.
+  const move = moves.find((candidate) => normalizeSan(candidate.san) === normalizeSan(san));
   if (!move) throw new Error(`best-move exercise "${def.id}": no legal move matches SAN "${san}"`);
   await clickSquare(page, move.from);
   await clickSquare(page, move.to);

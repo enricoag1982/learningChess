@@ -291,3 +291,116 @@ safe-or-not-r7: 'A pawn now guards the knight on d4. Is it in danger?'
 safe-or-not-r8: 'Is the rook on a1 in danger?'
 safe-or-not-r9: 'A bishop now blocks the attack on a1. Is the rook in danger?'
 safe-or-not-r10: 'Is the queen on f4 in danger?'
+check:
+  title: What Is Check?
+  story: >-
+    When a king is attacked, that's CHECK — danger! Lion must get to safety right away.
+    Owl will teach you to spot it, and how to give check yourself.
+  demo: A check! The black rook attacks Lion along the open file.
+check-g1: 'Is Lion in check from the black rook?'
+check-g2: 'Rhino can give check! Find the move that attacks the black king.'
+check-01: 'A black bishop attacks Lion along the diagonal. Is Lion in check?'
+check-02: 'Caterpillar now blocks the diagonal. Is Lion in check?'
+check-03: A black knight jumps into position to attack Lion. Is Lion in check?
+check-04: 'A black rook sits on a different line, far from Lion. Is Lion in check?'
+check-05: Move Rhino so he gives check to the black king.
+check-06: Move Elephant so he gives check to the black king.
+check-07: Lioness can check the black king in several ways. Find one!
+check-08: Move Horse so he gives check to the black king.
+escape-check:
+  title: Escape the Check!
+  story: >-
+    When Lion is in check, there are 3 ways out: move him to safety, block the attack, or
+    capture the attacker. Let's practise all three!
+  demo: Lion is in check. Every green dot is a square where he'd be safe.
+escape-check-g1: 'Lion is in check! Tap every square where he can escape.'
+escape-check-g2: The only way out is to move Lion — find a safe square.
+escape-check-01: 'Lion is in check from the rook. Tap every square where he is safe.'
+escape-check-02: 'Lion is in check from the bishop. Tap every square where he is safe.'
+escape-check-03: 'Lion is in check from the rook. Tap every safe square for him.'
+escape-check-04: 'Lion is in check from a bishop far away. Tap every safe square for him.'
+escape-check-05: A knight's check can never be blocked! Move Lion to safety.
+escape-check-06: Move Lion out of check — nothing can block or capture this rook here.
+escape-check-07: Block the check! Move Elephant between Lion and the rook.
+escape-check-08: Block the check! Move Rhino between Lion and the bishop.
+escape-check-09: Capture the checking knight!
+escape-check-10: The bishop giving check isn't guarded. Capture it with Lion!
+checkmate:
+  title: Check or Checkmate?
+  story: >-
+    Checkmate means the king is in check AND has no way out at all — no move, no block, no
+    capture. The game is won!
+  demo: Checkmate! Lioness checks the king, and every square around him is covered.
+checkmate-g1: 'Is the black king checkmated?'
+checkmate-g2: 'Is the black king checkmated? Look for an escape.'
+checkmate-01: 'The white rook checks along the back row. Is the black king checkmated?'
+checkmate-02: 'The white rook checks along the back row, but there is a gap. Is the black king checkmated?'
+checkmate-03: 'Two white rooks trap the black king. Is he checkmated?'
+checkmate-04: 'One white rook checks the black king. Is he checkmated?'
+checkmate-05: 'The white queen and king work together. Is the black king checkmated?'
+checkmate-06: 'A white rook checks the black king from far away. Is he checkmated?'
+checkmate-07: 'The white queen checks, guarded by her king. Is the black king checkmated?'
+checkmate-08: 'The white queen checks, but nothing guards her. Is the black king checkmated?'
+mate-in-1:
+  title: Mate in 1
+  story: >-
+    Owl challenges you to deliver CHECKMATE in just one move! Look for a move that traps
+    the king completely.
+  demo: Checkmate in one! Rhino delivers check along the open file.
+mate-in-1-g1: Find the checkmate in one move — check Rhino's path to the back row.
+mate-in-1-g2: Find the checkmate in one move — Lioness and Lion work together.
+mate-in-1-01: Checkmate in one! The black king is trapped by his own pawns.
+mate-in-1-02: Checkmate in one! Find the move along the open file.
+mate-in-1-03: Checkmate in one! Lioness can reach the back row.
+mate-in-1-04: Checkmate in one! Lioness and Lion team up.
+mate-in-1-05: Checkmate in one! Move Lioness right next to the black king.
+mate-in-1-06: Checkmate in one! Lion guards Lioness's checking square.
+mate-in-1-07: Checkmate in one! Two rooks trap the black king together.
+mate-in-1-08: Checkmate in one! One rook cuts off the escape, the other delivers check.
+mate-in-1-09: Checkmate in one! Lion guards the squares Rhino can't reach.
+mate-in-1-10: Checkmate in one! Lion and Rhino trap the black king in the corner.
+mate-in-1-11: Checkmate in one! Horse guards the squares for Lioness.
+mate-in-1-12: Checkmate in one! Horse and Caterpillar guard the king's escape.
+stalemate:
+  title: Watch Out for Stalemate!
+  story: >-
+    Stalemate is tricky: the king has no legal move at all, but he isn't in check. That's
+    not a win — it's a draw! Always check before you play the "obvious" move.
+  demo: Careful! The black king has no move and isn't in check — that's stalemate, a draw.
+stalemate-g1: 'Is the black king stalemated?'
+stalemate-g2: Find the checkmate in one move.
+stalemate-01: 'The black king has no moves, and he is not in check. Is he stalemated?'
+stalemate-02: 'The black king has no moves, and he is not in check. Is he stalemated?'
+stalemate-03: 'The black king has plenty of moves. Is he stalemated?'
+stalemate-04: 'The black king is in check, but he can escape. Is he stalemated?'
+stalemate-05: Checkmate in one — but careful, some moves would stalemate instead!
+stalemate-06: Checkmate in one — but careful, some moves would stalemate instead!
+escape-the-check:
+  title: Escape the Check
+  goal: Help Lion escape check 10 times — by moving, blocking, or capturing!
+escape-the-check-r1: 'Lion is in check from the rook. Tap every square where he is safe.'
+escape-the-check-r2: 'Lion is in check from the bishop. Tap every square where he is safe.'
+escape-the-check-r3: 'Lion is in check from the rook. Tap every safe square for him.'
+escape-the-check-r4: 'Lion is in check from a bishop far away. Tap every safe square for him.'
+escape-the-check-r5: A knight's check can never be blocked! Move Lion to safety.
+escape-the-check-r6: Move Lion out of check.
+escape-the-check-r7: Block the check! Move Elephant between Lion and the rook.
+escape-the-check-r8: Block the check! Move Rhino between Lion and the bishop.
+escape-the-check-r9: Capture the checking knight with Caterpillar!
+escape-the-check-r10: The rook giving check isn't guarded. Capture it with Lion!
+mate-hunt:
+  title: Mate in 1
+  goal: Find checkmate in one move, ten times in a row!
+mate-hunt-r1: Checkmate in one! The black king is trapped by his own pawns.
+mate-hunt-r2: Checkmate in one! Find the move along the open file.
+mate-hunt-r3: Checkmate in one! Lion guards the checking square.
+mate-hunt-r4: Checkmate in one! Lion guards the checking square.
+mate-hunt-r5: Checkmate in one! Two rooks work together.
+mate-hunt-r6: Checkmate in one! One rook cuts off the rank.
+mate-hunt-r7: Checkmate in one! Lion guards the flight squares.
+mate-hunt-r8: Checkmate in one! The black king is trapped by his own pawns.
+mate-hunt-r9: Checkmate in one! Lion guards Lioness's checking square.
+mate-hunt-r10: Checkmate in one! Lion guards the checking square.
+first-game:
+  title: Your First Full Game!
+  goal: Play a whole game against Mouse. Checkmate him to win — good luck!
