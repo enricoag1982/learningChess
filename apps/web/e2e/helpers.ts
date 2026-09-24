@@ -202,6 +202,19 @@ export async function getSoleProfileId(page: Page): Promise<string> {
   });
 }
 
+/** One (of possibly several) seeded profile's id, found by its `nickname` — same storage shape as `getSoleProfileId`. */
+export async function getProfileIdByNickname(page: Page, nickname: string): Promise<string> {
+  return page.evaluate((name) => {
+    const raw = localStorage.getItem('chess-kids:profiles');
+    const profiles = raw
+      ? (JSON.parse(raw) as Record<string, { id: string; nickname: string }>)
+      : {};
+    const profile = Object.values(profiles).find((candidate) => candidate.nickname === name);
+    if (!profile) throw new Error(`no seeded profile named "${name}" found in localStorage`);
+    return profile.id;
+  }, nickname);
+}
+
 /**
  * Seeds one lesson's progress directly into localStorage (same real storage key/shape the app
  * itself writes), marking it mastered: every exercise at 3 stars, and — for a lesson with a boss —
@@ -374,6 +387,35 @@ export async function seedLessonsMastered(
   for (const lesson of lessons) {
     await seedLessonMastered(page, profileId, lesson);
   }
+}
+
+/**
+ * Seeds every lesson through World 4 ("check") mastered, plus World 3's and World 4's own world
+ * bosses won (`win-the-queen`, `first-game`) — the same ingredients `world4.spec.ts` seeds by hand,
+ * bundled here for specs that only need "World 4 mastered" as a starting point (M4.3's vs Friend:
+ * unlocks the full game, and, from earlier worlds, Pawn Wars and Win the Queen too).
+ */
+export async function seedWorldFourMastered(
+  page: Page,
+  profileId: string,
+  catalog: TracksCatalog,
+  lessons: readonly Lesson[],
+): Promise<void> {
+  const basics = catalog.tracks.find((track) => track.id === 'basics');
+  if (!basics) throw new Error('seedWorldFourMastered: "basics" track not found');
+  const checkWorld = basics.worlds.find((world) => world.id === 'check');
+  if (!checkWorld) throw new Error('seedWorldFourMastered: "check" world not found');
+
+  const worldIds = new Set(
+    basics.worlds.filter((world) => world.order <= checkWorld.order).map((world) => world.id),
+  );
+  await seedLessonsMastered(
+    page,
+    profileId,
+    lessons.filter((lesson) => worldIds.has(lesson.world)),
+  );
+  await seedMiniGameWon(page, profileId, 'win-the-queen');
+  await seedMiniGameWon(page, profileId, 'first-game');
 }
 
 /**

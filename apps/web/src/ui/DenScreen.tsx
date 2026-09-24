@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { RankLadderEntry, TracksCatalog } from '@chess-kids/core';
-import { animalFriends, rankLadder, totalStars } from '@chess-kids/core';
+import { animalFriends, friendGamesPlayed, rankLadder, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
@@ -76,6 +76,7 @@ export function DenScreen(): JSX.Element {
   const ladder = rankLadder(journey.catalog, journey.lessons, progress);
   const stars = totalStars(progress);
   const gamesWon = gameRecords.filter((record) => record.result === 'win').length;
+  const friendGames = friendGamesPlayed(gameRecords);
 
   return (
     <main className="flex min-h-screen flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
@@ -99,12 +100,21 @@ export function DenScreen(): JSX.Element {
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
       </div>
 
-      <div
-        role="img"
-        aria-label={t('den.games-won', { count: gamesWon })}
-        className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
-      >
-        <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
+      <div className="flex flex-wrap gap-2">
+        <div
+          role="img"
+          aria-label={t('den.games-won', { count: gamesWon })}
+          className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
+        >
+          <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
+        </div>
+        <div
+          role="img"
+          aria-label={t('den.games-with-friends', { count: friendGames })}
+          className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
+        >
+          <span aria-hidden="true">{t('den.games-with-friends', { count: friendGames })}</span>
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">

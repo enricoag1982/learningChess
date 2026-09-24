@@ -38,8 +38,8 @@ export interface ProgressRepository {
 
 /**
  * Persistence of `GameRecord` (domain-model.md §2): full games and versus mini-games, vs the
- * computer (v1) or a friend (v2). Kept separate from `ProgressRepository` — records here are an
- * append-only game log, not lesson/mastery state.
+ * computer or a friend (same device, M4.3). Kept separate from `ProgressRepository` — records
+ * here are an append-only game log, not lesson/mastery state.
  */
 export interface GameRecordRepository {
   add(record: GameRecord): Promise<void>;

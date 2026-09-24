@@ -48,10 +48,50 @@ export type Screen =
   | 'den'
   | 'minigame'
   | 'full-game'
+  | 'friend-setup'
+  | 'friend-game'
   | 'warmup'
   | 'practice'
   | 'practice-run'
   | 'today-summary';
+
+/** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
+export type FriendOpponentChoice =
+  { readonly kind: 'profile'; readonly profileId: string } | { readonly kind: 'guest' };
+
+/** Board mode for a vs Friend match (`docs/app-structure.md` §6). */
+export type FriendBoardMode = 'pass-and-play' | 'face-to-face';
+
+/** The vs Friend setup sheet's current choices, and what the friend game screen reads once "Start" is tapped. */
+export interface FriendSetupState {
+  readonly opponent: FriendOpponentChoice | null;
+  /** `'full'` for the full game, else a `versus` mini-game's content id. */
+  readonly gameId: string | null;
+  readonly boardMode: FriendBoardMode;
+  readonly legalMoveDots: boolean;
+  /** Active profile plays White by default; true swaps starting colours. */
+  readonly swapColours: boolean;
+}
+
+/** Tablet landscape and up (docs/app-structure.md §6): face-to-face's own default board mode. */
+const FACE_TO_FACE_MIN_WIDTH = 768;
+
+/** `window.innerWidth`-based default board mode; never throws (SSR/test environments without `window`). */
+function defaultFriendBoardMode(): FriendBoardMode {
+  try {
+    return window.innerWidth >= FACE_TO_FACE_MIN_WIDTH ? 'face-to-face' : 'pass-and-play';
+  } catch {
+    return 'pass-and-play';
+  }
+}
+
+const DEFAULT_FRIEND_SETUP: FriendSetupState = {
+  opponent: null,
+  gameId: null,
+  boardMode: 'pass-and-play',
+  legalMoveDots: true,
+  swapColours: false,
+};
 
 /** Where the current lesson was opened from: decides where "Continue"/Close returns to.
  * `today`: opened as a Today session's lesson (or world-boss) activity — see `startToday`. */
@@ -106,6 +146,9 @@ export interface AppState {
    * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
    * it once (`goToHome`/`startFullGame` clear it so it never lingers past the game it is about). */
   readonly levelUpSuggestion: { readonly level: number } | null;
+  /** The vs Friend setup sheet's current choices (screen `friend-setup`), read by the friend game
+   * screen (`friend-game`) once "Start" is tapped. */
+  readonly friendSetup: FriendSetupState;
 
   /** The Today session in progress (`startToday`), or `null` outside one. */
   readonly todayPlan: TodaySessionPlan | null;
@@ -196,6 +239,18 @@ export interface AppState {
    * after its own `recordGame`.
    */
   readonly updateAutomaticLevel: (level: number) => Promise<void>;
+
+  /** Play's "vs Friend" card: opens the setup sheet, resetting its choices (board mode defaults
+   * to face-to-face on a tablet-width screen, pass-and-play otherwise). */
+  readonly goToFriendSetup: () => void;
+  /** Merges `patch` into the setup sheet's current choices. */
+  readonly updateFriendSetup: (patch: Partial<FriendSetupState>) => void;
+  /** The setup sheet's "Start" button: opens the friend game screen with the sheet's current
+   * choices (a no-op without both a second player and a game picked — the button is disabled by
+   * then, this guards a stale click). */
+  readonly startFriendGame: () => void;
+  /** Leaves the friend game screen back to Play, refreshing progress (game records included). */
+  readonly exitFriendGame: () => void;
 
   /**
    * Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
@@ -288,6 +343,7 @@ export function createAppStore(services: Services) {
       miniGameOrigin: 'play',
       fullGameLevel: 1,
       levelUpSuggestion: null,
+      friendSetup: DEFAULT_FRIEND_SETUP,
       todayPlan: null,
       todayActivityIndex: 0,
       todaySessionStartTotalStars: 0,
@@ -513,6 +569,28 @@ export function createAppStore(services: Services) {
         if (update?.leveledUp) {
           set({ levelUpSuggestion: { level: update.level } });
         }
+      },
+
+      goToFriendSetup() {
+        set({
+          screen: 'friend-setup',
+          friendSetup: { ...DEFAULT_FRIEND_SETUP, boardMode: defaultFriendBoardMode() },
+        });
+      },
+
+      updateFriendSetup(patch: Partial<FriendSetupState>) {
+        set((state) => ({ friendSetup: { ...state.friendSetup, ...patch } }));
+      },
+
+      startFriendGame() {
+        const { friendSetup } = get();
+        if (!friendSetup.opponent || !friendSetup.gameId) return;
+        set({ screen: 'friend-game' });
+      },
+
+      exitFriendGame() {
+        set({ screen: 'play' });
+        void get().refreshProgress();
       },
 
       async startToday() {

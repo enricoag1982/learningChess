@@ -5,6 +5,8 @@ import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
+import { FriendGameScreen } from './ui/FriendGameScreen.tsx';
+import { FriendSetupScreen } from './ui/FriendSetupScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
 import { HomeScreen } from './ui/HomeScreen.tsx';
 import { JourneyScreen } from './ui/JourneyScreen.tsx';
@@ -47,6 +49,10 @@ function Screens(): JSX.Element {
       return <MiniGameSessionScreen />;
     case 'full-game':
       return <FullGameScreen />;
+    case 'friend-setup':
+      return <FriendSetupScreen />;
+    case 'friend-game':
+      return <FriendGameScreen />;
     case 'warmup':
       return <WarmUpScreen />;
     case 'practice':

@@ -3,7 +3,12 @@ import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { ComputerLevelCondition, ComputerLevelStatus, MiniGame } from '@chess-kids/core';
-import { computerLevelStatus, suggestedLevel, unlockedMiniGames } from '@chess-kids/core';
+import {
+  computerLevelStatus,
+  friendGameOptions,
+  suggestedLevel,
+  unlockedMiniGames,
+} from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
@@ -104,7 +109,8 @@ function levelConditionText(t: TFunction, condition: ComputerLevelCondition): st
   });
 }
 
-/** Play: vs Computer (locked in M2), vs Friend (locked), and the unlocked mini-games grid. */
+/** Play: vs Computer, vs Friend (M4.3: unlocked once the profile has any game unlocked — the
+ * setup sheet, `FriendSetupScreen`), and the unlocked mini-games grid. */
 export function PlayScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -117,6 +123,7 @@ export function PlayScreen(): JSX.Element {
   const goToHome = useAppStore((state) => state.goToHome);
   const startMiniGame = useAppStore((state) => state.startMiniGame);
   const startFullGame = useAppStore((state) => state.startFullGame);
+  const goToFriendSetup = useAppStore((state) => state.goToFriendSetup);
 
   const [lockedMessage, setLockedMessage] = useState<string | null>(null);
   // `null` = no manual pick yet this session: the level chips default to the profile's stored
@@ -155,6 +162,15 @@ export function PlayScreen(): JSX.Element {
   const bestStarsById = new Map(
     miniGameProgress.map((entry) => [entry.miniGameId, entry.bestStars]),
   );
+
+  const friendOptions = friendGameOptions(
+    gameRecords,
+    journey,
+    journey.lessons,
+    services.deps.content.minigames(),
+    progress,
+  );
+  const friendUnlocked = friendOptions.length > 0;
 
   const levelStatuses = computerLevelStatus(gameRecords, journey);
   const effectiveLevel = selectedLevel ?? suggestedLevel(storedSuggestion, levelStatuses);
@@ -200,6 +216,18 @@ export function PlayScreen(): JSX.Element {
     }
     setLockedMessage(null);
     startMiniGame(game.id);
+  }
+
+  function activateFriend(): void {
+    if (!friendUnlocked) {
+      const message = t('play.vs-friend-locked');
+      setLockedMessage(message);
+      services.narrator.cancel();
+      void services.narrator.speak(message);
+      return;
+    }
+    setLockedMessage(null);
+    goToFriendSetup();
   }
 
   return (
@@ -323,12 +351,18 @@ export function PlayScreen(): JSX.Element {
           </div>
           <button
             type="button"
-            disabled
-            aria-label={`${t('play.vs-friend')}, ${t('play.vs-friend-locked')}`}
-            className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-[#F3EDE0] px-4 font-display text-lg font-semibold text-muted disabled:cursor-default"
+            aria-label={
+              friendUnlocked
+                ? t('play.vs-friend')
+                : `${t('play.vs-friend')}, ${t('play.vs-friend-locked')}`
+            }
+            onClick={activateFriend}
+            className={`flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold ${
+              friendUnlocked ? 'bg-today text-white' : 'bg-[#F3EDE0] text-muted'
+            }`}
           >
-            <LockIcon />
-            {t('play.vs-friend-locked')}
+            {!friendUnlocked && <LockIcon />}
+            {friendUnlocked ? t('play.vs-friend') : t('play.vs-friend-locked')}
           </button>
         </div>
       </div>
