@@ -228,7 +228,11 @@ parent:
     import-child-choice-label: "{{name}}'s progress"
     import-child-add-new: Add as new child
     import-child-merge-into: 'Merge into {{name}}'
-    import-child-change: '+{{stars}} stars, +{{badges}} badges, +{{minutes}} min this week'
+    import-change-stars_one: '+{{count}} star'
+    import-change-stars_other: '+{{count}} stars'
+    import-change-badges_one: '+{{count}} badge'
+    import-change-badges_other: '+{{count}} badges'
+    import-change-minutes: '+{{count}} min this week'
     import-warning: "Nothing is lost: both devices' progress is kept."
     import-confirm: Merge
     import-done: Import complete.

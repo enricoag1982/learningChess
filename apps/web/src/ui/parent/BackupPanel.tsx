@@ -281,11 +281,13 @@ export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Ele
                     )}
                     {change && (
                       <p className="text-sm text-muted">
-                        {t('parent.backup.import-child-change', {
-                          stars: change.starsDelta,
-                          badges: change.badgesDelta,
-                          minutes: change.minutesThisWeekDelta,
-                        })}
+                        {[
+                          t('parent.backup.import-change-stars', { count: change.starsDelta }),
+                          t('parent.backup.import-change-badges', { count: change.badgesDelta }),
+                          t('parent.backup.import-change-minutes', {
+                            count: change.minutesThisWeekDelta,
+                          }),
+                        ].join(', ')}
                       </p>
                     )}
                   </li>
