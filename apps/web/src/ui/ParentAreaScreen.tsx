@@ -21,6 +21,7 @@ import {
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
 } from './parent/parent-styles.ts';
+import { UnlockPanel } from './parent/UnlockPanel.tsx';
 
 interface ChildStats {
   readonly stars: number;
@@ -182,6 +183,7 @@ function ChildRow({
   const [nickname, setNickname] = useState(profile.nickname);
   const [pickingAvatar, setPickingAvatar] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
 
   async function submitRename(): Promise<void> {
     if (!validateNickname(nickname)) return;
@@ -286,6 +288,15 @@ function ChildRow({
         <button
           type="button"
           onClick={() => {
+            setUnlocking((value) => !value);
+          }}
+          className={PARENT_SECONDARY_BUTTON}
+        >
+          {t('parent.unlock-lessons-worlds')}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
             setConfirmingDelete(true);
           }}
           className={PARENT_DANGER_BUTTON}
@@ -293,6 +304,8 @@ function ChildRow({
           {t('parent.delete')}
         </button>
       </div>
+
+      {unlocking && <UnlockPanel profileId={profile.id} />}
 
       {confirmingDelete && (
         <DeleteConfirmDialog

@@ -2,6 +2,8 @@ import { createContext, useContext } from 'react';
 import { create } from 'zustand';
 import type {
   AnimalFriend,
+  AssessmentScope,
+  AssessmentScore,
   ConceptStats,
   ConceptTask,
   EarnedBadge,
@@ -10,6 +12,8 @@ import type {
   Lesson,
   LessonProgress,
   MiniGameProgress,
+  ParentUnlockTarget,
+  PlacementWorldPlan,
   Profile,
   Streak,
   TodaySessionPlan,
@@ -31,8 +35,15 @@ import {
   loadTodaySession,
   loadWarmUp,
   markSeen,
+  parentUnlock,
+  planPlacement,
+  planTestOutLesson,
+  planTestOutWorld,
   recordSessionMinutes,
+  scorePlacementWorld,
+  scoreTestOut,
   selectProfile,
+  submitAssessment,
   totalStars,
   updateSuggestedLevel,
 } from '@chess-kids/core';
@@ -63,7 +74,10 @@ export type Screen =
   | 'warmup'
   | 'practice'
   | 'practice-run'
-  | 'today-summary';
+  | 'today-summary'
+  | 'placement-offer'
+  | 'placement'
+  | 'assessment';
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
 export type FriendOpponentChoice =
@@ -170,6 +184,19 @@ export interface AppState {
    * screen (`friend-game`) once "Start" is tapped. */
   readonly friendSetup: FriendSetupState;
 
+  /** The test-out run in progress (screen `assessment`, M4.5: domain-model.md §3.2); `null` outside
+   * one. Its own runner records each task locally and scores the whole run once done — see
+   * `submitAssessmentRun`. */
+  readonly assessmentRun: {
+    readonly scope: AssessmentScope;
+    readonly tasks: readonly ConceptTask[];
+  } | null;
+  /** The placement test's full plan (one run per Basics world, in order), loaded once by
+   * `acceptPlacement`; `[]` outside a placement run (screen `placement`). */
+  readonly placementPlan: readonly PlacementWorldPlan[];
+  /** Index into `placementPlan` of the world currently running. */
+  readonly placementIndex: number;
+
   /** The Today session in progress (`startToday`), or `null` outside one. */
   readonly todayPlan: TodaySessionPlan | null;
   /** Index into `todayPlan.activities` of the activity currently showing. */
@@ -271,6 +298,47 @@ export interface AppState {
   readonly startFriendGame: () => void;
   /** Leaves the friend game screen back to Play, refreshing progress (game records included). */
   readonly exitFriendGame: () => void;
+
+  /**
+   * Journey locked-tap sheet "Yes, test me!" for a locked lesson (domain-model.md §3.2): plans a
+   * lesson test-out run (`planTestOutLesson`) and opens the runner (screen `assessment`).
+   */
+  readonly startTestOutLesson: (lessonId: string, worldId: string) => void;
+  /** Same, for a locked world (`planTestOutWorld`): all its lessons at once. */
+  readonly startTestOutWorld: (worldId: string) => void;
+  /**
+   * The assessment runner's `onDone`: scores the run (`scoreTestOut`) and applies a pass
+   * (`submitAssessment`) — masters every lesson in scope, unlocks it. Does not change screen; the
+   * runner shows the pass/fail result itself, then calls `exitAssessment`.
+   */
+  readonly submitAssessmentRun: (results: readonly boolean[]) => Promise<AssessmentScore>;
+  /** Leaves the assessment screen (Close, or the result screen's Continue) back to the Journey. */
+  readonly exitAssessment: () => void;
+
+  /** Placement offer screen "No, start at World 1": straight to Home, nothing tested. */
+  readonly declinePlacement: () => void;
+  /** Placement offer screen "Yes": plans the whole placement test (`planPlacement`) and opens the
+   * first Basics world's run (screen `placement`); straight to Home if there is nothing to test. */
+  readonly acceptPlacement: () => void;
+  /**
+   * One placement world's `onDone`: scores it (`scorePlacementWorld`) and applies a pass
+   * (`submitAssessment`) — same effect as a world test-out, `masteredVia: 'placement'`. Does not
+   * advance `placementIndex` itself; the screen reads the outcome and calls `advancePlacementWorld`
+   * (pass, more worlds left) or `finishPlacement` (fail, or nothing left to test).
+   */
+  readonly submitPlacementWorldRun: (
+    worldId: string,
+    results: readonly boolean[],
+  ) => Promise<AssessmentScore>;
+  /** Moves the placement run to its next Basics world. */
+  readonly advancePlacementWorld: () => void;
+  /** Ends the placement run (all worlds done, a world failed, or the kid closed it early — "can be
+   * skipped any time, keeps what passed") and returns Home, refreshing progress. */
+  readonly finishPlacement: () => void;
+
+  /** Parent area "Unlock" list: unlocks one lesson or world directly for `profileId`
+   * (domain-model.md §3.2 "Parent unlock", `masteredVia: 'parent'`). */
+  readonly parentUnlockTarget: (profileId: string, target: ParentUnlockTarget) => Promise<void>;
 
   /**
    * Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
@@ -421,6 +489,9 @@ export function createAppStore(services: Services) {
       fullGameLevel: 1,
       levelUpSuggestion: null,
       friendSetup: DEFAULT_FRIEND_SETUP,
+      assessmentRun: null,
+      placementPlan: [],
+      placementIndex: 0,
       todayPlan: null,
       todayActivityIndex: 0,
       todaySessionStartTotalStars: 0,
@@ -510,7 +581,10 @@ export function createAppStore(services: Services) {
           streak: rewards.streak ?? null,
           activeCelebration: null,
           celebrationsShownThisSession: 0,
-          screen: 'home',
+          // app-structure.md §3 / domain-model.md §3.2: offered once, right after creating a new
+          // player (not when a parent added a child from the parent area — that path stays on
+          // `finishNewPlayer`'s own early return above, straight back to 'parent').
+          screen: 'placement-offer',
         });
       },
 
@@ -694,6 +768,92 @@ export function createAppStore(services: Services) {
       exitFriendGame() {
         set({ screen: 'play' });
         void get().refreshProgress();
+      },
+
+      startTestOutLesson(lessonId: string, worldId: string) {
+        const { journey } = get();
+        const lesson = journey?.lessons.find((entry) => entry.id === lessonId);
+        if (!lesson) return;
+        const tasks = planTestOutLesson(lesson, services.deps.random);
+        if (tasks.length === 0) return;
+        set({
+          assessmentRun: { scope: { type: 'lesson', lessonId, worldId }, tasks },
+          screen: 'assessment',
+        });
+      },
+
+      startTestOutWorld(worldId: string) {
+        const { journey } = get();
+        if (!journey) return;
+        const world = journey.worlds.find((entry) => entry.world.id === worldId)?.world;
+        if (!world) return;
+        const tasks = planTestOutWorld(world, journey.lessons, services.deps.random);
+        if (tasks.length === 0) return;
+        set({ assessmentRun: { scope: { type: 'world', worldId }, tasks }, screen: 'assessment' });
+      },
+
+      async submitAssessmentRun(results: readonly boolean[]) {
+        const { profile, assessmentRun } = get();
+        const score = scoreTestOut(results);
+        if (!profile || !assessmentRun) return score;
+        await submitAssessment(services.deps, {
+          profileId: profile.id,
+          kind: 'test-out',
+          scope: assessmentRun.scope,
+          results,
+          score,
+        });
+        return score;
+      },
+
+      exitAssessment() {
+        set({ assessmentRun: null, screen: 'journey' });
+        void get().refreshProgress();
+      },
+
+      declinePlacement() {
+        set({ screen: 'home' });
+      },
+
+      acceptPlacement() {
+        const { journey } = get();
+        if (!journey) {
+          set({ screen: 'home' });
+          return;
+        }
+        const plan = planPlacement(journey.catalog, journey.lessons, services.deps.random);
+        if (plan.length === 0) {
+          set({ screen: 'home' });
+          return;
+        }
+        set({ placementPlan: plan, placementIndex: 0, screen: 'placement' });
+      },
+
+      async submitPlacementWorldRun(worldId: string, results: readonly boolean[]) {
+        const { profile } = get();
+        const score = scorePlacementWorld(results);
+        if (!profile) return score;
+        await submitAssessment(services.deps, {
+          profileId: profile.id,
+          kind: 'placement',
+          scope: { type: 'world', worldId },
+          results,
+          score,
+        });
+        return score;
+      },
+
+      advancePlacementWorld() {
+        set((state) => ({ placementIndex: state.placementIndex + 1 }));
+      },
+
+      finishPlacement() {
+        set({ placementPlan: [], placementIndex: 0, screen: 'home' });
+        void get().refreshProgress();
+      },
+
+      async parentUnlockTarget(profileId: string, target) {
+        await parentUnlock(services.deps, profileId, target);
       },
 
       async startToday() {

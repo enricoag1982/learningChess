@@ -25,6 +25,7 @@ export type {
 export type {
   Stars,
   LessonProgress,
+  MasteredVia,
   Attempt,
   LessonStatus,
   MiniGameProgress,
@@ -80,6 +81,27 @@ export {
 export type { UnlockedMiniGame } from './domain/play.ts';
 export { unlockedMiniGames } from './domain/play.ts';
 
+export type {
+  AssessmentKind,
+  AssessmentScope,
+  AssessmentScore,
+  AssessmentResult,
+  PlacementWorldPlan,
+  Unlock,
+} from './domain/assessment.ts';
+export {
+  TEST_OUT_LESSON_TASKS,
+  TEST_OUT_WORLD_TASKS,
+  PLACEMENT_TASKS_PER_WORLD,
+  planTestOutLesson,
+  planTestOutWorld,
+  planPlacement,
+  scoreTestOut,
+  scorePlacementWorld,
+  newAssessmentResult,
+  newUnlock,
+} from './domain/assessment.ts';
+
 export type { LessonStep, LessonPhase } from './domain/lesson-session.ts';
 export {
   EASIER_AFTER_ERRORS,
@@ -118,6 +140,7 @@ export type {
   ProgressRepository,
   GameRecordRepository,
   RewardsRepository,
+  AssessmentRepository,
   ParentLockRepository,
   PasswordFileWriter,
   AppSettings,
@@ -179,6 +202,9 @@ export {
 
 export type { Journey, JourneyWorld } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
+
+export type { SubmitAssessmentInput, ParentUnlockTarget } from './app/assessment.ts';
+export { loadUnlocked, submitAssessment, parentUnlock } from './app/assessment.ts';
 
 export type { RewardsCheckResult } from './app/rewards.ts';
 export {

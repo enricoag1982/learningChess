@@ -79,6 +79,8 @@ Character 1─1 piece type
 | Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` — **not stored in v1** (M4.3 decision log): only the `GameRecord`s below are saved; `MatchService` stays a hook for v2 online play |
 | GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend, same device, M4.3), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
 | Badge (`EarnedBadge` in code — `Badge` is `BadgeDef`'s catalogue entry) | `badgeId`, `tier`, `at`, `seen`; one row per tier reached, so a tiered badge gets up to 3 |
+| AssessmentResult (M4.5) | `id`, `profileId`, `kind` (`test-out` / `placement`), `scope`, `correct`, `total`, `passed`, `at` — one row per taken test-out/placement run, pass or fail (§3.2) |
+| Unlock (M4.5) | `id`, `profileId`, `targetType` (`lesson` / `world`), `targetId`, `via` (`test-out` / `placement` / `parent`), `at` — feeds `journey.ts`'s `unlocked` id set (§3.2) |
 | Streak | `current`, `best`, `lastDay` (local day, device time zone), `skipsUsedThisWeek` (tracked per ISO week of the day the skip is used, not the missed day) |
 | SessionLog | `date`, `minutes`; one row per profile + local day, minutes summed across sessions |
 | TimeEntry (v2) | `start`, `end`, `activity` (`lesson` / `practice` / `play`) |
@@ -118,15 +120,21 @@ Character 1─1 piece type
 - Task source (`conceptPool`): a concept's scored exercises across every lesson that teaches it (not only the one that first taught it), never a guided try or a variant; picked via the seeded `Random` port, avoiding `lastExerciseId` when another candidate exists.
 - Review tasks are scored for stats but never change a lesson's own `bestStars` (`recordReviewResult` logs a `review: true` `Attempt` against the task's own lesson id, separate from `recordExerciseResult`).
 
-### 3.2 Assessments
+### 3.2 Assessments (M4.5)
 
-| Kind | Content | Pass | Effect |
-|---|---|---|---|
-| Placement | 4 tasks per world, Basics worlds in order | ≥ 3/4 per world | Stops at first failed world; earlier worlds mastered (`placement`) |
-| Test-out | 5–8 tasks from lesson/world concepts | ≥ 80% | Scope mastered (`test-out`), next unlocked |
-| World test | Mixed tasks from all world concepts | ≥ 80% | Part of world mastery (optional per world) |
+| Kind | Trigger | Content | Pass | Effect |
+|---|---|---|---|---|
+| Test-out | Tap a locked lesson or locked world on the Journey → "Show you know it?" sheet (Owl) → choose lesson or whole world | Lesson: 5 tasks from that lesson's scored exercises. World: 8 tasks spread over the world's lessons, ≥ 1 per lesson. Seeded `Random`, no hints, no easier variants | ≥ 80% first try, rounded up (lesson 4/5, world 7/8) | Every lesson in scope: `masteredVia: 'test-out'`, every exercise floored to ≥ 1 best star (never lowers a higher one); world boss (if any) stays available, counts as won only once the kid wins it later — world reads mastered via test-out without it; scope's own id joins the `unlocked` set (`journey.ts`); each lesson's concept enters review box 1, due tomorrow (non-immediate `enterReview`) |
+| Placement | Offered once, right after creating a new player ("Already know some chess?" → Yes: placement / No: start at World 1) | 4 tasks per Basics world, worlds in main-track order, from that world's lessons | ≥ 3/4 first try (rounded up) per world | Same lesson effect as test-out (`masteredVia: 'placement'`) for every lesson of a passed world; stops at the first failed world (later worlds untouched, still locked); can be skipped any time from the runner — worlds already passed keep their effect |
+| Parent unlock | Parent area → child's "Unlock lessons & worlds" list (one row per still-locked lesson/world, "Unlock"/"Unlock world" button) | — (no test) | — | Every lesson in scope: `masteredVia: 'parent'`, **no star floor** (admin override, not a passed check); scope's own id joins the `unlocked` set |
 
-Failing any assessment: no penalty, no data lost.
+Failing test-out or placement: no penalty, nothing lost — Owl encourages, back to the path; the failed run is still recorded (below).
+
+Every run (pass or fail) and every parent unlock records one `AssessmentResult`: `id`, `profileId`, `kind` (`'test-out'` / `'placement'`), `scope` (`{type: 'lesson', lessonId, worldId}` or `{type: 'world', worldId}`), `correct`, `total`, `passed`, `at` — for the parent report (M5). A pass or a parent unlock also runs `checkRewards` once, so a newly-mastered world's milestone badge fires immediately (same choke point as every other activity, `app/rewards.ts`).
+
+A world mastered via test-out/placement, whose boss is later won directly (Journey or Play), is unaffected — `MiniGameProgress.wins` still increments normally; `masteredVia` only ever short-circuits `lessonStatus()`, never a `MiniGameProgress`.
+
+Not in M4.5 (future): a "world test" (mixed tasks from every concept of an already-in-progress world, an optional part of normal world mastery rather than a kid-initiated skip-ahead) — a distinct idea from test-out, not built here.
 
 ### 3.3 Session
 - Order: warm-up (if any concept is due; else skipped) → the Journey's next step (a lesson, resumed if in progress, or a pending world boss — same as `nextStep`, §3 table) → one mini-game → session summary (stars earned this session, new animal friends / rank, Owl's closing line) → Home.
@@ -154,7 +162,7 @@ Failing any assessment: no penalty, no data lost.
 | Area | Use cases |
 |---|---|
 | Profiles | `createProfile`, `selectProfile`, `updateSettings`, `deleteProfile` |
-| Assessment | `startPlacement`, `startTestOut`, `submitAssessment` |
+| Assessment (M4.5) | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
 | Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
@@ -170,6 +178,7 @@ Failing any assessment: no penalty, no data lost.
 | `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`) |
 | `GameRecordRepository` (M3.5) | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
 | `RewardsRepository` (M4.4) | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` (backward-compatible with every pre-M4.4 test fixture) |
+| `AssessmentRepository` (M4.5) | Persistence of `AssessmentResult`/`Unlock` (`addAssessmentResult`/`listAssessmentResults`, `addUnlock`/`listUnlocks`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps`, same backward-compatible pattern as `RewardsRepository` |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |
@@ -187,7 +196,6 @@ packages/content/
   characters.yaml
   bot-levels.yaml              computer opponent levels
   badges.yaml                  badge catalogue
-  assessments.yaml
   lessons/<world>/<lesson>.yaml
   minigames/<id>.yaml
   locales/<lang>/*.yaml        text by key

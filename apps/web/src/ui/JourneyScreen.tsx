@@ -19,6 +19,7 @@ import { characterPieceOrNull } from './art/character-meta.ts';
 import { firstLessonsByCharacter, journeyNodeLabel } from './lesson-character-labels.ts';
 import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
+import { TestOutSheet } from './TestOutSheet.tsx';
 import { useMediaQuery } from './useMediaQuery.ts';
 
 /** Pastel tint per habitat (app-structure.md §8: one habitat per world), for the map panel. */
@@ -205,9 +206,26 @@ export function JourneyScreen(): JSX.Element {
   const startLesson = useAppStore((state) => state.startLesson);
   const startMiniGame = useAppStore((state) => state.startMiniGame);
   const goToHome = useAppStore((state) => state.goToHome);
+  const startTestOutLesson = useAppStore((state) => state.startTestOutLesson);
+  const startTestOutWorld = useAppStore((state) => state.startTestOutWorld);
 
   const [selectedWorldId, setSelectedWorldId] = useState<string | undefined>(undefined);
-  const [lockedMessage, setLockedMessage] = useState<string | null>(null);
+  const [lockedMessage, setLockedMessage] = useState<{
+    readonly text: string;
+    readonly lessonId: string;
+    readonly worldId: string;
+  } | null>(null);
+  /** "Show you know it?" sheet (domain-model.md §3.2), for the locked lesson/world just tapped. */
+  const [testOutOffer, setTestOutOffer] = useState<
+    | {
+        readonly bodyText: string;
+        readonly kind: 'lesson';
+        readonly lessonId: string;
+        readonly worldId: string;
+      }
+    | { readonly bodyText: string; readonly kind: 'world'; readonly worldId: string }
+    | null
+  >(null);
 
   if (!journey) {
     return <main className="min-h-screen bg-cream" />;
@@ -229,6 +247,7 @@ export function JourneyScreen(): JSX.Element {
   function selectWorld(id: string): void {
     setSelectedWorldId(id);
     setLockedMessage(null);
+    setTestOutOffer(null);
   }
 
   function activateLesson(
@@ -248,13 +267,29 @@ export function JourneyScreen(): JSX.Element {
           ? tContent(t, previous.titleKey)
           : characterName(t, previous.character);
       const message = tContent(t, 'journey:ui.finish-first', { name });
-      setLockedMessage(message);
+      setLockedMessage({ text: message, lessonId: lesson.id, worldId: world.id });
+      setTestOutOffer(null);
       services.narrator.cancel();
       void services.narrator.speak(message);
       return;
     }
     setLockedMessage(null);
     void startLesson(lesson.id);
+  }
+
+  /** Locked-lesson bar's "Show you know it?" button: opens the sheet for that lesson. */
+  function offerTestOutLesson(lessonId: string, worldId: string, lessonName: string): void {
+    const bodyText = tContent(t, 'journey:ui.test-out-lesson-question', { name: lessonName });
+    setTestOutOffer({ bodyText, kind: 'lesson', lessonId, worldId });
+  }
+
+  /** Locked-world banner's "Show you know it?" button: opens the sheet for that whole world. */
+  function offerTestOutWorld(world: World): void {
+    const bodyText = tContent(t, 'journey:ui.test-out-world-question', {
+      order: world.order,
+      name: tContent(t, world.titleKey),
+    });
+    setTestOutOffer({ bodyText, kind: 'world', worldId: world.id });
   }
 
   function activateBoss(bossStatus: WorldBossStatus, miniGameId: string): void {
@@ -361,6 +396,15 @@ export function JourneyScreen(): JSX.Element {
               <span className="max-w-xs text-base font-semibold text-muted">
                 {tContent(t, 'journey:ui.locked-world-message')}
               </span>
+              <button
+                type="button"
+                onClick={() => {
+                  offerTestOutWorld(current.world);
+                }}
+                className="flex h-16 items-center justify-center rounded-2xl bg-go px-6 font-display text-base font-semibold text-white"
+              >
+                {tContent(t, 'journey:ui.show-you-know-it')}
+              </button>
             </div>
           )}
           {current && (current.status === 'available' || current.status === 'mastered') && (
@@ -384,12 +428,48 @@ export function JourneyScreen(): JSX.Element {
           )}
 
           {lockedMessage && (
-            <div className="absolute inset-x-4 bottom-4 flex items-center gap-3 rounded-3xl border-2 border-line bg-card px-4 py-3 shadow">
-              <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-[#E9DFF3] p-1.5">
-                <OwlIcon />
+            <div className="absolute inset-x-4 bottom-4 flex flex-col gap-3 rounded-3xl border-2 border-line bg-card px-4 py-3 shadow">
+              <div className="flex items-center gap-3">
+                <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-[#E9DFF3] p-1.5">
+                  <OwlIcon />
+                </div>
+                <p className="font-display text-lg text-ink">{lockedMessage.text}</p>
               </div>
-              <p className="font-display text-lg text-ink">{lockedMessage}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  const lesson = journey.lessons.find(
+                    (entry) => entry.id === lockedMessage.lessonId,
+                  );
+                  if (!lesson) return;
+                  const name =
+                    characterPieceOrNull(lesson.character) === null
+                      ? tContent(t, lesson.titleKey)
+                      : characterName(t, lesson.character);
+                  offerTestOutLesson(lockedMessage.lessonId, lockedMessage.worldId, name);
+                }}
+                className="flex h-16 items-center justify-center rounded-2xl bg-go font-display text-base font-semibold text-white"
+              >
+                {tContent(t, 'journey:ui.show-you-know-it')}
+              </button>
             </div>
+          )}
+
+          {testOutOffer && (
+            <TestOutSheet
+              bodyText={testOutOffer.bodyText}
+              onYes={() => {
+                if (testOutOffer.kind === 'lesson') {
+                  startTestOutLesson(testOutOffer.lessonId, testOutOffer.worldId);
+                } else {
+                  startTestOutWorld(testOutOffer.worldId);
+                }
+                setTestOutOffer(null);
+              }}
+              onNo={() => {
+                setTestOutOffer(null);
+              }}
+            />
           )}
         </div>
       </div>

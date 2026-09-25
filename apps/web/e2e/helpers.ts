@@ -623,6 +623,98 @@ export async function completeExercise(page: Page, def: ExerciseDef): Promise<vo
 }
 
 /**
+ * Deliberately answers one exercise wrong on the first try, then solves it correctly (M4.5: an
+ * assessment task always lets the kid keep trying — only hints are off — but its *first-try*
+ * result is what the run scores). Covers the exercise types World 1 ("board") and World 2
+ * ("pieces") actually use: `yes-no`, `choice`, `select-squares`, and the movement types
+ * (`collect-stars`/`capture` via one illegal-square tap; `best-move` via a legal-but-wrong move,
+ * when one exists, since `engine.ts`'s `playMove` already flags any non-solution move as an error
+ * without needing an illegal one).
+ */
+export async function answerExerciseWrongThenSolve(page: Page, def: ExerciseDef): Promise<void> {
+  switch (def.type) {
+    case 'yes-no': {
+      const wrongLabel = def.answer ? contentText('exercise.no') : contentText('exercise.yes');
+      await page.getByRole('button', { name: wrongLabel, exact: true }).click();
+      await solveExercise(page, def);
+      return;
+    }
+    case 'choice': {
+      const wrong = def.options.find((option) => option.id !== def.answer);
+      if (!wrong) throw new Error(`choice exercise "${def.id}" has no wrong option to pick`);
+      if (wrong.textKey !== undefined) {
+        await page.getByRole('button', { name: contentText(wrong.textKey), exact: true }).click();
+      } else if (wrong.piece) {
+        const color = contentText(`board.color.${wrong.piece.color}`);
+        const piece = contentText(`board.piece.${wrong.piece.type}`);
+        await page.getByRole('button', { name: `${color} ${piece}`, exact: true }).click();
+      }
+      await solveExercise(page, def);
+      return;
+    }
+    case 'select-squares': {
+      const answer = new Set(selectSquaresAnswer(def));
+      const wrongSquare = SQUARES.find((square) => !answer.has(square));
+      if (!wrongSquare)
+        throw new Error(`select-squares exercise "${def.id}": every square is correct`);
+      await clickSquare(page, wrongSquare); // select a wrong one
+      await page.getByRole('button', { name: /Check/ }).click(); // wrong check, first try spent
+      await clickSquare(page, wrongSquare); // deselect it again before solving for real
+      await solveExercise(page, def);
+      return;
+    }
+    case 'best-move': {
+      const moves = rules.legalMoves(def.position, { staticOpponent: true });
+      const solutionSans = new Set(def.solutions.map(normalizeSan));
+      const wrongMove = moves.find((move) => !solutionSans.has(normalizeSan(move.san)));
+      if (wrongMove) {
+        await clickSquare(page, wrongMove.from);
+        await clickSquare(page, wrongMove.to); // legal, but not the solution: an error either way
+        await solveExercise(page, def);
+        return;
+      }
+      // Every legal move happens to be a solution (rare): fall through to the illegal-tap path.
+      await tapIllegalMove(page, def.position);
+      await solveExercise(page, def);
+      return;
+    }
+    case 'collect-stars':
+    case 'capture': {
+      await tapIllegalMove(page, def.position);
+      await solveExercise(page, def);
+      return;
+    }
+    default:
+      throw new Error(`answerExerciseWrongThenSolve: exercise type "${def.type}" not supported`);
+  }
+}
+
+/**
+ * Taps a piece, then a square that is neither a legal destination for it nor another piece's own
+ * square (`Board.tsx`'s tap-tap: tapping another piece's square reselects instead of erroring) —
+ * always rejected as an illegal move (an error), leaving the position unchanged, then deselects the
+ * piece again so the `solveExercise` call that follows starts from a clean board.
+ */
+async function tapIllegalMove(page: Page, position: Position): Promise<void> {
+  const moves = rules.legalMoves(position, { staticOpponent: true });
+  const [firstMove] = moves;
+  if (!firstMove) throw new Error('tapIllegalMove: no legal moves to start from');
+  const reachableOrOwn = new Set([
+    ...moves.map((move) => move.from),
+    ...moves.map((move) => move.to),
+  ]);
+  const illegalTarget = SQUARES.find((square) => !reachableOrOwn.has(square));
+  if (!illegalTarget) throw new Error('tapIllegalMove: no illegal target square available to tap');
+  await clickSquare(page, firstMove.from); // select the piece
+  await clickSquare(page, illegalTarget); // rejected: an error, position unchanged
+  // Board.tsx never clears `selected` after a rejected attempt (on purpose, so the kid can retry at
+  // once) — deselect it again here, the same way the select-squares case above does, so the
+  // solveExercise call that follows this one starts from a clean, nothing-selected board (its own
+  // first click assumes that, same as a fresh exercise).
+  await clickSquare(page, firstMove.from);
+}
+
+/**
  * Solves whichever of `candidates` is currently on screen, then advances past its success panel;
  * returns the matched definition. For a review task (M3.4 warm-up / Practice), whose exact
  * exercise the app picks at random from a concept's pool — each candidate's own instruction text
@@ -823,7 +915,16 @@ export async function playLesson(
  * or a lesson call this first instead of `page.goto('/')` directly (`profiles.spec.ts` is the one
  * spec that exercises first run's own screens in detail).
  */
-export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<void> {
+/**
+ * Welcome → password → saved → new player (nickname, avatar), stopping right at the M4.5
+ * "Already know some chess?" placement offer (domain-model.md §3.2) — shared by `completeFirstRun`
+ * (declines it, same landing-on-Home contract every other spec relies on) and specs that exercise
+ * placement itself.
+ */
+export async function completeFirstRunToPlacementOffer(
+  page: Page,
+  nickname = 'Kid',
+): Promise<void> {
   await page.goto('/');
   await page.getByRole('button', { name: 'Start setup' }).click();
 
@@ -836,6 +937,14 @@ export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<vo
   await page.getByRole('button', { name: 'Next' }).click(); // nickname -> avatar
   await page.getByRole('button', { name: "Let's play!" }).click();
 
+  await page.getByText(contentText('placement.offer-question')).waitFor();
+}
+
+/** `completeFirstRunToPlacementOffer`, then declines placement ("No, start at World 1") — every
+ * spec that only needs a fresh profile on Home keeps this same contract after M4.5. */
+export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<void> {
+  await completeFirstRunToPlacementOffer(page, nickname);
+  await page.getByRole('button', { name: contentText('placement.offer-no') }).click();
   await page.getByRole('heading', { level: 1, name: 'Chess for Kids' }).waitFor();
 }
 

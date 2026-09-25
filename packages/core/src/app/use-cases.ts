@@ -16,6 +16,7 @@ import type { ConceptStats, ConceptTask } from '../domain/review.ts';
 import { appendResult, applyReviewResult, enterReview, newConceptStats } from '../domain/review.ts';
 import { saveMiniGamePlay } from './minigames.ts';
 import type {
+  AssessmentRepository,
   ContentSource,
   GameRecordRepository,
   IdGenerator,
@@ -40,6 +41,10 @@ export interface AppDeps {
    * before M4.4 keeps typechecking unchanged (same reasoning as `ContentSource.catalog`/`badges`);
    * `checkRewards` (`app/rewards.ts`) simply no-ops without it. */
   readonly rewards?: RewardsRepository;
+  /** Assessment results + unlocked lesson/world ids (M4.5). Optional for the same backward-compat
+   * reason `rewards` is; `app/assessment.ts`'s use cases no-op/throw without it, same pattern as
+   * `checkRewards`/`requireRewards`. */
+  readonly assessment?: AssessmentRepository;
   readonly clock: Clock;
   readonly ids: IdGenerator;
   readonly content: ContentSource;

@@ -31,6 +31,8 @@ export interface ExercisePlayAreaProps {
   readonly isStacked: boolean;
   /** The checked king's square right now, if any (Board's check ring, all exercise types). */
   readonly checkSquare?: Square;
+  /** Hides the Hint button (domain-model.md §3.2: an assessment task offers no hints). Default `true`. */
+  readonly showHint?: boolean;
 }
 
 export interface ExercisePlayArea {
@@ -56,6 +58,7 @@ export function buildExercisePlayArea({
   onSelectPiece,
   isStacked,
   checkSquare,
+  showHint = true,
 }: ExercisePlayAreaProps): ExercisePlayArea {
   const isSelectSquares = exercise.type === 'select-squares';
   const isMoveCounted = exercise.type === 'collect-stars' || exercise.type === 'capture';
@@ -224,16 +227,18 @@ export function buildExercisePlayArea({
     <>
       {isMoveCounted && <MovesCard t={t} current={state.core.moves} target={exercise.stars3} />}
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => {
-            dispatch({ type: 'hint' });
-          }}
-          className={SECONDARY_BUTTON}
-        >
-          <HintIcon />
-          {t('exercise.hint')}
-        </button>
+        {showHint && (
+          <button
+            type="button"
+            onClick={() => {
+              dispatch({ type: 'hint' });
+            }}
+            className={SECONDARY_BUTTON}
+          >
+            <HintIcon />
+            {t('exercise.hint')}
+          </button>
+        )}
         {isSelectSquares && (
           <button
             type="button"

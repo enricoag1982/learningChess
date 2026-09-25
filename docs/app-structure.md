@@ -33,9 +33,9 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 ## 3. Profiles
 
 - App start: profile picker (animal avatar + nickname, no password).
-- New profile: nickname → avatar → "New to chess?"
-  - Yes → start at World 1.
-  - No → placement test → start at first non-mastered world.
+- New profile: nickname → avatar → create → placement offer (M4.5, once, only right after creating a new player — not when a parent adds a child from the parent area): Owl "Already know some chess?"
+  - No → start at World 1 (default, and always available from the offer screen).
+  - Yes → placement test (domain-model.md §3.2): 4 tasks per Basics world in order, ≥3/4 passes it (`masteredVia: 'placement'`); stops at the first failed world; skippable any time, keeps whatever passed so far.
 - Per profile: own progress, stars, review queue, settings.
 
 ## 4. Kid navigation
@@ -54,14 +54,15 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 Journey
 └─ Track (Basics = main road; Openings / Tactics / Checkmates & Endgames)
    └─ World (one habitat)
-      ├─ Lesson (one concept)
-      │  ├─ Story card (animal + rule)
-      │  ├─ Demo
-      │  ├─ Guided tries (hints on)
-      │  ├─ Exercises (5–10 stages, 1–3 stars)
-      │  └─ Boss = mini-game
-      └─ World test (test-out / final check)
+      └─ Lesson (one concept)
+         ├─ Story card (animal + rule)
+         ├─ Demo
+         ├─ Guided tries (hints on)
+         ├─ Exercises (5–10 stages, 1–3 stars)
+         └─ Boss = mini-game
 ```
+
+Test-out/placement (M4.5) are not a content node: they're a Journey-level interaction over a locked lesson's or world's own exercises (§6 Skip (kid)), not authored content of their own.
 
 Exercise definition: position + task type + goal + answer check + hints + star criteria.
 
@@ -70,8 +71,8 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 - **Session:** warm-up (3 review tasks) → next lesson → mini-game → rewards → stop at time limit.
 - **Lesson:** story → demo → guided → exercises → boss → stars → unlock next.
 - **Error:** undo + spoken explanation → hint ladder (piece → target squares → move) → after 2 failures easier variant offered ("Easier one"; kid may keep trying) + concept to review. Never blocked.
-- **Skip (kid):** tap locked lesson/world → "Show you know it" test (5–8 mixed tasks) → ≥80% = mastered, unlocked; <80% = back to path, no penalty.
-- **Skip (parent):** unlock any lesson/world directly.
+- **Skip (kid), M4.5:** tap locked lesson/world → sheet, Owl "Want to show me you already know **X**?" → choose lesson (5 tasks) or whole world (8 tasks, ≥1 per lesson) from that scope's own scored exercises, no hints, no easier variant → ≥80% first try (rounded up: lesson 4/5, world 7/8) = every lesson in scope mastered (`masteredVia: 'test-out'`), unlocked, concepts to review; <80% = back to the path, no penalty, nothing lost. A test-out'd world's boss stays available — mastered without it, counts won once played later.
+- **Skip (parent), M4.5:** Parent area → child → "Unlock lessons & worlds" → per still-locked lesson/world, one **Unlock**/**Unlock world** button — no test, `masteredVia: 'parent'`, no star floor.
 - Skipped concepts enter the review pool like completed ones.
 - **Play vs Friend (same device, M4.3):** Play → vs Friend → setup sheet (second player, game, board mode, legal-move dots, swap colours) → friend game screen → result → Play.
   - Availability: vs Friend card unlocked once the active profile has any game unlocked (full game after World 4; Pawn Wars after Promotion; Win the Queen after Trades); only games unlocked for the active profile are offered; parent unlock is a later milestone.
@@ -85,7 +86,7 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 
 ## 7. Progression rules
 
-- Lesson complete = all stages done. Mastered = ≥80% of max stars or test-out passed.
+- Lesson complete = all stages done. Mastered = ≥80% of max stars, or `masteredVia` set (test-out / placement / parent unlock, M4.5).
 - Next lesson unlocks on completion; next world on mastery of all lessons + boss win.
 - Tracks unlock when Basics is mastered; any order; worlds within a track in order.
 - Today session after Basics: next lesson from the least advanced track.
@@ -120,7 +121,7 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 | Hints | 3-step ladder |
 | Computer opponent | Levels; human-like mistakes at low levels; scripted moves for tasks |
 | Mini-game engine | Custom setups + win conditions (promote, capture all, capture queen, reach square, move limit) |
-| Assessment | Placement test, test-out, world test |
+| Assessment (M4.5) | Placement test (new player), test-out (locked lesson/world, kid-initiated), parent unlock |
 | Mastery tracker | Accuracy per concept |
 | Review scheduler | Selects old-topic tasks for warm-up |
 | Rewards | Stars, badges, rank, collection ([rewards.md](rewards.md)) |

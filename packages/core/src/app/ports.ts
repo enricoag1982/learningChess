@@ -1,3 +1,4 @@
+import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { Move } from '../domain/chess/rules.ts';
 import type { GameState } from '../domain/game/types.ts';
@@ -65,6 +66,21 @@ export interface RewardsRepository {
   getSessionLog(profileId: string, date: string): Promise<SessionLog | undefined>;
   saveSessionLog(log: SessionLog): Promise<void>;
   /** Deletes every earned badge, the streak, and every session-log row for a profile (parent area "Delete"). */
+  deleteProfileData(profileId: string): Promise<void>;
+}
+
+/**
+ * Persistence of `AssessmentResult` / `Unlock` (domain-model.md §2, §3.2, M4.5). Kept separate from
+ * `ProgressRepository`, same reasoning as `RewardsRepository`; optional on `AppDeps` for the same
+ * backward-compatible reason — `app/assessment.ts`'s use cases simply throw a clear error if used
+ * without it wired up (same pattern `checkRewards`/`requireRewards` uses).
+ */
+export interface AssessmentRepository {
+  addAssessmentResult(result: AssessmentResult): Promise<void>;
+  listAssessmentResults(profileId: string): Promise<AssessmentResult[]>;
+  addUnlock(unlock: Unlock): Promise<void>;
+  listUnlocks(profileId: string): Promise<Unlock[]>;
+  /** Deletes every assessment result and unlock row for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 

@@ -26,7 +26,7 @@ function enterPassword(password: string): void {
 }
 
 describe('first run', () => {
-  it('welcome → password → saved → new player → Home (fresh install)', async () => {
+  it('welcome → password → saved → new player → placement offer → Home (fresh install)', async () => {
     const services = makeServices();
     render(<App services={services} />);
 
@@ -46,6 +46,10 @@ describe('first run', () => {
 
     await screen.findByText('Pick your animal!');
     fireEvent.click(screen.getByRole('button', { name: "Let's play!" }));
+
+    // domain-model.md §3.2: offered once, right after creating a new player.
+    await screen.findByText("Already know some chess? Let's find out where to start you!");
+    fireEvent.click(screen.getByRole('button', { name: 'No, start at World 1' }));
 
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
     expect(screen.getByText('Mia')).toBeTruthy();

@@ -103,6 +103,11 @@ parent:
   new-password-label: New password
   save: Save
   cancel: Cancel
+  unlock-lessons-worlds: Unlock lessons & worlds
+  unlock-world: Unlock world
+  unlock-lesson: Unlock
+  unlocked: Unlocked
+  unlock-empty: Everything is already unlocked for this child.
 lesson:
   close: Close lesson
   steps:
@@ -283,6 +288,28 @@ session:
   summary-new-friend: New friend!
   summary-closing: See you tomorrow!
   summary-done: Done
+assessment:
+  task-of: 'Task {{current}}/{{total}}'
+  pass-title: You did it!
+  pass-body_one: 'You already know {{name}}!'
+  pass-body_other: 'You already know {{name}} — {{count}} lessons are yours!'
+  fail-title: Keep going!
+  fail-body: No worries — nothing is lost. Keep practising on your path!
+  score: 'You got {{correct}} of {{total}} right.'
+  continue: Continue
+placement:
+  offer-question: Already know some chess? Let's find out where to start you!
+  offer-yes: Yes, test me!
+  offer-no: No, start at World 1
+  world-of: 'World {{order}} · Task {{current}}/{{total}}'
+  summary-passed-title: Great job!
+  summary-passed-body_one: 'You already know {{count}} world! Off you go!'
+  summary-passed-body_other: 'You already know {{count}} worlds! Off you go!'
+  summary-none-title: "Let's start at World 1!"
+  summary-none-body: Every chess champion starts with the first step.
+  summary-all-title: Wow, you know it all!
+  summary-all-body: You're ready to explore every path.
+  continue: Continue
 practice:
   title: Practice
   owl-line: Pick a topic, or start your warm-up!
