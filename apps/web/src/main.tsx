@@ -6,6 +6,7 @@ import '@fontsource-variable/nunito';
 import './index.css';
 import './i18n.ts';
 import App from './App.tsx';
+import { AppErrorBoundary } from './ui/AppErrorBoundary.tsx';
 import { createAppUpdate } from './adapters/app-update.ts';
 
 const rootElement = document.getElementById('root');
@@ -50,7 +51,9 @@ if (import.meta.env.DEV && location.hash === '#board') {
 } else {
   root.render(
     <StrictMode>
-      <App appUpdate={appUpdate} />
+      <AppErrorBoundary>
+        <App appUpdate={appUpdate} />
+      </AppErrorBoundary>
     </StrictMode>,
   );
 }

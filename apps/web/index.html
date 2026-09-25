@@ -7,9 +7,32 @@
     <title>Chess for Kids</title>
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <style>
+      .boot-note {
+        margin: 3rem 1rem;
+        text-align: center;
+        font-family: sans-serif;
+        font-size: 1.1rem;
+        color: #3a2f22;
+        opacity: 0;
+        animation: boot-note-in 0.3s 8s forwards;
+      }
+      @keyframes boot-note-in {
+        to {
+          opacity: 1;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Replaced by the app as soon as it starts. If the browser cannot run the app at all (too
+         old, e.g. iOS 12), the note fades in after 8 s instead of a blank page. -->
+    <div id="root">
+      <p class="boot-note">
+        Chess for Kids could not start on this browser. It needs iPadOS / iOS 15.4 or newer, or a
+        recent Chrome, Edge or Firefox.
+      </p>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

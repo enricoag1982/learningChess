@@ -11,6 +11,10 @@ next: Next
 play-again: Play again
 continue: Continue
 loading: Loading…
+app-error:
+  title: Oops, something went wrong
+  body: Tap "Try again". If this keeps happening, ask a grown-up to send the text below to the app's maker.
+  retry: Try again
 piece:
   r: Rook
   b: Bishop

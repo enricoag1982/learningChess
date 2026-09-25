@@ -6,7 +6,7 @@ Related: [validation.md](validation.md), [roadmap.md](roadmap.md), [../CONTRIBUT
 
 | Check | How |
 |---|---|
-| CI green | `quality` check passes on the PR head (branch up to date with `master`) |
+| CI green | `quality` check passes on the PR head (branch up to date with `master`), incl. `pnpm compat` (Safari 15.4 floor) |
 | Version bump | `apps/web/package.json` `version` set to the release version (`1.0.0` for MVP); shown in the parent area (`__APP_VERSION__`, injected at build by `vite.config.ts`'s `define` — see `docs/architecture.md` §11) |
 | Validation log row | `docs/validation.md` has a row for this iteration's tag (checks run, notes) — the tag workflow refuses to create a tag without one |
 | Privacy page | Parent area → Privacy renders; link from the first-run parent password screen opens it; `docs/privacy-policy.md` matches the in-app text |

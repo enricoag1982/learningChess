@@ -158,6 +158,46 @@ describe('createWebSpeechNarrator — available', () => {
     await speaking;
   });
 
+  it('works when SpeechSynthesis is not an EventTarget (Safari < 16, iPad mini 4 on iOS 15)', async () => {
+    const synth = {
+      voices: [] as SpeechSynthesisVoice[],
+      spoken: [] as FakeUtterance[],
+      onvoiceschanged: null as (() => void) | null,
+      getVoices(): SpeechSynthesisVoice[] {
+        return this.voices;
+      },
+      speak(utterance: FakeUtterance): void {
+        this.spoken.push(utterance);
+      },
+      cancel(): void {
+        // Nothing to stop.
+      },
+    };
+    const narrator = createWebSpeechNarrator(synth as unknown as SpeechSynthesis);
+
+    synth.voices = [makeVoice({ name: 'en-later', lang: 'en-US', localService: true })];
+    synth.onvoiceschanged?.();
+
+    const speaking = narrator.speak('hi');
+    const utterance = synth.spoken[0];
+    expect(utterance?.voice?.name).toBe('en-later');
+    utterance?.dispatchEvent(new Event('end'));
+    await speaking;
+  });
+
+  it('picks a voice at speak time when none was listed at startup and no event came', async () => {
+    const synth = new FakeSpeechSynthesis();
+    const narrator = createWebSpeechNarrator(synth as unknown as SpeechSynthesis);
+
+    synth.voices = [makeVoice({ name: 'en-late', lang: 'en-US', localService: true })];
+
+    const speaking = narrator.speak('hi');
+    const utterance = synth.spoken[0];
+    expect(utterance?.voice?.name).toBe('en-late');
+    utterance?.dispatchEvent(new Event('end'));
+    await speaking;
+  });
+
   it('cancel() stops the underlying synthesis', () => {
     const synth = new FakeSpeechSynthesis();
     const narrator = createWebSpeechNarrator(synth as unknown as SpeechSynthesis);
