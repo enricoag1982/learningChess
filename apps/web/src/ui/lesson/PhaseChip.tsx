@@ -37,7 +37,7 @@ export function PhaseChip({
         {PHASES.map((p) => (
           <span
             key={p}
-            className={`h-1.5 w-5 rounded-full ${PHASE_BAR[phaseState(p, phase, skippedPhases)]}`}
+            className={`h-2 w-7 rounded-full ${PHASE_BAR[phaseState(p, phase, skippedPhases)]}`}
           />
         ))}
       </span>
