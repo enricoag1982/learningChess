@@ -658,6 +658,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       await expectKidTouchTarget(page, 'Close lesson');
       await expectKidTouchTarget(page, /Listen again/);
       await expectKidTouchTarget(page, /Let me try/);
+      await expectKidTouchTarget(page, 'Skip'); // playtest 2
       await expectNoSeriousViolations(page, 'Story');
     }
     await page.getByRole('button', { name: /Let me try/ }).click();
@@ -665,6 +666,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     // Demo.
     if (!storyDemoScanned) {
       await expectKidTouchTarget(page, /^Next/);
+      await expectKidTouchTarget(page, 'Skip'); // playtest 2
       await expectNoSeriousViolations(page, 'Demo');
       storyDemoScanned = true;
     }
@@ -672,6 +674,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
     // Guided tries (not individually a11y-scanned; deep-scanned scored exercises cover the UI).
     for (const guided of lesson.guided) {
+      await expectKidTouchTarget(page, 'Skip'); // playtest 2: every guided try shows it
       await expectKidTouchTarget(page, /Hint/);
       if (isMoveCountedExercise(guided)) {
         await expectKidTouchTarget(page, /Undo/);

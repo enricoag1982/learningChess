@@ -1,7 +1,15 @@
 import { useEffect, useMemo } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { lessonSteps, saveResumeStep, stepPhase, totalStars } from '@chess-kids/core';
+import {
+  advanceLessonPhase,
+  isSkippablePhase,
+  lessonSteps,
+  phaseEndIndex,
+  skipLessonPhase,
+  stepPhase,
+  totalStars,
+} from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { BossStep } from './lesson/BossStep.tsx';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
@@ -81,6 +89,7 @@ export function LessonScreen(): JSX.Element {
   const exitLesson = useAppStore((state) => state.exitLesson);
   const completeLessonActivity = useAppStore((state) => state.completeLessonActivity);
   const checkForCelebrations = useAppStore((state) => state.checkForCelebrations);
+  const refreshProgress = useAppStore((state) => state.refreshProgress);
 
   const lesson = lessonId ? services.deps.content.lesson(lessonId) : undefined;
   const steps = useMemo(
@@ -119,12 +128,42 @@ export function LessonScreen(): JSX.Element {
   function advanceFromCurrent(): void {
     const next = stepIndex + 1;
     goToStep(next);
-    if (!lesson || !profile) return;
-    void saveResumeStep(services.deps, profile.id, lesson.id, next);
+    const currentStep = steps[stepIndex];
+    if (!lesson || !profile || !currentStep) return;
+    const currentPhase = stepPhase(currentStep);
+    if (!isSkippablePhase(currentPhase)) return;
+    void advanceLessonPhase(services.deps, profile.id, lesson.id, currentPhase, next).then(() => {
+      void refreshProgress();
+    });
+  }
+
+  // "Skip" (playtest 2, teaching-process.md §2): Story/Demo/Try only. Narration stops immediately;
+  // the mark is saved and `progress` refreshed *before* the step jumps, so `StepPills` never shows
+  // the old step as "done" for a frame on its way to "skipped".
+  function skipPhase(): void {
+    const currentStep = steps[stepIndex];
+    if (!lesson || !profile || !currentStep) return;
+    const currentPhase = stepPhase(currentStep);
+    if (!isSkippablePhase(currentPhase)) return;
+    services.narrator.cancel();
+    const target = phaseEndIndex(steps, stepIndex);
+    void skipLessonPhase(services.deps, profile.id, lesson.id, currentPhase, target).then(() => {
+      void refreshProgress().then(() => {
+        goToStep(target);
+      });
+    });
   }
 
   const phase = stepPhase(step);
   const stars = totalStars(progress);
+  const lessonProgress = progress.find((entry) => entry.lessonId === lessonId);
+  const skippedPhases = lessonProgress?.skippedPhases;
+  // Try's last guided step (its own `nextStepIndex` leaves the `try` phase): unmarks a previous
+  // "Skip" on replay (`recordExerciseResult`'s `completesPhase`), same "phase later completed
+  // normally" rule `advanceFromCurrent` applies to Story/Demo above.
+  const nextStep = steps[stepIndex + 1];
+  const completesTry =
+    step.kind === 'guided' && nextStep !== undefined && stepPhase(nextStep) !== 'try';
   // Scored exercises also show "N of M" via StageDots underneath; on the compact phone bar that
   // row drops its own label (`showLabel={!isCompact}` below) so the count is stated once, not twice.
   const chipCounts =
@@ -150,7 +189,7 @@ export function LessonScreen(): JSX.Element {
             (isCompact ? (
               <PhaseChip phase={phase} current={chipCounts?.current} total={chipCounts?.total} />
             ) : (
-              <StepPills current={phase} />
+              <StepPills current={phase} skippedPhases={skippedPhases} />
             ))}
         </div>
         <StarsPill count={stars} />
@@ -161,8 +200,12 @@ export function LessonScreen(): JSX.Element {
       )}
 
       <div className="flex min-h-0 flex-1 flex-col">
-        {step.kind === 'story' && <StoryStep lesson={lesson} onNext={advanceFromCurrent} />}
-        {step.kind === 'demo' && <DemoStep lesson={lesson} onNext={advanceFromCurrent} />}
+        {step.kind === 'story' && (
+          <StoryStep lesson={lesson} onNext={advanceFromCurrent} onSkip={skipPhase} />
+        )}
+        {step.kind === 'demo' && (
+          <DemoStep lesson={lesson} onNext={advanceFromCurrent} onSkip={skipPhase} />
+        )}
         {(step.kind === 'guided' || step.kind === 'exercise') && (
           <ExerciseStep
             key={step.exercise.id}
@@ -170,6 +213,8 @@ export function LessonScreen(): JSX.Element {
             exercise={step.exercise}
             guided={step.kind === 'guided'}
             nextStepIndex={stepIndex + 1}
+            onSkip={step.kind === 'guided' ? skipPhase : undefined}
+            completesPhase={completesTry ? 'try' : undefined}
           />
         )}
         {step.kind === 'boss' && (

@@ -44,8 +44,8 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (password) | Home, Parent area |
 | 2 | Home | Start | Rank, stars, Owl message, **Start today**, tiles: Journey, Practice, Play, My Den | Lesson story (session), Journey, Practice, Play, My Den, Profile picker |
 | 3 | Journey map | Path | World list + paths, lesson nodes (done / current / locked), **Show you know it** | Lesson story, test-out |
-| 4 | Lesson story | Introduce concept | Step pills (Story → Demo → Try → Exercises → Boss), character, speech bubble, mini demo board, Listen again, **Let me try** | Exercise |
-| 5 | Exercise | Practise | Board, stage dots, instruction + replay, move counter + star target, Hint, Undo; after 2 errors: **Easier one** (secondary, shares the replay row so Hint / Undo stay on screen) | Lesson complete |
+| 4 | Lesson story | Introduce concept | Step pills (Story → Demo → Try → Exercises → Boss; a skipped step: skip icon, muted, dashed bar), character, speech bubble, mini demo board, Listen again, **Let me try**, **Skip** (Story/Demo/Try only, playtest 2) | Exercise |
+| 5 | Exercise | Practise | Board, stage dots, instruction + replay, move counter + star target, Hint, Undo; after 2 errors: **Easier one** (secondary, shares the replay row so Hint / Undo stay on screen); a guided try also shows **Skip** there (never on a scored exercise or the boss) | Lesson complete |
 | 6 | Lesson complete | Reward | Stars, new badge, next lesson, new mini-game, Play again / **Continue** | Journey, Exercise |
 | 7 | Play | Apply | vs Computer (levels), vs Friend, mini-game grid (locked ones greyed) | Game screens |
 | 8 | vs Friend | Same-device game | Face-to-face board (black pieces rotated), take back + exit per player, turn indicator | Play |

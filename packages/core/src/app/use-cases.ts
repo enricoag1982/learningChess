@@ -5,12 +5,15 @@ import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts'
 import type { VersusState } from '../domain/exercise/versus.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
+import type { SkippablePhase } from '../domain/lesson-session.ts';
 import type { LessonProgress } from '../domain/progress.ts';
 import {
   newLessonProgress,
   recordBossStars,
   recordExerciseStars,
+  withoutSkippedPhase,
   withResumeStep,
+  withSkippedPhase,
 } from '../domain/progress.ts';
 import type { ConceptStats, ConceptTask } from '../domain/review.ts';
 import { appendResult, applyReviewResult, enterReview, newConceptStats } from '../domain/review.ts';
@@ -183,6 +186,10 @@ export interface RecordExerciseResultInput {
    * exercise `EASIER_VARIANT_STARS` (domain-model.md §3.4).
    */
   readonly standsInFor?: string;
+  /** Set when this solve leaves a skippable phase normally — Try's last guided try, `stepPhase` of
+   * `nextStep` no longer `'try'` (`LessonScreen` computes it): unmarks it from `skippedPhases` if a
+   * previous "Skip" had set it (playtest 2) — this is a "Play again" replay playing it through. */
+  readonly completesPhase?: SkippablePhase;
 }
 
 /**
@@ -198,13 +205,17 @@ export async function recordExerciseResult(
   deps: AppDeps,
   input: RecordExerciseResultInput,
 ): Promise<LessonProgress> {
-  const { profileId, lesson, state, scored, durationMs, nextStep, standsInFor } = input;
+  const { profileId, lesson, state, scored, durationMs, nextStep, standsInFor, completesPhase } =
+    input;
   const now = deps.clock.now();
   const stars = starsFor(state);
 
   await recordAttempt(deps, { profileId, lesson, state, scored, durationMs });
 
   let progress = await getLessonProgress(deps, profileId, lesson.id);
+  if (completesPhase !== undefined) {
+    progress = withoutSkippedPhase(progress, completesPhase, now);
+  }
   const wasComplete = progress.completedAt !== undefined;
   if (state.solved && stars !== 0) {
     if (standsInFor !== undefined) {
@@ -359,4 +370,44 @@ export async function saveResumeStep(
   const saved = withResumeStep(progress, step, deps.clock.now());
   await deps.progress.saveLesson(saved);
   return saved;
+}
+
+/**
+ * Marks `phase` skipped (kid tapped "Skip" on Story/Demo/Try, playtest 2) and moves the resume
+ * point past it (`nextStep`, `phaseEndIndex`'s own result). No attempt logged: Story/Demo never
+ * track one, and any guided try already played inside Try logged its own via `recordExerciseResult`.
+ */
+export async function skipLessonPhase(
+  deps: AppDeps,
+  profileId: string,
+  lessonId: string,
+  phase: SkippablePhase,
+  nextStep: number,
+): Promise<LessonProgress> {
+  const now = deps.clock.now();
+  let progress = await getLessonProgress(deps, profileId, lessonId);
+  progress = withSkippedPhase(progress, phase, now);
+  progress = withResumeStep(progress, nextStep, now);
+  await deps.progress.saveLesson(progress);
+  return progress;
+}
+
+/**
+ * Moves the resume point like `saveResumeStep`, and also unmarks `completedPhase` if it was
+ * previously skipped — Story/Demo's own "Next" (normal advance, not "Skip"): a "Play again" replay
+ * that this time plays the phase through instead of skipping it again.
+ */
+export async function advanceLessonPhase(
+  deps: AppDeps,
+  profileId: string,
+  lessonId: string,
+  completedPhase: SkippablePhase,
+  nextStep: number,
+): Promise<LessonProgress> {
+  const now = deps.clock.now();
+  let progress = await getLessonProgress(deps, profileId, lessonId);
+  progress = withoutSkippedPhase(progress, completedPhase, now);
+  progress = withResumeStep(progress, nextStep, now);
+  await deps.progress.saveLesson(progress);
+  return progress;
 }

@@ -11,7 +11,7 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Fonts | Self-hosted (no Google Fonts at runtime) |
 | Narration | Web Speech API with on-device voices only (`localService`; some browser voices need network); subtitles always shown, so the app works without voice. v3: generated audio files, precached |
 | Capacitor apps | All assets bundled in the app → offline by default |
-| Updates | Checked when online; applied at next app start, never mid-session |
+| Updates | No periodic polling (owner decision); checked on load and on return to the app. Applied only at a safe screen (Home / profile picker) — never mid-lesson/game/assessment/time-limit/parent; an update found elsewhere just waits until the kid next lands on one of those (v1.1.0, §1.2) |
 | Storage eviction | Request persistent storage; prompt parent to "Add to Home Screen" on iPad (Safari may clear website data after 7 days without use); backup file (§5) |
 | Offline size budget | ≤ 20 MB in v1 (no audio files); ≤ 50 MB per language in v3 with audio |
 
@@ -25,6 +25,18 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Precache | Already satisfied unchanged: `vite.config.ts`'s `workbox.globPatterns` globs the whole `dist` output, so every chunk (lazy or not) is precached regardless — confirmed by the precache entry count rising from 24 to 36 once the lazy screens split into their own files |
 | Cold start | `apps/web/e2e/performance.spec.ts`: Chromium DevTools `Emulation.setCPUThrottlingRate` (4×) + tablet viewport, timed from a warm-cache reload through picker → Home interactive; asserted `< 5 s` in CI (flake margin), local number logged in `docs/validation.md` |
 | CSP | `apps/web/vite.config.ts`'s `cspPlugin` (`apply: 'build'` only — never `pnpm dev`, so the Vite HMR client is unaffected) injects `<meta http-equiv="Content-Security-Policy">` into `dist/index.html`: `default-src 'self'; script-src 'self'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'` — `style-src` needs `'unsafe-inline'` (React's own `style` prop, used throughout for render-time colours/sizes, renders as the DOM `style` attribute, which `style-src` governs the same as a `<style>` tag); no `unsafe-inline` on `script-src`. `performance.spec.ts` listens for `securitypolicyviolation` across Home/Journey/Play/Den/parent area and asserts none fire |
+
+### 1.2 App update (v1.1.0)
+
+Owner found: phone showed a 7-hour-old build — `registerType: 'prompt'` alone (M5.4's own choice) had no update UI at all, so a waiting version sat until every tab closed.
+
+| Topic | Implementation |
+|---|---|
+| Registration | `vite-plugin-pwa`: `registerType: 'prompt'` kept, `injectRegister: false` (`vite.config.ts`) — the plugin injects nothing; the app registers itself via `virtual:pwa-register`'s `registerSW`, imported only in `main.tsx` (the composition root) so `App.tsx`/`App.test.tsx` never touch a module unavailable outside a Vite/PWA build |
+| Adapter | `apps/web/src/adapters/app-update.ts`'s `createAppUpdate(register)`: takes an injectable `RegisterSW` (unit-testable without the real plugin); tracks `isUpdateReady()` (`onNeedRefresh` fired) and `apply()` (`updateSW(true)` — skip-waiting + reload, idempotent) |
+| Check | No periodic polling (owner decision, dropped mid-task from the original spec's "every 60 min"); checked on load (the browser's own check on service-worker registration) and on return to the app (`onRegisteredSW`'s `registration.update()`, called whenever `document.visibilityState` becomes `'visible'` — a tablet waking from sleep, not only a fresh load) |
+| Apply | `ui/AppUpdater.tsx` (renders nothing, mounted in `App.tsx` alongside `TimeTracker`/`Celebration`): on every screen change, applies a ready update only if the new screen is `'home'` or `'picker'` — an update found elsewhere just waits (`isUpdateReady()` stays true) until the kid next lands on one of those |
+| Offline | Unchanged — precache still covers the whole `dist` output (`vite.config.ts`'s `workbox.globPatterns`); offline e2e green |
 
 ## 2. Accessibility
 

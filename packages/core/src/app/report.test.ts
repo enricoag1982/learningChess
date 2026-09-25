@@ -338,6 +338,24 @@ describe('buildChildReport', () => {
     expect(w1?.starsMax).toBe(12); // 2 lessons x 2 exercises x 3 stars
   });
 
+  it('lists only the lessons with a non-empty skippedPhases as "intro skipped" (playtest 2)', async () => {
+    const profile = newProfile('p1', 'Mia', 'fox', NOW);
+    const l1Progress: LessonProgress = {
+      ...newLessonProgress('lp1', 'p1', 'l1', NOW),
+      skippedPhases: ['story'],
+    };
+    const l2Progress = newLessonProgress('lp2', 'p1', 'l2', NOW); // never skipped
+    const deps = makeDeps({
+      profiles: makeProfileRepo([profile]),
+      progress: makeProgressRepo([l1Progress, l2Progress]),
+    });
+
+    const report = await buildChildReport(deps, 'p1');
+
+    const w1 = report.worlds[0];
+    expect(w1?.skippedIntroLessons.map((lesson) => lesson.id)).toEqual(['l1']);
+  });
+
   it('reports concept accuracy (last 10) and the weak-concept list', async () => {
     const profile = newProfile('p1', 'Mia', 'fox', NOW);
     const weak = makeConceptStats('p1', 'concept-a', [false, false, true]); // 1/3 = weak

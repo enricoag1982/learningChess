@@ -69,7 +69,10 @@ export default defineConfig({
     cspPlugin(),
     VitePWA({
       registerType: 'prompt',
-      injectRegister: 'script-defer',
+      // The app registers itself (`main.tsx`, `adapters/app-update.ts`, `virtual:pwa-register`)
+      // instead of the plugin's own injected script, so it controls exactly when a waiting update
+      // reloads the page (`docs/non-functional.md` §1 "App update").
+      injectRegister: false,
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Chess for Kids',

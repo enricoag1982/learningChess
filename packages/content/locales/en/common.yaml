@@ -156,6 +156,7 @@ parent:
     lessons-mastered_one: '{{count}} mastered'
     lessons-mastered_other: '{{count}} mastered'
     stars: '{{earned}}/{{max}} stars'
+    intro-skipped: 'Intro skipped: {{list}}'
     concepts-heading: Concept accuracy
     concepts-empty: No exercises attempted yet.
     accuracy: '{{percent}}% ({{attempts}} tries)'
@@ -214,12 +215,14 @@ parent:
     close: Close
 lesson:
   close: Close lesson
+  skip: Skip
   steps:
     story: Story
     demo: Demo
     try: Try
     exercises: Exercises
     boss: Boss
+    skipped: '{{step}}, skipped'
   stage-of: '{{current}} of {{total}}'
   board-label: Chess board
 board:

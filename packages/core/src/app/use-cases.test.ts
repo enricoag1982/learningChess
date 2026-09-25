@@ -17,6 +17,7 @@ import { seededRandom } from '../domain/random.ts';
 import type { ConceptStats } from '../domain/review.ts';
 import type { AppDeps } from './use-cases.ts';
 import {
+  advanceLessonPhase,
   getConceptStats,
   getLessonProgress,
   loadProgress,
@@ -25,6 +26,7 @@ import {
   recordExerciseResult,
   recordReviewResult,
   saveResumeStep,
+  skipLessonPhase,
 } from './use-cases.ts';
 import type {
   AppSettings,
@@ -962,5 +964,85 @@ describe('saveResumeStep', () => {
     expect(progress.resumeStep).toBe(5);
     expect(await deps.progress.listAttempts('profile-1')).toEqual([]);
     expect(await deps.progress.listLessons('profile-1')).toEqual([progress]);
+  });
+});
+
+describe('skipLessonPhase', () => {
+  it('marks the phase skipped and moves the resume point, without recording an attempt', async () => {
+    const deps = makeDeps();
+
+    const progress = await skipLessonPhase(deps, 'profile-1', 'rook', 'story', 1);
+
+    expect(progress.skippedPhases).toEqual(['story']);
+    expect(progress.resumeStep).toBe(1);
+    expect(await deps.progress.listAttempts('profile-1')).toEqual([]);
+  });
+
+  it('adds to, rather than replaces, an already-skipped phase', async () => {
+    const deps = makeDeps();
+    await skipLessonPhase(deps, 'profile-1', 'rook', 'story', 1);
+
+    const progress = await skipLessonPhase(deps, 'profile-1', 'rook', 'demo', 2);
+
+    expect(progress.skippedPhases).toEqual(['story', 'demo']);
+  });
+});
+
+describe('advanceLessonPhase', () => {
+  it('moves the resume point without marking anything skipped', async () => {
+    const deps = makeDeps();
+
+    const progress = await advanceLessonPhase(deps, 'profile-1', 'rook', 'story', 1);
+
+    expect(progress.resumeStep).toBe(1);
+    expect(progress.skippedPhases).toBeUndefined();
+  });
+
+  it('unmarks a phase previously skipped — a replay completing it normally this time', async () => {
+    const deps = makeDeps();
+    await skipLessonPhase(deps, 'profile-1', 'rook', 'story', 1);
+
+    const progress = await advanceLessonPhase(deps, 'profile-1', 'rook', 'story', 1);
+
+    expect(progress.skippedPhases).toEqual([]);
+  });
+});
+
+describe('recordExerciseResult completesPhase', () => {
+  it('unmarks a previously-skipped Try when the last guided try is solved normally', async () => {
+    const deps = makeDeps();
+    await skipLessonPhase(deps, 'profile-1', 'rook', 'try', 4);
+    const lesson = makeLesson();
+    const state = exerciseState(GUIDED_1, { solved: true, moves: 1 });
+
+    const progress = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: false,
+      durationMs: 1000,
+      nextStep: 2,
+      completesPhase: 'try',
+    });
+
+    expect(progress.skippedPhases).toEqual([]);
+  });
+
+  it('leaves skippedPhases untouched without completesPhase', async () => {
+    const deps = makeDeps();
+    await skipLessonPhase(deps, 'profile-1', 'rook', 'try', 4);
+    const lesson = makeLesson();
+    const state = exerciseState(GUIDED_1, { solved: true, moves: 1 });
+
+    const progress = await recordExerciseResult(deps, {
+      profileId: 'profile-1',
+      lesson,
+      state,
+      scored: false,
+      durationMs: 1000,
+      nextStep: 3,
+    });
+
+    expect(progress.skippedPhases).toEqual(['try']);
   });
 });

@@ -11,14 +11,17 @@ import { MiniBoard } from '../board/MiniBoard.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { CharacterCard } from './CharacterCard.tsx';
 import { NextButton } from './NextButton.tsx';
+import { SkipButton } from './SkipButton.tsx';
 
 export interface StoryStepProps {
   readonly lesson: Lesson;
   readonly onNext: () => void;
+  /** "Skip" (playtest 2): skips straight to Demo. */
+  readonly onSkip: () => void;
 }
 
 /** Story: meet the character, hear the rule, see its legal moves on a small static board. */
-export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
+export function StoryStep({ lesson, onNext, onSkip }: StoryStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
@@ -50,17 +53,25 @@ export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
         <SpeechBubble text={text} />
         {isCompact ? (
           <>
-            {/* Mini board centred, capped width; then full-width buttons stacked (fix: phone Story
-                layout — no squeezed two-line primary button next to a small board). */}
-            <div className="mx-auto w-full max-w-[320px]">
+            {/* Mini board centred, capped width; buttons pinned to the bottom so the primary is
+                always in view on a phone (playtest 2: it sat below the fold). */}
+            <div className="mx-auto w-full max-w-[240px]">
               <div className="aspect-square w-full">{board}</div>
             </div>
-            <ReplayButton onClick={replay} label={t('story.listen-again')} className="w-full" />
-            <NextButton onClick={onNext} label={t('story.primary')} className="w-full" />
+            <div className="sticky bottom-0 flex flex-col gap-3 bg-cream pt-2 pb-1">
+              <div className="flex gap-3">
+                <ReplayButton onClick={replay} label={t('story.listen-again')} className="flex-1" />
+                <SkipButton onClick={onSkip} />
+              </div>
+              <NextButton onClick={onNext} label={t('story.primary')} className="w-full" />
+            </div>
           </>
         ) : (
           <>
-            <ReplayButton onClick={replay} label={t('story.listen-again')} />
+            <div className="flex gap-3">
+              <ReplayButton onClick={replay} label={t('story.listen-again')} className="flex-1" />
+              <SkipButton onClick={onSkip} />
+            </div>
             <div className="flex items-end gap-6">
               <div className="h-36 w-36 flex-shrink-0 sm:h-52 sm:w-52">{board}</div>
               <NextButton onClick={onNext} label={t('story.primary')} className="flex-1" />

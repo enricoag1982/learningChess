@@ -37,6 +37,13 @@
 5. **Mini-game** vs computer: skill applied in a game.
 6. **Review**: 2–3 tasks of the concept in later sessions.
 
+Steps 1–3 (Story/Demo/Guided try) each carry a "Skip" button (owner playtest 2): one tap skips
+the rest of that step straight to step 4 (Exercises) or the next of 1–3. Exercises and the
+mini-game are never skippable — they decide stars/mastery. Marked `skipped` in `LessonProgress`
+and the lesson's progress track; unmarked if that step is later played through normally (e.g. a
+replay). Scoring/mastery/review unchanged either way. Details: [app-structure.md](app-structure.md)
+lesson flow, [domain-model.md](domain-model.md) §2 `LessonProgress`.
+
 ### 3.2 Per session (~12–15 min)
 Warm-up review (2 min) → 1 new concept (5–8 min) → 1 mini-game (5 min).
 

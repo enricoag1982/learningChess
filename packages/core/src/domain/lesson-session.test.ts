@@ -4,7 +4,14 @@ import type { ExerciseState } from './exercise/engine.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { StaticCaptureGameDef } from './exercise/minigame.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
-import { easierVariant, lessonSteps, shouldOfferEasier, stepPhase } from './lesson-session.ts';
+import {
+  easierVariant,
+  isSkippablePhase,
+  lessonSteps,
+  phaseEndIndex,
+  shouldOfferEasier,
+  stepPhase,
+} from './lesson-session.ts';
 
 const EMPTY_POSITION = {
   pieces: {},
@@ -120,6 +127,39 @@ describe('lessonSteps', () => {
     const lesson = makeLesson({ boss: undefined, guided: [], exercises: [] });
     const steps = lessonSteps(lesson, []);
     expect(steps.map((step) => step.kind)).toEqual(['story', 'demo', 'complete']);
+  });
+});
+
+describe('isSkippablePhase', () => {
+  it('is true for story, demo, try', () => {
+    expect(isSkippablePhase('story')).toBe(true);
+    expect(isSkippablePhase('demo')).toBe(true);
+    expect(isSkippablePhase('try')).toBe(true);
+  });
+
+  it('is false for exercises, boss, and null (complete)', () => {
+    expect(isSkippablePhase('exercises')).toBe(false);
+    expect(isSkippablePhase('boss')).toBe(false);
+    expect(isSkippablePhase(null)).toBe(false);
+  });
+});
+
+describe('phaseEndIndex', () => {
+  it('Story (one step): lands on the next step (Demo)', () => {
+    const steps = lessonSteps(makeLesson(), [makeMiniGame('hungry-rook')]);
+    expect(phaseEndIndex(steps, 0)).toBe(1);
+  });
+
+  it('Try (several guided steps): lands past every remaining one, at the first exercise', () => {
+    const steps = lessonSteps(makeLesson(), [makeMiniGame('hungry-rook')]);
+    // steps: story(0) demo(1) guided(2) guided(3) exercise(4) exercise(5) exercise(6) boss(7) complete(8)
+    expect(phaseEndIndex(steps, 2)).toBe(4);
+    expect(phaseEndIndex(steps, 3)).toBe(4); // from the last guided step too
+  });
+
+  it('never runs past the end: from the boss step, lands on complete', () => {
+    const steps = lessonSteps(makeLesson(), [makeMiniGame('hungry-rook')]);
+    expect(phaseEndIndex(steps, 7)).toBe(8);
   });
 });
 
