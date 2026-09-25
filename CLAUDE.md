@@ -1,6 +1,6 @@
 # Chess for Kids — project guide
 
-Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in progress: M6 voice & art, M7 (v2 scope); planned: v4 platform refactor (`docs/refactor-v4.md`).
+Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in progress: M6 voice & art (→ `v1.2.0`), M7 = v2 scope (→ `v2.0.0`); planned: v4 platform refactor (`docs/refactor-v4.md`).
 
 ## Working style (user preferences)
 

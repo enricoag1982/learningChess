@@ -151,7 +151,7 @@ describe('Allowed hours gate (M7.1)', () => {
     await screen.findByText("It's getting late. See you tomorrow!");
 
     fireEvent.click(screen.getByRole('button', { name: 'Parent: more time' }));
-    fireEvent.change(await screen.findByLabelText('Password', { exact: true }), {
+    fireEvent.change(await screen.findByLabelText('Parent code', { exact: true }), {
       target: { value: '1234' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));

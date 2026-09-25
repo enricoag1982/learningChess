@@ -129,7 +129,7 @@ test.describe('Allowed hours gate (M7.1)', () => {
     await expect(page.getByRole('button', { name: /Let me try/ })).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Parent: more time' }).click();
-    await page.getByLabel('Password', { exact: true }).fill('1234');
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
     await page.getByRole('button', { name: 'Open' }).click();
 
     // Resumes straight into the gated lesson — no confirmation screen in between.
