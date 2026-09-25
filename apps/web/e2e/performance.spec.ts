@@ -20,7 +20,7 @@ test('lazy-loaded screens (parent area, friend setup) fetch their own chunk on f
   );
   await page.getByRole('button', { name: 'Switch player' }).click();
   await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await expect(page.getByRole('heading', { name: 'Parent area' })).toBeVisible();
   await parentChunk;
@@ -53,7 +53,7 @@ test('no Content-Security-Policy violation across the main flows (Home, Journey,
   // Parent area (lazy chunk).
   await page.getByRole('button', { name: 'Switch player' }).click();
   await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await expect(page.getByRole('heading', { name: 'Parent area' })).toBeVisible();
   await page.getByRole('button', { name: 'Done' }).click();

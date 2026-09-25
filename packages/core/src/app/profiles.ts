@@ -50,6 +50,22 @@ export async function changeParentPassword(
   return { location };
 }
 
+/** Parent area "Download code file": writes the current code to a file again (a parent who lost
+ * the first copy) and remembers the new location for the grown-ups screen's "Forgot it?" hint. */
+export async function downloadParentCodeFile(deps: AppDeps): Promise<PasswordFileLocation> {
+  const lock = await deps.parentLock.get();
+  if (!lock) {
+    throw new Error('no parent code set up yet');
+  }
+  const { location } = await deps.passwordFile.write(lock.password);
+  await deps.parentLock.save({
+    ...lock,
+    fileLocation: location,
+    updatedAt: deps.clock.now().toISOString(),
+  });
+  return { location };
+}
+
 export interface VerifyPasswordResult {
   readonly ok: boolean;
   /** Milliseconds still to wait before the next attempt; `0` unless a lock is in effect. */

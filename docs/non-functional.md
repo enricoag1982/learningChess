@@ -54,7 +54,7 @@ Owner found: phone showed a 7-hour-old build — `registerType: 'prompt'` alone 
 |---|---|
 | Minimal data | Nickname + avatar only; no photos, email, location |
 | No tracking | No analytics, ads or third-party SDKs; no network requests except app updates |
-| Parent gate | Parent password (≥ 4 characters) before parent area, unlocks, limits, reset, external links; kept in a simple plain-text file (kid-gate, not a security boundary); password screen shows the file location; 5 wrong attempts → 1-minute wait |
+| Parent gate | Parent code (≥ 4 characters) before parent area, unlocks, limits, reset, external links; kept in a simple plain-text file (kid-gate, not a security boundary); password screen shows the file location; 5 wrong attempts → 1-minute wait |
 | Parent control | Export and delete each profile's data |
 | App stores | Privacy policy; complies with Apple Kids category and Google Play Families (no third-party analytics / ads, parental gate) |
 | Regulations | No personal data leaves the device → minimal COPPA / GDPR (Art. 8) obligations in v1; v2 stays offline; a later online login would need a parental consent flow |

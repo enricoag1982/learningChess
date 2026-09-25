@@ -87,7 +87,7 @@ test('a lazy-loaded screen (parent area) and a World 5 exercise both work after 
   // Parent area (lazy chunk), still offline: opens and shows the same as it would online.
   await page.getByRole('button', { name: 'Switch player' }).click();
   await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await expect(page.getByRole('heading', { name: 'Parent area' })).toBeVisible();
   await page.getByRole('button', { name: 'Done' }).click();

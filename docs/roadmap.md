@@ -89,7 +89,8 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m6.2` | Generated voice: narrated-text inventory (static + finite template expansions), Kokoro TTS script (offline, incremental, content-hash file names), audio narrator (Web Audio, unlocked on first tap) with device-voice fallback for texts without audio, full English audio, precache |
 | `m6.3` | Voice hardening: coverage check in CI (inventory = manifest), feedback note spoken on its own (no device voice mid-lesson), missed-text report from the e2e run, resume timeout before the first tap, offline size check, owner check on phone / tablet |
 | `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
-| `m6.5` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
+| `m6.5` | Owner request: "parent code" instead of "password" everywhere in the UI; first-run "Download again" removed; "Download code file" in the grown-ups area (after the code) |
+| `m6.6` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 

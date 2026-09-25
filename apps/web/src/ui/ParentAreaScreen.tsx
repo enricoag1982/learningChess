@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ChildOverview } from '@chess-kids/core';
-import { buildChildOverview, changeParentPassword, isValidPassword } from '@chess-kids/core';
+import {
+  buildChildOverview,
+  changeParentPassword,
+  downloadParentCodeFile,
+  isValidPassword,
+} from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
@@ -166,6 +171,7 @@ export function ParentAreaScreen(): JSX.Element {
   const startNewPlayer = useAppStore((state) => state.startNewPlayer);
   const [overviews, setOverviews] = useState<Readonly<Record<string, ChildOverview>>>({});
   const [changingPassword, setChangingPassword] = useState(false);
+  const [codeFileLocation, setCodeFileLocation] = useState<string | null>(null);
   const [view, setView] = useState<ParentView>({ kind: 'overview' });
 
   // Also re-fetches on every return to `'overview'` (not only when `profiles` itself changes): a
@@ -276,15 +282,33 @@ export function ParentAreaScreen(): JSX.Element {
                   }}
                 />
               ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChangingPassword(true);
-                  }}
-                  className={`${PARENT_SECONDARY_BUTTON} self-start`}
-                >
-                  {t('parent.change-password')}
-                </button>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setChangingPassword(true);
+                    }}
+                    className={PARENT_SECONDARY_BUTTON}
+                  >
+                    {t('parent.change-password')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void downloadParentCodeFile(services.deps).then(({ location }) => {
+                        setCodeFileLocation(location);
+                      });
+                    }}
+                    className={PARENT_SECONDARY_BUTTON}
+                  >
+                    {t('parent.download-code')}
+                  </button>
+                </div>
+              )}
+              {codeFileLocation !== null && (
+                <p role="status" className="text-sm text-muted">
+                  {t('parent.code-downloaded', { location: codeFileLocation })}
+                </p>
               )}
             </section>
 

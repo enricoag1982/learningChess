@@ -212,10 +212,10 @@ describe('Test-out (M4.5)', () => {
 /** Full onboarding (welcome -> password -> new player), stopping right at the placement offer. */
 async function completeOnboardingToPlacementOffer(nickname: string): Promise<void> {
   fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
-  fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
-  fireEvent.change(screen.getByLabelText('Repeat password'), { target: { value: '1234' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Save password' }));
-  await screen.findByText('Password saved!');
+  fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
+  fireEvent.change(screen.getByLabelText('Repeat code'), { target: { value: '1234' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Save code' }));
+  await screen.findByText('Code saved!');
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
   fireEvent.change(await screen.findByPlaceholderText('Your name'), {
     target: { value: nickname },
@@ -316,7 +316,7 @@ describe('Parent unlock (M4.5)', () => {
     render(<App services={services} />);
 
     fireEvent.click(await screen.findByRole('button', { name: /Grown-ups/ }));
-    fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
+    fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
@@ -357,7 +357,7 @@ describe('Parent unlock (M4.5)', () => {
     render(<App services={services} />);
 
     fireEvent.click(await screen.findByRole('button', { name: /Grown-ups/ }));
-    fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
+    fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
