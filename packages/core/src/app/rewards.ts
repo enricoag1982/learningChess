@@ -4,7 +4,7 @@ import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
 import { parseFen } from '../domain/chess/fen.ts';
 import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
 import { totalStars } from '../domain/progress.ts';
-import { addMinutes } from '../domain/session-log.ts';
+import { addMinutes, lastNDays } from '../domain/session-log.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
 import { localDayString, newStreak, recordActivityDay } from '../domain/streak.ts';
@@ -266,6 +266,34 @@ export async function recordSessionMinutes(
   const log = addMinutes(existing, deps.ids.next(), profileId, date, minutes, now);
   await rewards.saveSessionLog(log);
   return log;
+}
+
+/** One local calendar day's played minutes (`minutesByDay`'s own result row). */
+export interface DayMinutes {
+  readonly date: string;
+  readonly minutes: number;
+}
+
+/**
+ * A profile's played minutes for the last `days` local calendar days, oldest first, ending today
+ * (parent report "minutes per day", M5.2's daily-limit check — the lead's own note: read
+ * `dailyLimitMinutes` from `app/settings.ts` alongside this). `0` for a day with no session-log
+ * row. Permissive without `deps.rewards` wired up (every day reads `0`), same reasoning as
+ * `checkRewards`'s own early return.
+ */
+export async function minutesByDay(
+  deps: AppDeps,
+  profileId: string,
+  days: number,
+): Promise<readonly DayMinutes[]> {
+  const now = deps.clock.now();
+  const dayStrings = lastNDays(now, days);
+  if (deps.rewards === undefined) {
+    return dayStrings.map((date) => ({ date, minutes: 0 }));
+  }
+  const logs = await deps.rewards.listSessionLogs(profileId);
+  const byDate = new Map(logs.map((log) => [log.date, log.minutes]));
+  return dayStrings.map((date) => ({ date, minutes: byDate.get(date) ?? 0 }));
 }
 
 /** Outcome of {@link checkRewards}: the streak after today's activity, and any newly earned badges. */

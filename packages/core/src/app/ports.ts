@@ -6,10 +6,12 @@ import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
+import type { ProfileSettings } from '../domain/profile-settings.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
+import type { BackupFile } from './backup.ts';
 
 /** Persistence of child profiles. Async so cloud adapters can replace local ones. */
 export interface ProfileRepository {
@@ -65,6 +67,8 @@ export interface RewardsRepository {
   saveStreak(streak: Streak): Promise<void>;
   getSessionLog(profileId: string, date: string): Promise<SessionLog | undefined>;
   saveSessionLog(log: SessionLog): Promise<void>;
+  /** Every session-log row for a profile (M5.1 parent report / `minutesByDay`, M5.2's daily limit). */
+  listSessionLogs(profileId: string): Promise<SessionLog[]>;
   /** Deletes every earned badge, the streak, and every session-log row for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
@@ -95,8 +99,8 @@ export interface PasswordFileWriter {
   write(password: string): Promise<{ location: string }>;
 }
 
-/** Device-wide settings; `suggestedLevels` alone is keyed per profile within it (still one record
- * per device — a second profile on the same device gets its own entry in the same map). */
+/** Device-wide settings; `suggestedLevels`/`profileSettings` are each keyed per profile within it
+ * (still one record per device — a second profile on the same device gets its own entry). */
 export interface AppSettings {
   /** Profile to show first at the next app start (picker orders it first); `null` if none yet. */
   readonly lastProfileId: string | null;
@@ -104,6 +108,9 @@ export interface AppSettings {
    * suggested `BotLevel.level`, by profile id. Absent for a profile with no suggestion yet (its
    * chip defaults to the highest currently unlocked level instead — `games.ts`'s `suggestedLevel`). */
   readonly suggestedLevels: Readonly<Record<string, number>>;
+  /** Parent area "Settings per child" (M5.1, app-structure.md §11), by profile id. Absent for a
+   * profile with none saved yet — reads back as `DEFAULT_PROFILE_SETTINGS` (`app/settings.ts`). */
+  readonly profileSettings: Readonly<Record<string, ProfileSettings>>;
 }
 
 /** Persistence of `AppSettings`. Async so cloud adapters can replace local ones. */
@@ -164,6 +171,27 @@ export interface Random {
  */
 export interface BotPlayer {
   chooseMove(state: GameState, level: number, seed: number): Promise<Move | null>;
+}
+
+/**
+ * Writes a backup file somewhere the parent can find again (M5.1 `app-structure.md` §11, mirrors
+ * `PasswordFileWriter`'s own reasoning) — web downloads it; a Capacitor adapter can later write to
+ * Documents instead. `filename`/`contents` (the backup JSON, already stringified) are computed by
+ * `app/backup.ts` so naming stays a use-case concern, not an adapter one.
+ */
+export interface BackupFileWriter {
+  write(filename: string, contents: string): Promise<void>;
+}
+
+/**
+ * Parent area "Import" (M5.1): replaces every locally stored profile/progress/reward/assessment
+ * record with `file`'s own — atomically (`docs/architecture.md` §11: a web adapter stages the full
+ * write, then swaps it in) so a failure partway never leaves mixed old/new data. Never touches the
+ * parent password (`ParentLockRepository`) or `AppSettings.lastProfileId`/`suggestedLevels` — a
+ * restored backup starts at the picker with fresh level suggestions, same as first-time storage.
+ */
+export interface BackupImporter {
+  replaceAll(file: BackupFile): Promise<void>;
 }
 
 /** Online features are off in v1. */

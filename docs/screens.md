@@ -16,7 +16,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
 | Parent area | Adult style (smaller text, denser); behind parent password |
 | Owl row | Speech bubble + "Say it again": side by side from `sm` up, stacked on phones (bubble full width, button below); always stacked inside dialogs (celebration) |
-| Tappable vs info (open, roadmap F3) | Tappable and non-tappable elements must look different; rule to be set in the M5 design pass |
+| Tappable vs info (open, roadmap F3) | Tappable and non-tappable elements must look different; rule to be set app-wide in the M5.3 design pass. M5.1 decided it for the parent area only (not yet applied elsewhere): tappable = raised card, border, chevron (a child's Overview card, the Backup row, Report's Settings button); info = flat tinted panel, no border/shadow (a world/concept/game/assessment row) |
 
 ### 1.1 Design tokens (from sketches; Tailwind `@theme` in `apps/web/src/index.css`)
 
@@ -47,7 +47,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | 7 | Play | Apply | vs Computer (levels), vs Friend, mini-game grid (locked ones greyed) | Game screens |
 | 8 | vs Friend | Same-device game | Face-to-face board (black pieces rotated), take back + exit per player, turn indicator | Play |
 | 9 | My Den | Motivation | Rank ladder, badges, animal friends | Home |
-| 10 | Parent area | Control | Children list, progress by world, weak concepts, time per week vs limit, settings | Profile picker |
+| 10 | Parent area (M5.1) | Control | Overview (child cards) → child report (progress by world, concept accuracy, weak concepts, minutes per day, games, badges, assessments) → child settings (daily limit, voice/sound/hints, computer level, piece style, unlock, reset, delete); separate Backup (export / import) | Profile picker |
 
 ## 3. Not sketched yet
 

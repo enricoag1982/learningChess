@@ -119,6 +119,7 @@ export function PlayScreen(): JSX.Element {
   const miniGameProgress = useAppStore((state) => state.miniGameProgress);
   const gameRecords = useAppStore((state) => state.gameRecords);
   const journey = useAppStore((state) => state.journey);
+  const computerLevelSetting = useAppStore((state) => state.activeProfileSettings.computerLevel);
   const levelUpSuggestion = useAppStore((state) => state.levelUpSuggestion);
   const goToHome = useAppStore((state) => state.goToHome);
   const startMiniGame = useAppStore((state) => state.startMiniGame);
@@ -173,10 +174,22 @@ export function PlayScreen(): JSX.Element {
   const friendUnlocked = friendOptions.length > 0;
 
   const levelStatuses = computerLevelStatus(gameRecords, journey);
-  const effectiveLevel = selectedLevel ?? suggestedLevel(storedSuggestion, levelStatuses);
+  // Settings effect now (app-structure.md §11): a fixed "computer level" setting preselects that
+  // level (when it is currently unlocked — the parent-area picker only offers unlocked ones, but a
+  // level can regress from unlocked to not-yet-reached only in theory, never in practice) and
+  // disables the automatic suggestion below it; a manual chip tap this session (`selectedLevel`)
+  // still wins over either, same as before this setting existed.
+  const fixedLevel =
+    computerLevelSetting !== 'auto'
+      ? levelStatuses.find((status) => status.level === computerLevelSetting && !status.locked)
+          ?.level
+      : undefined;
+  const effectiveLevel =
+    selectedLevel ?? fixedLevel ?? suggestedLevel(storedSuggestion, levelStatuses);
   // The only level `effectiveLevel` can ever resolve to locked is Mouse (`suggestedLevel`'s own
   // fallback, when nothing at all is unlocked yet) — `selectLevel` below never lets a manual pick
-  // land on a locked chip, and `suggestedLevel`'s other branches only ever return an unlocked one.
+  // land on a locked chip, `fixedLevel` is filtered to unlocked levels above, and `suggestedLevel`'s
+  // other branches only ever return an unlocked one.
   const selectedStatus = levelStatuses.find((status) => status.level === effectiveLevel);
   const fullGameUnlocked = selectedStatus !== undefined && !selectedStatus.locked;
   const levelUpStatus = levelUpSuggestion

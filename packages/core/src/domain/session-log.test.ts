@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { addMinutes, newSessionLog } from './session-log.ts';
+import { addMinutes, lastNDays, newSessionLog } from './session-log.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
@@ -17,5 +17,35 @@ describe('addMinutes', () => {
     expect(second.minutes).toBe(20);
     expect(second.id).toBe('l1');
     expect(second.updatedAt).toBe(later.toISOString());
+  });
+});
+
+describe('lastNDays', () => {
+  it('returns the last N local calendar days, oldest first, ending today', () => {
+    expect(lastNDays(new Date(2026, 0, 10), 5)).toEqual([
+      '2026-01-06',
+      '2026-01-07',
+      '2026-01-08',
+      '2026-01-09',
+      '2026-01-10',
+    ]);
+  });
+
+  it('returns a single day for days: 1', () => {
+    expect(lastNDays(new Date(2026, 0, 10), 1)).toEqual(['2026-01-10']);
+  });
+
+  it('returns [] for days <= 0', () => {
+    expect(lastNDays(new Date(2026, 0, 10), 0)).toEqual([]);
+    expect(lastNDays(new Date(2026, 0, 10), -3)).toEqual([]);
+  });
+
+  it('crosses a month/year boundary correctly', () => {
+    expect(lastNDays(new Date(2026, 0, 2), 4)).toEqual([
+      '2025-12-30',
+      '2025-12-31',
+      '2026-01-01',
+      '2026-01-02',
+    ]);
   });
 });

@@ -108,6 +108,87 @@ parent:
   unlock-lesson: Unlock
   unlocked: Unlocked
   unlock-empty: Everything is already unlocked for this child.
+  back: Back
+  settings: Settings
+  settings-title: "{{name}}'s settings"
+  backup-nav: Backup
+  backup-heading: Backup
+  backup-title: Backup
+  export-child: Export this child's data
+  danger-heading: Danger zone
+  reset: Reset progress
+  reset-confirm-title: "Reset {{name}}'s progress?"
+  reset-confirm-body: This clears lessons, stars, games, badges and streak. Nickname, avatar and settings stay. This cannot be undone.
+  reset-confirm: Reset
+  reset-done: Progress reset.
+  password-label: Password
+  wrong-password: Wrong password.
+  daily-limit-heading: Daily time limit
+  daily-limit-off: Off
+  daily-limit-minutes_one: '{{count}} min'
+  daily-limit-minutes_other: '{{count}} min'
+  daily-limit-note: Enforced from M5.2.
+  voice-label: Voice
+  sound-label: Sounds
+  hints-label: Hints
+  computer-level-heading: Computer level
+  computer-level-auto: Automatic
+  piece-style-heading: Piece style
+  piece-style-animal: Animal badge
+  piece-style-classic: Classic
+  overview:
+    minutes-today_one: '{{count}} min today'
+    minutes-today_other: '{{count}} min today'
+    minutes-7-days_one: '{{count}} min this week'
+    minutes-7-days_other: '{{count}} min this week'
+    streak_one: '{{count}} day streak'
+    streak_other: '{{count}} day streak'
+  report:
+    loading: Loading report…
+    progress-heading: Progress by world
+    lessons-complete: '{{complete}}/{{total}} lessons complete'
+    lessons-mastered_one: '{{count}} mastered'
+    lessons-mastered_other: '{{count}} mastered'
+    stars: '{{earned}}/{{max}} stars'
+    concepts-heading: Concept accuracy
+    concepts-empty: No exercises attempted yet.
+    accuracy: '{{percent}}% ({{attempts}} tries)'
+    needs-practice: 'Needs practice: {{list}}'
+    needs-practice-tag: Needs practice
+    minutes-heading: Minutes per day (last 14 days)
+    minutes_one: '{{count}} min'
+    minutes_other: '{{count}} min'
+    games-heading: Games (last 10)
+    games-empty: No games played yet.
+    opponent-friend: A friend
+    result-win: Win
+    result-loss: Loss
+    result-draw: Draw
+    result-abandoned: Left unfinished
+    badges-heading: Badges earned
+    badges-empty: No badges earned yet.
+    assessments-heading: Assessments
+    assessments-empty: No test-out or placement runs yet.
+    assessment-kind:
+      test-out: Test-out
+      placement: Placement
+    assessment-score: '{{correct}}/{{total}}'
+    assessment-passed: Passed
+    assessment-failed: Not passed
+  backup:
+    export-heading: Export
+    export-body: Save one file with every child's progress. Keep it somewhere safe.
+    export-button: Export all
+    import-heading: Import
+    import-body: Pick a backup file to restore. This replaces all data currently on this device.
+    import-pick-file: Choose file
+    import-preview_one: '{{count}} child, {{totalStars}} stars'
+    import-preview_other: '{{count}} children, {{totalStars}} stars'
+    import-preview-detail: '{{names}}'
+    import-warning: Importing replaces all data on this device. This cannot be undone.
+    import-confirm: Replace all data
+    import-done: Import complete.
+    import-error-generic: This file could not be read.
 lesson:
   close: Close lesson
   steps:

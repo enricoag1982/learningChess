@@ -72,7 +72,7 @@ Character 1─1 piece type
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
 | ParentLock | `password` (plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
-| Settings | `sessionLimitMin`, `voice`, `sound`, `hints`, `botLevel` (`auto` or 1–5), `aids` (overrides), `pieceStyle` |
+| Settings (`ProfileSettings`, M5.1) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60 — stored, enforced from M5.2), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'` — stored, applied from M5.3). No `aids` overrides in v1 (dropped from the earlier placeholder here — `BotLevel.aids` is per-level, not per-profile) |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (M4.4, only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
@@ -89,6 +89,8 @@ Character 1─1 piece type
 
 - All stored records: UUID `id`, `createdAt`, `updatedAt` (sync-ready).
 - Derived, not stored: total stars, rank, world status, weak concepts.
+
+**Backup file (M5.1)**: `{ app: 'chess-kids', schemaVersion, exportedAt, profiles[], data }` — `data` is keyed by profile id, each entry holding that profile's own `settings`, `lessonProgress[]`, `attempts[]`, `miniGameProgress[]`, `conceptStats[]`, `gameRecords[]`, `earnedBadges[]`, `streak?`, `sessionLogs[]`, `assessmentResults[]`, `unlocks[]` — every entity above except `Account`/`ParentLock` (never exported) and the device-only `lastProfileId`/`suggestedLevels`. "Export" (every profile) and "export this child" (`data`/`profiles` filtered to one id) are the same format.
 
 ## 3. Rules
 
@@ -161,24 +163,27 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 
 | Area | Use cases |
 |---|---|
-| Profiles | `createProfile`, `selectProfile`, `updateSettings`, `deleteProfile` |
+| Profiles | `createProfile`, `selectProfile`, `renameProfile`, `changeAvatar`, `deleteProfile`, `resetProfileData` (M5.1: cascades progress/attempts/concept stats/mini-game progress/game records/rewards, keeps the profile itself) |
+| Settings (M5.1, `app/settings.ts`) | `getProfileSettings` (merged over `DEFAULT_PROFILE_SETTINGS`), `updateProfileSettings` (validates, merges a patch, persists) |
+| Report (M5.1, `app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report); `minutesByDay` (`app/rewards.ts`) backs both and M5.2's daily-limit check |
+| Backup (M5.1, `app/backup.ts`) | `buildBackupFile`/`exportBackup` (one profile or every profile), `parseBackupFile`/`backupSummary` (validate + preview), `importBackup` (validate then atomic replace via `BackupImporter`) |
 | Assessment (M4.5) | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
 | Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
 | Full game (M3.5) | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
 | Friend play (M4.3) | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
-| Parent | `getReport`, `unlock`, `resetProgress` |
 | Rewards (M4.4) | `checkRewards` (the one call every activity choke point makes: folds today into the streak, then evaluates + persists new badges — permissive no-op without `AppDeps.rewards`/`ContentSource.catalog()`); `evaluateAndRecordBadges`, `buildBadgeFacts`, `recordDailyActivity`, `recordSessionMinutes` (its own building blocks, `app/rewards.ts`) |
 
 ## 5. Ports
 
 | Port | Purpose |
 |---|---|
-| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`) |
+| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`); `SettingsRepository`'s `AppSettings` also carries `profileSettings` (M5.1, keyed by profile id) alongside the pre-existing `lastProfileId`/`suggestedLevels` |
 | `GameRecordRepository` (M3.5) | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
-| `RewardsRepository` (M4.4) | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` (backward-compatible with every pre-M4.4 test fixture) |
+| `RewardsRepository` (M4.4, gains `listSessionLogs` in M5.1) | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`/`listSessionLogs`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` (backward-compatible with every pre-M4.4 test fixture) |
 | `AssessmentRepository` (M4.5) | Persistence of `AssessmentResult`/`Unlock` (`addAssessmentResult`/`listAssessmentResults`, `addUnlock`/`listUnlocks`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps`, same backward-compatible pattern as `RewardsRepository` |
+| `BackupFileWriter` / `BackupImporter` (M5.1) | Backup export's file destination (web: downloads it, mirrors `PasswordFileWriter`) / import's atomic replace of every profile/progress/reward/assessment record (never the parent password or `lastProfileId`/`suggestedLevels`; web: stages the full write, then swaps it in) — both optional on `AppDeps`, same backward-compatible pattern |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |

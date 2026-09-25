@@ -17,6 +17,8 @@ import { appendResult, applyReviewResult, enterReview, newConceptStats } from '.
 import { saveMiniGamePlay } from './minigames.ts';
 import type {
   AssessmentRepository,
+  BackupFileWriter,
+  BackupImporter,
   ContentSource,
   GameRecordRepository,
   IdGenerator,
@@ -53,6 +55,16 @@ export interface AppDeps {
   readonly settings: SettingsRepository;
   /** Seeded in tests; drives warm-up/practice task selection (M3.4). */
   readonly random: Random;
+  /** Backup export's file destination (M5.1). Optional for the same backward-compat reason
+   * `rewards`/`assessment` are; `app/backup.ts`'s `exportBackup` throws a clear error without it. */
+  readonly backupFileWriter?: BackupFileWriter;
+  /** Backup import's atomic replace (M5.1), same optional-port reasoning as `backupFileWriter`. */
+  readonly backupImporter?: BackupImporter;
+  /** Current `chess-kids:*` local storage schema version (`apps/web/src/adapters/storage/local-store.ts`'s
+   * `SCHEMA_VERSION`) — injected so `app/backup.ts` can stamp/validate a backup file's own
+   * `schemaVersion` without `packages/core` (storage-agnostic) importing a web adapter constant.
+   * Optional for the same backward-compat reason `backupFileWriter`/`backupImporter` are. */
+  readonly storageSchemaVersion?: number;
 }
 
 /** Existing concept stats, or fresh (unsaved) ones if this profile has no attempt for it yet. */

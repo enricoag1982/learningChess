@@ -15,6 +15,7 @@ import type {
   ParentUnlockTarget,
   PlacementWorldPlan,
   Profile,
+  ProfileSettings,
   Streak,
   TodaySessionPlan,
 } from '@chess-kids/core';
@@ -23,7 +24,9 @@ import {
   checkRewards,
   computerLevelStatus,
   createProfile,
+  DEFAULT_PROFILE_SETTINGS,
   getLessonProgress,
+  getProfileSettings,
   isFirstRun,
   lessonStatus,
   listProfiles,
@@ -144,6 +147,11 @@ export interface AppState {
   readonly profiles: readonly Profile[];
   /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
+  /** `profile`'s own parent-set settings (M5.1, app-structure.md §11), loaded alongside it —
+   * `ExerciseStep`'s Hint button and `PlayScreen`'s computer-level default both read this;
+   * `DEFAULT_PROFILE_SETTINGS` outside a selected profile. Voice is applied as a side effect at
+   * load time (`services.setVoiceEnabled`), not read from here (`gated-narrator.ts` owns it). */
+  readonly activeProfileSettings: ProfileSettings;
   readonly progress: readonly LessonProgress[];
   /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
   readonly miniGameProgress: readonly MiniGameProgress[];
@@ -470,6 +478,7 @@ export function createAppStore(services: Services) {
       screen: 'loading',
       profiles: [],
       profile: null,
+      activeProfileSettings: DEFAULT_PROFILE_SETTINGS,
       progress: [],
       miniGameProgress: [],
       gameRecords: [],
@@ -519,17 +528,27 @@ export function createAppStore(services: Services) {
           // M1-upgrade path: an existing single profile with no parent lock yet skips profile
           // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
           await selectProfile(services.deps, only.id);
-          const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
-            await Promise.all([
-              loadProgress(services.deps, only.id),
-              loadMiniGameProgress(services.deps, only.id),
-              loadGameRecords(services.deps, only.id),
-              services.deps.progress.listConceptStats(only.id),
-              loadJourney(services.deps, only.id),
-              loadRewards(only.id),
-            ]);
+          const [
+            progress,
+            miniGameProgress,
+            gameRecords,
+            conceptStats,
+            journey,
+            rewards,
+            settings,
+          ] = await Promise.all([
+            loadProgress(services.deps, only.id),
+            loadMiniGameProgress(services.deps, only.id),
+            loadGameRecords(services.deps, only.id),
+            services.deps.progress.listConceptStats(only.id),
+            loadJourney(services.deps, only.id),
+            loadRewards(only.id),
+            getProfileSettings(services.deps, only.id),
+          ]);
+          services.setVoiceEnabled(settings.voice);
           set({
             profile: only,
+            activeProfileSettings: settings,
             progress,
             miniGameProgress,
             gameRecords,
@@ -569,8 +588,12 @@ export function createAppStore(services: Services) {
             loadJourney(services.deps, profile.id),
             loadRewards(profile.id),
           ]);
+        // A brand-new profile has no stored settings yet: DEFAULT_PROFILE_SETTINGS applies as-is
+        // (voice on), no need to round-trip `getProfileSettings` for a row that cannot exist yet.
+        services.setVoiceEnabled(DEFAULT_PROFILE_SETTINGS.voice);
         set({
           profile,
+          activeProfileSettings: DEFAULT_PROFILE_SETTINGS,
           progress,
           miniGameProgress,
           gameRecords,
@@ -600,7 +623,7 @@ export function createAppStore(services: Services) {
         const profile = await services.deps.profiles.get(profileId);
         if (!profile) return;
         await selectProfile(services.deps, profileId);
-        const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
+        const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards, settings] =
           await Promise.all([
             loadProgress(services.deps, profileId),
             loadMiniGameProgress(services.deps, profileId),
@@ -608,9 +631,16 @@ export function createAppStore(services: Services) {
             services.deps.progress.listConceptStats(profileId),
             loadJourney(services.deps, profileId),
             loadRewards(profileId),
+            getProfileSettings(services.deps, profileId),
           ]);
+        // Settings effect now (app-structure.md §11): voice/hints/computer level take effect the
+        // next time this profile is selected — voice is applied here as a side effect (gates the
+        // shared narrator), the rest is read straight off `activeProfileSettings` by the screens
+        // that need it (`ExerciseStep`'s Hint button, `PlayScreen`'s computer-level default).
+        services.setVoiceEnabled(settings.voice);
         set({
           profile,
+          activeProfileSettings: settings,
           progress,
           miniGameProgress,
           gameRecords,

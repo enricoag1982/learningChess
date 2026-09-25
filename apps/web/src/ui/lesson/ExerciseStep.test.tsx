@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen } from '@testing-library/react';
 import type {
   BestMoveDef,
   ChoiceDef,
@@ -43,6 +43,26 @@ describe('ExerciseStep', () => {
     expect(profile).not.toBeNull();
     const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
     expect(saved?.bestStars[exercise.id]).toBe(3);
+  });
+
+  it('hides the Hint button when the profile\'s "hints" setting is off (M5.1)', async () => {
+    const exercise = fixtureExercise('hint-me');
+    const lesson = fixtureLesson({ exercises: [exercise] });
+    const services = createTestServices(fixtureContentSource(lesson));
+    const { store } = await renderWithStore(
+      <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+      services,
+    );
+
+    expect(screen.getByRole('button', { name: 'Hint' })).toBeTruthy();
+
+    act(() => {
+      store.setState({
+        activeProfileSettings: { ...store.getState().activeProfileSettings, hints: false },
+      });
+    });
+
+    expect(screen.queryByRole('button', { name: 'Hint' })).toBeNull();
   });
 
   it('an illegal move counts an error and explains, without moving the piece', async () => {

@@ -62,7 +62,21 @@ export type { Streak } from './domain/streak.ts';
 export { newStreak, localDayString, isoWeekKey, recordActivityDay } from './domain/streak.ts';
 
 export type { SessionLog } from './domain/session-log.ts';
-export { newSessionLog, addMinutes } from './domain/session-log.ts';
+export { newSessionLog, addMinutes, lastNDays } from './domain/session-log.ts';
+
+export type {
+  ComputerLevelSetting,
+  PieceStyleSetting,
+  ProfileSettings,
+} from './domain/profile-settings.ts';
+export {
+  DAILY_LIMIT_OPTIONS,
+  DEFAULT_PROFILE_SETTINGS,
+  isValidDailyLimit,
+  isValidComputerLevel,
+  isValidPieceStyle,
+  isValidProfileSettings,
+} from './domain/profile-settings.ts';
 
 export type { ReviewBox, ConceptStats, ConceptPoolEntry, ConceptTask } from './domain/review.ts';
 export {
@@ -143,6 +157,8 @@ export type {
   AssessmentRepository,
   ParentLockRepository,
   PasswordFileWriter,
+  BackupFileWriter,
+  BackupImporter,
   AppSettings,
   SettingsRepository,
   IdGenerator,
@@ -206,14 +222,29 @@ export { loadJourney } from './app/journey.ts';
 export type { SubmitAssessmentInput, ParentUnlockTarget } from './app/assessment.ts';
 export { loadUnlocked, submitAssessment, parentUnlock } from './app/assessment.ts';
 
-export type { RewardsCheckResult } from './app/rewards.ts';
+export type { RewardsCheckResult, DayMinutes } from './app/rewards.ts';
 export {
   buildBadgeFacts,
   evaluateAndRecordBadges,
   recordDailyActivity,
   recordSessionMinutes,
+  minutesByDay,
   checkRewards,
 } from './app/rewards.ts';
+
+export type {
+  ChildOverview,
+  ChildReport,
+  WorldProgressSummary,
+  ConceptAccuracySummary,
+} from './app/report.ts';
+export { buildChildOverview, buildChildReport } from './app/report.ts';
+
+export type { BackupFile, ProfileBackupData, BackupSummary } from './app/backup.ts';
+// Backup values (zod validation) live behind `@chess-kids/core/backup` so zod stays out of the
+// main bundle and the bot worker; only the parent area imports them.
+
+export { getProfileSettings, updateProfileSettings } from './app/settings.ts';
 
 export type { TodayActivity, TodaySessionPlan } from './app/session.ts';
 export {
@@ -236,6 +267,7 @@ export {
   renameProfile,
   changeAvatar,
   deleteProfile,
+  resetProfileData,
   selectProfile,
 } from './app/profiles.ts';
 

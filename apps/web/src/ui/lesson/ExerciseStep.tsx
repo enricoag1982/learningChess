@@ -68,6 +68,7 @@ function ExerciseAttempt({
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
+  const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
   const isStacked = useIsStackedLayout();
@@ -172,6 +173,9 @@ function ExerciseAttempt({
     onSelectPiece: setSelectedPiece,
     isStacked,
     checkSquare,
+    // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
+    // auto-hint (the `dispatch({ type: 'auto-hint' })` effect above, unaffected by this setting).
+    showHint: hintsEnabled,
   });
 
   const panel = (

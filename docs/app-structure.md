@@ -133,13 +133,20 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 
 Tap square(s) · Move piece to goal · Collect stars · Capture target · Safe? (yes/no) · Find all (attacked squares / escapes) · Best move · Mate in 1 · Set up board.
 
-## 11. Parent area
+## 11. Parent area (M5.1)
 
-- Overview of all profiles.
-- Per profile: progress by track/world/concept, weak concepts, time per day.
-- Settings per profile: session limit, voice/sound, hints on/off, computer level, unlock lessons/worlds, reset.
-- Profile management: add, rename, delete.
-- Backup: export / import progress file (data is only on the device).
+Behind the parent gate; three screens deep — **Overview → child report → child settings** — plus a **Backup** screen off the Overview. Adult style throughout (`docs/screens.md` §1): denser text, touch targets ≥ 44 px, WCAG 2.2 AA. Tappable rows (a child's Overview card, the Backup entry, Settings' own button) look like buttons/links — raised card, border, chevron — vs. flat info panels for read-only stats (roadmap F3 decided here for the parent area only; the app-wide audit is M5.3).
+
+| Screen | Content |
+|---|---|
+| Overview | One card per child: avatar, nickname, rank, total stars, minutes today / last 7 days, streak (≥ 2 days). Tap → that child's report. Also: Add child, Backup, Change password |
+| Child report | Progress by world (lessons complete/mastered, stars) — worlds with no authored lessons yet are skipped. Concept accuracy (last 10 results) with a "needs practice" summary + a tag on each weak row. Minutes per day, last 14 days (bar + the exact number as visible text, so it reads to a screen reader too). Games, last 10, newest first (opponent by name, result, date). Badges earned (name + tier). Assessments (test-out/placement: kind, score, pass/fail, date). A **Settings** button opens that child's settings |
+| Child settings | Rename, change avatar (moved here from the old flat overview row — one settings screen per child, not one giant list). Daily limit (off / 15 / 20 / 30 / 45 / 60 min — stored now, enforced from M5.2). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Piece style (animal badge / classic — stored now, applied from M5.3). Unlock lessons & worlds (M4.5's panel, unchanged, now living here instead of a toggle on the old flat row). Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent password). Delete (unchanged: removes the profile entirely) |
+| Backup | Export: one JSON file for every child, or (from a child's own Settings) just that one — `chess-kids-backup-<date>.json` / `chess-kids-backup-<nickname>-<date>.json`. Import: pick a file → preview ("2 children, 1,234 stars") → confirm → replaces **all** local data on the device (children not in the file are gone too); an invalid or too-new file shows a clear error and changes nothing |
+
+**Settings effect now**: voice / hints / computer level take effect the next time that profile is selected (not live mid-session — the parent area is reached through "Switch player", which always ends back at the picker); sound has nothing to gate yet (no sound-effect system exists in v1); daily limit and piece style are stored only until M5.2 / M5.3 read them.
+
+**Backup scope**: never the parent password (`ParentLockRepository`) or the device's own `lastProfileId` / "Automatic level" suggestions — a restored backup starts fresh at the picker, like any newly-set-up device.
 
 ## 12. Data per profile
 
@@ -173,5 +180,5 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 | Topic | Options | Recommendation |
 |---|---|---|
-| Piece look on board | Animal pieces / classic pieces / classic + animal badge | Classic + animal badge in Worlds 1–4, classic only from World 5 (transfer to real boards); parent toggle |
+| Piece look on board | Animal pieces / classic pieces / classic + animal badge | Classic + animal badge in Worlds 1–4, classic only from World 5 (transfer to real boards); parent toggle (M5.1: `ProfileSettings.pieceStyle`, stored per child in the parent area's Settings screen — not yet applied to the board, M5.3) |
 | "Win the Queen" (World 3, before check) | King capturable / kings removed | Kings removed |

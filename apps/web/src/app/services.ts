@@ -4,17 +4,20 @@ import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
+import { createDownloadBackupFileWriter } from '../adapters/download-backup-file-writer.ts';
 import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
+import { createGatedNarrator } from '../adapters/narration/gated-narrator.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
 import { createMathRandom } from '../adapters/random.ts';
 import { LocalStorageAssessmentRepository } from '../adapters/storage/local-assessment-repository.ts';
+import { LocalStorageBackupImporter } from '../adapters/storage/local-backup-importer.ts';
 import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game-record-repository.ts';
 import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
 import { LocalStorageRewardsRepository } from '../adapters/storage/local-rewards-repository.ts';
 import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
-import { openLocalStore } from '../adapters/storage/local-store.ts';
+import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
 import { MIGRATIONS } from '../adapters/storage/migrations.ts';
 
 /** The app's wired-up use-case dependencies, plus the pieces the UI reaches for directly. */
@@ -23,6 +26,9 @@ export interface Services {
   readonly rules: VariantRules;
   readonly narrator: Narrator;
   readonly botPlayer: BotPlayer;
+  /** Gates `narrator` on the active profile's "voice" setting (M5.1, app-structure.md §11
+   * "Settings effect now") — set at every profile select (`selectProfileAndHome`, `store.ts`). */
+  setVoiceEnabled(enabled: boolean): void;
 }
 
 /** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
@@ -41,12 +47,20 @@ export function createServices(storage: Storage = window.localStorage): Services
     passwordFile: createDownloadPasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),
     random: createMathRandom(),
+    backupFileWriter: createDownloadBackupFileWriter(),
+    backupImporter: new LocalStorageBackupImporter(store),
+    storageSchemaVersion: SCHEMA_VERSION,
   };
+
+  const narrator = createGatedNarrator(createWebSpeechNarrator());
 
   return {
     deps,
     rules: createVariantRules(chessJsRules),
-    narrator: createWebSpeechNarrator(),
+    narrator,
     botPlayer: createWorkerBotPlayer(),
+    setVoiceEnabled: (enabled) => {
+      narrator.setEnabled(enabled);
+    },
   };
 }
