@@ -236,15 +236,30 @@ export function ChildReportScreen({
           </Section>
 
           <Section title={t('parent.report.minutes-heading')}>
+            {report.dailyLimitMinutes !== null && (
+              <p className={PARENT_NOTE}>
+                {t('parent.report.minutes-limit', { count: report.dailyLimitMinutes })}
+              </p>
+            )}
             <ul className="flex flex-col gap-1">
               {report.minutesByDay.map((day) => (
                 <li key={day.date} className="flex items-center gap-2 text-xs text-muted">
                   <span className="w-12 flex-shrink-0">{formatDate(day.date)}</span>
-                  <span className="h-3 flex-1 overflow-hidden rounded-full bg-cream">
+                  <span className="relative h-3 flex-1 overflow-hidden rounded-full bg-cream">
                     <span
                       className="block h-full rounded-full bg-info"
                       style={{ width: `${String((day.minutes / maxMinutes) * 100)}%` }}
                     />
+                    {report.dailyLimitMinutes !== null &&
+                      report.dailyLimitMinutes <= maxMinutes && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute inset-y-0 w-0.5 bg-[#8C4012]"
+                          style={{
+                            left: `${String((report.dailyLimitMinutes / maxMinutes) * 100)}%`,
+                          }}
+                        />
+                      )}
                   </span>
                   <span className="w-20 flex-shrink-0 text-right font-bold text-ink">
                     {t('parent.report.minutes', { count: day.minutes })}

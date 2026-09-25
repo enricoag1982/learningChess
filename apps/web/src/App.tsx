@@ -19,6 +19,8 @@ import { PracticeRunScreen } from './ui/PracticeRunScreen.tsx';
 import { PracticeScreen } from './ui/PracticeScreen.tsx';
 import { ProfilePickerScreen } from './ui/ProfilePickerScreen.tsx';
 import { SessionSummaryScreen } from './ui/SessionSummaryScreen.tsx';
+import { TimeLimitScreen } from './ui/TimeLimitScreen.tsx';
+import { TimeTracker } from './ui/TimeTracker.tsx';
 import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
 // Lazy-loaded screens (non-functional.md §4 "Initial JS ≤ 300 KB gzipped", M5.4 decision table
@@ -93,6 +95,8 @@ function Screens(): JSX.Element {
       return <PlacementScreen />;
     case 'assessment':
       return <AssessmentScreen />;
+    case 'time-limit':
+      return <TimeLimitScreen />;
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.
@@ -119,6 +123,7 @@ export default function App({ services }: AppProps): JSX.Element {
         <Screens />
       </Suspense>
       <Celebration />
+      <TimeTracker />
     </StoreProvider>
   );
 }

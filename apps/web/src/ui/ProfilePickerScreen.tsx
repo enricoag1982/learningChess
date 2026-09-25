@@ -91,7 +91,9 @@ export function ProfilePickerScreen(): JSX.Element {
       </div>
       <button
         type="button"
-        onClick={goToPasswordScreen}
+        onClick={() => {
+          goToPasswordScreen();
+        }}
         className="flex h-16 items-center gap-3 rounded-2xl border-2 border-line bg-card px-5 text-ink"
       >
         <LockIcon />

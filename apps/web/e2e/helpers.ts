@@ -327,6 +327,77 @@ export async function seedGameRecordWins(
 }
 
 /**
+ * Sets a profile's daily time limit (M5.2, same real storage shape as `LocalStorageSettingsRepository`
+ * — one `chess-kids:settings` record, `profileSettings` keyed by profile id) — every other setting
+ * defaults exactly as `DEFAULT_PROFILE_SETTINGS` does.
+ */
+export async function seedDailyLimit(
+  page: Page,
+  profileId: string,
+  dailyLimitMinutes: number,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, dailyLimitMinutes }) => {
+      const key = 'chess-kids:settings';
+      const raw = localStorage.getItem(key);
+      const settings = raw
+        ? (JSON.parse(raw) as {
+            lastProfileId: string | null;
+            suggestedLevels?: Record<string, number>;
+            profileSettings?: Record<string, unknown>;
+          })
+        : { lastProfileId: null, suggestedLevels: {}, profileSettings: {} };
+      settings.profileSettings = settings.profileSettings ?? {};
+      settings.profileSettings[pid] = {
+        dailyLimitMinutes,
+        voice: true,
+        sound: true,
+        hints: true,
+        computerLevel: 'auto',
+        pieceStyle: 'animal',
+      };
+      localStorage.setItem(key, JSON.stringify(settings));
+    },
+    { profileId, dailyLimitMinutes },
+  );
+}
+
+/**
+ * Seeds today's own `SessionLog` row straight at `minutes` played (M5.2, same real storage
+ * key/shape as `LocalStorageRewardsRepository`) — "no real waiting" for a daily-limit spec: the
+ * activity gate reads this exactly like real logged minutes.
+ */
+export async function seedMinutesToday(
+  page: Page,
+  profileId: string,
+  minutes: number,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, minutes }) => {
+      const key = 'chess-kids:session-logs';
+      const raw = localStorage.getItem(key);
+      const all = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
+      const now = new Date();
+      const date = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0'),
+      ].join('-');
+      all[`${pid}:${date}`] = {
+        id: 'seed-session-log',
+        profileId: pid,
+        date,
+        minutes,
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+      };
+      localStorage.setItem(key, JSON.stringify(all));
+    },
+    { profileId, minutes },
+  );
+}
+
+/**
  * Seeds one lesson's progress with explicit `bestStars` and `resumeStep` (same real storage
  * key/shape as `seedLessonMastered`), for a spec that needs to land mid-lesson — e.g. right at a
  * scored exercise that offers an easier variant — instead of at a freshly mastered or brand-new one.

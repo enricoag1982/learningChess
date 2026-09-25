@@ -17,16 +17,19 @@ import type {
   Profile,
   ProfileSettings,
   Streak,
+  TimeLimitStatus,
   TodaySessionPlan,
 } from '@chess-kids/core';
 import {
   animalFriends,
+  checkActivityGate,
   checkRewards,
   computerLevelStatus,
   createProfile,
   DEFAULT_PROFILE_SETTINGS,
   getLessonProgress,
   getProfileSettings,
+  grantExtraTime,
   isFirstRun,
   lessonStatus,
   listProfiles,
@@ -42,7 +45,6 @@ import {
   planPlacement,
   planTestOutLesson,
   planTestOutWorld,
-  recordSessionMinutes,
   scorePlacementWorld,
   scoreTestOut,
   selectProfile,
@@ -81,7 +83,8 @@ export type Screen =
   | 'today-summary'
   | 'placement-offer'
   | 'placement'
-  | 'assessment';
+  | 'assessment'
+  | 'time-limit';
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
 export type FriendOpponentChoice =
@@ -169,8 +172,6 @@ export interface AppState {
   readonly activeCelebration: EarnedBadge | null;
   /** Celebrations already shown this app sitting (reset on profile select); caps at {@link MAX_CELEBRATIONS_PER_SESSION}. */
   readonly celebrationsShownThisSession: number;
-  /** `Date.now()` at `startToday()`, for the session's played-minutes tally on the summary. */
-  readonly todaySessionStartedAt: number | null;
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
   readonly lessonId: string | null;
@@ -221,6 +222,17 @@ export interface AppState {
   readonly practiceConceptId: string | null;
   readonly practiceTasks: readonly ConceptTask[];
 
+  /** The activity gate's last read (M5.2, domain-model.md §3.3), shown on the "See you tomorrow"
+   * screen (screen `time-limit`); `null` outside one. */
+  readonly timeLimitStatus: TimeLimitStatus | null;
+  /** What the gate was about to do when it found the profile over its limit — replayed as-is
+   * (no re-check) once the parent grants more time (`grantMoreTimeAndResume`). `null` outside a
+   * `time-limit` screen. */
+  readonly pendingActivity: (() => void | Promise<void>) | null;
+  /** Which flow the password screen is for: the ordinary parent-area gate, or the "See you
+   * tomorrow" screen's "Parent: more time" (M5.2) — decides what a correct password does next. */
+  readonly passwordPurpose: 'parent-area' | 'more-time';
+
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
   /** First run only: after the "Saved" screen, either straight to the new-player wizard, straight to
@@ -234,10 +246,18 @@ export interface AppState {
   readonly goToPicker: () => Promise<void>;
   /** Picker: selects a profile, loads its progress, and goes to Home. */
   readonly selectProfileAndHome: (profileId: string) => Promise<void>;
-  /** Picker's "Grown-ups" button. */
-  readonly goToPasswordScreen: () => void;
-  /** Password screen, once the password is verified. */
+  /** Picker's "Grown-ups" button, and the "See you tomorrow" screen's "Parent: more time" button
+   * (`purpose: 'more-time'`, M5.2) — decides what a correct password does next. Defaults to the
+   * ordinary parent-area gate. */
+  readonly goToPasswordScreen: (purpose?: 'parent-area' | 'more-time') => void;
+  /** Password screen, once the password is verified (`passwordPurpose === 'parent-area'`). */
   readonly goToParentArea: () => Promise<void>;
+  /** Password screen, once the password is verified with `passwordPurpose === 'more-time'`
+   * (M5.2): grants more time for today, then replays `pendingActivity` (or Home, without one). */
+  readonly grantMoreTimeAndResume: () => Promise<void>;
+  /** "See you tomorrow" screen's "Switch player": abandons whatever was gated and opens the
+   * picker (M5.2). */
+  readonly switchPlayerFromTimeLimit: () => Promise<void>;
   /** Re-reads the profiles list without changing screen (parent area, after rename/avatar/delete/add). */
   readonly refreshProfiles: () => Promise<void>;
   /** Opens the Journey map. */
@@ -392,6 +412,37 @@ export type AppStore = ReturnType<typeof createAppStore>;
 /** Builds a fresh Zustand store bound to `services`; call once per `App` instance. */
 export function createAppStore(services: Services) {
   return create<AppState>((set, get) => {
+    /**
+     * Time-limit gate (M5.2, domain-model.md §3.3 "checked between activities only"): runs
+     * `enterActivity` (a plain `set(...)` closure, its whole point of entering the activity) if the
+     * active profile is under its daily limit; otherwise shows "See you tomorrow" instead and
+     * remembers `enterActivity` as `pendingActivity`, so granting more time
+     * (`grantMoreTimeAndResume`) can resume exactly where the kid was headed, unchecked. A no-op
+     * gate (straight to `enterActivity`) without an active profile — never blocks
+     * first-run/picker/parent-area navigation, only kid-mode activities and Home.
+     */
+    async function gated(enterActivity: () => void | Promise<void>): Promise<void> {
+      const { profile } = get();
+      if (!profile) {
+        await enterActivity();
+        return;
+      }
+      const status = await checkActivityGate(services.deps, profile.id);
+      if (status.overLimit) {
+        set({ screen: 'time-limit', timeLimitStatus: status, pendingActivity: enterActivity });
+        return;
+      }
+      await enterActivity();
+    }
+
+    /** `gated`, specialised to "returning to Home" (the gate's other checkpoint alongside entering
+     * an activity — domain-model.md §3.3). */
+    async function goHomeGated(): Promise<void> {
+      await gated(() => {
+        set({ screen: 'home' });
+      });
+    }
+
     /** Enters `lessonId`, remembering `origin` for `exitLesson`. Shared by `startLesson`/`enterTodayActivity`. */
     async function enterLesson(lessonId: string, origin: LessonOrigin): Promise<void> {
       const { profile, journey } = get();
@@ -402,29 +453,26 @@ export function createAppStore(services: Services) {
       const saved = await getLessonProgress(services.deps, profile.id, lessonId);
       const status = lessonStatus(lesson, saved);
       const startIndex = status === 'complete' || status === 'mastered' ? 0 : saved.resumeStep;
-      set({ screen: 'lesson', lessonId, stepIndex: startIndex, lessonOrigin: origin });
+      await gated(() => {
+        set({ screen: 'lesson', lessonId, stepIndex: startIndex, lessonOrigin: origin });
+      });
     }
 
     /**
      * Opens a Today session's activity at `index` (`todayPlan.activities`), or the summary once
-     * `index` runs past the end. Shared by `startToday`/`advanceToday`.
+     * `index` runs past the end. Shared by `startToday`/`advanceToday`. Each activity is its own
+     * gate checkpoint (`gated`) — the session pauses at "See you tomorrow" instead of continuing
+     * once the limit is reached between two of its activities.
      */
     async function enterTodayActivity(index: number): Promise<void> {
       const plan = get().todayPlan;
       const activity = plan?.activities[index];
       if (!plan || !activity) {
-        // rewards.md §4 "session ended" event: logs today's played minutes, folds the session into
-        // the streak/badges one more time (picks up anything only true once the whole session is
-        // done, e.g. Warm-up Champ), then the summary screen may show a celebration for it.
-        const { profile, todaySessionStartedAt } = get();
+        // rewards.md §4 "session ended" event: folds the session into the streak/badges one more
+        // time (picks up anything only true once the whole session is done, e.g. Warm-up Champ) —
+        // played minutes are already logged continuously by `TimeTracker`, not tallied here.
+        const { profile } = get();
         if (profile) {
-          const minutes =
-            todaySessionStartedAt === null
-              ? 0
-              : Math.round((Date.now() - todaySessionStartedAt) / 60_000);
-          if (minutes > 0) {
-            await recordSessionMinutes(services.deps, profile.id, minutes, new Date());
-          }
           await checkRewards(services.deps, profile.id);
         }
         set({ screen: 'today-summary', todayActivityIndex: index });
@@ -433,7 +481,9 @@ export function createAppStore(services: Services) {
       }
       set({ todayActivityIndex: index });
       if (activity.kind === 'warmup') {
-        set({ screen: 'warmup' });
+        await gated(() => {
+          set({ screen: 'warmup' });
+        });
         return;
       }
       if (activity.kind === 'lesson') {
@@ -448,7 +498,9 @@ export function createAppStore(services: Services) {
         await enterTodayActivity(index + 1);
         return;
       }
-      set({ screen: 'minigame', miniGameId, miniGameOrigin: 'today' });
+      await gated(() => {
+        set({ screen: 'minigame', miniGameId, miniGameOrigin: 'today' });
+      });
     }
 
     /** This profile's earned badges + streak (M4.4), `[]`/`undefined` when `rewards` is not wired. */
@@ -488,7 +540,6 @@ export function createAppStore(services: Services) {
       streak: null,
       activeCelebration: null,
       celebrationsShownThisSession: 0,
-      todaySessionStartedAt: null,
       journey: null,
       lessonId: null,
       stepIndex: 0,
@@ -509,6 +560,9 @@ export function createAppStore(services: Services) {
       todaySessionStartRankId: null,
       practiceConceptId: null,
       practiceTasks: [],
+      timeLimitStatus: null,
+      pendingActivity: null,
+      passwordPurpose: 'parent-area',
 
       async init() {
         if (await isFirstRun(services.deps)) {
@@ -659,13 +713,37 @@ export function createAppStore(services: Services) {
         });
       },
 
-      goToPasswordScreen() {
-        set({ screen: 'password' });
+      goToPasswordScreen(purpose = 'parent-area') {
+        set({ screen: 'password', passwordPurpose: purpose });
       },
 
       async goToParentArea() {
         const profiles = await listProfiles(services.deps);
         set({ profiles, screen: 'parent' });
+      },
+
+      async grantMoreTimeAndResume() {
+        const { profile, pendingActivity } = get();
+        if (!profile) return;
+        await grantExtraTime(services.deps, profile.id);
+        set({ timeLimitStatus: null, pendingActivity: null });
+        if (pendingActivity) {
+          await pendingActivity();
+        } else {
+          set({ screen: 'home' });
+        }
+      },
+
+      async switchPlayerFromTimeLimit() {
+        set({
+          timeLimitStatus: null,
+          pendingActivity: null,
+          todayPlan: null,
+          todayActivityIndex: 0,
+          lessonId: null,
+          miniGameId: null,
+        });
+        await get().goToPicker();
       },
 
       async refreshProfiles() {
@@ -678,7 +756,8 @@ export function createAppStore(services: Services) {
       },
 
       goToHome() {
-        set({ screen: 'home', levelUpSuggestion: null });
+        set({ levelUpSuggestion: null });
+        void goHomeGated();
       },
 
       async startLesson(lessonId: string) {
@@ -696,7 +775,11 @@ export function createAppStore(services: Services) {
           get().leaveToday();
           return;
         }
-        set({ screen: origin === 'journey' ? 'journey' : 'home' });
+        if (origin === 'journey') {
+          set({ screen: 'journey' });
+        } else {
+          void goHomeGated();
+        }
         void get().refreshProgress();
       },
 
@@ -707,7 +790,11 @@ export function createAppStore(services: Services) {
           await get().advanceToday();
           return;
         }
-        set({ screen: origin === 'journey' ? 'journey' : 'home' });
+        if (origin === 'journey') {
+          set({ screen: 'journey' });
+        } else {
+          await goHomeGated();
+        }
         void get().refreshProgress();
       },
 
@@ -743,7 +830,9 @@ export function createAppStore(services: Services) {
       },
 
       startMiniGame(miniGameId: string, origin: MiniGameOrigin = 'play') {
-        set({ screen: 'minigame', miniGameId, miniGameOrigin: origin });
+        void gated(() => {
+          set({ screen: 'minigame', miniGameId, miniGameOrigin: origin });
+        });
       },
 
       exitMiniGame() {
@@ -753,12 +842,18 @@ export function createAppStore(services: Services) {
           get().leaveToday();
           return;
         }
-        set({ screen: origin === 'journey' ? 'journey' : origin === 'home' ? 'home' : 'play' });
+        if (origin === 'home') {
+          void goHomeGated();
+        } else {
+          set({ screen: origin === 'journey' ? 'journey' : 'play' });
+        }
         void get().refreshProgress();
       },
 
       startFullGame(level: number) {
-        set({ screen: 'full-game', fullGameLevel: level, levelUpSuggestion: null });
+        void gated(() => {
+          set({ screen: 'full-game', fullGameLevel: level, levelUpSuggestion: null });
+        });
       },
 
       exitFullGame() {
@@ -797,7 +892,9 @@ export function createAppStore(services: Services) {
       startFriendGame() {
         const { friendSetup } = get();
         if (!friendSetup.opponent || !friendSetup.gameId) return;
-        set({ screen: 'friend-game' });
+        void gated(() => {
+          set({ screen: 'friend-game' });
+        });
       },
 
       exitFriendGame() {
@@ -847,7 +944,7 @@ export function createAppStore(services: Services) {
       },
 
       declinePlacement() {
-        set({ screen: 'home' });
+        void goHomeGated();
       },
 
       acceptPlacement() {
@@ -883,7 +980,8 @@ export function createAppStore(services: Services) {
       },
 
       finishPlacement() {
-        set({ placementPlan: [], placementIndex: 0, screen: 'home' });
+        set({ placementPlan: [], placementIndex: 0 });
+        void goHomeGated();
         void get().refreshProgress();
       },
 
@@ -901,7 +999,6 @@ export function createAppStore(services: Services) {
           todaySessionStartTotalStars: totalStars(progress),
           todaySessionStartFriends: animalFriends(journey.lessons, progress),
           todaySessionStartRankId: journey.rank?.id ?? null,
-          todaySessionStartedAt: Date.now(),
         });
         await enterTodayActivity(0);
       },
@@ -920,11 +1017,10 @@ export function createAppStore(services: Services) {
         set({
           todayPlan: null,
           todayActivityIndex: 0,
-          todaySessionStartedAt: null,
           lessonId: null,
           miniGameId: null,
-          screen: 'home',
         });
+        void goHomeGated();
         void get().refreshProgress();
       },
 
@@ -932,9 +1028,8 @@ export function createAppStore(services: Services) {
         set({
           todayPlan: null,
           todayActivityIndex: 0,
-          todaySessionStartedAt: null,
-          screen: 'home',
         });
+        void goHomeGated();
         void get().refreshProgress();
       },
 
@@ -947,14 +1042,18 @@ export function createAppStore(services: Services) {
         if (!profile) return;
         const tasks = await loadWarmUp(services.deps, profile.id);
         if (tasks.length === 0) return;
-        set({ practiceConceptId: null, practiceTasks: tasks, screen: 'practice-run' });
+        await gated(() => {
+          set({ practiceConceptId: null, practiceTasks: tasks, screen: 'practice-run' });
+        });
       },
 
       async startPracticeTopic(conceptId: string) {
         const { profile } = get();
         if (!profile) return;
         const tasks = await loadPracticeTasks(services.deps, profile.id, conceptId);
-        set({ practiceConceptId: conceptId, practiceTasks: tasks, screen: 'practice-run' });
+        await gated(() => {
+          set({ practiceConceptId: conceptId, practiceTasks: tasks, screen: 'practice-run' });
+        });
       },
 
       exitPracticeRun() {

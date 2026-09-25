@@ -40,6 +40,8 @@ export function PasswordScreen(): JSX.Element {
   const services = useServices();
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToParentArea = useAppStore((state) => state.goToParentArea);
+  const grantMoreTimeAndResume = useAppStore((state) => state.grantMoreTimeAndResume);
+  const passwordPurpose = useAppStore((state) => state.passwordPurpose);
 
   const [input, setInput] = useState('');
   const [fileLocation, setFileLocation] = useState<string | null>(null);
@@ -83,7 +85,11 @@ export function PasswordScreen(): JSX.Element {
     if (result.ok) {
       setWrongAttempts(null);
       setLockedUntil(null);
-      await goToParentArea();
+      if (passwordPurpose === 'more-time') {
+        await grantMoreTimeAndResume();
+      } else {
+        await goToParentArea();
+      }
       return;
     }
     const lock = await services.deps.parentLock.get();

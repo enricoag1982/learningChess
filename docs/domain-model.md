@@ -72,7 +72,7 @@ Character 1─1 piece type
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
 | ParentLock | `password` (plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
-| Settings (`ProfileSettings`, M5.1) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60 — stored, enforced from M5.2), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'` — stored, applied from M5.3). No `aids` overrides in v1 (dropped from the earlier placeholder here — `BotLevel.aids` is per-level, not per-profile) |
+| Settings (`ProfileSettings`, M5.1) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60 — stored M5.1, enforced live from M5.2), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'` — stored, applied from M5.3). No `aids` overrides in v1 (dropped from the earlier placeholder here — `BotLevel.aids` is per-level, not per-profile) |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (M4.4, only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
@@ -82,7 +82,7 @@ Character 1─1 piece type
 | AssessmentResult (M4.5) | `id`, `profileId`, `kind` (`test-out` / `placement`), `scope`, `correct`, `total`, `passed`, `at` — one row per taken test-out/placement run, pass or fail (§3.2) |
 | Unlock (M4.5) | `id`, `profileId`, `targetType` (`lesson` / `world`), `targetId`, `via` (`test-out` / `placement` / `parent`), `at` — feeds `journey.ts`'s `unlocked` id set (§3.2) |
 | Streak | `current`, `best`, `lastDay` (local day, device time zone), `skipsUsedThisWeek` (tracked per ISO week of the day the skip is used, not the missed day) |
-| SessionLog | `date`, `minutes`; one row per profile + local day, minutes summed across sessions |
+| SessionLog | `date`, `minutes`; one row per profile + local day, minutes summed across sessions; `extraMinutes` (M5.2, absent = 0) — parent "more time" grants for that day, on top of the daily limit |
 | TimeEntry (v2) | `start`, `end`, `activity` (`lesson` / `practice` / `play`) |
 | TimePolicy (v2) | `perWeekday` (minutes), `allowedHours`, `playLimit`, `learnLimit` |
 | TimeException (v2) | `date`, `extraMinutes` or policy override, `note` |
@@ -144,7 +144,17 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 - Home's **Start today** shows whenever the Journey has a next step (lesson or world boss) or any concept is due; hidden only once both are exhausted (a mini-game-only remainder with nothing else due is not offered from Home — a known gap, tracked for a later milestone).
 - The kid can leave any time: closing mid-activity (warm-up, lesson, mini-game) abandons the whole session straight to Home, without a summary; finishing an activity normally advances to the next one; the summary's "Done" is the only way out of it.
 - After Basics: next lesson from the least advanced track.
-- Time limit checked between activities only; never interrupts an exercise.
+- Time limit checked between activities only; never interrupts an exercise (M5.2): the activity gate
+  (`checkActivityGate`, `app/time-limit.ts`) runs on entering a lesson / warm-up / practice run /
+  game / mini-game, and on returning to Home — an activity already open always finishes. Over the
+  limit → "See you tomorrow" screen (Owl, spoken, today's stars) instead of the activity/Home the
+  kid was headed to; **Switch player** (picker) or **Parent: more time** (password →
+  `grantExtraTime`, +`EXTRA_TIME_GRANT_MINUTES` (15) today, repeatable) resumes the exact activity
+  the gate blocked, unchecked. What counts: foreground time with a kid profile active (lessons,
+  practice, play, Home/Journey/Den browsing), tracked client-side (`apps/web`'s `TimeTracker`) —
+  paused while the page is hidden or idle > 2 min without input, added to `SessionLog.minutes` once
+  per real minute. Resets at local midnight: `isOverLimit`/`timeUsedToday` read a stale (not-today)
+  log as "nothing played yet", no explicit reset step needed.
 
 **Practice screen** (reuses the exercise layout, `docs/screens.md`): a "Daily warm-up" card (due count; disabled "All done for today!" when none due — same `loadWarmUp`/`recordReviewResult` as the Today session's warm-up, just reachable on its own) + a topic list. One row per concept that any complete/mastered lesson teaches, using its earliest such lesson (world then lesson order) for the title/character; accuracy dots from `ConceptStats.recent` (last 10); a "Needs practice" tag when `isWeak`. Tapping a topic runs 5 tasks from `loadPracticeTasks`.
 
@@ -165,7 +175,8 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 |---|---|
 | Profiles | `createProfile`, `selectProfile`, `renameProfile`, `changeAvatar`, `deleteProfile`, `resetProfileData` (M5.1: cascades progress/attempts/concept stats/mini-game progress/game records/rewards, keeps the profile itself) |
 | Settings (M5.1, `app/settings.ts`) | `getProfileSettings` (merged over `DEFAULT_PROFILE_SETTINGS`), `updateProfileSettings` (validates, merges a patch, persists) |
-| Report (M5.1, `app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report); `minutesByDay` (`app/rewards.ts`) backs both and M5.2's daily-limit check |
+| Report (M5.1, `app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report, gains `dailyLimitMinutes` in M5.2 for the minutes-per-day chart's limit line); `minutesByDay` (`app/rewards.ts`) backs both |
+| Time limit (M5.2, `app/time-limit.ts`) | `checkActivityGate` (reads settings + today's `SessionLog`, reports `overLimit`/`usedMinutes`/`limitMinutes`/`extraMinutes`), `grantExtraTime` (parent "more time": +`EXTRA_TIME_GRANT_MINUTES` today, repeatable); domain (`domain/session-log.ts`): `timeUsedToday`, `isOverLimit`, `grantExtraMinutes` (pure, clock-driven); `starsToday` (`app/rewards.ts`) backs the "See you tomorrow" screen's own stars line |
 | Backup (M5.1, `app/backup.ts`) | `buildBackupFile`/`exportBackup` (one profile or every profile), `parseBackupFile`/`backupSummary` (validate + preview), `importBackup` (validate then atomic replace via `BackupImporter`) |
 | Assessment (M4.5) | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
 | Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
