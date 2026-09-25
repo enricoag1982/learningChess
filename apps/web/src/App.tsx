@@ -125,10 +125,20 @@ export interface AppProps {
 /** App root: wires one `Services` instance to a fresh store, then renders the current screen. */
 export default function App({ services, appUpdate = NOOP_APP_UPDATE }: AppProps): JSX.Element {
   const [store] = useState(() => createAppStore(services ?? createServices()));
+  const [initError, setInitError] = useState<Error | null>(null);
 
   useEffect(() => {
-    void store.getState().init();
+    store
+      .getState()
+      .init()
+      .catch((error: unknown) => {
+        setInitError(error instanceof Error ? error : new Error(String(error)));
+      });
   }, [store]);
+
+  // A failed start (e.g. storage unreadable) reaches `AppErrorBoundary` (`main.tsx`) instead of
+  // leaving the blank 'loading' screen up forever.
+  if (initError !== null) throw initError;
 
   return (
     <StoreProvider value={store}>

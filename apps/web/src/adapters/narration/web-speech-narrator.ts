@@ -38,9 +38,20 @@ export function createWebSpeechNarrator(speech?: SpeechSynthesis): Narrator {
   }
 
   let voice = pickVoice(synth.getVoices());
-  synth.addEventListener('voiceschanged', () => {
+  const refreshVoice = (): void => {
     voice = pickVoice(synth.getVoices());
-  });
+  };
+  // Safari < 16 (iPad mini 4, iOS 15): `SpeechSynthesis` is not an `EventTarget` — calling
+  // `addEventListener` threw at startup and left a blank page. The event-handler property is
+  // harmless there, and `speak` re-picks a voice if none was found yet.
+  const events = synth as Partial<Pick<EventTarget, 'addEventListener'>> & {
+    onvoiceschanged?: (() => void) | null;
+  };
+  if (typeof events.addEventListener === 'function') {
+    events.addEventListener('voiceschanged', refreshVoice);
+  } else {
+    events.onvoiceschanged = refreshVoice;
+  }
 
   return {
     available: true,
@@ -48,6 +59,7 @@ export function createWebSpeechNarrator(speech?: SpeechSynthesis): Narrator {
     speak(text: string): Promise<void> {
       synth.cancel();
       return new Promise((resolve) => {
+        voice ??= pickVoice(synth.getVoices());
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = RATE;
         utterance.pitch = PITCH;

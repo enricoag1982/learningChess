@@ -60,6 +60,10 @@ function cspPlugin(): Plugin {
 // Deploy workflow sets BASE_PATH to `/<repo>/` for GitHub Pages; local dev/build default to `/`.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
+  // Oldest supported: Safari 15.4 (iPad mini 4 on iOS 15.8, owner device; non-functional.md §4).
+  // Vite's default target (Safari 16.4+) would let newer syntax through; `pnpm compat` checks the
+  // result for what cannot be lowered.
+  build: { target: ['es2022', 'safari15.4', 'chrome100', 'edge100', 'firefox100'] },
   // Compile-time string replacement (not `import.meta.env`): fine under the M5.4 CSP's
   // `script-src 'self'` (no `unsafe-inline`/`eval`) since nothing is evaluated at runtime.
   define: { __APP_VERSION__: JSON.stringify(version) },

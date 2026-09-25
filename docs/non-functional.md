@@ -69,7 +69,15 @@ Owner found: phone showed a 7-hour-old build — `registerType: 'prompt'` alone 
 | Computer move | ≤ 300 ms compute (worker) |
 | Initial JS | ≤ 300 KB gzipped; parent area and later worlds lazy-loaded |
 
-Reference devices: iPad (9th gen, 2021), mid-range Android tablet (e.g. Samsung Galaxy Tab A8), desktop browsers. Browsers: latest 2 versions of Safari, Chrome, Edge, Firefox.
+Reference devices: iPad (9th gen, 2021), mid-range Android tablet (e.g. Samsung Galaxy Tab A8), desktop browsers, **iPad mini 4 on iOS 15.8 (owner device, oldest supported)**. Browsers: latest 2 versions of Safari, Chrome, Edge, Firefox; **minimum Safari 15.4 (iOS / iPadOS 15.4)**.
+
+| Older-browser rule (v1.1.1, owner found a blank page on iPad mini 4) | How |
+|---|---|
+| Build target | `vite.config.ts` `build.target` = `es2022`, `safari15.4`, `chrome100`, `edge100`, `firefox100` (Vite's default is Safari 16.4+) |
+| Compat check | `pnpm compat` (CI, after the size budget): scans the built JS for syntax / regex features Safari 15.4 lacks and Safari 16+ only built-ins called by name |
+| Guard newer APIs | Feature-check before use; e.g. `speechSynthesis.addEventListener` does not exist before Safari 16 (not an `EventTarget`) — its call at startup was the blank page |
+| Never blank | `AppErrorBoundary` (`main.tsx`): any startup / render error shows Owl + "Try again" + the error text; a browser that cannot run the app at all shows a static "needs iOS 15.4 or newer" note after 8 s (`index.html`) |
+| Test | `e2e/older-safari.spec.ts`: starts with Safari 15's `SpeechSynthesis`; a startup failure shows the error screen |
 
 ## 5. Reliability and data
 

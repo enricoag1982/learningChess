@@ -21,6 +21,7 @@ Every merged iteration gets an annotated tag `m<N>.<i>` (milestone done: also `m
 | S | Screenshot | App run in a browser, screens checked by eye (tablet 1024×768, phone 390×844) |
 | O | Offline | Built app reloads with network off |
 | Z | Size | Initial JS gzipped vs budget (≤ 300 KB) |
+| K | Compat | `pnpm compat`: built JS free of syntax / built-ins newer than Safari 15.4 |
 | D | Deploy | Pages URL serves the app |
 | A | Accessibility | axe-core scan of every lesson screen (serious / critical = fail); kid targets ≥ 64 px on desktop, tablet, iPad portrait, phone |
 
