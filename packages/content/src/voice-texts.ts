@@ -443,6 +443,114 @@ function collectBadgeSpokenLines(
   }
 }
 
+/**
+ * Every `exercise-text.ts`'s `exerciseNote` text (`ExerciseStep`/`SeriesBossStep`/
+ * `ReviewExerciseStep`), spoken as its own utterance since M6.3 item 1 (no longer concatenated with
+ * the instruction — that stays covered by `collectContentEntries`'s lesson-guided/lesson-exercise/
+ * minigame-round entries). Each note shape's own domain is bounded and content-derived, same rule
+ * as `collectUiTemplates` above: every lesson character (its display name and the piece it stands
+ * for — `character-meta.ts`'s `characterPiece` default-to-rook rule for a non-piece character like
+ * Owl, mirrored here via `characterPieceOf(...) ?? 'r'`), 1–3 stars, and colour × piece type for the
+ * opponent-moved / setup-hint lines (same pairing `collectUiTemplates` already expands for
+ * versus-boss). Also includes every one of those with `withEasierOffer`'s (`exercise-text.ts`)
+ * sentence appended — only `ExerciseStep` ever shows that offer, and only for its own error feedback
+ * kinds (`ERROR_FEEDBACK_KINDS` there): illegal, select-wrong, select-missing, select-both,
+ * wrong-answer, wrong-move, wrong-placement.
+ */
+function collectExerciseNoteTexts(
+  entries: Map<string, InventoryEntry>,
+  locales: Locales,
+  content: CompiledContent,
+): void {
+  const characters = [...new Set(content.lessons.map((lesson) => lesson.character))];
+  const easierOffer = resolve(locales, 'exercise.easier-offer');
+
+  /** An error-kind note: inventoried both plain and with the easier-variant offer appended. */
+  function addErrorNote(text: string): void {
+    addText(entries, text, 'exercise-note');
+    addText(entries, `${text} ${easierOffer}`, 'exercise-note-easier-offer');
+  }
+
+  // tap-first (never gets the easier offer: not one of ERROR_FEEDBACK_KINDS).
+  for (const character of characters) {
+    const name = resolve(locales, `characters:${character}.name`);
+    addText(entries, resolve(locales, 'exercise.tap-piece-first', { name }), 'exercise-note');
+  }
+
+  // illegal move: one per character (its own piece, same default-to-rook rule as `characterPiece`).
+  for (const character of characters) {
+    const name = resolve(locales, `characters:${character}.name`);
+    const piece = characterPieceOf(character) ?? 'r';
+    addErrorNote(resolve(locales, `exercise.illegal.${piece}`, { name }));
+  }
+
+  // Plain error notes with no variables.
+  for (const key of [
+    'exercise.select-wrong',
+    'exercise.select-missing',
+    'exercise.select-both',
+    'exercise.answer-wrong',
+    'exercise.move-wrong',
+    'exercise.setup.wrong',
+  ]) {
+    addErrorNote(resolve(locales, key));
+  }
+
+  // Hint ladder (never gets the easier offer): the shared "here is the answer" once; each kind's
+  // own level-1/2 texts; setup's level-1 "place the <color> <piece> next" over colour × piece.
+  addText(entries, resolve(locales, 'exercise.hint-answer'), 'exercise-note');
+  for (const character of characters) {
+    const name = resolve(locales, `characters:${character}.name`);
+    addText(entries, resolve(locales, 'exercise.hint-piece', { name }), 'exercise-note');
+  }
+  for (const key of [
+    'exercise.hint-target',
+    'exercise.hint-look',
+    'exercise.hint-think-again',
+    'exercise.hint-remove-option',
+    'exercise.setup.hint-square',
+  ]) {
+    addText(entries, resolve(locales, key), 'exercise-note');
+  }
+  for (const color of ['w', 'b'] as const) {
+    for (const piece of PIECE_TYPES) {
+      addText(
+        entries,
+        resolve(locales, 'exercise.setup.hint-piece', {
+          color: resolve(locales, `board.color.${color}`),
+          piece: resolve(locales, `board.piece.${piece}`),
+        }),
+        'exercise-note',
+      );
+    }
+  }
+
+  // Praise (solved), 1-3 stars; checkmate is its own JS-level concatenation of the "Checkmate!"
+  // line and the same praise line (`exercise-text.ts`'s `exerciseNote`, "checkmate" case).
+  const praiseKeys = ['exercise.praise-1', 'exercise.praise-2', 'exercise.praise-3'];
+  for (const key of praiseKeys) {
+    addText(entries, resolve(locales, key), 'exercise-note');
+  }
+  const checkmateText = resolve(locales, 'exercise.checkmate');
+  for (const key of praiseKeys) {
+    addText(entries, `${checkmateText} ${resolve(locales, key)}`, 'exercise-note');
+  }
+
+  // Opponent's scripted reply (mate-in-n): colour × piece.
+  for (const color of ['w', 'b'] as const) {
+    for (const piece of PIECE_TYPES) {
+      addText(
+        entries,
+        resolve(locales, 'exercise.opponent-moved', {
+          color: resolve(locales, `exercise.opponent-color.${color}`),
+          piece: resolve(locales, `board.piece.${piece}`),
+        }),
+        'exercise-note',
+      );
+    }
+  }
+}
+
 /** Builds the full inventory (`entries`, deduped by `voiceKey`, sorted by key) plus the report's
  * `skipped` list — pure function of already-loaded content, so both `scripts/voice-texts.ts` (real
  * content, writes `dist/voice-texts.json`) and this file's own tests (real content, no I/O) share it. */
@@ -456,19 +564,14 @@ export function buildVoiceInventory(
   collectContentEntries(entries, locales, content);
   collectUiTemplates(entries, locales, content, catalog, badges);
   collectBadgeSpokenLines(entries, locales, badges);
+  collectExerciseNoteTexts(entries, locales, content);
+  // Parent area "Test voice" check (M6.3 item 2, `ChildSettings.tsx`): its one fixed sentence.
+  addText(entries, resolve(locales, 'voice-check.sentence'), 'voice-check');
 
-  const skipped: SkippedTemplate[] = [
-    {
-      source: 'exercise-instruction+note (ExerciseStep/SeriesBossStep/ReviewExerciseStep)',
-      reason:
-        'runtime concatenates `${instructionText} ${note.text}` outside i18next; ' +
-        `~${String(
-          content.lessons.reduce((n, l) => n + l.guided.length + l.exercises.length, 0) +
-            content.minigames.reduce((n, m) => n + (m.mode === 'series' ? m.rounds.length : 0), 0),
-        )} instructions × ~15 note shapes is unbounded — falls back to Web Speech for that reading; ` +
-        'the bare instruction (feedback.kind === "instruction", no note yet) is covered via lesson-guided/lesson-exercise/minigame-round above.',
-    },
-  ];
+  // M6.3 item 1: every note text is now inventoried directly above (`collectExerciseNoteTexts`), so
+  // nothing is skipped any more — kept as an empty list, not removed, so a future unbounded template
+  // still has somewhere to log itself.
+  const skipped: SkippedTemplate[] = [];
 
   return {
     entries: [...entries.values()].sort((a, b) => a.key.localeCompare(b.key)),

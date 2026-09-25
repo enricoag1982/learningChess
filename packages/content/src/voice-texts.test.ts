@@ -116,9 +116,28 @@ describe('voice text inventory (real content)', () => {
     }
   });
 
-  it('logs the unbounded exercise instruction+note concatenation as skipped, not silently dropped', () => {
-    expect(inventory.skipped.length).toBeGreaterThan(0);
-    expect(inventory.skipped[0]?.source).toContain('exercise-instruction+note');
+  it('nothing is skipped (M6.3: every exercise note text is now inventoried on its own)', () => {
+    expect(inventory.skipped).toEqual([]);
+  });
+
+  it('has every exercise note shape (M6.3 item 1: instruction and note are spoken separately)', () => {
+    const notes = textsBySource.get('exercise-note') ?? [];
+    expect(notes).toContain('Not quite! Try again.'); // exercise.answer-wrong
+    expect(notes).toContain('Amazing!'); // exercise.praise-3
+    expect(notes).toContain('Here is the answer.'); // exercise.hint-answer, shared across every kind
+    expect(notes).toContain('Checkmate! Amazing!'); // checkmate + praise-3 concatenation
+    for (const lesson of content.lessons) {
+      const name = lookupLocale(locales, `characters:${lesson.character}.name`);
+      expect(notes.some((text) => text.includes(name))).toBe(true);
+    }
+
+    const withOffer = textsBySource.get('exercise-note-easier-offer') ?? [];
+    expect(withOffer.length).toBeGreaterThan(0);
+    for (const text of withOffer) {
+      expect(text.endsWith('This one is tricky. Want an easier one?')).toBe(true);
+    }
+    // The offer never appends to a hint/praise/checkmate/opponent-reply note.
+    expect(withOffer.some((text) => text.includes('Amazing!'))).toBe(false);
   });
 
   it('is deterministic across runs (same content in, same inventory out)', () => {

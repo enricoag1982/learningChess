@@ -139,6 +139,16 @@ parent:
   daily-limit-minutes_other: '{{count}} min'
   daily-limit-note: Enforced from M5.2.
   voice-label: Voice
+  voice-test-button: Test voice
+  voice-test-audio: Recorded voice ✓
+  voice-test-fallback: 'Device voice — recorded voice unavailable ({{reason}})'
+  voice-test-reason:
+    no-audio-context: no sound support
+    still-suspended: still starting up
+    manifest-not-loaded: voice list unavailable
+    no-generated-audio: no recorded line for this text
+    file-missing: audio file missing
+    decode-failed: audio file unreadable
   sound-label: Sounds
   hints-label: Hints
   computer-level-heading: Computer level
@@ -217,6 +227,12 @@ parent:
     contact-heading: Questions?
     contact-body: "Open an issue on the project's GitHub repository: {{url}}"
     close: Close
+voice-check:
+  # Parent area "Test voice" (M6.3 item 2): the one fixed sentence it speaks. Deliberately its own
+  # top-level key, not under `parent:` — every `parent.*`/`new-player.*`/`backup.*`/`privacy.*` key
+  # is grown-up-only and never narrated (`voice-texts.ts`'s `EXCLUDED_KEY_PREFIXES`), but this text
+  # must be in the voice inventory to actually test the recorded voice.
+  sentence: Let's play chess together!
 lesson:
   close: Close lesson
   skip: Skip

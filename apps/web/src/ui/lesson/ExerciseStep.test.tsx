@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type {
   BestMoveDef,
   ChoiceDef,
@@ -18,6 +18,7 @@ import {
   fixtureLesson,
   fixtureVariantExercise,
 } from '../../testing/fixtures.ts';
+import type { FakeNarrator } from '../../testing/fake-narrator.ts';
 import { stubMatchMedia } from '../../testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
@@ -165,7 +166,7 @@ describe('ExerciseStep', () => {
     expect(screen.queryByTestId('stars-row')).toBeNull();
   });
 
-  it('keeps the instruction visible under a hint note, and replay speaks both', async () => {
+  it('keeps the instruction visible under a hint note, and narrates each as its own utterance (M6.3 item 1)', async () => {
     const exercise: ExerciseDef = {
       id: 'note-me',
       concept: 'fixture-move',
@@ -186,6 +187,7 @@ describe('ExerciseStep', () => {
     };
     const lesson = fixtureLesson({ exercises: [exercise] });
     const services = createTestServices(fixtureContentSource(lesson));
+    const narrator = services.narrator as unknown as FakeNarrator;
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
@@ -194,9 +196,23 @@ describe('ExerciseStep', () => {
     // The instruction (the exercise's textKey, un-translated in this fixture setup) stays on
     // screen even once a hint note appears under it.
     await screen.findByText('note-instruction');
+    expect(narrator.spoken).toEqual(['note-instruction']); // no note yet: nothing to append
+
     fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
     await screen.findByText('Look at Rhino.');
     expect(screen.getByText('note-instruction')).toBeTruthy();
+    // Two separate utterances, in order — not one `${instruction} ${note}` concatenation.
+    expect(narrator.spoken.slice(-2)).toEqual(['note-instruction', 'Look at Rhino.']);
+
+    // Replay speaks the same sequence again, from the top.
+    const spokenBeforeReplay = narrator.spoken.length;
+    fireEvent.click(screen.getByRole('button', { name: /Say it again/ }));
+    await waitFor(() => {
+      expect(narrator.spoken.slice(spokenBeforeReplay)).toEqual([
+        'note-instruction',
+        'Look at Rhino.',
+      ]);
+    });
   });
 
   it('select-squares: a wrong check marks wrong picks and missing squares; the right set solves it', async () => {

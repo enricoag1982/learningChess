@@ -19,7 +19,7 @@ import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useNarratedText } from '../useNarratedText.ts';
+import { useNarratedTextSequence } from '../useNarratedText.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
 import { exerciseInstructionText, exerciseNote, withEasierOffer } from './exercise-text.ts';
@@ -172,8 +172,10 @@ function ExerciseAttempt({
   const instructionText = exerciseInstructionText(t, exercise);
   const baseNote = exerciseNote(t, state.feedback, lesson.character, shownStars);
   const note = offerEasier ? withEasierOffer(t, baseNote, state.feedback) : baseNote;
-  const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
-  const replay = useNarratedText(services.narrator, spokenText);
+  // Two utterances, not one concatenated string (M6.3 item 1): each is in the voice inventory on
+  // its own, so both get generated audio instead of falling back to a device voice.
+  const spokenTexts = note ? [instructionText, note.text] : [instructionText];
+  const replay = useNarratedTextSequence(services.narrator, spokenTexts);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
     t,
