@@ -193,6 +193,21 @@
   animation: lazy-spin 900ms linear infinite;
 }
 
+/* 5-minute warning banner (`AppNotice.tsx`, M7.1): slides down from the top of the viewport on
+   appearing. The rule below zeroes it for reduced motion (no separate opt-out needed here). */
+@keyframes notice-slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.notice-slide-down {
+  animation: notice-slide-down 220ms ease-out;
+}
+
 /* The rule below zeroes durations for reduced motion, so this rule only matters otherwise. */
 @media (prefers-reduced-motion: reduce) {
   *,

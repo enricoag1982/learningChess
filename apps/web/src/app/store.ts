@@ -6,6 +6,7 @@ import type {
   AssessmentScore,
   ConceptStats,
   ConceptTask,
+  ContentSource,
   EarnedBadge,
   GameRecord,
   Journey,
@@ -30,8 +31,10 @@ import {
   getLessonProgress,
   getProfileSettings,
   grantExtraTime,
+  grantHoursOverride,
   isFirstRun,
   lessonStatus,
+  lessonSteps,
   listProfiles,
   loadGameRecords,
   loadJourney,
@@ -40,7 +43,10 @@ import {
   loadProgress,
   loadTodaySession,
   loadWarmUp,
+  localDayString,
   markSeen,
+  markTimeWarning,
+  minutesUntilEnd,
   parentUnlock,
   planPlacement,
   planTestOutLesson,
@@ -48,6 +54,7 @@ import {
   scorePlacementWorld,
   scoreTestOut,
   selectProfile,
+  shouldWarn,
   submitAssessment,
   totalStars,
   updateSuggestedLevel,
@@ -85,6 +92,34 @@ export type Screen =
   | 'placement'
   | 'assessment'
   | 'time-limit';
+
+/** Screens the 5-minute warning (M7.1, app-structure.md §13 "5-min warning") may show on: every
+ * screen listed here, plus the lesson screen but only on its own lesson-complete step (checked
+ * separately below) — never mid-exercise/game/boss/assessment. */
+const CALM_SCREENS: ReadonlySet<Screen> = new Set([
+  'home',
+  'journey',
+  'play',
+  'practice',
+  'den',
+  'today-summary',
+]);
+
+/** `true` while `screen` is one the 5-minute warning may show on right now (M7.1) — see
+ * {@link CALM_SCREENS}; for `screen: 'lesson'`, only once `lessonId`/`stepIndex` land on that
+ * lesson's own `'complete'` step (`lessonSteps`, same step `LessonScreen` renders as `CompleteStep`). */
+function isCalmScreen(
+  screen: Screen,
+  lessonId: string | null,
+  stepIndex: number,
+  content: ContentSource,
+): boolean {
+  if (CALM_SCREENS.has(screen)) return true;
+  if (screen !== 'lesson' || lessonId === null) return false;
+  const lesson = content.lesson(lessonId);
+  if (!lesson) return false;
+  return lessonSteps(lesson, content.minigames())[stepIndex]?.kind === 'complete';
+}
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
 export type FriendOpponentChoice =
@@ -232,6 +267,19 @@ export interface AppState {
   /** Which flow the password screen is for: the ordinary parent-area gate, or the "See you
    * tomorrow" screen's "Parent: more time" (M5.2) — decides what a correct password does next. */
   readonly passwordPurpose: 'parent-area' | 'more-time';
+
+  /** The 5-minute warning banner (M7.1, `ui/AppNotice.tsx`): visible only on a calm screen, at
+   * most once per child per day (`SessionLog.warnedAt`). */
+  readonly timeNoticeVisible: boolean;
+  /**
+   * Re-evaluates the 5-minute warning (M7.1, app-structure.md §13 "5-min warning"):
+   * `trigger: 'screen'` (every screen change, incl. the lesson-complete step) first hides it —
+   * "gone on the next screen change" — then, same as `trigger: 'tick'` (`TimeTracker`'s own
+   * minute tick), shows it when the current screen is calm and {@link shouldWarn} says so,
+   * persisting `SessionLog.warnedAt` so it never shows twice the same day. A no-op without an
+   * active profile.
+   */
+  readonly checkTimeNotice: (trigger: 'screen' | 'tick') => Promise<void>;
 
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
@@ -563,6 +611,22 @@ export function createAppStore(services: Services) {
       timeLimitStatus: null,
       pendingActivity: null,
       passwordPurpose: 'parent-area',
+      timeNoticeVisible: false,
+
+      async checkTimeNotice(trigger) {
+        if (trigger === 'screen') set({ timeNoticeVisible: false });
+        const { profile, screen, lessonId, stepIndex } = get();
+        if (!profile) return;
+        if (!isCalmScreen(screen, lessonId, stepIndex, services.deps.content)) return;
+        const now = services.deps.clock.now();
+        const settings = await getProfileSettings(services.deps, profile.id);
+        const log = await services.deps.rewards?.getSessionLog(profile.id, localDayString(now));
+        const remaining = minutesUntilEnd(settings, log, now);
+        if (shouldWarn(remaining, log, now)) {
+          await markTimeWarning(services.deps, profile.id);
+          set({ timeNoticeVisible: true });
+        }
+      },
 
       async init() {
         if (await isFirstRun(services.deps)) {
@@ -723,9 +787,16 @@ export function createAppStore(services: Services) {
       },
 
       async grantMoreTimeAndResume() {
-        const { profile, pendingActivity } = get();
+        const { profile, pendingActivity, timeLimitStatus } = get();
         if (!profile) return;
-        await grantExtraTime(services.deps, profile.id);
+        // M7.1: a late/early gate grants a 15-minute hours override instead of extending the
+        // daily limit — `checkActivityGate` never over-reports "limit" once hours are also
+        // blocking (`app/time-limit.ts`'s own priority), so `reason` alone decides which to grant.
+        if (timeLimitStatus?.reason === 'late' || timeLimitStatus?.reason === 'early') {
+          await grantHoursOverride(services.deps, profile.id);
+        } else {
+          await grantExtraTime(services.deps, profile.id);
+        }
         set({ timeLimitStatus: null, pendingActivity: null });
         if (pendingActivity) {
           await pendingActivity();

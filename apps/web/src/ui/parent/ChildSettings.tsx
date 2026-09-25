@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -16,6 +16,8 @@ import {
   getProfileSettings,
   loadGameRecords,
   loadJourney,
+  PLAY_FROM_OPTIONS,
+  PLAY_UNTIL_OPTIONS,
   renameProfile,
   resetProfileData,
   updateProfileSettings,
@@ -168,6 +170,78 @@ function DeleteConfirmDialog({
   );
 }
 
+/** One {@link DAILY_LIMIT_OPTIONS} chip row (M7.1: reused for "Every day" / "Mon–Fri" / "Sat–Sun"). */
+function LimitChipRow({
+  label,
+  value,
+  onPick,
+}: {
+  readonly label: string;
+  readonly value: number | null;
+  readonly onPick: (value: number | null) => void;
+}): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="text-xs font-extrabold tracking-wide text-muted uppercase">{label}</h4>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
+        {DAILY_LIMIT_OPTIONS.map((option) => (
+          <button
+            key={String(option)}
+            type="button"
+            aria-pressed={value === option}
+            onClick={() => {
+              onPick(option);
+            }}
+            className={value === option ? PARENT_CHIP_SELECTED : PARENT_CHIP}
+          >
+            {option === null
+              ? t('parent.daily-limit-off')
+              : t('parent.daily-limit-minutes', { count: option })}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** One allowed-hours chip row (M7.1: "Play until" / "Not before") — `options` are `'HH:MM'`
+ * strings shown as-is, plus `null` for "off" (`parent.daily-limit-off`, same wording as the daily
+ * limit's own "Off" chip). */
+function HoursChipRow({
+  label,
+  options,
+  value,
+  onPick,
+}: {
+  readonly label: string;
+  readonly options: readonly (string | null)[];
+  readonly value: string | null;
+  readonly onPick: (value: string | null) => void;
+}): JSX.Element {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col gap-2">
+      <h3 className="text-sm font-extrabold text-ink">{label}</h3>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
+        {options.map((option) => (
+          <button
+            key={String(option)}
+            type="button"
+            aria-pressed={value === option}
+            onClick={() => {
+              onPick(option);
+            }}
+            className={value === option ? PARENT_CHIP_SELECTED : PARENT_CHIP}
+          >
+            {option === null ? t('parent.daily-limit-off') : option}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ToggleRow({
   label,
   checked,
@@ -273,9 +347,23 @@ export function ChildSettingsScreen({
     await refreshProfiles();
   }
 
+  // Queues patches one after another (M7.1: the daily-limit block now has up to four chip rows a
+  // parent could tap in quick succession — weekday, weekend, "Play until", "Not before"): each
+  // `updateProfileSettings` call reads-merges-saves the *stored* settings, so two overlapping
+  // calls would race and the slower one's read misses the faster one's not-yet-saved field,
+  // silently dropping it once both saves land. Chaining onto `patchQueueRef` instead makes every
+  // patch start its own read only after the previous one's save has completed.
+  const patchQueueRef = useRef<Promise<void>>(Promise.resolve());
+
   async function patchSettings(patch: Partial<ProfileSettings>): Promise<void> {
-    const updated = await updateProfileSettings(services.deps, profile.id, patch);
-    setSettings(updated);
+    const run = patchQueueRef.current.then(async () => {
+      const updated = await updateProfileSettings(services.deps, profile.id, patch);
+      setSettings(updated);
+    });
+    // The queue itself must never reject (a failed patch would otherwise wedge every later one
+    // behind a rejected promise); the caller's own `await run` below still sees the real error.
+    patchQueueRef.current = run.catch(() => undefined);
+    await run;
   }
 
   async function confirmDelete(): Promise<void> {
@@ -395,33 +483,62 @@ export function ChildSettingsScreen({
 
       {settings && (
         <section className="flex flex-col gap-4 rounded-xl border border-line bg-card p-4">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <h3 className="text-sm font-extrabold text-ink">{t('parent.daily-limit-heading')}</h3>
-            <div
-              className="flex flex-wrap gap-2"
-              role="group"
-              aria-label={t('parent.daily-limit-heading')}
-            >
-              {DAILY_LIMIT_OPTIONS.map((option) => (
-                <button
-                  key={String(option)}
-                  type="button"
-                  aria-pressed={settings.dailyLimitMinutes === option}
-                  onClick={() => {
-                    void patchSettings({ dailyLimitMinutes: option });
+            <ToggleRow
+              label={t('parent.weekend-limit-toggle')}
+              checked={settings.weekendLimitMinutes !== undefined}
+              onChange={(enabled) => {
+                void patchSettings({
+                  weekendLimitMinutes: enabled ? settings.dailyLimitMinutes : undefined,
+                });
+              }}
+            />
+            {settings.weekendLimitMinutes !== undefined ? (
+              <>
+                <LimitChipRow
+                  label={t('parent.daily-limit-weekday')}
+                  value={settings.dailyLimitMinutes}
+                  onPick={(value) => {
+                    void patchSettings({ dailyLimitMinutes: value });
                   }}
-                  className={
-                    settings.dailyLimitMinutes === option ? PARENT_CHIP_SELECTED : PARENT_CHIP
-                  }
-                >
-                  {option === null
-                    ? t('parent.daily-limit-off')
-                    : t('parent.daily-limit-minutes', { count: option })}
-                </button>
-              ))}
-            </div>
+                />
+                <LimitChipRow
+                  label={t('parent.daily-limit-weekend')}
+                  value={settings.weekendLimitMinutes}
+                  onPick={(value) => {
+                    void patchSettings({ weekendLimitMinutes: value });
+                  }}
+                />
+              </>
+            ) : (
+              <LimitChipRow
+                label={t('parent.daily-limit-everyday')}
+                value={settings.dailyLimitMinutes}
+                onPick={(value) => {
+                  void patchSettings({ dailyLimitMinutes: value });
+                }}
+              />
+            )}
             <p className={PARENT_NOTE}>{t('parent.daily-limit-note')}</p>
           </div>
+
+          <HoursChipRow
+            label={t('parent.play-until-heading')}
+            options={PLAY_UNTIL_OPTIONS}
+            value={settings.playUntil ?? null}
+            onPick={(value) => {
+              void patchSettings({ playUntil: value });
+            }}
+          />
+          <HoursChipRow
+            label={t('parent.play-from-heading')}
+            options={PLAY_FROM_OPTIONS}
+            value={settings.playFrom ?? null}
+            onPick={(value) => {
+              void patchSettings({ playFrom: value });
+            }}
+          />
 
           <ToggleRow
             label={t('parent.voice-label')}

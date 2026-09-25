@@ -40,6 +40,7 @@ export function TimeTracker(): null {
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const screen = useAppStore((state) => state.screen);
+  const checkTimeNotice = useAppStore((state) => state.checkTimeNotice);
   const profileId = profile?.id ?? null;
   // 0, not `Date.now()`, so the initial render stays pure (react-hooks/purity); the mount effect
   // below sets the real value before anything reads it.
@@ -76,11 +77,14 @@ export function TimeTracker(): null {
       if (!isTrackedScreen(screenRef.current) || document.hidden) return;
       if (Date.now() - lastInputRef.current > IDLE_LIMIT_MS) return;
       void recordSessionMinutes(services.deps, profileId, 1, services.deps.clock.now());
+      // M7.1 5-minute warning: the other trigger (`AppNotice.tsx` runs the "screen change" one) —
+      // catches the threshold being crossed while sitting still on an already-calm screen.
+      void checkTimeNotice('tick');
     }, TICK_MS);
     return () => {
       window.clearInterval(id);
     };
-  }, [profileId, services]);
+  }, [profileId, services, checkTimeNotice]);
 
   return null;
 }
