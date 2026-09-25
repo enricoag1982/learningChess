@@ -14,7 +14,7 @@ import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useNarratedText } from '../useNarratedText.ts';
+import { useNarratedTextSequence } from '../useNarratedText.ts';
 import { createExerciseReducer, initExerciseState } from '../lesson/exercise-reducer.ts';
 import { exerciseInstructionText, exerciseNote } from '../lesson/exercise-text.ts';
 import { buildExercisePlayArea } from '../lesson/exercise-play-area.tsx';
@@ -96,8 +96,9 @@ export function ReviewExerciseStep({
   const character = lesson?.character ?? 'owl';
   const instructionText = exerciseInstructionText(t, exercise);
   const note = exerciseNote(t, state.feedback, character, stars);
-  const spokenText = note ? `${instructionText} ${note.text}` : instructionText;
-  const replay = useNarratedText(services.narrator, spokenText);
+  // Two utterances, not one concatenated string (M6.3 item 1) — see `ExerciseStep.tsx`.
+  const spokenTexts = note ? [instructionText, note.text] : [instructionText];
+  const replay = useNarratedTextSequence(services.narrator, spokenTexts);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
     t,

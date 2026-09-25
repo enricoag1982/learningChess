@@ -65,5 +65,9 @@ export function createTestServices(
     setNickname: () => {
       // no-op
     },
+    // M6.3 item 2: same reason — `FakeNarrator` has no `lastOutcome` of its own to report. A test
+    // that needs the other outcome overrides `services.testVoice` directly (`Services.testVoice`
+    // is not `readonly`, same as `setVoiceEnabled`/`setNickname` above).
+    testVoice: () => Promise.resolve({ kind: 'audio' }),
   };
 }

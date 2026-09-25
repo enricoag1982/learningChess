@@ -17,7 +17,9 @@
     "build": "pnpm -r build",
     "test:e2e": "pnpm --filter @chess-kids/web test:e2e",
     "size": "pnpm --filter @chess-kids/web size",
-    "compat": "pnpm --filter @chess-kids/web compat"
+    "compat": "pnpm --filter @chess-kids/web compat",
+    "voice:check": "pnpm --filter @chess-kids/content voice-check",
+    "voice:generate": "pnpm --filter @chess-kids/content voice-texts && python3 tools/voice/generate.py"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

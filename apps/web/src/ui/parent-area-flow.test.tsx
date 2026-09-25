@@ -164,6 +164,30 @@ describe('Parent area settings effects (M5.1)', () => {
     expect(narrator.spoken.length).toBe(spokenSoFar);
   });
 
+  it('Test voice shows "Recorded voice" when generated audio actually played (M6.3 item 2)', async () => {
+    const services = makeServices();
+    services.testVoice = () => Promise.resolve({ kind: 'audio' });
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    await openSettings('Mia');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Test voice' }));
+    await screen.findByText('Recorded voice ✓');
+  });
+
+  it('Test voice explains why it fell back to the device voice, with a short reason (M6.3 item 2)', async () => {
+    const services = makeServices();
+    services.testVoice = () => Promise.resolve({ kind: 'fallback', reason: 'still-suspended' });
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    await openSettings('Mia');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Test voice' }));
+    await screen.findByText('Device voice — recorded voice unavailable (still starting up)');
+  });
+
   it('a fixed computer level preselects that level on the Play screen', async () => {
     const services = createTestServices(createBundledContentSource());
     const profile = await seedReturningProfile(services, 'Mia');

@@ -436,12 +436,22 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
 
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
-}) => {
+}, testInfo) => {
   // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
   // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
   // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
   // Walks the whole curriculum: grows with every world (2.3–2.5 min at World 4 under load).
   test.setTimeout(300_000);
+
+  // M6.3 item 4 (`docs/voice.md`): the missed-text report, chromium project only (this walk
+  // already runs 3x, once per viewport project — no need to also fetch/decode the same audio 3x).
+  // Set before the very first navigation, so it covers the whole walk from the first screen on.
+  const checkVoiceMisses = testInfo.project.name === 'chromium';
+  if (checkVoiceMisses) {
+    await page.addInitScript(() => {
+      localStorage.setItem('chess-kids:voice-report', '1');
+    });
+  }
 
   // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
   // exists in content, the first series boss (mid-round) and first static boss, and the Complete
@@ -772,6 +782,21 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
   expect(completeScanned, 'the Complete step got a scan').toBe(true);
   expect(summaryScanned, 'the session summary got a scan').toBe(true);
+
+  if (checkVoiceMisses) {
+    const misses = await page.evaluate(
+      () =>
+        (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses ?? [],
+    );
+    // A miss records the *original* text (`audio-narrator.ts`), which may still carry the
+    // nickname this walk's profile used ("Kid") even though the generated-audio lookup itself
+    // strips it first (`docs/voice.md` "Nickname") — excepted here, same as that rule.
+    const unexpected = misses.filter((text) => !text.includes('Kid'));
+    expect(
+      unexpected,
+      `voice misses (no generated audio played): ${JSON.stringify(misses)}`,
+    ).toEqual([]);
+  }
 });
 
 test('test-out sheet, runner and result screen have no serious/critical violations and kid-sized touch targets (M4.5)', async ({

@@ -6,6 +6,7 @@ import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { createDownloadBackupFileWriter } from '../adapters/download-backup-file-writer.ts';
 import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
+import type { AudioNarratorOutcome } from '../adapters/narration/audio-narrator.ts';
 import { createAudioNarrator } from '../adapters/narration/audio-narrator.ts';
 import { createGatedNarrator } from '../adapters/narration/gated-narrator.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
@@ -33,6 +34,11 @@ export interface Services {
   /** The active profile's nickname, stripped from narrated text before the generated-audio lookup
    * (M6.2, `docs/voice.md`) — set at every profile select, alongside `setVoiceEnabled`. */
   setNickname(nickname: string | null): void;
+  /** M6.3 item 2: the parent area "Test voice" check (`ChildSettings.tsx`) — speaks `text` (the
+   * app's one fixed, inventoried test sentence) through the real audio narrator, bypassing the
+   * voice on/off setting so it works even while that toggle is off, and reports whether generated
+   * audio actually played or why it fell back to the device voice. */
+  testVoice(text: string): Promise<AudioNarratorOutcome>;
 }
 
 /** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
@@ -75,6 +81,12 @@ export function createServices(storage: Storage = window.localStorage): Services
     },
     setNickname: (nickname) => {
       audioNarrator.setNickname(nickname);
+    },
+    testVoice: async (text) => {
+      await audioNarrator.speak(text);
+      // `doSpeak` (`audio-narrator.ts`) always sets this before returning; the fallback here is
+      // only for type safety (`lastOutcome()` is `| null` before any call ever completes).
+      return audioNarrator.lastOutcome() ?? { kind: 'fallback', reason: 'no-audio-context' };
     },
   };
 }
