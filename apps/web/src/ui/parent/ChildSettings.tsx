@@ -27,6 +27,7 @@ import {
 } from '@chess-kids/core';
 import { exportBackup } from '@chess-kids/core/backup';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
 import { AvatarIcon } from '../art/avatars.tsx';
 import { ChevronLeftIcon } from './parent-icons.tsx';
@@ -353,6 +354,8 @@ export function ChildSettingsScreen({
   const [confirmingReset, setConfirmingReset] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [shareNote, setShareNote] = useState<string | null>(null);
   const [nicknameError, setNicknameError] = useState<string | null>(null);
 
   const [settings, setSettings] = useState<ProfileSettings | null>(null);
@@ -432,6 +435,17 @@ export function ChildSettingsScreen({
     setExporting(true);
     await exportBackup(services.deps, [profile.id]);
     setExporting(false);
+  }
+
+  async function shareThisChild(): Promise<void> {
+    setSharing(true);
+    setShareNote(null);
+    const outcome = await sendBackupToOtherDevice(services.deps, [profile.id]);
+    if (outcome === 'shared') setShareNote(t('parent.backup.share-shared'));
+    if (outcome === 'downloaded')
+      setShareNote(t('parent.backup.share-downloaded', { location: 'Downloads' }));
+    // 'cancelled': silent, no note (decision table "A user cancel is silent").
+    setSharing(false);
   }
 
   const levelStatuses = journey ? computerLevelStatus(gameRecords, journey) : [];
@@ -686,16 +700,29 @@ export function ChildSettingsScreen({
 
       <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
         <h3 className="text-sm font-extrabold text-ink">{t('parent.backup-heading')}</h3>
-        <button
-          type="button"
-          disabled={exporting}
-          onClick={() => {
-            void exportThisChild();
-          }}
-          className={`${PARENT_SECONDARY_BUTTON} self-start`}
-        >
-          {t('parent.export-child')}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            disabled={sharing}
+            onClick={() => {
+              void shareThisChild();
+            }}
+            className={`${PARENT_PRIMARY_BUTTON} self-start`}
+          >
+            {t('parent.backup.share-button-child')}
+          </button>
+          <button
+            type="button"
+            disabled={exporting}
+            onClick={() => {
+              void exportThisChild();
+            }}
+            className={`${PARENT_SECONDARY_BUTTON} self-start`}
+          >
+            {t('parent.export-child')}
+          </button>
+        </div>
+        {shareNote && <p className={PARENT_NOTE}>{shareNote}</p>}
       </section>
 
       <section className="flex flex-col gap-3 rounded-xl border border-today p-4">

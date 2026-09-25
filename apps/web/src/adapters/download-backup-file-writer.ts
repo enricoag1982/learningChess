@@ -1,8 +1,10 @@
 import type { BackupFileWriter } from '@chess-kids/core';
 
 /** Triggers a same-origin download of `filename` holding `text`, then releases the object URL
- * (same mechanism `download-password-file-writer.ts` uses). */
-function triggerDownload(filename: string, text: string): void {
+ * (same mechanism `download-password-file-writer.ts` uses). Exported so `share-backup.ts`'s "Send
+ * to other device" fallback (M7.2, `navigator.share` unavailable or refused) can reuse it directly
+ * instead of going through the full `BackupFileWriter` port + its own filename rule. */
+export function triggerDownload(filename: string, text: string): void {
   const blob = new Blob([text], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

@@ -25,6 +25,7 @@ import {
   animalFriends,
   checkActivityGate,
   checkRewards,
+  combinedSessionLog,
   computerLevelStatus,
   createProfile,
   DEFAULT_PROFILE_SETTINGS,
@@ -43,7 +44,6 @@ import {
   loadProgress,
   loadTodaySession,
   loadWarmUp,
-  localDayString,
   markSeen,
   markTimeWarning,
   minutesUntilEnd,
@@ -620,7 +620,7 @@ export function createAppStore(services: Services) {
         if (!isCalmScreen(screen, lessonId, stepIndex, services.deps.content)) return;
         const now = services.deps.clock.now();
         const settings = await getProfileSettings(services.deps, profile.id);
-        const log = await services.deps.rewards?.getSessionLog(profile.id, localDayString(now));
+        const log = await combinedSessionLog(services.deps, profile.id, now);
         const remaining = minutesUntilEnd(settings, log, now);
         if (shouldWarn(remaining, log, now)) {
           await markTimeWarning(services.deps, profile.id);

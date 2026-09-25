@@ -83,8 +83,19 @@ describe('updateProfileSettings', () => {
   it('merges a partial patch into the current settings and persists it', async () => {
     const deps = makeDeps(EMPTY_SETTINGS);
     const updated = await updateProfileSettings(deps, 'p1', { hints: false, voice: false });
-    expect(updated).toEqual({ ...DEFAULT_PROFILE_SETTINGS, hints: false, voice: false });
+    expect(updated).toEqual({
+      ...DEFAULT_PROFILE_SETTINGS,
+      hints: false,
+      voice: false,
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    });
     expect(await getProfileSettings(deps, 'p1')).toEqual(updated);
+  });
+
+  it('stamps updatedAt (M7.2 device sharing "newest wins")', async () => {
+    const deps = makeDeps(EMPTY_SETTINGS);
+    const updated = await updateProfileSettings(deps, 'p1', { hints: false });
+    expect(updated.updatedAt).toBe(deps.clock.now().toISOString());
   });
 
   it('leaves other profiles’ settings alone', async () => {

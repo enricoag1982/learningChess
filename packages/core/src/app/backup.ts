@@ -67,6 +67,10 @@ const profileSettingsSchema = z.object({
   hints: z.boolean(),
   computerLevel: z.union([z.literal('auto'), z.number().int().min(1).max(5)]),
   pieceStyle: z.union([z.literal('animal'), z.literal('classic')]),
+  weekendLimitMinutes: z.number().nullable().optional(),
+  playUntil: z.string().nullable().optional(),
+  playFrom: z.string().nullable().optional(),
+  updatedAt: z.string().optional(),
 });
 
 const starsSchema = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
@@ -326,6 +330,38 @@ export function backupFileName(now: Date, nickname?: string): string {
   return nicknameSlug === ''
     ? `chess-kids-backup-${date}.json`
     : `chess-kids-backup-${nicknameSlug}-${date}.json`;
+}
+
+/**
+ * `<nickname>` or literal `all`, slugged, for the "Send to other device" filename (M7.2 device
+ * sharing, decision table "File name") — a different, more explicit shape than
+ * {@link backupFileName}'s own (kept unchanged for the existing "Export" button, so its filenames
+ * and any test/e2e expecting them stay the same). Falls back to `all` for an unsluggable nickname
+ * too (an emoji-only nickname, say), same as `backupFileName`'s own empty-slug fallback would need.
+ */
+export function shareFileName(now: Date, nickname?: string): string {
+  const date = localDayString(now);
+  const label = nickname === undefined ? '' : slug(nickname);
+  return `chess-for-kids-${label === '' ? 'all' : label}-${date}.json`;
+}
+
+/**
+ * Builds the exact same backup JSON {@link exportBackup} writes to disk, but returns it instead of
+ * writing it (M7.2 "Send to other device": the web UI hands this to `navigator.share`/a `Blob`
+ * download — only it can touch those browser APIs, so `packages/core` stays platform-agnostic).
+ * `profileIds: [id]` for "send this child" — same one-profile-nickname-in-the-filename rule as
+ * {@link exportBackup}.
+ */
+export async function buildShareFile(
+  deps: AppDeps,
+  profileIds?: readonly string[],
+): Promise<{ readonly filename: string; readonly contents: string }> {
+  const file = await buildBackupFile(deps, profileIds);
+  const nickname = profileIds?.length === 1 ? file.profiles[0]?.nickname : undefined;
+  return {
+    filename: shareFileName(deps.clock.now(), nickname),
+    contents: JSON.stringify(file, null, 2),
+  };
 }
 
 /**

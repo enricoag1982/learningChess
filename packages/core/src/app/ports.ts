@@ -115,6 +115,15 @@ export interface AppSettings {
    * profile is created (non-functional.md §1 "Storage eviction"); `undefined` until it settles or
    * when the API is unavailable. Shown in the parent area. */
   readonly storagePersisted?: boolean;
+  /**
+   * This device's own random id (M7.2 device sharing, `app/device.ts`'s `getOrCreateDeviceId`),
+   * created once, lazily, the first time it is needed (a local session-log write, or a "Send to
+   * other device"/export) — never regenerated afterwards. Stamped onto this device's own
+   * `SessionLog` rows so an import on another device can tell them apart from its own, and read
+   * back by a merge import to know which of an imported file's rows are "this same device" (a
+   * parent re-importing their own earlier export). Absent until first created.
+   */
+  readonly deviceId?: string;
 }
 
 /** Persistence of `AppSettings`. Async so cloud adapters can replace local ones. */
@@ -196,6 +205,31 @@ export interface BackupFileWriter {
  */
 export interface BackupImporter {
   replaceAll(file: BackupFile): Promise<void>;
+  /**
+   * M7.2 device sharing (`app/merge.ts`'s `importMerged`, the only caller): atomically writes
+   * `file` as this device's *entire* new dataset — every local profile, whether touched by this
+   * merge or not, since `importMerged` has already read the full local state and folded the chosen
+   * children's merged data back into it. Same staging-then-swap mechanism as `replaceAll`
+   * (`docs/architecture.md` §11), but differs in two ways "replace" never needed: session-log rows
+   * are keyed by (profile, date, device) — `options.localDeviceId` says which of a profile's rows
+   * is *this* device's own, so a foreign device's row for the same day is stored alongside it, never
+   * overwriting it; and `options.deviceSettings` (this device's own current `lastProfileId`/
+   * `suggestedLevels`/`storagePersisted`/`deviceId`, read just before the write) is carried straight
+   * through instead of being blanked — a merge import never resets the device back to
+   * first-time-storage the way an M5.1 "replace everything" restore did. Optional for the same
+   * backward-compatible reason every other `AppDeps` port is (`app/merge.ts`'s `requireBackupImporter`
+   * throws a clear error without it, same pattern `app/backup.ts` already uses for `replaceAll`).
+   */
+  writeMerged?(
+    file: BackupFile,
+    options: {
+      readonly localDeviceId?: string;
+      readonly deviceSettings: Pick<
+        AppSettings,
+        'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
+      >;
+    },
+  ): Promise<void>;
 }
 
 /** Online features are off in v1. */

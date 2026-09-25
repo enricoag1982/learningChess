@@ -56,9 +56,38 @@ function capped<T extends { readonly createdAt: string }>(items: readonly T[], m
   return sorted.length > max ? sorted.slice(sorted.length - max) : sorted;
 }
 
+/** This device's own current `AppSettings` fields a merge import must carry through unchanged
+ * (M7.2 device sharing) instead of the blank slate a plain "replace" writes — see `writeMerged`'s
+ * own doc on `BackupImporter` (`app/ports.ts`). */
+type DeviceOnlySettings = Pick<
+  AppSettings,
+  'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
+>;
+
+/** Options only `writeMerged` passes (`toRawRecords`' plain `replaceAll` call omits both, matching
+ * its pre-M7.2 behaviour exactly: every session-log row keyed bare, `AppSettings` blanked). */
+interface MergeWriteOptions {
+  readonly localDeviceId?: string;
+  readonly deviceSettings?: DeviceOnlySettings;
+}
+
+/** `${profileId}:${date}` for this device's own row (`log.deviceId` absent, or equal to
+ * `localDeviceId`) — the exact key `LocalStorageRewardsRepository`'s `getSessionLog`/
+ * `saveSessionLog` already read/write, so this device's live minute-by-minute tracking keeps
+ * finding the same row after a merge import. Any other `deviceId` is a foreign device's own row
+ * (M7.2 device sharing): suffixed so it is stored *alongside* this device's row for the same date,
+ * never overwriting it — `RewardsRepository.listSessionLogs`/`totalMinutesForDate` then sum both. */
+function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined): string {
+  const isLocal = log.deviceId === undefined || log.deviceId === localDeviceId;
+  return isLocal ? `${log.profileId}:${log.date}` : `${log.profileId}:${log.date}:${log.deviceId}`;
+}
+
 /** `file`'s data, reshaped into the exact raw value each `RECORD_NAMES` entry is stored as — same
  * shapes `LocalStorageXRepository`'s own private `readAll`/`writeAll` build and read. */
-function toRawRecords(file: BackupFile): Readonly<Record<(typeof RECORD_NAMES)[number], unknown>> {
+function toRawRecords(
+  file: BackupFile,
+  options: MergeWriteOptions = {},
+): Readonly<Record<(typeof RECORD_NAMES)[number], unknown>> {
   const profiles: Record<string, Profile> = {};
   const lessonProgress: Record<string, LessonProgress> = {};
   const miniGameProgress: Record<string, MiniGameProgress> = {};
@@ -88,7 +117,7 @@ function toRawRecords(file: BackupFile): Readonly<Record<(typeof RECORD_NAMES)[n
       conceptStats[`${stats.profileId}:${stats.conceptId}`] = stats;
     }
     for (const log of data.sessionLogs) {
-      sessionLogs[`${log.profileId}:${log.date}`] = log;
+      sessionLogs[sessionLogStorageKey(log, options.localDeviceId)] = log;
     }
     if (data.streak !== undefined) {
       streaks[profile.id] = data.streak;
@@ -100,7 +129,17 @@ function toRawRecords(file: BackupFile): Readonly<Record<(typeof RECORD_NAMES)[n
     unlocks = unlocks.concat(data.unlocks);
   }
 
-  const settings: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings };
+  const settings: AppSettings = {
+    lastProfileId: options.deviceSettings?.lastProfileId ?? null,
+    suggestedLevels: options.deviceSettings?.suggestedLevels ?? {},
+    profileSettings,
+    ...(options.deviceSettings?.storagePersisted === undefined
+      ? {}
+      : { storagePersisted: options.deviceSettings.storagePersisted }),
+    ...(options.deviceSettings?.deviceId === undefined
+      ? {}
+      : { deviceId: options.deviceSettings.deviceId }),
+  };
 
   return {
     profiles,
@@ -152,31 +191,57 @@ export class LocalStorageBackupImporter implements BackupImporter {
 
   replaceAll(file: BackupFile): Promise<void> {
     return toPromise(() => {
-      if (file.schemaVersion > SCHEMA_VERSION) {
-        throw new StorageError(
-          `Backup schema version ${String(file.schemaVersion)} is newer than supported version ${String(SCHEMA_VERSION)}`,
-        );
-      }
+      this.checkSchemaVersion(file);
+      this.stageThenSwap(toRawRecords(file));
+    });
+  }
 
-      const raw = toRawRecords(file);
+  writeMerged(
+    file: BackupFile,
+    options: {
+      readonly localDeviceId?: string;
+      readonly deviceSettings: DeviceOnlySettings;
+    },
+  ): Promise<void> {
+    return toPromise(() => {
+      this.checkSchemaVersion(file);
+      this.stageThenSwap(
+        toRawRecords(file, {
+          localDeviceId: options.localDeviceId,
+          deviceSettings: options.deviceSettings,
+        }),
+      );
+    });
+  }
 
-      const staged: (typeof RECORD_NAMES)[number][] = [];
-      try {
-        for (const name of RECORD_NAMES) {
-          this.store.write(`${STAGING_PREFIX}${name}`, raw[name]);
-          staged.push(name);
-        }
-      } catch (error: unknown) {
-        for (const name of staged) {
-          this.store.remove(`${STAGING_PREFIX}${name}`);
-        }
-        throw error instanceof Error ? error : new Error(String(error));
-      }
+  private checkSchemaVersion(file: BackupFile): void {
+    if (file.schemaVersion > SCHEMA_VERSION) {
+      throw new StorageError(
+        `Backup schema version ${String(file.schemaVersion)} is newer than supported version ${String(SCHEMA_VERSION)}`,
+      );
+    }
+  }
 
+  /** Writes every `raw` record to its staging key first, and only once every one of them has
+   * written successfully copies them over the real keys and clears the staging ones — shared by
+   * `replaceAll` and `writeMerged` (this class's own module doc). */
+  private stageThenSwap(raw: Readonly<Record<(typeof RECORD_NAMES)[number], unknown>>): void {
+    const staged: (typeof RECORD_NAMES)[number][] = [];
+    try {
       for (const name of RECORD_NAMES) {
-        this.store.write(name, this.store.read(`${STAGING_PREFIX}${name}`));
+        this.store.write(`${STAGING_PREFIX}${name}`, raw[name]);
+        staged.push(name);
+      }
+    } catch (error: unknown) {
+      for (const name of staged) {
         this.store.remove(`${STAGING_PREFIX}${name}`);
       }
-    });
+      throw error instanceof Error ? error : new Error(String(error));
+    }
+
+    for (const name of RECORD_NAMES) {
+      this.store.write(name, this.store.read(`${STAGING_PREFIX}${name}`));
+      this.store.remove(`${STAGING_PREFIX}${name}`);
+    }
   }
 }

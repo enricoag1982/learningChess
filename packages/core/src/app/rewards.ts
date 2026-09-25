@@ -4,10 +4,11 @@ import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
 import { parseFen } from '../domain/chess/fen.ts';
 import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
 import { totalStars } from '../domain/progress.ts';
-import { addMinutes, lastNDays } from '../domain/session-log.ts';
+import { addMinutes, lastNDays, totalMinutesForDate } from '../domain/session-log.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
 import { localDayString, newStreak, recordActivityDay } from '../domain/streak.ts';
+import { getOrCreateDeviceId } from './device.ts';
 import type { Journey } from './journey.ts';
 import { loadJourney } from './journey.ts';
 import type { RewardsRepository } from './ports.ts';
@@ -262,8 +263,11 @@ export async function recordSessionMinutes(
 ): Promise<SessionLog> {
   const rewards = requireRewards(deps);
   const date = localDayString(now);
-  const existing = await rewards.getSessionLog(profileId, date);
-  const log = addMinutes(existing, deps.ids.next(), profileId, date, minutes, now);
+  const [existing, deviceId] = await Promise.all([
+    rewards.getSessionLog(profileId, date),
+    getOrCreateDeviceId(deps),
+  ]);
+  const log = addMinutes(existing, deps.ids.next(), profileId, date, minutes, now, deviceId);
   await rewards.saveSessionLog(log);
   return log;
 }
@@ -277,9 +281,11 @@ export interface DayMinutes {
 /**
  * A profile's played minutes for the last `days` local calendar days, oldest first, ending today
  * (parent report "minutes per day", M5.2's daily-limit check — the lead's own note: read
- * `dailyLimitMinutes` from `app/settings.ts` alongside this). `0` for a day with no session-log
- * row. Permissive without `deps.rewards` wired up (every day reads `0`), same reasoning as
- * `checkRewards`'s own early return.
+ * `dailyLimitMinutes` from `app/settings.ts` alongside this). Each day sums every device's row for
+ * that date (M7.2 device sharing, `totalMinutesForDate`) — `listSessionLogs` already returns this
+ * device's own row alongside any row merged in from a shared file, one profile+date pair can now
+ * hold more than one. `0` for a day with no session-log row at all. Permissive without
+ * `deps.rewards` wired up (every day reads `0`), same reasoning as `checkRewards`'s own early return.
  */
 export async function minutesByDay(
   deps: AppDeps,
@@ -292,8 +298,7 @@ export async function minutesByDay(
     return dayStrings.map((date) => ({ date, minutes: 0 }));
   }
   const logs = await deps.rewards.listSessionLogs(profileId);
-  const byDate = new Map(logs.map((log) => [log.date, log.minutes]));
-  return dayStrings.map((date) => ({ date, minutes: byDate.get(date) ?? 0 }));
+  return dayStrings.map((date) => ({ date, minutes: totalMinutesForDate(logs, date) }));
 }
 
 /**

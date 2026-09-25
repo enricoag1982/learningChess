@@ -213,14 +213,24 @@ parent:
     export-heading: Export
     export-body: Save one file with every child's progress. Keep it somewhere safe.
     export-button: Export all
+    share-heading: Send to other device
+    share-body: "Send every child's progress to the other device (AirDrop, Messages, Drive…). Nothing is lost: both devices' progress is kept."
+    share-button: Send to other device
+    share-button-child: Send to other device
+    share-shared: Sent.
+    share-downloaded: 'Saved a copy: {{location}}'
     import-heading: Import
-    import-body: Pick a backup file to restore. This replaces all data currently on this device.
+    import-body: Pick a backup file from another device. Its progress merges with what's already here — nothing is lost.
     import-pick-file: Choose file
-    import-preview_one: '{{count}} child, {{totalStars}} stars'
-    import-preview_other: '{{count}} children, {{totalStars}} stars'
-    import-preview-detail: '{{names}}'
-    import-warning: Importing replaces all data on this device. This cannot be undone.
-    import-confirm: Replace all data
+    import-preview_one: '{{count}} child'
+    import-preview_other: '{{count}} children'
+    import-child-auto-merge: 'Merging into {{name}}'
+    import-child-choice-label: "{{name}}'s progress"
+    import-child-add-new: Add as new child
+    import-child-merge-into: 'Merge into {{name}}'
+    import-child-change: '+{{stars}} stars, +{{badges}} badges, +{{minutes}} min this week'
+    import-warning: "Nothing is lost: both devices' progress is kept."
+    import-confirm: Merge
     import-done: Import complete.
     import-error-generic: This file could not be read.
   privacy-nav: Privacy
@@ -233,7 +243,7 @@ parent:
     no-accounts-heading: No accounts, no tracking
     no-accounts-body: No sign-up, no analytics, no ads, no third-party services. The app never phones home.
     network-heading: Network use
-    network-body: The only network access is checking for app updates. Updates are static files delivered from GitHub Pages.
+    network-body: 'The only network access is checking for app updates. Updates are static files delivered from GitHub Pages. "Send to other device" hands the file to whichever app or device the parent picks — the app itself still sends nothing.'
     control-heading: Parent control
     control-body: Export or delete any child's data any time, from Backup and from that child's Settings in the parent area.
     contact-heading: Questions?
