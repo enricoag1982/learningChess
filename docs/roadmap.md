@@ -84,7 +84,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m5.3` | Design + accessibility pass: tappable vs info look (F3) on every screen, WCAG 2.2 AA parent area, contrast / reduced motion / screen-reader audit, classic pieces from World 5 (app-structure.md piece look) |
 | `m5.4` | Offline + performance hardening: persistent storage request, iPad "Add to Home Screen" prompt, lazy-load parent area and later worlds, cold start ≤ 3 s, CSP, offline e2e over all worlds, Bear strength (F4) |
 | `m5.5` | Release: privacy policy page, readable README (F1), easier variants for the hardest Worlds 1–2 exercises (F2), release checklist → `m5` (playtest 4 by user) |
-| `retro` | After `m5` (owner request): deep retrospective of the whole process — what went well, what went wrong, learnings for a similar app, time estimate (coding, design, active collaboration with the owner, CI / pipeline, agent runs) from git history, CI runs, agent run logs and session transcripts → `docs/retrospective.md` |
+| `retro` | After `m5` (owner request): deep retrospective of the whole process — what went well, what went wrong, learnings for a similar app, time estimate (coding, design, active collaboration with the owner, CI / pipeline, agent runs) from git history, CI runs, agent run logs and session transcripts → `docs/retrospective.md` (done 2026-09-25) |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
