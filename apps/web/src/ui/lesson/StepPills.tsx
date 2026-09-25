@@ -22,28 +22,29 @@ function CheckIcon(): JSX.Element {
   );
 }
 
-/** Story · Demo · Try · Exercises · Boss: current = orange fill, done = green check, rest muted. */
+/**
+ * Story · Demo · Try · Exercises · Boss as a flat progress track (info, not tappable — F3,
+ * docs/screens.md §1): label over a thin bar; current = orange bar, done = green bar + check,
+ * rest muted. No pill box, so no step reads as a button.
+ */
 export function StepPills({ current }: { readonly current: LessonPhase }): JSX.Element {
   const { t } = useTranslation();
   const currentIndex = PHASES.indexOf(current);
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="flex items-end justify-center gap-3">
       {PHASES.map((phase, index) => {
         const done = index < currentIndex;
         const isCurrent = index === currentIndex;
-        const classes = isCurrent
-          ? 'bg-today text-white'
-          : done
-            ? 'bg-go text-white'
-            : 'bg-[#F1E9D8] text-muted';
+        const text = isCurrent ? 'text-ink' : done ? 'text-go' : 'text-muted';
+        const bar = isCurrent ? 'bg-today' : done ? 'bg-go' : 'bg-line';
         return (
-          <span
-            key={phase}
-            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-extrabold sm:text-base ${classes}`}
-          >
-            {done && <CheckIcon />}
-            {t(`lesson.steps.${phase}`)}
+          <span key={phase} className="flex min-w-14 flex-col items-center gap-1">
+            <span className={`flex items-center gap-1 text-sm font-semibold sm:text-base ${text}`}>
+              {done && <CheckIcon />}
+              {t(`lesson.steps.${phase}`)}
+            </span>
+            <span className={`h-1.5 w-full rounded-full ${bar}`} aria-hidden="true" />
           </span>
         );
       })}

@@ -33,7 +33,7 @@ export function ReplayButton({ onClick, label, className = '' }: ReplayButtonPro
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-16 min-w-16 shrink-0 items-center justify-center gap-2 rounded-2xl border-2 border-line bg-card px-4 font-semibold text-ink ${className}`}
+      className={`tap-raised flex h-16 min-w-16 shrink-0 items-center justify-center gap-2 rounded-2xl bg-card px-4 font-semibold text-ink ${className}`}
     >
       <ReplayIcon />
       {label}

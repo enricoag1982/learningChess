@@ -143,7 +143,7 @@ export function PracticeScreen(): JSX.Element {
           type="button"
           aria-label={t('practice.back')}
           onClick={goToHome}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <BackIcon />
         </button>
@@ -174,7 +174,7 @@ export function PracticeScreen(): JSX.Element {
         onClick={() => {
           void startPracticeWarmUp();
         }}
-        className="flex items-center gap-4 rounded-[2rem] border-2 border-line bg-card p-5 text-left disabled:cursor-default disabled:opacity-70"
+        className="tap-raised flex items-center gap-4 rounded-[2rem] bg-card p-5 text-left disabled:cursor-default disabled:opacity-70"
       >
         <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#FBE3D2]">
           <WarmUpIcon />
@@ -214,7 +214,7 @@ export function PracticeScreen(): JSX.Element {
                           total: stats ? stats.recent.length : 0,
                         })}`
                   }
-                  className="flex w-full items-center justify-between gap-4 rounded-3xl border-2 border-line bg-card p-4 text-left"
+                  className="tap-raised flex w-full items-center justify-between gap-4 rounded-3xl bg-card p-4 text-left"
                 >
                   <div className="flex flex-col gap-1">
                     <span className="font-display text-lg text-ink sm:text-xl">{title}</span>

@@ -33,7 +33,7 @@ export function NextButton({ onClick, label, className = '' }: NextButtonProps):
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-20 items-center justify-center gap-3 rounded-3xl bg-go px-6 font-display text-2xl font-semibold text-white ${className}`}
+      className={`tap-raised tap-go flex h-20 items-center justify-center gap-3 rounded-3xl bg-go px-6 font-display text-2xl font-semibold text-white ${className}`}
     >
       {label ?? t('next')}
       <ArrowIcon />

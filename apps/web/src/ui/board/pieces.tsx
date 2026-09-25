@@ -1,5 +1,7 @@
 import type { JSX } from 'react';
 import type { Color, PieceType } from '@chess-kids/core';
+import { characterColor, characterForPiece } from '../art/character-meta.ts';
+import { CharacterIcon } from '../art/characters.tsx';
 
 /** A drawable piece: its type and colour. */
 export interface PieceIconProps {
@@ -222,6 +224,25 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
         </g>
       )}
     </svg>
+  );
+}
+
+/**
+ * Small animal-face badge overlaid on a piece's corner (docs/app-structure.md "Piece look on
+ * board": classic + animal badge in Worlds 1-4). Purely decorative — a square's own accessible
+ * name already names the piece by type and colour (`Board`'s `role="grid"` labels) — so it is
+ * `aria-hidden`.
+ */
+export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
+  const character = characterForPiece(type);
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute -bottom-0.5 -right-0.5 flex h-[40%] w-[40%] items-center justify-center overflow-hidden rounded-full border border-white/80 p-0.5"
+      style={{ backgroundColor: characterColor(character) }}
+    >
+      <CharacterIcon character={character} />
+    </span>
   );
 }
 

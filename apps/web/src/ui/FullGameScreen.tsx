@@ -168,7 +168,7 @@ export function FullGameScreen(): JSX.Element {
           type="button"
           aria-label={t('play.close')}
           onClick={requestLeave}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <CloseIcon />
         </button>
@@ -201,14 +201,14 @@ export function FullGameScreen(): JSX.Element {
                 onClick={() => {
                   setConfirmLeave(false);
                 }}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl border-2 border-line bg-card font-display text-lg font-semibold text-ink"
+                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
               >
                 {t('boss.versus.stop-game-cancel')}
               </button>
               <button
                 type="button"
                 onClick={confirmedLeave}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
+                className="tap-raised tap-today flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
               >
                 {t('boss.versus.stop-game-confirm')}
               </button>

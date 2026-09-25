@@ -73,7 +73,7 @@ export function MiniGameSessionScreen(): JSX.Element {
           type="button"
           aria-label={t('play.close')}
           onClick={exitMiniGame}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <CloseIcon />
         </button>

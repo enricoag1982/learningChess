@@ -127,7 +127,7 @@ function ChildOverviewCard({
         <span className="flex flex-1 flex-col gap-1">
           <span className="flex items-center gap-2">
             <span className="text-base font-extrabold text-ink">{overview.profile.nickname}</span>
-            <RankPill rank={overview.rank} />
+            <RankPill rank={overview.rank} compact />
           </span>
           <span className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted">
             <span>{t('parent.stars-total', { count: overview.totalStars })}</span>

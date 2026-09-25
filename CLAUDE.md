@@ -39,8 +39,8 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 
 ## Status and next step
 
-- Done: M0 (`m0`), M1 (`m1`), M2 (`m2`), M3 (`m3`), M4 (`m4`). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–3 (`docs/roadmap.md` §5).
-- Next: M5 iterations `m5.1`–`m5.5` (`docs/roadmap.md` §3.1). Branch `m5-release`.
+- Done: M0–M5 (`m0` … `m5`), release `v1.0.0`. Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
+- Next: retrospective (`docs/retrospective.md`); then after-MVP work (`docs/roadmap.md` §4), open follow-up F4 (Bear strength). Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you".

@@ -52,8 +52,8 @@ function ChoiceChip({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`flex h-16 min-h-16 items-center justify-center rounded-2xl border-2 px-5 font-display text-lg font-semibold ${
-        selected ? 'border-go bg-go text-white' : 'border-line bg-card text-ink'
+      className={`tap-raised flex h-16 min-h-16 items-center justify-center rounded-2xl px-5 font-display text-lg font-semibold ${
+        selected ? 'tap-go bg-go text-white' : 'bg-card text-ink'
       }`}
     >
       {label}
@@ -115,7 +115,7 @@ export function FriendSetupScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToPlay}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <BackIcon />
         </button>
@@ -140,10 +140,10 @@ export function FriendSetupScreen(): JSX.Element {
                 onClick={() => {
                   chooseOpponent({ kind: 'profile', profileId: candidate.id });
                 }}
-                className={`flex w-28 flex-col items-center gap-2 rounded-3xl border-2 p-3 ${
+                className={`tap-raised flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
                   isOpponentSelected({ kind: 'profile', profileId: candidate.id })
-                    ? 'border-go bg-white'
-                    : 'border-line bg-card'
+                    ? 'tap-border-go bg-white'
+                    : 'bg-card'
                 }`}
               >
                 <span
@@ -165,8 +165,8 @@ export function FriendSetupScreen(): JSX.Element {
               onClick={() => {
                 chooseOpponent({ kind: 'guest' });
               }}
-              className={`flex w-28 flex-col items-center gap-2 rounded-3xl border-2 p-3 ${
-                isOpponentSelected({ kind: 'guest' }) ? 'border-go bg-white' : 'border-line bg-card'
+              className={`tap-raised flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
+                isOpponentSelected({ kind: 'guest' }) ? 'tap-border-go bg-white' : 'bg-card'
               }`}
             >
               <span className="h-16 w-16 overflow-hidden rounded-full bg-[#EDEFF1] p-2">
@@ -251,7 +251,7 @@ export function FriendSetupScreen(): JSX.Element {
         type="button"
         disabled={!canStart}
         onClick={startFriendGame}
-        className="mt-auto flex h-20 items-center justify-center gap-3 rounded-3xl bg-go px-6 font-display text-2xl font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
+        className="tap-raised tap-go mt-auto flex h-20 items-center justify-center gap-3 rounded-3xl bg-go px-6 font-display text-2xl font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
       >
         {t('friend-play.start')}
       </button>

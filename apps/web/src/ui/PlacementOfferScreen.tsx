@@ -28,14 +28,14 @@ export function PlacementOfferScreen(): JSX.Element {
         <button
           type="button"
           onClick={acceptPlacement}
-          className="h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
+          className="tap-raised tap-go h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
         >
           {t('placement.offer-yes')}
         </button>
         <button
           type="button"
           onClick={declinePlacement}
-          className="h-20 rounded-[2rem] border-2 border-line bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
+          className="tap-raised h-20 rounded-[2rem] bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
         >
           {t('placement.offer-no')}
         </button>

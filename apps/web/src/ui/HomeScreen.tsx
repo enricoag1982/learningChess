@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { JSX } from 'react';
+import type { CSSProperties, JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
@@ -140,8 +140,15 @@ function HomeTile({
     <button
       type="button"
       onClick={onClick}
-      style={{ backgroundColor: bg, color: fg }}
-      className="flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4"
+      style={
+        {
+          backgroundColor: bg,
+          color: fg,
+          '--tap-border': fg,
+          '--tap-ledge': fg,
+        } as CSSProperties
+      }
+      className="tap-raised flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4"
     >
       <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white sm:h-16 sm:w-16">
         {icon}
@@ -255,7 +262,7 @@ export function HomeScreen(): JSX.Element {
             onClick={() => {
               void goToPicker();
             }}
-            className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+            className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
           >
             <SwitchPlayerIcon />
           </button>
@@ -275,7 +282,7 @@ export function HomeScreen(): JSX.Element {
             onClick={() => {
               void startToday();
             }}
-            className="flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
+            className="tap-raised tap-today flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
           >
             <span className="flex items-center gap-3 font-display text-2xl font-semibold sm:text-3xl">
               <PlayIcon />

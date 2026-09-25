@@ -3,7 +3,7 @@ import type { CSSProperties, JSX, KeyboardEvent, PointerEvent as ReactPointerEve
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { Color, Move, Piece, Position, Square } from '@chess-kids/core';
-import { BlockedIcon, PieceIcon, StarIcon } from './pieces.tsx';
+import { BlockedIcon, PieceBadge, PieceIcon, StarIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
 
@@ -74,6 +74,10 @@ export interface BoardProps {
   readonly showLegalMoveDots?: boolean;
   /** Accessible name of the board, e.g. "Chess board". */
   readonly label: string;
+  /** Animal-badge piece look (docs/app-structure.md "Piece look on board", M5.3): a small corner
+   * badge naming each piece's taught animal, on top of the classic drawing. Default `false`
+   * (classic only) — callers compute this from `board/piece-style.ts`'s `showPieceBadges`. */
+  readonly pieceBadges?: boolean;
 }
 
 const CELLS: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -176,6 +180,7 @@ export function Board({
   rotateTopPieces = false,
   showLegalMoveDots = true,
   label,
+  pieceBadges = false,
 }: BoardProps): JSX.Element {
   const { t } = useTranslation();
   const squareMode = onSquareTap !== undefined;
@@ -554,6 +559,7 @@ export function Board({
                           >
                             <PieceIcon piece={piece} />
                           </span>
+                          {pieceBadges && <PieceBadge type={piece.type} />}
                         </span>
                       )}
 
@@ -679,6 +685,7 @@ export function Board({
             >
               <PieceIcon piece={draggedPiece} />
             </span>
+            {pieceBadges && <PieceBadge type={draggedPiece.type} />}
           </div>
         )}
       </div>

@@ -17,6 +17,7 @@ import { useAppStore, useServices } from '../../app/store.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
 import { useNarratedText } from '../useNarratedText.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
@@ -69,6 +70,7 @@ function ExerciseAttempt({
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
   const isStacked = useIsStackedLayout();
@@ -176,6 +178,7 @@ function ExerciseAttempt({
     // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
     // auto-hint (the `dispatch({ type: 'auto-hint' })` effect above, unaffected by this setting).
     showHint: hintsEnabled,
+    pieceBadges: showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world })),
   });
 
   const panel = (

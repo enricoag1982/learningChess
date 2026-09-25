@@ -1,13 +1,14 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Lesson } from '@chess-kids/core';
-import { useServices } from '../../app/store.ts';
+import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { useIsCompact } from '../useMediaQuery.ts';
 import { useNarratedText } from '../useNarratedText.ts';
 import { MiniBoard } from '../board/MiniBoard.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { CharacterCard } from './CharacterCard.tsx';
 import { NextButton } from './NextButton.tsx';
 
@@ -20,6 +21,7 @@ export interface StoryStepProps {
 export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const isCompact = useIsCompact();
   const { demo } = lesson;
   const dots =
@@ -31,8 +33,14 @@ export function StoryStep({ lesson, onNext }: StoryStepProps): JSX.Element {
   const text = tContent(t, lesson.storyKey);
   const replay = useNarratedText(services.narrator, text);
 
+  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
   const board = (
-    <MiniBoard position={demo.position} highlightSquares={dots} label={t('lesson.board-label')} />
+    <MiniBoard
+      position={demo.position}
+      highlightSquares={dots}
+      label={t('lesson.board-label')}
+      pieceBadges={pieceBadges}
+    />
   );
 
   return (

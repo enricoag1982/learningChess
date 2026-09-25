@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
+import { InfoPill } from './primitives.tsx';
 
 function FlameIcon(): JSX.Element {
   return (
@@ -12,17 +13,19 @@ function FlameIcon(): JSX.Element {
   );
 }
 
-/** Orange pill: flame + current streak days. Home's top bar (>= 2 days) and My Den both use it. */
+/** Info pill (docs/screens.md §1 "Pills"): flame + current streak days. Home's top bar (>= 2 days)
+ * and My Den both use it. */
 export function StreakPill({ days }: { readonly days: number }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div
+    <InfoPill
       role="img"
-      className="flex h-14 items-center gap-2 rounded-full bg-[#FCEEE3] px-4 font-display text-lg font-semibold text-[#7A3A0F]"
+      tint="bg-[#FCEEE3]"
+      className="h-14 font-display text-lg font-semibold text-[#7A3A0F]"
       aria-label={t('streak.pill', { count: days })}
     >
       <FlameIcon />
       <span aria-hidden="true">{days}</span>
-    </div>
+    </InfoPill>
   );
 }

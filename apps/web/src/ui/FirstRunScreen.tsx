@@ -54,7 +54,7 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
       <button
         type="button"
         onClick={onNext}
-        className="flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
+        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
       >
         {t('first-run.welcome.primary')}
       </button>
@@ -130,7 +130,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
           onClick={() => {
             setShow((value) => !value);
           }}
-          className="self-start text-sm font-bold text-info"
+          className="self-start text-sm font-bold text-info underline underline-offset-2"
         >
           {show ? t('first-run.password.hide') : t('first-run.password.show')}
         </button>

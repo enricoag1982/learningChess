@@ -46,7 +46,7 @@ export function CharacterCard({ character }: { readonly character: string }): JS
         {characterName(t, character)}
       </span>
       {piece !== null && (
-        <div className="ml-auto flex items-center gap-2 rounded-full border-2 border-line bg-card px-3 py-1.5 font-bold text-ink sm:ml-0 sm:px-4 sm:py-2">
+        <div className="info-flat ml-auto flex items-center gap-2 rounded-full bg-cream px-3 py-1.5 font-bold text-ink sm:ml-0 sm:px-4 sm:py-2">
           <span className="h-6 w-6 sm:h-7 sm:w-7">
             <PieceIcon piece={{ color: 'w', type: piece }} />
           </span>

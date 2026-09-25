@@ -61,7 +61,7 @@ export function CompleteStep({ lesson, onPlayAgain, onContinue }: CompleteStepPr
       </div>
 
       {minigame && (
-        <div className="flex w-full max-w-md items-center gap-4 rounded-3xl border-2 border-line bg-card p-5 text-left">
+        <div className="info-flat flex w-full max-w-md items-center gap-4 rounded-3xl bg-card p-5 text-left">
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-[#DCEFE3]">
             <NewGameIcon />
           </div>
@@ -78,14 +78,14 @@ export function CompleteStep({ lesson, onPlayAgain, onContinue }: CompleteStepPr
         <button
           type="button"
           onClick={onPlayAgain}
-          className="h-20 flex-1 rounded-3xl border-2 border-line bg-card font-display text-xl font-semibold text-ink"
+          className="tap-raised h-20 flex-1 rounded-3xl bg-card font-display text-xl font-semibold text-ink"
         >
           {t('play-again')}
         </button>
         <button
           type="button"
           onClick={onContinue}
-          className="h-20 flex-1 rounded-3xl bg-go font-display text-xl font-semibold text-white"
+          className="tap-raised tap-go h-20 flex-1 rounded-3xl bg-go font-display text-xl font-semibold text-white"
         >
           {t('continue')}
         </button>

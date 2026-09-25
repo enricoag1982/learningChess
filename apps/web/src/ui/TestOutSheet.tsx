@@ -43,14 +43,14 @@ export function TestOutSheet({ bodyText, onYes, onNo }: TestOutSheetProps): JSX.
           <button
             type="button"
             onClick={onYes}
-            className="flex h-16 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
+            className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
           >
             {tContent(t, 'journey:ui.test-out-yes')}
           </button>
           <button
             type="button"
             onClick={onNo}
-            className="flex h-16 items-center justify-center rounded-2xl border-2 border-line bg-card font-display text-lg font-semibold text-ink"
+            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
           >
             {tContent(t, 'journey:ui.test-out-no')}
           </button>

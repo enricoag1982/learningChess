@@ -328,7 +328,7 @@ export function JourneyScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <BackIcon />
         </button>
@@ -401,7 +401,7 @@ export function JourneyScreen(): JSX.Element {
                 onClick={() => {
                   offerTestOutWorld(current.world);
                 }}
-                className="flex h-16 items-center justify-center rounded-2xl bg-go px-6 font-display text-base font-semibold text-white"
+                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go px-6 font-display text-base font-semibold text-white"
               >
                 {tContent(t, 'journey:ui.show-you-know-it')}
               </button>
@@ -428,7 +428,7 @@ export function JourneyScreen(): JSX.Element {
           )}
 
           {lockedMessage && (
-            <div className="absolute inset-x-4 bottom-4 flex flex-col gap-3 rounded-3xl border-2 border-line bg-card px-4 py-3 shadow">
+            <div className="info-flat absolute inset-x-4 bottom-4 flex flex-col gap-3 rounded-3xl bg-card px-4 py-3">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-[#E9DFF3] p-1.5">
                   <OwlIcon />
@@ -448,7 +448,7 @@ export function JourneyScreen(): JSX.Element {
                       : characterName(t, lesson.character);
                   offerTestOutLesson(lockedMessage.lessonId, lockedMessage.worldId, name);
                 }}
-                className="flex h-16 items-center justify-center rounded-2xl bg-go font-display text-base font-semibold text-white"
+                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go font-display text-base font-semibold text-white"
               >
                 {tContent(t, 'journey:ui.show-you-know-it')}
               </button>
@@ -498,12 +498,8 @@ function WorldRow({
     <button
       type="button"
       onClick={onSelect}
-      className={`flex h-16 min-w-[180px] flex-shrink-0 items-center gap-3 rounded-2xl border-2 px-3 lg:min-w-0 lg:w-full ${
-        selected
-          ? 'border-go bg-white'
-          : muted
-            ? 'border-transparent bg-[#F3EDE0]'
-            : 'border-transparent bg-transparent'
+      className={`tap-raised flex h-16 min-w-[180px] flex-shrink-0 items-center gap-3 rounded-2xl px-3 lg:min-w-0 lg:w-full ${
+        selected ? 'tap-border-go bg-white' : muted ? 'bg-[#F3EDE0]' : 'bg-card'
       }`}
     >
       <span

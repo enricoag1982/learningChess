@@ -55,6 +55,21 @@ describe('Board — rendering', () => {
   });
 });
 
+describe('Board — piece badges (M5.3 piece look)', () => {
+  it('shows no animal badge by default (classic only)', () => {
+    render(<Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />);
+    expect(cell('d5').querySelectorAll('span.absolute.-bottom-0\\.5.-right-0\\.5')).toHaveLength(0);
+  });
+
+  it('overlays an animal badge on every piece when pieceBadges is true', () => {
+    render(<Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" pieceBadges />);
+    expect(cell('d5').querySelectorAll('span.absolute.-bottom-0\\.5.-right-0\\.5')).toHaveLength(1);
+    expect(cell('b1').querySelectorAll('span.absolute.-bottom-0\\.5.-right-0\\.5')).toHaveLength(1);
+    // An empty square never gets a badge.
+    expect(cell('a1').querySelectorAll('span.absolute.-bottom-0\\.5.-right-0\\.5')).toHaveLength(0);
+  });
+});
+
 describe('Board — tap-tap', () => {
   it('selects a movable piece, then moves it to a legal target', () => {
     const onMove = vi.fn();

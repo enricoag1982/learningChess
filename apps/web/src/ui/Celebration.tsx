@@ -63,7 +63,7 @@ export function Celebration(): JSX.Element | null {
           onClick={() => {
             void dismissCelebration();
           }}
-          className="mt-2 h-16 w-full max-w-xs rounded-3xl bg-go font-display text-xl font-semibold text-white"
+          className="tap-raised tap-go mt-2 h-16 w-full max-w-xs rounded-3xl bg-go font-display text-xl font-semibold text-white"
         >
           {t('celebration.continue')}
         </button>

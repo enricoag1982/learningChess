@@ -23,6 +23,7 @@ import {
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { Board } from '../board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
@@ -122,8 +123,17 @@ export function VersusStep({
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
+  const pieceBadges = showPieceBadges(
+    pieceStyle,
+    isClassicOnlyContext({
+      worldId: lesson.world,
+      kings: minigame.rules.kings,
+      position: minigame.position,
+    }),
+  );
 
   const [versus, setVersus] = useState<VersusState>(() => startVersus(minigame));
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | undefined>(undefined);
@@ -324,13 +334,14 @@ export function VersusStep({
               ...(hint ? { hint: [hint.from, hint.to] } : {}),
             }}
             label={t('lesson.board-label')}
+            pieceBadges={pieceBadges}
           />
         }
         panel={
           <>
             <SpeechBubble text={spokenText} />
             <ReplayButton onClick={replay} label={t('exercise.replay')} />
-            <div className="flex flex-col gap-1 rounded-3xl border-2 border-line bg-card px-5 py-4 font-display text-lg text-ink">
+            <div className="info-flat flex flex-col gap-1 rounded-3xl bg-card px-5 py-4 font-display text-lg text-ink">
               {thinking && <span>{t('boss.versus.thinking', { name: botName() })}</span>}
               <span>{t('boss.versus.moves', { count: moves })}</span>
             </div>

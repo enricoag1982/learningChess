@@ -21,6 +21,7 @@ import {
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { Board } from '../board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
@@ -53,7 +54,7 @@ function SeriesCounters({
 }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-1 rounded-3xl border-2 border-line bg-card px-5 py-4 font-display text-lg text-ink">
+    <div className="info-flat flex flex-col gap-1 rounded-3xl bg-card px-5 py-4 font-display text-lg text-ink">
       <span>{t('boss.series.round-of', { current, total })}</span>
       <span>{t('boss.series.mistakes', { count: mistakes })}</span>
     </div>
@@ -62,6 +63,7 @@ function SeriesCounters({
 
 interface SeriesRoundProps {
   readonly character: string;
+  readonly worldId: string;
   readonly exercise: ExerciseDef;
   readonly roundNumber: number;
   readonly totalRounds: number;
@@ -78,6 +80,7 @@ interface SeriesRoundProps {
  */
 function SeriesRound({
   character,
+  worldId,
   exercise,
   roundNumber,
   totalRounds,
@@ -87,6 +90,7 @@ function SeriesRound({
   const { t } = useTranslation();
   const services = useServices();
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const isStacked = useIsStackedLayout();
   const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
   const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
@@ -109,6 +113,7 @@ function SeriesRound({
     onSelectPiece: setSelectedPiece,
     isStacked,
     showHint: hintsEnabled,
+    pieceBadges: showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId })),
   });
 
   // Live running total: mistakes already folded in from earlier rounds, plus this round's own
@@ -159,8 +164,10 @@ export function SeriesBossStep({
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
+  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
 
   const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame));
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
@@ -217,6 +224,7 @@ export function SeriesBossStep({
         <SeriesRound
           key={series.roundIndex}
           character={lesson.character}
+          worldId={lesson.world}
           exercise={currentRound(series)}
           roundNumber={series.roundIndex + 1}
           totalRounds={minigame.rounds.length}
@@ -230,6 +238,7 @@ export function SeriesBossStep({
               position={series.round.position}
               legalMoves={[]}
               label={t('lesson.board-label')}
+              pieceBadges={pieceBadges}
             />
           }
           panel={

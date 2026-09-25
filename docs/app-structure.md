@@ -180,5 +180,5 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 | Topic | Options | Recommendation |
 |---|---|---|
-| Piece look on board | Animal pieces / classic pieces / classic + animal badge | Classic + animal badge in Worlds 1–4, classic only from World 5 (transfer to real boards); parent toggle (M5.1: `ProfileSettings.pieceStyle`, stored per child in the parent area's Settings screen — not yet applied to the board, M5.3) |
+| Piece look on board | Animal pieces / classic pieces / classic + animal badge | **Implemented M5.3.** Classic + animal badge in Worlds 1–4, classic only from World 5 and any full game (transfer to real boards) — `ui/board/piece-style.ts`. Parent toggle (M5.1: `ProfileSettings.pieceStyle`, per child in the parent area's Settings screen): `classic` forces classic everywhere, overriding the above; `animal` (default) shows the badge everywhere except World 5 / a full game — it does not force badges into those, since that transfer moment is a fixed design decision |
 | "Win the Queen" (World 3, before check) | King capturable / kings removed | Kings removed |

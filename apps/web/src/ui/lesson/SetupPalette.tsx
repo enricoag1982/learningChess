@@ -53,7 +53,7 @@ export function SetupPalette({
               onClick={() => {
                 onSelect({ color: entry.color, type: entry.type });
               }}
-              className={`relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border-4 bg-board-light ${
+              className={`tap-raised relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border-4 bg-board-light ${
                 isSelected ? 'border-go' : isHinted ? 'border-dashed border-today' : 'border-line'
               }`}
             >

@@ -107,6 +107,31 @@ async function expectNoSeriousViolations(page: Page, screen: string): Promise<vo
   expect(serious, `${screen}: ${JSON.stringify(serious, null, 2)}`).toEqual([]);
 }
 
+/**
+ * Tappable vs info (docs/screens.md §1, roadmap F3, M5.3): every real `<button>` on the screen
+ * carries the shared `.tap-raised` marker class, and no non-button element does. The board
+ * (`role="grid"`, one button per square) is its own established game surface, not part of this
+ * contrast, so it is excluded; a `role="dialog"`/`"alertdialog"` open at scan time is included
+ * (its own buttons still need to be raised).
+ */
+async function expectOnlyButtonsRaised(page: Page, screen: string): Promise<void> {
+  const result = await page.evaluate(() => {
+    const board = document.querySelector('[role="grid"]');
+    const unraisedButtons = Array.from(document.querySelectorAll('button'))
+      .filter((button) => !board?.contains(button))
+      .filter((button) => !button.classList.contains('tap-raised'))
+      .map(
+        (button) => button.getAttribute('aria-label') ?? (button.textContent.trim() || '(unnamed)'),
+      );
+    const raisedNonButtons = Array.from(document.querySelectorAll('.tap-raised'))
+      .filter((el) => el.tagName !== 'BUTTON')
+      .map((el) => `<${el.tagName.toLowerCase()}> ${el.outerHTML.slice(0, 100)}`);
+    return { unraisedButtons, raisedNonButtons };
+  });
+  expect(result.unraisedButtons, `${screen}: <button>s missing .tap-raised`).toEqual([]);
+  expect(result.raisedNonButtons, `${screen}: non-<button> elements with .tap-raised`).toEqual([]);
+}
+
 /** Kid touch targets must be >= 64px both ways (docs/screens.md §1). */
 async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<void> {
   const box = await page.getByRole('button', { name }).boundingBox();
@@ -201,11 +226,13 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Add child');
   await expectParentTouchTarget(page, 'Backup');
   await expectNoSeriousViolations(page, 'Parent area: overview');
+  await expectOnlyButtonsRaised(page, 'Parent area: overview');
 
   // 8.5. Overview -> Mia's card -> child report (parent style).
   await page.getByRole('button', { name: /^Mia/ }).click();
   await expectParentTouchTarget(page, 'Settings');
   await expectNoSeriousViolations(page, 'Parent area: child report');
+  await expectOnlyButtonsRaised(page, 'Parent area: child report');
 
   // 8.6. Report -> Settings: rename/avatar, daily limit, voice/sound/hints, computer level, piece
   // style, unlock panel, export, reset/delete — every control on the busiest parent screen.
@@ -220,6 +247,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Reset progress');
   await expectParentTouchTarget(page, 'Delete');
   await expectNoSeriousViolations(page, 'Parent area: child settings');
+  await expectOnlyButtonsRaised(page, 'Parent area: child settings');
 
   // 8.7. Settings -> Report -> Overview -> Backup.
   await page.getByRole('button', { name: 'Back' }).click();
@@ -280,6 +308,7 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
   await expectKidTouchTarget(page, /Say it again/);
   await expectKidTouchTarget(page, /Hint/);
   await expectNoSeriousViolations(page, `Exercise (${def.type}, hint shown)`);
+  await expectOnlyButtonsRaised(page, `Exercise (${def.type}, hint shown)`);
 
   if (def.type === 'yes-no') {
     await expectKidTouchTarget(page, contentText('exercise.yes'));
@@ -347,6 +376,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
+  await expectOnlyButtonsRaised(page, 'Home');
 
   // Play and My Den (app-structure.md §4): a fresh install, so every mini-game is locked and no
   // rank/friend is earned yet — still worth their own a11y + touch-target pass.
@@ -355,11 +385,13 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await expectKidTouchTarget(page, /Play a full game/);
   await expectKidTouchTarget(page, /^Hungry Rook,/);
   await expectNoSeriousViolations(page, 'Play');
+  await expectOnlyButtonsRaised(page, 'Play');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
   await page.getByRole('button', { name: 'My Den', exact: true }).click();
   await expectKidTouchTarget(page, 'Back to Home');
   await expectNoSeriousViolations(page, 'My Den');
+  await expectOnlyButtonsRaised(page, 'My Den');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
   // Practice (M3.4): nothing complete yet, so the "All done for today!" / no-topics state.
