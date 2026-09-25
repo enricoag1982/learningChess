@@ -12,6 +12,7 @@ import {
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
+import { animalImage } from './art/animal-images.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { OwlIcon } from './art/characters.tsx';
@@ -315,8 +316,16 @@ export function PlayScreen(): JSX.Element {
                           : 'bg-[#EEF3FA] text-[#24497D]'
                     }`}
                   >
-                    <span className="text-sm font-extrabold" aria-hidden="true">
-                      {name}
+                    <span className="flex items-center gap-1.5" aria-hidden="true">
+                      <img
+                        src={animalImage(status.name)}
+                        alt=""
+                        draggable={false}
+                        className={`h-6 w-6 flex-shrink-0 rounded-full object-contain ${
+                          status.locked ? 'opacity-50' : ''
+                        }`}
+                      />
+                      <span className="text-sm font-extrabold">{name}</span>
                     </span>
                     <span className="flex items-center gap-1 text-xs font-bold" aria-hidden="true">
                       {status.locked ? (

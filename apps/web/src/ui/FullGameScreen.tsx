@@ -10,6 +10,7 @@ import {
   versusGameState,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
+import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
 
@@ -172,6 +173,12 @@ export function FullGameScreen(): JSX.Element {
         >
           <CloseIcon />
         </button>
+        <img
+          src={animalImage(botLevel?.name ?? 'mouse')}
+          alt=""
+          draggable={false}
+          className="h-9 w-9 flex-shrink-0 rounded-full object-contain sm:h-10 sm:w-10"
+        />
         <span className="min-w-0 flex-1 truncate font-display text-xl text-ink sm:text-2xl">
           {t('play.full-game-vs', { name: botName })}
         </span>
