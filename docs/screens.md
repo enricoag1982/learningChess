@@ -42,7 +42,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | # | Screen | Purpose | Key elements | Goes to |
 |---|---|---|---|---|
 | 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (password) | Home, Parent area |
-| 2 | Home | Start | Rank, stars, Owl message, **Start today**, tiles: Journey, Practice, Play, My Den | Lesson story (session), Journey, Practice, Play, My Den, Profile picker |
+| 2 | Home | Start | Rank, stars, Owl message, **Start today**, tiles: Journey, Practice, Play, My Den; small version line at the bottom (M6.1) | Lesson story (session), Journey, Practice, Play, My Den, Profile picker |
 | 3 | Journey map | Path | World list + paths, lesson nodes (done / current / locked), **Show you know it** | Lesson story, test-out |
 | 4 | Lesson story | Introduce concept | Step pills (Story → Demo → Try → Exercises → Boss; a skipped step: skip icon, muted, striped bar; phone: phase chip + 5-segment mini track, same states), character, speech bubble, mini demo board, Listen again + **Skip** in one row (Story/Demo/Try only, playtest 2), **Let me try** full width (phone: pinned to the bottom) | Exercise |
 | 5 | Exercise | Practise | Board, stage dots, instruction + replay, move counter + star target, Hint, Undo; after 2 errors: **Easier one** (secondary, shares the replay row so Hint / Undo stay on screen); a guided try also shows **Skip** there (never on a scored exercise or the boss) | Lesson complete |

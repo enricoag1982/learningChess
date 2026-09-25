@@ -28,7 +28,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | Platform | File | Change password |
 |---|---|---|
 | Web (v1) | Browser cannot read a file from a fixed path → app keeps the password; copy saved as `Downloads/chess-for-kids-parent-password.txt` at setup and at every change | In parent area; forgotten → read the file |
-| Store apps (M6) | App reads the password from `parent-password.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in parent area. Android location to verify at M6 |
+| Store apps (M7) | App reads the password from `parent-password.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in parent area. Android location to verify at M7 |
 
 ## 3. Profiles
 

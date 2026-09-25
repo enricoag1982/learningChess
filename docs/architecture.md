@@ -30,7 +30,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Plural text | i18next plural suffixes (`_one`, `_other`, …) allowed on text leaves; languages compared by base key |
 | Layout | Tablet landscape: board left, panel right; below 1024 px wide: board on top, panel below; phone: one-row top bar with phase chip |
 | Profiles | App start: first run while no parent lock exists, else profile picker (last used first); avatars = 8 fixed animal ids; nickname 1–12 characters |
-| Parent lock | Plain-text password (kid-gate) in localStorage + downloaded copy `chess-for-kids-parent-password.txt`; lockout state persisted; `PasswordFileWriter` port (store apps: Documents file, M6) |
+| Parent lock | Plain-text password (kid-gate) in localStorage + downloaded copy `chess-for-kids-parent-password.txt`; lockout state persisted; `PasswordFileWriter` port (store apps: Documents file, M7) |
 | Mini-games | Union by `mode`: `static` (goal capture-all / collect-stars, par, move limit), `series` (rounds of any exercise type, stars by total mistakes = errors + hint levels); `versus` (bot) in M2.6 |
 | Journey rules | Catalog in `tracks.yaml` (tracks, worlds, habitats, ranks) → `tracks.json`; statuses derived (never stored): lesson locked / available / complete / mastered, world locked / available / mastered / coming-soon (no authored lessons; never blocks later worlds), next lesson, rank; parent / test-out unlocks as an id set. World boss (M3.2a): optional `boss: <mini-game id>` per world, compiled to `World.boss?`; status locked / available (every lesson of the world complete or better, world not locked) / won (`MiniGameProgress.wins >= 1`, any route) / none; gates world mastery alongside lesson mastery; "next step" (Home / Journey highlight) is the world boss once its world's lessons are all done and it is unwon; build fails if `boss` names an unknown mini-game or one whose `unlockAfter` lesson is outside that world |
 | Game rules | `domain/game`: variant rules (kings on/off, no-moves lose / draw, win conditions per side: checkmate, promote, capture-all, capture piece, reach, survive; move limit) + standard draws (stalemate, insufficient material, threefold, 50-move) |
@@ -74,7 +74,7 @@ apps/native        only if a native UI is ever needed; reuses core
 | `ProfileRepository` | localStorage | IndexedDB / native storage → cloud (Supabase, Firebase) |
 | `ProgressRepository` | localStorage | same |
 | `SettingsRepository` | localStorage | same |
-| `Narrator` | Web Speech API (prefers on-device voices: `localService`) | v3: generated audio files per language |
+| `Narrator` | Web Speech API (prefers on-device voices: `localService`) | M6: pre-generated audio per language (Kokoro), Web Speech fallback for texts without audio |
 | `Platform` | Web | Capacitor (haptics, native storage) |
 | `AuthService` | Guest (local account) | Parent login (e.g. Supabase Auth) |
 | `SyncService` | No-op | Device ↔ cloud |
@@ -149,7 +149,7 @@ stars2: 5
 | Topic | Decision |
 |---|---|
 | Languages | Multi-language via i18n; English first |
-| Narration | Web Speech API (browser / device voices) in v1 and v2; generated audio files in v3 |
+| Narration | Web Speech API (browser / device voices) up to v1.1; pre-generated audio files from M6 (v3 scope pulled forward), Web Speech fallback |
 | Mobile | PWA first → Capacitor |
 | Online (login, sync, remote play) | Off in v1; ports + local adapters only |
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |

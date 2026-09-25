@@ -85,6 +85,11 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m5.4` | Offline + performance hardening: persistent storage request, iPad "Add to Home Screen" prompt, lazy-load parent area and later worlds, cold start ≤ 3 s, CSP, offline e2e over all worlds, Bear strength (F4) |
 | `m5.5` | Release: privacy policy page, readable README (F1), easier variants for the hardest Worlds 1–2 exercises (F2), release checklist → `m5` (playtest 4 by user) |
 | `retro` | After `m5` (owner request): deep retrospective of the whole process — what went well, what went wrong, learnings for a similar app, time estimate (coding, design, active collaboration with the owner, CI / pipeline, agent runs) from git history, CI runs, agent run logs and session transcripts → `docs/retrospective.md` (done 2026-09-25) |
+| `m6.1` | Version text on Home (also kept in the parent area); M6 plan; Store apps → M7, Paths → M8 |
+| `m6.2` | Generated voice: narrated-text inventory (static + finite template expansions), Kokoro TTS script (offline, incremental, content-hash file names), audio narrator (Web Audio, unlocked on first tap) with device-voice fallback for texts without audio, full English audio, precache |
+| `m6.3` | Voice hardening: coverage check (every inventoried text has audio), missed-text report from the e2e run, offline size check, owner check on phone / tablet |
+| `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
+| `m6.5` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
@@ -102,10 +107,11 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | # | Milestone | Scope |
 |---|---|---|
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
-| M6 | Store apps | Capacitor Android + iPad, native storage, store listings |
-| M7 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
-| v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions |
-| v3 | Nicer media | Generated voice audio files per language; nicer illustrations |
+| M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships as `v1.2.0` |
+| M7 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M8 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions. 2026-09-25: owner unsure about online → scope under discussion |
+| v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
 
 ## 5. Playtests
 
@@ -126,6 +132,6 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | Topic | Decision |
 |---|---|
-| Illustrations | Very basic AI-generated images; one style prompt for consistency; tool terms must allow commercial use; stored in the app (offline) |
+| Illustrations | v1: own flat SVG placeholders. M6 owner pick (current / Fluent 3D / Fluent flat): Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
-| Voice | Browser / device voices (Web Speech API) in v1–v2; generated audio files in v3 |
+| Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps |
