@@ -312,7 +312,7 @@ describe('Parent area reset (M5.1)', () => {
     const dialog = await screen.findByRole('dialog');
     fireEvent.change(within(dialog).getByLabelText('Parent code'), { target: { value: 'nope' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Reset' }));
-    await within(dialog).findByText('Wrong code.');
+    await within(dialog).findByText('Wrong parent code.');
 
     fireEvent.change(within(dialog).getByLabelText('Parent code'), { target: { value: '1234' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Reset' }));
@@ -342,7 +342,7 @@ describe('Parent area privacy and version (M5.5)', () => {
 });
 
 describe('Parent code file (owner request 2026-09-25)', () => {
-  it('"Download code file" writes the current code again and says where', async () => {
+  it('"Download parent code file" writes the current code again and says where', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
     render(<App services={services} />);
@@ -350,7 +350,7 @@ describe('Parent code file (owner request 2026-09-25)', () => {
     const writer = services.deps.passwordFile as FakePasswordFileWriter;
     const writesBefore = writer.writes.length;
 
-    fireEvent.click(screen.getByRole('button', { name: 'Download code file' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Download parent code file' }));
 
     await screen.findByText('Saved a copy: Downloads/chess-for-kids-parent-code.txt');
     expect(writer.writes.length).toBe(writesBefore + 1);

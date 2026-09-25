@@ -155,7 +155,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
 }
 
 /** Step 3 (parent style): confirms where the code file was saved. A new copy can be downloaded
- * later from the grown-ups area ("Download code file"). */
+ * later from the grown-ups area ("Download parent code file"). */
 function SavedStep({
   location,
   onNext,

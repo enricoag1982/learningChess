@@ -248,7 +248,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
 
   // 2. First run: parent password (parent style).
   await page.getByRole('button', { name: 'Start setup' }).click();
-  await expectParentTouchTarget(page, 'Save code');
+  await expectParentTouchTarget(page, 'Save parent code');
   await expectNoSeriousViolations(page, 'First run: Password');
 
   // 2.5. Its "Read our privacy policy" link (M5.5): an in-screen dialog, not a new store screen.
@@ -261,10 +261,10 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await privacyDialog.waitFor({ state: 'hidden' });
 
   await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByLabel('Repeat code').fill('1234');
+  await page.getByLabel('Repeat parent code').fill('1234');
   await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Save code' }).click(),
+    page.getByRole('button', { name: 'Save parent code' }).click(),
   ]);
 
   // 3. First run: Saved (parent style).

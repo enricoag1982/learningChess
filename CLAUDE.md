@@ -38,7 +38,7 @@ Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in pro
 - TypeScript + React + Vite PWA; Capacitor later for Android / iPad. GitHub Pages hosts the static app.
 - Layers: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`. Content in YAML → Zod → JSON.
 - Animal theme; English first (i18n); narration = Web Speech API (device voices) up to v1.1, pre-generated audio (Kokoro) from M6.
-- Parent code (UI term; not a real password) kept in a simple plain-text file; the code screen reminds where the file is (web: copy in Downloads, again via "Download code file" in the grown-ups area; store apps: editable file in app Documents). Daily time limit in v1.
+- Parent code (UI term; not a real password) kept in a simple plain-text file; the code screen reminds where the file is (web: copy in Downloads, again via "Download parent code file" in the grown-ups area; store apps: editable file in app Documents). Daily time limit in v1.
 
 ## Status and next step
 

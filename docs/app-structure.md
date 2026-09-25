@@ -27,7 +27,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 
 | Platform | File | Change / copy |
 |---|---|---|
-| Web (v1) | Browser cannot read a file from a fixed path → app keeps the code; copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on "Download code file" (grown-ups area, after the code; not on the code screen, so a child cannot fetch it). Older installs keep the location of their first file (`…-parent-password.txt`) until the next download | "Change code" / "Download code file" in the grown-ups area; forgotten → read the file |
+| Web (v1) | Browser cannot read a file from a fixed path → app keeps the code; copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on "Download parent code file" (grown-ups area, after the code; not on the code screen, so a child cannot fetch it). Older installs keep the location of their first file (`…-parent-password.txt`) until the next download | "Change parent code" / "Download parent code file" in the grown-ups area; forgotten → read the file |
 | Store apps (M8) | App reads the code from `parent-code.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in the grown-ups area. Android location to verify at M8 |
 
 ## 3. Profiles

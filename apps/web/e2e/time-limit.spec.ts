@@ -50,7 +50,7 @@ test.describe('Daily time limit (M5.2)', () => {
     await page.getByRole('button', { name: 'Parent: more time' }).click();
     await page.getByLabel('Parent code', { exact: true }).fill('nope');
     await page.getByRole('button', { name: 'Open' }).click();
-    await page.getByText('Wrong code (1 of 5)').waitFor();
+    await page.getByText('Wrong parent code (1 of 5)').waitFor();
   });
 
   test('Switch player from "See you tomorrow" returns to the picker', async ({ page }) => {
