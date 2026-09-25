@@ -9,11 +9,11 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Whole app usable with no network (lessons, games, computer, profiles, progress) | v1 has no server calls; everything runs and stores locally |
 | Web / PWA | Service worker (vite-plugin-pwa / Workbox) precaches app shell, compiled content, images, fonts |
 | Fonts | Self-hosted (no Google Fonts at runtime) |
-| Narration | Web Speech API with on-device voices only (`localService`; some browser voices need network); subtitles always shown, so the app works without voice. v3: generated audio files, precached |
+| Narration | Web Speech API with on-device voices only (`localService`; some browser voices need network); subtitles always shown, so the app works without voice. M6: generated audio files, precached |
 | Capacitor apps | All assets bundled in the app → offline by default |
 | Updates | No periodic polling (owner decision); checked on load and on return to the app. Applied only at a safe screen (Home / profile picker) — never mid-lesson/game/assessment/time-limit/parent; an update found elsewhere just waits until the kid next lands on one of those (v1.1.0, §1.2) |
 | Storage eviction | Request persistent storage; prompt parent to "Add to Home Screen" on iPad (Safari may clear website data after 7 days without use); backup file (§5) |
-| Offline size budget | ≤ 20 MB in v1 (no audio files); ≤ 50 MB per language in v3 with audio |
+| Offline size budget | ≤ 20 MB in v1 (no audio files); ≤ 50 MB per language with audio (M6) |
 
 ### 1.1 Implementation (M5.4)
 

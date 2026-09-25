@@ -349,6 +349,10 @@ export function HomeScreen(): JSX.Element {
           </span>
         )}
       </p>
+
+      <p className="-mt-4 text-center text-xs text-muted">
+        {t('parent.version', { version: __APP_VERSION__ })}
+      </p>
     </main>
   );
 }

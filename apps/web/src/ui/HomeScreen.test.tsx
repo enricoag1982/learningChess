@@ -105,6 +105,15 @@ describe('HomeScreen', () => {
     await screen.findByRole('heading', { name: "Who's playing today?" });
   });
 
+  it('shows the app version at the bottom (also in the parent area)', async () => {
+    const services = createServicesWithRealContent();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await pickProfileFromPicker('Mia');
+
+    await screen.findByText(`Version ${__APP_VERSION__}`);
+  });
+
   it('Journey tile opens the Journey screen', async () => {
     const services = createServicesWithRealContent();
     await seedReturningProfile(services, 'Mia');

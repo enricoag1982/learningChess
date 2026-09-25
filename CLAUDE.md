@@ -36,13 +36,13 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 - Offline app: v1 has no server; all data on device. Online (login, sync, remote play) = v2, hooks only.
 - TypeScript + React + Vite PWA; Capacitor later for Android / iPad. GitHub Pages hosts the static app.
 - Layers: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`. Content in YAML → Zod → JSON.
-- Animal theme; English first (i18n); narration = Web Speech API (device voices) until v3.
+- Animal theme; English first (i18n); narration = Web Speech API (device voices) up to v1.1, pre-generated audio (Kokoro) from M6.
 - Parent password kept in a simple plain-text file; password screen reminds where the file is (web: copy in Downloads; store apps: editable file in app Documents). Daily time limit in v1.
 
 ## Status and next step
 
 - Done: M0–M5 (`m0` … `m5`), releases `v1.0.0`, `v1.1.0` (owner playtest 2). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
-- Next: after-MVP work (`docs/roadmap.md` §4), open follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
+- Next: M6 Voice & art (v3 scope, `docs/roadmap.md` §3 `m6.x`, branch `m6-media`); v2 scope under discussion (owner unsure about online); open follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you".
