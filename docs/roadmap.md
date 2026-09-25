@@ -80,7 +80,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m4.4` | Badges (`badges.yaml`, badge engine on events, max 2 celebrations per session, My Den badges), streak (1 free skip per week), session log |
 | `m4.5` | Test-out ("Show you know it") on locked lessons / worlds, placement test at first run → `m4` |
 | `m5.1` | Parent area complete: overview of profiles, report per profile (progress by world / concept, weak concepts, time per day, games, badges), settings per profile (session limit, voice / sound, hints, computer level auto / fixed, piece style), reset profile; backup export / import (JSON, versioned) |
-| `m5.2` | Daily time limit: minutes per profile from the session log, Owl warns 2 min before, checked between activities only, "See you tomorrow" screen, parent password to continue |
+| `m5.2` | Daily time limit: minutes per profile from the session log, checked between activities only (never mid-exercise), "See you tomorrow" screen, parent password → +15 min; warning before the limit = v2 |
 | `m5.3` | Design + accessibility pass: tappable vs info look (F3) on every screen, WCAG 2.2 AA parent area, contrast / reduced motion / screen-reader audit, classic pieces from World 5 (app-structure.md piece look) |
 | `m5.4` | Offline + performance hardening: persistent storage request, iPad "Add to Home Screen" prompt, lazy-load parent area and later worlds, cold start ≤ 3 s, CSP, offline e2e over all worlds, Bear strength (F4) |
 | `m5.5` | Release: privacy policy page, readable README (F1), easier variants for the hardest Worlds 1–2 exercises (F2), release checklist → `m5` (playtest 4 by user) |
