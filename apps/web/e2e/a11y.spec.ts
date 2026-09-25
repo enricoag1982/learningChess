@@ -445,13 +445,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
   // M6.3 item 4 (`docs/voice.md`): the missed-text report, chromium project only (this walk
   // already runs 3x, once per viewport project — no need to also fetch/decode the same audio 3x).
-  // Set before the very first navigation, so it covers the whole walk from the first screen on.
   const checkVoiceMisses = testInfo.project.name === 'chromium';
-  if (checkVoiceMisses) {
-    await page.addInitScript(() => {
-      localStorage.setItem('chess-kids:voice-report', '1');
-    });
-  }
 
   // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
   // exists in content, the first series boss (mid-round) and first static boss, and the Complete
@@ -471,9 +465,20 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await completeFirstRun(page);
   // Shortens the bot's "thinking" pause for every versus boss reached below (Pawn Wars Jr. and,
   // to deep-scan `choice`/`best-move`, Pawn Wars too) — set now, well before either is reached.
-  await page.evaluate(() => {
-    localStorage.setItem('chess-kids:test-seed', '1');
-  });
+  // The voice-report flag (above) is set here too, not via `addInitScript` before the first
+  // `page.goto`: every `chess-kids:*` key is reserved for the app's own versioned storage
+  // (`local-store.ts`), which throws "Unversioned chess-kids data found in storage" if one is
+  // already present before the app's own startup writes its version key. Setting it only once the
+  // app is already up (same as `test-seed` already did) still covers the whole curriculum walk
+  // below — only the first-run screens themselves go unwatched, and those are scanned separately
+  // by the "onboarding and profile screens" test above, with nothing to narrate incorrectly there.
+  await page.evaluate(
+    ({ checkVoiceMisses: check }: { checkVoiceMisses: boolean }) => {
+      localStorage.setItem('chess-kids:test-seed', '1');
+      if (check) localStorage.setItem('chess-kids:voice-report', '1');
+    },
+    { checkVoiceMisses },
+  );
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
