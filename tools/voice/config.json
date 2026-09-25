@@ -1,0 +1,11 @@
+{
+  "engine": "kokoro-onnx",
+  "model": "kokoro-v1.0.int8.onnx",
+  "voicesFile": "voices-v1.0.bin",
+  "voice": "af_heart",
+  "lang": "en-us",
+  "speed": 0.92,
+  "sampleRateHz": 24000,
+  "mp3BitrateKbps": 32,
+  "mp3Quality": 2
+}

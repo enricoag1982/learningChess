@@ -60,5 +60,10 @@ export function createTestServices(
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },
+    // M6.2: the real `createAudioNarrator` is web-speech/audio-only plumbing `FakeNarrator`
+    // deliberately skips (its own doc comment) — nothing here to wire it into.
+    setNickname: () => {
+      // no-op
+    },
   };
 }

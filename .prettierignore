@@ -5,3 +5,4 @@ pnpm-lock.yaml
 **/playwright-report
 **/test-results
 **/*.md
+apps/web/public/audio/**/manifest.json

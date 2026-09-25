@@ -88,3 +88,5 @@ pnpm test:e2e         # Playwright, against the production build
 - Animal art: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji) by Microsoft, via
   [@lobehub/fluent-emoji-3d](https://www.npmjs.com/package/@lobehub/fluent-emoji-3d) (MIT — full
   notice: [`apps/web/public/licenses/fluent-emoji.txt`](apps/web/public/licenses/fluent-emoji.txt)).
+- Narration voice: generated offline with [Kokoro](https://huggingface.co/hexgrad/Kokoro-82M)
+  (Apache License 2.0) — see [`docs/voice.md`](docs/voice.md).
