@@ -126,6 +126,9 @@ importers:
       chess.js:
         specifier: 1.4.0
         version: 1.4.0
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
 
 packages:
 

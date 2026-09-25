@@ -320,7 +320,11 @@ describe('Parent unlock (M4.5)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Unlock lessons & worlds' }));
+    // M5.1: the unlock panel moved from the overview row into the child's own Settings screen.
+    const miaCard = screen.getByText('Mia').closest('button');
+    if (!miaCard) throw new Error('Mia card not found');
+    fireEvent.click(miaCard);
+    fireEvent.click(await screen.findByRole('button', { name: 'Settings' }));
     // l1 is unlocked by default (world's first lesson); l2 is locked and listed with its own toggle.
     const l2Row = (await screen.findByText(/Elephant/)).closest('div');
     if (!l2Row) throw new Error('Elephant row not found');
@@ -335,7 +339,12 @@ describe('Parent unlock (M4.5)', () => {
     expect(progress?.bestStars ?? {}).toEqual({});
 
     // Back to Mia's own session: the Journey now shows it unlocked.
-    fireEvent.click(screen.getByRole('button', { name: 'Done' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back' })); // settings -> report
+    fireEvent.click(await screen.findByRole('button', { name: 'Back' })); // report -> overview
+    fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
+    // Waits for the picker itself (not just any "Mia" match — the overview's own child card is
+    // also named "Mia" and can still be mounted the instant after the async `goToPicker()` fires).
+    await screen.findByRole('heading', { name: "Who's playing today?" });
     await pickProfileFromPicker('Mia');
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     expect(screen.queryByRole('button', { name: /Elephant the Bishop, locked/ })).toBeNull();
@@ -352,7 +361,11 @@ describe('Parent unlock (M4.5)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Unlock lessons & worlds' }));
+    // M5.1: the unlock panel moved from the overview row into the child's own Settings screen.
+    const miaCard = screen.getByText('Mia').closest('button');
+    if (!miaCard) throw new Error('Mia card not found');
+    fireEvent.click(miaCard);
+    fireEvent.click(await screen.findByRole('button', { name: 'Settings' }));
     await screen.findByRole('button', { name: 'Unlock world' });
     fireEvent.click(screen.getByRole('button', { name: 'Unlock world' }));
 

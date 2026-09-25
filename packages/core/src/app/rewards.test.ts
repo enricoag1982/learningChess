@@ -23,6 +23,7 @@ import {
   buildBadgeFacts,
   checkRewards,
   evaluateAndRecordBadges,
+  minutesByDay,
   recordDailyActivity,
   recordSessionMinutes,
 } from './rewards.ts';
@@ -168,6 +169,8 @@ function makeRewardsRepo(initialEarned: readonly EarnedBadge[] = []): RewardsRep
       logs.set(`${log.profileId}:${log.date}`, log);
       return Promise.resolve();
     },
+    listSessionLogs: (profileId) =>
+      Promise.resolve([...logs.values()].filter((log) => log.profileId === profileId)),
     deleteProfileData: () => Promise.resolve(),
   };
 }
@@ -220,7 +223,12 @@ function baseDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     parentLock: { get: () => Promise.resolve(undefined), save: () => Promise.resolve() },
     passwordFile: { write: () => Promise.resolve({ location: 'x' }) },
     settings: {
-      get: () => Promise.resolve<AppSettings>({ lastProfileId: null, suggestedLevels: {} }),
+      get: () =>
+        Promise.resolve<AppSettings>({
+          lastProfileId: null,
+          suggestedLevels: {},
+          profileSettings: {},
+        }),
       save: () => Promise.resolve(),
     },
     random: seededRandom(1),
@@ -245,6 +253,69 @@ describe('recordSessionMinutes', () => {
     await recordSessionMinutes(deps, 'p1', 5, NOW);
     const log = await recordSessionMinutes(deps, 'p1', 7, new Date(NOW.getTime() + 1000));
     expect(log.minutes).toBe(12);
+  });
+});
+
+describe('minutesByDay', () => {
+  it('returns 0 for every day with no session-log row', async () => {
+    const deps = baseDeps();
+    const days = await minutesByDay(deps, 'p1', 3);
+    expect(days).toEqual([
+      { date: '2026-01-03', minutes: 0 },
+      { date: '2026-01-04', minutes: 0 },
+      { date: '2026-01-05', minutes: 0 },
+    ]);
+  });
+
+  it('fills in real minutes for days that have a session-log row, oldest first', async () => {
+    const deps = baseDeps();
+    await deps.rewards?.saveSessionLog({
+      id: 'l1',
+      profileId: 'p1',
+      date: '2026-01-04',
+      minutes: 15,
+      createdAt: NOW.toISOString(),
+      updatedAt: NOW.toISOString(),
+    });
+    await deps.rewards?.saveSessionLog({
+      id: 'l2',
+      profileId: 'p1',
+      date: '2026-01-05',
+      minutes: 8,
+      createdAt: NOW.toISOString(),
+      updatedAt: NOW.toISOString(),
+    });
+
+    const days = await minutesByDay(deps, 'p1', 3);
+    expect(days).toEqual([
+      { date: '2026-01-03', minutes: 0 },
+      { date: '2026-01-04', minutes: 15 },
+      { date: '2026-01-05', minutes: 8 },
+    ]);
+  });
+
+  it('never mixes in another profile’s minutes', async () => {
+    const deps = baseDeps();
+    await deps.rewards?.saveSessionLog({
+      id: 'l1',
+      profileId: 'other',
+      date: '2026-01-05',
+      minutes: 99,
+      createdAt: NOW.toISOString(),
+      updatedAt: NOW.toISOString(),
+    });
+
+    const days = await minutesByDay(deps, 'p1', 1);
+    expect(days).toEqual([{ date: '2026-01-05', minutes: 0 }]);
+  });
+
+  it('returns every day as 0 without deps.rewards wired up', async () => {
+    const deps = baseDeps({ rewards: undefined });
+    const days = await minutesByDay(deps, 'p1', 2);
+    expect(days).toEqual([
+      { date: '2026-01-04', minutes: 0 },
+      { date: '2026-01-05', minutes: 0 },
+    ]);
   });
 });
 

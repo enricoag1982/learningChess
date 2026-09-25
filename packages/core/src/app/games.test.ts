@@ -82,7 +82,7 @@ const stubContent: ContentSource = {
 
 /** In-memory `SettingsRepository`, so `updateSuggestedLevel`'s save-then-get round-trips. */
 function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {} },
+  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
 ): SettingsRepository {
   let settings = initial;
   return {
@@ -480,6 +480,7 @@ describe('updateSuggestedLevel', () => {
     await deps.settings.save({
       lastProfileId: null,
       suggestedLevels: { 'profile-other': 4 },
+      profileSettings: {},
     });
     const records = winsAndLosses(2, ['loss', 'loss', 'loss', 'loss', 'loss']);
 

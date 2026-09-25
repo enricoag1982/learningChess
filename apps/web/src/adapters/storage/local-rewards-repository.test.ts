@@ -90,6 +90,18 @@ describe('LocalStorageRewardsRepository', () => {
     expect(await repo.getSessionLog('profile-1', '2026-01-06')).toBeUndefined();
   });
 
+  it('lists every session log for one profile', async () => {
+    const repo = makeRepo();
+    await repo.saveSessionLog(makeSessionLog({ id: 'sl1', date: '2026-01-05' }));
+    await repo.saveSessionLog(makeSessionLog({ id: 'sl2', date: '2026-01-06', minutes: 8 }));
+    await repo.saveSessionLog(makeSessionLog({ id: 'sl3', profileId: 'profile-2' }));
+
+    const logs = await repo.listSessionLogs('profile-1');
+    expect(logs).toHaveLength(2);
+    expect(logs.map((log) => log.date).sort()).toEqual(['2026-01-05', '2026-01-06']);
+    expect(await repo.listSessionLogs('profile-3')).toEqual([]);
+  });
+
   it('deleteProfileData removes badges, streak and session logs for that profile only', async () => {
     const repo = makeRepo();
     await repo.addEarnedBadge(makeBadge({ id: 'eb1', profileId: 'profile-1' }));

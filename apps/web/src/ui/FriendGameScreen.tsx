@@ -40,6 +40,10 @@ function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element
   useLayoutEffect(() => {
     const element = containerRef.current;
     if (!element || typeof ResizeObserver === 'undefined') return;
+    // First size now, before paint: the observer's first callback lands a frame later, and until
+    // then the unsized fallback fills the whole area (not square).
+    const rect = element.getBoundingClientRect();
+    setSize(Math.max(0, Math.min(rect.width, rect.height)));
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;

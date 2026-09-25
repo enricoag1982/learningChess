@@ -28,6 +28,7 @@ import {
   playSolveLine,
   playVersusBoss,
   selectSquaresAnswer,
+  shownExercise,
   solveExercise,
   waitForVersusTurnOrEnd,
   worldBossMiniGame,
@@ -111,10 +112,15 @@ async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<
   expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(64);
 }
 
-/** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). */
-async function expectParentTouchTarget(page: Page, name: RegExp | string): Promise<void> {
-  const box = await page.getByRole('button', { name }).boundingBox();
-  expect(box, `no bounding box for button matching ${String(name)}`).not.toBeNull();
+/** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). `role` defaults to
+ * `'button'`; a toggle (M5.1 voice/sound/hints) is `role="switch"` instead. */
+async function expectParentTouchTarget(
+  page: Page,
+  name: RegExp | string,
+  role: 'button' | 'switch' = 'button',
+): Promise<void> {
+  const box = await page.getByRole(role, { name }).boundingBox();
+  expect(box, `no bounding box for ${role} matching ${String(name)}`).not.toBeNull();
   expect(box?.width ?? 0, `${String(name)} width`).toBeGreaterThanOrEqual(44);
   expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(44);
 }
@@ -176,12 +182,39 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Open');
   await expectNoSeriousViolations(page, 'Password screen');
 
-  // 8. Parent area (parent style).
+  // 8. Parent area overview (parent style, M5.1: tappable child cards, no inline management
+  // buttons any more — those moved to the child's own Settings screen, scanned next).
   await page.getByLabel('Password', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await expectParentTouchTarget(page, 'Add child');
+  await expectParentTouchTarget(page, 'Backup');
+  await expectNoSeriousViolations(page, 'Parent area: overview');
+
+  // 8.5. Overview -> Mia's card -> child report (parent style).
+  await page.getByRole('button', { name: /^Mia/ }).click();
+  await expectParentTouchTarget(page, 'Settings');
+  await expectNoSeriousViolations(page, 'Parent area: child report');
+
+  // 8.6. Report -> Settings: rename/avatar, daily limit, voice/sound/hints, computer level, piece
+  // style, unlock panel, export, reset/delete — every control on the busiest parent screen.
+  await page.getByRole('button', { name: 'Settings' }).click();
   await expectParentTouchTarget(page, 'Rename');
-  await expectNoSeriousViolations(page, 'Parent area');
+  await expectParentTouchTarget(page, 'Change avatar');
+  await expectParentTouchTarget(page, 'Off');
+  await expectParentTouchTarget(page, 'Voice', 'switch');
+  await expectParentTouchTarget(page, 'Automatic');
+  await expectParentTouchTarget(page, /^Animal badge$/);
+  await expectParentTouchTarget(page, "Export this child's data");
+  await expectParentTouchTarget(page, 'Reset progress');
+  await expectParentTouchTarget(page, 'Delete');
+  await expectNoSeriousViolations(page, 'Parent area: child settings');
+
+  // 8.7. Settings -> Report -> Overview -> Backup.
+  await page.getByRole('button', { name: 'Back' }).click();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await page.getByRole('button', { name: 'Backup' }).click();
+  await expectParentTouchTarget(page, 'Export all');
+  await expectNoSeriousViolations(page, 'Parent area: backup');
 });
 
 /** Every exercise type actually authored in the bundled content (scored exercises only). */
@@ -611,13 +644,7 @@ test('test-out sheet, runner and result screen have no serious/critical violatio
   const failHeading = page.getByRole('heading', { name: contentText('assessment.fail-title') });
   for (let i = 0; i < second.exercises.length + 1; i += 1) {
     if (await failHeading.isVisible().catch(() => false)) break;
-    let matched: ExerciseDef | undefined;
-    for (const candidate of second.exercises) {
-      if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
-        matched = candidate;
-        break;
-      }
-    }
+    const matched = await shownExercise(page, second.exercises);
     if (!matched)
       throw new Error('test-out runner: no candidate exercise matched the current task');
     await answerExerciseWrongThenSolve(page, matched);

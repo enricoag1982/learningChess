@@ -166,6 +166,12 @@ export class LocalStorageRewardsRepository implements RewardsRepository {
     });
   }
 
+  listSessionLogs(profileId: string): Promise<SessionLog[]> {
+    return toPromise(() =>
+      [...this.readSessionLogs().values()].filter((log) => log.profileId === profileId),
+    );
+  }
+
   deleteProfileData(profileId: string): Promise<void> {
     return toPromise(() => {
       const badges = this.readEarnedBadges().filter((badge) => badge.profileId !== profileId);

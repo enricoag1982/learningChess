@@ -11,6 +11,7 @@ import {
   isFirstRun,
   listProfiles,
   renameProfile,
+  resetProfileData,
   selectProfile,
   setupParentPassword,
   verifyParentPassword,
@@ -26,6 +27,7 @@ import type {
   PasswordFileWriter,
   ProfileRepository,
   ProgressRepository,
+  RewardsRepository,
   SettingsRepository,
 } from './ports.ts';
 
@@ -108,6 +110,25 @@ function makeGameRecordRepo(): GameRecordRepository & { readonly deletedFor: str
   };
 }
 
+function makeRewardsRepo(): RewardsRepository & { readonly deletedFor: string[] } {
+  const deletedFor: string[] = [];
+  return {
+    addEarnedBadge: () => Promise.resolve(),
+    listEarnedBadges: () => Promise.resolve([]),
+    saveEarnedBadge: () => Promise.resolve(),
+    getStreak: () => Promise.resolve(undefined),
+    saveStreak: () => Promise.resolve(),
+    getSessionLog: () => Promise.resolve(undefined),
+    saveSessionLog: () => Promise.resolve(),
+    listSessionLogs: () => Promise.resolve([]),
+    deleteProfileData: (profileId) => {
+      deletedFor.push(profileId);
+      return Promise.resolve();
+    },
+    deletedFor,
+  };
+}
+
 function makeParentLockRepo(initial?: ParentLock): ParentLockRepository {
   let lock = initial;
   return {
@@ -131,7 +152,7 @@ function makePasswordFileWriter(): PasswordFileWriter & { readonly writes: strin
 }
 
 function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {} },
+  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
 ): SettingsRepository {
   let settings = initial;
   return {
@@ -292,7 +313,11 @@ describe('selectProfile / deleteProfile', () => {
     const deps = makeDeps();
     const profile = await createProfile(deps, 'Mia', 'panda');
     await selectProfile(deps, profile.id);
-    expect(await deps.settings.get()).toEqual({ lastProfileId: profile.id, suggestedLevels: {} });
+    expect(await deps.settings.get()).toEqual({
+      lastProfileId: profile.id,
+      suggestedLevels: {},
+      profileSettings: {},
+    });
   });
 
   it('deleteProfile cascades progress and game-record data and clears lastProfileId when it was selected', async () => {
@@ -307,7 +332,11 @@ describe('selectProfile / deleteProfile', () => {
     expect(await deps.profiles.get(profile.id)).toBeUndefined();
     expect(progress.deletedFor).toEqual([profile.id]);
     expect(gameRecords.deletedFor).toEqual([profile.id]);
-    expect(await deps.settings.get()).toEqual({ lastProfileId: null, suggestedLevels: {} });
+    expect(await deps.settings.get()).toEqual({
+      lastProfileId: null,
+      suggestedLevels: {},
+      profileSettings: {},
+    });
   });
 
   it('deleteProfile leaves lastProfileId alone when a different profile is selected', async () => {
@@ -318,6 +347,44 @@ describe('selectProfile / deleteProfile', () => {
 
     await deleteProfile(deps, mia.id);
 
-    expect(await deps.settings.get()).toEqual({ lastProfileId: leo.id, suggestedLevels: {} });
+    expect(await deps.settings.get()).toEqual({
+      lastProfileId: leo.id,
+      suggestedLevels: {},
+      profileSettings: {},
+    });
+  });
+});
+
+describe('resetProfileData', () => {
+  it('cascades progress, game-record and rewards data, but keeps the profile itself', async () => {
+    const progress = makeProgressRepo();
+    const gameRecords = makeGameRecordRepo();
+    const rewards = makeRewardsRepo();
+    const deps = makeDeps({ progress, gameRecords, rewards });
+    const profile = await createProfile(deps, 'Mia', 'panda');
+    await selectProfile(deps, profile.id);
+
+    await resetProfileData(deps, profile.id);
+
+    expect(progress.deletedFor).toEqual([profile.id]);
+    expect(gameRecords.deletedFor).toEqual([profile.id]);
+    expect(rewards.deletedFor).toEqual([profile.id]);
+    expect(await deps.profiles.get(profile.id)).toEqual(profile);
+    // Unlike deleteProfile, lastProfileId (identity/selection) is left alone.
+    expect((await deps.settings.get()).lastProfileId).toBe(profile.id);
+  });
+
+  it('throws for an unknown profile id', async () => {
+    const deps = makeDeps();
+    await expect(resetProfileData(deps, 'ghost')).rejects.toThrow();
+  });
+
+  it('no-ops the rewards cascade without deps.rewards wired up', async () => {
+    const progress = makeProgressRepo();
+    const deps = makeDeps({ progress, rewards: undefined });
+    const profile = await createProfile(deps, 'Mia', 'panda');
+
+    await expect(resetProfileData(deps, profile.id)).resolves.toBeUndefined();
+    expect(progress.deletedFor).toEqual([profile.id]);
   });
 });

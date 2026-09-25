@@ -126,11 +126,21 @@ describe('parent area', () => {
     await screen.findByRole('heading', { name: 'Parent area' });
   }
 
+  /** Overview → that child's card → Report → "Settings" (M5.1: rename/avatar/delete moved there). */
+  async function openChildSettings(nickname: string): Promise<void> {
+    const card = screen.getByText(nickname).closest('button');
+    if (!card) throw new Error(`${nickname} card not found`);
+    fireEvent.click(card);
+    fireEvent.click(await screen.findByRole('button', { name: 'Settings' }));
+    await screen.findByRole('button', { name: 'Rename' });
+  }
+
   it('renames a child', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
     render(<App services={services} />);
     await openParentArea();
+    await openChildSettings('Mia');
 
     fireEvent.click(screen.getByRole('button', { name: 'Rename' }));
     const input = screen.getByDisplayValue('Mia');
@@ -157,10 +167,9 @@ describe('parent area', () => {
     // Back in the parent area (not Home): adding a child from here must not switch the active player.
     await screen.findByRole('heading', { name: 'Parent area' });
     await screen.findByText('Leo');
+    await openChildSettings('Leo');
 
-    const leoRow = screen.getByText('Leo').closest('li');
-    if (!leoRow) throw new Error('Leo row not found');
-    fireEvent.click(within(leoRow).getByRole('button', { name: 'Delete' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
 
     const dialog = await screen.findByRole('dialog');
     within(dialog).getByText('Delete Leo and all progress?');

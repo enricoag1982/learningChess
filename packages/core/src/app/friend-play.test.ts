@@ -88,7 +88,7 @@ const stubContent: ContentSource = {
 };
 
 function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {} },
+  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
 ): SettingsRepository {
   let settings = initial;
   return {

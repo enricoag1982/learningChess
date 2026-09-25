@@ -86,6 +86,7 @@ function SeriesRound({
 }: SeriesRoundProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
   const isStacked = useIsStackedLayout();
   const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
   const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
@@ -107,6 +108,7 @@ function SeriesRound({
     selectedPiece,
     onSelectPiece: setSelectedPiece,
     isStacked,
+    showHint: hintsEnabled,
   });
 
   // Live running total: mistakes already folded in from earlier rounds, plus this round's own

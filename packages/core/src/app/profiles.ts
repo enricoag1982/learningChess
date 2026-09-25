@@ -143,6 +143,22 @@ export async function deleteProfile(deps: AppDeps, profileId: string): Promise<v
   }
 }
 
+/**
+ * Parent area "Reset child" (M5.1, app-structure.md §11): clears progress, attempts, concept
+ * stats, mini-game progress (all under `ProgressRepository.deleteProfileData`), game records,
+ * earned badges, streak and session log — but keeps the profile itself (nickname, avatar,
+ * settings) and its assessment results/unlocks (a passed test-out/placement/parent unlock is left
+ * alone, matching `deleteProfile`'s own per-repository cascade, minus `profiles.delete` and
+ * `assessment.deleteProfileData`). The parent-area UI confirms this with the parent password
+ * before calling it (`verifyParentPassword`) — this use case itself performs no such check.
+ */
+export async function resetProfileData(deps: AppDeps, profileId: string): Promise<void> {
+  await requireProfile(deps, profileId);
+  await deps.progress.deleteProfileData(profileId);
+  await deps.gameRecords.deleteProfileData(profileId);
+  await deps.rewards?.deleteProfileData(profileId);
+}
+
 /** Records which profile the kid picked, so the picker shows it first next time. */
 export async function selectProfile(deps: AppDeps, profileId: string): Promise<void> {
   const settings = await deps.settings.get();

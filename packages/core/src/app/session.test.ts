@@ -209,7 +209,12 @@ function makePasswordFileWriter(): PasswordFileWriter {
 
 function makeSettingsRepo(): SettingsRepository {
   return {
-    get: () => Promise.resolve<AppSettings>({ lastProfileId: null, suggestedLevels: {} }),
+    get: () =>
+      Promise.resolve<AppSettings>({
+        lastProfileId: null,
+        suggestedLevels: {},
+        profileSettings: {},
+      }),
     save: () => Promise.resolve(),
   };
 }
