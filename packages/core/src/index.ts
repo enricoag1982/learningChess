@@ -4,6 +4,8 @@ export { validateNickname, newProfile } from './domain/profile.ts';
 export type { Avatar } from './domain/avatars.ts';
 export { AVATARS, isAvatar } from './domain/avatars.ts';
 
+export { normalizeVoiceText, stripNickname, voiceKey } from './domain/voice-text.ts';
+
 export type { ParentLock, CheckPasswordResult } from './domain/parent-lock.ts';
 export {
   isValidPassword,

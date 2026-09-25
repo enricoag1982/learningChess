@@ -601,6 +601,7 @@ export function createAppStore(services: Services) {
             getProfileSettings(services.deps, only.id),
           ]);
           services.setVoiceEnabled(settings.voice);
+          services.setNickname(only.nickname);
           set({
             profile: only,
             activeProfileSettings: settings,
@@ -650,6 +651,7 @@ export function createAppStore(services: Services) {
         // A brand-new profile has no stored settings yet: DEFAULT_PROFILE_SETTINGS applies as-is
         // (voice on), no need to round-trip `getProfileSettings` for a row that cannot exist yet.
         services.setVoiceEnabled(DEFAULT_PROFILE_SETTINGS.voice);
+        services.setNickname(profile.nickname);
         set({
           profile,
           activeProfileSettings: DEFAULT_PROFILE_SETTINGS,
@@ -697,6 +699,7 @@ export function createAppStore(services: Services) {
         // shared narrator), the rest is read straight off `activeProfileSettings` by the screens
         // that need it (`ExerciseStep`'s Hint button, `PlayScreen`'s computer-level default).
         services.setVoiceEnabled(settings.voice);
+        services.setNickname(profile.nickname);
         set({
           profile,
           activeProfileSettings: settings,

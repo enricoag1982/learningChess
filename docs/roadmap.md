@@ -87,7 +87,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `retro` | After `m5` (owner request): deep retrospective of the whole process — what went well, what went wrong, learnings for a similar app, time estimate (coding, design, active collaboration with the owner, CI / pipeline, agent runs) from git history, CI runs, agent run logs and session transcripts → `docs/retrospective.md` (done 2026-09-25) |
 | `m6.1` | Version text on Home (also kept in the parent area); M6 plan; Store apps → M7, Paths → M8 |
 | `m6.2` | Generated voice: narrated-text inventory (static + finite template expansions), Kokoro TTS script (offline, incremental, content-hash file names), audio narrator (Web Audio, unlocked on first tap) with device-voice fallback for texts without audio, full English audio, precache |
-| `m6.3` | Voice hardening: coverage check (every inventoried text has audio), missed-text report from the e2e run, offline size check, owner check on phone / tablet |
+| `m6.3` | Voice hardening: coverage check in CI (inventory = manifest), feedback note spoken on its own (no device voice mid-lesson), missed-text report from the e2e run, resume timeout before the first tap, offline size check, owner check on phone / tablet |
 | `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
 | `m6.5` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
 

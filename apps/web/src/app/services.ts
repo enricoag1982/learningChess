@@ -6,6 +6,7 @@ import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { createDownloadBackupFileWriter } from '../adapters/download-backup-file-writer.ts';
 import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
+import { createAudioNarrator } from '../adapters/narration/audio-narrator.ts';
 import { createGatedNarrator } from '../adapters/narration/gated-narrator.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
 import { createMathRandom } from '../adapters/random.ts';
@@ -29,6 +30,9 @@ export interface Services {
   /** Gates `narrator` on the active profile's "voice" setting (M5.1, app-structure.md §11
    * "Settings effect now") — set at every profile select (`selectProfileAndHome`, `store.ts`). */
   setVoiceEnabled(enabled: boolean): void;
+  /** The active profile's nickname, stripped from narrated text before the generated-audio lookup
+   * (M6.2, `docs/voice.md`) — set at every profile select, alongside `setVoiceEnabled`. */
+  setNickname(nickname: string | null): void;
 }
 
 /** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
@@ -52,7 +56,14 @@ export function createServices(storage: Storage = window.localStorage): Services
     storageSchemaVersion: SCHEMA_VERSION,
   };
 
-  const narrator = createGatedNarrator(createWebSpeechNarrator());
+  // M6.2 (docs/voice.md): pre-generated Kokoro audio per narrated text, Web Speech (device voice)
+  // as the fallback for any text without generated audio — `createGatedNarrator` wraps the
+  // combined pair, same as it wrapped Web Speech alone before this milestone.
+  const audioNarrator = createAudioNarrator({
+    baseUrl: `${import.meta.env.BASE_URL}audio/en/`,
+    fallback: createWebSpeechNarrator(),
+  });
+  const narrator = createGatedNarrator(audioNarrator);
 
   return {
     deps,
@@ -61,6 +72,9 @@ export function createServices(storage: Storage = window.localStorage): Services
     botPlayer: createWorkerBotPlayer(),
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
+    },
+    setNickname: (nickname) => {
+      audioNarrator.setNickname(nickname);
     },
   };
 }
