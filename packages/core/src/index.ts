@@ -66,14 +66,25 @@ export { newStreak, localDayString, isoWeekKey, recordActivityDay } from './doma
 export type { SessionLog } from './domain/session-log.ts';
 export {
   EXTRA_TIME_GRANT_MINUTES,
+  HOURS_OVERRIDE_MINUTES,
   newSessionLog,
   addMinutes,
   lastNDays,
   timeUsedToday,
   extraMinutesToday,
   isOverLimit,
+  limitForDay,
   grantExtraMinutes,
+  setHoursOverride,
+  markWarned,
 } from './domain/session-log.ts';
+
+export {
+  allowedHoursReason,
+  isWithinAllowedHours,
+  minutesUntilEnd,
+  shouldWarn,
+} from './domain/time-policy.ts';
 
 export type {
   ComputerLevelSetting,
@@ -82,8 +93,13 @@ export type {
 } from './domain/profile-settings.ts';
 export {
   DAILY_LIMIT_OPTIONS,
+  PLAY_UNTIL_OPTIONS,
+  PLAY_FROM_OPTIONS,
   DEFAULT_PROFILE_SETTINGS,
   isValidDailyLimit,
+  isValidWeekendLimit,
+  isValidPlayUntil,
+  isValidPlayFrom,
   isValidComputerLevel,
   isValidPieceStyle,
   isValidProfileSettings,
@@ -248,8 +264,13 @@ export {
   checkRewards,
 } from './app/rewards.ts';
 
-export type { TimeLimitStatus } from './app/time-limit.ts';
-export { checkActivityGate, grantExtraTime } from './app/time-limit.ts';
+export type { TimeLimitReason, TimeLimitStatus } from './app/time-limit.ts';
+export {
+  checkActivityGate,
+  grantExtraTime,
+  grantHoursOverride,
+  markTimeWarning,
+} from './app/time-limit.ts';
 
 export type {
   ChildOverview,
