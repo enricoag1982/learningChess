@@ -187,7 +187,12 @@ export function LessonScreen(): JSX.Element {
         <div className="min-w-0 flex-1 overflow-x-auto">
           {phase &&
             (isCompact ? (
-              <PhaseChip phase={phase} current={chipCounts?.current} total={chipCounts?.total} />
+              <PhaseChip
+                phase={phase}
+                current={chipCounts?.current}
+                total={chipCounts?.total}
+                skippedPhases={skippedPhases}
+              />
             ) : (
               <StepPills current={phase} skippedPhases={skippedPhases} />
             ))}

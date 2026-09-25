@@ -1,8 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LessonPhase, SkippablePhase } from '@chess-kids/core';
-
-const PHASES: readonly LessonPhase[] = ['story', 'demo', 'try', 'exercises', 'boss'];
+import { PHASE_BAR, PHASES, phaseState } from './phase-track.ts';
 
 function CheckIcon(): JSX.Element {
   return (
@@ -57,30 +56,15 @@ export interface StepPillsProps {
  */
 export function StepPills({ current, skippedPhases = [] }: StepPillsProps): JSX.Element {
   const { t } = useTranslation();
-  const currentIndex = PHASES.indexOf(current);
 
   return (
     <div className="flex items-end justify-center gap-3">
-      {PHASES.map((phase, index) => {
-        const skipped = skippedPhases.includes(phase as SkippablePhase);
-        const done = index < currentIndex;
-        const isCurrent = index === currentIndex;
-        const text = skipped
-          ? 'text-muted'
-          : isCurrent
-            ? 'text-ink'
-            : done
-              ? 'text-go'
-              : 'text-muted';
-        const bar = skipped
-          ? // Diagonal stripe (muted on line, both existing tokens): distinct from every solid
-            // state below, so "skipped" is never mistaken for "done" or "rest".
-            'bg-[repeating-linear-gradient(135deg,var(--color-muted)_0_4px,var(--color-line)_4px_8px)]'
-          : isCurrent
-            ? 'bg-today'
-            : done
-              ? 'bg-go'
-              : 'bg-line';
+      {PHASES.map((phase) => {
+        const state = phaseState(phase, current, skippedPhases);
+        const skipped = state === 'skipped';
+        const done = state === 'done';
+        const text = state === 'current' ? 'text-ink' : state === 'done' ? 'text-go' : 'text-muted';
+        const bar = PHASE_BAR[state];
         return (
           <span key={phase} className="flex min-w-14 flex-col items-center gap-1">
             <span className={`flex items-center gap-1 text-sm font-semibold sm:text-base ${text}`}>
