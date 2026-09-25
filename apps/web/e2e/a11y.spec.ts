@@ -248,7 +248,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
 
   // 2. First run: parent password (parent style).
   await page.getByRole('button', { name: 'Start setup' }).click();
-  await expectParentTouchTarget(page, 'Save code');
+  await expectParentTouchTarget(page, 'Save parent code');
   await expectNoSeriousViolations(page, 'First run: Password');
 
   // 2.5. Its "Read our privacy policy" link (M5.5): an in-screen dialog, not a new store screen.
@@ -261,10 +261,10 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await privacyDialog.waitFor({ state: 'hidden' });
 
   await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByLabel('Repeat code').fill('1234');
+  await page.getByLabel('Repeat parent code').fill('1234');
   await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Save code' }).click(),
+    page.getByRole('button', { name: 'Save parent code' }).click(),
   ]);
 
   // 3. First run: Saved (parent style).
@@ -436,12 +436,16 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
 
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
-}) => {
+}, testInfo) => {
   // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
   // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
   // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
   // Walks the whole curriculum: grows with every world (2.3–2.5 min at World 4 under load).
   test.setTimeout(300_000);
+
+  // M6.3 item 4 (`docs/voice.md`): the missed-text report, chromium project only (this walk
+  // already runs 3x, once per viewport project — no need to also fetch/decode the same audio 3x).
+  const checkVoiceMisses = testInfo.project.name === 'chromium';
 
   // Walk the Journey's lessons in order, deep-scanning the first exercise of each type that
   // exists in content, the first series boss (mid-round) and first static boss, and the Complete
@@ -461,9 +465,20 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await completeFirstRun(page);
   // Shortens the bot's "thinking" pause for every versus boss reached below (Pawn Wars Jr. and,
   // to deep-scan `choice`/`best-move`, Pawn Wars too) — set now, well before either is reached.
-  await page.evaluate(() => {
-    localStorage.setItem('chess-kids:test-seed', '1');
-  });
+  // The voice-report flag (above) is set here too, not via `addInitScript` before the first
+  // `page.goto`: every `chess-kids:*` key is reserved for the app's own versioned storage
+  // (`local-store.ts`), which throws "Unversioned chess-kids data found in storage" if one is
+  // already present before the app's own startup writes its version key. Setting it only once the
+  // app is already up (same as `test-seed` already did) still covers the whole curriculum walk
+  // below — only the first-run screens themselves go unwatched, and those are scanned separately
+  // by the "onboarding and profile screens" test above, with nothing to narrate incorrectly there.
+  await page.evaluate(
+    ({ checkVoiceMisses: check }: { checkVoiceMisses: boolean }) => {
+      localStorage.setItem('chess-kids:test-seed', '1');
+      if (check) localStorage.setItem('chess-kids:voice-report', '1');
+    },
+    { checkVoiceMisses },
+  );
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
   await expectNoSeriousViolations(page, 'Home');
@@ -772,6 +787,21 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
   expect(completeScanned, 'the Complete step got a scan').toBe(true);
   expect(summaryScanned, 'the session summary got a scan').toBe(true);
+
+  if (checkVoiceMisses) {
+    const misses = await page.evaluate(
+      () =>
+        (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses ?? [],
+    );
+    // A miss records the *original* text (`audio-narrator.ts`), which may still carry the
+    // nickname this walk's profile used ("Kid") even though the generated-audio lookup itself
+    // strips it first (`docs/voice.md` "Nickname") — excepted here, same as that rule.
+    const unexpected = misses.filter((text) => !text.includes('Kid'));
+    expect(
+      unexpected,
+      `voice misses (no generated audio played): ${JSON.stringify(misses)}`,
+    ).toEqual([]);
+  }
 });
 
 test('test-out sheet, runner and result screen have no serious/critical violations and kid-sized touch targets (M4.5)', async ({

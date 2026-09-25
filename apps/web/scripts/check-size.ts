@@ -1,5 +1,5 @@
 import { gzipSync } from 'node:zlib';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -78,4 +78,55 @@ console.log(`Total JS (incl. lazy chunks + worker): ${totalKb} KB gzip`);
 
 if (initialBytes > BUDGET_BYTES) {
   throw new Error(`initial JS size budget exceeded: ${initialKb} KB > ${budgetKb} KB`);
+}
+
+/**
+ * Offline precache size (M6.3 item 5; `docs/non-functional.md` §1's ≤ 50 MB/language budget,
+ * `docs/voice.md`'s own ≤ 25 MB English audio slice being the dominant piece of it): every file
+ * the built service worker (`vite-plugin-pwa`'s `dist/sw.js`) actually precaches on first install,
+ * parsed straight out of its own `precacheAndRoute([{ url, revision }, …])` call — the exact list
+ * workbox itself caches, not a re-derived guess — so this always matches what a first offline
+ * visit really stores. Reports the `audio/en/*` slice separately from the rest.
+ */
+const PRECACHE_BUDGET_BYTES = 50 * 1024 * 1024;
+
+/** Every `url:"…"` (or `url:'…'`) in `precacheAndRoute([{ url: "…", revision: "…" }, …])` — the
+ * built, minified `sw.js` quotes each string, but not always with the same quote character. */
+function precachedUrls(swJs: string): string[] {
+  const urls: string[] = [];
+  const pattern = /\burl:(["'])((?:(?!\1).)*?)\1/g;
+  for (const match of swJs.matchAll(pattern)) {
+    const url = match[2];
+    if (url !== undefined) urls.push(url);
+  }
+  return urls;
+}
+
+const swPath = join(distDir, 'sw.js');
+const swJs = readFileSync(swPath, 'utf-8');
+const precacheUrls = precachedUrls(swJs);
+if (precacheUrls.length === 0) {
+  throw new Error(`no precacheAndRoute(...) entries found in ${swPath} — run the build first`);
+}
+
+let precacheBytes = 0;
+let audioBytes = 0;
+for (const url of precacheUrls) {
+  const filePath = join(distDir, decodeURIComponent(url));
+  const bytes = statSync(filePath).size;
+  precacheBytes += bytes;
+  if (url.startsWith('audio/')) audioBytes += bytes;
+}
+
+const precacheMb = (precacheBytes / 1024 / 1024).toFixed(1);
+const audioMb = (audioBytes / 1024 / 1024).toFixed(1);
+const precacheBudgetMb = (PRECACHE_BUDGET_BYTES / 1024 / 1024).toFixed(0);
+console.log(
+  `Offline precache: ${precacheMb} MB (budget ${precacheBudgetMb} MB), of which audio: ${audioMb} MB`,
+);
+
+if (precacheBytes > PRECACHE_BUDGET_BYTES) {
+  throw new Error(
+    `offline precache size budget exceeded: ${precacheMb} MB > ${precacheBudgetMb} MB`,
+  );
 }

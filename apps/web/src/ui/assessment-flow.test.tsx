@@ -213,9 +213,9 @@ describe('Test-out (M4.5)', () => {
 async function completeOnboardingToPlacementOffer(nickname: string): Promise<void> {
   fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
   fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
-  fireEvent.change(screen.getByLabelText('Repeat code'), { target: { value: '1234' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Save code' }));
-  await screen.findByText('Code saved!');
+  fireEvent.change(screen.getByLabelText('Repeat parent code'), { target: { value: '1234' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Save parent code' }));
+  await screen.findByText('Parent code saved!');
   fireEvent.click(screen.getByRole('button', { name: 'Next' }));
   fireEvent.change(await screen.findByPlaceholderText('Your name'), {
     target: { value: nickname },

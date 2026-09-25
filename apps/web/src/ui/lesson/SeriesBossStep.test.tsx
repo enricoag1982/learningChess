@@ -4,6 +4,7 @@ import type { MiniGame, SelectSquaresDef } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
+import type { FakeNarrator } from '../../testing/fake-narrator.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
 import { BossStep } from './BossStep.tsx';
@@ -87,6 +88,7 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     const boss = fixtureSeriesBoss(0, 2);
     const lesson = fixtureLesson({ boss: boss.id });
     const services = createTestServices(fixtureContentSource(lesson, [boss]));
+    const narrator = services.narrator as unknown as FakeNarrator;
     const { store } = await renderWithStore(
       <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
       services,
@@ -101,6 +103,14 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
     fireEvent.click(screen.getByRole('button', { name: /Check/ }));
     expect(screen.getByText('1 mistake so far')).toBeTruthy();
+    // The instruction, then the wrong-pick note, as two separate utterances (M6.3 item 1) — not
+    // one `${instruction} ${note}` concatenation.
+    await waitFor(() => {
+      expect(narrator.spoken.slice(-2)).toEqual([
+        'sh-r2',
+        'Not quite! Take away the orange squares and tap the dashed ones.',
+      ]);
+    });
 
     // Deselect the wrong pick, select the right one, and finish.
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));

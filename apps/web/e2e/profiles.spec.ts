@@ -14,15 +14,15 @@ test.describe('Profiles, first run and parent area', () => {
 
     // First run: parent password.
     await page.getByLabel('Parent code', { exact: true }).fill('1234');
-    await page.getByLabel('Repeat code').fill('1234');
+    await page.getByLabel('Repeat parent code').fill('1234');
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: 'Save code' }).click(),
+      page.getByRole('button', { name: 'Save parent code' }).click(),
     ]);
     expect(download.suggestedFilename()).toBe('chess-for-kids-parent-code.txt');
 
     // First run: Saved.
-    await expect(page.getByText('Code saved!')).toBeVisible();
+    await expect(page.getByText('Parent code saved!')).toBeVisible();
     await expect(page.getByText('chess-for-kids-parent-code.txt')).toBeVisible();
     await page.getByRole('button', { name: 'Next' }).click();
 
@@ -55,7 +55,7 @@ test.describe('Profiles, first run and parent area', () => {
     for (let attempt = 1; attempt <= 4; attempt += 1) {
       await page.getByLabel('Parent code', { exact: true }).fill('nope');
       await page.getByRole('button', { name: 'Open' }).click();
-      await expect(page.getByText(`Wrong code (${String(attempt)} of 5)`)).toBeVisible();
+      await expect(page.getByText(`Wrong parent code (${String(attempt)} of 5)`)).toBeVisible();
     }
     await page.getByLabel('Parent code', { exact: true }).fill('nope');
     await page.getByRole('button', { name: 'Open' }).click();

@@ -8,6 +8,7 @@ import type {
   Profile,
   ProfileSettings,
 } from '@chess-kids/core';
+import type { Services } from '../../app/services.ts';
 import {
   changeAvatar,
   computerLevelStatus,
@@ -238,6 +239,54 @@ function HoursChipRow({
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+type VoiceOutcome = Awaited<ReturnType<Services['testVoice']>>;
+
+/**
+ * Parent area "Test voice" check (M6.3 item 2): speaks one fixed, inventoried sentence
+ * (`voice-check.sentence`) through the real narrator and reports whether generated audio actually
+ * played, or a short reason why it fell back to the device voice (`docs/voice.md` "Fallback
+ * rules") — the owner-reported "voice sounds mechanical" symptom is that fallback, most often on
+ * iPad Safari before the audio context is truly unlocked.
+ */
+function VoiceTestRow(): JSX.Element {
+  const { t } = useTranslation();
+  const services = useServices();
+  const [testing, setTesting] = useState(false);
+  const [outcome, setOutcome] = useState<VoiceOutcome | null>(null);
+
+  async function runTest(): Promise<void> {
+    setTesting(true);
+    const result = await services.testVoice(t('voice-check.sentence'));
+    setOutcome(result);
+    setTesting(false);
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <button
+        type="button"
+        disabled={testing}
+        onClick={() => {
+          void runTest();
+        }}
+        className={PARENT_SECONDARY_BUTTON}
+      >
+        {t('parent.voice-test-button')}
+      </button>
+      {outcome &&
+        (outcome.kind === 'audio' ? (
+          <p className="text-sm font-bold text-muted">{t('parent.voice-test-audio')}</p>
+        ) : (
+          <p className={PARENT_NOTE}>
+            {t('parent.voice-test-fallback', {
+              reason: t(`parent.voice-test-reason.${outcome.reason}`),
+            })}
+          </p>
+        ))}
     </div>
   );
 }
@@ -547,6 +596,7 @@ export function ChildSettingsScreen({
               void patchSettings({ voice: value });
             }}
           />
+          <VoiceTestRow />
           <ToggleRow
             label={t('parent.sound-label')}
             checked={settings.sound}

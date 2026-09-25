@@ -65,7 +65,7 @@ test.describe('Parent area: overview, report, backup (M5.1)', () => {
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel('Parent code', { exact: true }).fill('nope');
     await dialog.getByRole('button', { name: 'Reset' }).click();
-    await dialog.getByText('Wrong code.').waitFor();
+    await dialog.getByText('Wrong parent code.').waitFor();
     await dialog.getByLabel('Parent code', { exact: true }).fill('1234');
     await dialog.getByRole('button', { name: 'Reset' }).click();
     await page.getByText('Progress reset.').waitFor();

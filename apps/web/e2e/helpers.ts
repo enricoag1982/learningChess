@@ -1078,8 +1078,8 @@ export async function completeFirstRunToPlacementOffer(
   await page.getByRole('button', { name: 'Start setup' }).click();
 
   await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByLabel('Repeat code').fill('1234');
-  await page.getByRole('button', { name: 'Save code' }).click();
+  await page.getByLabel('Repeat parent code').fill('1234');
+  await page.getByRole('button', { name: 'Save parent code' }).click();
 
   await page.getByRole('button', { name: 'Next' }).click(); // Saved -> new player
   await page.getByPlaceholder('Your name').fill(nickname);

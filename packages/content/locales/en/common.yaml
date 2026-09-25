@@ -55,18 +55,18 @@ first-run:
     primary: Start setup
   password:
     title: Set a parent code
-    body: "You'll need this code to open the grown-ups area. It keeps children out of the settings; it is not a security password."
+    body: "You'll need this parent code to open the grown-ups area. It keeps children out of the settings; it is not a security password."
     label: Parent code
-    repeat-label: Repeat code
+    repeat-label: Repeat parent code
     show: Show
     hide: Hide
     rules: At least 4 characters. Numbers are OK.
-    mismatch: The codes do not match.
+    mismatch: The parent codes do not match.
     too-short: Use at least 4 characters.
     privacy-link: Read our privacy policy
-    primary: Save code
+    primary: Save parent code
   saved:
-    title: Code saved!
+    title: Parent code saved!
     body: 'Saved a copy: {{location}}'
     primary: Next
 new-player:
@@ -89,7 +89,7 @@ password-screen:
   primary: Open
   back: Back
   forgot: 'Forgot it? It is in the file {{location}}.'
-  wrong: 'Wrong code ({{attempt}} of {{max}})'
+  wrong: 'Wrong parent code ({{attempt}} of {{max}})'
   locked: 'Try again in {{time}}'
 parent:
   title: Parent area
@@ -108,9 +108,9 @@ parent:
   delete-confirm-body: This removes all saved progress for this child. This cannot be undone.
   delete-cancel: Cancel
   delete-confirm: Delete
-  change-password: Change code
-  new-password-label: New code
-  download-code: Download code file
+  change-password: Change parent code
+  new-password-label: New parent code
+  download-code: Download parent code file
   code-downloaded: 'Saved a copy: {{location}}'
   save: Save
   cancel: Cancel
@@ -133,7 +133,7 @@ parent:
   reset-confirm: Reset
   reset-done: Progress reset.
   password-label: Parent code
-  wrong-password: Wrong code.
+  wrong-password: Wrong parent code.
   daily-limit-heading: Daily time limit
   daily-limit-off: Off
   daily-limit-minutes_one: '{{count}} min'
@@ -146,6 +146,16 @@ parent:
   play-until-heading: Play until
   play-from-heading: Not before
   voice-label: Voice
+  voice-test-button: Test voice
+  voice-test-audio: Recorded voice ✓
+  voice-test-fallback: 'Device voice — recorded voice unavailable ({{reason}})'
+  voice-test-reason:
+    no-audio-context: no sound support
+    still-suspended: still starting up
+    manifest-not-loaded: voice list unavailable
+    no-generated-audio: no recorded line for this text
+    file-missing: audio file missing
+    decode-failed: audio file unreadable
   sound-label: Sounds
   hints-label: Hints
   computer-level-heading: Computer level
@@ -229,6 +239,12 @@ parent:
     contact-heading: Questions?
     contact-body: "Open an issue on the project's GitHub repository: {{url}}"
     close: Close
+voice-check:
+  # Parent area "Test voice" (M6.3 item 2): the one fixed sentence it speaks. Deliberately its own
+  # top-level key, not under `parent:` — every `parent.*`/`new-player.*`/`backup.*`/`privacy.*` key
+  # is grown-up-only and never narrated (`voice-texts.ts`'s `EXCLUDED_KEY_PREFIXES`), but this text
+  # must be in the voice inventory to actually test the recorded voice.
+  sentence: Let's play chess together!
 lesson:
   close: Close lesson
   skip: Skip

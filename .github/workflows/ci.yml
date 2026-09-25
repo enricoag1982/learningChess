@@ -53,6 +53,9 @@ jobs:
       - name: Older Safari compatibility (iOS 15.4+)
         run: pnpm run --if-present compat
 
+      - name: Voice coverage
+        run: pnpm run --if-present voice:check
+
       - name: Install Playwright browser
         run: pnpm --filter @chess-kids/web exec playwright install --with-deps chromium
 

@@ -155,6 +155,8 @@ beforeEach(() => {
 afterEach(() => {
   (window as unknown as { AudioContext?: typeof AudioContext }).AudioContext = realAudioContext;
   vi.restoreAllMocks();
+  window.localStorage.removeItem('chess-kids:voice-report');
+  delete (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses;
 });
 
 describe('createAudioNarrator', () => {
@@ -180,6 +182,32 @@ describe('createAudioNarrator', () => {
 
     ctx.sources[0]?.finish();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'audio' });
+  });
+
+  it('blank text is a no-op: nothing spoken, nothing interrupted', async () => {
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith('k'))));
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const current = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    await expect(narrator.speak('')).resolves.toBeUndefined();
+    await expect(narrator.speak('   ')).resolves.toBeUndefined();
+
+    expect(fallback.speakCalls).toEqual([TEXT]);
+    expect(fallback.cancelCalls).toBe(1); // only the one `speak(TEXT)` itself did, not the blanks
+    fallback.resolveNext();
+    await current;
   });
 
   it('miss: falls back to Web Speech for a text with no manifest entry', async () => {
@@ -204,6 +232,29 @@ describe('createAudioNarrator', () => {
 
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'no-generated-audio' });
+  });
+
+  it('mp3 fetch failure (404) falls back to Web Speech', async () => {
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith(KEY))));
+    fetch.on(`${BASE_URL}${KEY}.mp3`, () => Promise.resolve(bufferResponse(false)));
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    fallback.resolveNext();
+    await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'file-missing' });
   });
 
   it('manifest load failure (network error) falls back to Web Speech', async () => {
@@ -224,6 +275,7 @@ describe('createAudioNarrator', () => {
     });
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'manifest-not-loaded' });
   });
 
   it('manifest load failure (404) falls back to Web Speech', async () => {
@@ -244,6 +296,7 @@ describe('createAudioNarrator', () => {
     });
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'manifest-not-loaded' });
   });
 
   it('decode error falls back to Web Speech', async () => {
@@ -266,6 +319,7 @@ describe('createAudioNarrator', () => {
     });
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'decode-failed' });
   });
 
   it('no AudioContext available falls back to Web Speech', async () => {
@@ -286,6 +340,7 @@ describe('createAudioNarrator', () => {
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
     expect(narrator.available).toBe(true); // fallback.available still makes the narrator available
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'no-audio-context' });
   });
 
   it('a still-suspended AudioContext falls back when resume() fails', async () => {
@@ -309,6 +364,37 @@ describe('createAudioNarrator', () => {
     expect(ctx.resumeCalls).toBe(1);
     fallback.resolveNext();
     await expect(speaking).resolves.toBeUndefined();
+    expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'still-suspended' });
+  });
+
+  it('a still-suspended AudioContext falls back after a 300ms resume() timeout (resume() never settles)', async () => {
+    vi.useFakeTimers();
+    try {
+      const ctx = new FakeAudioContext();
+      ctx.state = 'suspended';
+      ctx.resume = () => new Promise<void>(() => {}); // never settles
+      const fetch = new FakeFetch();
+      fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith(KEY))));
+      const fallback = new FakeFallback();
+      const narrator = createAudioNarrator({
+        baseUrl: BASE_URL,
+        fallback,
+        fetch: fetch.fn,
+        audioContextFactory: () => ctx as unknown as AudioContext,
+      });
+
+      const speaking = narrator.speak(TEXT);
+      await vi.advanceTimersByTimeAsync(300);
+      await vi.waitFor(() => {
+        expect(fallback.speakCalls).toEqual([TEXT]);
+      });
+      expect(ctx.state).toBe('suspended'); // resume() truly never settled
+      fallback.resolveNext();
+      await expect(speaking).resolves.toBeUndefined();
+      expect(narrator.lastOutcome()).toEqual({ kind: 'fallback', reason: 'still-suspended' });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('cancel() stops in-flight audio playback and the fallback', async () => {
@@ -510,5 +596,192 @@ describe('createAudioNarrator', () => {
     const mp3FetchesAfterSecond = fetch.calls.filter((url) => url.endsWith('.mp3')).length;
     expect(mp3FetchesAfterSecond).toBe(mp3FetchesAfterFirst);
     expect(ctx.decodeCalls).toBe(1);
+  });
+});
+
+describe('iOS unlock listeners (owner report: voice sounds mechanical on iPad)', () => {
+  it('listens on pointerdown, touchend, click and keydown — iOS only truly unlocks inside touchend/click', async () => {
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith(KEY))));
+    fetch.on(`${BASE_URL}${KEY}.mp3`, () => Promise.resolve(bufferResponse()));
+    const fallback = new FakeFallback();
+    const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    // Creating the `AudioContext` (any `speak()` call) is what registers the unlock listeners.
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(ctx.sources).toHaveLength(1);
+    });
+    ctx.sources[0]?.finish();
+    await speaking;
+
+    const listenedTypes = new Set(
+      addEventListenerSpy.mock.calls
+        .filter(([, listener]) => typeof listener === 'function')
+        .map(([type]) => type),
+    );
+    expect(listenedTypes).toEqual(new Set(['pointerdown', 'touchend', 'click', 'keydown']));
+  });
+
+  it('keeps listening for the unlock gesture until the context actually resumes, then stops', async () => {
+    const ctx = new FakeAudioContext(); // starts 'running': this test's own `speak()` never resumes
+    let resumeCalls = 0;
+    let resolvedState: AudioContextState = 'suspended';
+    ctx.resume = () => {
+      resumeCalls += 1;
+      ctx.state = resolvedState;
+      return Promise.resolve();
+    };
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith(KEY))));
+    fetch.on(`${BASE_URL}${KEY}.mp3`, () => Promise.resolve(bufferResponse()));
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    // Registers the unlock listeners; `ctx` starts 'running' so this call's own `ensureRunning`
+    // never touches `resume()` itself — every `resumeCalls` below comes only from the listeners.
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(ctx.sources).toHaveLength(1);
+    });
+    ctx.sources[0]?.finish();
+    await speaking;
+    expect(resumeCalls).toBe(0);
+
+    // The context is (or remains) suspended: the first gesture's `resume()` doesn't actually
+    // unlock it — a real iOS case a `{ once: true }` listener would miss entirely.
+    ctx.state = 'suspended';
+    document.dispatchEvent(new Event('pointerdown'));
+    await vi.waitFor(() => {
+      expect(resumeCalls).toBe(1);
+    });
+    expect(ctx.state).toBe('suspended');
+
+    document.dispatchEvent(new Event('touchend'));
+    await vi.waitFor(() => {
+      expect(resumeCalls).toBe(2);
+    });
+    expect(ctx.state).toBe('suspended'); // still listening: neither gesture actually unlocked it
+
+    // A later gesture actually succeeds: the listeners are then removed.
+    resolvedState = 'running';
+    document.dispatchEvent(new Event('click'));
+    await vi.waitFor(() => {
+      expect(ctx.state).toBe('running');
+    });
+    const callsOnceRunning = resumeCalls;
+
+    document.dispatchEvent(new Event('keydown'));
+    expect(resumeCalls).toBe(callsOnceRunning); // listeners were removed: no further resume() calls
+  });
+});
+
+describe('missed-text report (M6.3 item 4)', () => {
+  it('off by default: a manifest miss records nothing to window.__chessKidsVoiceMisses', async () => {
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () =>
+      Promise.resolve(jsonResponse(manifestWith('other-key'))),
+    );
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    fallback.resolveNext();
+    await speaking;
+
+    expect(
+      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
+    ).toBeUndefined();
+  });
+
+  it('on (chess-kids:voice-report=1): records a manifest miss and a decode failure', async () => {
+    window.localStorage.setItem('chess-kids:voice-report', '1');
+
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () =>
+      Promise.resolve(jsonResponse(manifestWith('other-key'))),
+    );
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const speaking = narrator.speak(TEXT); // TEXT's key is not in the manifest: a manifest miss
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    fallback.resolveNext();
+    await speaking;
+
+    ctx.decodeFails = true;
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith(KEY))));
+    fetch.on(`${BASE_URL}${KEY}.mp3`, () => Promise.resolve(bufferResponse()));
+    // A fresh narrator, so a fresh (uncached) manifest fetch picks up the handler swap above.
+    const narrator2 = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+    const speaking2 = narrator2.speak(TEXT); // now a manifest hit, but decoding fails
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT, TEXT]);
+    });
+    fallback.resolveNext();
+    await speaking2;
+
+    expect(
+      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
+    ).toEqual([TEXT, TEXT]);
+  });
+
+  it('does not record an environmental fallback (no AudioContext) — not a content gap', async () => {
+    window.localStorage.setItem('chess-kids:voice-report', '1');
+
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: () => Promise.reject(new Error('should not be called')),
+      audioContextFactory: () => {
+        throw new Error('no AudioContext');
+      },
+    });
+
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    fallback.resolveNext();
+    await speaking;
+
+    expect(
+      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
+    ).toBeUndefined();
   });
 });
