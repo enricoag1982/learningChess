@@ -101,6 +101,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Done (`m5.5`): every remaining World 1–2 lesson (Rook already had `rook-04-easy`/`rook-08-easy`) now has one, on its hardest scored exercise; rules: domain-model.md §3.4 |
 | F3 | Tappable vs not tappable (owner, playtest) | Today info boxes (e.g. "Your moves: 48", stars pill, Owl bubble) look like buttons (same card, border). Proposal: tappable = raised card (border + bottom shadow, pressed state, icon or chevron); info = flat tinted panel, no border, no shadow; audit every screen | Done (`m5.3`): `.tap-raised`/`.info-flat` (`index.css`), shared primitives (`ui/primitives.tsx`), screens.md §1 |
 | F4 | Bear stronger than Wolf | M5.4: tried null-move pruning + late move reductions + history-heuristic ordering (`docs/computer-opponent.md` §6.6); bear vs wolf 13.3% → 20.0% (N = 30, same-seed baseline vs after), still well short of ≥ 70% | Still open. Next: richer `staticEval` for Bear (mobility, king safety, passed pawns — the one M4.2 option not yet tried), isolating each of the 3 techniques' own share (measured together only, for time), wider opening-book coverage |
+| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze (reducer ignores input while `pendingReply` is set). Unreachable today (all 27 mate-in-n are n = 1) | Fixed by v4 R3 (`useExerciseSession`); before any mate-in-2+ content, fix directly |
 
 ## 4. After MVP
 
@@ -113,6 +114,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | v2 | Time controls + device sharing (offline, no server; owner 2026-09-25) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
 | Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
+| v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; after `v2.0.0` |
 
 ## 5. Playtests
 

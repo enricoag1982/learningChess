@@ -1,6 +1,6 @@
 # Chess for Kids — project guide
 
-Offline chess learning app for an 8-year-old beginner. Design is complete; implementation starts at milestone M0.
+Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in progress: M6 voice & art, M7 (v2 scope); planned: v4 platform refactor (`docs/refactor-v4.md`).
 
 ## Working style (user preferences)
 
@@ -11,7 +11,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
   - `model: "sonnet"`: implementation tasks with a clear spec (files, interfaces, tests to write).
   - `model: "haiku"`: running lint / typecheck / tests, mechanical edits, dependency checks.
   - Main agent: plans, writes precise task specs, reviews diffs, decides, commits.
-- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Milestone branches from `master` (current: `m0-scaffold`); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: log row in `docs/validation.md` (checks run, manual checks) + squash title `M<N>.<i>: …` → CI creates annotated tag `m<N>.<i>` (session cannot push tags: HTTP 403).
+- Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Branches from `master` (one per milestone / iteration); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: log row in `docs/validation.md` (checks run, manual checks) + squash title `M<N>.<i>: …` → CI creates annotated tag `m<N>.<i>` (session cannot push tags: HTTP 403).
 
 ## Docs (read the relevant one before working on an area)
 
@@ -30,6 +30,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 | `docs/validation.md` | Check IDs, per-tag validation log |
 | `docs/release.md` | Release checklist, tagging, rollback |
 | `docs/retrospective.md` | M0–M5 retrospective: outcome, time spent, went well / wrong, learnings |
+| `docs/refactor-v4.md` | v4 plan: learning-platform refactor (platform packages + chess subject pack), phases, targets |
 
 ## Key decisions
 
