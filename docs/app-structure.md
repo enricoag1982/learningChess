@@ -157,23 +157,23 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 - **In:** profiles, placement test + test-out, Basics (worlds 1–5), Today session + warm-up, 12 Basics mini-games (5 game modes) + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
 - **Next:** tracks Openings, Tactics, Checkmates & Endgames; puzzle library. Later: Strategy track.
-- **v2 (online):** parent login, cloud sync, online play with friends (invite code, no chat, preset emojis).
-- **v2 (time controls):** explore detailed time log, limits and exceptions (below).
+- **v2 (offline, owner 2026-09-25):** time controls (below) + device sharing: merge rules and "Send to other device" file (roadmap §7).
+- **Later, maybe (online):** parent login, automatic sync, online play with friends (invite code, no chat, preset emojis).
 
 ### Time controls
-| Feature | v1 | v2 (explore) |
+| Feature | v1 | v2 |
 |---|---|---|
 | Time log | Minutes per day per profile (parent report, streaks); foreground time with a kid profile active (lessons, practice, play, Home/Journey/Den browsing) — paused when the page is hidden or idle > 2 min without input (M5.2) | Sessions: start, end, activity (lesson / practice / play); week and month views |
 | Limits | One daily limit per profile, off by default, resets at local midnight (M5.1 setting, enforced from M5.2) | Per weekday; allowed hours (e.g. not after 20:00); separate limits for Play vs Learning |
 | Exceptions | Parent "more time" from the "See you tomorrow" screen: password → +15 min today, on top of the limit, repeatable (M5.2) | Kid "Ask for more time" trigger (parent still enters the password); date overrides (holidays, weekends) |
-| Limit reached | Checked between activities only — on entering a lesson / warm-up / practice run / game / mini-game, and on returning to Home; never mid-exercise or mid-game, so an activity started before the limit always finishes. Then: "See you tomorrow" screen (Owl, spoken, today's stars); **Switch player** or **Parent: more time** (M5.2) | Owl warns 2 min before; same end flow |
-| Across devices | — | With login + sync: one limit across all devices |
+| Limit reached | Checked between activities only — on entering a lesson / warm-up / practice run / game / mini-game, and on returning to Home; never mid-exercise or mid-game, so an activity started before the limit always finishes. Then: "See you tomorrow" screen (Owl, spoken, today's stars); **Switch player** or **Parent: more time** (M5.2) Owl warns at ≤ 5 min left, on calm screens only (notice layer, roadmap §7); same end flow |
+| Across devices | — | Per device; merged at each file share (minutes recomputed from the merged log). One live limit only with the later online sync |
 
 ### Online hooks in v1
-| Hook | v1 | v2 |
+| Hook | v1 | Later, maybe (online) |
 |---|---|---|
 | Login | Guest; implicit local account owns profiles | Parent account (email link / Google / Apple) |
-| Sync | None | Device ↔ cloud |
+| Sync | None (v2: file share + merge import) | Family-code encrypted sync, same merge rules |
 | Matches | Same-device matches | Online matches via invite code |
 | Feature flags | `login: false`, `online: false` → no online entries in UI | Flags on |
 

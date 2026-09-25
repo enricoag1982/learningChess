@@ -110,7 +110,8 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships as `v1.2.0` |
 | M7 | Store apps | Capacitor Android + iPad, native storage, store listings |
 | M8 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
-| v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions. 2026-09-25: owner unsure about online → scope under discussion |
+| v2 | Time controls + device sharing (offline, no server; owner 2026-09-25) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
+| Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
 
 ## 5. Playtests
@@ -134,4 +135,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 |---|---|
 | Illustrations | v1: own flat SVG placeholders. M6 owner pick (current / Fluent 3D / Fluent flat): Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
+| v2 scope (2026-09-25) | Offline only: time controls + file-based device sharing with merge. Online (login, remote play, cloud sync) parked: server, child-consent law (COPPA / GDPR Art. 8), privacy-policy rewrite, moderation, for little gain with one child at home |
+| 5-min warning | App-level notice layer in `App.tsx` (next to `TimeTracker` / `AppUpdater`), shown only on calm screens (Home, Journey, Play, Practice, My Den, lesson complete, session summary), never mid-exercise / game; remaining ≤ 5 min, once per child per day; Owl banner, info style (not tappable), spoken once, gone on the next screen change, `aria-live="polite"`. Reusable for later notices |
+| Device sharing | Option 1 of 4 (share file / QR / parent's cloud drive / family-code sync): merge rules (stars and progress: best of both; attempts, games, time log: union by id; badges: union; streak and minutes: recomputed; settings: newest wins; same child created on 2 devices: "Link to …?" at import) + "Send to other device" via the Web Share API (download fallback). Time limit is per device between shares |
 | Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps |

@@ -199,9 +199,9 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |
 | `Random` | Seeded randomness (deterministic tests for bot, task picking) |
-| `AuthService` | v1 guest; v2 parent login |
-| `SyncService` | v1 no-op; v2 cloud sync |
-| `MatchService` | v1 local matches; v2 online |
+| `AuthService` | v1 guest; parent login parked (later, maybe) |
+| `SyncService` | v1 no-op; v2 merge import of a shared file; later: family-code sync |
+| `MatchService` | v1 local matches; online parked (later, maybe) |
 | `FeatureFlags` | `login`, `online` (false in v1) |
 
 ## 6. Content files
