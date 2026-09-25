@@ -86,9 +86,9 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m5.5` | Release: privacy policy page, readable README (F1), easier variants for the hardest Worlds 1–2 exercises (F2), release checklist → `m5` (playtest 4 by user) |
 | `retro` | After `m5` (owner request): deep retrospective of the whole process — what went well, what went wrong, learnings for a similar app, time estimate (coding, design, active collaboration with the owner, CI / pipeline, agent runs) from git history, CI runs, agent run logs and session transcripts → `docs/retrospective.md` (done 2026-09-25) |
 | `m6.1` | Version text on Home (also kept in the parent area); M6 plan; Store apps → M7, Paths → M8 |
-| `m6.2` | Generated voice pipeline: narrated-text inventory (static + finite template expansions), Kokoro TTS script (offline, incremental, content-hash file names), audio narrator (Web Audio, unlocked on first tap) with device-voice fallback for texts without audio; sample audio for World 1 |
-| `m6.3` | Full English audio in the owner's chosen voice, coverage check (every static text has audio), precache, offline size check, missed-text report from the e2e run → device checks on phone / tablet |
-| `m6.4` | Illustrations in the owner's chosen style: piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
+| `m6.2` | Generated voice: narrated-text inventory (static + finite template expansions), Kokoro TTS script (offline, incremental, content-hash file names), audio narrator (Web Audio, unlocked on first tap) with device-voice fallback for texts without audio, full English audio, precache |
+| `m6.3` | Voice hardening: coverage check (every inventoried text has audio), missed-text report from the e2e run, offline size check, owner check on phone / tablet |
+| `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
 | `m6.5` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
@@ -132,6 +132,6 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | Topic | Decision |
 |---|---|
-| Illustrations | v1: own flat SVG placeholders. M6: owner picks A current / B Microsoft Fluent Emoji 3D / C Fluent Emoji flat (MIT, 2–6 KB each, bundled); no emoji for a lioness (C: lion SVG without the mane) |
+| Illustrations | v1: own flat SVG placeholders. M6 owner pick (current / Fluent 3D / Fluent flat): Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
-| Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio (e.g. the child's nickname). Voice: owner picks from 5 samples |
+| Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps |
