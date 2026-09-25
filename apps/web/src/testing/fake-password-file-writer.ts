@@ -1,6 +1,6 @@
 import type { PasswordFileWriter } from '@chess-kids/core';
 
-const LOCATION = 'Downloads/chess-for-kids-parent-password.txt';
+const LOCATION = 'Downloads/chess-for-kids-parent-code.txt';
 
 export interface FakePasswordFileWriter extends PasswordFileWriter {
   /** Every password written so far, oldest first. */

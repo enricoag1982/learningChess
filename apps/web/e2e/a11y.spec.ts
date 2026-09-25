@@ -245,7 +245,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
 
   // 2. First run: parent password (parent style).
   await page.getByRole('button', { name: 'Start setup' }).click();
-  await expectParentTouchTarget(page, 'Save password');
+  await expectParentTouchTarget(page, 'Save code');
   await expectNoSeriousViolations(page, 'First run: Password');
 
   // 2.5. Its "Read our privacy policy" link (M5.5): an in-screen dialog, not a new store screen.
@@ -257,11 +257,11 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await privacyDialog.getByRole('button', { name: 'Close' }).click();
   await privacyDialog.waitFor({ state: 'hidden' });
 
-  await page.getByLabel('Password', { exact: true }).fill('1234');
-  await page.getByLabel('Repeat password').fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
+  await page.getByLabel('Repeat code').fill('1234');
   await Promise.all([
     page.waitForEvent('download'),
-    page.getByRole('button', { name: 'Save password' }).click(),
+    page.getByRole('button', { name: 'Save code' }).click(),
   ]);
 
   // 3. First run: Saved (parent style).
@@ -303,7 +303,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
 
   // 8. Parent area overview (parent style, M5.1: tappable child cards, no inline management
   // buttons any more — those moved to the child's own Settings screen, scanned next).
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await expectParentTouchTarget(page, 'Add child');
   await expectParentTouchTarget(page, 'Backup');
@@ -362,7 +362,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectOnlyButtonsRaised(page, 'Time limit: See you tomorrow');
 
   await page.getByRole('button', { name: 'Parent: more time' }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await page.getByRole('button', { name: /Let me try/ }).waitFor(); // resumed into the lesson
 });

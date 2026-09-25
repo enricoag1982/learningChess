@@ -1,11 +1,11 @@
 import type { PasswordFileWriter } from '@chess-kids/core';
 
-const FILE_NAME = 'chess-for-kids-parent-password.txt';
+const FILE_NAME = 'chess-for-kids-parent-code.txt';
 /** app-structure.md §2: web keeps the password in the app; this file is only the parent's copy. */
 const LOCATION = `Downloads/${FILE_NAME}`;
 
 function fileText(password: string): string {
-  return `Chess for Kids — parent password: ${password}\nKeep this file. The app asks for this password before the parent area.\n`;
+  return `Chess for Kids — parent code: ${password}\nKeep this file. The app asks for this code before the grown-ups area.\n`;
 }
 
 /** Triggers a same-origin download of `filename` holding `text`, then releases the object URL. */
@@ -24,7 +24,8 @@ function triggerDownload(filename: string, text: string): void {
 /**
  * `PasswordFileWriter` for the web: browsers cannot write to a fixed path, so this downloads a
  * plain-text copy of the password to the browser's Downloads folder instead (app-structure.md §2:
- * "copy saved as `Downloads/chess-for-kids-parent-password.txt` at setup and at every change").
+ * "copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on
+ * \"Download code file\" in the grown-ups area").
  */
 export function createDownloadPasswordFileWriter(): PasswordFileWriter {
   return {

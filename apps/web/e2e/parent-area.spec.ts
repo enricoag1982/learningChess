@@ -10,7 +10,7 @@ import {
 /** From an already-rendered profile picker, opens the parent area with the standard test password. */
 async function openParentArea(page: import('@playwright/test').Page): Promise<void> {
   await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
   await page.getByRole('heading', { name: 'Parent area' }).waitFor();
 }
@@ -63,10 +63,10 @@ test.describe('Parent area: overview, report, backup (M5.1)', () => {
     // Reset: wrong password rejected, right password clears progress (report now shows 0 stars).
     await page.getByRole('button', { name: 'Reset progress' }).click();
     const dialog = page.getByRole('dialog');
-    await dialog.getByLabel('Password', { exact: true }).fill('nope');
+    await dialog.getByLabel('Parent code', { exact: true }).fill('nope');
     await dialog.getByRole('button', { name: 'Reset' }).click();
-    await dialog.getByText('Wrong password.').waitFor();
-    await dialog.getByLabel('Password', { exact: true }).fill('1234');
+    await dialog.getByText('Wrong code.').waitFor();
+    await dialog.getByLabel('Parent code', { exact: true }).fill('1234');
     await dialog.getByRole('button', { name: 'Reset' }).click();
     await page.getByText('Progress reset.').waitFor();
 

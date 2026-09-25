@@ -7,7 +7,7 @@ function makeLock(overrides: Partial<ParentLock> = {}): ParentLock {
   return {
     id: 'lock-1',
     password: '1234',
-    fileLocation: 'Downloads/chess-for-kids-parent-password.txt',
+    fileLocation: 'Downloads/chess-for-kids-parent-code.txt',
     failedAttempts: 0,
     lockedUntil: null,
     createdAt: '2026-01-01T00:00:00.000Z',

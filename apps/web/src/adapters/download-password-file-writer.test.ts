@@ -18,7 +18,7 @@ afterEach(() => {
 });
 
 describe('createDownloadPasswordFileWriter', () => {
-  it('triggers a download named chess-for-kids-parent-password.txt and reports its location', async () => {
+  it('triggers a download named chess-for-kids-parent-code.txt and reports its location', async () => {
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
       // jsdom does not implement navigation; only the trigger matters here.
     });
@@ -26,10 +26,10 @@ describe('createDownloadPasswordFileWriter', () => {
 
     const result = await writer.write('1234');
 
-    expect(result).toEqual({ location: 'Downloads/chess-for-kids-parent-password.txt' });
+    expect(result).toEqual({ location: 'Downloads/chess-for-kids-parent-code.txt' });
     expect(clickSpy).toHaveBeenCalledTimes(1);
     const anchor = clickSpy.mock.instances[0] as HTMLAnchorElement;
-    expect(anchor.download).toBe('chess-for-kids-parent-password.txt');
+    expect(anchor.download).toBe('chess-for-kids-parent-code.txt');
     expect(createObjectURL).toHaveBeenCalledTimes(1);
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:fake-url');
 

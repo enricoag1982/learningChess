@@ -21,7 +21,7 @@ async function openGrownUps(): Promise<void> {
 }
 
 function enterPassword(password: string): void {
-  fireEvent.change(screen.getByLabelText('Password'), { target: { value: password } });
+  fireEvent.change(screen.getByLabelText('Parent code'), { target: { value: password } });
   fireEvent.click(screen.getByRole('button', { name: 'Open' }));
 }
 
@@ -32,11 +32,11 @@ describe('first run', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
 
-    fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
-    fireEvent.change(screen.getByLabelText('Repeat password'), { target: { value: '1234' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Save password' }));
+    fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
+    fireEvent.change(screen.getByLabelText('Repeat code'), { target: { value: '1234' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save code' }));
 
-    await screen.findByText('Password saved!');
+    await screen.findByText('Code saved!');
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
     fireEvent.change(await screen.findByPlaceholderText('Your name'), {
@@ -61,10 +61,10 @@ describe('first run', () => {
     render(<App services={services} />);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
-    fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
-    fireEvent.change(screen.getByLabelText('Repeat password'), { target: { value: '1234' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Save password' }));
-    await screen.findByText('Password saved!');
+    fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
+    fireEvent.change(screen.getByLabelText('Repeat code'), { target: { value: '1234' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save code' }));
+    await screen.findByText('Code saved!');
     fireEvent.click(screen.getByRole('button', { name: 'Next' }));
 
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
@@ -76,7 +76,7 @@ describe('first run', () => {
     const services = makeServices();
     render(<App services={services} />);
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
-    await screen.findByRole('heading', { name: 'Set a parent password' });
+    await screen.findByRole('heading', { name: 'Set a parent code' });
 
     fireEvent.click(screen.getByRole('button', { name: 'Read our privacy policy' }));
     const dialog = await screen.findByRole('dialog', { name: 'Privacy' });
@@ -87,7 +87,7 @@ describe('first run', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
     });
-    expect(screen.getByRole('heading', { name: 'Set a parent password' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Set a parent code' })).toBeTruthy();
   });
 });
 
@@ -101,7 +101,7 @@ describe('password screen', () => {
 
     for (let attempt = 1; attempt <= 4; attempt += 1) {
       enterPassword('nope');
-      await screen.findByText(`Wrong password (${String(attempt)} of 5)`);
+      await screen.findByText(`Wrong code (${String(attempt)} of 5)`);
     }
 
     enterPassword('nope');
@@ -205,12 +205,12 @@ describe('parent area', () => {
     render(<App services={services} />);
     await openParentArea();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Change password' }));
-    fireEvent.change(screen.getByLabelText('New password'), { target: { value: '5678' } });
-    fireEvent.change(screen.getByLabelText('Repeat password'), { target: { value: '5678' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Change code' }));
+    fireEvent.change(screen.getByLabelText('New code'), { target: { value: '5678' } });
+    fireEvent.change(screen.getByLabelText('Repeat code'), { target: { value: '5678' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-    await screen.findByRole('button', { name: 'Change password' }); // form closed again
+    await screen.findByRole('button', { name: 'Change code' }); // form closed again
 
     const writer = services.deps.passwordFile as FakePasswordFileWriter;
     expect(writer.writes).toContain('5678');

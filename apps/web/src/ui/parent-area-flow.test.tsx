@@ -13,6 +13,7 @@ import {
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
+import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
 
 afterEach(cleanup);
 
@@ -25,7 +26,7 @@ function makeServices(): ReturnType<typeof createTestServices> {
 /** From the picker (already showing), opens the parent area with the standard test password. */
 async function openParentArea(): Promise<void> {
   fireEvent.click(await screen.findByRole('button', { name: /Grown-ups/ }));
-  fireEvent.change(await screen.findByLabelText('Password'), { target: { value: '1234' } });
+  fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
   fireEvent.click(screen.getByRole('button', { name: 'Open' }));
   await screen.findByRole('heading', { name: 'Parent area' });
 }
@@ -203,11 +204,11 @@ describe('Parent area reset (M5.1)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Reset progress' }));
     const dialog = await screen.findByRole('dialog');
-    fireEvent.change(within(dialog).getByLabelText('Password'), { target: { value: 'nope' } });
+    fireEvent.change(within(dialog).getByLabelText('Parent code'), { target: { value: 'nope' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Reset' }));
-    await within(dialog).findByText('Wrong password.');
+    await within(dialog).findByText('Wrong code.');
 
-    fireEvent.change(within(dialog).getByLabelText('Password'), { target: { value: '1234' } });
+    fireEvent.change(within(dialog).getByLabelText('Parent code'), { target: { value: '1234' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Reset' }));
 
     await screen.findByText('Progress reset.');
@@ -231,6 +232,23 @@ describe('Parent area privacy and version (M5.5)', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
     await screen.findByRole('heading', { name: 'Parent area' });
+  });
+});
+
+describe('Parent code file (owner request 2026-09-25)', () => {
+  it('"Download code file" writes the current code again and says where', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    const writer = services.deps.passwordFile as FakePasswordFileWriter;
+    const writesBefore = writer.writes.length;
+
+    fireEvent.click(screen.getByRole('button', { name: 'Download code file' }));
+
+    await screen.findByText('Saved a copy: Downloads/chess-for-kids-parent-code.txt');
+    expect(writer.writes.length).toBe(writesBefore + 1);
+    expect(writer.writes.at(-1)).toBe('1234');
   });
 });
 

@@ -4,12 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { isValidPassword, setupParentPassword } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
-import {
-  PARENT_INPUT,
-  PARENT_NOTE,
-  PARENT_PRIMARY_BUTTON,
-  PARENT_SECONDARY_BUTTON,
-} from './parent/parent-styles.ts';
+import { PARENT_INPUT, PARENT_NOTE, PARENT_PRIMARY_BUTTON } from './parent/parent-styles.ts';
 import { Owl } from './Owl.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
@@ -159,7 +154,8 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
   );
 }
 
-/** Step 3 (parent style): confirms the file location, offers a re-download. */
+/** Step 3 (parent style): confirms where the code file was saved. A new copy can be downloaded
+ * later from the grown-ups area ("Download code file"). */
 function SavedStep({
   location,
   onNext,
@@ -168,28 +164,12 @@ function SavedStep({
   readonly onNext: () => void;
 }): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
-
-  async function downloadAgain(): Promise<void> {
-    const lock = await services.deps.parentLock.get();
-    if (!lock) return;
-    await services.deps.passwordFile.write(lock.password);
-  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-line bg-card p-6">
         <h1 className="text-lg font-extrabold text-ink">{t('first-run.saved.title')}</h1>
         <p className="text-sm text-muted">{t('first-run.saved.body', { location })}</p>
-        <button
-          type="button"
-          onClick={() => {
-            void downloadAgain();
-          }}
-          className={PARENT_SECONDARY_BUTTON}
-        >
-          {t('first-run.saved.download-again')}
-        </button>
         <button type="button" onClick={onNext} className={PARENT_PRIMARY_BUTTON}>
           {t('first-run.saved.primary')}
         </button>
