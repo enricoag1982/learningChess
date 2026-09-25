@@ -102,7 +102,8 @@ describe('password screen', () => {
     enterPassword('1234');
 
     await screen.findByRole('heading', { name: 'Parent area' });
-    expect(screen.getByText('Mia')).toBeTruthy();
+    // M5.1 overview cards load after the (lazy, M5.4) screen mounts.
+    expect(await screen.findByText('Mia')).toBeTruthy();
   });
 
   it('back returns to the picker', async () => {

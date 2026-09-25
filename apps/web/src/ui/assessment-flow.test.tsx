@@ -321,7 +321,7 @@ describe('Parent unlock (M4.5)', () => {
     await screen.findByRole('heading', { name: 'Parent area' });
 
     // M5.1: the unlock panel moved from the overview row into the child's own Settings screen.
-    const miaCard = screen.getByText('Mia').closest('button');
+    const miaCard = (await screen.findByText('Mia')).closest('button');
     if (!miaCard) throw new Error('Mia card not found');
     fireEvent.click(miaCard);
     fireEvent.click(await screen.findByRole('button', { name: 'Settings' }));

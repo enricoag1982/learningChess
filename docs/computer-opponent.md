@@ -160,6 +160,49 @@ never run anywhere near that long. Bear's shortfall is the real one: a bigger al
 (null-move pruning, a richer evaluation, or wider opening-book coverage so fewer games leave it)
 would address it; out of scope for M4.2, left for a later iteration.
 
+## 6.6 Bear strength (M5.4, roadmap F4)
+
+Tried, in the order the roadmap's F4 entry suggested, all in `packages/core/src/domain/bot/search.ts`,
+**Bear only** (`bear !== undefined` gates every one of them — see §6.5 above for why that scoping
+matters: the same value-preserving-but-order-shifting effect that changed Fox's own conversion rate
+in M4.2 applies to a new technique exactly the same way):
+
+1. **Null-move pruning** — before searching a node's own moves, asks whether the opponent would
+   still reach `beta` even after a free pass, at a reduced depth; a `no` prunes the whole subtree.
+   Standard `R = 2` reduction (`negamax`'s `tryNullMove`). A first, small-sample self-play check
+   (N = 10) looked like a regression next to a same-seed baseline run at the same N, which turned
+   out to be small-sample noise: a further same-seed baseline check at that N came back identical
+   (§6.5's own "worse than chance" `NEAR_BEST_MARGIN` finding was reached the same way, at a larger
+   N — a reminder to size the sample before trusting a small one either way here). Kept.
+2. **Late move reductions** — a quiet move ordered late in a node's own move list (`orderMoves` — TT
+   move, captures, killers, then history score, next) is searched one ply shallower first,
+   re-searched at full depth only if that still beats `alpha`. Kept: `LMR_MIN_DEPTH = 3`,
+   `LMR_FULL_MOVE_COUNT = 3`, `LMR_REDUCTION = 1` (`negamax`).
+3. **History heuristic** — a quiet move that caused a beta cutoff anywhere in one `chooseBySearch`
+   call is remembered (`HistoryTable`, keyed by colour + from + to, weighted by `depth²`) and reused
+   as `orderMoves`'s tiebreak below captures/TT/killers, at any ply, not only the one it cut off at
+   (killer moves are ply-scoped; history is not). Kept.
+4. **Richer eval** (mobility, king safety, passed pawns): not reached — 1-3 together already measured
+   a real gain (below), and isolating each technique's own individual share of it would have cost
+   another full N = 30 self-play run per technique (≈ 7 minutes each, this machine) on top of the
+   ones already spent chasing the small-sample false alarm above; the milestone's time budget
+   favoured a solid combined measurement over that. Left as the next thing to try if a later
+   iteration revisits this (`§9`).
+
+**Measured** (`pnpm --filter @chess-kids/core calibrate 30 bear`, this machine, 1-3 together vs a
+same-seed baseline run of the unmodified pre-M5.4 code — taken purposely on identical seeds rather
+than trust the older, smaller-sample M4.2 figure (§6.5's 26.7% over 15 seeds) at face value): bear
+vs wolf **13.3% → 20.0%** (4/30 → 6/30 wins, 0 draws → 2 draws) — a real, roughly 1.5× improvement
+over this same-seed baseline, still below M4.2's own 26.7%/15-seed figure and well short of the 70%
+target either way. Per this milestone's own instructions, stopping here and reporting the numbers
+rather than pushing further within this iteration's time budget. Speed is unaffected: `search.test.ts`'s
+reference-set p50/p95 stay in the same range §6.5 already measured (this run: p50 ≈ 277 ms,
+p95 ≈ 307 ms — the ≤ 300 ms(local) / ≤ 600 ms (CI) test bounds still hold within their own existing
+noise margin, same as §6.5's own 300-330 ms range). `fox vs rabbit`/`wolf vs fox` are unaffected
+(`winnability.test.ts`, `search.test.ts`'s own tactics/determinism suite: unchanged, green) — every
+one of these three techniques is gated on `level.level === 5`, same as §6.5's own `tt`/`killers`/
+`quiesce`.
+
 ## 7. Mini-games and exercises
 
 | Use | Opponent |
@@ -177,10 +220,16 @@ would address it; out of scope for M4.2, left for a later iteration.
 | Determinism | Same position + seed → same move (Bear's own case, `search.test.ts`, given §6.5's mid-search time cap) |
 | Performance | Bear ≤ 300 ms per move (p50) / ≤ 600 ms (p95, CI) on a 10-position reference set |
 | Book | `bookCandidates`/`bookMove` (`book.test.ts`): prefix matching, ply cap, dedup, determinism; `chooseMove` wiring (`search.test.ts`) |
-| Calibration (manual, not in CI) | `pnpm --filter @chess-kids/core calibrate [games]` (default 40): self-play, each level vs the previous, target ≥ 70% win rate. Run once for M4.2 (§6.5's numbers); not a nightly job (no CI schedule wired up) |
+| Calibration (manual, not in CI) | `pnpm --filter @chess-kids/core calibrate [games] [level]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate; the optional 3rd arg filters to one pairing by its higher level's name (`calibrate 30 bear`, M5.4's own quick smoke check while tuning one level). Run for M4.2 (§6.5's numbers) and M5.4 (§6.6's); not a nightly job (no CI schedule wired up) |
 | Mate hint (M3.5) | `mateHint` returns a legal move for the side to move; finds a mate-in-1 when one exists; `null` only with no legal move at all |
 
 ## 9. Later
 
 - **Game review:** after a game, Owl shows up to 3 key moments (material swing ≥ 3), e.g. "Here the Horse could take the Rook".
-- **Bear strength (M4.2 known limitation, §6.5):** a genuinely complete depth-4 search within the 250 ms budget, in the wide-open positions where it matters most — null-move pruning, a richer `staticEval`, or wider opening-book coverage are the likely levers; the calibration script (§8) is how to check progress.
+- **Bear strength (M5.4, §6.6, roadmap F4 — still open):** 13.3% → 20.0% bear-vs-wolf, still well
+  short of 70%. Likely next levers, in order of expected payoff for the effort: a richer
+  `staticEval` for Bear only (mobility, king safety, passed pawns — the one option from F4's own
+  list not yet tried); isolating each of null-move/LMR/history's own individual contribution (§6.6
+  measured them together only, for time); wider opening-book coverage so fewer games ever leave it
+  in the first place. The calibration script (§8, `calibrate 30 bear` for a faster read on this one
+  pairing) is how to check progress on any of them.

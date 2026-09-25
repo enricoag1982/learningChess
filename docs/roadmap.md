@@ -93,7 +93,7 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | No README yet; `docs/` are compact specs, not for casual readers |
 | F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Engine, UI, Rook variants (`rook-04`, `rook-08`) done; rules: domain-model.md §3.4 |
 | F3 | Tappable vs not tappable (owner, playtest) | Today info boxes (e.g. "Your moves: 48", stars pill, Owl bubble) look like buttons (same card, border). Proposal: tappable = raised card (border + bottom shadow, pressed state, icon or chevron); info = flat tinted panel, no border, no shadow; audit every screen | Design pass in M5 (accessibility + polish); rule goes to screens.md §1 |
-| F4 | Bear stronger than Wolf | Calibration (M4.2): bear vs wolf 26.7% (target ≥ 70%); Bear = depth 4 with a 250 ms cap rarely completes depth 4 in quiet positions | Options: null-move pruning, richer eval, wider book, or Bear = Wolf depth + quiescence; decide with M5 performance work |
+| F4 | Bear stronger than Wolf | M5.4: tried null-move pruning + late move reductions + history-heuristic ordering (`docs/computer-opponent.md` §6.6); bear vs wolf 13.3% → 20.0% (N = 30, same-seed baseline vs after), still well short of ≥ 70% | Still open. Next: richer `staticEval` for Bear (mobility, king safety, passed pawns — the one M4.2 option not yet tried), isolating each of the 3 techniques' own share (measured together only, for time), wider opening-book coverage |
 
 ## 4. After MVP
 

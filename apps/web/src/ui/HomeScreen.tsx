@@ -7,6 +7,7 @@ import { avatarName, characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
+import { InstallBanner } from './InstallBanner.tsx';
 import { RankPill } from './RankPill.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { SpeechBubble } from './SpeechBubble.tsx';
@@ -260,6 +261,8 @@ export function HomeScreen(): JSX.Element {
           </button>
         </div>
       </div>
+
+      <InstallBanner />
 
       <div className="flex flex-1 flex-col items-stretch justify-center gap-8 sm:flex-row sm:items-center">
         <div className="flex flex-1 flex-col gap-3">

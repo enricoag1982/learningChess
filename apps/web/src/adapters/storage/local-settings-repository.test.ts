@@ -37,6 +37,17 @@ describe('LocalStorageSettingsRepository', () => {
     });
   });
 
+  it('keeps storagePersisted through a save / get round trip (M5.4)', async () => {
+    const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
+    await repo.save({
+      lastProfileId: null,
+      suggestedLevels: {},
+      profileSettings: {},
+      storagePersisted: true,
+    });
+    expect((await repo.get()).storagePersisted).toBe(true);
+  });
+
   it('saves and reads back per-profile settings (M5.1)', async () => {
     const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
     const settings = {

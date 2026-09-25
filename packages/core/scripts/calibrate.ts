@@ -89,12 +89,23 @@ if (!Number.isInteger(N) || N <= 0) {
   throw new Error(`calibrate: expected a positive integer game count, got "${String(gamesArg)}"`);
 }
 
+/** Optional 3rd arg (`pnpm --filter @chess-kids/core calibrate 15 bear`): only the pairing whose
+ * `higher` level has this name — a quick smoke check while tuning one level (M5.4's own Bear
+ * strength work, `docs/computer-opponent.md` §9) without paying for the other 3 pairings every
+ * time. Omitted runs every pairing, as before. */
+const filterArg = process.argv[3];
+const pairings =
+  filterArg === undefined ? PAIRINGS : PAIRINGS.filter((p) => p.higher === filterArg);
+if (pairings.length === 0) {
+  throw new Error(`calibrate: no pairing has "${String(filterArg)}" as its higher level`);
+}
+
 console.log(
   `Calibration: ${String(N)} seeded games per pairing, target >= ${String(TARGET_WIN_RATE * 100)}% for the higher level.\n`,
 );
 
 let allOk = true;
-for (const { higher: higherName, lower: lowerName } of PAIRINGS) {
+for (const { higher: higherName, lower: lowerName } of pairings) {
   const higher = levelNamed(higherName);
   const lower = levelNamed(lowerName);
   const start = performance.now();

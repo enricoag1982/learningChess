@@ -111,6 +111,10 @@ export interface AppSettings {
   /** Parent area "Settings per child" (M5.1, app-structure.md §11), by profile id. Absent for a
    * profile with none saved yet — reads back as `DEFAULT_PROFILE_SETTINGS` (`app/settings.ts`). */
   readonly profileSettings: Readonly<Record<string, ProfileSettings>>;
+  /** Result of the one `navigator.storage.persist()` request on this device, made after its first
+   * profile is created (non-functional.md §1 "Storage eviction"); `undefined` until it settles or
+   * when the API is unavailable. Shown in the parent area. */
+  readonly storagePersisted?: boolean;
 }
 
 /** Persistence of `AppSettings`. Async so cloud adapters can replace local ones. */

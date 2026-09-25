@@ -13,9 +13,12 @@ const DEFAULT_SETTINGS: AppSettings = {
  * pre-`profileSettings` record (M4.1 and earlier / pre-M5.1) does not have — same "old data reads
  * back as the empty default" approach `migrations.ts` already uses for `concept-stats`/
  * `game-records`, so this needs no version bump. */
-function isAppSettingsShape(
-  value: unknown,
-): value is { lastProfileId: string | null; suggestedLevels?: unknown; profileSettings?: unknown } {
+function isAppSettingsShape(value: unknown): value is {
+  lastProfileId: string | null;
+  suggestedLevels?: unknown;
+  profileSettings?: unknown;
+  storagePersisted?: unknown;
+} {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
   if (record.lastProfileId !== null && typeof record.lastProfileId !== 'string') return false;
@@ -36,11 +39,15 @@ function normalize(stored: {
   lastProfileId: string | null;
   suggestedLevels?: unknown;
   profileSettings?: unknown;
+  storagePersisted?: unknown;
 }): AppSettings {
   return {
     lastProfileId: stored.lastProfileId,
     suggestedLevels: (stored.suggestedLevels as Record<string, number> | undefined) ?? {},
     profileSettings: (stored.profileSettings as AppSettings['profileSettings'] | undefined) ?? {},
+    ...(typeof stored.storagePersisted === 'boolean'
+      ? { storagePersisted: stored.storagePersisted }
+      : {}),
   };
 }
 

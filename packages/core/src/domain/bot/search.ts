@@ -43,22 +43,46 @@ function captureScore(move: Move): number {
   return PIECE_VALUE[move.captured];
 }
 
+/** History-heuristic key: colour + from + to (no piece/promotion — a quiet move's own identity is
+ * fully carried by which square moved where, for the colour whose history table this scores). */
+function historyKey(move: Move): string {
+  return `${move.color}${move.from}${move.to}`;
+}
+
+/** History heuristic (`docs/computer-opponent.md` §3/§8, Bear-only — see `negamax`'s doc comment
+ * on why every one of these tables is scoped to Bear alone): a quiet move that caused a beta
+ * cutoff anywhere in this `chooseBySearch` call, weighted by the depth it cut off at (a cutoff deep
+ * in the tree says more than one a ply from a leaf), read back by `orderMoves` as a tiebreak below
+ * captures/TT/killers — the same "try what worked before, elsewhere in the tree, first" idea as
+ * killer moves, but keyed by the move itself (not just the ply) so it also helps order moves at a
+ * *different* ply that killers never reach. */
+type HistoryTable = Map<string, number>;
+
+function recordHistory(history: HistoryTable, move: Move, depth: number): void {
+  const key = historyKey(move);
+  history.set(key, (history.get(key) ?? 0) + depth * depth);
+}
+
 /**
  * Move ordering for one search node (`docs/computer-opponent.md` §3/§8 "Bear speed"): the
  * transposition-table move from a previous pass first (it is this node's best move so far — trying
  * it first lets alpha-beta prune the rest fastest), then captures by MVV-LVA, then this ply's
  * killer moves (quiet moves that caused a beta cutoff at the same ply elsewhere in the tree), then
- * the rest in generation order. Skips the sort on a node where none of that applies (most nodes,
- * deep in the tree, with no captures, no TT hit and no killer) — cheap and worth checking first,
- * since this runs at every node.
+ * every other quiet move by its history score (Bear only — `history` is `undefined` for every other
+ * level, same as before this table existed), then the rest in generation order. Skips the sort on a
+ * node where none of that applies (most nodes, deep in the tree, with no captures, no TT hit, no
+ * killer and an empty/no history table) — cheap and worth checking first, since this runs at every
+ * node.
  */
 function orderMoves(
   moves: readonly Move[],
   ttMove?: Move,
   killers: readonly Move[] = NO_KILLERS,
+  history?: HistoryTable,
 ): Move[] {
   const hasCapture = moves.some((move) => move.captured !== undefined);
-  if (!hasCapture && ttMove === undefined && killers.length === 0) {
+  const hasHistory = history !== undefined && history.size > 0;
+  if (!hasCapture && ttMove === undefined && killers.length === 0 && !hasHistory) {
     return [...moves];
   }
   function score(move: Move): number {
@@ -70,7 +94,10 @@ function orderMoves(
       return 500_000 + capture;
     }
     const killerIndex = killers.findIndex((killer) => sameMove(killer, move));
-    return killerIndex === -1 ? 0 : 100_000 - killerIndex;
+    if (killerIndex !== -1) {
+      return 100_000 - killerIndex;
+    }
+    return history?.get(historyKey(move)) ?? 0;
   }
   return [...moves].sort((a, b) => score(b) - score(a));
 }
@@ -141,6 +168,115 @@ function fromTT(score: number, plyFromRoot: number): number {
   }
   return score;
 }
+
+/**
+ * Bear-only search extras, bundled into one optional parameter instead of three separate ones
+ * threaded through `negamax`/`quiesce`/`searchRoot`/`chooseBySearch` (`docs/computer-opponent.md`
+ * §3/§8): `quiescenceDepth` (unchanged from before this bundle existed), `rules` (needed only to
+ * build the position `negamax` searches after a null move — see `tryNullMove` — every other
+ * function here already gets its board from the caller), and `history` (the table above).
+ * `undefined` for every level but Bear, same as `quiescenceDepth` alone used to be — so this is a
+ * rename, not a new behaviour, for anything that stays `undefined`.
+ */
+interface BearSearch {
+  readonly quiescenceDepth: number;
+  readonly rules: ChessRules;
+  readonly history: HistoryTable;
+}
+
+/** Plies of reduction for a null-move search (`tryNullMove`): standard `R = 2`. */
+const NULL_MOVE_REDUCTION = 2;
+
+/** Never tries a null move below this depth — `depth - 1 - NULL_MOVE_REDUCTION` must stay ≥ 0, and
+ * a null move this close to a leaf has too little search left under it to say anything useful. */
+const NULL_MOVE_MIN_DEPTH = 3;
+
+/** A null move that flips `toMove` with nothing else changed would wrongly leave an en passant
+ * capture on the table that was never really available (nobody just played the double step that
+ * creates one) — standard null-move handling clears it. Castling rights are untouched: passing the
+ * move affects neither side's own right to castle later. */
+function nullMovePosition(position: Position): Position {
+  return { ...position, toMove: other(position.toMove), enPassant: null };
+}
+
+/** Null-move pruning's own "not in a likely zugzwang" guard (`tryNullMove`): skip when the side to
+ * move has only its king and pawns left, the position class where "passing" can be *better* than
+ * every legal move (the whole idea a null move tests), so the pruning it enables is unsound there. */
+function hasNonPawnMaterial(pieces: Position['pieces'], color: Color): boolean {
+  return Object.values(pieces).some(
+    (piece) => piece.color === color && piece.type !== 'p' && piece.type !== 'k',
+  );
+}
+
+/**
+ * Null-move pruning (`docs/computer-opponent.md` §3/§8 "Bear speed"): before searching this node's
+ * own moves, asks "if the side to move got a free pass, would the opponent's best reply still stay
+ * at or below `beta`?" at a shallow, reduced depth. A wide-open, quiet, roughly-equal position is
+ * exactly the case flagged in §6.5/§9 as Bear's weak spot — most legal moves there score near-
+ * identically, which is also exactly when a free pass still fails to reach `beta`: the position was
+ * never in danger of dropping below it in the first place, so the *actual* move search below can be
+ * skipped outright. Returns a fail-soft score `>= beta` on a successful cutoff, `null` otherwise (no
+ * conclusion — the normal move loop runs as usual). Guards: not in check (a null move cannot escape
+ * one), not already searching for a mate score either side (`Math.abs(beta) < MATE_THRESHOLD` — a
+ * null move's own shallow reply search is a poor judge of an actual mate line), and not a likely
+ * zugzwang position (`hasNonPawnMaterial`). Builds a fresh `SearchBoard` from the flipped position
+ * (`nullMovePosition`) rather than reaching into `board`'s own undo stack for a "move" that is not
+ * really a legal chess move — cheap next to a real subtree, since this only ever runs at `depth >=
+ * NULL_MOVE_MIN_DEPTH` (a handful of nodes near the root of Bear's own shallow, depth-4 tree, not
+ * the hot per-node path the rest of this file is written for). At Bear's own shallow depth the
+ * reduced verification is often no more than a single quiescence call (`depth - 1 - R` bottoms out
+ * at 0) — measured (`packages/core/scripts/calibrate.ts`, `docs/computer-opponent.md` §9) against a
+ * same-size baseline sample rather than trusted on theory alone, since a shallow-verification
+ * technique like this is exactly the kind small-sample calibration noise can make look like a
+ * regression (or an improvement) that a same-seed baseline comparison shows is not there. */
+function tryNullMove(
+  board: SearchBoard,
+  def: GameRulesDef,
+  needsPieces: boolean,
+  depth: number,
+  beta: number,
+  plyFromRoot: number,
+  tt: TranspositionTable,
+  killers: Killers,
+  bear: BearSearch,
+  clock: SearchClock,
+): number | null {
+  if (depth < NULL_MOVE_MIN_DEPTH || Math.abs(beta) >= MATE_THRESHOLD || board.inCheck()) {
+    return null;
+  }
+  const position = board.position();
+  if (!hasNonPawnMaterial(position.pieces, position.toMove)) {
+    return null;
+  }
+  const nullBoard = bear.rules.searchBoard(nullMovePosition(position));
+  const score = -negamax(
+    nullBoard,
+    def,
+    needsPieces,
+    depth - 1 - NULL_MOVE_REDUCTION,
+    -beta,
+    -beta + 1,
+    plyFromRoot + 1,
+    undefined,
+    tt,
+    killers,
+    bear,
+    clock,
+  );
+  return score >= beta ? score : null;
+}
+
+/** Late move reductions (`docs/computer-opponent.md` §3/§8 "Bear speed"): a quiet move ordered
+ * late (`orderMoves` already tried the TT move, captures and killers first — by this index, none
+ * of those explain why it might be good) is searched one ply shallower first; only a move that
+ * still beats `alpha` at that reduced depth earns the full-depth re-search `negamax`'s own loop
+ * would otherwise always pay for. Skips a move that gives check (a check is never "quiet" in the
+ * sense this reduction assumes — it forces a reply, so judging it at a shallower depth is more
+ * likely to misjudge it) and the first `LMR_FULL_MOVE_COUNT` moves at a node (ordering already put
+ * the moves most likely to matter there). */
+const LMR_MIN_DEPTH = 3;
+const LMR_FULL_MOVE_COUNT = 3;
+const LMR_REDUCTION = 1;
 
 /** Thrown to unwind a search past its `TIME_BUDGET_MS` deadline (see `chooseBySearch`); caught
  * only where it is thrown from, so it never escapes as a real error. */
@@ -310,8 +446,9 @@ function quiesce(
  * costly) piece map for that check when the def has no such condition, which plain chess never
  * does — only checkmate, decided from the legal-move count and check flag alone.
  *
- * `tt`/`killers`/`quiesce` (`docs/computer-opponent.md` §3/§8 "Bear speed") are all scoped to Bear
- * (`quiescenceDepth !== undefined`, this call's `useTt`) and nowhere else: `tt` caches each node's
+ * `tt`/`killers`/`quiesce`/null-move/LMR/history (`docs/computer-opponent.md` §3/§8/§9 "Bear
+ * speed"/"Bear strength") are all scoped to Bear (`bear !== undefined`, this call's `useTt`) and
+ * nowhere else: `tt` caches each node's
  * result by `SearchBoard.hash()` so a cutoff-strength entry (depth ≥ what is needed here)
  * short-circuits the node outright, its move seeding `orderMoves` even below that depth; `killers`
  * feeds the same ordering with quiet moves that cut off a sibling node at this ply before.
@@ -334,11 +471,11 @@ function negamax(
   lastMove: Move | undefined,
   tt: TranspositionTable,
   killers: Killers,
-  quiescenceDepth: number | undefined,
+  bear: BearSearch | undefined,
   clock: SearchClock,
 ): number {
   checkDeadline(clock);
-  const useTt = quiescenceDepth !== undefined;
+  const useTt = bear !== undefined;
   const hash = useTt ? board.hash() : 0n;
   const ttEntry = useTt ? tt.get(hash) : undefined;
   if (ttEntry !== undefined && ttEntry.depth >= depth) {
@@ -361,7 +498,7 @@ function negamax(
     return terminal;
   }
   if (depth === 0) {
-    return quiescenceDepth === undefined
+    return bear === undefined
       ? staticEval(needsPieces ? view : boardView(board, moves, true), def)
       : quiesce(
           board,
@@ -370,34 +507,84 @@ function negamax(
           alpha,
           beta,
           plyFromRoot,
-          quiescenceDepth,
+          bear.quiescenceDepth,
           lastMove,
           clock,
         );
   }
 
+  if (bear !== undefined) {
+    const pruned = tryNullMove(
+      board,
+      def,
+      needsPieces,
+      depth,
+      beta,
+      plyFromRoot,
+      tt,
+      killers,
+      bear,
+      clock,
+    );
+    if (pruned !== null) {
+      return pruned;
+    }
+  }
+
   let best = -Infinity;
   let bestMove: Move | undefined;
   let localAlpha = alpha;
-  const ordered = orderMoves(moves, ttEntry?.move, killers[plyFromRoot] ?? NO_KILLERS);
-  for (const move of ordered) {
+  const nodeKillers = killers[plyFromRoot] ?? NO_KILLERS;
+  const ordered = orderMoves(moves, ttEntry?.move, nodeKillers, bear?.history);
+  for (const [index, move] of ordered.entries()) {
     board.play(move);
     let score: number;
     try {
+      // Late move reductions (Bear only, `LMR_MIN_DEPTH`'s own doc comment): a quiet move this far
+      // down the already-good-first ordering, that does not itself give check, is tried one ply
+      // shallower first — only re-searched at the full depth below when that still beats alpha.
+      const isQuiet = move.captured === undefined;
+      const isPriority =
+        (ttEntry?.move !== undefined && sameMove(move, ttEntry.move)) ||
+        nodeKillers.some((killer) => sameMove(killer, move));
+      const reducible =
+        bear !== undefined &&
+        depth >= LMR_MIN_DEPTH &&
+        index >= LMR_FULL_MOVE_COUNT &&
+        isQuiet &&
+        !isPriority &&
+        !board.inCheck();
+      const reduction = reducible ? LMR_REDUCTION : 0;
       score = -negamax(
         board,
         def,
         needsPieces,
-        depth - 1,
+        depth - 1 - reduction,
         -beta,
         -localAlpha,
         plyFromRoot + 1,
         move,
         tt,
         killers,
-        quiescenceDepth,
+        bear,
         clock,
       );
+      if (reduction > 0 && score > localAlpha) {
+        score = -negamax(
+          board,
+          def,
+          needsPieces,
+          depth - 1,
+          -beta,
+          -localAlpha,
+          plyFromRoot + 1,
+          move,
+          tt,
+          killers,
+          bear,
+          clock,
+        );
+      }
     } finally {
       board.undo();
     }
@@ -409,8 +596,9 @@ function negamax(
       localAlpha = best;
     }
     if (localAlpha >= beta) {
-      if (useTt && move.captured === undefined) {
+      if (bear !== undefined && move.captured === undefined) {
         recordKiller(killers, plyFromRoot, move);
+        recordHistory(bear.history, move, depth);
       }
       break;
     }
@@ -513,7 +701,7 @@ function searchRoot(
   depth: number,
   tt: TranspositionTable,
   killers: Killers,
-  quiescenceDepth: number | undefined,
+  bear: BearSearch | undefined,
   clock: SearchClock,
 ): ScoredMove[] {
   let alpha = -Infinity;
@@ -533,7 +721,7 @@ function searchRoot(
         move,
         tt,
         killers,
-        quiescenceDepth,
+        bear,
         clock,
       );
     } finally {
@@ -575,9 +763,13 @@ function chooseBySearch(
   def: GameRulesDef,
   level: BotLevel,
   random: Random,
+  rules: ChessRules,
 ): Move {
   const needsPieces = needsPiecesForTerminal(def);
-  const quiescenceDepth = level.level === 5 ? QUIESCENCE_DEPTH : undefined;
+  const bear: BearSearch | undefined =
+    level.level === 5
+      ? { quiescenceDepth: QUIESCENCE_DEPTH, rules, history: new Map<string, number>() }
+      : undefined;
   const tt: TranspositionTable = new Map();
   const killers: Killers = [];
   const clock: SearchClock = { nodes: 0, deadline: performance.now() + TIME_BUDGET_MS };
@@ -585,17 +777,7 @@ function chooseBySearch(
   let scored: ScoredMove[] = [];
   for (let depth = 1; depth <= level.depth; depth += 1) {
     try {
-      scored = searchRoot(
-        ordered,
-        board,
-        def,
-        needsPieces,
-        depth,
-        tt,
-        killers,
-        quiescenceDepth,
-        clock,
-      );
+      scored = searchRoot(ordered, board, def, needsPieces, depth, tt, killers, bear, clock);
     } catch (error) {
       if (error instanceof SearchAborted) {
         // Past budget mid-depth: `board` is already back to this call's own position (every
@@ -704,7 +886,7 @@ export function chooseMove(
   if (level.depth <= 0 || roll < level.random + level.shallow) {
     return chooseShallow(candidates, board, state.def, random);
   }
-  return chooseBySearch(candidates, board, state.def, level, random);
+  return chooseBySearch(candidates, board, state.def, level, random, rules);
 }
 
 function pickUniform(moves: readonly Move[], random: Random): Move {

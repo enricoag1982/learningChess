@@ -12,6 +12,10 @@ import type { Streak } from '../domain/streak.ts';
 import type { BackupFileWriter, BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
+// No `new Function` fast path: the production CSP (`script-src 'self'`, M5.4) would report zod's
+// eval probe as a violation. Set before any schema below is built (object schemas read it at init).
+z.config({ jitless: true });
+
 /**
  * One profile's full backed-up data (M5.1, app-structure.md §11/§12, `docs/non-functional.md` §3
  * "export each profile's data"): every stored record this app keeps for a child, except its
