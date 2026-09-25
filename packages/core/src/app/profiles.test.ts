@@ -6,6 +6,7 @@ import { seededRandom } from '../domain/random.ts';
 import {
   changeAvatar,
   changeParentPassword,
+  downloadParentCodeFile,
   createProfile,
   deleteProfile,
   isFirstRun,
@@ -283,6 +284,26 @@ describe('changeParentPassword', () => {
   it('rejects when no lock exists yet', async () => {
     const deps = makeDeps();
     await expect(changeParentPassword(deps, '5678')).rejects.toThrow();
+  });
+});
+
+describe('downloadParentCodeFile', () => {
+  it('writes the current code again, keeps the code and records the new location', async () => {
+    const writer = makePasswordFileWriter();
+    const deps = makeDeps({ passwordFile: writer });
+    await setupParentPassword(deps, '1234');
+
+    const result = await downloadParentCodeFile(deps);
+    expect(result.location).toBe('Downloads/1234.txt');
+    expect(writer.writes).toEqual(['1234', '1234']);
+    const lock = await deps.parentLock.get();
+    expect(lock?.password).toBe('1234');
+    expect(lock?.fileLocation).toBe('Downloads/1234.txt');
+  });
+
+  it('rejects when no code is set up yet', async () => {
+    const deps = makeDeps();
+    await expect(downloadParentCodeFile(deps)).rejects.toThrow();
   });
 });
 

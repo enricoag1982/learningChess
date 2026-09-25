@@ -16,19 +16,19 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 ## 2. Modes
 
 - **Kid mode** (default): icons + voice, no reading required.
-- **Parent mode**: behind parent password. All profiles, progress, settings.
+- **Parent mode**: behind the parent code. All profiles, progress, settings.
 
-### Parent password
-- Simple kid-gate, not a security boundary: password kept in plain text in a simple file.
-- First run: welcome → set parent password (≥ 4 characters, numeric PIN allowed) → file saved → app shows where it is → first child profile.
-- Password screen always shows the reminder: "Forgot it? It is in the file `<path>`."
-- Asked for: parent area, unlock lessons, change limits, extra time, reset / delete, external links.
+### Parent code
+- UI term "parent code", not "password" (owner 2026-09-25): a simple kid-gate, not a security boundary; kept in plain text in a simple file. Internal names (`ParentLock`, `verifyParentPassword`, `PasswordScreen`) unchanged until the v4 refactor.
+- First run: welcome → set parent code (≥ 4 characters, numeric PIN allowed) → file saved → app shows where it is → first child profile. No re-download button there.
+- Code screen always shows the reminder: "Forgot it? It is in the file `<path>`."
+- Asked for: grown-ups area, unlock lessons, change limits, extra time, reset / delete, external links.
 - 5 wrong attempts → 1-minute wait.
 
-| Platform | File | Change password |
+| Platform | File | Change / copy |
 |---|---|---|
-| Web (v1) | Browser cannot read a file from a fixed path → app keeps the password; copy saved as `Downloads/chess-for-kids-parent-password.txt` at setup and at every change | In parent area; forgotten → read the file |
-| Store apps (M7) | App reads the password from `parent-password.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in parent area. Android location to verify at M7 |
+| Web (v1) | Browser cannot read a file from a fixed path → app keeps the code; copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on "Download code file" (grown-ups area, after the code; not on the code screen, so a child cannot fetch it). Older installs keep the location of their first file (`…-parent-password.txt`) until the next download | "Change code" / "Download code file" in the grown-ups area; forgotten → read the file |
+| Store apps (M7) | App reads the code from `parent-code.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in the grown-ups area. Android location to verify at M7 |
 
 ## 3. Profiles
 
@@ -142,12 +142,12 @@ Behind the parent gate; three screens deep — **Overview → child report → c
 |---|---|
 | Overview | One card per child: avatar, nickname, rank, total stars, minutes today / last 7 days, streak (≥ 2 days). Tap → that child's report. Also: Add child, Backup, Change password |
 | Child report | Progress by world (lessons complete/mastered, stars) — worlds with no authored lessons yet are skipped. Concept accuracy (last 10 results) with a "needs practice" summary + a tag on each weak row. Minutes per day, last 14 days (bar + the exact number as visible text, so it reads to a screen reader too; a line marks the daily limit, M5.2). Games, last 10, newest first (opponent by name, result, date). Badges earned (name + tier). Assessments (test-out/placement: kind, score, pass/fail, date). A **Settings** button opens that child's settings |
-| Child settings | Rename, change avatar (moved here from the old flat overview row — one settings screen per child, not one giant list). Daily limit (off / 15 / 20 / 30 / 45 / 60 min — enforced live from M5.2). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Piece style (animal badge / classic — stored now, applied from M5.3). Unlock lessons & worlds (M4.5's panel, unchanged, now living here instead of a toggle on the old flat row). Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent password). Delete (unchanged: removes the profile entirely) |
+| Child settings | Rename, change avatar (moved here from the old flat overview row — one settings screen per child, not one giant list). Daily limit (off / 15 / 20 / 30 / 45 / 60 min — enforced live from M5.2). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Piece style (animal badge / classic — stored now, applied from M5.3). Unlock lessons & worlds (M4.5's panel, unchanged, now living here instead of a toggle on the old flat row). Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent code). Delete (unchanged: removes the profile entirely) |
 | Backup | Export: one JSON file for every child, or (from a child's own Settings) just that one — `chess-kids-backup-<date>.json` / `chess-kids-backup-<nickname>-<date>.json`. Import: pick a file → preview ("2 children, 1,234 stars") → confirm → replaces **all** local data on the device (children not in the file are gone too); an invalid or too-new file shows a clear error and changes nothing |
 
 **Settings effect now**: voice / hints / computer level take effect the next time that profile is selected (not live mid-session — the parent area is reached through "Switch player", which always ends back at the picker); sound has nothing to gate yet (no sound-effect system exists in v1); daily limit is enforced live, read fresh at every activity gate check (M5.2); piece style is stored only until M5.3 reads it.
 
-**Backup scope**: never the parent password (`ParentLockRepository`) or the device's own `lastProfileId` / "Automatic level" suggestions — a restored backup starts fresh at the picker, like any newly-set-up device.
+**Backup scope**: never the parent code (`ParentLockRepository`) or the device's own `lastProfileId` / "Automatic level" suggestions — a restored backup starts fresh at the picker, like any newly-set-up device.
 
 ## 12. Data per profile
 

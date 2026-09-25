@@ -303,6 +303,7 @@ export {
   isFirstRun,
   setupParentPassword,
   changeParentPassword,
+  downloadParentCodeFile,
   verifyParentPassword,
   listProfiles,
   createProfile,

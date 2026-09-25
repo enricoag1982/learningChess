@@ -13,17 +13,17 @@ test.describe('Profiles, first run and parent area', () => {
     await page.getByRole('button', { name: 'Start setup' }).click();
 
     // First run: parent password.
-    await page.getByLabel('Password', { exact: true }).fill('1234');
-    await page.getByLabel('Repeat password').fill('1234');
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
+    await page.getByLabel('Repeat code').fill('1234');
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: 'Save password' }).click(),
+      page.getByRole('button', { name: 'Save code' }).click(),
     ]);
-    expect(download.suggestedFilename()).toBe('chess-for-kids-parent-password.txt');
+    expect(download.suggestedFilename()).toBe('chess-for-kids-parent-code.txt');
 
     // First run: Saved.
-    await expect(page.getByText('Password saved!')).toBeVisible();
-    await expect(page.getByText('chess-for-kids-parent-password.txt')).toBeVisible();
+    await expect(page.getByText('Code saved!')).toBeVisible();
+    await expect(page.getByText('chess-for-kids-parent-code.txt')).toBeVisible();
     await page.getByRole('button', { name: 'Next' }).click();
 
     // New player: nickname, then avatar.
@@ -53,11 +53,11 @@ test.describe('Profiles, first run and parent area', () => {
     await page.getByRole('button', { name: 'Switch player' }).click();
     await page.getByRole('button', { name: /Grown-ups/ }).click();
     for (let attempt = 1; attempt <= 4; attempt += 1) {
-      await page.getByLabel('Password', { exact: true }).fill('nope');
+      await page.getByLabel('Parent code', { exact: true }).fill('nope');
       await page.getByRole('button', { name: 'Open' }).click();
-      await expect(page.getByText(`Wrong password (${String(attempt)} of 5)`)).toBeVisible();
+      await expect(page.getByText(`Wrong code (${String(attempt)} of 5)`)).toBeVisible();
     }
-    await page.getByLabel('Password', { exact: true }).fill('nope');
+    await page.getByLabel('Parent code', { exact: true }).fill('nope');
     await page.getByRole('button', { name: 'Open' }).click();
     await expect(page.getByText(/Try again in \d:\d\d/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Open' })).toBeDisabled();
@@ -65,7 +65,7 @@ test.describe('Profiles, first run and parent area', () => {
     // Skip the 1-minute wait, then the right password opens the parent area.
     await page.clock.fastForward('01:01');
     await expect(page.getByRole('button', { name: 'Open' })).toBeEnabled();
-    await page.getByLabel('Password', { exact: true }).fill('1234');
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
     await page.getByRole('button', { name: 'Open' }).click();
     await expect(page.getByRole('heading', { name: 'Parent area' })).toBeVisible();
 

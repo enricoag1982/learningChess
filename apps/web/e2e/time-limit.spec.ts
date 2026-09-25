@@ -31,7 +31,7 @@ test.describe('Daily time limit (M5.2)', () => {
     await expect(page.getByRole('button', { name: /Let me try/ })).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Parent: more time' }).click();
-    await page.getByLabel('Password', { exact: true }).fill('1234');
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
     await page.getByRole('button', { name: 'Open' }).click();
 
     // Resumes straight into the gated lesson — no confirmation screen in between.
@@ -48,9 +48,9 @@ test.describe('Daily time limit (M5.2)', () => {
     await page.getByRole('heading', { name: 'See you tomorrow!' }).waitFor();
 
     await page.getByRole('button', { name: 'Parent: more time' }).click();
-    await page.getByLabel('Password', { exact: true }).fill('nope');
+    await page.getByLabel('Parent code', { exact: true }).fill('nope');
     await page.getByRole('button', { name: 'Open' }).click();
-    await page.getByText('Wrong password (1 of 5)').waitFor();
+    await page.getByText('Wrong code (1 of 5)').waitFor();
   });
 
   test('Switch player from "See you tomorrow" returns to the picker', async ({ page }) => {
@@ -106,7 +106,7 @@ test.describe('Daily time limit (M5.2)', () => {
     await pickProfileFromPicker(page, 'Kid');
     await page.getByRole('button', { name: 'Switch player' }).click();
     await page.getByRole('button', { name: /Grown-ups/ }).click();
-    await page.getByLabel('Password', { exact: true }).fill('1234');
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
     await page.getByRole('button', { name: 'Open' }).click();
     await page.getByRole('button', { name: /^Kid/ }).click();
     await page.getByRole('button', { name: 'Settings' }).waitFor();

@@ -54,21 +54,20 @@ first-run:
     owl: A grown-up helps set things up first.
     primary: Start setup
   password:
-    title: Set a parent password
-    body: "You'll need this to open the parent area later."
-    label: Password
-    repeat-label: Repeat password
+    title: Set a parent code
+    body: "You'll need this code to open the grown-ups area. It keeps children out of the settings; it is not a security password."
+    label: Parent code
+    repeat-label: Repeat code
     show: Show
     hide: Hide
     rules: At least 4 characters. Numbers are OK.
-    mismatch: Passwords do not match.
+    mismatch: The codes do not match.
     too-short: Use at least 4 characters.
     privacy-link: Read our privacy policy
-    primary: Save password
+    primary: Save code
   saved:
-    title: Password saved!
+    title: Code saved!
     body: 'Saved a copy: {{location}}'
-    download-again: Download again
     primary: Next
 new-player:
   nickname:
@@ -83,14 +82,14 @@ picker:
   title: "Who's playing today?"
   new-player: New player
   grown-ups: Grown-ups
-  grown-ups-hint: Parent password
+  grown-ups-hint: Parent code
 password-screen:
   title: Grown-ups
-  label: Password
+  label: Parent code
   primary: Open
   back: Back
   forgot: 'Forgot it? It is in the file {{location}}.'
-  wrong: 'Wrong password ({{attempt}} of {{max}})'
+  wrong: 'Wrong code ({{attempt}} of {{max}})'
   locked: 'Try again in {{time}}'
 parent:
   title: Parent area
@@ -109,8 +108,10 @@ parent:
   delete-confirm-body: This removes all saved progress for this child. This cannot be undone.
   delete-cancel: Cancel
   delete-confirm: Delete
-  change-password: Change password
-  new-password-label: New password
+  change-password: Change code
+  new-password-label: New code
+  download-code: Download code file
+  code-downloaded: 'Saved a copy: {{location}}'
   save: Save
   cancel: Cancel
   unlock-lessons-worlds: Unlock lessons & worlds
@@ -131,8 +132,8 @@ parent:
   reset-confirm-body: This clears lessons, stars, games, badges and streak. Nickname, avatar and settings stay. This cannot be undone.
   reset-confirm: Reset
   reset-done: Progress reset.
-  password-label: Password
-  wrong-password: Wrong password.
+  password-label: Parent code
+  wrong-password: Wrong code.
   daily-limit-heading: Daily time limit
   daily-limit-off: Off
   daily-limit-minutes_one: '{{count}} min'

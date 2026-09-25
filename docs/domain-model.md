@@ -70,7 +70,7 @@ Character 1─1 piece type
 | Entity | Fields |
 |---|---|
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
-| ParentLock | `password` (plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
+| ParentLock | `password` (the parent code; plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
 | Settings (`ProfileSettings`, M5.1) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60 — stored M5.1, enforced live from M5.2; "every day / school days" once M7.1's weekend toggle is on), `weekendLimitMinutes?` (M7.1: absent = same as `dailyLimitMinutes`; same options, Sat/Sun device-local), `playUntil?`/`playFrom?` (M7.1: `'HH:MM'` local or `null`/absent = that edge off; `playUntil` options 18:00–21:00 every 30 min, `playFrom` 07:00/08:00/09:00), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'` — stored, applied from M5.3). No `aids` overrides in v1 (dropped from the earlier placeholder here — `BotLevel.aids` is per-level, not per-profile) |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`), `skippedPhases?` (playtest 2: `('story'\|'demo'\|'try')[]`, absent = none; set on a "Skip" tap, a phase removed once later played through normally — e.g. a replay) |
