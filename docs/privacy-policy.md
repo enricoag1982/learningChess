@@ -17,7 +17,8 @@ No sign-up, no analytics, no ads, no third-party services. The app never phones 
 ## Network use
 
 The only network access is checking for app updates. Updates are static files delivered from
-GitHub Pages.
+GitHub Pages. "Send to other device" hands the file to whichever app or device the parent picks —
+the app itself still sends nothing.
 
 ## Parent control
 

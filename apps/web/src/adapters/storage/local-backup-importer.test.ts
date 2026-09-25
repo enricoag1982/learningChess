@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { AppDeps, ContentSource } from '@chess-kids/core';
-import { createProfile } from '@chess-kids/core';
+import type { AppDeps, BackupFile, ContentSource, ProfileSettings } from '@chess-kids/core';
+import { createProfile, DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core';
 import { buildBackupFile } from '@chess-kids/core/backup';
 import { LocalStorageBackupImporter } from './local-backup-importer.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
@@ -16,6 +16,14 @@ import { MIGRATIONS } from './migrations.ts';
 beforeEach(() => {
   localStorage.clear();
 });
+
+/** `file.data[profileId]`, or throws — `buildBackupFile` always includes one entry per requested
+ * profile, so this is just a lint-friendly stand-in for a non-null assertion. */
+function requireData(file: BackupFile, profileId: string): BackupFile['data'][string] {
+  const data = file.data[profileId];
+  if (data === undefined) throw new Error(`no data for profile "${profileId}" in fixture file`);
+  return data;
+}
 
 const stubContent: ContentSource = {
   lessons: () => [],
@@ -185,5 +193,149 @@ describe('LocalStorageBackupImporter', () => {
     expect(await after.rewards?.listSessionLogs(profile.id)).toEqual([
       expect.objectContaining({ date: '2026-01-09', minutes: 12 }),
     ]);
+  });
+});
+
+describe('LocalStorageBackupImporter.writeMerged (M7.2 device sharing)', () => {
+  it('preserves this device’s own lastProfileId/suggestedLevels/storagePersisted/deviceId instead of blanking them', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    await deps.settings.save({
+      lastProfileId: mia.id,
+      suggestedLevels: { [mia.id]: 3 },
+      profileSettings: {},
+      storagePersisted: true,
+      deviceId: 'this-device',
+    });
+    const file = await buildBackupFile(deps, [mia.id]);
+    const deviceSettings = await deps.settings.get();
+
+    await deps.backupImporter?.writeMerged?.(file, {
+      localDeviceId: 'this-device',
+      deviceSettings,
+    });
+
+    const after = makeDeps();
+    const settings = await after.settings.get();
+    expect(settings.lastProfileId).toBe(mia.id);
+    expect(settings.suggestedLevels).toEqual({ [mia.id]: 3 });
+    expect(settings.storagePersisted).toBe(true);
+    expect(settings.deviceId).toBe('this-device');
+  });
+
+  it('keeps this device’s own session-log row (bare key) alongside a foreign device’s row for the same profile + date', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    await deps.rewards?.saveSessionLog({
+      id: 'local-log',
+      profileId: mia.id,
+      date: '2026-01-10',
+      minutes: 10,
+      deviceId: 'this-device',
+      createdAt: '2026-01-10T00:00:00.000Z',
+      updatedAt: '2026-01-10T00:00:00.000Z',
+    });
+    const file = await buildBackupFile(deps, [mia.id]);
+    // Add a foreign device's row for the exact same profile + date, as a merge use case would.
+    const miaData = requireData(file, mia.id);
+    const merged: BackupFile = {
+      ...file,
+      data: {
+        [mia.id]: {
+          ...miaData,
+          sessionLogs: [
+            ...miaData.sessionLogs,
+            {
+              id: 'foreign-log',
+              profileId: mia.id,
+              date: '2026-01-10',
+              minutes: 25,
+              deviceId: 'other-device',
+              createdAt: '2026-01-10T00:00:00.000Z',
+              updatedAt: '2026-01-10T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    };
+    const deviceSettings = await deps.settings.get();
+
+    await deps.backupImporter?.writeMerged?.(merged, {
+      localDeviceId: 'this-device',
+      deviceSettings,
+    });
+
+    const after = makeDeps();
+    // This device's own row is still reachable through the normal getSessionLog(profileId, date)
+    // path — never displaced by the foreign device's row.
+    const localRow = await after.rewards?.getSessionLog(mia.id, '2026-01-10');
+    expect(localRow?.minutes).toBe(10);
+    expect(localRow?.deviceId).toBe('this-device');
+    // Both rows are present when listing every session log for this profile (what the app sums).
+    const all = await after.rewards?.listSessionLogs(mia.id);
+    expect(all?.map((log) => log.minutes).sort()).toEqual([10, 25]);
+  });
+
+  it('stages then swaps, leaving the device untouched on a quota error', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    const file = await buildBackupFile(deps, [mia.id]);
+    const deviceSettings = await deps.settings.get();
+
+    // `patched` below forwards to this via `.call(this, …)`, preserving whichever `Storage`
+    // instance (localStorage/sessionStorage) is the real caller.
+    /* eslint-disable @typescript-eslint/unbound-method -- deliberately extracted, see above */
+    const originalSetItem: (this: Storage, key: string, value: string) => void =
+      Storage.prototype.setItem;
+    /* eslint-enable @typescript-eslint/unbound-method */
+    let calls = 0;
+    Storage.prototype.setItem = function patched(key: string, value: string): void {
+      calls += 1;
+      if (key.includes('backup-staging:earned-badges')) {
+        throw new DOMException('quota exceeded', 'QuotaExceededError');
+      }
+      originalSetItem.call(this, key, value);
+    };
+    try {
+      await expect(
+        deps.backupImporter?.writeMerged?.(file, { localDeviceId: undefined, deviceSettings }),
+      ).rejects.toThrow();
+    } finally {
+      Storage.prototype.setItem = originalSetItem;
+    }
+    expect(calls).toBeGreaterThan(0);
+
+    const staging: string[] = [];
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (key?.includes('backup-staging:')) staging.push(key);
+    }
+    expect(staging).toEqual([]);
+
+    const after = makeDeps();
+    // The device is exactly as it was before the failed write: still has Mia, no crash residue.
+    expect((await after.profiles.list()).map((p) => p.id)).toEqual([mia.id]);
+  });
+
+  it('merges a same-profile-settings choice by newest updatedAt (fed in already computed by app/merge.ts)', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    const newerSettings: ProfileSettings = {
+      ...DEFAULT_PROFILE_SETTINGS,
+      hints: false,
+      updatedAt: '2026-02-01T00:00:00.000Z',
+    };
+    const file = await buildBackupFile(deps, [mia.id]);
+    const merged: BackupFile = {
+      ...file,
+      data: { [mia.id]: { ...requireData(file, mia.id), settings: newerSettings } },
+    };
+    const deviceSettings = await deps.settings.get();
+
+    await deps.backupImporter?.writeMerged?.(merged, { localDeviceId: undefined, deviceSettings });
+
+    const after = makeDeps();
+    const settings = await after.settings.get();
+    expect(settings.profileSettings[mia.id]).toEqual(newerSettings);
   });
 });

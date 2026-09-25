@@ -1,6 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { createProfile, updateProfileSettings } from '@chess-kids/core';
+import { createProfile, DEFAULT_PROFILE_SETTINGS, updateProfileSettings } from '@chess-kids/core';
+import type { BackupFile } from '@chess-kids/core';
 import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
@@ -15,7 +16,48 @@ import {
 import { createTestServices } from '../testing/test-services.ts';
 import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
+
+/** A minimal, valid incoming `BackupFile` for one child (M7.2 device sharing tests). */
+function incomingFileFor(
+  profileOverrides: { readonly id: string; readonly nickname: string; readonly avatar?: string },
+  dataOverrides: Partial<BackupFile['data'][string]> = {},
+): BackupFile {
+  const now = new Date().toISOString();
+  const profile = {
+    id: profileOverrides.id,
+    accountId: 'local',
+    nickname: profileOverrides.nickname,
+    avatar: profileOverrides.avatar ?? 'panda',
+    locale: 'en',
+    createdAt: now,
+    updatedAt: now,
+  };
+  return {
+    app: 'chess-kids',
+    schemaVersion: 1,
+    exportedAt: now,
+    profiles: [profile],
+    data: {
+      [profile.id]: {
+        settings: DEFAULT_PROFILE_SETTINGS,
+        lessonProgress: [],
+        attempts: [],
+        miniGameProgress: [],
+        conceptStats: [],
+        gameRecords: [],
+        earnedBadges: [],
+        sessionLogs: [],
+        assessmentResults: [],
+        unlocks: [],
+        ...dataOverrides,
+      },
+    },
+  };
+}
 
 function makeServices(): ReturnType<typeof createTestServices> {
   return createTestServices(
@@ -334,7 +376,7 @@ describe('Parent code file (owner request 2026-09-25)', () => {
   });
 });
 
-describe('Parent area backup (M5.1)', () => {
+describe('Parent area backup — export (M5.1)', () => {
   it('export all writes one file via the backup file writer', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
@@ -350,7 +392,80 @@ describe('Parent area backup (M5.1)', () => {
       expect(writer.writes[0]?.filename).toMatch(/^chess-kids-backup-\d{4}-\d{2}-\d{2}\.json$/);
     });
   });
+});
 
+describe('Parent area — Send to other device (M7.2 device sharing)', () => {
+  it('shares a file via the Web Share API when the browser can share files', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    const canShare = vi.fn().mockReturnValue(true);
+    vi.stubGlobal('navigator', Object.assign({}, navigator, { share, canShare }));
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Send to other device' }));
+
+    await screen.findByText('Sent.');
+    expect(share).toHaveBeenCalledTimes(1);
+    const [payload] = share.mock.calls[0] as [{ files: File[] }];
+    expect(payload.files[0]?.name).toMatch(/^chess-for-kids-all-\d{4}-\d{2}-\d{2}\.json$/);
+  });
+
+  it('falls back to a download when file sharing is unavailable (Safari 15.4)', async () => {
+    vi.stubGlobal(
+      'navigator',
+      Object.assign({}, navigator, { share: undefined, canShare: undefined }),
+    );
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL: vi.fn(() => 'blob:fake'),
+      revokeObjectURL: vi.fn(),
+    });
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Send to other device' }));
+
+    await screen.findByText('Saved a copy: Downloads');
+    expect(clickSpy).toHaveBeenCalledTimes(1);
+    clickSpy.mockRestore();
+  });
+
+  it('a user cancel (AbortError) is silent — no note, no download fallback', async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException('cancelled', 'AbortError'));
+    const canShare = vi.fn().mockReturnValue(true);
+    vi.stubGlobal('navigator', Object.assign({}, navigator, { share, canShare }));
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => undefined);
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Send to other device' }));
+
+    await waitFor(() => {
+      const button = screen.getByRole('button', { name: 'Send to other device' });
+      expect(button.hasAttribute('disabled')).toBe(false);
+    });
+    expect(screen.queryByText('Sent.')).toBeNull();
+    expect(screen.queryByText(/Saved a copy/)).toBeNull();
+    expect(clickSpy).not.toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
+});
+
+describe('Parent area import — merge (M7.2 device sharing)', () => {
   it('shows a clear error for an invalid file, changing nothing', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
@@ -363,31 +478,84 @@ describe('Parent area backup (M5.1)', () => {
     fireEvent.change(input, { target: { files: [file] } });
 
     await screen.findByText('Not a valid backup file (invalid JSON).');
-    expect(screen.queryByText(/Replace all data/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Merge' })).toBeNull();
   });
 
-  it('previews a valid file (profile count, stars), then replaces all data on confirm', async () => {
+  it('auto-merges a child whose id matches a local profile, no choice shown, folds its stars in', async () => {
     const services = makeServices();
-    await seedReturningProfile(services, 'Mia');
+    const mia = await seedReturningProfile(services, 'Mia');
+    const incoming = incomingFileFor(
+      { id: mia.id, nickname: 'Mia' },
+      {
+        lessonProgress: [
+          {
+            id: 'lp-other-device',
+            profileId: mia.id,
+            lessonId: 'fixture',
+            bestStars: { 'fixture-ex': 3 },
+            bossStars: 0,
+            resumeStep: 1,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        ],
+      },
+    );
     render(<App services={services} />);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
-    const backupJson = JSON.stringify({
-      app: 'chess-kids',
-      schemaVersion: 1,
-      exportedAt: new Date().toISOString(),
-      profiles: [],
-      data: {},
-    });
     const input = await screen.findByLabelText('Choose file');
-    const file = new File([backupJson], 'backup.json', { type: 'application/json' });
+    const file = new File([JSON.stringify(incoming)], 'share.json', { type: 'application/json' });
     fireEvent.change(input, { target: { files: [file] } });
 
-    await screen.findByText('0 children, 0 stars');
-    fireEvent.click(screen.getByRole('button', { name: 'Replace all data' }));
+    await screen.findByText('Merging into Mia');
+    expect(screen.queryByRole('combobox')).toBeNull(); // no choice control ("no question")
 
+    fireEvent.click(screen.getByRole('button', { name: 'Merge' }));
     await screen.findByText('Import complete.');
-    expect(await services.deps.profiles.list()).toEqual([]);
+
+    const merged = await services.deps.progress.listLessons(mia.id);
+    expect(merged[0]?.bestStars).toEqual({ 'fixture-ex': 3 });
+  });
+
+  it('defaults an unmatched child to "Add as new child"; confirming adds it alongside the existing child', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    const incoming = incomingFileFor({ id: 'other-device-leo', nickname: 'Leo' });
+    render(<App services={services} />);
+    await openParentArea();
+    fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
+
+    const input = await screen.findByLabelText('Choose file');
+    const file = new File([JSON.stringify(incoming)], 'share.json', { type: 'application/json' });
+    fireEvent.change(input, { target: { files: [file] } });
+
+    const select = await screen.findByRole('combobox');
+    expect((select as HTMLSelectElement).value).toBe('add-new');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Merge' }));
+    await screen.findByText('Import complete.');
+
+    const profiles = await services.deps.profiles.list();
+    expect(profiles.map((p) => p.nickname).sort()).toEqual(['Leo', 'Mia']);
+  });
+
+  it('preselects "Merge into" when the incoming nickname matches a local child', async () => {
+    const services = makeServices();
+    const mia = await seedReturningProfile(services, 'Mia');
+    const incoming = incomingFileFor({ id: 'other-device-mia', nickname: 'mia' }); // case differs
+    render(<App services={services} />);
+    await openParentArea();
+    fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
+
+    const input = await screen.findByLabelText('Choose file');
+    const file = new File([JSON.stringify(incoming)], 'share.json', { type: 'application/json' });
+    fireEvent.change(input, { target: { files: [file] } });
+
+    const select = await screen.findByRole('combobox');
+    await waitFor(() => {
+      expect((select as HTMLSelectElement).value).toBe(mia.id);
+    });
   });
 });

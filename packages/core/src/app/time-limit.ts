@@ -6,14 +6,46 @@ import {
   isOverLimit,
   limitForDay,
   markWarned as markWarnedLog,
+  newSessionLog,
   setHoursOverride,
   timeUsedToday,
+  totalMinutesForDate,
 } from '../domain/session-log.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import { localDayString } from '../domain/streak.ts';
 import { allowedHoursReason, minutesUntilEnd } from '../domain/time-policy.ts';
+import { getOrCreateDeviceId } from './device.ts';
 import { getProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
+
+/**
+ * This device's own session-log row for `now`'s local day, with `minutes` replaced by the sum of
+ * every device's row for that same profile + date (M7.2 device sharing, app-structure.md §13
+ * "Across devices"): the daily limit, its remaining-minutes count (`minutesUntilEnd`) and the
+ * 5-minute warning (`shouldWarn`) all read combined play across every device that has ever shared
+ * into this one, while `extraMinutes`/`hoursOverrideUntil`/`warnedAt` stay this device's own (a
+ * parent's "more time" grant or today's warning is per device, never shared) — every other field
+ * those pure functions read off a `SessionLog` besides `minutes` comes straight from `local`.
+ * `undefined` only when neither this device nor any merged-in device logged anything today, or
+ * without `deps.rewards` wired up.
+ */
+export async function combinedSessionLog(
+  deps: AppDeps,
+  profileId: string,
+  now: Date,
+): Promise<SessionLog | undefined> {
+  if (deps.rewards === undefined) return undefined;
+  const date = localDayString(now);
+  const [local, all] = await Promise.all([
+    deps.rewards.getSessionLog(profileId, date),
+    deps.rewards.listSessionLogs(profileId),
+  ]);
+  const minutes = totalMinutesForDate(all, date);
+  if (local === undefined) {
+    return minutes === 0 ? undefined : newSessionLog('', profileId, date, minutes, now);
+  }
+  return minutes === local.minutes ? local : { ...local, minutes };
+}
 
 /** Why the activity gate is blocking right now (M7.1, app-structure.md §13): over the daily limit,
  * or outside the allowed-hours window (too late / too early); `null` while none apply. */
@@ -61,7 +93,7 @@ export async function checkActivityGate(
 ): Promise<TimeLimitStatus> {
   const now = deps.clock.now();
   const settings = await getProfileSettings(deps, profileId);
-  const log = await deps.rewards?.getSessionLog(profileId, localDayString(now));
+  const log = await combinedSessionLog(deps, profileId, now);
   const hoursReason = allowedHoursReason(settings, now, log?.hoursOverrideUntil);
   const reason: TimeLimitReason | null =
     hoursReason ?? (isOverLimit(settings, log, now) ? 'limit' : null);
@@ -89,7 +121,10 @@ export async function grantExtraTime(deps: AppDeps, profileId: string): Promise<
   }
   const now = deps.clock.now();
   const date = localDayString(now);
-  const existing = await deps.rewards.getSessionLog(profileId, date);
+  const [existing, deviceId] = await Promise.all([
+    deps.rewards.getSessionLog(profileId, date),
+    getOrCreateDeviceId(deps),
+  ]);
   const log = grantExtraMinutes(
     existing,
     deps.ids.next(),
@@ -97,6 +132,7 @@ export async function grantExtraTime(deps: AppDeps, profileId: string): Promise<
     date,
     EXTRA_TIME_GRANT_MINUTES,
     now,
+    deviceId,
   );
   await deps.rewards.saveSessionLog(log);
   return log;
@@ -116,7 +152,10 @@ export async function grantHoursOverride(deps: AppDeps, profileId: string): Prom
   }
   const now = deps.clock.now();
   const date = localDayString(now);
-  const existing = await deps.rewards.getSessionLog(profileId, date);
+  const [existing, deviceId] = await Promise.all([
+    deps.rewards.getSessionLog(profileId, date),
+    getOrCreateDeviceId(deps),
+  ]);
   const log = setHoursOverride(
     existing,
     deps.ids.next(),
@@ -124,6 +163,7 @@ export async function grantHoursOverride(deps: AppDeps, profileId: string): Prom
     date,
     HOURS_OVERRIDE_MINUTES,
     now,
+    deviceId,
   );
   await deps.rewards.saveSessionLog(log);
   return log;
@@ -141,8 +181,11 @@ export async function markTimeWarning(deps: AppDeps, profileId: string): Promise
   }
   const now = deps.clock.now();
   const date = localDayString(now);
-  const existing = await deps.rewards.getSessionLog(profileId, date);
-  const log = markWarnedLog(existing, deps.ids.next(), profileId, date, now);
+  const [existing, deviceId] = await Promise.all([
+    deps.rewards.getSessionLog(profileId, date),
+    getOrCreateDeviceId(deps),
+  ]);
+  const log = markWarnedLog(existing, deps.ids.next(), profileId, date, now, deviceId);
   await deps.rewards.saveSessionLog(log);
   return log;
 }
