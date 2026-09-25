@@ -9,6 +9,7 @@ import {
   completeFirstRunToPlacementOffer,
   contentText,
   journeyNodeName,
+  shownExercise,
   solveExercise,
   worldTabName,
 } from './helpers.ts';
@@ -32,7 +33,7 @@ function worldExercisePool(worldId: string): readonly ExerciseDef[] {
 /**
  * Solves `count` assessment/placement tasks in a row, each of which the app picked at random from
  * `candidates` (that lesson's or world's own exercise pool) — matches by the task's own instruction
- * text, same pattern `solveWhicheverExercise` uses for warm-up/Practice. `wrong` answers every task
+ * text (and board, `shownExercise`), same as `solveWhicheverExercise` for warm-up/Practice. `wrong` answers every task
  * wrong on the first try (still solving it, M4.5: only hints are off — see
  * `answerExerciseWrongThenSolve`), guaranteeing a fail.
  */
@@ -43,13 +44,10 @@ async function runTasks(
   wrong: boolean,
 ): Promise<void> {
   for (let i = 0; i < count; i += 1) {
-    let matched: ExerciseDef | undefined;
-    for (const candidate of candidates) {
-      if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
-        matched = candidate;
-        break;
-      }
-    }
+    // Wait for this task's own counter first: right after the previous task's "Next" click the old
+    // instruction text can still be on screen, and matching it would solve the wrong board.
+    await page.getByText(new RegExp(`Task ${String(i + 1)}/\\d+$`)).waitFor();
+    const matched = await shownExercise(page, candidates);
     if (!matched) {
       throw new Error(`runTasks: no candidate instruction text matched task ${String(i + 1)}`);
     }

@@ -28,6 +28,7 @@ import {
   playSolveLine,
   playVersusBoss,
   selectSquaresAnswer,
+  shownExercise,
   solveExercise,
   waitForVersusTurnOrEnd,
   worldBossMiniGame,
@@ -643,13 +644,7 @@ test('test-out sheet, runner and result screen have no serious/critical violatio
   const failHeading = page.getByRole('heading', { name: contentText('assessment.fail-title') });
   for (let i = 0; i < second.exercises.length + 1; i += 1) {
     if (await failHeading.isVisible().catch(() => false)) break;
-    let matched: ExerciseDef | undefined;
-    for (const candidate of second.exercises) {
-      if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
-        matched = candidate;
-        break;
-      }
-    }
+    const matched = await shownExercise(page, second.exercises);
     if (!matched)
       throw new Error('test-out runner: no candidate exercise matched the current task');
     await answerExerciseWrongThenSolve(page, matched);

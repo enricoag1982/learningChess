@@ -724,13 +724,50 @@ export async function solveWhicheverExercise(
   page: Page,
   candidates: readonly ExerciseDef[],
 ): Promise<ExerciseDef> {
+  const shown = await shownExercise(page, candidates);
+  if (!shown) {
+    throw new Error('solveWhicheverExercise: no candidate instruction text matched what is shown');
+  }
+  await completeExercise(page, shown);
+  return shown;
+}
+
+/**
+ * Which of `candidates` is on screen right now (single pass, no waiting): matched by its
+ * instruction text; when several candidates share that text (e.g. `rook-07` / `queen-07`, "Three
+ * pawns, three captures"), by its starting pieces on the rendered board too. Call it before the
+ * first move of the task.
+ */
+export async function shownExercise(
+  page: Page,
+  candidates: readonly ExerciseDef[],
+): Promise<ExerciseDef | undefined> {
+  let first: ExerciseDef | undefined;
   for (const candidate of candidates) {
     if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
-      await completeExercise(page, candidate);
-      return candidate;
+      first = candidate;
+      break;
     }
   }
-  throw new Error('solveWhicheverExercise: no candidate instruction text matched what is shown');
+  if (!first) return undefined;
+  const text = contentText(first.textKey);
+  const sameText = candidates.filter((candidate) => contentText(candidate.textKey) === text);
+  if (sameText.length === 1) return first;
+  const board = await readVersusPieces(page);
+  return sameText.find((candidate) => samePieces(candidate.position.pieces, board)) ?? first;
+}
+
+function samePieces(
+  a: Readonly<Partial<Record<Square, Piece>>>,
+  b: Readonly<Partial<Record<Square, Piece>>>,
+): boolean {
+  const squares = Object.keys(a) as Square[];
+  if (squares.length !== Object.keys(b).length) return false;
+  return squares.every((square) => {
+    const pa = a[square];
+    const pb = b[square];
+    return pa !== undefined && pb !== undefined && pa.color === pb.color && pa.type === pb.type;
+  });
 }
 
 /** Reverse-lookup maps (rendered English word → chess letter) for `readVersusPieces`. */
