@@ -60,6 +60,39 @@ function lessonForConcept(lessons: readonly Lesson[], conceptId: string): Lesson
   return lessons.find((lesson) => lesson.concept === conceptId);
 }
 
+/** `null`/off -> "Off", else "N min" — the same wording `ChildSettings`'s own chips use. */
+function limitLabel(t: TFunction, minutes: number | null): string {
+  return minutes === null
+    ? t('parent.daily-limit-off')
+    : t('parent.daily-limit-minutes', { count: minutes });
+}
+
+/**
+ * One-line summary of the active time-control rules (M7.1, app-structure.md §13), e.g. "Mon–Fri
+ * 30 min · Sat–Sun 60 min · until 20:00" — shown under the minutes-per-day chart, alongside (not
+ * replacing) its own existing "Daily limit: N min" line. `null` when nothing is set (no limit, no
+ * allowed-hours window) — nothing to show.
+ */
+function activeRulesLine(t: TFunction, report: ChildReport): string | null {
+  const parts: string[] = [];
+  if (report.weekendLimitMinutes !== undefined) {
+    parts.push(
+      t('parent.report.rules-weekday', { limit: limitLabel(t, report.dailyLimitMinutes) }),
+    );
+    parts.push(
+      t('parent.report.rules-weekend', { limit: limitLabel(t, report.weekendLimitMinutes) }),
+    );
+  } else if (report.dailyLimitMinutes !== null) {
+    parts.push(
+      t('parent.report.rules-everyday', { limit: limitLabel(t, report.dailyLimitMinutes) }),
+    );
+  }
+  if (report.playUntil != null)
+    parts.push(t('parent.report.rules-until', { time: report.playUntil }));
+  if (report.playFrom != null) parts.push(t('parent.report.rules-from', { time: report.playFrom }));
+  return parts.length > 0 ? parts.join(' · ') : null;
+}
+
 function Section({
   title,
   children,
@@ -253,6 +286,9 @@ export function ChildReportScreen({
               <p className={PARENT_NOTE}>
                 {t('parent.report.minutes-limit', { count: report.dailyLimitMinutes })}
               </p>
+            )}
+            {activeRulesLine(t, report) !== null && (
+              <p className={PARENT_NOTE}>{activeRulesLine(t, report)}</p>
             )}
             <ul className="flex flex-col gap-1">
               {report.minutesByDay.map((day) => (

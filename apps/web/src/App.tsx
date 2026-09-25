@@ -4,6 +4,7 @@ import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import type { AppUpdate } from './adapters/app-update.ts';
+import { AppNotice } from './ui/AppNotice.tsx';
 import { AppUpdater } from './ui/AppUpdater.tsx';
 import { Celebration } from './ui/Celebration.tsx';
 import { DenScreen } from './ui/DenScreen.tsx';
@@ -146,6 +147,7 @@ export default function App({ services, appUpdate = NOOP_APP_UPDATE }: AppProps)
         <Screens />
       </Suspense>
       <Celebration />
+      <AppNotice />
       <TimeTracker />
       <AppUpdater appUpdate={appUpdate} />
     </StoreProvider>

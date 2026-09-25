@@ -96,6 +96,11 @@ export interface ChildReport {
   readonly minutesByDay: readonly DayMinutes[];
   /** `ProfileSettings.dailyLimitMinutes` (M5.2): the minutes-per-day chart's own limit line. */
   readonly dailyLimitMinutes: number | null;
+  /** `ProfileSettings.weekendLimitMinutes`/`playUntil`/`playFrom` (M7.1, app-structure.md §13):
+   * the "active rules" line under the minutes-per-day chart. */
+  readonly weekendLimitMinutes: number | null | undefined;
+  readonly playUntil: string | null | undefined;
+  readonly playFrom: string | null | undefined;
   readonly streakCurrent: number;
   /** Most recent games first, capped at {@link REPORT_RECENT_COUNT}. */
   readonly games: readonly GameRecord[];
@@ -196,6 +201,9 @@ export async function buildChildReport(deps: AppDeps, profileId: string): Promis
     weakConcepts: conceptAccuracy.filter((entry) => entry.weak).map((entry) => entry.conceptId),
     minutesByDay: days,
     dailyLimitMinutes: settings.dailyLimitMinutes,
+    weekendLimitMinutes: settings.weekendLimitMinutes,
+    playUntil: settings.playUntil,
+    playFrom: settings.playFrom,
     streakCurrent: streak?.current ?? 0,
     games: [...records].sort(byRecencyDesc).slice(0, REPORT_RECENT_COUNT),
     badges,
