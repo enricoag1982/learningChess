@@ -17,5 +17,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
+    // Full-app RTL flows (a whole game, a mini-game run) take 3–5 s on a loaded machine; the 5 s
+    // default timed them out under parallel load (v1.1.0 validation).
+    testTimeout: 15_000,
   },
 });

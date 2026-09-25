@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDef, Lesson, Piece } from '@chess-kids/core';
+import type { ExerciseDef, Lesson, Piece, SkippablePhase } from '@chess-kids/core';
 import {
   EASIER_VARIANT_STARS,
   chessJsRules,
@@ -26,6 +26,7 @@ import { exerciseInstructionText, exerciseNote, withEasierOffer } from './exerci
 import { buildExercisePlayArea } from './exercise-play-area.tsx';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
+import { SkipButton } from './SkipButton.tsx';
 
 export interface ExerciseStepProps {
   readonly lesson: Lesson;
@@ -33,6 +34,11 @@ export interface ExerciseStepProps {
   /** Guided tries: hint level 1 auto-shown, never scored. */
   readonly guided: boolean;
   readonly nextStepIndex: number;
+  /** "Skip" (playtest 2): only ever set for a guided try (`guided`) — Exercises/Boss never skip. */
+  readonly onSkip?: () => void;
+  /** Set when solving this leaves a skippable phase normally (Try's last guided step) — see
+   * `RecordExerciseResultInput.completesPhase`. */
+  readonly completesPhase?: SkippablePhase;
 }
 
 function prefersReducedMotion(): boolean {
@@ -62,6 +68,8 @@ function ExerciseAttempt({
   exercise,
   guided,
   nextStepIndex,
+  onSkip,
+  completesPhase,
   easier,
   onTakeEasier,
   standsInFor,
@@ -127,6 +135,7 @@ function ExerciseAttempt({
       durationMs: Date.now() - startedAt,
       nextStep: nextStepIndex,
       ...(standsInFor === undefined ? {} : { standsInFor }),
+      ...(completesPhase === undefined ? {} : { completesPhase }),
     }).then(() => {
       setSaved(true);
       // Keeps the store's `progress` current through the lesson, not just when it's re-read on
@@ -140,6 +149,7 @@ function ExerciseAttempt({
     lesson,
     guided,
     standsInFor,
+    completesPhase,
     nextStepIndex,
     state.core,
     startedAt,
@@ -189,6 +199,10 @@ function ExerciseAttempt({
           forced (teaching-process.md §3.3): the kid may keep trying the original. */}
       <div className="flex gap-3">
         <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
+        {/* Guided tries only (playtest 2): skips the rest of Try, straight to the first scored
+            exercise. Never alongside the easier-variant offer — that only ever appears on a
+            scored exercise (`easier` is undefined for a guided try, see `ExerciseStep` below). */}
+        {guided && onSkip && <SkipButton onClick={onSkip} />}
         {offerEasier && (
           <button type="button" onClick={handleTakeEasier} className={SECONDARY_BUTTON}>
             {t('exercise.easier')}

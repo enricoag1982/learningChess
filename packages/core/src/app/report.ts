@@ -1,6 +1,7 @@
 import type { AssessmentResult } from '../domain/assessment.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
 import type { RankDef, World } from '../domain/journey.ts';
+import type { Lesson } from '../domain/lesson.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { GameRecord } from '../domain/progress.ts';
 import { lessonStars, totalStars } from '../domain/progress.ts';
@@ -70,6 +71,9 @@ export interface WorldProgressSummary {
   readonly lessonsMastered: number;
   readonly starsEarned: number;
   readonly starsMax: number;
+  /** Lessons in this world with `LessonProgress.skippedPhases` non-empty (playtest 2) — the
+   * report's own small "intro skipped" per-lesson line. */
+  readonly skippedIntroLessons: readonly Lesson[];
 }
 
 /** One concept's accuracy over its last (up to 10) results (parent report "concept accuracy"). */
@@ -112,13 +116,18 @@ function worldProgress(
   let lessonsMastered = 0;
   let starsEarned = 0;
   let starsMax = 0;
+  const skippedIntroLessons: Lesson[] = [];
   for (const lesson of lessons) {
     const status = journey.statuses.get(lesson.id);
     if (status === 'complete' || status === 'mastered') lessonsComplete += 1;
     if (status === 'mastered') lessonsMastered += 1;
-    const stars = lessonStars(lesson, progressByLesson.get(lesson.id));
+    const progress = progressByLesson.get(lesson.id);
+    const stars = lessonStars(lesson, progress);
     starsEarned += stars.earned;
     starsMax += stars.max;
+    if ((progress?.skippedPhases?.length ?? 0) > 0) {
+      skippedIntroLessons.push(lesson);
+    }
   }
   return {
     world,
@@ -127,6 +136,7 @@ function worldProgress(
     lessonsMastered,
     starsEarned,
     starsMax,
+    skippedIntroLessons,
   };
 }
 

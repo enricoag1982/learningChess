@@ -222,7 +222,7 @@ describe('Parent area privacy and version (M5.5)', () => {
     render(<App services={services} />);
     await openParentArea();
 
-    await screen.findByText('Version 1.0.0');
+    await screen.findByText('Version 1.1.0');
 
     fireEvent.click(screen.getByRole('button', { name: 'Privacy' }));
     await screen.findByRole('heading', { name: 'Privacy' });

@@ -5,6 +5,7 @@ import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   completeExercise,
+  completeFirstRun,
   dismissCelebrationIfShown,
   pickProfileFromPicker,
   playLesson,
@@ -100,5 +101,33 @@ test.describe('First lesson (whichever the Journey currently offers)', () => {
 
     // Resumed at the same exercise (3 of N), not back at the story or an earlier one.
     await expect(page.getByText(stageThreeOfN)).toBeVisible();
+  });
+
+  test('Skip: Story, Demo and Try each marked skipped in the track, then exercises start (playtest 2)', async ({
+    page,
+  }) => {
+    const lesson = firstJourneyLesson();
+    if (lesson.guided.length === 0) {
+      throw new Error('first lesson needs at least one guided try for this test');
+    }
+
+    await completeFirstRun(page);
+    await page.getByRole('button', { name: /Start/ }).click(); // Home -> Story
+
+    await page.getByRole('button', { name: 'Skip' }).click(); // Story -> Demo
+    await page.getByRole('button', { name: 'Skip' }).click(); // Demo -> Try
+    await page.getByRole('button', { name: 'Skip' }).click(); // Try -> Exercises (every guided try)
+
+    // Lands on the first scored exercise, stage 1 of N — never touches guided or later exercises.
+    await expect(page.getByText(`1 of ${String(lesson.exercises.length)}`)).toBeVisible();
+
+    // Track: all three intro phases marked skipped (accessible text, `sr-only` — visually just a
+    // skip icon + muted label, so `toBeAttached` rather than `toBeVisible`).
+    await expect(page.getByText('Story, skipped')).toBeAttached();
+    await expect(page.getByText('Demo, skipped')).toBeAttached();
+    await expect(page.getByText('Try, skipped')).toBeAttached();
+
+    // Exercises never show Skip.
+    await expect(page.getByRole('button', { name: 'Skip' })).toHaveCount(0);
   });
 });

@@ -69,10 +69,11 @@ export interface InfoPillProps extends HTMLAttributes<HTMLDivElement> {
   readonly children: ReactNode;
 }
 
-/** A flat info pill (docs/screens.md §1 "Pills"): rank / stars / streak, or any other small
- * read-only counter — a smaller radius than a raised chip, no border, no shadow. */
+/** A flat info pill (docs/screens.md §1 "Pills" / "Info = no box"): rank / stars / streak, or any
+ * other small read-only counter — icon + text, no border, no shadow, and (default `tint`) no
+ * background box either, so it never reads as a tappable chip. */
 export function InfoPill({
-  tint = 'bg-cream',
+  tint = '',
   className = '',
   children,
   ...rest

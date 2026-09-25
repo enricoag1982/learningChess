@@ -3,6 +3,8 @@ import type { JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
+import type { AppUpdate } from './adapters/app-update.ts';
+import { AppUpdater } from './ui/AppUpdater.tsx';
 import { Celebration } from './ui/Celebration.tsx';
 import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
@@ -104,13 +106,24 @@ function Screens(): JSX.Element {
   }
 }
 
+/** Never applies an update on its own: the default for tests and any render that does not pass
+ * `appUpdate` (`main.tsx`, the real composition root, always does). */
+const NOOP_APP_UPDATE: AppUpdate = {
+  isUpdateReady: () => false,
+  apply: () => Promise.resolve(),
+  onUpdateReady: () => () => undefined,
+};
+
 export interface AppProps {
   /** Injected in tests (fake narrator + in-memory storage); defaults to the real web adapters. */
   readonly services?: Services;
+  /** Injected from `main.tsx` (the real `virtual:pwa-register`-backed one, `adapters/app-update.ts`)
+   * or a fake in tests; defaults to a no-op so nothing here ever touches PWA update logic. */
+  readonly appUpdate?: AppUpdate;
 }
 
 /** App root: wires one `Services` instance to a fresh store, then renders the current screen. */
-export default function App({ services }: AppProps): JSX.Element {
+export default function App({ services, appUpdate = NOOP_APP_UPDATE }: AppProps): JSX.Element {
   const [store] = useState(() => createAppStore(services ?? createServices()));
 
   useEffect(() => {
@@ -124,6 +137,7 @@ export default function App({ services }: AppProps): JSX.Element {
       </Suspense>
       <Celebration />
       <TimeTracker />
+      <AppUpdater appUpdate={appUpdate} />
     </StoreProvider>
   );
 }

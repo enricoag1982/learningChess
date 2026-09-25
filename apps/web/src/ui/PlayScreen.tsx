@@ -275,8 +275,11 @@ export function PlayScreen(): JSX.Element {
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
       </div>
 
+      {/* Both cards below are flat, no border (docs/screens.md §1 "Cards that contain buttons",
+          v1.1.0 part B, the rule's own named example): each wraps raised level chips/buttons, so a
+          bordered outer card would itself read as a second, competing button around them. */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-3 rounded-[2rem] border-2 border-line bg-card p-5">
+        <div className="info-flat flex flex-col gap-3 rounded-[2rem] bg-[#F3EDE0] p-5">
           <div className="flex items-center gap-3">
             <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#DDE8F6]">
               <ComputerIcon />
@@ -350,7 +353,7 @@ export function PlayScreen(): JSX.Element {
           </button>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-[2rem] border-2 border-line bg-card p-5">
+        <div className="info-flat flex flex-col gap-3 rounded-[2rem] bg-[#F3EDE0] p-5">
           <div className="flex items-center gap-3">
             <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#FBE3D2]">
               <FriendIcon />

@@ -1,4 +1,5 @@
 import type { Lesson } from './lesson.ts';
+import type { SkippablePhase } from './lesson-session.ts';
 import type { StoredRecord } from './profile.ts';
 
 /** Star rating shown to the kid: `0` = not solved yet. */
@@ -26,6 +27,10 @@ export interface LessonProgress extends StoredRecord {
   readonly completedAt?: string;
   /** Set by a passed test-out/placement or a parent unlock (M4.5); see {@link MasteredVia}. */
   readonly masteredVia?: MasteredVia;
+  /** Story/Demo/Try phases the kid tapped "Skip" past (playtest 2); absent = none. A phase is
+   * removed from here the next time it is completed normally instead (e.g. a "Play again" replay
+   * that plays it through) — see `withSkippedPhase`/`withoutSkippedPhase`. */
+  readonly skippedPhases?: readonly SkippablePhase[];
 }
 
 /** One recorded try at an exercise or mini-game, scored or not. */
@@ -109,6 +114,35 @@ export function recordBossStars(progress: LessonProgress, stars: Stars, now: Dat
 /** Moves the resume point (index into `lessonSteps(...)`). */
 export function withResumeStep(progress: LessonProgress, step: number, now: Date): LessonProgress {
   return { ...progress, resumeStep: step, updatedAt: now.toISOString() };
+}
+
+/** Adds `phase` to `skippedPhases` (no duplicate) — the kid tapped "Skip". A no-op (same object)
+ * if already marked. */
+export function withSkippedPhase(
+  progress: LessonProgress,
+  phase: SkippablePhase,
+  now: Date,
+): LessonProgress {
+  const existing = progress.skippedPhases ?? [];
+  if (existing.includes(phase)) {
+    return progress;
+  }
+  return { ...progress, skippedPhases: [...existing, phase], updatedAt: now.toISOString() };
+}
+
+/** Removes `phase` from `skippedPhases`, if present — `phase` was just completed normally
+ * (not skipped), e.g. a "Play again" replay playing it through this time. A no-op (same object)
+ * if it was not marked. */
+export function withoutSkippedPhase(
+  progress: LessonProgress,
+  phase: SkippablePhase,
+  now: Date,
+): LessonProgress {
+  if (progress.skippedPhases === undefined || !progress.skippedPhases.includes(phase)) {
+    return progress;
+  }
+  const skippedPhases = progress.skippedPhases.filter((entry) => entry !== phase);
+  return { ...progress, skippedPhases, updatedAt: now.toISOString() };
 }
 
 /**

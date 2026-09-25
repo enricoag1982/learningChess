@@ -80,6 +80,7 @@ const lessonProgressSchema = z.object({
   resumeStep: z.number(),
   completedAt: z.string().optional(),
   masteredVia: z.enum(['play', 'test-out', 'placement', 'parent']).optional(),
+  skippedPhases: z.array(z.enum(['story', 'demo', 'try'])).optional(),
 });
 
 const attemptSchema = z.object({

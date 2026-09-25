@@ -11,14 +11,17 @@ import { SpeechBubble } from '../SpeechBubble.tsx';
 import { useNarratedText } from '../useNarratedText.ts';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
+import { SkipButton } from './SkipButton.tsx';
 
 export interface DemoStepProps {
   readonly lesson: Lesson;
   readonly onNext: () => void;
+  /** "Skip" (playtest 2): skips straight to Try (or Exercises if the lesson has no guided tries). */
+  readonly onSkip: () => void;
 }
 
 /** Free play with the lesson's piece: every legal move is open, nothing is scored. */
-export function DemoStep({ lesson, onNext }: DemoStepProps): JSX.Element {
+export function DemoStep({ lesson, onNext, onSkip }: DemoStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
@@ -52,8 +55,12 @@ export function DemoStep({ lesson, onNext }: DemoStepProps): JSX.Element {
       panel={
         <>
           <SpeechBubble text={text} />
-          <ReplayButton onClick={replay} label={t('exercise.replay')} />
-          <NextButton onClick={onNext} className="mt-auto" />
+          {/* Skip sits beside Replay (same place as on Story / Try), never beside the primary. */}
+          <div className="flex gap-3">
+            <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
+            <SkipButton onClick={onSkip} />
+          </div>
+          <NextButton onClick={onNext} className="mt-auto w-full" />
         </>
       }
     />

@@ -19,8 +19,9 @@ function CrownIcon(): JSX.Element {
   );
 }
 
-/** Info pill (docs/screens.md §1 "Pills"): the current rank name, next to the Home/Journey stars
- * pill — flat, an icon alongside the text so it never reads as a bare button label. */
+/** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): the current rank name, next to the
+ * Home/Journey stars pill — crown icon + text, no pill background or border, so it never reads as
+ * a bare button label or a tappable chip. */
 export function RankPill({
   rank,
   compact = false,
@@ -34,7 +35,7 @@ export function RankPill({
   const name = tContent(t, `journey:ranks.${rank.id}`);
   return (
     <InfoPill
-      tint="bg-[#DCEFE3]"
+      data-testid="rank-pill"
       className={
         compact
           ? 'h-7 self-start text-xs font-bold text-[#1F5A41]'

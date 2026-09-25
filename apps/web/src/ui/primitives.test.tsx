@@ -57,22 +57,32 @@ describe('InfoPanel / InfoPill', () => {
     expect(pill.className).toContain('info-flat');
     expect(pill.className).not.toContain('tap-raised');
   });
+
+  it('InfoPill has no background box by default (docs/screens.md §1 "Info = no box", v1.1.0 part B) — a caller must ask for a tint, none currently do', () => {
+    render(<InfoPill aria-label="3 stars">★ 3</InfoPill>);
+    const pill = screen.getByLabelText('3 stars');
+    expect(pill.className).not.toMatch(/\bbg-/);
+  });
 });
 
 describe('.tap-raised (index.css)', () => {
   const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
 
-  it('defines the raised look: border, ledge shadow, and per-role ledge tokens', () => {
-    expect(css).toMatch(/\.tap-raised\s*\{[^}]*box-shadow:\s*0 4px 0 0 var\(--tap-ledge\)/);
+  it('defines the raised look: border, ledge shadow, and per-role edge/ledge tokens (v1.1.0 part B: border and ledge each a darker shade of the fill, neutral shares one dark taupe tone)', () => {
+    expect(css).toMatch(/\.tap-raised\s*\{[^}]*box-shadow:\s*0 6px 0 0 var\(--tap-ledge\)/);
+    expect(css).toContain('--color-edge-neutral');
+    expect(css).toContain('--color-ledge-neutral');
+    expect(css).toContain('--color-edge-go');
+    expect(css).toContain('--color-edge-today');
+    expect(css).toContain('--color-edge-info');
     expect(css).toContain('--color-ledge-go');
     expect(css).toContain('--color-ledge-today');
     expect(css).toContain('--color-ledge-info');
-    expect(css).toContain('--color-ledge-card');
   });
 
-  it('moves down and shrinks the ledge when pressed, never removes it entirely', () => {
+  it('moves down 4px and shrinks the ledge to 2px when pressed, never removes it entirely', () => {
     expect(css).toMatch(
-      /\.tap-raised:active:not\(:disabled\)\s*\{\s*transform:\s*translateY\(2px\);\s*box-shadow:\s*0 2px 0 0 var\(--tap-ledge\);/,
+      /\.tap-raised:active:not\(:disabled\)\s*\{\s*transform:\s*translateY\(4px\);\s*box-shadow:\s*0 2px 0 0 var\(--tap-ledge\);/,
     );
   });
 

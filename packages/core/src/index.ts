@@ -37,6 +37,8 @@ export {
   recordExerciseStars,
   recordBossStars,
   withResumeStep,
+  withSkippedPhase,
+  withoutSkippedPhase,
   lessonStatus,
   lessonStars,
   totalStars,
@@ -125,12 +127,14 @@ export {
   newUnlock,
 } from './domain/assessment.ts';
 
-export type { LessonStep, LessonPhase } from './domain/lesson-session.ts';
+export type { LessonStep, LessonPhase, SkippablePhase } from './domain/lesson-session.ts';
 export {
   EASIER_AFTER_ERRORS,
   EASIER_VARIANT_STARS,
   lessonSteps,
   stepPhase,
+  isSkippablePhase,
+  phaseEndIndex,
   easierVariant,
   shouldOfferEasier,
 } from './domain/lesson-session.ts';
@@ -196,6 +200,8 @@ export {
   recordBossResult,
   recordReviewResult,
   saveResumeStep,
+  skipLessonPhase,
+  advanceLessonPhase,
 } from './app/use-cases.ts';
 
 export type { RecordMiniGameResultInput } from './app/minigames.ts';

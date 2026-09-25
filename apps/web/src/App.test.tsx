@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import './i18n.ts';
 import App from './App.tsx';
+import type { AppUpdate } from './adapters/app-update.ts';
 import { fixtureContentSource, fixtureLesson } from './testing/fixtures.ts';
 import { createTestServices } from './testing/test-services.ts';
 import { pickProfileFromPicker, seedReturningProfile } from './testing/app-test-helpers.ts';
@@ -52,5 +53,71 @@ describe('App', () => {
     // Back at Home: the fixture's only lesson is done, so the Journey has nothing left to offer.
     await screen.findByText('You finished everything for now. Come back soon for more!');
     expect(container.querySelector('[aria-label="3 stars"]')).not.toBeNull();
+  });
+
+  it('applies a waiting app update only at a safe screen (Home), never mid-lesson', async () => {
+    const services = createTestServices(fixtureContentSource(fixtureLesson()));
+    await seedReturningProfile(services, 'Mia');
+    let ready = false;
+    let applyCount = 0;
+    const appUpdate: AppUpdate = {
+      isUpdateReady: () => ready,
+      apply: () => {
+        applyCount += 1;
+        return Promise.resolve();
+      },
+      onUpdateReady: () => () => undefined,
+    };
+    render(<App services={services} appUpdate={appUpdate} />);
+
+    await screen.findByRole('heading', { name: "Who's playing today?" });
+    await pickProfileFromPicker('Mia');
+    await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // Home: a safe screen
+
+    // Home is a safe screen, but the update is not ready yet: nothing applies on arrival.
+    expect(applyCount).toBe(0);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Start/ }));
+    await screen.findByRole('button', { name: /Let me try/ }); // now inside the lesson (Story)
+
+    // The update arrives while mid-lesson: it must wait, not apply immediately.
+    ready = true;
+    expect(applyCount).toBe(0);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close lesson' }));
+    await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // back at Home
+
+    expect(applyCount).toBe(1);
+  });
+
+  it('applies an update found while already at Home right away (app reopened on Home)', async () => {
+    const services = createTestServices(fixtureContentSource(fixtureLesson()));
+    await seedReturningProfile(services, 'Mia');
+    let ready = false;
+    let applyCount = 0;
+    const listeners: (() => void)[] = [];
+    const appUpdate: AppUpdate = {
+      isUpdateReady: () => ready,
+      apply: () => {
+        applyCount += 1;
+        return Promise.resolve();
+      },
+      onUpdateReady: (listener) => {
+        listeners.push(listener);
+        return () => undefined;
+      },
+    };
+    render(<App services={services} appUpdate={appUpdate} />);
+    await screen.findByRole('heading', { name: "Who's playing today?" });
+    await pickProfileFromPicker('Mia');
+    await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
+    expect(applyCount).toBe(0);
+
+    ready = true;
+    act(() => {
+      for (const listener of listeners) listener();
+    });
+
+    expect(applyCount).toBe(1);
   });
 });

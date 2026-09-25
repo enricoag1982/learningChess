@@ -45,8 +45,12 @@ function StepPreview({
   return (
     <StoreProvider value={store}>
       <div className="flex min-h-0 max-h-[560px] flex-1 flex-col">
-        {view.kind === 'story' && <StoryStep lesson={lesson} onNext={() => undefined} />}
-        {view.kind === 'demo' && <DemoStep lesson={lesson} onNext={() => undefined} />}
+        {view.kind === 'story' && (
+          <StoryStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
+        )}
+        {view.kind === 'demo' && (
+          <DemoStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
+        )}
         {view.kind === 'exercise' && (
           <ExerciseStep
             key={view.exercise.id}

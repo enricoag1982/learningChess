@@ -11,7 +11,9 @@ import {
   recordExerciseStars,
   recordMiniGamePlay,
   totalStars,
+  withoutSkippedPhase,
   withResumeStep,
+  withSkippedPhase,
 } from './progress.ts';
 
 const EMPTY_POSITION = {
@@ -111,6 +113,47 @@ describe('withResumeStep', () => {
     const progress = withResumeStep(makeProgress(), 4, LATER);
     expect(progress.resumeStep).toBe(4);
     expect(progress.updatedAt).toBe(LATER.toISOString());
+  });
+});
+
+describe('withSkippedPhase', () => {
+  it('adds a phase to an empty/absent skippedPhases', () => {
+    const progress = withSkippedPhase(makeProgress(), 'story', LATER);
+    expect(progress.skippedPhases).toEqual(['story']);
+    expect(progress.updatedAt).toBe(LATER.toISOString());
+  });
+
+  it('adds a second, different phase alongside the first', () => {
+    let progress = withSkippedPhase(makeProgress(), 'story', NOW);
+    progress = withSkippedPhase(progress, 'demo', LATER);
+    expect(progress.skippedPhases).toEqual(['story', 'demo']);
+  });
+
+  it('is a no-op (same object) when the phase is already marked', () => {
+    const once = withSkippedPhase(makeProgress(), 'try', NOW);
+    const twice = withSkippedPhase(once, 'try', LATER);
+    expect(twice).toBe(once);
+  });
+});
+
+describe('withoutSkippedPhase', () => {
+  it('removes a marked phase, keeping any others', () => {
+    let progress = withSkippedPhase(makeProgress(), 'story', NOW);
+    progress = withSkippedPhase(progress, 'demo', NOW);
+    progress = withoutSkippedPhase(progress, 'story', LATER);
+    expect(progress.skippedPhases).toEqual(['demo']);
+    expect(progress.updatedAt).toBe(LATER.toISOString());
+  });
+
+  it('is a no-op (same object) when the phase was never marked', () => {
+    const progress = makeProgress();
+    expect(withoutSkippedPhase(progress, 'demo', LATER)).toBe(progress);
+  });
+
+  it('is a no-op (same object) when skippedPhases is absent', () => {
+    const progress = withSkippedPhase(makeProgress(), 'try', NOW);
+    const cleared = withoutSkippedPhase(progress, 'try', LATER);
+    expect(withoutSkippedPhase(cleared, 'try', LATER)).toBe(cleared);
   });
 });
 

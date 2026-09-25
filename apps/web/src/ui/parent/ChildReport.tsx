@@ -163,11 +163,24 @@ export function ChildReportScreen({
                     key={entry.world.id}
                     className={`${PARENT_INFO_PANEL} flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3`}
                   >
-                    <span className="flex-1 text-sm font-bold text-ink">
-                      {tContent(t, 'journey:ui.world-heading', {
-                        order: entry.world.order,
-                        name: tContent(t, entry.world.titleKey),
-                      })}
+                    <span className="flex flex-1 flex-col gap-0.5">
+                      <span className="text-sm font-bold text-ink">
+                        {tContent(t, 'journey:ui.world-heading', {
+                          order: entry.world.order,
+                          name: tContent(t, entry.world.titleKey),
+                        })}
+                      </span>
+                      {/* "Intro skipped" (playtest 2): one line per lesson that had a Story/Demo/Try
+                          "Skip" tap, small muted text — never shown when none did. */}
+                      {entry.skippedIntroLessons.length > 0 && (
+                        <span className="text-xs text-muted">
+                          {t('parent.report.intro-skipped', {
+                            list: entry.skippedIntroLessons
+                              .map((lesson) => tContent(t, lesson.titleKey))
+                              .join(', '),
+                          })}
+                        </span>
+                      )}
                     </span>
                     <span className="flex flex-wrap gap-x-3 gap-y-0.5">
                       <span className="text-xs text-muted">

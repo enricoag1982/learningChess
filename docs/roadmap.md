@@ -101,6 +101,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | # | Milestone | Scope |
 |---|---|---|
+| v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
 | M6 | Store apps | Capacitor Android + iPad, native storage, store listings |
 | M7 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 | Online & time | Parent login, sync, online friends; detailed time log, limits, exceptions |
