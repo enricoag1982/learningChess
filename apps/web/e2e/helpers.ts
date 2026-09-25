@@ -363,6 +363,47 @@ export async function seedDailyLimit(
 }
 
 /**
+ * Patches `playUntil` onto `profileId`'s stored settings (M7.1, same real storage key/shape as
+ * `seedDailyLimit`), merged over whatever is already stored (the M5.1 defaults if none yet) so a
+ * spec can seed just this one allowed-hours edge without clobbering an earlier `seedDailyLimit`
+ * call. `playUntil` is written as-is (no `PLAY_UNTIL_OPTIONS` check — same "seed straight past
+ * validation" the daily-limit fields above already do), so a spec can pass any `'HH:MM'`, e.g.
+ * one minute before the real current time, to land reliably "in the past" regardless of when the
+ * suite happens to run.
+ */
+export async function seedPlayUntil(
+  page: Page,
+  profileId: string,
+  playUntil: string,
+): Promise<void> {
+  await page.evaluate(
+    ({ profileId: pid, playUntil }) => {
+      const key = 'chess-kids:settings';
+      const raw = localStorage.getItem(key);
+      const settings = raw
+        ? (JSON.parse(raw) as {
+            lastProfileId: string | null;
+            suggestedLevels?: Record<string, number>;
+            profileSettings?: Record<string, Record<string, unknown>>;
+          })
+        : { lastProfileId: null, suggestedLevels: {}, profileSettings: {} };
+      settings.profileSettings = settings.profileSettings ?? {};
+      const current = settings.profileSettings[pid] ?? {
+        dailyLimitMinutes: null,
+        voice: true,
+        sound: true,
+        hints: true,
+        computerLevel: 'auto',
+        pieceStyle: 'animal',
+      };
+      settings.profileSettings[pid] = { ...current, playUntil };
+      localStorage.setItem(key, JSON.stringify(settings));
+    },
+    { profileId, playUntil },
+  );
+}
+
+/**
  * Seeds today's own `SessionLog` row straight at `minutes` played (M5.2, same real storage
  * key/shape as `LocalStorageRewardsRepository`) — "no real waiting" for a daily-limit spec: the
  * activity gate reads this exactly like real logged minutes.
