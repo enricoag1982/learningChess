@@ -7,6 +7,7 @@ import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import type { Profile } from '../domain/profile.ts';
 import { newProfile } from '../domain/profile.ts';
+import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import { seededRandom } from '../domain/random.ts';
@@ -377,6 +378,31 @@ describe('buildChildReport', () => {
     expect(report.minutesByDay).toHaveLength(14);
     expect(report.minutesByDay[13]).toEqual({ date: '2026-01-10', minutes: 12 });
     expect(report.minutesByDay[12]).toEqual({ date: '2026-01-09', minutes: 0 });
+  });
+
+  it("carries the profile's daily limit (M5.2, minutes-per-day chart's own limit line)", async () => {
+    const profile = newProfile('p1', 'Mia', 'fox', NOW);
+    const deps = makeDeps({
+      profiles: makeProfileRepo([profile]),
+      settings: {
+        get: () =>
+          Promise.resolve<AppSettings>({
+            lastProfileId: null,
+            suggestedLevels: {},
+            profileSettings: { p1: { ...DEFAULT_PROFILE_SETTINGS, dailyLimitMinutes: 30 } },
+          }),
+        save: () => Promise.resolve(),
+      },
+    });
+
+    expect((await buildChildReport(deps, 'p1')).dailyLimitMinutes).toBe(30);
+  });
+
+  it('reports the daily limit off (null) for a profile with none set', async () => {
+    const profile = newProfile('p1', 'Mia', 'fox', NOW);
+    const deps = makeDeps({ profiles: makeProfileRepo([profile]) });
+
+    expect((await buildChildReport(deps, 'p1')).dailyLimitMinutes).toBeNull();
   });
 
   it('lists the last 10 games, newest first', async () => {

@@ -86,6 +86,28 @@ describe('Parent area child report (M5.1)', () => {
     await screen.findByText('No badges earned yet.');
     await screen.findByText('No test-out or placement runs yet.');
   });
+
+  it("shows the daily limit as a line under the minutes-per-day chart's heading (M5.2)", async () => {
+    const services = makeServices();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 30 });
+    render(<App services={services} />);
+    await openParentArea();
+    await openReport('Mia');
+
+    await screen.findByText('Daily limit: 30 min (line on the chart)');
+  });
+
+  it('shows no daily-limit line for a profile with the limit off', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    await openReport('Mia');
+
+    await screen.findByText('Minutes per day (last 14 days)');
+    expect(screen.queryByText(/Daily limit:/)).toBeNull();
+  });
 });
 
 describe('Parent area settings effects (M5.1)', () => {

@@ -211,8 +211,8 @@ export interface ChildSettingsScreenProps {
  * unlock lessons & worlds (M4.5's `UnlockPanel`, integrated here rather than duplicated), export
  * this child's data, and reset. Settings effects (`docs/app-structure.md` §11 "Settings effect
  * now"): voice/sound/hints/computer level take effect the next time this profile is selected
- * (`selectProfileAndHome` re-reads them); daily limit is stored only until M5.2; piece style only
- * until M5.3.
+ * (`selectProfileAndHome` re-reads them); daily limit is enforced live, from the very next activity
+ * gate check (M5.2, `store.ts`'s `gated`); piece style only stored until M5.3.
  */
 export function ChildSettingsScreen({
   profile,

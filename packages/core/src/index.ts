@@ -62,7 +62,16 @@ export type { Streak } from './domain/streak.ts';
 export { newStreak, localDayString, isoWeekKey, recordActivityDay } from './domain/streak.ts';
 
 export type { SessionLog } from './domain/session-log.ts';
-export { newSessionLog, addMinutes, lastNDays } from './domain/session-log.ts';
+export {
+  EXTRA_TIME_GRANT_MINUTES,
+  newSessionLog,
+  addMinutes,
+  lastNDays,
+  timeUsedToday,
+  extraMinutesToday,
+  isOverLimit,
+  grantExtraMinutes,
+} from './domain/session-log.ts';
 
 export type {
   ComputerLevelSetting,
@@ -229,8 +238,12 @@ export {
   recordDailyActivity,
   recordSessionMinutes,
   minutesByDay,
+  starsToday,
   checkRewards,
 } from './app/rewards.ts';
+
+export type { TimeLimitStatus } from './app/time-limit.ts';
+export { checkActivityGate, grantExtraTime } from './app/time-limit.ts';
 
 export type {
   ChildOverview,

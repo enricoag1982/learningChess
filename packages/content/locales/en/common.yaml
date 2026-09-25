@@ -161,6 +161,7 @@ parent:
     needs-practice: 'Needs practice: {{list}}'
     needs-practice-tag: Needs practice
     minutes-heading: Minutes per day (last 14 days)
+    minutes-limit: 'Daily limit: {{count}} min (line on the chart)'
     minutes_one: '{{count}} min'
     minutes_other: '{{count}} min'
     games-heading: Games (last 10)
@@ -374,6 +375,11 @@ session:
   summary-new-friend: New friend!
   summary-closing: See you tomorrow!
   summary-done: Done
+time-limit:
+  title: See you tomorrow!
+  body: You've used up all your play time for today. Come back tomorrow!
+  stars-today: '{{count}} stars today'
+  more-time: 'Parent: more time'
 assessment:
   task-of: 'Task {{current}}/{{total}}'
   pass-title: You did it!

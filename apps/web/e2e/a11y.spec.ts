@@ -20,6 +20,7 @@ import {
   contentText,
   dismissCelebrationIfShown,
   findMiniGame,
+  getSoleProfileId,
   isMoveCountedExercise,
   journeyNodeName,
   lessonsInJourneyOrder,
@@ -27,6 +28,8 @@ import {
   playOneKidVersusMove,
   playSolveLine,
   playVersusBoss,
+  seedDailyLimit,
+  seedMinutesToday,
   selectSquaresAnswer,
   shownExercise,
   solveExercise,
@@ -215,6 +218,26 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await page.getByRole('button', { name: 'Backup' }).click();
   await expectParentTouchTarget(page, 'Export all');
   await expectNoSeriousViolations(page, 'Parent area: backup');
+
+  // 8.8. Daily time limit (M5.2): "See you tomorrow" (kid style) once over the limit, then its own
+  // "Parent: more time" password flow resuming the gated activity.
+  await page.getByRole('button', { name: 'Back' }).click(); // Backup -> Overview
+  await page.getByRole('button', { name: contentText('parent.done') }).click(); // Overview -> picker
+  await pickProfileFromPicker(page, 'Mia');
+  const profileId = await getSoleProfileId(page);
+  await seedDailyLimit(page, profileId, 15);
+  await seedMinutesToday(page, profileId, 15);
+
+  await page.getByRole('button', { name: /Start today/ }).click();
+  await page.getByRole('heading', { name: 'See you tomorrow!' }).waitFor();
+  await expectKidTouchTarget(page, 'Switch player');
+  await expectKidTouchTarget(page, 'Parent: more time');
+  await expectNoSeriousViolations(page, 'Time limit: See you tomorrow');
+
+  await page.getByRole('button', { name: 'Parent: more time' }).click();
+  await page.getByLabel('Password', { exact: true }).fill('1234');
+  await page.getByRole('button', { name: 'Open' }).click();
+  await page.getByRole('button', { name: /Let me try/ }).waitFor(); // resumed into the lesson
 });
 
 /** Every exercise type actually authored in the bundled content (scored exercises only). */

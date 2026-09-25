@@ -296,6 +296,20 @@ export async function minutesByDay(
   return dayStrings.map((date) => ({ date, minutes: byDate.get(date) ?? 0 }));
 }
 
+/**
+ * Stars earned today (sum of every scored `Attempt.stars`, local day) — the "See you tomorrow"
+ * screen's own celebratory line (M5.2, app-structure.md's time controls table). Not deduplicated
+ * against a lesson's own `bestStars` record (re-solving an exercise the same day counts again): a
+ * fun daily tally, not a formal one, same "no new port needed" reasoning `minutesByDay` documents.
+ */
+export async function starsToday(deps: AppDeps, profileId: string, now: Date): Promise<number> {
+  const attempts = await deps.progress.listAttempts(profileId);
+  const today = localDayString(now);
+  return attempts
+    .filter((attempt) => attempt.scored && localDayString(new Date(attempt.createdAt)) === today)
+    .reduce((sum, attempt) => sum + attempt.stars, 0);
+}
+
 /** Outcome of {@link checkRewards}: the streak after today's activity, and any newly earned badges. */
 export interface RewardsCheckResult {
   readonly streak: Streak;

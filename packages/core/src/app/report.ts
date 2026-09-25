@@ -10,6 +10,7 @@ import type { DayMinutes } from './rewards.ts';
 import { minutesByDay } from './rewards.ts';
 import type { Journey } from './journey.ts';
 import { loadJourney } from './journey.ts';
+import { getProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** Days shown in the parent report's "minutes per day" list (app-structure.md §11's own row). */
@@ -89,6 +90,8 @@ export interface ChildReport {
   /** Concept ids from `conceptAccuracy` with `weak: true`, in the same order. */
   readonly weakConcepts: readonly string[];
   readonly minutesByDay: readonly DayMinutes[];
+  /** `ProfileSettings.dailyLimitMinutes` (M5.2): the minutes-per-day chart's own limit line. */
+  readonly dailyLimitMinutes: number | null;
   readonly streakCurrent: number;
   /** Most recent games first, capped at {@link REPORT_RECENT_COUNT}. */
   readonly games: readonly GameRecord[];
@@ -135,18 +138,29 @@ function worldProgress(
  * (badges/assessments read `[]`), same reasoning `checkRewards`/`loadUnlocked` already use.
  */
 export async function buildChildReport(deps: AppDeps, profileId: string): Promise<ChildReport> {
-  const [profile, journey, progresses, conceptStats, days, streak, records, badges, assessments] =
-    await Promise.all([
-      requireProfile(deps, profileId),
-      loadJourney(deps, profileId),
-      deps.progress.listLessons(profileId),
-      deps.progress.listConceptStats(profileId),
-      minutesByDay(deps, profileId, REPORT_MINUTES_DAYS),
-      deps.rewards?.getStreak(profileId),
-      deps.gameRecords.listByProfile(profileId),
-      deps.rewards?.listEarnedBadges(profileId) ?? Promise.resolve([]),
-      deps.assessment?.listAssessmentResults(profileId) ?? Promise.resolve([]),
-    ]);
+  const [
+    profile,
+    journey,
+    progresses,
+    conceptStats,
+    days,
+    streak,
+    records,
+    badges,
+    assessments,
+    settings,
+  ] = await Promise.all([
+    requireProfile(deps, profileId),
+    loadJourney(deps, profileId),
+    deps.progress.listLessons(profileId),
+    deps.progress.listConceptStats(profileId),
+    minutesByDay(deps, profileId, REPORT_MINUTES_DAYS),
+    deps.rewards?.getStreak(profileId),
+    deps.gameRecords.listByProfile(profileId),
+    deps.rewards?.listEarnedBadges(profileId) ?? Promise.resolve([]),
+    deps.assessment?.listAssessmentResults(profileId) ?? Promise.resolve([]),
+    getProfileSettings(deps, profileId),
+  ]);
 
   const progressByLesson = new Map(progresses.map((progress) => [progress.lessonId, progress]));
   const worlds = journey.worlds.map(({ world }) => worldProgress(journey, world, progressByLesson));
@@ -171,6 +185,7 @@ export async function buildChildReport(deps: AppDeps, profileId: string): Promis
     conceptAccuracy,
     weakConcepts: conceptAccuracy.filter((entry) => entry.weak).map((entry) => entry.conceptId),
     minutesByDay: days,
+    dailyLimitMinutes: settings.dailyLimitMinutes,
     streakCurrent: streak?.current ?? 0,
     games: [...records].sort(byRecencyDesc).slice(0, REPORT_RECENT_COUNT),
     badges,

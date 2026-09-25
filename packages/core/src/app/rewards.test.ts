@@ -26,6 +26,7 @@ import {
   minutesByDay,
   recordDailyActivity,
   recordSessionMinutes,
+  starsToday,
 } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -316,6 +317,28 @@ describe('minutesByDay', () => {
       { date: '2026-01-04', minutes: 0 },
       { date: '2026-01-05', minutes: 0 },
     ]);
+  });
+});
+
+describe('starsToday', () => {
+  it("sums today's scored attempts' stars, ignoring other days and unscored attempts", async () => {
+    const deps = baseDeps({
+      progress: makeProgressRepo(
+        [],
+        [
+          makeAttempt({ stars: 3, createdAt: NOW.toISOString() }),
+          makeAttempt({ stars: 2, createdAt: NOW.toISOString() }),
+          makeAttempt({ stars: 3, scored: false, createdAt: NOW.toISOString() }), // easier variant
+          makeAttempt({ stars: 1, createdAt: '2026-01-04T12:00:00.000Z' }), // yesterday
+        ],
+      ),
+    });
+    expect(await starsToday(deps, 'p1', NOW)).toBe(5);
+  });
+
+  it('is 0 with nothing attempted today', async () => {
+    const deps = baseDeps();
+    expect(await starsToday(deps, 'p1', NOW)).toBe(0);
   });
 });
 
