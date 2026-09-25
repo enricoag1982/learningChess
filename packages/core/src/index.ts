@@ -74,6 +74,7 @@ export {
   lastNDays,
   timeUsedToday,
   extraMinutesToday,
+  totalMinutesForDate,
   isOverLimit,
   limitForDay,
   grantExtraMinutes,
@@ -269,10 +270,13 @@ export {
 export type { TimeLimitReason, TimeLimitStatus } from './app/time-limit.ts';
 export {
   checkActivityGate,
+  combinedSessionLog,
   grantExtraTime,
   grantHoursOverride,
   markTimeWarning,
 } from './app/time-limit.ts';
+
+export { getOrCreateDeviceId } from './app/device.ts';
 
 export type {
   ChildOverview,
@@ -285,6 +289,26 @@ export { buildChildOverview, buildChildReport } from './app/report.ts';
 export type { BackupFile, ProfileBackupData, BackupSummary } from './app/backup.ts';
 // Backup values (zod validation) live behind `@chess-kids/core/backup` so zod stays out of the
 // main bundle and the bot worker; only the parent area imports them.
+
+export type { MergeableProfileData } from './domain/merge.ts';
+export {
+  mergeProfileData,
+  mergeLessonProgress,
+  mergeMiniGameProgress,
+  mergeConceptStats,
+  mergeEarnedBadges,
+  mergeStreak,
+  mergeProfileSettings,
+  mergeSessionLogs,
+  mergeUnlocks,
+  rekeyProfileData,
+  emptyProfileData,
+  totalMinutesToday,
+  totalMinutesOverDays,
+} from './domain/merge.ts';
+// M7.2 device sharing: `app/merge.ts`'s `planImport`/`previewChildChange`/`importMerged` (they
+// import `app/backup.ts`, which needs zod) live behind `@chess-kids/core/merge`, same reasoning
+// `@chess-kids/core/backup` documents above.
 
 export { getProfileSettings, updateProfileSettings } from './app/settings.ts';
 

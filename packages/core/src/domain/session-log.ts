@@ -31,18 +31,41 @@ export interface SessionLog extends StoredRecord {
   /** ISO instant the 5-minute warning (M7.1) was last spoken/shown for this day. Absent = not
    * warned yet today (every pre-M7.1 row) — `shouldWarn` shows it once per child per day. */
   readonly warnedAt?: string;
+  /**
+   * Which device wrote this row (M7.2 device sharing, `AppSettings.deviceId`). Absent = this
+   * device's own legacy rows (written before M7.2, or before this device's own id existed yet) —
+   * still read as "the local row" by every local-only reader (`extraMinutesToday`,
+   * `hoursOverrideUntil`, `warnedAt`). A device's own local activity is always read/written through
+   * `RewardsRepository.getSessionLog`/`saveSessionLog` (one row per profile + date, unchanged since
+   * M4.4) regardless of this field; an *imported* foreign device's row is a separate physical row,
+   * kept side by side so the two can be summed (`totalMinutesForDate`) without either overwriting
+   * the other — see `docs/domain-model.md`'s device-sharing table.
+   */
+  readonly deviceId?: string;
 }
 
-/** Fresh, unsaved log row for a profile's first recorded minutes on `date`. */
+/** Fresh, unsaved log row for a profile's first recorded minutes on `date`. `deviceId` stamps this
+ * device's own id (M7.2, lazily created — `app/device.ts`'s `getOrCreateDeviceId`) onto a brand-new
+ * local row so a later export identifies it; omitted for an imported foreign row (already has its
+ * own source device's id) or before this device has one yet. */
 export function newSessionLog(
   id: string,
   profileId: string,
   date: string,
   minutes: number,
   now: Date,
+  deviceId?: string,
 ): SessionLog {
   const nowIso = now.toISOString();
-  return { id, profileId, date, minutes, createdAt: nowIso, updatedAt: nowIso };
+  return {
+    id,
+    profileId,
+    date,
+    minutes,
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    ...(deviceId === undefined ? {} : { deviceId }),
+  };
 }
 
 /**
@@ -61,7 +84,8 @@ export function lastNDays(now: Date, days: number): readonly string[] {
   return result;
 }
 
-/** Adds `minutes` to `existing` (same day), or starts a fresh row (`id` only used then). */
+/** Adds `minutes` to `existing` (same day), or starts a fresh row (`id`/`deviceId` only used then —
+ * `existing`, once created, keeps whichever `deviceId` it already has). */
 export function addMinutes(
   existing: SessionLog | undefined,
   id: string,
@@ -69,11 +93,20 @@ export function addMinutes(
   date: string,
   minutes: number,
   now: Date,
+  deviceId?: string,
 ): SessionLog {
   if (existing === undefined) {
-    return newSessionLog(id, profileId, date, minutes, now);
+    return newSessionLog(id, profileId, date, minutes, now, deviceId);
   }
   return { ...existing, minutes: existing.minutes + minutes, updatedAt: now.toISOString() };
+}
+
+/** Sum of `minutes` across every row in `logs` for `date` (M7.2 device sharing): the daily limit,
+ * the parent report and the 5-minute warning all read combined play across every device that has
+ * ever shared into this one, not only this device's own row (`app/time-limit.ts`'s
+ * `combinedSessionLog`, `app/rewards.ts`'s `minutesByDay`). `0` with no matching row. */
+export function totalMinutesForDate(logs: readonly SessionLog[], date: string): number {
+  return logs.filter((log) => log.date === date).reduce((sum, log) => sum + log.minutes, 0);
 }
 
 /**
@@ -138,9 +171,10 @@ export function grantExtraMinutes(
   date: string,
   minutes: number,
   now: Date,
+  deviceId?: string,
 ): SessionLog {
   if (existing === undefined) {
-    return { ...newSessionLog(id, profileId, date, 0, now), extraMinutes: minutes };
+    return { ...newSessionLog(id, profileId, date, 0, now, deviceId), extraMinutes: minutes };
   }
   return {
     ...existing,
@@ -162,10 +196,11 @@ export function setHoursOverride(
   date: string,
   minutes: number,
   now: Date,
+  deviceId?: string,
 ): SessionLog {
   const hoursOverrideUntil = new Date(now.getTime() + minutes * 60_000).toISOString();
   if (existing === undefined) {
-    return { ...newSessionLog(id, profileId, date, 0, now), hoursOverrideUntil };
+    return { ...newSessionLog(id, profileId, date, 0, now, deviceId), hoursOverrideUntil };
   }
   return { ...existing, hoursOverrideUntil, updatedAt: now.toISOString() };
 }
@@ -180,10 +215,11 @@ export function markWarned(
   profileId: string,
   date: string,
   now: Date,
+  deviceId?: string,
 ): SessionLog {
   const warnedAt = now.toISOString();
   if (existing === undefined) {
-    return { ...newSessionLog(id, profileId, date, 0, now), warnedAt };
+    return { ...newSessionLog(id, profileId, date, 0, now, deviceId), warnedAt };
   }
   return { ...existing, warnedAt, updatedAt: now.toISOString() };
 }

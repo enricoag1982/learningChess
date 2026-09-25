@@ -18,6 +18,7 @@ function isAppSettingsShape(value: unknown): value is {
   suggestedLevels?: unknown;
   profileSettings?: unknown;
   storagePersisted?: unknown;
+  deviceId?: unknown;
 } {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
@@ -40,6 +41,7 @@ function normalize(stored: {
   suggestedLevels?: unknown;
   profileSettings?: unknown;
   storagePersisted?: unknown;
+  deviceId?: unknown;
 }): AppSettings {
   return {
     lastProfileId: stored.lastProfileId,
@@ -48,6 +50,7 @@ function normalize(stored: {
     ...(typeof stored.storagePersisted === 'boolean'
       ? { storagePersisted: stored.storagePersisted }
       : {}),
+    ...(typeof stored.deviceId === 'string' ? { deviceId: stored.deviceId } : {}),
   };
 }
 
