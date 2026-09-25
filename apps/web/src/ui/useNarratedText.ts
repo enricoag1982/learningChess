@@ -9,6 +9,8 @@ import { speakSequence } from './speakSequence.ts';
  */
 export function useNarratedText(narrator: Narrator, text: string): () => void {
   useEffect(() => {
+    // Nothing to say (e.g. text still loading): leave whatever is playing alone.
+    if (text === '') return;
     narrator.cancel();
     void narrator.speak(text);
     return () => {

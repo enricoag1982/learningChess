@@ -3,7 +3,6 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
 import { Owl } from './Owl.tsx';
-import { useNarratedText } from './useNarratedText.ts';
 
 /**
  * 5-minute warning banner (M7.1, app-structure.md §13 "5-min warning"): the store's
@@ -31,7 +30,11 @@ export function AppNotice(): JSX.Element | null {
   }, [screen, lessonId, stepIndex, checkTimeNotice]);
 
   const text = t('notice.five-minutes');
-  useNarratedText(services.narrator, visible ? text : '');
+  // Spoken once when it appears. Never cancels on hide: the hide happens on a screen change, and a
+  // cancel here (this runs after the new screen's own narration effect) would silence that screen.
+  useEffect(() => {
+    if (visible) void services.narrator.speak(text);
+  }, [visible, text, services.narrator]);
 
   if (!visible) {
     return null;

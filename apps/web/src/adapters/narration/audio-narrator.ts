@@ -384,6 +384,8 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     },
 
     speak(text: string): Promise<void> {
+      // Blank text: nothing to say, and nothing to interrupt (never inventoried, never a miss).
+      if (text.trim() === '') return Promise.resolve();
       token += 1;
       const myToken = token;
       stopCurrentSource();

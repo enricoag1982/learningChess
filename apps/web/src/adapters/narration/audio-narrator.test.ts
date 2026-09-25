@@ -185,6 +185,31 @@ describe('createAudioNarrator', () => {
     expect(narrator.lastOutcome()).toEqual({ kind: 'audio' });
   });
 
+  it('blank text is a no-op: nothing spoken, nothing interrupted', async () => {
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () => Promise.resolve(jsonResponse(manifestWith('k'))));
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const current = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    await expect(narrator.speak('')).resolves.toBeUndefined();
+    await expect(narrator.speak('   ')).resolves.toBeUndefined();
+
+    expect(fallback.speakCalls).toEqual([TEXT]);
+    expect(fallback.cancelCalls).toBe(1); // only the one `speak(TEXT)` itself did, not the blanks
+    fallback.resolveNext();
+    await current;
+  });
+
   it('miss: falls back to Web Speech for a text with no manifest entry', async () => {
     const ctx = new FakeAudioContext();
     const fetch = new FakeFetch();
