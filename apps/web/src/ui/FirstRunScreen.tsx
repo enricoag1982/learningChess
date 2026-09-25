@@ -3,6 +3,7 @@ import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isValidPassword, setupParentPassword } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
+import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
@@ -69,6 +70,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
   const [repeat, setRepeat] = useState('');
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   async function onSubmit(event: SubmitEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -136,10 +138,23 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
         <p className="text-xs text-muted">{t('first-run.password.rules')}</p>
         {error && <p className={PARENT_NOTE}>{error}</p>}
 
+        <PrivacyLink
+          onClick={() => {
+            setShowPrivacy(true);
+          }}
+        />
+
         <button type="submit" className={PARENT_PRIMARY_BUTTON}>
           {t('first-run.password.primary')}
         </button>
       </form>
+      {showPrivacy && (
+        <PrivacyDialog
+          onClose={() => {
+            setShowPrivacy(false);
+          }}
+        />
+      )}
     </main>
   );
 }

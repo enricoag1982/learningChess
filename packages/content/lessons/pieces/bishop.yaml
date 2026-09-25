@@ -148,6 +148,7 @@ exercises:
   - id: bishop-08
     type: capture
     text: bishop-08
+    easier: bishop-08-easy
     board: |
       . . . . . . . p
       p . . . . . . .
@@ -159,4 +160,19 @@ exercises:
       p . . . . . p .
     stars3: 5
     stars2: 6
+variants:
+  - id: bishop-08-easy
+    type: capture
+    text: bishop-08-easy
+    board: |
+      . . . . . . . p
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . B . . . .
+      . . . . . . . .
+      . . . . . . . .
+      p . . . . . . .
+    stars3: 2
+    stars2: 3
 boss: hungry-bishop

@@ -120,6 +120,7 @@ exercises:
   - id: king-06
     type: collect-stars
     text: king-06
+    easier: king-06-easy
     board: |
       . . . . . . * .
       . . . . . . . .
@@ -131,4 +132,19 @@ exercises:
       K . . . . . . .
     stars3: 7
     stars2: 8
+variants:
+  - id: king-06-easy
+    type: collect-stars
+    text: king-06-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . p . . . . .
+      . . * . . . . .
+      K . . . . . . .
+    stars3: 2
+    stars2: 3
 boss: king-walk

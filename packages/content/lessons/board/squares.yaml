@@ -105,6 +105,7 @@ exercises:
   - id: squares-05
     type: select-squares
     text: squares-05
+    easier: squares-05-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -115,3 +116,17 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     answer: [a1, c1, e1, g1]
+variants:
+  - id: squares-05-easy
+    type: select-squares
+    text: squares-05-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [a1]

@@ -141,6 +141,15 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Save password');
   await expectNoSeriousViolations(page, 'First run: Password');
 
+  // 2.5. Its "Read our privacy policy" link (M5.5): an in-screen dialog, not a new store screen.
+  await page.getByRole('button', { name: 'Read our privacy policy' }).click();
+  const privacyDialog = page.getByRole('dialog', { name: 'Privacy' });
+  await privacyDialog.waitFor();
+  await expectParentTouchTarget(page, 'Close');
+  await expectNoSeriousViolations(page, 'First run: Privacy dialog');
+  await privacyDialog.getByRole('button', { name: 'Close' }).click();
+  await privacyDialog.waitFor({ state: 'hidden' });
+
   await page.getByLabel('Password', { exact: true }).fill('1234');
   await page.getByLabel('Repeat password').fill('1234');
   await Promise.all([
@@ -219,9 +228,15 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Export all');
   await expectNoSeriousViolations(page, 'Parent area: backup');
 
-  // 8.8. Daily time limit (M5.2): "See you tomorrow" (kid style) once over the limit, then its own
+  // 8.8. Backup -> Overview -> Privacy (M5.5): same policy text as the first-run dialog above.
+  await page.getByRole('button', { name: 'Back' }).click();
+  await page.getByRole('button', { name: 'Privacy' }).click();
+  await expectParentTouchTarget(page, 'Back');
+  await expectNoSeriousViolations(page, 'Parent area: privacy');
+
+  // 8.9. Daily time limit (M5.2): "See you tomorrow" (kid style) once over the limit, then its own
   // "Parent: more time" password flow resuming the gated activity.
-  await page.getByRole('button', { name: 'Back' }).click(); // Backup -> Overview
+  await page.getByRole('button', { name: 'Back' }).click(); // Privacy -> Overview
   await page.getByRole('button', { name: contentText('parent.done') }).click(); // Overview -> picker
   await pickProfileFromPicker(page, 'Mia');
   const profileId = await getSoleProfileId(page);

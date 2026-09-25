@@ -154,6 +154,7 @@ exercises:
   - id: setup-05
     type: setup
     text: setup-05
+    easier: setup-05-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -172,5 +173,28 @@ exercises:
         . . . . . . . .
         . . . . . . . .
         P P P P P P P P
+        R N B Q K B N R
+variants:
+  - id: setup-05-easy
+    type: setup
+    text: setup-05-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R N B Q K B N R
+    target:
+      board: |
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        P P P P . . . .
         R N B Q K B N R
 boss: setup-race

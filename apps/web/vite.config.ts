@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
 import type { Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+// Shown in the parent area (M5.5, `docs/release.md`); read once at build/dev-server start, not
+// imported as JSON (that would pull the whole file, incl. `devDependencies`, into the dep graph).
+const { version } = JSON.parse(
+  readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf-8'),
+) as { version: string };
 
 /**
  * Content Security Policy (`non-functional.md` §6 "Security", M5.4 decision table): no remote
@@ -52,6 +60,9 @@ function cspPlugin(): Plugin {
 // Deploy workflow sets BASE_PATH to `/<repo>/` for GitHub Pages; local dev/build default to `/`.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
+  // Compile-time string replacement (not `import.meta.env`): fine under the M5.4 CSP's
+  // `script-src 'self'` (no `unsafe-inline`/`eval`) since nothing is evaluated at runtime.
+  define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [
     react(),
     tailwindcss(),

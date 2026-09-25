@@ -148,6 +148,7 @@ exercises:
   - id: knight-08
     type: collect-stars
     text: knight-08
+    easier: knight-08-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -159,4 +160,19 @@ exercises:
       . . . . . . N *
     stars3: 6
     stars2: 7
+variants:
+  - id: knight-08-easy
+    type: collect-stars
+    text: knight-08-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . * . .
+      . . . N . . . *
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    stars3: 2
+    stars2: 3
 boss: knight-maze
