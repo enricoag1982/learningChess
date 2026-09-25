@@ -1,11 +1,18 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import type { CompiledContent, ExerciseDef, MiniGame, TracksCatalog } from '@chess-kids/core';
-import { SQUARES } from '@chess-kids/core';
+import type {
+  CompiledContent,
+  ExerciseDef,
+  Lesson,
+  MiniGame,
+  TracksCatalog,
+} from '@chess-kids/core';
+import { nextLesson, SQUARES, worldLessons } from '@chess-kids/core';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
+  answerExerciseWrongThenSolve,
   clickSquare,
   completeBoss,
   completeExercise,
@@ -29,6 +36,19 @@ import {
 
 const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
+
+/** The first two lessons of a brand-new profile's first world (siblings, same world) — the second
+ * one naturally locked, no seeding needed (M4.5's own onboarding/test-out a11y walk below). */
+function firstTwoLessons(): { readonly first: Lesson; readonly second: Lesson } {
+  const first = nextLesson(catalog, content.lessons, []);
+  if (!first) throw new Error('bundled content/tracks: no first lesson found');
+  const world = catalog.tracks.flatMap((track) => track.worlds).find((w) => w.id === first.world);
+  if (!world) throw new Error(`world "${first.world}" not found in tracks.json`);
+  const siblings = worldLessons(world, content.lessons);
+  const second = siblings[siblings.findIndex((lesson) => lesson.id === first.id) + 1];
+  if (!second) throw new Error(`world "${first.world}" needs at least 2 lessons for this test`);
+  return { first, second };
+}
 
 /**
  * Clears any concept stats this walk's own deep-scanning has produced (M3.4: an exercise scanned
@@ -135,6 +155,14 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectKidTouchTarget(page, "Let's play!");
   await expectNoSeriousViolations(page, 'New player: avatar');
   await page.getByRole('button', { name: "Let's play!" }).click();
+
+  // 5.5. Placement offer (M4.5, kid style): declined here (a full placement run is scanned in its
+  // own dedicated test below, alongside the test-out sheet/runner/results).
+  await page.getByText(contentText('placement.offer-question')).waitFor();
+  await expectKidTouchTarget(page, contentText('placement.offer-yes'));
+  await expectKidTouchTarget(page, contentText('placement.offer-no'));
+  await expectNoSeriousViolations(page, 'Placement offer');
+  await page.getByRole('button', { name: contentText('placement.offer-no') }).click();
 
   // 6. Home's switch-player button, then the picker (kid style).
   await expectKidTouchTarget(page, 'Switch player');
@@ -547,4 +575,60 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
   expect(completeScanned, 'the Complete step got a scan').toBe(true);
   expect(summaryScanned, 'the session summary got a scan').toBe(true);
+});
+
+test('test-out sheet, runner and result screen have no serious/critical violations and kid-sized touch targets (M4.5)', async ({
+  page,
+}) => {
+  test.setTimeout(60_000);
+  const { second } = firstTwoLessons();
+
+  await completeFirstRun(page, 'Kid');
+  await page.getByRole('button', { name: /Journey/ }).click();
+  await page.getByRole('button', { name: journeyNodeName(second, 'locked') }).click();
+
+  // Locked-lesson message bar's "Show you know it?" button.
+  await expectKidTouchTarget(page, contentText('journey:ui.show-you-know-it'));
+  await expectNoSeriousViolations(page, 'Journey (locked lesson message)');
+  await page.getByRole('button', { name: contentText('journey:ui.show-you-know-it') }).click();
+
+  // The sheet itself (docs/screens.md §1: Owl row always stacked in a dialog).
+  await page.getByRole('dialog', { name: contentText('journey:ui.show-you-know-it') }).waitFor();
+  await expectKidTouchTarget(page, contentText('journey:ui.test-out-yes'));
+  await expectKidTouchTarget(page, contentText('journey:ui.test-out-no'));
+  await expectNoSeriousViolations(page, 'Test-out sheet');
+  await page.getByRole('button', { name: contentText('journey:ui.test-out-yes') }).click();
+
+  // The runner: no Hint control (domain-model.md §3.2 "no hints offered").
+  await page.getByText(/^Task 1\//).waitFor();
+  await expect(page.getByRole('button', { name: /Hint/ })).toHaveCount(0);
+  await expectKidTouchTarget(page, /Say it again/);
+  await expectNoSeriousViolations(page, 'Test-out runner');
+
+  // Answers every task wrong-then-right (whichever the app picked at random from the lesson's own
+  // exercise pool): a deterministic "Fail" result to also scan, without depending on which of its
+  // (up to 5) tasks got picked.
+  const failHeading = page.getByRole('heading', { name: contentText('assessment.fail-title') });
+  for (let i = 0; i < second.exercises.length + 1; i += 1) {
+    if (await failHeading.isVisible().catch(() => false)) break;
+    let matched: ExerciseDef | undefined;
+    for (const candidate of second.exercises) {
+      if (await page.getByText(contentText(candidate.textKey), { exact: true }).isVisible()) {
+        matched = candidate;
+        break;
+      }
+    }
+    if (!matched)
+      throw new Error('test-out runner: no candidate exercise matched the current task');
+    await answerExerciseWrongThenSolve(page, matched);
+    await page.getByRole('button', { name: /^Next/ }).click();
+  }
+  await failHeading.waitFor();
+
+  await expectKidTouchTarget(page, contentText('assessment.continue'));
+  await expectNoSeriousViolations(page, 'Test-out result (fail)');
+  await page.getByRole('button', { name: contentText('assessment.continue') }).click();
+
+  // Back on the Journey, no penalty: still locked (domain-model.md §3.2 "Fail").
+  await page.getByRole('button', { name: journeyNodeName(second, 'locked') }).waitFor();
 });

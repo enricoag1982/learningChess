@@ -33,6 +33,12 @@ test.describe('Profiles, first run and parent area', () => {
     await page.getByRole('button', { name: 'Fox' }).click();
     await page.getByRole('button', { name: "Let's play!" }).click();
 
+    // M4.5: offered once, right after creating a new player; declines it here (Home shows Mia).
+    await expect(
+      page.getByText("Already know some chess? Let's find out where to start you!"),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'No, start at World 1' }).click();
+
     // Home shows Mia.
     await expect(page.getByRole('heading', { level: 1, name: 'Chess for Kids' })).toBeVisible();
     await expect(page.getByText('Mia')).toBeVisible();

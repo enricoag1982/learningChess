@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ConceptTask, Piece } from '@chess-kids/core';
+import type { ConceptTask, ExerciseState, Piece } from '@chess-kids/core';
 import {
   chessJsRules,
   isInCheck,
@@ -23,10 +23,20 @@ import { NextButton } from '../lesson/NextButton.tsx';
 
 export interface ReviewExerciseStepProps {
   readonly task: ConceptTask;
-  /** Threaded into `recordReviewResult` (rewards.md §4 "Warm-up Champ"). */
+  /** Threaded into `recordReviewResult` (rewards.md §4 "Warm-up Champ"). Ignored when `onRecord` is
+   * given (an assessment task never touches the Leitner review scheduler this way). */
   readonly reviewSource: 'warmup' | 'practice';
-  /** Called once the solved attempt is saved (`recordReviewResult`) and Next is tapped. */
+  /** Called once the solved attempt is saved (`recordReviewResult`, or `onRecord` when given) and
+   * Next is tapped. */
   readonly onNext: () => void;
+  /** Hides the Hint control (domain-model.md §3.2: an assessment task offers no hints). Default `true`. */
+  readonly showHint?: boolean;
+  /**
+   * Overrides the default `recordReviewResult` save (assessment tasks, M4.5: scoring is per-run, not
+   * a per-task Leitner box move). Receives the solved core exercise state and whether it was solved
+   * first-try with no hint/error; must resolve before the Next button appears.
+   */
+  readonly onRecord?: (state: ExerciseState, correct: boolean) => Promise<void>;
 }
 
 /**
@@ -38,6 +48,8 @@ export function ReviewExerciseStep({
   task,
   reviewSource,
   onNext,
+  showHint = true,
+  onRecord,
 }: ReviewExerciseStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -66,16 +78,20 @@ export function ReviewExerciseStep({
   useEffect(() => {
     if (!solved || savedRef.current || !profile) return;
     savedRef.current = true;
-    void recordReviewResult(services.deps, {
-      profileId: profile.id,
-      task,
-      state: state.core,
-      durationMs: Date.now() - startedAt,
-      reviewSource,
-    }).then(() => {
+    const correct = state.core.errors === 0 && state.core.hintLevel === 0;
+    const save = onRecord
+      ? onRecord(state.core, correct)
+      : recordReviewResult(services.deps, {
+          profileId: profile.id,
+          task,
+          state: state.core,
+          durationMs: Date.now() - startedAt,
+          reviewSource,
+        }).then(() => undefined);
+    void save.then(() => {
       setSaved(true);
     });
-  }, [solved, profile, services.deps, task, state.core, startedAt, reviewSource]);
+  }, [solved, profile, services.deps, task, state.core, startedAt, reviewSource, onRecord]);
 
   const character = lesson?.character ?? 'owl';
   const instructionText = exerciseInstructionText(t, exercise);
@@ -93,6 +109,7 @@ export function ReviewExerciseStep({
     onSelectPiece: setSelectedPiece,
     isStacked,
     checkSquare,
+    showHint,
   });
 
   const panel = (

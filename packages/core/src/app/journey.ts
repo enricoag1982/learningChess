@@ -15,6 +15,7 @@ import {
 } from '../domain/journey.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { totalStars } from '../domain/progress.ts';
+import { loadUnlocked } from './assessment.ts';
 import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -57,9 +58,10 @@ function requireCatalog(content: ContentSource): TracksCatalog {
 export async function loadJourney(deps: AppDeps, profileId: string): Promise<Journey> {
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();
-  const [progresses, miniGames] = await Promise.all([
+  const [progresses, miniGames, unlocked] = await Promise.all([
     deps.progress.listLessons(profileId),
     deps.progress.listMiniGames(profileId),
+    loadUnlocked(deps, profileId),
   ]);
 
   const worlds: JourneyWorld[] = [];
@@ -67,8 +69,8 @@ export async function loadJourney(deps: AppDeps, profileId: string): Promise<Jou
     for (const world of [...track.worlds].sort((a, b) => a.order - b.order)) {
       worlds.push({
         world,
-        status: worldStatus(catalog, world, lessons, progresses, undefined, miniGames),
-        bossStatus: worldBossStatus(catalog, world, lessons, progresses, undefined, miniGames),
+        status: worldStatus(catalog, world, lessons, progresses, unlocked, miniGames),
+        bossStatus: worldBossStatus(catalog, world, lessons, progresses, unlocked, miniGames),
       });
     }
   }
@@ -76,11 +78,11 @@ export async function loadJourney(deps: AppDeps, profileId: string): Promise<Jou
   return {
     catalog,
     lessons,
-    statuses: lessonAvailability(catalog, lessons, progresses, undefined, miniGames),
+    statuses: lessonAvailability(catalog, lessons, progresses, unlocked, miniGames),
     worlds,
-    next: nextLesson(catalog, lessons, progresses, undefined, miniGames),
-    nextStep: nextStep(catalog, lessons, progresses, undefined, miniGames),
-    rank: currentRank(catalog, lessons, progresses, undefined, miniGames),
+    next: nextLesson(catalog, lessons, progresses, unlocked, miniGames),
+    nextStep: nextStep(catalog, lessons, progresses, unlocked, miniGames),
+    rank: currentRank(catalog, lessons, progresses, unlocked, miniGames),
     totalStars: totalStars(progresses),
   };
 }

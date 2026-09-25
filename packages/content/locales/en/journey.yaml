@@ -41,6 +41,10 @@ ui:
   coming-soon-title: Coming soon!
   coming-soon-message: More lessons are on their way here.
   finish-first: 'Finish {{name}} first!'
+  test-out-lesson-question: 'Want to show me you already know {{name}}?'
+  test-out-world-question: 'Want to show me you already know World {{order}} · {{name}}?'
+  test-out-yes: Yes, test me!
+  test-out-no: Not yet
   character-piece: '{{character}} the {{piece}}'
   node-name: '{{name}}, {{status}}'
   node-name-stars: '{{name}}, {{status}}, {{count}} stars'

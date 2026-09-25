@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
+import { AssessmentScreen } from './ui/AssessmentScreen.tsx';
 import { Celebration } from './ui/Celebration.tsx';
 import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
@@ -16,6 +17,8 @@ import { MiniGameSessionScreen } from './ui/MiniGameSessionScreen.tsx';
 import { NewPlayerScreen } from './ui/NewPlayerScreen.tsx';
 import { ParentAreaScreen } from './ui/ParentAreaScreen.tsx';
 import { PasswordScreen } from './ui/PasswordScreen.tsx';
+import { PlacementOfferScreen } from './ui/PlacementOfferScreen.tsx';
+import { PlacementScreen } from './ui/PlacementScreen.tsx';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { PracticeRunScreen } from './ui/PracticeRunScreen.tsx';
 import { PracticeScreen } from './ui/PracticeScreen.tsx';
@@ -62,6 +65,12 @@ function Screens(): JSX.Element {
       return <PracticeRunScreen />;
     case 'today-summary':
       return <SessionSummaryScreen />;
+    case 'placement-offer':
+      return <PlacementOfferScreen />;
+    case 'placement':
+      return <PlacementScreen />;
+    case 'assessment':
+      return <AssessmentScreen />;
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.

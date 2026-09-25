@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
-import type { ConceptTask } from '@chess-kids/core';
+import type { ConceptTask, ExerciseState } from '@chess-kids/core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
 
 function CloseIcon(): JSX.Element {
@@ -54,12 +54,18 @@ export interface ReviewTaskRunnerProps {
   /** e.g. "Warm-up {{current}}/{{total}}" (warm-up) or "Practice {{current}}/{{total}}" (Practice). */
   readonly headerText: (current: number, total: number) => string;
   readonly closeAriaLabel: string;
-  /** Threaded into every `recordReviewResult` call (rewards.md §4 "Warm-up Champ"). */
+  /** Threaded into every `recordReviewResult` call (rewards.md §4 "Warm-up Champ"). Ignored when
+   * `onRecord` is given. */
   readonly reviewSource: 'warmup' | 'practice';
   /** Called once every task is solved and its result saved. */
   readonly onDone: () => void;
   /** Top-bar Close: leaves the run early (kid can leave any time). */
   readonly onClose: () => void;
+  /** Hides every task's Hint control (assessment runs, M4.5: domain-model.md §3.2). Default `true`. */
+  readonly showHint?: boolean;
+  /** Overrides the default per-task `recordReviewResult` save (assessment runs, M4.5); see
+   * `ReviewExerciseStepProps.onRecord`. Receives the task alongside its solved state/correctness. */
+  readonly onRecord?: (task: ConceptTask, state: ExerciseState, correct: boolean) => Promise<void>;
 }
 
 /**
@@ -74,6 +80,8 @@ export function ReviewTaskRunner({
   reviewSource,
   onDone,
   onClose,
+  showHint = true,
+  onRecord,
 }: ReviewTaskRunnerProps): JSX.Element {
   const [index, setIndex] = useState(0);
   const task = tasks[index];
@@ -116,6 +124,8 @@ export function ReviewTaskRunner({
           task={task}
           reviewSource={reviewSource}
           onNext={advance}
+          showHint={showHint}
+          onRecord={onRecord ? (state, correct) => onRecord(task, state, correct) : undefined}
         />
       </div>
     </main>

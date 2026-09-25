@@ -4,6 +4,14 @@ import type { StoredRecord } from './profile.ts';
 /** Star rating shown to the kid: `0` = not solved yet. */
 export type Stars = 0 | 1 | 2 | 3;
 
+/**
+ * How a lesson reached `mastered` (domain-model.md §2, §3.2): `'test-out'` / `'placement'` passed
+ * an assessment for it; `'parent'` is a direct parent-area unlock. Absent (or `'play'`, never
+ * actually stored — a documented sentinel, not a real value the app writes) means the ordinary
+ * path: mastery purely from `bestStars` reaching 80% of max (`lessonStatus`).
+ */
+export type MasteredVia = 'play' | 'test-out' | 'placement' | 'parent';
+
 /** One profile's saved progress on one lesson. */
 export interface LessonProgress extends StoredRecord {
   readonly profileId: string;
@@ -16,6 +24,8 @@ export interface LessonProgress extends StoredRecord {
   readonly resumeStep: number;
   /** First time every exercise had ≥ 1 star. */
   readonly completedAt?: string;
+  /** Set by a passed test-out/placement or a parent unlock (M4.5); see {@link MasteredVia}. */
+  readonly masteredVia?: MasteredVia;
 }
 
 /** One recorded try at an exercise or mini-game, scored or not. */
@@ -103,12 +113,16 @@ export function withResumeStep(progress: LessonProgress, step: number, now: Date
 
 /**
  * Lesson status (domain-model.md §3): `new` without progress; `mastered` when the best-stars sum
- * over `lesson.exercises` is ≥ 80% of the 3-star max; `complete` when every exercise has ≥ 1 star;
- * `in-progress` otherwise.
+ * over `lesson.exercises` is ≥ 80% of the 3-star max, *or* `progress.masteredVia` is set to a
+ * non-`'play'` value (a passed test-out/placement or a parent unlock, M4.5 — mastery regardless of
+ * `bestStars`); `complete` when every exercise has ≥ 1 star; `in-progress` otherwise.
  */
 export function lessonStatus(lesson: Lesson, progress?: LessonProgress): LessonStatus {
   if (progress === undefined) {
     return 'new';
+  }
+  if (progress.masteredVia !== undefined && progress.masteredVia !== 'play') {
+    return 'mastered';
   }
   const max = 3 * lesson.exercises.length;
   const earned = lesson.exercises.reduce(

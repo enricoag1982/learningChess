@@ -5,6 +5,7 @@ import { unlockedMiniGames } from '../domain/play.ts';
 import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptPoolEntry, ConceptStats, ConceptTask } from '../domain/review.ts';
 import { conceptPool, pickPracticeTasks, pickWarmUp } from '../domain/review.ts';
+import { loadUnlocked } from './assessment.ts';
 import type { ContentSource, Random } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -149,6 +150,8 @@ export function planTodaySession(
   conceptStats: readonly ConceptStats[],
   now: Date,
   random: Random,
+  /** Lesson/world ids unlocked out of order by a test-out/placement/parent unlock (M4.5). */
+  unlocked?: ReadonlySet<string>,
 ): TodaySessionPlan {
   const activities: TodayActivity[] = [];
 
@@ -161,7 +164,7 @@ export function planTodaySession(
     catalog,
     lessons,
     progresses,
-    undefined,
+    unlocked,
     miniGameProgresses,
   );
   if (step !== null) {
@@ -195,10 +198,11 @@ export async function loadTodaySession(
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();
   const minigames = deps.content.minigames();
-  const [progresses, miniGameProgresses, conceptStats] = await Promise.all([
+  const [progresses, miniGameProgresses, conceptStats, unlocked] = await Promise.all([
     deps.progress.listLessons(profileId),
     deps.progress.listMiniGames(profileId),
     deps.progress.listConceptStats(profileId),
+    loadUnlocked(deps, profileId),
   ]);
   return planTodaySession(
     catalog,
@@ -209,5 +213,6 @@ export async function loadTodaySession(
     conceptStats,
     deps.clock.now(),
     deps.random,
+    unlocked,
   );
 }
