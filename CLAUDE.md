@@ -28,6 +28,8 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 | `docs/screens.md` | UI rules, screen list; sketches: https://claude.ai/artifact/HohYgZ3J9mqBrsamJnin5S |
 | `docs/roadmap.md` | MVP scope, epics, milestones M0–M5, playtests, metrics, decisions |
 | `docs/validation.md` | Check IDs, per-tag validation log |
+| `docs/release.md` | Release checklist, tagging, rollback |
+| `docs/retrospective.md` | M0–M5 retrospective: outcome, time spent, went well / wrong, learnings |
 
 ## Key decisions
 
@@ -40,7 +42,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 ## Status and next step
 
 - Done: M0–M5 (`m0` … `m5`), release `v1.0.0`. Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
-- Next: retrospective (`docs/retrospective.md`); then after-MVP work (`docs/roadmap.md` §4), open follow-up F4 (Bear strength). Release steps: `docs/release.md`.
+- Next: after-MVP work (`docs/roadmap.md` §4), open follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you".
