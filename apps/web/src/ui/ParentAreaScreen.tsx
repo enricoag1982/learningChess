@@ -11,6 +11,7 @@ import { BackupScreen } from './parent/BackupPanel.tsx';
 import { ChildReportScreen } from './parent/ChildReport.tsx';
 import { ChildSettingsScreen } from './parent/ChildSettings.tsx';
 import { ChevronRightIcon } from './parent/parent-icons.tsx';
+import { PrivacyScreen } from './parent/PrivacyPolicy.tsx';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
@@ -151,7 +152,8 @@ type ParentView =
   | { readonly kind: 'overview' }
   | { readonly kind: 'report'; readonly profileId: string }
   | { readonly kind: 'settings'; readonly profileId: string }
-  | { readonly kind: 'backup' };
+  | { readonly kind: 'backup' }
+  | { readonly kind: 'privacy' };
 
 /** Parent area (parent style, ≥ 44px targets, WCAG 2.2 AA): overview → child report → child
  * settings; backup export / import — behind the parent gate (app-structure.md §11, M5.1). */
@@ -252,6 +254,18 @@ export function ParentAreaScreen(): JSX.Element {
                 </span>
                 <ChevronRightIcon />
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setView({ kind: 'privacy' });
+                }}
+                className={PARENT_TAPPABLE_ROW}
+              >
+                <span className="flex-1 text-sm font-extrabold text-ink">
+                  {t('parent.privacy-nav')}
+                </span>
+                <ChevronRightIcon />
+              </button>
             </section>
 
             <section className="flex flex-col gap-3">
@@ -273,6 +287,10 @@ export function ParentAreaScreen(): JSX.Element {
                 </button>
               )}
             </section>
+
+            <p className="text-center text-xs text-muted">
+              {t('parent.version', { version: __APP_VERSION__ })}
+            </p>
           </>
         )}
 
@@ -313,6 +331,14 @@ export function ParentAreaScreen(): JSX.Element {
               // Refreshes the Overview's own profile list in the background, but stays on this
               // screen (the parent reads "Import complete." first, then Back returns themselves).
               void refreshProfiles();
+            }}
+          />
+        )}
+
+        {view.kind === 'privacy' && (
+          <PrivacyScreen
+            onBack={() => {
+              setView({ kind: 'overview' });
             }}
           />
         )}

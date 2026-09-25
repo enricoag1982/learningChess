@@ -215,6 +215,25 @@ describe('Parent area reset (M5.1)', () => {
   });
 });
 
+describe('Parent area privacy and version (M5.5)', () => {
+  it('shows the app version on the overview, and the Privacy row opens the same policy text', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+
+    await screen.findByText('Version 1.0.0');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Privacy' }));
+    await screen.findByRole('heading', { name: 'Privacy' });
+    expect(screen.getByText(/Chess for Kids keeps everything on this device/)).toBeTruthy();
+    expect(screen.getByText(/No sign-up, no analytics, no ads/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+    await screen.findByRole('heading', { name: 'Parent area' });
+  });
+});
+
 describe('Parent area backup (M5.1)', () => {
   it('export all writes one file via the backup file writer', async () => {
     const services = makeServices();

@@ -85,3 +85,24 @@ test.describe('Parent area: overview, report, backup (M5.1)', () => {
     await expect(miaCard.getByText(/^[1-9]\d* stars$/)).toBeVisible();
   });
 });
+
+test.describe('Parent area: privacy (M5.5)', () => {
+  test('the Privacy row opens the policy page, same text as the first-run link, version shown on the overview', async ({
+    page,
+  }) => {
+    await completeFirstRun(page, 'Mia');
+    await page.getByRole('button', { name: 'Switch player' }).click();
+    await openParentArea(page);
+
+    await page.getByText(/^Version \d+\.\d+\.\d+$/).waitFor();
+
+    await page.getByRole('button', { name: 'Privacy' }).click();
+    await page.getByRole('heading', { name: 'Privacy' }).waitFor();
+    await expect(
+      page.getByText('Chess for Kids keeps everything on this device.', { exact: false }),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back' }).click();
+    await page.getByRole('heading', { name: 'Parent area' }).waitFor();
+  });
+});

@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 4173;
+const PORT = Number(process.env.PW_PORT ?? 4173);
 const baseURL = `http://localhost:${String(PORT)}`;
 
 // Runs against the production build (`pnpm build && pnpm test:e2e`), never the dev server.
@@ -17,7 +17,7 @@ export default defineConfig({
       : {}),
   },
   webServer: {
-    command: 'pnpm preview',
+    command: `pnpm exec vite preview --port ${String(PORT)} --strictPort`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },

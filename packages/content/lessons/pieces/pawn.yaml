@@ -148,6 +148,7 @@ exercises:
   - id: pawn-08
     type: collect-stars
     text: pawn-08
+    easier: pawn-08-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -159,4 +160,19 @@ exercises:
       . . . . . . . .
     stars3: 3
     stars2: 4
+variants:
+  - id: pawn-08-easy
+    type: collect-stars
+    text: pawn-08-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . * . . . . .
+      . . p . . . . .
+      . P . . . . . .
+      . . . . . . . .
+    stars3: 2
+    stars2: 3
 boss: pawn-wars-4

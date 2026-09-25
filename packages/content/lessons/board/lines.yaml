@@ -113,6 +113,7 @@ exercises:
   - id: lines-06
     type: select-squares
     text: lines-06
+    easier: lines-06-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -123,4 +124,18 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     answer: [h1, g2, f3, e4, d5, c6, b7, a8]
+variants:
+  - id: lines-06-easy
+    type: select-squares
+    text: lines-06-easy
+    board: |
+      . . . . . . . .
+      . . . . . . K .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    answer: [f8, g7, h6]
 boss: square-hunt

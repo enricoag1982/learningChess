@@ -84,6 +84,7 @@ exercises:
   - id: promotion-03
     type: best-move
     text: promotion-03
+    easier: promotion-03-easy
     board: |
       . . . n r . . .
       . . . P . . . .
@@ -122,4 +123,18 @@ exercises:
       . . . . . . . .
     answer: 'no'
     focus: d5
+variants:
+  - id: promotion-03-easy
+    type: best-move
+    text: promotion-03-easy
+    board: |
+      . . . . r . . .
+      . . . P . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+    solutions: [d8=Q, dxe8=Q]
 boss: pawn-wars

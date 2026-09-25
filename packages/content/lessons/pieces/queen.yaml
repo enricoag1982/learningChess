@@ -148,6 +148,7 @@ exercises:
   - id: queen-08
     type: collect-stars
     text: queen-08
+    easier: queen-08-easy
     board: |
       * . . . . . . *
       . . . . . . . .
@@ -159,4 +160,19 @@ exercises:
       * . . . . . . *
     stars3: 4
     stars2: 6
+variants:
+  - id: queen-08-easy
+    type: collect-stars
+    text: queen-08-easy
+    board: |
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . Q . . . .
+      . . . . . . . .
+      . . . . . . . .
+      * . . . . . . *
+    stars3: 2
+    stars2: 3
 boss: hungry-queen

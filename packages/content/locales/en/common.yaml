@@ -59,6 +59,7 @@ first-run:
     rules: At least 4 characters. Numbers are OK.
     mismatch: Passwords do not match.
     too-short: Use at least 4 characters.
+    privacy-link: Read our privacy policy
     primary: Save password
   saved:
     title: Password saved!
@@ -195,6 +196,22 @@ parent:
     import-confirm: Replace all data
     import-done: Import complete.
     import-error-generic: This file could not be read.
+  privacy-nav: Privacy
+  version: 'Version {{version}}'
+  privacy:
+    title: Privacy
+    intro: Chess for Kids keeps everything on this device. Here's exactly what that means.
+    data-heading: What we keep
+    data-body: A nickname, an avatar picture, and lesson progress for each child — stored only on this device, never sent anywhere.
+    no-accounts-heading: No accounts, no tracking
+    no-accounts-body: No sign-up, no analytics, no ads, no third-party services. The app never phones home.
+    network-heading: Network use
+    network-body: The only network access is checking for app updates. Updates are static files delivered from GitHub Pages.
+    control-heading: Parent control
+    control-body: Export or delete any child's data any time, from Backup and from that child's Settings in the parent area.
+    contact-heading: Questions?
+    contact-body: "Open an issue on the project's GitHub repository: {{url}}"
+    close: Close
 lesson:
   close: Close lesson
   steps:

@@ -71,6 +71,24 @@ describe('first run', () => {
     expect(screen.getByText('Player')).toBeTruthy();
     expect(screen.queryByText('Pick your animal!')).toBeNull();
   });
+
+  it('the privacy policy link opens an in-screen dialog (no new store screen), closable, keeping the password step underneath (M5.5)', async () => {
+    const services = makeServices();
+    render(<App services={services} />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
+    await screen.findByRole('heading', { name: 'Set a parent password' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Read our privacy policy' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Privacy' });
+    await within(dialog).findByText(/Chess for Kids keeps everything on this device/);
+    expect(within(dialog).getByText(/No sign-up, no analytics, no ads/)).toBeTruthy();
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).toBeNull();
+    });
+    expect(screen.getByRole('heading', { name: 'Set a parent password' })).toBeTruthy();
+  });
 });
 
 describe('password screen', () => {

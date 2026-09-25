@@ -35,6 +35,7 @@ bishop-05: A rock blocks the diagonal! Find another way to the star.
 bishop-06: Elephant is hungry. Gobble up the pawn!
 bishop-07: A rock blocks one path, a pawn waits on another. Tap every square Elephant can reach.
 bishop-08: Elephant's biggest challenge yet. Capture all four pawns.
+bishop-08-easy: Capture both pawns on Elephant's diagonals.
 hungry-bishop:
   title: Hungry Bishop
   goal: Elephant is starving! Capture every piece before the moves run out.
@@ -54,6 +55,7 @@ queen-05: Lioness is hungry. Gobble up the pawn!
 queen-06: A friend blocks one line, a pawn waits on another. Tap every square Lioness can reach.
 queen-07: Three pawns, three captures. Get them all!
 queen-08: Lioness's biggest challenge yet. Collect every star around the rock.
+queen-08-easy: Collect both stars in the corners below.
 hungry-queen:
   title: Hungry Queen
   goal: Lioness is starving! Capture every piece before the moves run out.
@@ -71,6 +73,7 @@ king-03: A pawn is watching a square! Find a safe path to the star.
 king-04: Tap only the squares where Lion is safe.
 king-05: A pawn blocks the direct path. Find the safe way to the star.
 king-06: Lion's longest walk yet. Stay safe all the way to the star.
+king-06-easy: A short walk this time. Stay safe on the way to the star.
 king-walk:
   title: King Walk
   goal: Lion must reach both stars, one careful step at a time, always staying safe.
@@ -90,6 +93,7 @@ knight-05: A rock blocks one landing spot. Tap every square Horse can jump to.
 knight-06: Horse is boxed in by rocks, but a knight jumps right over them!
 knight-07: Two jumps, two captures. Get them both!
 knight-08: Collect both stars. Plan Horse's jumps!
+knight-08-easy: Collect both stars. Just two quick jumps!
 knight-maze:
   title: Knight Maze
   goal: Horse must collect every star by jumping over the rocks!
@@ -110,6 +114,7 @@ pawn-05: Caterpillar is blocked straight ahead, but she can still capture on eit
 pawn-06: A piece waits on the diagonal. Capture it, then keep creeping to the star!
 pawn-07: Two pieces stand in Caterpillar's way. Creep closer, then capture them both!
 pawn-08: Collect the first star, then find a way around the blocker to reach the second!
+pawn-08-easy: Capture the pawn, then reach the star!
 pawn-wars-4:
   title: Pawn Wars Jr.
   goal: Four caterpillars each! Be the first to transform into a queen, or capture every enemy.
@@ -127,6 +132,7 @@ promotion-02: Caterpillar is about to transform! Which piece should she become?
 promotion-03: A knight blocks the square ahead, but Caterpillar can capture her way to the last row. Find the winning move!
 promotion-04: Tap every square where Caterpillar could transform this move.
 promotion-05: Look at Caterpillar. Is she about to transform into a new piece?
+promotion-03-easy: Move Caterpillar to the last row. Push forward, or capture the rook — either way she transforms!
 pawn-wars:
   title: Pawn Wars
   goal: Eight caterpillars each! Race to transform first, or capture every piece.
@@ -143,6 +149,7 @@ squares-02: He hopped all the way to the far corner on your left. Is that square
 squares-03: Now he's out in the middle of the board. Is his square light?
 squares-04: Tap every light square in the bottom row, the one nearest you.
 squares-05: Now tap every dark square in that bottom row.
+squares-05-easy: Tap the dark square in the bottom-left corner.
 lines:
   title: Rows, Columns, and Diagonals
   story: >-
@@ -157,6 +164,7 @@ lines-03: Your king moved closer to you. Tap his whole row.
 lines-04: Tap every square in your king's column, all the way across the board.
 lines-05: This line runs corner to corner. Tap every square on your king's diagonal.
 lines-06: Here's the other diagonal. Tap every square your king shares with it.
+lines-06-easy: Your king sits on two diagonals. Tap every square of the short one.
 square-hunt:
   title: Square Hunt
   goal: Tap every square in each highlighted line, as fast as you can!
@@ -181,6 +189,7 @@ setup-04: >-
   Finally the queen and king share the middle. Remember: the queen always stands on a square of
   her own colour!
 setup-05: All that's left is the pawns — line up all eight, standing guard in front.
+setup-05-easy: Add four pawns, one in front of each piece on the left, from the rook to the queen.
 setup-race:
   title: Setup Race
   goal: Race to place every piece in its starting spot!

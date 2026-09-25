@@ -25,7 +25,7 @@ Format check → lint → typecheck → unit + content tests → build → E2E s
 | `pnpm install` | Install; builds content JSON (`prepare`) |
 | `pnpm dev` | Web app dev server |
 | `pnpm format` / `pnpm lint` / `pnpm typecheck` / `pnpm test` | Same checks as CI |
-| `pnpm build && pnpm test:e2e` | Production build + Playwright smoke (first time: `pnpm --filter @chess-kids/web exec playwright install chromium`) |
+| `pnpm build && pnpm test:e2e` | Production build + Playwright smoke (first time: `pnpm --filter @chess-kids/web exec playwright install chromium`); preview port 4173, override with `PW_PORT` (parallel work, M5.5) |
 
 ## Repository settings (manual, GitHub UI)
 
