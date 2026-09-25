@@ -25,7 +25,7 @@ import type {
   TracksCatalog,
   World,
 } from '@chess-kids/core';
-import { voiceKey } from '@chess-kids/core';
+import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
 import type { Locales } from './load.ts';
 import type { LocaleTree } from './schema.ts';
 
@@ -401,6 +401,8 @@ function collectUiTemplates(
   for (const key of [
     'session.summary-closing',
     'time-limit.body',
+    'time-limit.late-body',
+    'notice.five-minutes',
     'practice.owl-line',
     'den.owl-line',
     'play.owl-line',
@@ -408,6 +410,12 @@ function collectUiTemplates(
     'first-run.welcome.owl',
   ]) {
     addText(entries, resolve(locales, key), 'owl-line');
+  }
+
+  // Time limit "too early" (M7.1): bounded by the parent's "Not before" options.
+  for (const time of PLAY_FROM_OPTIONS) {
+    if (time !== null)
+      addText(entries, resolve(locales, 'time-limit.early-body', { time }), 'owl-line');
   }
 }
 
