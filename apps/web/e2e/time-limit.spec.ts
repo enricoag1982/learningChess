@@ -5,7 +5,15 @@ import {
   pickProfileFromPicker,
   seedDailyLimit,
   seedMinutesToday,
+  seedPlayUntil,
 } from './helpers.ts';
+
+/** `'HH:MM'` one minute before the real current time — lands "in the past" regardless of when the
+ * suite happens to run (M7.1's allowed-hours gate). */
+function oneMinuteAgo(): string {
+  const past = new Date(Date.now() - 60_000);
+  return `${String(past.getHours()).padStart(2, '0')}:${String(past.getMinutes()).padStart(2, '0')}`;
+}
 
 test.describe('Daily time limit (M5.2)', () => {
   test('Start today -> See you tomorrow -> parent password -> +15 min -> lesson starts', async ({
@@ -104,5 +112,43 @@ test.describe('Daily time limit (M5.2)', () => {
     await page.getByRole('button', { name: 'Settings' }).waitFor();
 
     await expect(page.getByText('Daily limit: 30 min')).toBeVisible();
+  });
+});
+
+test.describe('Allowed hours gate (M7.1)', () => {
+  test('playUntil in the past shows "Time to rest!" -> parent password -> activity resumes', async ({
+    page,
+  }) => {
+    await completeFirstRun(page, 'Kid');
+    const profileId = await getSoleProfileId(page);
+    await seedPlayUntil(page, profileId, oneMinuteAgo());
+
+    await page.getByRole('button', { name: /Start today/ }).click();
+    await page.getByRole('heading', { name: 'Time to rest!' }).waitFor();
+    await page.getByText("It's getting late. See you tomorrow!").waitFor();
+    await expect(page.getByRole('button', { name: /Let me try/ })).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Parent: more time' }).click();
+    await page.getByLabel('Parent code', { exact: true }).fill('1234');
+    await page.getByRole('button', { name: 'Open' }).click();
+
+    // Resumes straight into the gated lesson — no confirmation screen in between.
+    await page.getByRole('button', { name: /Let me try/ }).waitFor();
+  });
+});
+
+test.describe('5-minute warning (M7.1)', () => {
+  test('seeded minutes at limit − 3 shows the warning banner on Home', async ({ page }) => {
+    await completeFirstRun(page, 'Kid');
+    const profileId = await getSoleProfileId(page);
+    await seedDailyLimit(page, profileId, 15);
+    await seedMinutesToday(page, profileId, 12); // remaining = 15 - 12 = 3 min
+
+    // A screen change is what (re-)evaluates the notice (`AppNotice.tsx`) — reload + re-enter Home,
+    // same as the "a parent-set limit shows its line" spec above.
+    await page.reload();
+    await pickProfileFromPicker(page, 'Kid');
+
+    await page.getByText('5 minutes left — pick something short!').waitFor();
   });
 });

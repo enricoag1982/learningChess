@@ -183,6 +183,88 @@ describe('Parent area settings effects (M5.1)', () => {
   });
 });
 
+describe('Parent area weekend and hours limits (M7.1)', () => {
+  it('weekend toggle off shows one "Every day" row; toggling on shows Mon–Fri / Sat–Sun rows, each saving its own limit', async () => {
+    const services = makeServices();
+    const profile = await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    await openSettings('Mia');
+
+    expect(screen.getByRole('group', { name: 'Every day' })).toBeTruthy();
+    expect(screen.queryByRole('group', { name: 'Mon–Fri' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Sat–Sun' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Different limit at the weekend' }));
+
+    const weekdayGroup = await screen.findByRole('group', { name: 'Mon–Fri' });
+    const weekendGroup = screen.getByRole('group', { name: 'Sat–Sun' });
+    expect(screen.queryByRole('group', { name: 'Every day' })).toBeNull();
+
+    fireEvent.click(within(weekdayGroup).getByRole('button', { name: '30 min' }));
+    fireEvent.click(within(weekendGroup).getByRole('button', { name: '60 min' }));
+
+    await waitFor(async () => {
+      const settings = await services.deps.settings.get();
+      expect(settings.profileSettings[profile.id]?.dailyLimitMinutes).toBe(30);
+      expect(settings.profileSettings[profile.id]?.weekendLimitMinutes).toBe(60);
+    });
+  });
+
+  it('toggling the weekend limit back off removes weekendLimitMinutes (back to "Every day")', async () => {
+    const services = makeServices();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await updateProfileSettings(services.deps, profile.id, { weekendLimitMinutes: 45 });
+    render(<App services={services} />);
+    await openParentArea();
+    await openSettings('Mia');
+
+    await screen.findByRole('group', { name: 'Sat–Sun' });
+    fireEvent.click(screen.getByRole('switch', { name: 'Different limit at the weekend' }));
+
+    await waitFor(async () => {
+      const settings = await services.deps.settings.get();
+      expect(settings.profileSettings[profile.id]?.weekendLimitMinutes).toBeUndefined();
+    });
+    expect(screen.queryByRole('group', { name: 'Sat–Sun' })).toBeNull();
+    expect(screen.getByRole('group', { name: 'Every day' })).toBeTruthy();
+  });
+
+  it('"Play until" / "Not before" chips save', async () => {
+    const services = makeServices();
+    const profile = await seedReturningProfile(services, 'Mia');
+    render(<App services={services} />);
+    await openParentArea();
+    await openSettings('Mia');
+
+    const untilGroup = screen.getByRole('group', { name: 'Play until' });
+    const fromGroup = screen.getByRole('group', { name: 'Not before' });
+    fireEvent.click(within(untilGroup).getByRole('button', { name: '20:00' }));
+    fireEvent.click(within(fromGroup).getByRole('button', { name: '08:00' }));
+
+    await waitFor(async () => {
+      const settings = await services.deps.settings.get();
+      expect(settings.profileSettings[profile.id]?.playUntil).toBe('20:00');
+      expect(settings.profileSettings[profile.id]?.playFrom).toBe('08:00');
+    });
+  });
+
+  it('shows the active rules line under the minutes-per-day chart', async () => {
+    const services = makeServices();
+    const profile = await seedReturningProfile(services, 'Mia');
+    await updateProfileSettings(services.deps, profile.id, {
+      dailyLimitMinutes: 30,
+      weekendLimitMinutes: 60,
+      playUntil: '20:00',
+    });
+    render(<App services={services} />);
+    await openParentArea();
+    await openReport('Mia');
+
+    await screen.findByText('Mon–Fri 30 min · Sat–Sun 60 min · until 20:00');
+  });
+});
+
 describe('Parent area reset (M5.1)', () => {
   it('requires the parent password, rejects a wrong one, and clears progress on the right one', async () => {
     const services = makeServices();

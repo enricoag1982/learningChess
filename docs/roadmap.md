@@ -91,6 +91,9 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
 | `m6.5` | Owner request: "parent code" instead of "password" everywhere in the UI; first-run "Download again" removed; "Download code file" in the grown-ups area (after the code) |
 | `m6.6` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
+| `m7.1` | Time controls: Mon–Fri / Sat–Sun limits, allowed hours ("Play until" / "Not before", parent +15 min window), 5-minute warning (app-level notice on calm screens, once per child per day, spoken) |
+| `m7.2` | Device sharing: merge rules, per-device session logs, "Send to other device" (share sheet), merge import with "Merge into …" / "Add as new child" |
+| `m7.3` | Release `v2.0.0` → `m7` |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
@@ -110,9 +113,9 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 |---|---|---|
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
 | M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships as `v1.2.0` |
-| M7 | Store apps | Capacitor Android + iPad, native storage, store listings |
-| M8 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
-| v2 | Time controls + device sharing (offline, no server; owner 2026-09-25) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
+| M8 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M9 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| v2 → M7 | Time controls + device sharing (offline, no server; owner 2026-09-25; iterations §3 `m7.x`; ships as `v2.0.0`) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
 | Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
 | v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; after `v2.0.0` |

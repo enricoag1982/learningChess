@@ -139,6 +139,12 @@ parent:
   daily-limit-minutes_one: '{{count}} min'
   daily-limit-minutes_other: '{{count}} min'
   daily-limit-note: Enforced from M5.2.
+  weekend-limit-toggle: Different limit at the weekend
+  daily-limit-everyday: Every day
+  daily-limit-weekday: Mon–Fri
+  daily-limit-weekend: Sat–Sun
+  play-until-heading: Play until
+  play-from-heading: Not before
   voice-label: Voice
   sound-label: Sounds
   hints-label: Hints
@@ -171,6 +177,11 @@ parent:
     minutes-limit: 'Daily limit: {{count}} min (line on the chart)'
     minutes_one: '{{count}} min'
     minutes_other: '{{count}} min'
+    rules-everyday: 'Every day {{limit}}'
+    rules-weekday: 'Mon–Fri {{limit}}'
+    rules-weekend: 'Sat–Sun {{limit}}'
+    rules-until: 'until {{time}}'
+    rules-from: 'from {{time}}'
     games-heading: Games (last 10)
     games-empty: No games played yet.
     opponent-friend: A friend
@@ -403,8 +414,14 @@ session:
 time-limit:
   title: See you tomorrow!
   body: You've used up all your play time for today. Come back tomorrow!
+  late-title: Time to rest!
+  late-body: It's getting late. See you tomorrow!
+  early-title: Too early!
+  early-body: 'Chess opens at {{time}}. See you soon!'
   stars-today: '{{count}} stars today'
   more-time: 'Parent: more time'
+notice:
+  five-minutes: 5 minutes left — pick something short!
 assessment:
   task-of: 'Task {{current}}/{{total}}'
   pass-title: You did it!

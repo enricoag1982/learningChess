@@ -28,7 +28,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | Platform | File | Change / copy |
 |---|---|---|
 | Web (v1) | Browser cannot read a file from a fixed path → app keeps the code; copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on "Download code file" (grown-ups area, after the code; not on the code screen, so a child cannot fetch it). Older installs keep the location of their first file (`…-parent-password.txt`) until the next download | "Change code" / "Download code file" in the grown-ups area; forgotten → read the file |
-| Store apps (M7) | App reads the code from `parent-code.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in the grown-ups area. Android location to verify at M7 |
+| Store apps (M8) | App reads the code from `parent-code.txt` in its own Documents folder (iPad: Files app → On My iPad → Chess for Kids) | Edit the file (needs a text editor app) or in the grown-ups area. Android location to verify at M8 |
 
 ## 3. Profiles
 
@@ -157,16 +157,16 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 - **In:** profiles, placement test + test-out, Basics (worlds 1–5), Today session + warm-up, 12 Basics mini-games (5 game modes) + computer, vs Friend (same device), My Den (basic), parent progress + limits + unlock. Guest only, data on device.
 - **Next:** tracks Openings, Tactics, Checkmates & Endgames; puzzle library. Later: Strategy track.
-- **v2 (offline, owner 2026-09-25):** time controls (below) + device sharing: merge rules and "Send to other device" file (roadmap §7).
+- **v2 (offline, owner 2026-09-25):** time controls (below, M7.1) + device sharing: merge rules and "Send to other device" file (roadmap §7).
 - **Later, maybe (online):** parent login, automatic sync, online play with friends (invite code, no chat, preset emojis).
 
 ### Time controls
-| Feature | v1 | v2 |
+| Feature | Current (v1 + M7.1) | v2 remainder |
 |---|---|---|
-| Time log | Minutes per day per profile (parent report, streaks); foreground time with a kid profile active (lessons, practice, play, Home/Journey/Den browsing) — paused when the page is hidden or idle > 2 min without input (M5.2) | Sessions: start, end, activity (lesson / practice / play); week and month views |
-| Limits | One daily limit per profile, off by default, resets at local midnight (M5.1 setting, enforced from M5.2) | Per weekday; allowed hours (e.g. not after 20:00); separate limits for Play vs Learning |
-| Exceptions | Parent "more time" from the "See you tomorrow" screen: password → +15 min today, on top of the limit, repeatable (M5.2) | Kid "Ask for more time" trigger (parent still enters the password); date overrides (holidays, weekends) |
-| Limit reached | Checked between activities only — on entering a lesson / warm-up / practice run / game / mini-game, and on returning to Home; never mid-exercise or mid-game, so an activity started before the limit always finishes. Then: "See you tomorrow" screen (Owl, spoken, today's stars); **Switch player** or **Parent: more time** (M5.2) Owl warns at ≤ 5 min left, on calm screens only (notice layer, roadmap §7); same end flow |
+| Time log | Minutes per day per profile (parent report, streaks); foreground time with a kid profile active (lessons, practice, play, Home/Journey/Den browsing) — paused when the page is hidden or idle > 2 min without input (M5.2) | Detailed session log: start, end, activity (lesson / practice / play); week and month views |
+| Limits | One daily limit per profile, off by default, resets at local midnight (M5.1 setting, enforced from M5.2). Optional separate Sat/Sun limit (M7.1: `weekendLimitMinutes`, off = same as the weekday limit; device-local weekday). Optional allowed-hours window, "Play until" / "Not before" (M7.1: `playUntil`/`playFrom`, `'HH:MM'` local, either edge off by default) | Separate limits for Play vs Learning |
+| Exceptions | Parent "more time" from the "See you tomorrow" screen: password → +15 min today on top of the limit (M5.2), or a 15-minute allowed-hours override past the edge (M7.1), each repeatable | Kid "Ask for more time" trigger (parent still enters the password); date overrides (holidays) |
+| Limit reached | Checked between activities only — on entering a lesson / warm-up / practice run / game / mini-game, and on returning to Home; never mid-exercise or mid-game, so an activity started before the limit always finishes. Then: "See you tomorrow" screen (Owl, spoken, today's stars, reason-specific title/body — over the limit / too late / too early, M7.1); **Switch player** or **Parent: more time** resumes exactly where it blocked. 5-minute warning (M7.1): Owl banner, info style, on calm screens only (Home/Journey/Play/Practice/Den/session summary/lesson-complete), once per child per day, spoken once, gone on the next screen change | — |
 | Across devices | — | Per device; merged at each file share (minutes recomputed from the merged log). One live limit only with the later online sync |
 
 ### Online hooks in v1

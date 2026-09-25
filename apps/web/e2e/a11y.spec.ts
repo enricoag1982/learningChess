@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import type {
   CompiledContent,
@@ -223,13 +223,16 @@ async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<
 }
 
 /** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). `role` defaults to
- * `'button'`; a toggle (M5.1 voice/sound/hints) is `role="switch"` instead. */
+ * `'button'`; a toggle (M5.1 voice/sound/hints) is `role="switch"` instead. `scope` narrows the
+ * lookup (M7.1: the daily-limit block's own "Off" chip is no longer unique on the settings screen
+ * — "Play until"/"Not before" each have one too — so a caller passes that chip row's own `group`
+ * locator instead of the whole `page`). */
 async function expectParentTouchTarget(
-  page: Page,
+  scope: Page | Locator,
   name: RegExp | string,
   role: 'button' | 'switch' = 'button',
 ): Promise<void> {
-  const box = await page.getByRole(role, { name }).boundingBox();
+  const box = await scope.getByRole(role, { name }).boundingBox();
   expect(box, `no bounding box for ${role} matching ${String(name)}`).not.toBeNull();
   expect(box?.width ?? 0, `${String(name)} width`).toBeGreaterThanOrEqual(44);
   expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(44);
@@ -316,12 +319,16 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectNoSeriousViolations(page, 'Parent area: child report');
   await expectOnlyButtonsRaised(page, 'Parent area: child report');
 
-  // 8.6. Report -> Settings: rename/avatar, daily limit, voice/sound/hints, computer level, piece
-  // style, unlock panel, export, reset/delete — every control on the busiest parent screen.
+  // 8.6. Report -> Settings: rename/avatar, daily limit (M7.1: weekend toggle + hours), voice/
+  // sound/hints, computer level, piece style, unlock panel, export, reset/delete — every control
+  // on the busiest parent screen.
   await page.getByRole('button', { name: 'Settings' }).click();
   await expectParentTouchTarget(page, 'Rename');
   await expectParentTouchTarget(page, 'Change avatar');
-  await expectParentTouchTarget(page, 'Off');
+  await expectParentTouchTarget(page.getByRole('group', { name: 'Every day' }), 'Off');
+  await expectParentTouchTarget(page, 'Different limit at the weekend', 'switch');
+  await expectParentTouchTarget(page.getByRole('group', { name: 'Play until' }), '20:00');
+  await expectParentTouchTarget(page.getByRole('group', { name: 'Not before' }), '08:00');
   await expectParentTouchTarget(page, 'Voice', 'switch');
   await expectParentTouchTarget(page, 'Automatic');
   await expectParentTouchTarget(page, /^Animal badge$/);

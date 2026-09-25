@@ -6,6 +6,11 @@ import { localDayString } from './streak.ts';
  * daily limit each tap of "Parent: more time", once or repeatedly. */
 export const EXTRA_TIME_GRANT_MINUTES = 15;
 
+/** Parent "more time" grant for the allowed-hours edge (M7.1, app-structure.md §13): a rolling
+ * window from the moment of the grant, not additive like {@link EXTRA_TIME_GRANT_MINUTES} — each
+ * tap resets `SessionLog.hoursOverrideUntil` to now plus this many minutes. */
+export const HOURS_OVERRIDE_MINUTES = 15;
+
 /** One profile's played minutes for one local calendar day (domain-model.md §2 `SessionLog`). */
 export interface SessionLog extends StoredRecord {
   readonly profileId: string;
@@ -16,6 +21,16 @@ export interface SessionLog extends StoredRecord {
    * Absent = 0 — a pre-M5.2 row simply has none yet (same optional-field, no-migration pattern
    * `AppSettings.storagePersisted` uses, M5.4). */
   readonly extraMinutes?: number;
+  /**
+   * Parent "more time" for the allowed-hours edge (M7.1, app-structure.md §13 "Allowed hours"):
+   * an ISO instant, set by "Parent: more time" from the late/early "See you tomorrow" screen —
+   * allowed regardless of `playUntil`/`playFrom` until this instant. Absent = no override granted
+   * today (every pre-M7.1 row).
+   */
+  readonly hoursOverrideUntil?: string;
+  /** ISO instant the 5-minute warning (M7.1) was last spoken/shown for this day. Absent = not
+   * warned yet today (every pre-M7.1 row) — `shouldWarn` shows it once per child per day. */
+  readonly warnedAt?: string;
 }
 
 /** Fresh, unsaved log row for a profile's first recorded minutes on `date`. */
@@ -80,16 +95,35 @@ export function extraMinutesToday(log: SessionLog | undefined, now: Date): numbe
 }
 
 /**
- * `true` once today's played minutes reach the profile's daily limit plus any extra granted today
- * (app-structure.md's time controls table); always `false` with the limit off (`null`).
+ * `now`'s own effective daily limit (M7.1, app-structure.md §13 "School days vs weekend limit"):
+ * `weekendLimitMinutes` on a device-local Saturday/Sunday when set, else `dailyLimitMinutes` every
+ * day — so a pre-M7.1 profile (`weekendLimitMinutes` absent) behaves exactly as before on every
+ * day of the week.
+ */
+export function limitForDay(
+  settings: Pick<ProfileSettings, 'dailyLimitMinutes' | 'weekendLimitMinutes'>,
+  now: Date,
+): number | null {
+  const day = now.getDay(); // 0 = Sunday .. 6 = Saturday, device-local
+  const isWeekend = day === 0 || day === 6;
+  if (isWeekend && settings.weekendLimitMinutes !== undefined) {
+    return settings.weekendLimitMinutes;
+  }
+  return settings.dailyLimitMinutes;
+}
+
+/**
+ * `true` once today's played minutes reach {@link limitForDay}'s limit plus any extra granted
+ * today (app-structure.md's time controls table); always `false` with that day's limit off (`null`).
  */
 export function isOverLimit(
-  settings: Pick<ProfileSettings, 'dailyLimitMinutes'>,
+  settings: Pick<ProfileSettings, 'dailyLimitMinutes' | 'weekendLimitMinutes'>,
   log: SessionLog | undefined,
   now: Date,
 ): boolean {
-  if (settings.dailyLimitMinutes === null) return false;
-  return timeUsedToday(log, now) >= settings.dailyLimitMinutes + extraMinutesToday(log, now);
+  const limit = limitForDay(settings, now);
+  if (limit === null) return false;
+  return timeUsedToday(log, now) >= limit + extraMinutesToday(log, now);
 }
 
 /**
@@ -113,4 +147,43 @@ export function grantExtraMinutes(
     extraMinutes: (existing.extraMinutes ?? 0) + minutes,
     updatedAt: now.toISOString(),
   };
+}
+
+/**
+ * Parent "more time" for the allowed-hours edge (M7.1): sets `hoursOverrideUntil` to `now` plus
+ * `minutes` (the app layer always passes {@link HOURS_OVERRIDE_MINUTES}) — a rolling window, so
+ * repeated taps each reset it forward rather than stacking like {@link grantExtraMinutes}'s
+ * additive daily-limit grant.
+ */
+export function setHoursOverride(
+  existing: SessionLog | undefined,
+  id: string,
+  profileId: string,
+  date: string,
+  minutes: number,
+  now: Date,
+): SessionLog {
+  const hoursOverrideUntil = new Date(now.getTime() + minutes * 60_000).toISOString();
+  if (existing === undefined) {
+    return { ...newSessionLog(id, profileId, date, 0, now), hoursOverrideUntil };
+  }
+  return { ...existing, hoursOverrideUntil, updatedAt: now.toISOString() };
+}
+
+/**
+ * Marks the 5-minute warning (M7.1) shown for today, so {@link shouldWarn}
+ * (`domain/time-policy.ts`) never shows it again the same day.
+ */
+export function markWarned(
+  existing: SessionLog | undefined,
+  id: string,
+  profileId: string,
+  date: string,
+  now: Date,
+): SessionLog {
+  const warnedAt = now.toISOString();
+  if (existing === undefined) {
+    return { ...newSessionLog(id, profileId, date, 0, now), warnedAt };
+  }
+  return { ...existing, warnedAt, updatedAt: now.toISOString() };
 }

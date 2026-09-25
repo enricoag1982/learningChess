@@ -7,7 +7,10 @@ import {
   grantExtraMinutes,
   isOverLimit,
   lastNDays,
+  limitForDay,
+  markWarned,
   newSessionLog,
+  setHoursOverride,
   timeUsedToday,
 } from './session-log.ts';
 import type { SessionLog } from './session-log.ts';
@@ -123,6 +126,101 @@ describe('isOverLimit', () => {
     const grantedLog = { ...TODAY_LOG, minutes: 40, extraMinutes: 15 };
     expect(isOverLimit(settings, grantedLog, TODAY)).toBe(false); // 40 < 30 + 15
     expect(isOverLimit(settings, { ...grantedLog, minutes: 45 }, TODAY)).toBe(true);
+  });
+});
+
+const SATURDAY = new Date(2026, 0, 3, 10, 0, 0); // 2026-01-03, local
+const SUNDAY = new Date(2026, 0, 4, 10, 0, 0); // 2026-01-04, local
+const MONDAY = new Date(2026, 0, 5, 10, 0, 0); // 2026-01-05, local
+
+describe('limitForDay (M7.1)', () => {
+  it('is the daily limit on a weekday, whether or not a weekend limit is set', () => {
+    const withoutWeekend = { ...DEFAULT_PROFILE_SETTINGS, dailyLimitMinutes: 30 };
+    const withWeekend = { ...withoutWeekend, weekendLimitMinutes: 60 };
+    expect(limitForDay(withoutWeekend, MONDAY)).toBe(30);
+    expect(limitForDay(withWeekend, MONDAY)).toBe(30);
+  });
+
+  it('is the weekend limit on Saturday and Sunday when set', () => {
+    const settings = {
+      ...DEFAULT_PROFILE_SETTINGS,
+      dailyLimitMinutes: 30,
+      weekendLimitMinutes: 60,
+    };
+    expect(limitForDay(settings, SATURDAY)).toBe(60);
+    expect(limitForDay(settings, SUNDAY)).toBe(60);
+  });
+
+  it('a weekend limit of null turns the limit off only on Sat/Sun', () => {
+    const settings = {
+      ...DEFAULT_PROFILE_SETTINGS,
+      dailyLimitMinutes: 30,
+      weekendLimitMinutes: null,
+    };
+    expect(limitForDay(settings, SATURDAY)).toBeNull();
+    expect(limitForDay(settings, MONDAY)).toBe(30);
+  });
+
+  it('old settings without weekendLimitMinutes use the daily limit every day (pre-M7.1 behaviour)', () => {
+    const settings = { ...DEFAULT_PROFILE_SETTINGS, dailyLimitMinutes: 30 };
+    expect(limitForDay(settings, SATURDAY)).toBe(30);
+    expect(limitForDay(settings, SUNDAY)).toBe(30);
+    expect(limitForDay(settings, MONDAY)).toBe(30);
+  });
+});
+
+describe('isOverLimit — weekend limit (M7.1)', () => {
+  it('uses the weekend limit on a Saturday', () => {
+    const settings = {
+      ...DEFAULT_PROFILE_SETTINGS,
+      dailyLimitMinutes: 30,
+      weekendLimitMinutes: 60,
+    };
+    const log = { ...newSessionLog('l1', 'p1', '2026-01-03', 45, SATURDAY) };
+    expect(isOverLimit(settings, log, SATURDAY)).toBe(false); // under 60
+    expect(isOverLimit(settings, { ...log, minutes: 60 }, SATURDAY)).toBe(true);
+  });
+
+  it('the same minutes would be over the (lower) weekday limit', () => {
+    const settings = {
+      ...DEFAULT_PROFILE_SETTINGS,
+      dailyLimitMinutes: 30,
+      weekendLimitMinutes: 60,
+    };
+    const weekdayLog = newSessionLog('l1', 'p1', '2026-01-05', 45, MONDAY);
+    expect(isOverLimit(settings, weekdayLog, MONDAY)).toBe(true);
+  });
+});
+
+describe('setHoursOverride (M7.1)', () => {
+  it('starts a fresh row at 0 played minutes with the override set', () => {
+    const log = setHoursOverride(undefined, 'l1', 'p1', '2026-01-05', 15, TODAY);
+    expect(log.minutes).toBe(0);
+    expect(log.hoursOverrideUntil).toBe(new Date(TODAY.getTime() + 15 * 60_000).toISOString());
+  });
+
+  it('resets (not stacks) the window on an existing row', () => {
+    const first = setHoursOverride(undefined, 'l1', 'p1', '2026-01-05', 15, TODAY);
+    const later = new Date(2026, 0, 5, 10, 10, 0);
+    const second = setHoursOverride(first, 'l1', 'p1', '2026-01-05', 15, later);
+    expect(second.hoursOverrideUntil).toBe(new Date(later.getTime() + 15 * 60_000).toISOString());
+  });
+});
+
+describe('markWarned (M7.1)', () => {
+  it('starts a fresh row at 0 played minutes with warnedAt set', () => {
+    const log = markWarned(undefined, 'l1', 'p1', '2026-01-05', TODAY);
+    expect(log.minutes).toBe(0);
+    expect(log.warnedAt).toBe(TODAY.toISOString());
+  });
+
+  it('sets warnedAt on an existing row without touching played/extra minutes', () => {
+    const first = { ...TODAY_LOG, extraMinutes: 5 };
+    const later = new Date(2026, 0, 5, 11, 0, 0);
+    const second = markWarned(first, 'l1', 'p1', '2026-01-05', later);
+    expect(second.warnedAt).toBe(later.toISOString());
+    expect(second.minutes).toBe(TODAY_LOG.minutes);
+    expect(second.extraMinutes).toBe(5);
   });
 });
 

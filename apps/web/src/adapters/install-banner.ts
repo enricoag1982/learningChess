@@ -12,7 +12,7 @@ export interface InstallBannerEnv {
   readonly userAgent: string;
   readonly maxTouchPoints: number;
   /** Already running as an installed app — a standalone PWA (added to Home Screen already) or a
-   * Capacitor shell (M7): never shown either way (`non-functional.md` §1 "Capacitor apps: all
+   * Capacitor shell (M8): never shown either way (`non-functional.md` §1 "Capacitor apps: all
    * assets bundled, offline by default" — no install prompt applies there at all). */
   readonly standalone: boolean;
 }
