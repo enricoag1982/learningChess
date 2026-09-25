@@ -269,7 +269,10 @@ export function DenScreen(): JSX.Element {
 
       {/* M4.4: badges + streak, its own section (kept apart from the rank/friends row above so a
           "Games with friends" count added elsewhere in My Den merges cleanly). */}
-      <div className="flex flex-col gap-4 rounded-[2rem] border-2 border-line bg-card p-5">
+      {/* Flat, no border (docs/screens.md §1 "Cards that contain buttons", v1.1.0 part B): this
+          panel's own content is a grid of raised badge tiles, so a bordered outer card would read
+          as a second, bigger button around them. */}
+      <div className="info-flat flex flex-col gap-4 rounded-[2rem] bg-[#F3EDE0] p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-display text-xl text-ink sm:text-2xl">{t('badges.heading')}</h2>
           {streak && streak.current >= 1 ? (

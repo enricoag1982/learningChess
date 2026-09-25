@@ -43,11 +43,13 @@ export function infoPanelClass(tint = 'bg-cream', extra = ''): string {
   return `info-flat ${tint} ${extra}`.trim();
 }
 
-/** Flat pill class (rank / stars / streak, a counter): tinted, rounded, no border/shadow. Never a
- * single bold centred word alone in the box (docs/screens.md §1 "text never looks like a button
- * label") — every caller pairs it with an icon, a value, or both. Sizing/text weight are each
- * caller's own via `extra`/`className` (kept out of the default, so they never fight it at equal
- * Tailwind specificity). */
-export function infoPillClass(tint = 'bg-cream', extra = ''): string {
+/** Flat pill "class" (rank / stars / streak, a counter): icon + text, no border/shadow — and, since
+ * v1.1.0 part B (docs/screens.md §1 "Info = no box"), no background box either: `tint` defaults to
+ * none, so a caller only ever adds one back deliberately (none currently do). Never a single bold
+ * centred word alone (docs/screens.md §1 "text never looks like a button label") — every caller
+ * pairs it with an icon, a value, or both. Sizing/text weight are each caller's own via
+ * `extra`/`className` (kept out of the default, so they never fight it at equal Tailwind
+ * specificity). */
+export function infoPillClass(tint = '', extra = ''): string {
   return `info-flat inline-flex items-center gap-2 rounded-2xl px-4 ${tint} ${extra}`.trim();
 }

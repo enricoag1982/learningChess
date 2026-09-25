@@ -13,14 +13,14 @@ function FlameIcon(): JSX.Element {
   );
 }
 
-/** Info pill (docs/screens.md §1 "Pills"): flame + current streak days. Home's top bar (>= 2 days)
- * and My Den both use it. */
+/** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): flame + current streak days, no pill
+ * background or border. Home's top bar (>= 2 days) and My Den both use it. */
 export function StreakPill({ days }: { readonly days: number }): JSX.Element {
   const { t } = useTranslation();
   return (
     <InfoPill
       role="img"
-      tint="bg-[#FCEEE3]"
+      data-testid="streak-pill"
       className="h-14 font-display text-lg font-semibold text-[#7A3A0F]"
       aria-label={t('streak.pill', { count: days })}
     >

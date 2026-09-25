@@ -16,12 +16,22 @@
   --color-board-dark: #c49a6c;
   --color-board-frame: #8a6a48;
 
-  /* "Ledge" shadow tones (docs/screens.md §1 "Tappable vs info", roadmap F3): a darker tone of
-     each role's own fill, for a tappable element's raised bottom edge (`.tap-raised` below). */
-  --color-ledge-go: #1f5a41;
-  --color-ledge-today: #8c4012;
-  --color-ledge-info: #1f3f6d;
-  --color-ledge-card: #d9ceb4;
+  /* Raised-look tones (docs/screens.md §1 "Tappable vs info", roadmap F3, v1.1.0 part B): every
+     tappable's border is a darker shade of its own fill, its ledge darker still, so the boundary
+     itself (not just the fill) clears WCAG 2.2 SC 1.4.11's 3:1 non-text contrast against the
+     surface around it — verified with a contrast calc, see docs/screens.md §1.1 for the ratios.
+     White/neutral buttons have no coloured fill to shade, so border and ledge share one dark
+     taupe tone instead (`--color-edge-neutral`, reused for `--color-ledge-neutral` too). */
+  --color-edge-neutral: #8c7b61;
+  /* Locked / disabled (owner playtest 2): dashed, lighter than any live edge — not raised, not info. */
+  --color-edge-locked: #b9ab92;
+  --color-ledge-neutral: #8c7b61;
+  --color-edge-go: #1f5a41;
+  --color-edge-today: #8c4012;
+  --color-edge-info: #1f3f6d;
+  --color-ledge-go: #163f2e;
+  --color-ledge-today: #622d0d;
+  --color-ledge-info: #162c4c;
 
   --font-display: 'Fredoka Variable', ui-rounded, system-ui, sans-serif;
   --font-body: 'Nunito Variable', system-ui, sans-serif;
@@ -34,53 +44,55 @@
 }
 
 /*
- * Tappable vs info (docs/screens.md §1, roadmap F3): every tappable control is "raised" — a 2px
- * border plus a solid 4px "ledge" shadow below it, in a darker tone of its own fill — and every
- * info-only element is flat (no border, no shadow). `.tap-raised` is the shared raised look,
- * combined with one role modifier (`.tap-go` / `.tap-today` / `.tap-info`; none = neutral
- * `card`/`line`); `apps/web/src/ui/primitives.tsx` is the one place these class names are written.
+ * Tappable vs info (docs/screens.md §1, roadmap F3; raised look widened v1.1.0 part B — playtest
+ * 2: "not clear are buttons vs something else", the old beige-on-cream border/ledge measured
+ * ~1.2:1): every tappable control is "raised" — a 2px border plus a solid 6px "ledge" shadow below
+ * it, each ≥ 3:1 against the surface around it (WCAG 2.2 SC 1.4.11) — and every info-only element
+ * is flat (no border, no shadow). `.tap-raised` is the shared raised look, combined with one role
+ * modifier (`.tap-go` / `.tap-today` / `.tap-info`; none = neutral `edge-neutral`);
+ * `apps/web/src/ui/primitives.tsx` is the one place these class names are written.
  */
 @layer components {
   .tap-raised {
-    --tap-border: var(--color-line);
-    --tap-ledge: var(--color-ledge-card);
+    --tap-border: var(--color-edge-neutral);
+    --tap-ledge: var(--color-ledge-neutral);
     border-width: 2px;
     border-style: solid;
     border-color: var(--tap-border);
-    box-shadow: 0 4px 0 0 var(--tap-ledge);
+    box-shadow: 0 6px 0 0 var(--tap-ledge);
     transition:
       transform 100ms ease-out,
       box-shadow 100ms ease-out;
   }
 
   .tap-raised.tap-go {
-    --tap-border: var(--color-go);
+    --tap-border: var(--color-edge-go);
     --tap-ledge: var(--color-ledge-go);
   }
   .tap-raised.tap-today {
-    --tap-border: var(--color-today);
+    --tap-border: var(--color-edge-today);
     --tap-ledge: var(--color-ledge-today);
   }
   .tap-raised.tap-info {
-    --tap-border: var(--color-info);
+    --tap-border: var(--color-edge-info);
     --tap-ledge: var(--color-ledge-info);
   }
 
-  /* Border-only role tint, ledge stays neutral `card` (an outline button, e.g. Danger, or a
-     selected state on an otherwise neutral row/chip — its fill is still `card`, so the ledge
-     stays "a darker tone of its own fill" rather than following the border colour). */
+  /* Border-only role tint, ledge stays neutral (an outline button, e.g. Danger, or a selected
+     state on an otherwise neutral row/chip — its fill is still neutral, so the ledge stays "a
+     darker tone of its own fill" rather than following the border colour). */
   .tap-raised.tap-border-go {
-    --tap-border: var(--color-go);
+    --tap-border: var(--color-edge-go);
   }
   .tap-raised.tap-border-today {
-    --tap-border: var(--color-today);
+    --tap-border: var(--color-edge-today);
   }
 
-  /* Pressed: moves down 2px, ledge shrinks to 2px (never disappears) — same physical button, just
+  /* Pressed: moves down 4px, ledge shrinks to 2px (never disappears) — same physical button, just
      pushed in. `:not(:disabled)` so a disabled native `<button>` (never actually pressable) keeps
      its resting shadow; the "Disabled" rule below removes it instead. */
   .tap-raised:active:not(:disabled) {
-    transform: translateY(2px);
+    transform: translateY(4px);
     box-shadow: 0 2px 0 0 var(--tap-ledge);
   }
 
@@ -94,6 +106,8 @@
      than pressed. Greying and any lock icon are the caller's own existing `disabled:` classes. */
   .tap-raised:disabled {
     box-shadow: none;
+    border-style: dashed;
+    border-color: var(--color-edge-locked);
   }
 
   /* Same "no ledge" treatment for a control that is technically still tappable (it responds with a
@@ -101,6 +115,8 @@
      `:disabled` rule above only ever reaches a real native-disabled `<button>`. */
   .tap-raised.tap-locked {
     box-shadow: none;
+    border-style: dashed;
+    border-color: var(--color-edge-locked);
   }
   .tap-raised.tap-locked:active:not(:disabled) {
     transform: none;
@@ -115,7 +131,7 @@
     }
     .tap-raised:active:not(:disabled) {
       transform: none;
-      box-shadow: 0 4px 0 0 var(--tap-ledge);
+      box-shadow: 0 6px 0 0 var(--tap-ledge);
       filter: brightness(0.94);
     }
   }

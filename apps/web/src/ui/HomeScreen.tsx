@@ -122,18 +122,22 @@ function DenTileIcon(): JSX.Element {
   );
 }
 
-/** One Home tile (Journey / Play / My Den): icon in a white circle over a coloured label. */
+/** One Home tile (Journey / Play / My Den): icon in a white circle over a coloured label. Border =
+ * `fg` (already a darker shade of `bg`, docs/screens.md §1 "Raised look"), ledge = `ledge`, a
+ * darker shade still — verified against the cream page with a contrast calc, docs/screens.md §1.1. */
 function HomeTile({
   icon,
   label,
   bg,
   fg,
+  ledge,
   onClick,
 }: {
   readonly icon: JSX.Element;
   readonly label: string;
   readonly bg: string;
   readonly fg: string;
+  readonly ledge: string;
   readonly onClick: () => void;
 }): JSX.Element {
   return (
@@ -145,7 +149,7 @@ function HomeTile({
           backgroundColor: bg,
           color: fg,
           '--tap-border': fg,
-          '--tap-ledge': fg,
+          '--tap-ledge': ledge,
         } as CSSProperties
       }
       className="tap-raised flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4"
@@ -299,6 +303,7 @@ export function HomeScreen(): JSX.Element {
           label={t('home.journey-tile')}
           bg="#DCEFE3"
           fg="#1F5A41"
+          ledge="#163F2E"
           onClick={goToJourney}
         />
         <HomeTile
@@ -306,6 +311,7 @@ export function HomeScreen(): JSX.Element {
           label={t('home.practice-tile')}
           bg="#FBE3D2"
           fg="#7A3A10"
+          ledge="#55290B"
           onClick={goToPractice}
         />
         <HomeTile
@@ -313,6 +319,7 @@ export function HomeScreen(): JSX.Element {
           label={t('home.play-tile')}
           bg="#FBE3D2"
           fg="#7A3A10"
+          ledge="#55290B"
           onClick={goToPlay}
         />
         <HomeTile
@@ -320,6 +327,7 @@ export function HomeScreen(): JSX.Element {
           label={t('home.den-tile')}
           bg="#EFE4F7"
           fg="#4B3A63"
+          ledge="#352945"
           onClick={goToDen}
         />
       </div>

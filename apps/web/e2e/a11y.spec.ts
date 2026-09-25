@@ -108,11 +108,15 @@ async function expectNoSeriousViolations(page: Page, screen: string): Promise<vo
 }
 
 /**
- * Tappable vs info (docs/screens.md §1, roadmap F3, M5.3): every real `<button>` on the screen
- * carries the shared `.tap-raised` marker class, and no non-button element does. The board
- * (`role="grid"`, one button per square) is its own established game surface, not part of this
- * contrast, so it is excluded; a `role="dialog"`/`"alertdialog"` open at scan time is included
- * (its own buttons still need to be raised).
+ * Tappable vs info (docs/screens.md §1, roadmap F3; widened v1.1.0 part B, playtest 2): every real
+ * `<button>` on the screen carries the shared `.tap-raised` marker class, and no non-button element
+ * does; every raised, enabled button's boundary (its border, or its background if the border is
+ * transparent) has >= 3:1 contrast (WCAG 2.2 SC 1.4.11) against the nearest opaque ancestor
+ * background it sits on; and a rank/stars pill (`RankPill`/`StarsPill`, "Info = no box") has no
+ * background box or border. The board (`role="grid"`, one button per square) is its own established
+ * game surface, not part of this contrast, so it is excluded, as is a disabled or `.tap-locked`
+ * button (docs/screens.md §1 "Disabled: ... exempt"); a `role="dialog"`/`"alertdialog"` open at scan
+ * time is included (its own buttons still need to be raised).
  */
 async function expectOnlyButtonsRaised(page: Page, screen: string): Promise<void> {
   const result = await page.evaluate(() => {
@@ -126,10 +130,88 @@ async function expectOnlyButtonsRaised(page: Page, screen: string): Promise<void
     const raisedNonButtons = Array.from(document.querySelectorAll('.tap-raised'))
       .filter((el) => el.tagName !== 'BUTTON')
       .map((el) => `<${el.tagName.toLowerCase()}> ${el.outerHTML.slice(0, 100)}`);
-    return { unraisedButtons, raisedNonButtons };
+
+    // WCAG relative luminance / contrast ratio (same formula as the lead's own contrast-calc
+    // script, docs/screens.md §1.1) computed live from `getComputedStyle`, since only the browser
+    // knows the actual rendered (post-cascade, post-CSS-variable) colour of every element.
+    function parseColor(value: string): { r: number; g: number; b: number; a: number } | null {
+      const m = value.match(/rgba?\(([^)]+)\)/);
+      const inner = m?.[1];
+      if (inner === undefined) return null;
+      const parts = inner.split(',').map((s) => parseFloat(s.trim()));
+      const [r, g, b, a = 1] = parts;
+      if (r === undefined || g === undefined || b === undefined) return null;
+      return { r, g, b, a };
+    }
+    function relLuminance(c: { r: number; g: number; b: number }): number {
+      const f = (channel: number): number => {
+        const cs = channel / 255;
+        return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+      };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    }
+    function contrastRatio(
+      c1: { r: number; g: number; b: number },
+      c2: { r: number; g: number; b: number },
+    ): number {
+      const l1 = relLuminance(c1);
+      const l2 = relLuminance(c2);
+      const [lighter, darker] = l1 > l2 ? [l1, l2] : [l2, l1];
+      return (lighter + 0.05) / (darker + 0.05);
+    }
+    // Walks up from an element's parent to the first ancestor with a fully opaque background —
+    // the "surface around it" a boundary is judged against (docs/screens.md §1 "Measurable rule").
+    function nearestOpaqueAncestorBg(el: Element): { r: number; g: number; b: number } {
+      let node = el.parentElement;
+      while (node) {
+        const c = parseColor(getComputedStyle(node).backgroundColor);
+        if (c && c.a >= 0.999) return c;
+        node = node.parentElement;
+      }
+      return { r: 255, g: 255, b: 255 }; // none found: the default document canvas is white
+    }
+
+    const lowContrastButtons: string[] = [];
+    for (const button of Array.from(document.querySelectorAll('button.tap-raised'))) {
+      if (board?.contains(button)) continue;
+      const el = button as HTMLButtonElement;
+      if (el.disabled || el.classList.contains('tap-locked')) continue;
+      const style = getComputedStyle(el);
+      const borderColor = parseColor(style.borderTopColor);
+      const hasBorder =
+        borderColor !== null && borderColor.a > 0 && parseFloat(style.borderTopWidth) > 0;
+      const boundary = hasBorder ? borderColor : parseColor(style.backgroundColor);
+      if (!boundary) continue;
+      const ratio = contrastRatio(boundary, nearestOpaqueAncestorBg(el));
+      if (ratio < 3) {
+        const name = el.getAttribute('aria-label') ?? (el.textContent.trim() || '(unnamed)');
+        lowContrastButtons.push(`${name}: ${ratio.toFixed(2)}:1`);
+      }
+    }
+
+    const pillViolations = Array.from(
+      document.querySelectorAll('[data-testid="rank-pill"], [data-testid="stars-pill"]'),
+    )
+      .filter((el) => {
+        const style = getComputedStyle(el);
+        const bg = parseColor(style.backgroundColor);
+        const hasVisibleBg = bg !== null && bg.a > 0;
+        const hasBorder = style.borderTopStyle !== 'none' && parseFloat(style.borderTopWidth) > 0;
+        return hasVisibleBg || hasBorder;
+      })
+      .map((el) => el.getAttribute('data-testid') ?? '(pill)');
+
+    return { unraisedButtons, raisedNonButtons, lowContrastButtons, pillViolations };
   });
   expect(result.unraisedButtons, `${screen}: <button>s missing .tap-raised`).toEqual([]);
   expect(result.raisedNonButtons, `${screen}: non-<button> elements with .tap-raised`).toEqual([]);
+  expect(
+    result.lowContrastButtons,
+    `${screen}: raised buttons under 3:1 boundary contrast`,
+  ).toEqual([]);
+  expect(result.pillViolations, `${screen}: rank/stars pill with a background or border`).toEqual(
+    [],
+  );
 }
 
 /** Kid touch targets must be >= 64px both ways (docs/screens.md §1). */
@@ -261,6 +343,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await page.getByRole('button', { name: 'Privacy' }).click();
   await expectParentTouchTarget(page, 'Back');
   await expectNoSeriousViolations(page, 'Parent area: privacy');
+  await expectOnlyButtonsRaised(page, 'Parent area: privacy');
 
   // 8.9. Daily time limit (M5.2): "See you tomorrow" (kid style) once over the limit, then its own
   // "Parent: more time" password flow resuming the gated activity.
@@ -276,6 +359,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectKidTouchTarget(page, 'Switch player');
   await expectKidTouchTarget(page, 'Parent: more time');
   await expectNoSeriousViolations(page, 'Time limit: See you tomorrow');
+  await expectOnlyButtonsRaised(page, 'Time limit: See you tomorrow');
 
   await page.getByRole('button', { name: 'Parent: more time' }).click();
   await page.getByLabel('Password', { exact: true }).fill('1234');
