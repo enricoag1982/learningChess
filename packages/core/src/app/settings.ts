@@ -31,7 +31,13 @@ export async function updateProfileSettings(
   patch: Partial<ProfileSettings>,
 ): Promise<ProfileSettings> {
   const current = await getProfileSettings(deps, profileId);
-  const updated: ProfileSettings = { ...current, ...patch };
+  const updated: ProfileSettings = {
+    ...current,
+    ...patch,
+    // M7.2 device sharing: stamped on every save so `domain/merge.ts`'s settings merge can tell
+    // which device changed a setting more recently ("newest wins").
+    updatedAt: deps.clock.now().toISOString(),
+  };
   if (!isValidProfileSettings(updated)) {
     throw new Error('invalid profile settings');
   }

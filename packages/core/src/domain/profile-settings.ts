@@ -35,6 +35,14 @@ export interface ProfileSettings {
   readonly hints: boolean;
   readonly computerLevel: ComputerLevelSetting;
   readonly pieceStyle: PieceStyleSetting;
+  /**
+   * ISO instant of the last change (M7.2 device sharing), set by `app/settings.ts`'s
+   * `updateProfileSettings`. Absent on every pre-M7.2 record ("missing = oldest" —
+   * `domain/merge.ts`'s settings merge treats an absent value as older than any real timestamp, so
+   * a device that has never changed a setting always loses to one that has; both absent keeps the
+   * local side, same "nothing to compare" reasoning `masteredVia`'s "local wins on conflict" uses).
+   */
+  readonly updatedAt?: string;
 }
 
 /** Daily limit choices (app-structure.md §11): off, or 15/20/30/45/60 minutes. Reused for the
