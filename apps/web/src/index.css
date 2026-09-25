@@ -62,6 +62,18 @@
   animation: celebration-pop 260ms ease-out backwards;
 }
 
+/* Lazy-loaded screen Suspense fallback (`LazyFallback.tsx`, M5.4): a plain rotation, so the global
+   reduced-motion rule below simply leaves it static instead of needing its own opt-out. */
+@keyframes lazy-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.lazy-spin {
+  animation: lazy-spin 900ms linear infinite;
+}
+
 /* The rule below zeroes durations for reduced motion, so this rule only matters otherwise. */
 @media (prefers-reduced-motion: reduce) {
   *,

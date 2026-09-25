@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
 import type {
@@ -255,5 +255,46 @@ describe('HomeScreen next step is a world boss', () => {
     });
     expect(store.getState().miniGameId).toBe('boss-mg');
     expect(store.getState().miniGameOrigin).toBe('today');
+  });
+});
+
+const IPAD_SAFARI_UA =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15';
+
+describe('HomeScreen install banner (M5.4, non-functional.md §1/§4)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    window.localStorage.clear();
+  });
+
+  it('shows on iOS Safari, not standalone; dismissing hides it and remembers the choice', async () => {
+    vi.stubGlobal(
+      'navigator',
+      Object.assign({}, navigator, { userAgent: IPAD_SAFARI_UA, maxTouchPoints: 5 }),
+    );
+    const services = createTestServices(fixtureContentSource(fixtureLesson()));
+    await renderWithStore(<HomeScreen />, services);
+
+    await screen.findByText(i18n.t('install-banner.title'));
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('install-banner.dismiss') }));
+    expect(screen.queryByText(i18n.t('install-banner.title'))).toBeNull();
+    // Persistence of the dismiss choice itself (`install-banner.test.ts`'s own unit test) is not
+    // re-tested here — this only covers HomeScreen actually wiring the banner in and out.
+  });
+
+  it('never shows on a non-iOS device', async () => {
+    vi.stubGlobal(
+      'navigator',
+      Object.assign({}, navigator, {
+        userAgent: 'Mozilla/5.0 (X11; Linux x86_64)',
+        maxTouchPoints: 0,
+      }),
+    );
+    const services = createTestServices(fixtureContentSource(fixtureLesson()));
+    await renderWithStore(<HomeScreen />, services);
+
+    await screen.findByRole('heading', { level: 1 });
+    expect(screen.queryByText(i18n.t('install-banner.title'))).toBeNull();
   });
 });

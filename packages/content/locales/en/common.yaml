@@ -2,10 +2,15 @@ app:
   title: Chess for Kids
 offline:
   ready: Ready to play offline.
+install-banner:
+  title: Add to Home Screen so your progress stays safe
+  steps: Tap the Share button, then "Add to Home Screen".
+  dismiss: Got it
 stars-count: '{{count}} stars'
 next: Next
 play-again: Play again
 continue: Continue
+loading: Loading…
 piece:
   r: Rook
   b: Bishop

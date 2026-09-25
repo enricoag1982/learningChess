@@ -50,6 +50,7 @@ import {
   totalStars,
   updateSuggestedLevel,
 } from '@chess-kids/core';
+import { requestPersistentStorageIfNeeded } from '../adapters/persistent-storage.ts';
 import type { Services } from './services.ts';
 
 /** Rare celebrations (rewards.md §1): at most this many full-screen badge celebrations per app
@@ -572,6 +573,10 @@ export function createAppStore(services: Services) {
 
       async finishNewPlayer(nickname: string, avatar: string) {
         const profile = await createProfile(services.deps, nickname, avatar);
+        // Storage eviction (non-functional.md §1, M5.4 decision table): asks once, on whichever
+        // profile creation happens first on this device — a no-op every time after (see
+        // `requestPersistentStorageIfNeeded`'s own doc comment).
+        await requestPersistentStorageIfNeeded(services.deps);
         if (get().newPlayerReturnsToParent) {
           const profiles = await listProfiles(services.deps);
           set({ profiles, screen: 'parent' });
