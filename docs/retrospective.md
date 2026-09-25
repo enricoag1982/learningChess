@@ -25,7 +25,8 @@ Sources: lead session transcript, 40 agent transcripts, git history, GitHub PRs 
 | M3 Worlds 3–4, review, full game | 14:59–20:19 | 5.3 h | offline |
 | M4 World 5, levels, friend, badges, placement | 20:19–09-25 02:09 | 5.8 h | 21:00–21:55: Pages setting, first playtest, 3 findings |
 | M5 parent, limit, design, offline, release | 02:09–07:01 | 4.9 h | 02:49: retrospective request |
-| **Total** | 09-24 03:09 → 09-25 07:01 | **27.9 h** | active ≈ 2.0 h |
+| **Total to v1.0.0** | 09-24 03:09 → 09-25 07:01 | **27.9 h** | active ≈ 2.0 h |
+| v1.1.0 owner playtest 2 (skip, buttons, app update) | 09-25 14:38–16:10 | 1.5 h | phone playtest + 2 follow-ups |
 
 ## 3. Time spent (estimate)
 
@@ -41,7 +42,7 @@ Sources: lead session transcript, 40 agent transcripts, git history, GitHub PRs 
 | Idle (nothing running) | ≈ 0.4 | one 22 min gap (lead running local repro tests between M5.1 fixes) |
 
 Mean M5 iteration: agent 0.8–1.6 h + lead review / integration / CI ≈ 0.7 h → 1.2–2.6 h from spec to merge.
-Output tokens: lead ≈ 2.3 M, agents ≈ 0.34 M (agents wrote the code; the lead's tokens went to specs, reviews, integration).
+Models, tokens and CI minutes: §8.
 
 ## 4. What went well
 
@@ -70,6 +71,9 @@ Output tokens: lead ≈ 2.3 M, agents ≈ 0.34 M (agents wrote the code; the lea
 | Specs left gaps | rework after review | `pieceStyle` semantics, minute counting across screens, lesson step pills not listed | acceptance examples + "screens in scope" list in each spec |
 | Agent drift | lead re-commits, long docs, one agent stopped before committing | own trailers, verbose validation rows vs "compact" preference | exact trailers, word limits and finish steps in every spec |
 | Bear target missed (≥ 70 % vs Wolf, got 20 %) | F4 still open | target set without a feasibility spike | spike + calibration before committing to a number |
+| Owner's phone ran a 7-hour-old build (v1.1.0) | playtest 2 judged the pre-M5.3 design | service worker `prompt` mode with no update UI: a new version waited until every tab closed | update applied at Home / picker, checked on load and on return (v1.1.0) |
+| Buttons still unclear after M5.3 (v1.1.0) | second design pass | "raised" rule had no measurable threshold; beige edge ≈ 1.2:1 on cream | edge contrast ≥ 3:1 (WCAG 1.4.11), asserted in e2e |
+| Phone Story: primary button below the fold | found only in lead review of v1.1.0 | screenshots checked at 390×844, real phones show less height | check 390×660 too; primary pinned to the bottom |
 
 ## 6. Learnings for a similar app
 
@@ -85,6 +89,9 @@ Output tokens: lead ≈ 2.3 M, agents ≈ 0.34 M (agents wrote the code; the lea
 | Performance / security | Size budget and CSP from M0; lazy-load rare screens; keep validation libs out of the main entry |
 | AI opponent | Self-play calibration early; set strength targets after a spike |
 | Owner collaboration | Short approvals ("ok, go") worked; ask for pending owner actions up front; send one status line per merged milestone |
+| PWA updates | Decide the update strategy on day 1 (when a new build applies), not after a stale-build playtest |
+| Token accounting | Transcripts hold the start-of-stream usage snapshot, so output tokens need an estimate; read final usage from the API / console when exact figures matter |
+| Agent context | Cache reads are 99 % of token volume and grow with each tool call: prefer shorter, well-scoped agent tasks over 500+-call runs |
 
 ## 7. Open after v1.0.0
 
@@ -94,3 +101,36 @@ Output tokens: lead ≈ 2.3 M, agents ≈ 0.34 M (agents wrote the code; the lea
 | Offline check on an iPad and an Android tablet (`release.md` §1) | user |
 | F4: Bear vs Wolf 20 % (target 70 %) | next iteration |
 | Capacitor apps (v1.x), online features (v2), narration upgrade (v3) | roadmap §4 |
+
+## 8. Models, tokens, CI minutes (added after v1.1.0)
+
+Model names stay out of the repository (session rule); roles:
+
+| Role | Model | Turns | Cache writes |
+|---|---|---|---|
+| Lead (plans, specs, review, integration, merges) | one larger model, every turn | 1,352 | 1-hour |
+| Implementation agents (40 runs) | one smaller model (CLAUDE.md delegation tier), every turn | 11,262 | 5-minute |
+| Data agent (retrospective numbers) | same as implementation agents | 88 | 5-minute |
+
+Tokens, design → v1.1.0 (per message, duplicates removed):
+
+| Role | Fresh input | Cache writes | Cache reads | Output, visible (estimate) | Output, recorded snapshot |
+|---|---|---|---|---|---|
+| Lead | 2.9 K | 5.0 M | 539 M | 0.32 M | 1.00 M |
+| Agents (implementation + data) | 22.7 K | 28.2 M | 3.92 B | 1.82 M | 0.30 M |
+| **Total** | **25.6 K** | **33.2 M** | **4.46 B** | **2.13 M** | **1.30 M** |
+
+| Reading | Value |
+|---|---|
+| Cache reads / all input-side tokens | 99.3 % (every tool call re-reads the growing context) |
+| Agent share of visible output | ≈ 85 % (code and tests written through tool calls); lead ≈ 15 % |
+| Visible output per merged PR | ≈ 59 K tokens |
+| Visible output by phase (K tokens) | design 63 · M0 73 · M1 229 · M2 476 · M3 400 · M4 397 · M5 360 · v1.1 95 |
+| Measurement | Input side exact. Output: transcripts store the usage snapshot taken when a response starts streaming, so "recorded" undercounts tool-heavy turns; "visible" = logged text + tool input characters ÷ 4, a lower bound (thinking text not stored). No cost estimate (owner decision) |
+
+| CI (to the v1.1.0 PR) | Runs | Compute |
+|---|---|---|
+| `quality` (format, lint, typecheck, unit, build, size, e2e) | 80 | 402 min |
+| Deploy (Pages) | 35 | 25 min (22 failures before Pages was enabled) |
+| Tag | 36 | 6 min |
+| **Total** | **151** | **433 min (7.2 h)**; 4 real CI failures, all fixed at root cause |

@@ -41,7 +41,7 @@ Offline chess learning app for an 8-year-old beginner. Design is complete; imple
 
 ## Status and next step
 
-- Done: M0–M5 (`m0` … `m5`), release `v1.0.0`. Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
+- Done: M0–M5 (`m0` … `m5`), releases `v1.0.0`, `v1.1.0` (owner playtest 2). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
 - Next: after-MVP work (`docs/roadmap.md` §4), open follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
