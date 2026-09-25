@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import type { Color, PieceType } from '@chess-kids/core';
 import { characterColor, characterForPiece } from '../art/character-meta.ts';
-import { CharacterIcon } from '../art/characters.tsx';
+import { animalImage } from '../art/animal-images.ts';
 
 /** A drawable piece: its type and colour. */
 export interface PieceIconProps {
@@ -231,7 +231,11 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
  * Small animal-face badge overlaid on a piece's corner (docs/app-structure.md "Piece look on
  * board": classic + animal badge in Worlds 1-4). Purely decorative — a square's own accessible
  * name already names the piece by type and colour (`Board`'s `role="grid"` labels) — so it is
- * `aria-hidden`.
+ * `aria-hidden`. The Fluent Emoji 3D artwork is drawn as an SVG `<image>` (not `<img>`, unlike the
+ * other animal spots in the app) so it composes with the badge's own ring/background in one
+ * element at this very small size (≤ ~16 px at a 40 px board square) instead of layering an `img`
+ * inside an HTML circle. White vs Black stays readable from the piece shape/fill under the badge
+ * (unchanged in this file) — the badge itself never varies by colour.
  */
 export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
   const character = characterForPiece(type);
@@ -241,7 +245,16 @@ export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element 
       className="absolute -bottom-0.5 -right-0.5 flex h-[40%] w-[40%] items-center justify-center overflow-hidden rounded-full border border-white/80 p-0.5"
       style={{ backgroundColor: characterColor(character) }}
     >
-      <CharacterIcon character={character} />
+      <svg viewBox="0 0 100 100" className="h-full w-full">
+        <image
+          href={animalImage(character)}
+          x={0}
+          y={0}
+          width={100}
+          height={100}
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </svg>
     </span>
   );
 }

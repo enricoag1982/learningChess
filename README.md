@@ -82,3 +82,9 @@ pnpm test:e2e         # Playwright, against the production build
 - Fonts: Fredoka and Nunito, via [Fontsource](https://fontsource.org/) (SIL Open Font License).
 - No third-party analytics, ads, or tracking of any kind — see
   [`docs/privacy-policy.md`](docs/privacy-policy.md).
+
+## Credits
+
+- Animal art: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji) by Microsoft, via
+  [@lobehub/fluent-emoji-3d](https://www.npmjs.com/package/@lobehub/fluent-emoji-3d) (MIT — full
+  notice: [`apps/web/public/licenses/fluent-emoji.txt`](apps/web/public/licenses/fluent-emoji.txt)).
