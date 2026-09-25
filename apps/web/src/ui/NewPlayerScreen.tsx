@@ -51,7 +51,7 @@ function NicknameStep({
         type="button"
         disabled={!valid}
         onClick={onNext}
-        className="flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white disabled:opacity-40 sm:h-20 sm:text-2xl"
+        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white disabled:opacity-40 sm:h-20 sm:text-2xl"
       >
         {t('new-player.nickname.primary')}
       </button>
@@ -98,7 +98,7 @@ function AvatarStep({
       <button
         type="button"
         onClick={onFinish}
-        className="flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
+        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
       >
         {t('new-player.avatar.primary')}
       </button>

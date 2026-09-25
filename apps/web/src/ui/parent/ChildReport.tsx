@@ -120,7 +120,7 @@ export function ChildReportScreen({
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink"
+          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <ChevronLeftIcon />
         </button>
@@ -134,7 +134,7 @@ export function ChildReportScreen({
             </span>
             <div className="flex flex-1 flex-col">
               <span className="text-base font-extrabold text-ink">{report.profile.nickname}</span>
-              <RankPill rank={report.rank} />
+              <RankPill rank={report.rank} compact />
             </div>
           </>
         )}
@@ -298,7 +298,7 @@ export function ChildReportScreen({
                   return (
                     <li
                       key={badge.id}
-                      className="rounded-full border border-line bg-card px-3 py-1.5 text-xs font-bold text-ink"
+                      className="info-flat rounded-full bg-cream px-3 py-1.5 text-xs font-bold text-ink"
                     >
                       {badge.tier ? `${name} (${t(`tier.${badge.tier}`)})` : name}
                     </li>

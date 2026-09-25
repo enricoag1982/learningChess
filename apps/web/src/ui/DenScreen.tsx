@@ -18,6 +18,7 @@ import { SpeechBubble } from './SpeechBubble.tsx';
 import { ReplayButton } from './ReplayButton.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
+import { InfoPill } from './primitives.tsx';
 import { useNarratedText } from './useNarratedText.ts';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
@@ -151,7 +152,7 @@ export function DenScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <BackIcon />
         </button>
@@ -167,20 +168,20 @@ export function DenScreen(): JSX.Element {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <div
+        <InfoPill
           role="img"
           aria-label={t('den.games-won', { count: gamesWon })}
-          className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
+          className="h-10 w-fit text-sm font-extrabold text-ink"
         >
           <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
-        </div>
-        <div
+        </InfoPill>
+        <InfoPill
           role="img"
           aria-label={t('den.games-with-friends', { count: friendGames })}
-          className="flex h-10 w-fit items-center gap-2 rounded-full border-2 border-line bg-card px-4 text-sm font-extrabold text-ink"
+          className="h-10 w-fit text-sm font-extrabold text-ink"
         >
           <span aria-hidden="true">{t('den.games-with-friends', { count: friendGames })}</span>
-        </div>
+        </InfoPill>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
@@ -196,8 +197,8 @@ export function DenScreen(): JSX.Element {
                 <li
                   key={entry.rank.id}
                   aria-label={`${name}, ${note}`}
-                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2 ${
-                    current ? 'border-go bg-white' : 'border-transparent'
+                  className={`info-flat flex items-center gap-3 rounded-xl px-3 py-2 ${
+                    current ? 'bg-[#E3F1EA]' : ''
                   }`}
                 >
                   <span
@@ -317,8 +318,8 @@ export function DenScreen(): JSX.Element {
                         onClick={() => {
                           tapBadge(def, display, name);
                         }}
-                        className={`relative flex min-h-16 w-full flex-col items-center gap-1 rounded-2xl border-2 px-2 py-3 text-center ${
-                          display.earned ? 'border-line bg-white' : 'border-line bg-[#F3EDE0]'
+                        className={`tap-raised relative flex min-h-16 w-full flex-col items-center gap-1 rounded-2xl px-2 py-3 text-center ${
+                          display.earned ? 'bg-white' : 'bg-[#F3EDE0]'
                         }`}
                       >
                         {display.isNew && (

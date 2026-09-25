@@ -16,6 +16,7 @@ import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -203,14 +204,14 @@ function PlayerStrip({
             type="button"
             onClick={onTakeBack}
             disabled={!canTakeBack}
-            className="flex h-16 items-center justify-center rounded-2xl border-2 border-line bg-card px-4 font-display text-base font-semibold text-ink disabled:opacity-40"
+            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink disabled:opacity-40"
           >
             {t('friend-play.take-back')}
           </button>
           <button
             type="button"
             onClick={onStop}
-            className="flex h-16 items-center justify-center rounded-2xl border-2 border-line bg-card px-4 font-display text-base font-semibold text-ink"
+            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink"
           >
             {t('friend-play.stop')}
           </button>
@@ -223,14 +224,14 @@ function PlayerStrip({
               <button
                 type="button"
                 onClick={onPlayAgain}
-                className="flex h-16 items-center justify-center rounded-2xl border-2 border-line bg-card px-4 font-display text-base font-semibold text-ink"
+                className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink"
               >
                 {t('play-again')}
               </button>
               <button
                 type="button"
                 onClick={onBackToPlay}
-                className="flex h-16 items-center justify-center rounded-2xl bg-go px-4 font-display text-base font-semibold text-white"
+                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go px-4 font-display text-base font-semibold text-white"
               >
                 {t('play.back-to-play')}
               </button>
@@ -267,6 +268,11 @@ function FriendMatch({
 }: FriendMatchProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
+  const pieceBadges = showPieceBadges(
+    pieceStyle,
+    isClassicOnlyContext({ kings: def.rules.kings, position: def.position }),
+  );
 
   const [swapped, setSwapped] = useState(initialSwapColours);
   const [match, setMatch] = useState<game.LocalMatchState>(() =>
@@ -407,6 +413,7 @@ function FriendMatch({
               onMove={handleMove}
               highlights={highlights}
               label={t('lesson.board-label')}
+              pieceBadges={pieceBadges}
             />
           </SquareArea>
           <PlayerStrip player={whitePlayer} isTurn={position.toMove === 'w'} {...stripCommon} />
@@ -426,6 +433,7 @@ function FriendMatch({
               onMove={handleMove}
               highlights={highlights}
               label={t('lesson.board-label')}
+              pieceBadges={pieceBadges}
             />
           </SquareArea>
           <PlayerStrip player={toMovePlayer} isTurn {...stripCommon} />
@@ -448,7 +456,7 @@ function FriendMatch({
                 onClick={() => {
                   respondTakeBack(false);
                 }}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl border-2 border-line bg-card font-display text-lg font-semibold text-ink"
+                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
               >
                 {t('exercise.no')}
               </button>
@@ -457,7 +465,7 @@ function FriendMatch({
                 onClick={() => {
                   respondTakeBack(true);
                 }}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
+                className="tap-raised tap-go flex h-14 flex-1 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
               >
                 {t('exercise.yes')}
               </button>
@@ -480,14 +488,14 @@ function FriendMatch({
                 onClick={() => {
                   setConfirmStop(false);
                 }}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl border-2 border-line bg-card font-display text-lg font-semibold text-ink"
+                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
               >
                 {t('boss.versus.stop-game-cancel')}
               </button>
               <button
                 type="button"
                 onClick={confirmStopNow}
-                className="flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
+                className="tap-raised tap-today flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
               >
                 {t('boss.versus.stop-game-confirm')}
               </button>

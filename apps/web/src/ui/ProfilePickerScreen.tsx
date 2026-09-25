@@ -61,7 +61,7 @@ export function ProfilePickerScreen(): JSX.Element {
             onClick={() => {
               void selectProfileAndHome(profile.id);
             }}
-            className="flex w-40 flex-col items-center gap-3 rounded-3xl border-2 border-line bg-card p-5 sm:w-52"
+            className="tap-raised flex w-40 flex-col items-center gap-3 rounded-3xl bg-card p-5 sm:w-52"
           >
             <span
               className="h-24 w-24 overflow-hidden rounded-full p-3 sm:h-32 sm:w-32"
@@ -94,7 +94,7 @@ export function ProfilePickerScreen(): JSX.Element {
         onClick={() => {
           goToPasswordScreen();
         }}
-        className="flex h-16 items-center gap-3 rounded-2xl border-2 border-line bg-card px-5 text-ink"
+        className="tap-raised flex h-16 items-center gap-3 rounded-2xl bg-card px-5 text-ink"
       >
         <LockIcon />
         <span className="flex flex-col items-start">

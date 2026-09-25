@@ -60,7 +60,7 @@ export function TimeLimitScreen(): JSX.Element {
           onClick={() => {
             void switchPlayerFromTimeLimit();
           }}
-          className="h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
+          className="tap-raised tap-go h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
         >
           {t('home.switch-player')}
         </button>
@@ -69,7 +69,7 @@ export function TimeLimitScreen(): JSX.Element {
           onClick={() => {
             goToPasswordScreen('more-time');
           }}
-          className="h-20 rounded-[2rem] border-2 border-line bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
+          className="tap-raised h-20 rounded-[2rem] bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
         >
           {t('time-limit.more-time')}
         </button>

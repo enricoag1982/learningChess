@@ -250,7 +250,7 @@ export function PlayScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border-2 border-line bg-card text-ink"
+          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <BackIcon />
         </button>
@@ -304,11 +304,11 @@ export function PlayScreen(): JSX.Element {
                     onClick={() => {
                       selectLevel(status);
                     }}
-                    className={`flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 text-left ${
+                    className={`tap-raised flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 text-left ${
                       status.locked
-                        ? 'bg-[#F3EDE0] text-muted'
+                        ? 'tap-locked bg-[#F3EDE0] text-muted'
                         : selected
-                          ? 'bg-info text-white'
+                          ? 'tap-info bg-info text-white'
                           : 'bg-[#EEF3FA] text-[#24497D]'
                     }`}
                   >
@@ -343,7 +343,7 @@ export function PlayScreen(): JSX.Element {
             onClick={() => {
               startFullGame(effectiveLevel);
             }}
-            className="flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
+            className="tap-raised tap-info flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
           >
             {!fullGameUnlocked && <LockIcon />}
             {fullGameUnlocked ? t('play.full-game') : t('play.full-game-locked')}
@@ -370,8 +370,10 @@ export function PlayScreen(): JSX.Element {
                 : `${t('play.vs-friend')}, ${t('play.vs-friend-locked')}`
             }
             onClick={activateFriend}
-            className={`flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold ${
-              friendUnlocked ? 'bg-today text-white' : 'bg-[#F3EDE0] text-muted'
+            className={`tap-raised flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold ${
+              friendUnlocked
+                ? 'tap-today bg-today text-white'
+                : 'tap-locked bg-[#F3EDE0] text-muted'
             }`}
           >
             {!friendUnlocked && <LockIcon />}
@@ -403,10 +405,8 @@ export function PlayScreen(): JSX.Element {
                 onClick={() => {
                   activateGame(minigame, unlocked);
                 }}
-                className={`flex min-h-24 w-full flex-col justify-between gap-2 rounded-[1.5rem] border-2 p-3 text-left ${
-                  unlocked
-                    ? 'border-line bg-card text-ink'
-                    : 'border-transparent bg-[#F3EDE0] text-muted'
+                className={`tap-raised flex min-h-24 w-full flex-col justify-between gap-2 rounded-[1.5rem] p-3 text-left ${
+                  unlocked ? 'bg-card text-ink' : 'tap-locked bg-[#F3EDE0] text-muted'
                 }`}
               >
                 <span className="font-display text-base font-semibold leading-tight sm:text-lg">
@@ -429,7 +429,7 @@ export function PlayScreen(): JSX.Element {
       </ul>
 
       {(lockedMessage ?? levelUpBanner) && (
-        <div className="flex items-center gap-3 rounded-3xl border-2 border-line bg-card px-4 py-3 shadow">
+        <div className="info-flat flex items-center gap-3 rounded-3xl bg-card px-4 py-3">
           <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full bg-[#E9DFF3] p-1.5">
             <OwlIcon />
           </div>

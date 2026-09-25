@@ -105,7 +105,7 @@ export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Ele
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink"
+          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <ChevronLeftIcon />
         </button>

@@ -16,6 +16,13 @@
   --color-board-dark: #c49a6c;
   --color-board-frame: #8a6a48;
 
+  /* "Ledge" shadow tones (docs/screens.md §1 "Tappable vs info", roadmap F3): a darker tone of
+     each role's own fill, for a tappable element's raised bottom edge (`.tap-raised` below). */
+  --color-ledge-go: #1f5a41;
+  --color-ledge-today: #8c4012;
+  --color-ledge-info: #1f3f6d;
+  --color-ledge-card: #d9ceb4;
+
   --font-display: 'Fredoka Variable', ui-rounded, system-ui, sans-serif;
   --font-body: 'Nunito Variable', system-ui, sans-serif;
 }
@@ -23,6 +30,102 @@
 @layer base {
   body {
     @apply bg-cream text-ink font-body;
+  }
+}
+
+/*
+ * Tappable vs info (docs/screens.md §1, roadmap F3): every tappable control is "raised" — a 2px
+ * border plus a solid 4px "ledge" shadow below it, in a darker tone of its own fill — and every
+ * info-only element is flat (no border, no shadow). `.tap-raised` is the shared raised look,
+ * combined with one role modifier (`.tap-go` / `.tap-today` / `.tap-info`; none = neutral
+ * `card`/`line`); `apps/web/src/ui/primitives.tsx` is the one place these class names are written.
+ */
+@layer components {
+  .tap-raised {
+    --tap-border: var(--color-line);
+    --tap-ledge: var(--color-ledge-card);
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--tap-border);
+    box-shadow: 0 4px 0 0 var(--tap-ledge);
+    transition:
+      transform 100ms ease-out,
+      box-shadow 100ms ease-out;
+  }
+
+  .tap-raised.tap-go {
+    --tap-border: var(--color-go);
+    --tap-ledge: var(--color-ledge-go);
+  }
+  .tap-raised.tap-today {
+    --tap-border: var(--color-today);
+    --tap-ledge: var(--color-ledge-today);
+  }
+  .tap-raised.tap-info {
+    --tap-border: var(--color-info);
+    --tap-ledge: var(--color-ledge-info);
+  }
+
+  /* Border-only role tint, ledge stays neutral `card` (an outline button, e.g. Danger, or a
+     selected state on an otherwise neutral row/chip — its fill is still `card`, so the ledge
+     stays "a darker tone of its own fill" rather than following the border colour). */
+  .tap-raised.tap-border-go {
+    --tap-border: var(--color-go);
+  }
+  .tap-raised.tap-border-today {
+    --tap-border: var(--color-today);
+  }
+
+  /* Pressed: moves down 2px, ledge shrinks to 2px (never disappears) — same physical button, just
+     pushed in. `:not(:disabled)` so a disabled native `<button>` (never actually pressable) keeps
+     its resting shadow; the "Disabled" rule below removes it instead. */
+  .tap-raised:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 0 var(--tap-ledge);
+  }
+
+  /* Focus ring: 3px `info`, offset so it never merges into the ledge shadow. */
+  .tap-raised:focus-visible {
+    outline: 3px solid var(--color-info);
+    outline-offset: 2px;
+  }
+
+  /* Disabled (docs/screens.md §1 "Disabled"): raised shape kept, no ledge — reads as inert rather
+     than pressed. Greying and any lock icon are the caller's own existing `disabled:` classes. */
+  .tap-raised:disabled {
+    box-shadow: none;
+  }
+
+  /* Same "no ledge" treatment for a control that is technically still tappable (it responds with a
+     message, e.g. a locked Journey node) but must not read as an inviting, pressable action — the
+     `:disabled` rule above only ever reaches a real native-disabled `<button>`. */
+  .tap-raised.tap-locked {
+    box-shadow: none;
+  }
+  .tap-raised.tap-locked:active:not(:disabled) {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Reduced motion: no movement; a darker fill (via `filter`, so it needs no per-role colour of its
+     own) stands in for the press instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .tap-raised {
+      transition: none;
+    }
+    .tap-raised:active:not(:disabled) {
+      transform: none;
+      box-shadow: 0 4px 0 0 var(--tap-ledge);
+      filter: brightness(0.94);
+    }
+  }
+
+  /* Info only: flat, no border/shadow — the other half of the tappable/info contrast. Mostly a
+     marker class (the e2e a11y walk asserts no non-button element carries `.tap-raised`); the
+     tinted background and smaller radius are each caller's own Tailwind classes. */
+  .info-flat {
+    border: none;
+    box-shadow: none;
   }
 }
 

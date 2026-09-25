@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { StarsRow } from '../StarsRow.tsx';
+import { InfoPanel } from '../primitives.tsx';
 
 export function HintIcon(): JSX.Element {
   return (
@@ -47,10 +48,11 @@ export interface MovesCardProps {
   readonly target: number;
 }
 
-/** Moves-so-far card for a move-counted exercise (collect-stars / capture); `t` passed in since this isn't a hook. */
+/** Moves-so-far counter for a move-counted exercise (collect-stars / capture) — info, flat
+ * (docs/screens.md §1): read-only, never a button. `t` passed in since this isn't a hook. */
 export function MovesCard({ t, current, target }: MovesCardProps): JSX.Element {
   return (
-    <div className="flex flex-col gap-2 rounded-3xl border-2 border-line bg-card px-5 py-4">
+    <InfoPanel className="flex flex-col gap-2 rounded-3xl px-5 py-4">
       <span className="text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
         {t('exercise.moves-label')}
       </span>
@@ -61,6 +63,6 @@ export function MovesCard({ t, current, target }: MovesCardProps): JSX.Element {
         <StarsRow earned={3} max={3} size="1.1rem" />
         {t('exercise.moves-target', { count: target })}
       </div>
-    </div>
+    </InfoPanel>
   );
 }

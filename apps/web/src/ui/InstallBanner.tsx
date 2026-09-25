@@ -36,7 +36,7 @@ export function InstallBanner(): JSX.Element | null {
   return (
     <div
       role="note"
-      className="flex items-start gap-3 rounded-2xl p-4"
+      className="info-flat flex items-start gap-3 rounded-2xl p-4"
       style={{ backgroundColor: '#EAF1FB' }}
     >
       <Owl className="h-12 w-12" />
@@ -50,7 +50,7 @@ export function InstallBanner(): JSX.Element | null {
           dismissInstallBanner();
           setVisible(false);
         }}
-        className="flex h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-full px-3 text-sm font-bold text-info"
+        className="flex h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-full px-3 text-sm font-bold text-info underline underline-offset-2"
       >
         {t('install-banner.dismiss')}
       </button>

@@ -2,9 +2,10 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Lesson, Position, Square } from '@chess-kids/core';
-import { useServices } from '../../app/store.ts';
+import { useAppStore, useServices } from '../../app/store.ts';
 import { characterName, tContent } from '../../content-text.ts';
 import { Board } from '../board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { useNarratedText } from '../useNarratedText.ts';
@@ -20,10 +21,12 @@ export interface DemoStepProps {
 export function DemoStep({ lesson, onNext }: DemoStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const [position, setPosition] = useState<Position>(lesson.demo.position);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | undefined>(undefined);
   const text = tContent(t, lesson.demo.textKey);
   const replay = useNarratedText(services.narrator, text);
+  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
 
   const legalMoves = services.rules.legalMoves(position, { staticOpponent: true });
 
@@ -43,6 +46,7 @@ export function DemoStep({ lesson, onNext }: DemoStepProps): JSX.Element {
           onMove={handleMove}
           highlights={lastMove ? { lastMove } : undefined}
           label={t('demo.board-label', { name: characterName(t, lesson.character) })}
+          pieceBadges={pieceBadges}
         />
       }
       panel={

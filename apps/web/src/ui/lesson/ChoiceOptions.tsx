@@ -40,8 +40,8 @@ export function ChoiceOptions({
             onClick={() => {
               onPick(option.id);
             }}
-            className={`flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 px-2 py-3 font-display text-sm font-semibold ${
-              isWrong ? 'border-today text-today opacity-80' : 'border-line bg-card text-ink'
+            className={`tap-raised flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-3 font-display text-sm font-semibold ${
+              isWrong ? 'border-today text-today opacity-80' : 'bg-card text-ink'
             }`}
           >
             {option.piece && (

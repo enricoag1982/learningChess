@@ -16,7 +16,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
 | Parent area | Adult style (smaller text, denser); behind parent password |
 | Owl row | Speech bubble + "Say it again": side by side from `sm` up, stacked on phones (bubble full width, button below); always stacked inside dialogs (celebration) |
-| Tappable vs info (open, roadmap F3) | Tappable and non-tappable elements must look different; rule to be set app-wide in the M5.3 design pass. M5.1 decided it for the parent area only (not yet applied elsewhere): tappable = raised card, border, chevron (a child's Overview card, the Backup row, Report's Settings button); info = flat tinted panel, no border/shadow (a world/concept/game/assessment row) |
+| Tappable vs info (M5.3, roadmap F3) | Tappable: raised — 2 px border (`line` or role colour) + 4 px solid bottom "ledge" shadow in a darker tone of its fill (`--color-ledge-*` tokens); pressed = move down 2 px + ledge 2 px (reduced motion: no movement, darker fill instead); focus ring 3 px `info`; icon or label (existing rule); a tappable tile/row shows a chevron or play icon when the action is navigation. Info: flat — no border, no shadow, tinted background, smaller radius; never a bold centred single word alone in a pill-shaped box. Disabled: raised shape kept, greyed, lock icon when locked, no ledge. Owl bubble: flat (keeps its tail); "Say it again" is raised. Pills (rank/stars/streak): flat unless tapping does something, then raised + chevron. Shared primitives: `TapButton` / `InfoPanel` / `InfoPill` (`apps/web/src/ui/primitives.tsx`), `.tap-raised` / `.info-flat` (`apps/web/src/index.css`) |
 
 ### 1.1 Design tokens (from sketches; Tailwind `@theme` in `apps/web/src/index.css`)
 
@@ -33,6 +33,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | `info` | `#2F5E9E` | Computer / info |
 | `locked` | `#8C8C8C` | Locked (always with lock icon) |
 | `board-light` / `board-dark` / `board-frame` | `#F1E4C8` / `#C49A6C` / `#8A6A48` | Board squares, frame |
+| `ledge-go` / `ledge-today` / `ledge-info` / `ledge-card` | `#1F5A41` / `#8C4012` / `#1F3F6D` / `#D9CEB4` | Tappable "ledge" shadow per role (M5.3, darker tone of that role's fill) |
 
 ## 2. Screen list
 

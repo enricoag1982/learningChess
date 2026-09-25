@@ -49,7 +49,7 @@ export function SessionSummaryScreen(): JSX.Element {
       </div>
 
       {newRank && (
-        <div className="flex w-full max-w-md items-center gap-4 rounded-3xl border-2 border-line bg-card p-5 text-left">
+        <div className="info-flat flex w-full max-w-md items-center gap-4 rounded-3xl bg-card p-5 text-left">
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-[#DCEFE3] font-display text-2xl text-[#1F5A41]">
             ★
           </div>
@@ -67,7 +67,7 @@ export function SessionSummaryScreen(): JSX.Element {
       {newFriends.map((friend) => (
         <div
           key={friend.character}
-          className="flex w-full max-w-md items-center gap-4 rounded-3xl border-2 border-line bg-card p-5 text-left"
+          className="info-flat flex w-full max-w-md items-center gap-4 rounded-3xl bg-card p-5 text-left"
         >
           <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#EFE4F7] p-2">
             <CharacterIcon character={friend.character} />
@@ -91,7 +91,7 @@ export function SessionSummaryScreen(): JSX.Element {
       <button
         type="button"
         onClick={finishToday}
-        className="mt-auto h-20 w-full max-w-lg rounded-3xl bg-go font-display text-xl font-semibold text-white"
+        className="tap-raised tap-go mt-auto h-20 w-full max-w-lg rounded-3xl bg-go font-display text-xl font-semibold text-white"
       >
         {t('session.summary-done')}
       </button>

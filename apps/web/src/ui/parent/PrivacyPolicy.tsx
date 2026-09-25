@@ -61,7 +61,7 @@ export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink"
+          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <ChevronLeftIcon />
         </button>
@@ -116,7 +116,11 @@ export interface PrivacyLinkProps {
 export function PrivacyLink({ onClick }: PrivacyLinkProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <button type="button" onClick={onClick} className="self-start text-sm font-bold text-info">
+    <button
+      type="button"
+      onClick={onClick}
+      className="self-start text-sm font-bold text-info underline underline-offset-2"
+    >
       {t('first-run.password.privacy-link')}
     </button>
   );

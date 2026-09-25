@@ -33,6 +33,8 @@ export interface ExercisePlayAreaProps {
   readonly checkSquare?: Square;
   /** Hides the Hint button (domain-model.md §3.2: an assessment task offers no hints). Default `true`. */
   readonly showHint?: boolean;
+  /** Animal-badge piece look (`board/piece-style.ts`), default `false` (classic only). */
+  readonly pieceBadges?: boolean;
 }
 
 export interface ExercisePlayArea {
@@ -59,6 +61,7 @@ export function buildExercisePlayArea({
   isStacked,
   checkSquare,
   showHint = true,
+  pieceBadges = false,
 }: ExercisePlayAreaProps): ExercisePlayArea {
   const isSelectSquares = exercise.type === 'select-squares';
   const isMoveCounted = exercise.type === 'collect-stars' || exercise.type === 'capture';
@@ -90,6 +93,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   } else if (exercise.type === 'yes-no') {
@@ -104,6 +108,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   } else if (exercise.type === 'choice') {
@@ -113,6 +118,7 @@ export function buildExercisePlayArea({
         legalMoves={[]}
         highlights={checkHighlight}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     ) : null;
   } else if (exercise.type === 'best-move') {
@@ -137,6 +143,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   } else if (exercise.type === 'setup') {
@@ -154,6 +161,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   } else if (exercise.type === 'mate-in-n') {
@@ -185,6 +193,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   } else {
@@ -208,6 +217,7 @@ export function buildExercisePlayArea({
           ...checkHighlight,
         }}
         label={t('lesson.board-label')}
+        pieceBadges={pieceBadges}
       />
     );
   }

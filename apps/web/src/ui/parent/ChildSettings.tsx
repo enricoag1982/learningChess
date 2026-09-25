@@ -51,7 +51,7 @@ function AvatarPicker({ onPick }: { readonly onPick: (avatar: string) => void })
           onClick={() => {
             onPick(id);
           }}
-          className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full p-1.5"
+          className="tap-raised flex h-11 w-11 items-center justify-center overflow-hidden rounded-full p-1.5"
           style={{ backgroundColor: avatarBackground(id) }}
         >
           <AvatarIcon avatar={id} />
@@ -185,7 +185,7 @@ function ToggleRow({
       onClick={() => {
         onChange(!checked);
       }}
-      className="flex min-h-[44px] items-center justify-between gap-3 rounded-xl border border-line bg-card px-4 py-2 text-left"
+      className="tap-raised flex min-h-[44px] items-center justify-between gap-3 rounded-xl bg-card px-4 py-2 text-left"
     >
       <span className="text-sm font-bold text-ink">{label}</span>
       <span
@@ -306,7 +306,7 @@ export function ChildSettingsScreen({
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-line bg-card text-ink"
+          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
         >
           <ChevronLeftIcon />
         </button>

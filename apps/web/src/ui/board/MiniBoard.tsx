@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import type { Color, Position, Square } from '@chess-kids/core';
-import { PieceIcon } from './pieces.tsx';
+import { PieceBadge, PieceIcon } from './pieces.tsx';
 import { cellToSquare } from './geometry.ts';
 
 const CELLS: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -18,6 +18,8 @@ export interface MiniBoardProps {
   readonly orientation?: Color;
   /** Accessible label; the board itself is a static illustration, not a control. */
   readonly label: string;
+  /** Animal-badge piece look (`board/piece-style.ts`), default `false` (classic only). */
+  readonly pieceBadges?: boolean;
 }
 
 /**
@@ -30,6 +32,7 @@ export function MiniBoard({
   highlightSquares = [],
   orientation = 'w',
   label,
+  pieceBadges = false,
 }: MiniBoardProps): JSX.Element {
   return (
     <div
@@ -53,6 +56,7 @@ export function MiniBoard({
                 {piece && (
                   <span className="absolute inset-[6%]">
                     <PieceIcon piece={piece} />
+                    {pieceBadges && <PieceBadge type={piece.type} />}
                   </span>
                 )}
                 {isDot && <span className="h-[28%] w-[28%] rounded-full bg-go/60" />}

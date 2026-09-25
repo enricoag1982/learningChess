@@ -10,13 +10,14 @@ export interface PhaseChipProps {
 }
 
 /**
- * Phone top bar (< 640px, docs/screens.md §1): one compact pill naming the current phase, in the
- * same "current" colour as `StepPills`, replacing the full five-pill row that would wrap there.
+ * Phone top bar (< 640px, docs/screens.md §1): one compact label naming the current phase,
+ * replacing the full `StepPills` track that would wrap there. Info, not tappable (F3): flat tint,
+ * small radius, `StepPills`' orange "current" bar as a left edge.
  */
 export function PhaseChip({ phase, current, total }: PhaseChipProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <span className="inline-flex max-w-full items-center gap-1.5 truncate rounded-full bg-today px-4 py-2 text-sm font-extrabold text-white">
+    <span className="inline-flex max-w-full items-center gap-1.5 truncate rounded-md border-l-4 border-today bg-today/10 px-3 py-1.5 text-sm font-semibold text-ink">
       {t(`lesson.steps.${phase}`)}
       {current !== undefined && total !== undefined && (
         <> · {t('lesson.stage-of', { current, total })}</>
