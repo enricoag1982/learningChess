@@ -1,51 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
+import { makeExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import type { Track, TracksCatalog, World } from './journey.ts';
 import type { Lesson } from './lesson.ts';
-import type { ExerciseDef } from './exercise/types.ts';
 import { newLessonProgress, recordExerciseStars } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 import { animalFriends, rankLadder } from './rewards.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
-function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: `${id}-concept`,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
 function makeLesson(id: string, character: string, order: number): Lesson {
-  return {
+  return buildLesson({
     id,
-    world: 'pieces',
     order,
     concept: `${id}-move`,
     character,
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [makeExercise(`${id}-01`)],
-  };
+    exercises: [makeExercise({ id: `${id}-01`, concept: `${id}-01-concept` })],
+  });
 }
 
 function completeProgress(lesson: Lesson): LessonProgress {

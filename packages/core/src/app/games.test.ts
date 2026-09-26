@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { GameRecord } from '../domain/progress.ts';
-import type { Profile } from '../domain/profile.ts';
-import { seededRandom } from '../domain/random.ts';
+import { makeDeps as buildDeps, makeGameRecordRepo } from '../testing/index.ts';
 import type { Journey } from './journey.ts';
 import {
   computerLevelStatus,
@@ -13,110 +12,9 @@ import {
   updateSuggestedLevel,
 } from './games.ts';
 import type { AppDeps } from './use-cases.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-function makeClock(iso = '2026-01-01T00:00:00.000Z'): Clock {
-  return { now: () => new Date(iso) };
-}
-
-function makeGameRecordRepo(initial: readonly GameRecord[] = []): GameRecordRepository {
-  const records: GameRecord[] = [...initial];
-  return {
-    add: (record) => {
-      records.push(record);
-      return Promise.resolve();
-    },
-    listByProfile: (profileId) =>
-      Promise.resolve(records.filter((record) => record.profileId === profileId)),
-    deleteProfileData: (profileId) => {
-      for (let i = records.length - 1; i >= 0; i -= 1) {
-        if (records[i]?.profileId === profileId) records.splice(i, 1);
-      }
-      return Promise.resolve();
-    },
-  };
-}
-
-const stubProgress: ProgressRepository = {
-  listLessons: () => Promise.resolve([]),
-  getLesson: () => Promise.resolve(undefined),
-  saveLesson: () => Promise.resolve(),
-  addAttempt: () => Promise.resolve(),
-  listAttempts: () => Promise.resolve([]),
-  getMiniGame: () => Promise.resolve(undefined),
-  listMiniGames: () => Promise.resolve([]),
-  saveMiniGame: () => Promise.resolve(),
-  getConceptStats: () => Promise.resolve(undefined),
-  listConceptStats: () => Promise.resolve([]),
-  saveConceptStats: () => Promise.resolve(),
-  deleteProfileData: () => Promise.resolve(),
-};
-
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
-/** In-memory `SettingsRepository`, so `updateSuggestedLevel`'s save-then-get round-trips. */
-function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
-): SettingsRepository {
-  let settings = initial;
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
 
 function makeDeps(records: readonly GameRecord[] = []): AppDeps {
-  return {
-    profiles: {
-      list: () => Promise.resolve<Profile[]>([]),
-      get: () => Promise.resolve(undefined),
-      save: () => Promise.resolve(),
-      delete: () => Promise.resolve(),
-    } satisfies ProfileRepository,
-    progress: stubProgress,
-    gameRecords: makeGameRecordRepo(records),
-    clock: makeClock(),
-    ids: makeIds(),
-    content: stubContent,
-    parentLock: {
-      get: () => Promise.resolve(undefined),
-      save: () => Promise.resolve(),
-    } satisfies ParentLockRepository,
-    passwordFile: {
-      write: (password) => Promise.resolve({ location: `fake/${password}.txt` }),
-    } satisfies PasswordFileWriter,
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
-  };
+  return buildDeps({ gameRecords: makeGameRecordRepo(records) });
 }
 
 function record(overrides: Partial<GameRecord> = {}): GameRecord {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ExerciseDef } from './exercise/types.ts';
+import { makeExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import {
   HABITATS,
   currentRank,
@@ -19,27 +19,7 @@ import type { Lesson } from './lesson.ts';
 import type { LessonProgress, MiniGameProgress } from './progress.ts';
 import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 const NOW = new Date('2026-01-01T00:00:00.000Z');
-
-function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: `${id}-concept`,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
 
 /** One-exercise lesson (max 3 stars): 1 star = `complete`, 3 stars = `mastered` (2.4 threshold). */
 function makeLesson(
@@ -48,23 +28,14 @@ function makeLesson(
   order: number,
   overrides: Partial<Lesson> = {},
 ): Lesson {
-  return {
+  return buildLesson({
     id,
     world,
     order,
     concept: `${id}-concept`,
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [makeExercise(`${id}-01`)],
+    exercises: [makeExercise({ id: `${id}-01`, concept: `${id}-01-concept` })],
     ...overrides,
-  };
+  });
 }
 
 function freshProgress(lessonId: string): LessonProgress {

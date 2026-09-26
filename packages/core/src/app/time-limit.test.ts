@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import type { SessionLog } from '../domain/session-log.ts';
-import { seededRandom } from '../domain/random.ts';
+import {
+  makeDeps as buildDeps,
+  makeRewardsRepo as buildRewardsRepo,
+  makeClock,
+} from '../testing/index.ts';
 import {
   checkActivityGate,
   grantExtraTime,
@@ -10,75 +14,20 @@ import {
   markTimeWarning,
 } from './time-limit.ts';
 import type { AppDeps } from './use-cases.ts';
-import type {
-  AppSettings,
-  ContentSource,
-  GameRecordRepository,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  RewardsRepository,
-  SettingsRepository,
-} from './ports.ts';
+import type { AppSettings, RewardsRepository, SettingsRepository } from './ports.ts';
 
 const NOW = new Date(2026, 0, 5, 10, 0, 0); // 2026-01-05, local
 
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
 function makeRewardsRepo(initial: readonly SessionLog[] = []): RewardsRepository {
-  const logs = new Map(initial.map((log) => [`${log.profileId}:${log.date}`, log]));
-  return {
-    addEarnedBadge: () => Promise.resolve(),
-    listEarnedBadges: () => Promise.resolve([]),
-    saveEarnedBadge: () => Promise.resolve(),
-    getStreak: () => Promise.resolve(undefined),
-    saveStreak: () => Promise.resolve(),
-    getSessionLog: (profileId, date) => Promise.resolve(logs.get(`${profileId}:${date}`)),
-    saveSessionLog: (log) => {
-      logs.set(`${log.profileId}:${log.date}`, log);
-      return Promise.resolve();
-    },
-    listSessionLogs: (profileId) =>
-      Promise.resolve([...logs.values()].filter((log) => log.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
+  return buildRewardsRepo({ sessionLogs: initial });
 }
 
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  const profiles: ProfileRepository = {
-    list: () => Promise.resolve([]),
-    get: () => Promise.resolve(undefined),
-    save: () => Promise.resolve(),
-    delete: () => Promise.resolve(),
-  };
-  const settingsStore: AppSettings = {
-    lastProfileId: null,
-    suggestedLevels: {},
-    profileSettings: {},
-  };
-  return {
-    profiles,
-    progress: {} as unknown as ProgressRepository,
-    gameRecords: {} as unknown as GameRecordRepository,
+  return buildDeps({
     rewards: makeRewardsRepo(),
-    clock: { now: () => NOW },
-    ids: { next: () => 'id-1' },
-    content: stubContent,
-    parentLock: {} as unknown as ParentLockRepository,
-    passwordFile: {} as unknown as PasswordFileWriter,
-    settings: {
-      get: () => Promise.resolve(settingsStore),
-      save: () => Promise.resolve(),
-    },
-    random: seededRandom(1),
+    clock: makeClock(NOW),
     ...overrides,
-  };
+  });
 }
 
 function withSettings(profileSettings: AppSettings['profileSettings']): SettingsRepository {

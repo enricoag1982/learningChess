@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeMiniGame as buildMiniGame,
+} from '../testing/index.ts';
 import type { ExerciseState } from './exercise/engine.ts';
 import type { ExerciseDef } from './exercise/types.ts';
-import type { StaticCaptureGameDef } from './exercise/minigame.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
 import {
   easierVariant,
@@ -13,59 +17,26 @@ import {
   stepPhase,
 } from './lesson-session.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: 'rook-move',
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
-function makeGameDef(id: string): StaticCaptureGameDef {
-  return { id, concept: 'rook-move', position: EMPTY_POSITION, par: 2 };
+  return buildExercise({ id });
 }
 
 function makeMiniGame(id: string): MiniGame {
-  return {
-    ...makeGameDef(id),
-    mode: 'static',
+  return buildMiniGame({
+    id,
+    par: 2,
     titleKey: `lessons:${id}.title`,
     goalKey: `lessons:${id}.goal`,
-    unlockAfter: 'rook',
-  };
+  });
 }
 
 function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
-  return {
-    id: 'rook',
-    world: 'pieces',
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: 'lessons:rook.title',
-    storyKey: 'lessons:rook.story',
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: 'lessons:rook.demo',
-      highlight: { legalMovesFrom: 'd4' },
-    },
+  return buildLesson({
     guided: [makeExercise('rook-g1'), makeExercise('rook-g2')],
     exercises: [makeExercise('rook-01'), makeExercise('rook-02'), makeExercise('rook-03')],
     boss: 'hungry-rook',
     ...overrides,
-  };
+  });
 }
 
 describe('lessonSteps', () => {

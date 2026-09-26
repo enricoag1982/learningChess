@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeProgress,
+} from '../testing/index.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { Lesson } from './lesson.ts';
-import type { LessonProgress } from './progress.ts';
 import {
   lessonStars,
   lessonStatus,
-  newLessonProgress,
   recordBossStars,
   recordExerciseStars,
   recordMiniGamePlay,
@@ -16,55 +19,20 @@ import {
   withSkippedPhase,
 } from './progress.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: 'rook-move',
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
+  return buildExercise({ id });
 }
 
+/** 3 exercises (max 9 stars; 80% of 9 = 7.2), like every other copy this replaces. */
 function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
-  return {
-    id: 'rook',
-    world: 'pieces',
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: 'lessons:rook.title',
-    storyKey: 'lessons:rook.story',
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: 'lessons:rook.demo',
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
+  return buildLesson({
     exercises: [makeExercise('rook-01'), makeExercise('rook-02'), makeExercise('rook-03')],
     ...overrides,
-  };
+  });
 }
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 const LATER = new Date('2026-01-02T00:00:00.000Z');
-
-function makeProgress(overrides: Partial<LessonProgress> = {}): LessonProgress {
-  return {
-    ...newLessonProgress('p1', 'profile-1', 'rook', NOW),
-    ...overrides,
-  };
-}
 
 describe('recordExerciseStars', () => {
   it('keeps the previous best when the new score is lower', () => {

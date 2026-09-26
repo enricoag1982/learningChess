@@ -10,12 +10,12 @@ import { playVersusMove, startVersus, versusStars } from '../domain/exercise/ver
 import type { VersusGameDef } from '../domain/exercise/versus.ts';
 import type { GameRulesDef } from '../domain/game/types.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
-import type { ParentLock } from '../domain/parent-lock.ts';
-import type { Profile } from '../domain/profile.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import { seededRandom } from '../domain/random.ts';
-import type { ConceptStats } from '../domain/review.ts';
-import type { AppDeps } from './use-cases.ts';
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeDeps,
+  stubContent,
+} from '../testing/index.ts';
 import {
   advanceLessonPhase,
   getConceptStats,
@@ -28,26 +28,6 @@ import {
   saveResumeStep,
   skipLessonPhase,
 } from './use-cases.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
-
-function makeGameRecordRepo(): GameRecordRepository {
-  return {
-    add: () => Promise.resolve(),
-    listByProfile: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
 
 const EMPTY_POSITION = {
   pieces: {},
@@ -58,16 +38,7 @@ const EMPTY_POSITION = {
 } as const;
 
 function makeExercise(id: string, overrides: Partial<ExerciseDef> = {}): ExerciseDef {
-  return {
-    id,
-    concept: 'rook-move',
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-    ...overrides,
-  } as ExerciseDef;
+  return buildExercise({ id, ...overrides });
 }
 
 const GUIDED_1 = makeExercise('rook-g1');
@@ -75,23 +46,7 @@ const EXERCISE_1 = makeExercise('rook-01');
 const EXERCISE_2 = makeExercise('rook-02');
 
 function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
-  return {
-    id: 'rook',
-    world: 'pieces',
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: 'lessons:rook.title',
-    storyKey: 'lessons:rook.story',
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: 'lessons:rook.demo',
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [GUIDED_1],
-    exercises: [EXERCISE_1, EXERCISE_2],
-    ...overrides,
-  };
+  return buildLesson({ guided: [GUIDED_1], exercises: [EXERCISE_1, EXERCISE_2], ...overrides });
 }
 
 function exerciseState(def: ExerciseDef, overrides: Partial<ExerciseState> = {}): ExerciseState {
@@ -139,130 +94,6 @@ function seriesGameState(id: string, overrides: Partial<SeriesGameState> = {}): 
     round: exerciseState(round1),
     mistakes: 0,
     done: false,
-    ...overrides,
-  };
-}
-
-function makeClock(iso: string): Clock {
-  return { now: () => new Date(iso) };
-}
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-function makeProfileRepo(initial: readonly Profile[] = []): ProfileRepository {
-  const store = new Map(initial.map((profile) => [profile.id, profile]));
-  return {
-    list: () =>
-      Promise.resolve([...store.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt))),
-    get: (id) => Promise.resolve(store.get(id)),
-    save: (profile) => {
-      store.set(profile.id, profile);
-      return Promise.resolve();
-    },
-    delete: (id) => {
-      store.delete(id);
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeProgressRepo(): ProgressRepository {
-  const lessons = new Map<string, LessonProgress>();
-  const attempts: Attempt[] = [];
-  const minigames = new Map<string, MiniGameProgress>();
-  const conceptStats = new Map<string, ConceptStats>();
-  const key = (profileId: string, id: string): string => `${profileId}:${id}`;
-  return {
-    listLessons: (profileId) =>
-      Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
-    getLesson: (profileId, lessonId) => Promise.resolve(lessons.get(key(profileId, lessonId))),
-    saveLesson: (progress) => {
-      lessons.set(key(progress.profileId, progress.lessonId), progress);
-      return Promise.resolve();
-    },
-    addAttempt: (attempt) => {
-      attempts.push(attempt);
-      return Promise.resolve();
-    },
-    listAttempts: (profileId) => Promise.resolve(attempts.filter((a) => a.profileId === profileId)),
-    getMiniGame: (profileId, miniGameId) =>
-      Promise.resolve(minigames.get(key(profileId, miniGameId))),
-    listMiniGames: (profileId) =>
-      Promise.resolve([...minigames.values()].filter((p) => p.profileId === profileId)),
-    saveMiniGame: (progress) => {
-      minigames.set(key(progress.profileId, progress.miniGameId), progress);
-      return Promise.resolve();
-    },
-    getConceptStats: (profileId, conceptId) =>
-      Promise.resolve(conceptStats.get(key(profileId, conceptId))),
-    listConceptStats: (profileId) =>
-      Promise.resolve([...conceptStats.values()].filter((s) => s.profileId === profileId)),
-    saveConceptStats: (stats) => {
-      conceptStats.set(key(stats.profileId, stats.conceptId), stats);
-      return Promise.resolve();
-    },
-    deleteProfileData: (profileId) => {
-      for (const [k, progress] of lessons) {
-        if (progress.profileId === profileId) lessons.delete(k);
-      }
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeParentLockRepo(): ParentLockRepository {
-  let lock: ParentLock | undefined;
-  return {
-    get: () => Promise.resolve(lock),
-    save: (next) => {
-      lock = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-function makePasswordFileWriter(): PasswordFileWriter {
-  return { write: (password) => Promise.resolve({ location: `fake/${password}.txt` }) };
-}
-
-function makeSettingsRepo(): SettingsRepository {
-  let settings: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} };
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
-function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
-    clock: makeClock('2026-01-01T00:00:00.000Z'),
-    ids: makeIds(),
-    content: stubContent,
-    parentLock: makeParentLockRepo(),
-    passwordFile: makePasswordFileWriter(),
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
     ...overrides,
   };
 }

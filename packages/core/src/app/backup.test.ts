@@ -1,18 +1,25 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
-import type { EarnedBadge } from '../domain/badges.ts';
 import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
-import type { Profile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
-import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import { seededRandom } from '../domain/random.ts';
-import type { ConceptStats } from '../domain/review.ts';
-import type { SessionLog } from '../domain/session-log.ts';
-import type { Streak } from '../domain/streak.ts';
+import type { GameRecord, LessonProgress } from '../domain/progress.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeContentSource,
+  makeDeps as buildDeps,
+  makeGameRecordRepo,
+  makeProfileRepo,
+  makeProgressRepo as buildProgressRepo,
+  makeRewardsRepo as buildRewardsRepo,
+  makeAssessmentRepo as buildAssessmentRepo,
+  makeClock as buildClock,
+  makeBackupFileWriter,
+  makeBackupImporter,
+} from '../testing/index.ts';
 import {
   BackupValidationError,
   backupFileName,
@@ -23,217 +30,40 @@ import {
   parseBackupFile,
 } from './backup.ts';
 import type { BackupFile } from './backup.ts';
-import type {
-  AppSettings,
-  AssessmentRepository,
-  BackupFileWriter,
-  BackupImporter,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  RewardsRepository,
-} from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: `${id}-concept`,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
+  return buildExercise({ id, concept: `${id}-concept` });
 }
 
-const L1: Lesson = {
+const L1: Lesson = buildLesson({
   id: 'l1',
   world: 'w1',
-  order: 1,
   concept: 'l1-concept',
-  character: 'rhino',
-  titleKey: 'lessons:l1.title',
-  storyKey: 'lessons:l1.story',
-  demo: {
-    position: EMPTY_POSITION,
-    textKey: 'lessons:l1.demo',
-    highlight: { legalMovesFrom: 'd4' },
-  },
-  guided: [],
   exercises: [makeExercise('l1-01'), makeExercise('l1-02')],
-};
+});
 
-function makeContent(): ContentSource {
-  return {
-    lessons: () => [L1],
-    lesson: (id) => (id === L1.id ? L1 : undefined),
-    minigames: () => [],
-    minigame: () => undefined,
-  };
+function makeContent(): ReturnType<typeof makeContentSource> {
+  return makeContentSource({ lessons: [L1] });
 }
 
-function makeProfileRepo(initial: readonly Profile[] = []): ProfileRepository {
-  const store = new Map(initial.map((profile) => [profile.id, profile]));
-  return {
-    list: () => Promise.resolve([...store.values()]),
-    get: (id) => Promise.resolve(store.get(id)),
-    save: (profile) => {
-      store.set(profile.id, profile);
-      return Promise.resolve();
-    },
-    delete: (id) => {
-      store.delete(id);
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeProgressRepo(
-  lessons: readonly LessonProgress[] = [],
-  attempts: readonly Attempt[] = [],
-  miniGames: readonly MiniGameProgress[] = [],
-  conceptStats: readonly ConceptStats[] = [],
-): ProgressRepository {
-  return {
-    listLessons: (profileId) => Promise.resolve(lessons.filter((p) => p.profileId === profileId)),
-    getLesson: () => Promise.resolve(undefined),
-    saveLesson: () => Promise.resolve(),
-    addAttempt: () => Promise.resolve(),
-    listAttempts: (profileId) => Promise.resolve(attempts.filter((a) => a.profileId === profileId)),
-    getMiniGame: () => Promise.resolve(undefined),
-    listMiniGames: (profileId) =>
-      Promise.resolve(miniGames.filter((m) => m.profileId === profileId)),
-    saveMiniGame: () => Promise.resolve(),
-    getConceptStats: () => Promise.resolve(undefined),
-    listConceptStats: (profileId) =>
-      Promise.resolve(conceptStats.filter((s) => s.profileId === profileId)),
-    saveConceptStats: () => Promise.resolve(),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeGameRecordRepo(records: readonly GameRecord[] = []): GameRecordRepository {
-  return {
-    add: () => Promise.resolve(),
-    listByProfile: (profileId) => Promise.resolve(records.filter((r) => r.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeRewardsRepo(
-  options: {
-    readonly badges?: readonly EarnedBadge[];
-    readonly streaks?: readonly Streak[];
-    readonly sessionLogs?: readonly SessionLog[];
-  } = {},
-): RewardsRepository {
-  const badges = options.badges ?? [];
-  const streaks = options.streaks ?? [];
-  const logs = options.sessionLogs ?? [];
-  return {
-    addEarnedBadge: () => Promise.resolve(),
-    listEarnedBadges: (profileId) =>
-      Promise.resolve(badges.filter((b) => b.profileId === profileId)),
-    saveEarnedBadge: () => Promise.resolve(),
-    getStreak: (profileId) => Promise.resolve(streaks.find((s) => s.profileId === profileId)),
-    saveStreak: () => Promise.resolve(),
-    getSessionLog: () => Promise.resolve(undefined),
-    saveSessionLog: () => Promise.resolve(),
-    listSessionLogs: (profileId) => Promise.resolve(logs.filter((l) => l.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeAssessmentRepo(
-  results: readonly AssessmentResult[] = [],
-  unlocks: readonly Unlock[] = [],
-): AssessmentRepository {
-  return {
-    addAssessmentResult: () => Promise.resolve(),
-    listAssessmentResults: (profileId) =>
-      Promise.resolve(results.filter((r) => r.profileId === profileId)),
-    addUnlock: () => Promise.resolve(),
-    listUnlocks: (profileId) => Promise.resolve(unlocks.filter((u) => u.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeBackupFileWriter(): BackupFileWriter & {
-  readonly writes: { readonly filename: string; readonly contents: string }[];
-} {
-  const writes: { readonly filename: string; readonly contents: string }[] = [];
-  return {
-    writes,
-    write: (filename, contents) => {
-      writes.push({ filename, contents });
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeBackupImporter(): BackupImporter & { readonly calls: BackupFile[] } {
-  const calls: BackupFile[] = [];
-  return {
-    calls,
-    replaceAll: (file) => {
-      calls.push(file);
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
+function makeProgressRepo(lessons: readonly LessonProgress[] = []): AppDeps['progress'] {
+  return buildProgressRepo({ lessons });
 }
 
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
-    rewards: makeRewardsRepo(),
-    assessment: makeAssessmentRepo(),
-    clock: { now: () => NOW },
-    ids: makeIds(),
+  return buildDeps({
+    rewards: buildRewardsRepo(),
+    assessment: buildAssessmentRepo(),
+    clock: buildClock(NOW),
     content: makeContent(),
-    parentLock: {} as unknown as ParentLockRepository,
-    passwordFile: {} as unknown as PasswordFileWriter,
-    settings: {
-      get: () =>
-        Promise.resolve<AppSettings>({
-          lastProfileId: null,
-          suggestedLevels: {},
-          profileSettings: {},
-        }),
-      save: () => Promise.resolve(),
-    },
-    random: seededRandom(1),
     backupFileWriter: makeBackupFileWriter(),
     backupImporter: makeBackupImporter(),
     storageSchemaVersion: 5,
     ...overrides,
-  };
+  });
 }
 
 function makeGameRecord(overrides: Partial<GameRecord> = {}): GameRecord {
