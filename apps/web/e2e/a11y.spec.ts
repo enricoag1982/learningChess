@@ -29,6 +29,8 @@ import {
   playSolveLine,
   playVersusBoss,
   seedDailyLimit,
+  seedLessonsMastered,
+  seedMiniGameWon,
   seedMinutesToday,
   selectSquaresAnswer,
   shownExercise,
@@ -437,6 +439,14 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
 test('lesson flow has no serious/critical accessibility violations and kid-sized touch targets', async ({
   page,
 }, testInfo) => {
+  // Full curriculum walk: chromium only (m8.2 item 3 — it already does the voice-miss check here
+  // too). `tablet`/`tablet-portrait`/`phone` run the seeded scan below instead, reaching the same
+  // scan points (`journey`/`story`/`demo`/every exercise type/every boss mode/`complete`/`session
+  // summary`) without playing the whole curriculum on each viewport.
+  test.skip(
+    testInfo.project.name !== 'chromium',
+    'full curriculum walk runs on chromium only; see the seeded scan test below',
+  );
   // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
   // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
   // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
@@ -802,6 +812,262 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       `voice misses (no generated audio played): ${JSON.stringify(misses)}`,
     ).toEqual([]);
   }
+});
+
+/** One lesson the seeded scan below needs to visit, and what it deep-scans there. */
+interface SeededScanTarget {
+  readonly lesson: Lesson;
+  /** First-in-curriculum occurrence of each not-yet-seen exercise type, in lesson order. */
+  readonly exercisesToScan: readonly ExerciseDef[];
+  /** Set when this lesson's own boss is the curriculum's first occurrence of that mode. */
+  readonly bossToScan: 'series' | 'static' | 'versus' | undefined;
+}
+
+/**
+ * Content-only plan for the seeded scan (m8.2 item 3): in journey order, every lesson that
+ * introduces the curriculum's first occurrence of an exercise type or a boss mode — the same
+ * first-occurrence rule the full curriculum walk above applies lesson by lesson, computed here
+ * without Playwright so the seeded scan can jump straight to each one via seeded progress instead
+ * of playing everything before it. Stops as soon as every type/mode has a target, same as the walk.
+ */
+function planSeededScan(
+  catalog: TracksCatalog,
+  lessons: readonly Lesson[],
+): readonly SeededScanTarget[] {
+  const wantedTypes = allExerciseTypes();
+  const seenTypes = new Set<string>();
+  let seriesDone = false;
+  let staticDone = false;
+  let versusDone = false;
+  const targets: SeededScanTarget[] = [];
+
+  for (const lesson of lessonsInJourneyOrder(catalog, lessons)) {
+    const exercisesToScan = lesson.exercises.filter((exercise) => {
+      if (seenTypes.has(exercise.type)) return false;
+      seenTypes.add(exercise.type);
+      return true;
+    });
+    let bossToScan: 'series' | 'static' | 'versus' | undefined;
+    if (lesson.boss) {
+      const boss = findMiniGame(lesson.boss);
+      if (boss.mode === 'series' && !seriesDone) {
+        bossToScan = 'series';
+        seriesDone = true;
+      } else if (boss.mode === 'static' && !staticDone) {
+        bossToScan = 'static';
+        staticDone = true;
+      } else if (boss.mode === 'versus' && !versusDone) {
+        bossToScan = 'versus';
+        versusDone = true;
+      }
+    }
+    if (exercisesToScan.length > 0 || bossToScan !== undefined) {
+      targets.push({ lesson, exercisesToScan, bossToScan });
+    }
+    if (seenTypes.size === wantedTypes.size && seriesDone && staticDone && versusDone) break;
+  }
+  return targets;
+}
+
+/**
+ * Seeds every main-track lesson before `targetLessonId` (journey order) as mastered, plus any
+ * earlier world's own boss as won — everything `nextLesson`/`lessonAvailability` (`domain/
+ * journey.ts`) need to call `targetLessonId` itself the next available lesson, without seeding it.
+ */
+async function seedProgressBeforeLesson(
+  page: Page,
+  profileId: string,
+  targetLessonId: string,
+): Promise<void> {
+  const ordered = lessonsInJourneyOrder(catalog, content.lessons);
+  const targetIndex = ordered.findIndex((lesson) => lesson.id === targetLessonId);
+  if (targetIndex < 0) {
+    throw new Error(`seedProgressBeforeLesson: lesson "${targetLessonId}" not in journey order`);
+  }
+  const before = ordered.slice(0, targetIndex);
+  await seedLessonsMastered(page, profileId, before);
+
+  const targetWorldId = ordered[targetIndex]?.world;
+  const priorWorldIds = new Set(
+    before.map((lesson) => lesson.world).filter((world) => world !== targetWorldId),
+  );
+  const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
+  for (const world of mainTrack?.worlds ?? []) {
+    if (priorWorldIds.has(world.id) && world.boss !== undefined) {
+      await seedMiniGameWon(page, profileId, world.boss);
+    }
+  }
+}
+
+test('seeded scan reaches the lesson-flow walk’s scan points without playing the curriculum (m8.2)', async ({
+  page,
+}, testInfo) => {
+  // The counterpart to the full curriculum walk above: chromium runs that one, this runs on every
+  // other a11y project (tablet/tablet-portrait/phone) instead — same scan points (every exercise
+  // type, every boss mode, Journey/Story/Demo/Complete/session summary), reached by seeding a
+  // profile straight to each lesson that first introduces one, instead of playing every lesson.
+  test.skip(
+    testInfo.project.name === 'chromium',
+    'chromium runs the full curriculum walk above instead',
+  );
+  test.setTimeout(120_000);
+
+  const targets = planSeededScan(catalog, content.lessons);
+  const [completionTarget] = targets;
+  if (!completionTarget) throw new Error('planSeededScan: content has no scan targets');
+
+  const wantedTypes = allExerciseTypes();
+  const scannedTypes = new Set<string>();
+  let seriesBossScanned = false;
+  let staticBossScanned = false;
+  let versusBossScanned = false;
+  let completeScanned = false;
+  let summaryScanned = false;
+  let storyDemoScanned = false;
+  const scannedLabels: string[] = [];
+  async function scan(screen: string): Promise<void> {
+    scannedLabels.push(screen);
+    await expectNoSeriousViolations(page, screen);
+  }
+
+  await completeFirstRun(page);
+  const profileId = await getSoleProfileId(page);
+
+  // Journey (scanned once — same label the full walk uses, docs/screens.md §1).
+  await page.getByRole('button', { name: /Journey/ }).click();
+  await expectKidTouchTarget(page, journeyNodeName(completionTarget.lesson, 'current'));
+  await expectKidTouchTarget(page, /Back to Home/);
+  await scan('Journey');
+  await page.getByRole('button', { name: /Back to Home/ }).click();
+
+  for (const target of targets) {
+    const fullCompletion = target.bossToScan !== undefined || target === completionTarget;
+
+    await seedProgressBeforeLesson(page, profileId, target.lesson.id);
+    await page.reload();
+    await pickProfileFromPicker(page, 'Kid');
+    // Deep-scanning an exercise (a wrong pick / hint) can put its concept in review, due
+    // immediately — cleared before every entry so Home's Start/Continue always opens the target
+    // lesson directly, never a warm-up first (same reason the full walk clears it above).
+    await clearConceptStats(page);
+    await page.getByRole('button', { name: /Start|Continue/ }).click();
+
+    // Story.
+    if (!storyDemoScanned) {
+      await expectKidTouchTarget(page, 'Close lesson');
+      await expectKidTouchTarget(page, /Listen again/);
+      await expectKidTouchTarget(page, /Let me try/);
+      await expectKidTouchTarget(page, 'Skip');
+      await scan('Story');
+    }
+    await page.getByRole('button', { name: 'Skip' }).click(); // Story -> Demo
+
+    // Demo.
+    if (!storyDemoScanned) {
+      await expectKidTouchTarget(page, /^Next/);
+      await expectKidTouchTarget(page, 'Skip');
+      await scan('Demo');
+      storyDemoScanned = true;
+    }
+    await page.getByRole('button', { name: 'Skip' }).click(); // Demo -> first guided/exercise
+
+    // One tap on the first guided try skips the rest of the whole "try" phase (`SkipButton.tsx`).
+    if (target.lesson.guided.length > 0) {
+      await page.getByRole('button', { name: 'Skip' }).click();
+    }
+
+    const idSet = new Set(target.exercisesToScan.map((exercise) => exercise.id));
+    const lastNeededIndex = target.lesson.exercises.reduce(
+      (last, exercise, index) => (idSet.has(exercise.id) ? index : last),
+      -1,
+    );
+    const lastIndex = fullCompletion ? target.lesson.exercises.length - 1 : lastNeededIndex;
+    for (let i = 0; i <= lastIndex; i += 1) {
+      const exercise = target.lesson.exercises[i];
+      if (exercise === undefined) continue;
+      if (idSet.has(exercise.id)) {
+        await deepScanExercise(page, exercise); // scans `Exercise (${type}, hint shown)` itself
+        scannedLabels.push(`Exercise (${exercise.type}, hint shown)`);
+        if (exercise.type === 'select-squares') {
+          scannedLabels.push('Exercise (select-squares, wrong pick)');
+        }
+        scannedTypes.add(exercise.type);
+      } else {
+        await completeExercise(page, exercise);
+      }
+    }
+
+    if (!fullCompletion) {
+      await page.getByRole('button', { name: 'Close lesson' }).click();
+      continue;
+    }
+
+    // Boss (deep-scanned only when it is the curriculum's first occurrence of its mode).
+    if (target.lesson.boss) {
+      const boss: MiniGame = findMiniGame(target.lesson.boss);
+      if (target.bossToScan !== undefined && boss.mode === 'series') {
+        const [firstRound, ...restRounds] = boss.rounds;
+        if (!firstRound) throw new Error(`mini-game "${boss.id}" has no rounds`);
+        await completeExercise(page, firstRound);
+        await scan('Boss (series, mid-round)');
+        for (const round of restRounds) {
+          await completeExercise(page, round);
+        }
+        await page.getByRole('button', { name: /^Next/ }).click();
+        seriesBossScanned = true;
+      } else if (target.bossToScan !== undefined && boss.mode === 'static') {
+        await scan('Boss (static)');
+        const goal = boss.goal === 'collect-stars' ? 'collect-stars' : 'capture';
+        await playSolveLine(page, boss.position, goal);
+        await page.getByRole('button', { name: /^Next/ }).click();
+        staticBossScanned = true;
+      } else if (target.bossToScan !== undefined && boss.mode === 'versus') {
+        await expectKidTouchTarget(page, /Take back/);
+        await scan('Boss (versus, start)');
+        await playOneKidVersusMove(page, boss);
+        await waitForVersusTurnOrEnd(page);
+        await scan('Boss (versus, mid-game)');
+        await playVersusBoss(page, boss);
+        await page.getByRole('button', { name: /^Next/ }).click();
+        versusBossScanned = true;
+      } else {
+        await completeBoss(page, boss);
+      }
+    }
+
+    // Complete.
+    await expect(page.getByText('Lesson complete!')).toBeVisible();
+    await dismissCelebrationIfShown(page);
+    if (!completeScanned) {
+      await expectKidTouchTarget(page, /Play again/);
+      await expectKidTouchTarget(page, /Continue/);
+      await scan('Complete');
+      completeScanned = true;
+    }
+    await page.getByRole('button', { name: /Continue/ }).click();
+
+    // A Today-session lesson (every target here is entered via Home) may lead through a trailing
+    // mini-game before the session summary, same as the full walk.
+    await passThroughTrailingMiniGame(page);
+    await expect(page.getByText('Great session!')).toBeVisible();
+    if (!summaryScanned) {
+      await expectKidTouchTarget(page, 'Done');
+      await scan('Session summary');
+      summaryScanned = true;
+    }
+    await page.getByRole('button', { name: 'Done' }).click();
+  }
+
+  console.log(`seeded scan (${testInfo.project.name}): ${[...new Set(scannedLabels)].join(', ')}`);
+
+  expect([...scannedTypes].sort(), 'every exercise type in content got a deep scan').toEqual(
+    [...wantedTypes].sort(),
+  );
+  expect(seriesBossScanned, 'a series boss got a mid-round scan').toBe(true);
+  expect(staticBossScanned, 'a static boss got a scan').toBe(true);
+  expect(versusBossScanned, 'a versus boss got a mid-game scan').toBe(true);
+  expect(completeScanned, 'the Complete step got a scan').toBe(true);
+  expect(summaryScanned, 'the session summary got a scan').toBe(true);
 });
 
 test('test-out sheet, runner and result screen have no serious/critical violations and kid-sized touch targets (M4.5)', async ({
