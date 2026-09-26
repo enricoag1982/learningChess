@@ -1,0 +1,1244 @@
+{
+ "characters": {
+  "rhino": {
+   "name": "Rhino"
+  },
+  "elephant": {
+   "name": "Elephant"
+  },
+  "lioness": {
+   "name": "Lioness"
+  },
+  "lion": {
+   "name": "Lion"
+  },
+  "horse": {
+   "name": "Horse"
+  },
+  "caterpillar": {
+   "name": "Caterpillar"
+  },
+  "owl": {
+   "name": "Owl"
+  }
+ },
+ "common": {
+  "app": {
+   "title": "Chess for Kids"
+  },
+  "offline": {
+   "ready": "Ready to play offline."
+  },
+  "install-banner": {
+   "title": "Add to Home Screen so your progress stays safe",
+   "steps": "Tap the Share button, then \"Add to Home Screen\".",
+   "dismiss": "Got it"
+  },
+  "stars-count": "{{count}} stars",
+  "next": "Next",
+  "play-again": "Play again",
+  "continue": "Continue",
+  "loading": "Loading…",
+  "app-error": {
+   "title": "Oops, something went wrong",
+   "body": "Tap \"Try again\". If this keeps happening, ask a grown-up to send the text below to the app's maker.",
+   "retry": "Try again"
+  },
+  "piece": {
+   "r": "Rook",
+   "b": "Bishop",
+   "q": "Queen",
+   "k": "King",
+   "n": "Knight",
+   "p": "Pawn"
+  },
+  "home": {
+   "owl-next": "Today you meet {{character}}!",
+   "owl-next-topic": "Hi! I'm Owl. Today: {{topic}}!",
+   "owl-resume": "Let's keep going!",
+   "owl-world-boss": "World boss time: {{title}}!",
+   "owl-all-done": "You finished everything for now. Come back soon for more!",
+   "owl-warmup-only": "Let's warm up what you know!",
+   "start-today": "Start today",
+   "subtitle-with-minigame": "New lesson · Mini-game",
+   "subtitle-lesson-only": "New lesson",
+   "subtitle-world-boss": "World boss",
+   "subtitle-warmup": "Warm-up",
+   "avatar-alt": "{{name}} avatar",
+   "switch-player": "Switch player",
+   "journey-tile": "Journey",
+   "practice-tile": "Practice",
+   "play-tile": "Play",
+   "den-tile": "My Den"
+  },
+  "avatar": {
+   "fox": "Fox",
+   "bear": "Bear",
+   "rabbit": "Rabbit",
+   "cat": "Cat",
+   "panda": "Panda",
+   "penguin": "Penguin",
+   "frog": "Frog",
+   "elephant": "Elephant"
+  },
+  "first-run": {
+   "welcome": {
+    "owl": "A grown-up helps set things up first.",
+    "primary": "Start setup"
+   },
+   "password": {
+    "title": "Set a parent code",
+    "body": "You'll need this parent code to open the grown-ups area. It keeps children out of the settings; it is not a security password.",
+    "label": "Parent code",
+    "repeat-label": "Repeat parent code",
+    "show": "Show",
+    "hide": "Hide",
+    "rules": "At least 4 characters. Numbers are OK.",
+    "mismatch": "The parent codes do not match.",
+    "too-short": "Use at least 4 characters.",
+    "privacy-link": "Read our privacy policy",
+    "primary": "Save parent code"
+   },
+   "saved": {
+    "title": "Parent code saved!",
+    "body": "Saved a copy: {{location}}",
+    "primary": "Next"
+   }
+  },
+  "new-player": {
+   "nickname": {
+    "title": "What is your name?",
+    "placeholder": "Your name",
+    "invalid": "Use 1-12 letters or numbers.",
+    "primary": "Next"
+   },
+   "avatar": {
+    "title": "Pick your animal!",
+    "primary": "Let's play!"
+   }
+  },
+  "picker": {
+   "title": "Who's playing today?",
+   "new-player": "New player",
+   "grown-ups": "Grown-ups",
+   "grown-ups-hint": "Parent code"
+  },
+  "password-screen": {
+   "title": "Grown-ups",
+   "label": "Parent code",
+   "primary": "Open",
+   "back": "Back",
+   "forgot": "Forgot it? It is in the file {{location}}.",
+   "wrong": "Wrong parent code ({{attempt}} of {{max}})",
+   "locked": "Try again in {{time}}"
+  },
+  "parent": {
+   "title": "Parent area",
+   "done": "Done",
+   "children": "Children",
+   "add-child": "Add child",
+   "stars-total_one": "{{count}} star",
+   "stars-total_other": "{{count}} stars",
+   "lessons-complete_one": "{{count}} lesson complete",
+   "lessons-complete_other": "{{count}} lessons complete",
+   "rename": "Rename",
+   "rename-label": "Nickname",
+   "change-avatar": "Change avatar",
+   "delete": "Delete",
+   "delete-confirm-title": "Delete {{name}} and all progress?",
+   "delete-confirm-body": "This removes all saved progress for this child. This cannot be undone.",
+   "delete-cancel": "Cancel",
+   "delete-confirm": "Delete",
+   "change-password": "Change parent code",
+   "new-password-label": "New parent code",
+   "download-code": "Download parent code file",
+   "code-downloaded": "Saved a copy: {{location}}",
+   "save": "Save",
+   "cancel": "Cancel",
+   "unlock-lessons-worlds": "Unlock lessons & worlds",
+   "unlock-world": "Unlock world",
+   "unlock-lesson": "Unlock",
+   "unlocked": "Unlocked",
+   "unlock-empty": "Everything is already unlocked for this child.",
+   "back": "Back",
+   "settings": "Settings",
+   "settings-title": "{{name}}'s settings",
+   "backup-nav": "Backup",
+   "backup-heading": "Backup",
+   "backup-title": "Backup",
+   "export-child": "Export this child's data",
+   "danger-heading": "Danger zone",
+   "reset": "Reset progress",
+   "reset-confirm-title": "Reset {{name}}'s progress?",
+   "reset-confirm-body": "This clears lessons, stars, games, badges and streak. Nickname, avatar and settings stay. This cannot be undone.",
+   "reset-confirm": "Reset",
+   "reset-done": "Progress reset.",
+   "password-label": "Parent code",
+   "wrong-password": "Wrong parent code.",
+   "daily-limit-heading": "Daily time limit",
+   "daily-limit-off": "Off",
+   "daily-limit-minutes_one": "{{count}} min",
+   "daily-limit-minutes_other": "{{count}} min",
+   "daily-limit-note": "Enforced from M5.2.",
+   "weekend-limit-toggle": "Different limit at the weekend",
+   "daily-limit-everyday": "Every day",
+   "daily-limit-weekday": "Mon–Fri",
+   "daily-limit-weekend": "Sat–Sun",
+   "play-until-heading": "Play until",
+   "play-from-heading": "Not before",
+   "voice-label": "Voice",
+   "voice-test-button": "Test voice",
+   "voice-test-audio": "Recorded voice ✓",
+   "voice-test-fallback": "Device voice — recorded voice unavailable ({{reason}})",
+   "voice-test-reason": {
+    "no-audio-context": "no sound support",
+    "still-suspended": "still starting up",
+    "manifest-not-loaded": "voice list unavailable",
+    "no-generated-audio": "no recorded line for this text",
+    "file-missing": "audio file missing",
+    "decode-failed": "audio file unreadable"
+   },
+   "sound-label": "Sounds",
+   "hints-label": "Hints",
+   "computer-level-heading": "Computer level",
+   "computer-level-auto": "Automatic",
+   "piece-style-heading": "Piece style",
+   "piece-style-animal": "Animal badge",
+   "piece-style-classic": "Classic",
+   "overview": {
+    "minutes-today_one": "{{count}} min today",
+    "minutes-today_other": "{{count}} min today",
+    "minutes-7-days_one": "{{count}} min this week",
+    "minutes-7-days_other": "{{count}} min this week",
+    "streak_one": "{{count}} day streak",
+    "streak_other": "{{count}} day streak"
+   },
+   "report": {
+    "loading": "Loading report…",
+    "progress-heading": "Progress by world",
+    "lessons-complete": "{{complete}}/{{total}} lessons complete",
+    "lessons-mastered_one": "{{count}} mastered",
+    "lessons-mastered_other": "{{count}} mastered",
+    "stars": "{{earned}}/{{max}} stars",
+    "intro-skipped": "Intro skipped: {{list}}",
+    "concepts-heading": "Concept accuracy",
+    "concepts-empty": "No exercises attempted yet.",
+    "accuracy": "{{percent}}% ({{attempts}} tries)",
+    "needs-practice": "Needs practice: {{list}}",
+    "needs-practice-tag": "Needs practice",
+    "minutes-heading": "Minutes per day (last 14 days)",
+    "minutes-limit": "Daily limit: {{count}} min (line on the chart)",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "rules-everyday": "Every day {{limit}}",
+    "rules-weekday": "Mon–Fri {{limit}}",
+    "rules-weekend": "Sat–Sun {{limit}}",
+    "rules-until": "until {{time}}",
+    "rules-from": "from {{time}}",
+    "games-heading": "Games (last 10)",
+    "games-empty": "No games played yet.",
+    "opponent-friend": "A friend",
+    "result-win": "Win",
+    "result-loss": "Loss",
+    "result-draw": "Draw",
+    "result-abandoned": "Left unfinished",
+    "badges-heading": "Badges earned",
+    "badges-empty": "No badges earned yet.",
+    "assessments-heading": "Assessments",
+    "assessments-empty": "No test-out or placement runs yet.",
+    "assessment-kind": {
+     "test-out": "Test-out",
+     "placement": "Placement"
+    },
+    "assessment-score": "{{correct}}/{{total}}",
+    "assessment-passed": "Passed",
+    "assessment-failed": "Not passed"
+   },
+   "backup": {
+    "export-heading": "Export",
+    "export-body": "Save one file with every child's progress. Keep it somewhere safe.",
+    "export-button": "Export all",
+    "share-heading": "Send to other device",
+    "share-body": "Send every child's progress to the other device (AirDrop, Messages, Drive…). Nothing is lost: both devices' progress is kept.",
+    "share-button": "Send to other device",
+    "share-button-child": "Send to other device",
+    "share-shared": "Sent.",
+    "share-downloaded": "Saved a copy: {{location}}",
+    "import-heading": "Import",
+    "import-body": "Pick a backup file from another device. Its progress merges with what's already here — nothing is lost.",
+    "import-pick-file": "Choose file",
+    "import-preview_one": "{{count}} child",
+    "import-preview_other": "{{count}} children",
+    "import-child-auto-merge": "Merging into {{name}}",
+    "import-child-choice-label": "{{name}}'s progress",
+    "import-child-add-new": "Add as new child",
+    "import-child-merge-into": "Merge into {{name}}",
+    "import-change-stars_one": "+{{count}} star",
+    "import-change-stars_other": "+{{count}} stars",
+    "import-change-badges_one": "+{{count}} badge",
+    "import-change-badges_other": "+{{count}} badges",
+    "import-change-minutes": "+{{count}} min this week",
+    "import-warning": "Nothing is lost: both devices' progress is kept.",
+    "import-confirm": "Merge",
+    "import-done": "Import complete.",
+    "import-error-generic": "This file could not be read."
+   },
+   "privacy-nav": "Privacy",
+   "version": "Version {{version}}",
+   "privacy": {
+    "title": "Privacy",
+    "intro": "Chess for Kids keeps everything on this device. Here's exactly what that means.",
+    "data-heading": "What we keep",
+    "data-body": "A nickname, an avatar picture, and lesson progress for each child — stored only on this device, never sent anywhere.",
+    "no-accounts-heading": "No accounts, no tracking",
+    "no-accounts-body": "No sign-up, no analytics, no ads, no third-party services. The app never phones home.",
+    "network-heading": "Network use",
+    "network-body": "The only network access is checking for app updates. Updates are static files delivered from GitHub Pages. \"Send to other device\" hands the file to whichever app or device the parent picks — the app itself still sends nothing.",
+    "control-heading": "Parent control",
+    "control-body": "Export or delete any child's data any time, from Backup and from that child's Settings in the parent area.",
+    "contact-heading": "Questions?",
+    "contact-body": "Open an issue on the project's GitHub repository: {{url}}",
+    "close": "Close"
+   }
+  },
+  "voice-check": {
+   "sentence": "Let's play chess together!"
+  },
+  "lesson": {
+   "close": "Close lesson",
+   "skip": "Skip",
+   "steps": {
+    "story": "Story",
+    "demo": "Demo",
+    "try": "Try",
+    "exercises": "Exercises",
+    "boss": "Boss",
+    "skipped": "{{step}}, skipped"
+   },
+   "stage-of": "{{current}} of {{total}}",
+   "board-label": "Chess board"
+  },
+  "board": {
+   "color": {
+    "w": "white",
+    "b": "black"
+   },
+   "piece": {
+    "k": "king",
+    "q": "queen",
+    "r": "rook",
+    "b": "bishop",
+    "n": "knight",
+    "p": "pawn"
+   },
+   "square": {
+    "piece": "{{square}}, {{color}} {{piece}}",
+    "star": "{{square}}, star",
+    "blocked": "{{square}}, blocked",
+    "empty": "{{square}}, empty",
+    "selected": "{{base}}, selected",
+    "possible-move": "{{base}}, possible move",
+    "focus": "{{base}}, look here",
+    "danger": "{{base}}, in danger",
+    "check": "{{base}}, in check",
+    "wrong": "{{base}}, not right",
+    "missed": "{{base}}, still missing"
+   }
+  },
+  "story": {
+   "listen-again": "Listen again",
+   "primary": "Let me try"
+  },
+  "demo": {
+   "board-label": "{{name}}'s board"
+  },
+  "exercise": {
+   "replay": "Say it again",
+   "hint": "Hint",
+   "undo": "Undo",
+   "check": "Check",
+   "yes": "Yes",
+   "no": "No",
+   "moves-label": "Moves",
+   "moves-of": "{{current}} of {{total}}",
+   "moves-target_one": "in {{count}} move",
+   "moves-target_other": "in {{count}} moves",
+   "tap-piece-first": "Tap {{name}} first.",
+   "select-wrong": "Not quite! Tap the orange squares again to take them away.",
+   "select-missing": "Almost! Tap the squares with a dashed orange line too.",
+   "select-both": "Not quite! Take away the orange squares and tap the dashed ones.",
+   "answer-wrong": "Not quite! Try again.",
+   "move-wrong": "Not this one. Try again!",
+   "checkmate": "Checkmate!",
+   "opponent-moved": "{{color}} moved the {{piece}}.",
+   "opponent-color": {
+    "w": "White",
+    "b": "Black"
+   },
+   "hint-piece": "Look at {{name}}.",
+   "hint-target": "Try the orange square.",
+   "hint-answer": "Here is the answer.",
+   "hint-look": "Look closely.",
+   "hint-think-again": "Think about it again.",
+   "hint-remove-option": "One choice is ruled out.",
+   "easier-offer": "This one is tricky. Want an easier one?",
+   "easier": "Easier one",
+   "praise-3": "Amazing!",
+   "praise-2": "Well done!",
+   "praise-1": "Good try!",
+   "illegal": {
+    "r": "{{name}} only runs in straight lines!",
+    "b": "{{name}} only walks on diagonal paths!",
+    "q": "{{name}} moves straight or diagonal, not like that!",
+    "k": "{{name}} only steps one square at a time!",
+    "n": "{{name}} only jumps in an L shape!",
+    "p": "{{name}} only moves straight ahead (and captures diagonally)!"
+   },
+   "setup": {
+    "wrong": "Not quite! Try a different piece or square.",
+    "palette-label": "Pieces to place",
+    "palette-item": "{{color}} {{piece}}, {{count}} left",
+    "hint-piece": "Place the {{color}} {{piece}} next.",
+    "hint-square": "Put it on the orange square."
+   }
+  },
+  "boss": {
+   "captured-of": "Captured {{current}} of {{total}}",
+   "stars-of": "Stars {{current}} of {{total}}",
+   "moves-par": "Moves {{moves}} · Par {{par}}",
+   "ended": "Good try!",
+   "series": {
+    "round-of": "Round {{current}} of {{total}}",
+    "mistakes_one": "{{count}} mistake so far",
+    "mistakes_other": "{{count}} mistakes so far"
+   },
+   "versus": {
+    "bot-name": {
+     "mouse": "Mouse",
+     "rabbit": "Rabbit",
+     "fox": "Fox",
+     "wolf": "Wolf",
+     "bear": "Bear"
+    },
+    "moves": "Your moves: {{count}}",
+    "take-back": "Take back",
+    "thinking": "{{name}} is thinking…",
+    "bot-moved": "{{name}} moved a {{piece}}.",
+    "bot-captured": "{{name}} took your {{piece}}!",
+    "kid-captured": "You took a {{piece}}!",
+    "your-turn": "Your turn!",
+    "won": "You won!",
+    "lost": "Good game! Want to try again?",
+    "draw": "It's a draw! Want to try again?",
+    "draw-reason": {
+     "stalemate": "No safe moves left for anyone — that's a stalemate.",
+     "insufficient-material": "Not enough pieces left for either side to checkmate.",
+     "threefold-repetition": "The same position happened three times.",
+     "fifty-move": "50 moves with no capture or pawn move."
+    },
+    "hint-offer": "Need a hint?",
+    "stop-game-title": "Stop this game?",
+    "stop-game-cancel": "Keep playing",
+    "stop-game-confirm": "Stop game"
+   }
+  },
+  "complete": {
+   "title": "Lesson complete!",
+   "stars-pill": "+{{count}} stars",
+   "new-in-play": "New in Play"
+  },
+  "play": {
+   "title": "Play",
+   "owl-line": "Pick a game!",
+   "vs-computer": "vs Computer",
+   "full-game": "Play a full game",
+   "full-game-locked": "After World 4",
+   "full-game-title": "Full Game",
+   "full-game-goal": "Checkmate the other king!",
+   "full-game-vs": "Full Game vs {{name}}",
+   "vs-friend": "vs Friend",
+   "vs-friend-note": "On this tablet",
+   "vs-friend-locked": "Finish more lessons first",
+   "minigames-heading": "Mini-games",
+   "locked-condition": "After {{label}} lesson",
+   "minigame-name-stars": "{{title}}, {{stars}}",
+   "minigame-name-locked": "{{title}}, locked, {{condition}}",
+   "level-name-wins": "{{name}}, won {{wins}} of {{games}}",
+   "level-name-unplayed": "{{name}}, not played yet",
+   "level-name-locked": "{{name}}, locked, {{condition}}",
+   "level-wins": "Won {{wins}} of {{games}}",
+   "level-unplayed": "Not played yet",
+   "level-condition-beat": "Beat {{name}} {{times}} times",
+   "level-up-suggestion": "Ready for the {{name}}?",
+   "close": "Close",
+   "back-to-play": "Back to Play",
+   "back-to-journey": "Back to Journey",
+   "back-to-home": "Back to Home"
+  },
+  "friend-play": {
+   "setup-title": "vs Friend",
+   "setup-owl-line": "Who's playing?",
+   "guest": "Guest",
+   "second-player-heading": "Second player",
+   "no-other-profiles": "Add another player to play against them, or pick Guest.",
+   "game-heading": "Game",
+   "no-games-yet": "Finish more lessons to unlock a game to play together!",
+   "board-mode-heading": "Board",
+   "board-mode-pass-and-play": "Pass and play",
+   "board-mode-face-to-face": "Face to face",
+   "legal-move-dots-on": "Move dots on",
+   "legal-move-dots-off": "Move dots off",
+   "swap-colours": "Swap colours",
+   "start": "Start",
+   "take-back": "Take back",
+   "stop": "Stop",
+   "take-back-ask-title": "Allow take back?",
+   "take-back-ask": "Ask {{name}}: Allow take back?",
+   "turn": "Turn now",
+   "result-win": "{{name}} wins!",
+   "result-draw": "It's a draw!"
+  },
+  "session": {
+   "warmup-of": "Warm-up {{current}}/{{total}}",
+   "leave": "Leave",
+   "summary-title": "Great session!",
+   "summary-new-rank": "New rank!",
+   "summary-new-friend": "New friend!",
+   "summary-closing": "See you tomorrow!",
+   "summary-done": "Done"
+  },
+  "time-limit": {
+   "title": "See you tomorrow!",
+   "body": "You've used up all your play time for today. Come back tomorrow!",
+   "late-title": "Time to rest!",
+   "late-body": "It's getting late. See you tomorrow!",
+   "early-title": "Too early!",
+   "early-body": "Chess opens at {{time}}. See you soon!",
+   "stars-today": "{{count}} stars today",
+   "more-time": "Parent: more time"
+  },
+  "notice": {
+   "five-minutes": "5 minutes left — pick something short!"
+  },
+  "assessment": {
+   "task-of": "Task {{current}}/{{total}}",
+   "pass-title": "You did it!",
+   "pass-body_one": "You already know {{name}}!",
+   "pass-body_other": "You already know {{name}} — {{count}} lessons are yours!",
+   "fail-title": "Keep going!",
+   "fail-body": "No worries — nothing is lost. Keep practising on your path!",
+   "score": "You got {{correct}} of {{total}} right.",
+   "continue": "Continue"
+  },
+  "placement": {
+   "offer-question": "Already know some chess? Let's find out where to start you!",
+   "offer-yes": "Yes, test me!",
+   "offer-no": "No, start at World 1",
+   "world-of": "World {{order}} · Task {{current}}/{{total}}",
+   "summary-passed-title": "Great job!",
+   "summary-passed-body_one": "You already know {{count}} world! Off you go!",
+   "summary-passed-body_other": "You already know {{count}} worlds! Off you go!",
+   "summary-none-title": "Let's start at World 1!",
+   "summary-none-body": "Every chess champion starts with the first step.",
+   "summary-all-title": "Wow, you know it all!",
+   "summary-all-body": "You're ready to explore every path.",
+   "continue": "Continue"
+  },
+  "practice": {
+   "title": "Practice",
+   "owl-line": "Pick a topic, or start your warm-up!",
+   "back": "Back to Home",
+   "warmup-card-title": "Daily warm-up",
+   "warmup-due_one": "{{count}} due today",
+   "warmup-due_other": "{{count}} due today",
+   "warmup-all-done": "All done for today!",
+   "topics-heading": "Topics",
+   "topics-empty": "Finish a lesson to see it here!",
+   "weak-tag": "Needs practice",
+   "topic-accuracy": "{{correct}} of {{total}} correct",
+   "topic-of": "Practice {{current}}/{{total}}"
+  },
+  "den": {
+   "title": "{{name}}'s Den",
+   "owl-line": "Look at all your friends!",
+   "games-won_one": "{{count}} game won",
+   "games-won_other": "{{count}} games won",
+   "games-with-friends_one": "{{count}} game with friends",
+   "games-with-friends_other": "{{count}} games with friends",
+   "rank-heading": "My rank",
+   "rank-current": "You are here",
+   "rank-start": "Start",
+   "rank-after-world": "After World {{order}}",
+   "rank-after-track": "After {{track}}",
+   "rank-all-tracks": "After all paths",
+   "friends-heading": "Animal friends",
+   "friend-name": "{{character}}, friend",
+   "friend-name-locked": "{{character}}, locked, finish the {{piece}} lesson",
+   "friend-condition": "Finish the {{piece}} lesson"
+  },
+  "badges": {
+   "heading": "Badges",
+   "category-milestone": "Milestones",
+   "category-skill": "Skills",
+   "category-play": "Play",
+   "category-habit": "Habits",
+   "tile-earned": "{{name}}, earned",
+   "tile-earned-tier": "{{name}}, {{tier}} tier, earned",
+   "tile-locked": "{{name}}, locked. {{condition}}",
+   "new-dot": "New"
+  },
+  "tier": {
+   "bronze": "Bronze",
+   "silver": "Silver",
+   "gold": "Gold"
+  },
+  "streak": {
+   "pill": "{{count}} day streak",
+   "heading": "Streak",
+   "current_one": "{{count}} day",
+   "current_other": "{{count}} days",
+   "best": "Best: {{count}}",
+   "none": "Play today to start a streak!"
+  },
+  "celebration": {
+   "heading": "New badge!",
+   "owl-line": "You earned the {{name}} badge!",
+   "continue": "Continue"
+  }
+ },
+ "journey": {
+  "tracks": {
+   "basics": "Basics",
+   "openings": "Openings",
+   "tactics": "Tactics",
+   "endgames": "Checkmates & Endgames"
+  },
+  "worlds": {
+   "board": "Board",
+   "pieces": "Pieces",
+   "attack": "Attack & Defence",
+   "check": "Check & Mate",
+   "rules": "Full Rules",
+   "openings": "Openings",
+   "tactics": "Tactics",
+   "endgames": "Checkmates & Endgames"
+  },
+  "habitats": {
+   "meadow": "Meadow",
+   "savannah": "Savannah",
+   "jungle": "Jungle",
+   "mountains": "Mountains",
+   "river": "River",
+   "forest": "Forest",
+   "ocean": "Ocean",
+   "arctic": "Arctic"
+  },
+  "ranks": {
+   "pawn": "Pawn",
+   "knight": "Knight",
+   "bishop": "Bishop",
+   "rook": "Rook",
+   "queen": "Queen",
+   "king": "King"
+  },
+  "ui": {
+   "coming-soon": "Coming soon",
+   "locked": "Locked",
+   "show-you-know-it": "Show you know it",
+   "back": "Back to Home",
+   "rank-pill": "{{rank}} rank",
+   "world-heading": "World {{order}} · {{name}}",
+   "world-stars": "{{earned}} of {{max}} stars",
+   "paths-after-basics": "Paths after Basics",
+   "locked-world-message": "Finish the earlier worlds first to unlock this one.",
+   "coming-soon-title": "Coming soon!",
+   "coming-soon-message": "More lessons are on their way here.",
+   "finish-first": "Finish {{name}} first!",
+   "test-out-lesson-question": "Want to show me you already know {{name}}?",
+   "test-out-world-question": "Want to show me you already know World {{order}} · {{name}}?",
+   "test-out-yes": "Yes, test me!",
+   "test-out-no": "Not yet",
+   "character-piece": "{{character}} the {{piece}}",
+   "node-name": "{{name}}, {{status}}",
+   "node-name-stars": "{{name}}, {{status}}, {{count}} stars",
+   "status-current": "current",
+   "status-complete": "complete",
+   "status-locked": "locked",
+   "world-boss": "World boss",
+   "world-boss-name": "World boss: {{title}}, {{status}}",
+   "boss-status-locked": "locked",
+   "boss-status-available": "available",
+   "boss-status-won": "won"
+  }
+ },
+ "lessons": {
+  "rook": {
+   "title": "Meet Rhino the Rook",
+   "story": "Rhino loves charging straight ahead! He runs up, down, left, or right, as far as he wants. He can never jump over another piece.",
+   "demo": "Watch Rhino run to every green dot. Straight lines, any distance!"
+  },
+  "rook-g1": "Move Rhino straight up to the star.",
+  "rook-g2": "Move Rhino straight across to the star.",
+  "rook-01": "Help Rhino grab both stars in the corners.",
+  "rook-02": "Collect every star. Plan Rhino's path first!",
+  "rook-03": "Tap every square Rhino can reach from here.",
+  "rook-04": "A rock blocks the way! Find another path to the star.",
+  "rook-05": "Rhino is hungry. Gobble up the pawn!",
+  "rook-06": "A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.",
+  "rook-07": "Three pawns, three captures. Get them all!",
+  "rook-08": "Rhino's biggest challenge yet. Collect every star around the rock.",
+  "rook-04-easy": "A rock blocks the way! Go around it to reach the star.",
+  "rook-08-easy": "Collect both stars. The rock is in the way!",
+  "hungry-rook": {
+   "title": "Hungry Rook",
+   "goal": "Rhino is starving! Capture every piece before the moves run out."
+  },
+  "bishop": {
+   "title": "Meet Elephant the Bishop",
+   "story": "Elephant only walks on diagonal paths, but he can go as far as he likes! Long ago people even called this piece \"the Elephant.\" He always stays on squares of one colour.",
+   "demo": "Watch Elephant walk to every green dot. Diagonal paths, any distance!"
+  },
+  "bishop-g1": "Move Elephant diagonally to the star.",
+  "bishop-g2": "Move Elephant the other diagonal way to the star.",
+  "bishop-01": "Help Elephant grab both stars, corner to corner.",
+  "bishop-02": "Collect every star. Plan Elephant's diagonal path first!",
+  "bishop-03": "Elephant only visits squares of one colour. Can Elephant reach the star?",
+  "bishop-04": "Tap every square Elephant can reach. Look — they're all the same colour!",
+  "bishop-05": "A rock blocks the diagonal! Find another way to the star.",
+  "bishop-06": "Elephant is hungry. Gobble up the pawn!",
+  "bishop-07": "A rock blocks one path, a pawn waits on another. Tap every square Elephant can reach.",
+  "bishop-08": "Elephant's biggest challenge yet. Capture all four pawns.",
+  "bishop-08-easy": "Capture both pawns on Elephant's diagonals.",
+  "hungry-bishop": {
+   "title": "Hungry Bishop",
+   "goal": "Elephant is starving! Capture every piece before the moves run out."
+  },
+  "queen": {
+   "title": "Meet Lioness the Queen",
+   "story": "Lioness combines Rhino's straight charges and Elephant's diagonal paths. She is the strongest hunter on the board!",
+   "demo": "Watch Lioness run to every green dot. Straight lines and diagonals, any distance!"
+  },
+  "queen-g1": "Move Lioness straight up to the star.",
+  "queen-g2": "Move Lioness straight across to the star.",
+  "queen-01": "Help Lioness grab both stars in the corners.",
+  "queen-02": "One swift diagonal move reaches the far star!",
+  "queen-03": "Tap every square Lioness can reach from here.",
+  "queen-04": "A rock blocks the way! Find another path to the star.",
+  "queen-05": "Lioness is hungry. Gobble up the pawn!",
+  "queen-06": "A friend blocks one line, a pawn waits on another. Tap every square Lioness can reach.",
+  "queen-07": "Three pawns, three captures. Get them all!",
+  "queen-08": "Lioness's biggest challenge yet. Collect every star around the rock.",
+  "queen-08-easy": "Collect both stars in the corners below.",
+  "hungry-queen": {
+   "title": "Hungry Queen",
+   "goal": "Lioness is starving! Capture every piece before the moves run out."
+  },
+  "king": {
+   "title": "Meet Lion the King",
+   "story": "Lion is the most important piece of all! He only steps one square at a time, in any direction, and he must always stay safe.",
+   "demo": "Watch Lion take one careful step in every direction."
+  },
+  "king-g1": "Move Lion one step up to the star.",
+  "king-g2": "Move Lion one step to the star.",
+  "king-01": "Walk Lion to the star, one step at a time.",
+  "king-02": "Tap every square Lion can step to.",
+  "king-03": "A pawn is watching a square! Find a safe path to the star.",
+  "king-04": "Tap only the squares where Lion is safe.",
+  "king-05": "A pawn blocks the direct path. Find the safe way to the star.",
+  "king-06": "Lion's longest walk yet. Stay safe all the way to the star.",
+  "king-06-easy": "A short walk this time. Stay safe on the way to the star.",
+  "king-walk": {
+   "title": "King Walk",
+   "goal": "Lion must reach both stars, one careful step at a time, always staying safe."
+  },
+  "knight": {
+   "title": "Meet Horse the Knight",
+   "story": "Horse jumps in an L shape: two squares one way, then one more to the side. He can jump right over anyone standing in between!",
+   "demo": "Watch Horse jump to every green dot. Always an L shape!"
+  },
+  "knight-g1": "Jump Horse to the star.",
+  "knight-g2": "Jump Horse to the star.",
+  "knight-01": "Jump Horse to the star.",
+  "knight-02": "Rocks are in the way, but Horse jumps right over them!",
+  "knight-03": "Tap every square Horse can jump to.",
+  "knight-04": "Horse is hungry. Gobble up the pawn!",
+  "knight-05": "A rock blocks one landing spot. Tap every square Horse can jump to.",
+  "knight-06": "Horse is boxed in by rocks, but a knight jumps right over them!",
+  "knight-07": "Two jumps, two captures. Get them both!",
+  "knight-08": "Collect both stars. Plan Horse's jumps!",
+  "knight-08-easy": "Collect both stars. Just two quick jumps!",
+  "knight-maze": {
+   "title": "Knight Maze",
+   "goal": "Horse must collect every star by jumping over the rocks!"
+  },
+  "pawn": {
+   "title": "Meet Caterpillar the Pawn",
+   "story": "Caterpillar only creeps straight ahead, never sideways or back. On her very first move she can creep one square or two — after that, always just one. To capture, she steps diagonally forward instead, never straight ahead.",
+   "demo": "Watch Caterpillar creep forward. On her very first step she can go one square or two!"
+  },
+  "pawn-g1": "Creep Caterpillar forward, one square, to the star.",
+  "pawn-g2": "On her very first move, Caterpillar can creep two squares. Reach the star!",
+  "pawn-01": "Creep Caterpillar to the star. Her first move can go one square or two!",
+  "pawn-02": "Caterpillar already made her first move. Now she creeps one square at a time. Reach the star.",
+  "pawn-03": "Something blocks Caterpillar's path straight ahead. Tap every square she can still reach.",
+  "pawn-04": "Caterpillar can only capture on a diagonal, never straight ahead. Find the piece she can capture.",
+  "pawn-05": "Caterpillar is blocked straight ahead, but she can still capture on either diagonal. Tap every square she can reach.",
+  "pawn-06": "A piece waits on the diagonal. Capture it, then keep creeping to the star!",
+  "pawn-07": "Two pieces stand in Caterpillar's way. Creep closer, then capture them both!",
+  "pawn-08": "Collect the first star, then find a way around the blocker to reach the second!",
+  "pawn-08-easy": "Capture the pawn, then reach the star!",
+  "pawn-wars-4": {
+   "title": "Pawn Wars Jr.",
+   "goal": "Four caterpillars each! Be the first to transform into a queen, or capture every enemy."
+  },
+  "promotion": {
+   "title": "Caterpillar Transforms!",
+   "story": "At the very last row, something amazing happens: Caterpillar transforms into a brand-new piece! She can become a queen, a rook, a bishop, or a knight — the powerful queen is almost always the best choice.",
+   "demo": "Watch Caterpillar creep all the way to the last row. There, she transforms!"
+  },
+  "promotion-g1": "One more step and Caterpillar transforms! Move her to the last row.",
+  "promotion-g2": "Caterpillar is about to transform! Which piece should she become?",
+  "promotion-01": "One more step and Caterpillar transforms! Move her to the last row.",
+  "promotion-02": "Caterpillar is about to transform! Which piece should she become?",
+  "promotion-03": "A knight blocks the square ahead, but Caterpillar can capture her way to the last row. Find the winning move!",
+  "promotion-04": "Tap every square where Caterpillar could transform this move.",
+  "promotion-05": "Look at Caterpillar. Is she about to transform into a new piece?",
+  "promotion-03-easy": "Move Caterpillar to the last row. Push forward, or capture the rook — either way she transforms!",
+  "pawn-wars": {
+   "title": "Pawn Wars",
+   "goal": "Eight caterpillars each! Race to transform first, or capture every piece."
+  },
+  "squares": {
+   "title": "Meet the Squares",
+   "story": "Every chessboard is a checkerboard: light squares and dark squares, side by side. Here's Owl's favourite trick — the corner near your right hand is always light!",
+   "demo": "Look at your two corners. The one near your right hand is light. The one near your left hand is dark."
+  },
+  "squares-g1": "Your king is standing in your right-hand corner. Is that square light?",
+  "squares-g2": "Now he hopped to your left-hand corner. Is that square light?",
+  "squares-01": "Now he went to the far corner on your right. Is that square light?",
+  "squares-02": "He hopped all the way to the far corner on your left. Is that square light?",
+  "squares-03": "Now he's out in the middle of the board. Is his square light?",
+  "squares-04": "Tap every light square in the bottom row, the one nearest you.",
+  "squares-05": "Now tap every dark square in that bottom row.",
+  "squares-05-easy": "Tap the dark square in the bottom-left corner.",
+  "lines": {
+   "title": "Rows, Columns, and Diagonals",
+   "story": "A row runs from side to side, a column runs from you to Owl, and a diagonal runs corner to corner. Every line is straight, and every square on it belongs together!",
+   "demo": "See this whole row, edge to edge? Every square on it is part of the same line."
+  },
+  "lines-g1": "Tap every square in the same row as your king.",
+  "lines-g2": "Tap every square in the same column as your king.",
+  "lines-01": "Tap every square in your king's row.",
+  "lines-02": "This time, tap every square in your king's column.",
+  "lines-03": "Your king moved closer to you. Tap his whole row.",
+  "lines-04": "Tap every square in your king's column, all the way across the board.",
+  "lines-05": "This line runs corner to corner. Tap every square on your king's diagonal.",
+  "lines-06": "Here's the other diagonal. Tap every square your king shares with it.",
+  "lines-06-easy": "Your king sits on two diagonals. Tap every square of the short one.",
+  "square-hunt": {
+   "title": "Square Hunt",
+   "goal": "Tap every square in each highlighted line, as fast as you can!"
+  },
+  "square-hunt-r1": "Tap every square in your king's row.",
+  "square-hunt-r2": "Tap every square in your king's column.",
+  "square-hunt-r3": "Tap every square in your king's row.",
+  "square-hunt-r4": "Tap every square in your king's column.",
+  "square-hunt-r5": "Tap every square on the long diagonal through your king, from corner to corner.",
+  "square-hunt-r6": "Now the other long diagonal through your king. Tap it from corner to corner.",
+  "setup": {
+   "title": "Setting Up the Board",
+   "story": "Every game starts the same way. Rooks stand in the corners, knights right beside them, then bishops, and the queen and king share the middle. Pawns line up in front to protect them all.",
+   "demo": "Here is the whole starting line-up, ready to play."
+  },
+  "setup-g1": "Let's start easy. Place the king on the dark square in the middle of the back row.",
+  "setup-g2": "Now put the queen right next to him, on his left side.",
+  "setup-01": "Place both rooks in their corners.",
+  "setup-02": "Now add the knights, right next to the rooks.",
+  "setup-03": "Next come the bishops, next to the knights.",
+  "setup-04": "Finally the queen and king share the middle. Remember: the queen always stands on a square of her own colour!",
+  "setup-05": "All that's left is the pawns — line up all eight, standing guard in front.",
+  "setup-05-easy": "Add four pawns, one in front of each piece on the left, from the rook to the queen.",
+  "setup-race": {
+   "title": "Setup Race",
+   "goal": "Race to place every piece in its starting spot!"
+  },
+  "setup-race-r1": "Place every piece on the back row, all in their starting spots.",
+  "setup-race-r2": "Now add all eight pawns, standing guard in front.",
+  "attack": {
+   "title": "What Does It Attack?",
+   "story": "A piece \"attacks\" every square it could capture on right now, even the empty ones! Before you move, Owl wants you to spot every attack on the board.",
+   "demo": "Watch Caterpillar the Pawn. She attacks both diagonal squares in front of her!"
+  },
+  "attack-g1": "Tap every square Caterpillar the Pawn attacks.",
+  "attack-g2": "Horse wants to attack the bishop on d4. Which move lets him attack it?",
+  "attack-01": "Tap every square Caterpillar the Pawn attacks — the knight and the bishop are both there.",
+  "attack-02": "Horse jumps in an L. Tap every square he attacks from d4 — some are empty, some have pieces!",
+  "attack-03": "Rhino attacks in straight lines. Tap every square he attacks from d1.",
+  "attack-04": "Move Horse so he attacks the bishop on c4.",
+  "attack-05": "Move Rhino so he attacks the knight on d4.",
+  "attack-06": "Move Elephant so he attacks the knight on a5.",
+  "attack-07": "Horse has more than one jump. Which move attacks the rook on b5?",
+  "attack-08": "Lioness is very powerful. Find a move that attacks the knight on f6.",
+  "defend": {
+   "title": "Defend Your Pieces",
+   "story": "When an enemy attacks your piece, you can move it away, bring a friend to guard it, block the attack, or capture the attacker. Owl calls all of these \"defending\"!",
+   "demo": "Rhino is coming for Horse! Horse can hop away to safety, or a friend could guard him."
+  },
+  "defend-g1": "Is Horse defended by the pawn on c3?",
+  "defend-g2": "Rhino is coming for Horse! Move Horse to safety.",
+  "defend-01": "Is the knight on d5 defended?",
+  "defend-02": "A pawn now guards d5. Is the knight defended?",
+  "defend-03": "Rhino (black) is attacking Horse. Is Horse defended by the white rook on d2?",
+  "defend-04": "Rhino (black) is coming for Horse on b5! Move Horse to safety.",
+  "defend-05": "Horse (a1) is trapped and Rhino is attacking him! Move Elephant so he guards Horse.",
+  "defend-06": "Horse (a1) still can't move. Save him — block the attack, or capture the attacking rook!",
+  "defend-07": "Rhino (black) is attacking Elephant. Move Elephant to safety.",
+  "defend-08": "The bishop on c3 is attacking Rhino! Move Horse to capture it.",
+  "safe-pieces": {
+   "title": "Safe or Not?",
+   "story": "A piece is \"hanging\" when it is attacked and nothing protects it — the enemy could take it for free! Owl's #1 safety habit is always asking, \"Is my piece safe?\"",
+   "demo": "Look at Horse. Rhino attacks him and nothing guards him — Horse is hanging!"
+  },
+  "safe-pieces-g1": "Is Horse hanging?",
+  "safe-pieces-g2": "Caterpillar (black) is undefended. Capture her for free!",
+  "safe-pieces-01": "The bishop (black) attacks Horse and nothing guards him. Is Horse hanging?",
+  "safe-pieces-02": "A pawn now guards Horse. Is he still hanging?",
+  "safe-pieces-03": "Nothing attacks Elephant. Is he hanging?",
+  "safe-pieces-04": "The knight (black) attacks Caterpillar and nothing guards her. Is she hanging?",
+  "safe-pieces-05": "The rook (black) attacks Rhino on a4, but your other rook guards him. Is he hanging?",
+  "safe-pieces-06": "The knight (black) attacks Lioness and nothing guards her. Is she hanging?",
+  "safe-pieces-07": "The bishop (black) is undefended. Capture it for free with Lioness!",
+  "safe-pieces-08": "Two pawns (black) are waiting. Only one is undefended — capture that one for free!",
+  "safe-pieces-09": "Two pieces (black) are undefended. Find a move that captures one for free.",
+  "safe-pieces-10": "One rook (black) is undefended, the other is guarded. Capture the free one!",
+  "piece-values": {
+   "title": "How Much Is Each Piece Worth?",
+   "story": "Every piece has a value: Caterpillar is worth 1, Horse and Elephant are worth 3, Rhino is worth 5, and Lioness is worth a mighty 9! Knowing this helps you decide if a trade is worth it.",
+   "demo": "Here they are in order: Caterpillar 1, Horse or Elephant 3, Rhino 5, Lioness 9."
+  },
+  "piece-values-g1": "Which is worth more: the pawn or the rook?",
+  "piece-values-g2": "Which is worth more: the knight or the queen?",
+  "piece-values-01": "Which is worth more: the pawn or the knight?",
+  "piece-values-02": "Which is worth more: the bishop or the rook?",
+  "piece-values-03": "Which is worth more: the rook or the queen?",
+  "piece-values-04": "Which piece is worth exactly 5?",
+  "piece-values-05": "Which piece is worth exactly 9?",
+  "piece-values-06": "Which piece is worth exactly 1?",
+  "trades": {
+   "title": "Good Trade or Bad Trade?",
+   "story": "Before you capture, ask what you give up and what you get. Taking a bigger piece, or an undefended one, is good — losing more than you gain is bad!",
+   "demo": "Rhino captures the queen! He gives up a rook (worth 5) to win a queen (worth 9) — a great trade!"
+  },
+  "trade-good": "Good trade",
+  "trade-equal": "Equal trade",
+  "trade-bad": "Bad trade",
+  "trades-g1": "Rhino captures the queen on h1. Is this trade good, equal, or bad?",
+  "trades-g2": "The knight (black) is undefended. Capture it with Elephant — a free piece is always a good trade!",
+  "trades-01": "Horse captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?",
+  "trades-02": "The pawn on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?",
+  "trades-03": "The rook on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?",
+  "trades-04": "The pawn on f4 is undefended. If Elephant captures it, good, equal, or bad trade?",
+  "trades-05": "The pawn on c3 is guarded by another pawn. If Horse captures it, good, equal, or bad trade?",
+  "trades-06": "The knight on c3 is guarded by a pawn. If Horse captures it, good, equal, or bad trade?",
+  "trades-07": "Find the good trade: capture a piece worth more than Rhino.",
+  "trades-08": "Elephant can capture two different pieces. Find a good trade.",
+  "queen-vs-pawns": {
+   "title": "Queen vs Pawns",
+   "goal": "Lioness must capture every caterpillar before one of them transforms!"
+  },
+  "army-battle": {
+   "title": "Army Battle",
+   "goal": "Pawns and knights on both sides! Capture every enemy piece, or be first to transform."
+  },
+  "win-the-queen": {
+   "title": "Win the Queen",
+   "goal": "No kings today — the first side to capture the enemy queen wins!"
+  },
+  "safe-or-not": {
+   "title": "Safe or Not?",
+   "goal": "Ten pieces, ten questions: is each one safe, or in danger?"
+  },
+  "safe-or-not-r1": "Is the bishop on e4 in danger?",
+  "safe-or-not-r2": "A pawn now guards the bishop on e4. Is it in danger?",
+  "safe-or-not-r3": "Nothing attacks the knight on h4. Is it in danger?",
+  "safe-or-not-r4": "Is the pawn on a7 in danger?",
+  "safe-or-not-r5": "A rook now guards the pawn on a7. Is it in danger?",
+  "safe-or-not-r6": "Is the knight on d4 in danger?",
+  "safe-or-not-r7": "A pawn now guards the knight on d4. Is it in danger?",
+  "safe-or-not-r8": "Is the rook on a1 in danger?",
+  "safe-or-not-r9": "A bishop now blocks the attack on a1. Is the rook in danger?",
+  "safe-or-not-r10": "Is the queen on f4 in danger?",
+  "check": {
+   "title": "What Is Check?",
+   "story": "When a king is attacked, that's CHECK — danger! Lion must get to safety right away. Owl will teach you to spot it, and how to give check yourself.",
+   "demo": "A check! The black rook attacks Lion along the open file."
+  },
+  "check-g1": "Is Lion in check from the black rook?",
+  "check-g2": "Rhino can give check! Find the move that attacks the black king.",
+  "check-01": "A black bishop attacks Lion along the diagonal. Is Lion in check?",
+  "check-02": "Caterpillar now blocks the diagonal. Is Lion in check?",
+  "check-03": "A black knight jumps into position to attack Lion. Is Lion in check?",
+  "check-04": "A black rook sits on a different line, far from Lion. Is Lion in check?",
+  "check-05": "Move Rhino so he gives check to the black king.",
+  "check-06": "Move Elephant so he gives check to the black king.",
+  "check-07": "Lioness can check the black king in several ways. Find one!",
+  "check-08": "Move Horse so he gives check to the black king.",
+  "escape-check": {
+   "title": "Escape the Check!",
+   "story": "When Lion is in check, there are 3 ways out: move him to safety, block the attack, or capture the attacker. Let's practise all three!",
+   "demo": "Lion is in check. Every green dot is a square where he'd be safe."
+  },
+  "escape-check-g1": "Lion is in check! Tap every square where he can escape.",
+  "escape-check-g2": "The only way out is to move Lion — find a safe square.",
+  "escape-check-01": "Lion is in check from the rook. Tap every square where he is safe.",
+  "escape-check-02": "Lion is in check from the bishop. Tap every square where he is safe.",
+  "escape-check-03": "Lion is in check from the rook. Tap every safe square for him.",
+  "escape-check-04": "Lion is in check from a bishop far away. Tap every safe square for him.",
+  "escape-check-05": "A knight's check can never be blocked! Move Lion to safety.",
+  "escape-check-06": "Move Lion out of check — nothing can block or capture this rook here.",
+  "escape-check-07": "Block the check! Move Elephant between Lion and the rook.",
+  "escape-check-08": "Block the check! Move Rhino between Lion and the bishop.",
+  "escape-check-09": "Capture the checking knight!",
+  "escape-check-10": "The bishop giving check isn't guarded. Capture it with Lion!",
+  "checkmate": {
+   "title": "Check or Checkmate?",
+   "story": "Checkmate means the king is in check AND has no way out at all — no move, no block, no capture. The game is won!",
+   "demo": "Checkmate! Lioness checks the king, and every square around him is covered."
+  },
+  "checkmate-g1": "Is the black king checkmated?",
+  "checkmate-g2": "Is the black king checkmated? Look for an escape.",
+  "checkmate-01": "The white rook checks along the back row. Is the black king checkmated?",
+  "checkmate-02": "The white rook checks along the back row, but there is a gap. Is the black king checkmated?",
+  "checkmate-03": "Two white rooks trap the black king. Is he checkmated?",
+  "checkmate-04": "One white rook checks the black king. Is he checkmated?",
+  "checkmate-05": "The white queen and king work together. Is the black king checkmated?",
+  "checkmate-06": "A white rook checks the black king from far away. Is he checkmated?",
+  "checkmate-07": "The white queen checks, guarded by her king. Is the black king checkmated?",
+  "checkmate-08": "The white queen checks, but nothing guards her. Is the black king checkmated?",
+  "mate-in-1": {
+   "title": "Mate in 1",
+   "story": "Owl challenges you to deliver CHECKMATE in just one move! Look for a move that traps the king completely.",
+   "demo": "Checkmate in one! Rhino delivers check along the open file."
+  },
+  "mate-in-1-g1": "Find the checkmate in one move — check Rhino's path to the back row.",
+  "mate-in-1-g2": "Find the checkmate in one move — Lioness and Lion work together.",
+  "mate-in-1-01": "Checkmate in one! The black king is trapped by his own pawns.",
+  "mate-in-1-02": "Checkmate in one! Find the move along the open file.",
+  "mate-in-1-03": "Checkmate in one! Lioness can reach the back row.",
+  "mate-in-1-04": "Checkmate in one! Lioness and Lion team up.",
+  "mate-in-1-05": "Checkmate in one! Move Lioness right next to the black king.",
+  "mate-in-1-06": "Checkmate in one! Lion guards Lioness's checking square.",
+  "mate-in-1-07": "Checkmate in one! Two rooks trap the black king together.",
+  "mate-in-1-08": "Checkmate in one! One rook cuts off the escape, the other delivers check.",
+  "mate-in-1-09": "Checkmate in one! Lion guards the squares Rhino can't reach.",
+  "mate-in-1-10": "Checkmate in one! Lion and Rhino trap the black king in the corner.",
+  "mate-in-1-11": "Checkmate in one! Horse guards the squares for Lioness.",
+  "mate-in-1-12": "Checkmate in one! Horse and Caterpillar guard the king's escape.",
+  "stalemate": {
+   "title": "Watch Out for Stalemate!",
+   "story": "Stalemate is tricky: the king has no legal move at all, but he isn't in check. That's not a win — it's a draw! Always check before you play the \"obvious\" move.",
+   "demo": "Careful! The black king has no move and isn't in check — that's stalemate, a draw."
+  },
+  "stalemate-g1": "Is the black king stalemated?",
+  "stalemate-g2": "Find the checkmate in one move.",
+  "stalemate-01": "The black king has no moves, and he is not in check. Is he stalemated?",
+  "stalemate-02": "The black king has no moves, and he is not in check. Is he stalemated?",
+  "stalemate-03": "The black king has plenty of moves. Is he stalemated?",
+  "stalemate-04": "The black king is in check, but he can escape. Is he stalemated?",
+  "stalemate-05": "Checkmate in one — but careful, some moves would stalemate instead!",
+  "stalemate-06": "Checkmate in one — but careful, some moves would stalemate instead!",
+  "escape-the-check": {
+   "title": "Escape the Check",
+   "goal": "Help Lion escape check 10 times — by moving, blocking, or capturing!"
+  },
+  "escape-the-check-r1": "Lion is in check from the rook. Tap every square where he is safe.",
+  "escape-the-check-r2": "Lion is in check from the bishop. Tap every square where he is safe.",
+  "escape-the-check-r3": "Lion is in check from the rook. Tap every safe square for him.",
+  "escape-the-check-r4": "Lion is in check from a bishop far away. Tap every safe square for him.",
+  "escape-the-check-r5": "A knight's check can never be blocked! Move Lion to safety.",
+  "escape-the-check-r6": "Move Lion out of check.",
+  "escape-the-check-r7": "Block the check! Move Elephant between Lion and the rook.",
+  "escape-the-check-r8": "Block the check! Move Rhino between Lion and the bishop.",
+  "escape-the-check-r9": "Capture the checking knight with Caterpillar!",
+  "escape-the-check-r10": "The rook giving check isn't guarded. Capture it with Lion!",
+  "mate-hunt": {
+   "title": "Mate in 1",
+   "goal": "Find checkmate in one move, ten times in a row!"
+  },
+  "mate-hunt-r1": "Checkmate in one! The black king is trapped by his own pawns.",
+  "mate-hunt-r2": "Checkmate in one! Find the move along the open file.",
+  "mate-hunt-r3": "Checkmate in one! Lion guards the checking square.",
+  "mate-hunt-r4": "Checkmate in one! Lion guards the checking square.",
+  "mate-hunt-r5": "Checkmate in one! Two rooks work together.",
+  "mate-hunt-r6": "Checkmate in one! One rook cuts off the rank.",
+  "mate-hunt-r7": "Checkmate in one! Lion guards the flight squares.",
+  "mate-hunt-r8": "Checkmate in one! The black king is trapped by his own pawns.",
+  "mate-hunt-r9": "Checkmate in one! Lion guards Lioness's checking square.",
+  "mate-hunt-r10": "Checkmate in one! Lion guards the checking square.",
+  "first-game": {
+   "title": "Your First Full Game!",
+   "goal": "Play a whole game against Mouse. Checkmate him to win — good luck!"
+  },
+  "castling": {
+   "title": "Castling: King and Rook Swap",
+   "story": "Castling is a special move! Lion and a Rhino move together: Lion jumps two squares toward a Rhino that hasn't moved yet, and that Rhino hops right over to stand beside him. It's the only time two pieces move in one turn!",
+   "demo": "Try it! Move Lion two squares toward a Rhino to castle."
+  },
+  "castling-g1": "Lion and the kingside Rhino haven't moved, and nothing stands between them. Can Lion castle kingside right now?",
+  "castling-g2": "Castle kingside! Move Lion two squares to swap places with Rhino.",
+  "castling-01": "Lion and the queenside Rhino are both still home, with a clear path between them. Can Lion castle queenside right now?",
+  "castling-02": "The kingside Rhino already moved away from the corner. Can Lion castle kingside right now?",
+  "castling-03": "A black rook is giving Lion check! Can Lion castle kingside right now?",
+  "castling-04": "Horse stands between Lion and the kingside Rhino. Can Lion castle kingside right now?",
+  "castling-05": "A black bishop watches the square right next to Lion. Can Lion castle queenside right now?",
+  "castling-06": "Only the queenside Rhino is still home. Castle queenside!",
+  "castling-07": "Only the kingside Rhino is still home. Castle kingside!",
+  "castling-08": "Both Rhinos are still home! Castle with either one.",
+  "en-passant": {
+   "title": "En Passant: Catch It \"In Passing\"",
+   "story": "Sometimes a Caterpillar rushes two squares on its very first move, right past an enemy Caterpillar standing beside it. That's not quite fair — so, just this once, the enemy Caterpillar may capture it anyway, as if it had only moved one square. This is called \"en passant\" (French for \"in passing\"), and it only works right away, the very next move.",
+   "demo": "Black's pawn just rushed two squares past yours. Capture it en passant, right now!"
+  },
+  "en-passant-g1": "Black's pawn just rushed two squares and landed beside yours. Capture it en passant!",
+  "en-passant-g2": "Black's pawn just rushed two squares past your Caterpillar on c5. Can you capture it en passant right now?",
+  "en-passant-01": "Black's pawn just rushed two squares past yours. Capture it en passant!",
+  "en-passant-02": "Black's pawn just rushed two squares past yours. Capture it en passant!",
+  "en-passant-03": "Two of your Caterpillars could catch this one — either capture works!",
+  "en-passant-04": "Black's pawn just rushed two squares past your Caterpillar on h5. Can you capture it en passant right now?",
+  "en-passant-05": "Black's last move was the king, not the pawn. Can your Caterpillar on d5 capture the e5 pawn en passant right now?",
+  "draws": {
+   "title": "Draws: Nobody Wins",
+   "story": "Some games end in a draw — nobody wins! Stalemate is one way: no legal move, but not in check. A game is also a draw when there isn't enough material left to checkmate (like a lone king against a lone king), if the exact same position happens three times in a row, or if 50 moves pass with no capture and no pawn move.",
+   "demo": "The black king has no legal move, and he isn't in check. That's stalemate — a draw!"
+  },
+  "draws-g1": "The black king has no legal move, and he isn't in check. Is he stalemated?",
+  "draws-g2": "Only two lone kings are left on the board. Stalemate, not enough material — or not a draw at all?",
+  "draws-01": "The black king has no legal move, and he isn't in check. Is he stalemated?",
+  "draws-02": "A king and knight can never checkmate a lone king. Is this a draw by insufficient material?",
+  "draws-03": "It's Black's turn. Stalemate, not enough material — or not a draw at all?",
+  "draws-04": "Look at every piece on the board. Stalemate, not enough material — or not a draw at all?",
+  "draws-05": "It's White's turn. Stalemate, not enough material — or not a draw at all?",
+  "draws-opt-stalemate": "Stalemate",
+  "draws-opt-insufficient": "Not enough material",
+  "draws-opt-not-a-draw": "Not a draw",
+  "full-game-rabbit": {
+   "title": "Full Game vs Rabbit",
+   "goal": "Play a whole game against Rabbit. Checkmate him to win — he's quicker than Mouse!"
+  }
+ },
+ "rewards": {
+  "badges": {
+   "board-explorer": {
+    "name": "Board Explorer",
+    "condition": "Master World 1: The Board"
+   },
+   "piece-master": {
+    "name": "Piece Master",
+    "condition": "Master World 2: The Pieces"
+   },
+   "guardian": {
+    "name": "Guardian",
+    "condition": "Master World 3: Attack & Defence"
+   },
+   "checkmate-champion": {
+    "name": "Checkmate Champion",
+    "condition": "Master World 4: Check & Mate"
+   },
+   "rule-master": {
+    "name": "Rule Master",
+    "condition": "Master World 5: Full Rules"
+   },
+   "basics-graduate": {
+    "name": "Basics Graduate",
+    "condition": "Master all of Basics"
+   },
+   "perfect-lesson": {
+    "name": "Perfect Lesson",
+    "condition_one": "Get 3 stars on every exercise in {{count}} lesson",
+    "condition_other": "Get 3 stars on every exercise in {{count}} lessons"
+   },
+   "star-collector": {
+    "name": "Star Collector",
+    "condition_one": "Earn {{count}} star",
+    "condition_other": "Earn {{count}} stars"
+   },
+   "sharp-eyes": {
+    "name": "Sharp Eyes",
+    "condition_one": "Answer \"Safe or not?\" right {{count}} time in a row",
+    "condition_other": "Answer \"Safe or not?\" right {{count}} times in a row"
+   },
+   "escape-artist": {
+    "name": "Escape Artist",
+    "condition_one": "Escape check without a hint {{count}} time in a row",
+    "condition_other": "Escape check without a hint {{count}} times in a row"
+   },
+   "mate-master": {
+    "name": "Mate Master",
+    "condition_one": "Solve {{count}} mate in 1",
+    "condition_other": "Solve {{count}} mates in 1"
+   },
+   "butterfly-maker": {
+    "name": "Butterfly Maker",
+    "condition_one": "Promote {{count}} pawn in games",
+    "condition_other": "Promote {{count}} pawns in games"
+   },
+   "castle-builder": {
+    "name": "Castle Builder",
+    "condition_one": "Castle in {{count}} game",
+    "condition_other": "Castle in {{count}} games"
+   },
+   "first-win": {
+    "name": "First Win",
+    "condition": "Win a game vs the computer"
+   },
+   "mouse-tamer": {
+    "name": "Mouse Tamer",
+    "condition": "Win a game vs Mouse"
+   },
+   "rabbit-catcher": {
+    "name": "Rabbit Catcher",
+    "condition": "Win a game vs Rabbit"
+   },
+   "fox-outsmarter": {
+    "name": "Fox Outsmarter",
+    "condition": "Win a game vs Fox"
+   },
+   "wolf-tamer": {
+    "name": "Wolf Tamer",
+    "condition": "Win a game vs Wolf"
+   },
+   "bear-buddy": {
+    "name": "Bear Buddy",
+    "condition": "Win a game vs Bear"
+   },
+   "queen-keeper": {
+    "name": "Queen Keeper",
+    "condition": "Win a game without losing your queen"
+   },
+   "pawn-wars-winner": {
+    "name": "Pawn Wars Winner",
+    "condition_one": "Win Pawn Wars {{count}} time",
+    "condition_other": "Win Pawn Wars {{count}} times"
+   },
+   "friendly-match": {
+    "name": "Friendly Match",
+    "condition": "Play a game vs a friend"
+   },
+   "daily-player": {
+    "name": "Daily Player",
+    "condition_one": "Play {{count}} day in a row",
+    "condition_other": "Play {{count}} days in a row"
+   },
+   "warm-up-champ": {
+    "name": "Warm-up Champ",
+    "condition_one": "Finish {{count}} warm-up task",
+    "condition_other": "Finish {{count}} warm-up tasks"
+   },
+   "never-give-up": {
+    "name": "Never Give Up",
+    "condition_one": "Come back from 2 or more wrong tries {{count}} time",
+    "condition_other": "Come back from 2 or more wrong tries {{count}} times"
+   }
+  }
+ }
+}
