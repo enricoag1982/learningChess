@@ -153,8 +153,9 @@ squares-05-easy: Tap the dark square in the bottom-left corner.
 lines:
   title: Rows, Columns, and Diagonals
   story: >-
-    A row runs from side to side, a column runs from you to Owl, and a diagonal runs corner to
-    corner. Every line is straight, and every square on it belongs together!
+    A row runs from side to side, a column runs from you to Owl, and a diagonal runs on a slant,
+    like stairs. Most squares sit on two diagonals, one leaning each way. Every line is straight,
+    and every square on it belongs together!
   demo: See this whole row, edge to edge? Every square on it is part of the same line.
 lines-g1: Tap every square in the same row as your king.
 lines-g2: Tap every square in the same column as your king.
@@ -162,8 +163,8 @@ lines-01: Tap every square in your king's row.
 lines-02: This time, tap every square in your king's column.
 lines-03: Your king moved closer to you. Tap his whole row.
 lines-04: Tap every square in your king's column, all the way across the board.
-lines-05: This line runs corner to corner. Tap every square on your king's diagonal.
-lines-06: Here's the other diagonal. Tap every square your king shares with it.
+lines-05: Your king is in a corner, so he sits on just one diagonal. Tap every square on it.
+lines-06: Now your king sits on two diagonals. Tap every square of the long one, from corner to corner.
 lines-06-easy: Your king sits on two diagonals. Tap every square of the short one.
 square-hunt:
   title: Square Hunt

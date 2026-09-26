@@ -46,7 +46,7 @@ Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voi
 - Next: v4 learning-platform refactor (`docs/refactor-v4.md`; owner decisions §8 pending); follow-ups F4 (Bear strength), F5 (mate-in-2+ freeze outside a lesson step); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
-- Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you".
+- Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you". Diagonals: every non-corner square sits on two; "tap the diagonal" only from a corner square, otherwise name which one ("from corner to corner", "the short one") (owner 2026-09-26).
 
 Version notes (checked 2026-09-24):
 
