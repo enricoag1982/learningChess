@@ -1,22 +1,14 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef, ExerciseState } from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core';
 import {
-  answerYesNo,
-  chessJsRules,
   completeRound,
-  createVariantRules,
   currentRound,
-  playMateInN,
-  playMove,
-  selectSquaresAnswer,
   seriesResult,
   seriesStars,
-  startExercise,
   startSeries,
-  submitSelection,
-  toggleSquare,
 } from '@chess-kids/core';
+import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
@@ -24,65 +16,8 @@ import { loadContent } from './lesson-load.ts';
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locales = loadLocales(join(packageDir, 'locales'));
 const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
-const rules = createVariantRules(chessJsRules);
 
 const WORLD4_LESSON_IDS = ['check', 'escape-check', 'checkmate', 'mate-in-1', 'stalemate'];
-
-/**
- * Plays one exercise to completion using its own definition as the answer key — `select-squares` /
- * `yes-no` / `best-move` as in `world3-playthrough.test.ts`, plus `mate-in-n` (M3.3: walks the whole
- * scripted `line`, kid move by kid move, real chess rules — the loader already proved the line is
- * legal and mates; this only proves the engine accepts it end to end).
- */
-function playExerciseToCompletion(def: ExerciseDef): ExerciseState {
-  const state = startExercise(def);
-  if (def.type === 'select-squares') {
-    const answer = selectSquaresAnswer(def, rules);
-    const selected = answer.reduce((s, square) => toggleSquare(s, square), state);
-    return submitSelection(selected, rules).state;
-  }
-  if (def.type === 'yes-no') {
-    return answerYesNo(state, def.answer);
-  }
-  if (def.type === 'best-move') {
-    const [solutionSan] = def.solutions;
-    if (solutionSan === undefined) {
-      throw new Error(`best-move exercise "${def.id}" has no solutions`);
-    }
-    const candidates = rules.legalMoves(def.position, { staticOpponent: true });
-    const move = candidates.find(
-      (candidate) => candidate.san.replace(/[+#]+$/, '') === solutionSan.replace(/[+#]+$/, ''),
-    );
-    if (move === undefined) {
-      throw new Error(`best-move exercise "${def.id}": no legal move matches "${solutionSan}"`);
-    }
-    return playMove(state, rules, { from: move.from, to: move.to, promotion: move.promotion })
-      .state;
-  }
-  if (def.type === 'mate-in-n') {
-    let current = state;
-    for (const san of def.line) {
-      const candidates = chessJsRules.legalMoves(current.position);
-      const move = candidates.find(
-        (candidate) => candidate.san.replace(/[+#]+$/, '') === san.replace(/[+#]+$/, ''),
-      );
-      if (move === undefined) {
-        throw new Error(`mate-in-n exercise "${def.id}": no legal move matches "${san}"`);
-      }
-      const { state: next } = playMateInN(current, chessJsRules, {
-        from: move.from,
-        to: move.to,
-        promotion: move.promotion,
-      });
-      current = next;
-      if (current.solved) {
-        break; // the final (mating) move solves it before the scripted reply, if any, is needed
-      }
-    }
-    return current;
-  }
-  throw new Error(`playExerciseToCompletion: unsupported exercise type "${def.type}"`);
-}
 
 describe("World 4 lessons play to completion via the engine, using each exercise's own answer", () => {
   for (const lessonId of WORLD4_LESSON_IDS) {

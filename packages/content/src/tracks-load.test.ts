@@ -1,19 +1,11 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import type { Lesson, MiniGame, Position } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core';
+import { makeLesson as buildLesson, makeMiniGame as buildMiniGame } from '@chess-kids/core/testing';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ContentError, loadLocales } from './load.ts';
 import { loadTracks } from './tracks-load.ts';
-
-/** Fixture position for `Lesson`/`MiniGame` fixtures below; its content is never exercised here. */
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as unknown as Position;
 
 let dir: string;
 
@@ -81,36 +73,12 @@ function issuesOf(minigames: readonly MiniGame[] = [], lessons: readonly Lesson[
 
 /** A minimal, otherwise-content-shaped lesson for `checkWorldBoss` fixture tests. */
 function makeLesson(id: string, world: string): Lesson {
-  return {
-    id,
-    world,
-    order: 1,
-    concept: `${id}-concept`,
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [],
-  };
+  return buildLesson({ id, world, guided: [], exercises: [] });
 }
 
 /** A minimal static mini-game unlocked by `unlockAfter`, for `checkWorldBoss` fixture tests. */
 function makeMiniGame(id: string, unlockAfter: string): MiniGame {
-  return {
-    mode: 'static',
-    id,
-    concept: `${id}-concept`,
-    titleKey: `minigames:${id}.title`,
-    goalKey: `minigames:${id}.goal`,
-    unlockAfter,
-    position: EMPTY_POSITION,
-    par: 5,
-  };
+  return buildMiniGame({ id, concept: `${id}-concept`, par: 5, unlockAfter });
 }
 
 describe('loadTracks', () => {

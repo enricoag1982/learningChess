@@ -1,22 +1,14 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef, ExerciseState } from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core';
 import {
-  answerChoice,
-  answerYesNo,
-  chessJsRules,
   completeRound,
-  createVariantRules,
   currentRound,
-  playMove,
-  selectSquaresAnswer,
   seriesResult,
   seriesStars,
-  startExercise,
   startSeries,
-  submitSelection,
-  toggleSquare,
 } from '@chess-kids/core';
+import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
@@ -24,46 +16,8 @@ import { loadContent } from './lesson-load.ts';
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locales = loadLocales(join(packageDir, 'locales'));
 const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
-const rules = createVariantRules(chessJsRules);
 
 const WORLD3_LESSON_IDS = ['attack', 'defend', 'safe-pieces', 'piece-values', 'trades'];
-
-/**
- * Plays one `select-squares` / `yes-no` / `choice` / `best-move` exercise to completion using its
- * own definition as the answer key (World 3's rule-verified types have no solver: the build already
- * proved the authored answer/solutions match the computed rule, `lesson-load.test.ts` §best-move /
- * choice verify — this only proves the engine actually accepts it end to end).
- */
-function playExerciseToCompletion(def: ExerciseDef): ExerciseState {
-  const state = startExercise(def);
-  if (def.type === 'select-squares') {
-    const answer = selectSquaresAnswer(def, rules);
-    const selected = answer.reduce((s, square) => toggleSquare(s, square), state);
-    return submitSelection(selected, rules).state;
-  }
-  if (def.type === 'yes-no') {
-    return answerYesNo(state, def.answer);
-  }
-  if (def.type === 'choice') {
-    return answerChoice(state, def.answer);
-  }
-  if (def.type === 'best-move') {
-    const [solutionSan] = def.solutions;
-    if (solutionSan === undefined) {
-      throw new Error(`best-move exercise "${def.id}" has no solutions`);
-    }
-    const candidates = rules.legalMoves(def.position, { staticOpponent: true });
-    const move = candidates.find(
-      (candidate) => candidate.san.replace(/[+#]+$/, '') === solutionSan.replace(/[+#]+$/, ''),
-    );
-    if (move === undefined) {
-      throw new Error(`best-move exercise "${def.id}": no legal move matches "${solutionSan}"`);
-    }
-    return playMove(state, rules, { from: move.from, to: move.to, promotion: move.promotion })
-      .state;
-  }
-  throw new Error(`playExerciseToCompletion: unsupported exercise type "${def.type}"`);
-}
 
 describe("World 3 lessons play to completion via the engine, using each exercise's own answer", () => {
   for (const lessonId of WORLD3_LESSON_IDS) {
