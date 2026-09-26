@@ -1,6 +1,6 @@
 # Chess for Kids — project guide
 
-Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in progress: M6 voice & art (→ `v1.2.0`), M7 = v2 scope (→ `v2.0.0`); planned: v4 platform refactor (`docs/refactor-v4.md`).
+Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voice & art + M7 time controls & device sharing); planned: v4 platform refactor (`docs/refactor-v4.md`).
 
 ## Working style (user preferences)
 
@@ -42,8 +42,8 @@ Offline chess learning app for an 8-year-old beginner. Released `v1.1.1`; in pro
 
 ## Status and next step
 
-- Done: M0–M5 (`m0` … `m5`), releases `v1.0.0`, `v1.1.0` (owner playtest 2). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
-- Next: M6 Voice & art (v3 scope, `docs/roadmap.md` §3 `m6.x`, branch `m6-media`); then v2 (offline time controls + file sharing, `docs/roadmap.md` §4 / §7); open follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
+- Done: M0–M7 (`m0` … `m7`), releases `v1.0.0`, `v1.1.0` (owner playtest 2), `v1.1.1` (iPad mini 4 / iOS 15 fix), `v2.0.0` (generated voice, Fluent 3D art, parent code, time controls, device sharing). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
+- Next: v4 learning-platform refactor (`docs/refactor-v4.md`; owner decisions §8 pending); follow-ups F4 (Bear strength), F5 (mate-in-2+ freeze outside a lesson step); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you".

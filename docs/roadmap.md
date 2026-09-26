@@ -90,10 +90,10 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m6.3` | Voice hardening: coverage check in CI (inventory = manifest), feedback note spoken on its own (no device voice mid-lesson), missed-text report from the e2e run, resume timeout before the first tap, offline size check, owner check on phone / tablet |
 | `m6.4` | Illustrations (Fluent 3D): piece characters (incl. lioness), Owl, bot levels, avatars; same look on Home / Journey / Play / picker |
 | `m6.5` | Owner request: "parent code" instead of "password" everywhere in the UI; first-run "Download again" removed; "Download code file" in the grown-ups area (after the code) |
-| `m6.6` | Release `v1.2.0`: validation, README screenshots, release checklist → `m6` |
+| `m6.6` | Release prep (README screenshots, validation) → `m6`; shipped in `v2.0.0` together with M7 |
 | `m7.1` | Time controls: Mon–Fri / Sat–Sun limits, allowed hours ("Play until" / "Not before", parent +15 min window), 5-minute warning (app-level notice on calm screens, once per child per day, spoken) |
 | `m7.2` | Device sharing: merge rules, per-device session logs, "Send to other device" (share sheet), merge import with "Merge into …" / "Add as new child" |
-| `m7.3` | Release `v2.0.0` → `m7` |
+| `m7.3` | Release `v2.0.0` (M6 + M7) → `m7` |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
@@ -112,7 +112,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | # | Milestone | Scope |
 |---|---|---|
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
-| M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships as `v1.2.0` |
+| M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships in `v2.0.0` (with M7, 2026-09-25: M6.3 merged after M7.1, no M6-only release point) |
 | M8 | Store apps | Capacitor Android + iPad, native storage, store listings |
 | M9 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 → M7 | Time controls + device sharing (offline, no server; owner 2026-09-25; iterations §3 `m7.x`; ships as `v2.0.0`) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
