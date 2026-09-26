@@ -9,7 +9,6 @@
     "preview": "vite preview --port 4173 --strictPort",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests",
     "test:e2e": "playwright test",
     "icons": "node scripts/icons.ts",
     "size": "node scripts/check-size.ts",

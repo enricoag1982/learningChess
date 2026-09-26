@@ -11,9 +11,10 @@ const { version } = JSON.parse(
 ) as { version: string };
 
 // Separate from vite.config.ts: the PWA plugin has no role in tests and slows them down.
-// `pnpm test` (default `vitest run`): fast unit tests only. `*.slow.test.{ts,tsx}` (none authored
-// yet) is excluded here and would run under `pnpm test:slow` (`vitest.slow.config.ts`) instead —
-// m8.2 item 1, CI's `slow` job.
+// `*.slow.test.{ts,tsx}` stays excluded here (m8.2 item 1's `*.slow.test.ts` convention, used by
+// core/content) even though this package has no `test:slow` script: no web test is slow enough to
+// need one yet (no test here takes > 3s) — the exclude is just a no-op guard against one landing in
+// the default `pnpm test` run by accident if that ever changes.
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [react()],
