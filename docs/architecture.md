@@ -132,7 +132,9 @@ stars2: 5
 | Content | Vitest | Every exercise: schema valid, valid position, legal solution, solution reaches goal within star limits; all text keys present in every locale |
 | Components | React Testing Library | Board interaction, lesson flow |
 | End-to-end | Playwright | Create profile → lesson → mini-game → progress persisted |
-| Static | `tsc` strict, ESLint (typescript-eslint `strictTypeChecked` + layer rules), Prettier | Every PR via CI `quality` job |
+| Static | `tsc` strict, ESLint (typescript-eslint `strictTypeChecked` + layer rules), Prettier | Every PR via CI |
+| Slow unit (M8.2) | Vitest, `*.slow.test.ts`, `pnpm test:slow` | Bot self-play / strength / timing, winnability, deep perft; excluded from `pnpm test` |
+| CI (M8.2) | GitHub Actions `ci.yml` | Parallel jobs `checks` (format, lint, typecheck, unit, build, size, compat, voice), `slow`, `e2e` × 3 shards; `quality` = the one required check, green only if all succeed. Full a11y curriculum walk on chromium; tablet / tablet-portrait / phone reach the same 21 scan points by seeded progress |
 | Content snapshot (M8.1) | Vitest `toMatchFileSnapshot` | Every `dist/` output of the content build (`compileAll`), pretty JSON in `packages/content/src/__snapshots__/content/`. Changes only with a deliberate content change: `pnpm --filter @chess-kids/content exec vitest run -u`, review the diff |
 | Storage compat (M8.1) | Vitest + Playwright | `apps/web/test-fixtures/storage/<tag>/`: localStorage + backup files recorded with real `v1.0.0`, `v1.1.0`, `v2.0.0` builds; load and merge snapshots must stay equal; add a fixture per release (folder README) |
 
