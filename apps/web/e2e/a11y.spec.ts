@@ -471,6 +471,13 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   let journeyScanned = false;
   let summaryScanned = false;
   let currentWorldId: string | undefined;
+  // Logged at the end (m8.2 item 3): the seeded scan on the other 3 projects must reach this same
+  // set of labels.
+  const scannedLabels: string[] = [];
+  async function scan(screen: string): Promise<void> {
+    scannedLabels.push(screen);
+    await expectNoSeriousViolations(page, screen);
+  }
 
   await completeFirstRun(page);
   // Shortens the bot's "thinking" pause for every versus boss reached below (Pawn Wars Jr. and,
@@ -491,7 +498,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   );
   await expectKidTouchTarget(page, /Start/);
   await expectKidTouchTarget(page, /Journey/);
-  await expectNoSeriousViolations(page, 'Home');
+  await scan('Home');
   await expectOnlyButtonsRaised(page, 'Home');
 
   // Play and My Den (app-structure.md §4): a fresh install, so every mini-game is locked and no
@@ -500,13 +507,13 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await expectKidTouchTarget(page, 'Back to Home');
   await expectKidTouchTarget(page, /Play a full game/);
   await expectKidTouchTarget(page, /^Hungry Rook,/);
-  await expectNoSeriousViolations(page, 'Play');
+  await scan('Play');
   await expectOnlyButtonsRaised(page, 'Play');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
   await page.getByRole('button', { name: 'My Den', exact: true }).click();
   await expectKidTouchTarget(page, 'Back to Home');
-  await expectNoSeriousViolations(page, 'My Den');
+  await scan('My Den');
   await expectOnlyButtonsRaised(page, 'My Den');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
@@ -514,7 +521,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await page.getByRole('button', { name: 'Practice', exact: true }).click();
   await expectKidTouchTarget(page, 'Back to Home');
   await expectKidTouchTarget(page, /Daily warm-up/);
-  await expectNoSeriousViolations(page, 'Practice');
+  await scan('Practice');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
   for (const lesson of orderedLessons) {
@@ -597,17 +604,17 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await expectKidTouchTarget(page, /Play a full game/);
           await page.getByRole('button', { name: 'Play a full game' }).click();
           await expectKidTouchTarget(page, 'Close');
-          await expectNoSeriousViolations(page, 'Full game (start)');
+          await scan('Full game (start)');
 
           await playOneKidVersusMove(page, previousWorldBoss);
           await waitForVersusTurnOrEnd(page);
-          await expectNoSeriousViolations(page, 'Full game (mid-game)');
+          await scan('Full game (mid-game)');
 
           await page.getByRole('button', { name: 'Close' }).click();
           await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
           await expectKidTouchTarget(page, 'Stop game');
           await expectKidTouchTarget(page, 'Keep playing');
-          await expectNoSeriousViolations(page, 'Full game (leave confirm)');
+          await scan('Full game (leave confirm)');
           await page.getByRole('button', { name: 'Stop game' }).click();
 
           await page.getByRole('heading', { name: 'Play' }).waitFor();
@@ -623,7 +630,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('heading', { name: 'vs Friend' }).waitFor();
           await expectKidTouchTarget(page, 'Guest');
           await expectKidTouchTarget(page, 'Full Game');
-          await expectNoSeriousViolations(page, 'vs Friend (setup sheet)');
+          await scan('vs Friend (setup sheet)');
 
           await page.getByRole('button', { name: 'Guest' }).click();
           await page.getByRole('button', { name: 'Full Game' }).click();
@@ -632,18 +639,18 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('button', { name: /^e2,/ }).waitFor();
           await expectKidTouchTarget(page, 'Take back');
           await expectKidTouchTarget(page, 'Stop');
-          await expectNoSeriousViolations(page, 'vs Friend (game, start)');
+          await scan('vs Friend (game, start)');
 
           await clickSquare(page, 'e2');
           await clickSquare(page, 'e4');
           await page.getByRole('button', { name: /^e4, white pawn/ }).waitFor();
-          await expectNoSeriousViolations(page, 'vs Friend (game, after a move)');
+          await scan('vs Friend (game, after a move)');
 
           await page.getByRole('button', { name: 'Take back' }).click();
           await page.getByRole('alertdialog', { name: 'Allow take back?' }).waitFor();
           await expectKidTouchTarget(page, 'Yes');
           await expectKidTouchTarget(page, 'No');
-          await expectNoSeriousViolations(page, 'vs Friend (take-back ask)');
+          await scan('vs Friend (take-back ask)');
           await page.getByRole('button', { name: 'Yes' }).click();
           await page.getByRole('button', { name: /^e2, white pawn/ }).waitFor();
 
@@ -651,7 +658,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
           await expectKidTouchTarget(page, 'Stop game');
           await expectKidTouchTarget(page, 'Keep playing');
-          await expectNoSeriousViolations(page, 'vs Friend (stop confirm)');
+          await scan('vs Friend (stop confirm)');
           await page.getByRole('button', { name: 'Stop game' }).click();
 
           await page.getByRole('heading', { name: 'Play' }).waitFor();
@@ -676,7 +683,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       await expectKidTouchTarget(page, journeyNodeName(lesson, 'current'));
       if (!journeyScanned) {
         await expectKidTouchTarget(page, /Back to Home/);
-        await expectNoSeriousViolations(page, 'Journey');
+        await scan('Journey');
         journeyScanned = true;
       }
       await page.getByRole('button', { name: journeyNodeName(lesson, 'current') }).click();
@@ -691,7 +698,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       await expectKidTouchTarget(page, /Listen again/);
       await expectKidTouchTarget(page, /Let me try/);
       await expectKidTouchTarget(page, 'Skip'); // playtest 2
-      await expectNoSeriousViolations(page, 'Story');
+      await scan('Story');
     }
     await page.getByRole('button', { name: /Let me try/ }).click();
 
@@ -699,7 +706,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     if (!storyDemoScanned) {
       await expectKidTouchTarget(page, /^Next/);
       await expectKidTouchTarget(page, 'Skip'); // playtest 2
-      await expectNoSeriousViolations(page, 'Demo');
+      await scan('Demo');
       storyDemoScanned = true;
     }
     await page.getByRole('button', { name: /^Next/ }).click();
@@ -719,7 +726,11 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       if (scannedTypes.has(exercise.type)) {
         await completeExercise(page, exercise);
       } else {
-        await deepScanExercise(page, exercise);
+        await deepScanExercise(page, exercise); // scans `Exercise (${type}, hint shown)` itself
+        scannedLabels.push(`Exercise (${exercise.type}, hint shown)`);
+        if (exercise.type === 'select-squares') {
+          scannedLabels.push('Exercise (select-squares, wrong pick)');
+        }
         scannedTypes.add(exercise.type);
       }
     }
@@ -731,24 +742,24 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
         const [firstRound, ...restRounds] = boss.rounds;
         if (!firstRound) throw new Error(`mini-game "${boss.id}" has no rounds`);
         await completeExercise(page, firstRound);
-        await expectNoSeriousViolations(page, 'Boss (series, mid-round)');
+        await scan('Boss (series, mid-round)');
         for (const round of restRounds) {
           await completeExercise(page, round);
         }
         await page.getByRole('button', { name: /^Next/ }).click();
         seriesBossScanned = true;
       } else if (boss.mode === 'static' && !staticBossScanned) {
-        await expectNoSeriousViolations(page, 'Boss (static)');
+        await scan('Boss (static)');
         const goal = boss.goal === 'collect-stars' ? 'collect-stars' : 'capture';
         await playSolveLine(page, boss.position, goal);
         await page.getByRole('button', { name: /^Next/ }).click();
         staticBossScanned = true;
       } else if (boss.mode === 'versus' && !versusBossScanned) {
         await expectKidTouchTarget(page, /Take back/);
-        await expectNoSeriousViolations(page, 'Boss (versus, start)');
+        await scan('Boss (versus, start)');
         await playOneKidVersusMove(page, boss);
         await waitForVersusTurnOrEnd(page);
-        await expectNoSeriousViolations(page, 'Boss (versus, mid-game)');
+        await scan('Boss (versus, mid-game)');
         await playVersusBoss(page, boss);
         await page.getByRole('button', { name: /^Next/ }).click();
         versusBossScanned = true;
@@ -766,7 +777,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     if (!completeScanned) {
       await expectKidTouchTarget(page, /Play again/);
       await expectKidTouchTarget(page, /Continue/);
-      await expectNoSeriousViolations(page, 'Complete');
+      await scan('Complete');
       completeScanned = true;
     }
     await page.getByRole('button', { name: /Continue/ }).click();
@@ -782,12 +793,14 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       await expect(page.getByText('Great session!')).toBeVisible();
       if (!summaryScanned) {
         await expectKidTouchTarget(page, 'Done');
-        await expectNoSeriousViolations(page, 'Session summary');
+        await scan('Session summary');
         summaryScanned = true;
       }
       await page.getByRole('button', { name: 'Done' }).click();
     }
   }
+
+  console.log(`full walk (${testInfo.project.name}): ${[...new Set(scannedLabels)].join(', ')}`);
 
   expect([...scannedTypes].sort(), 'every exercise type in content got a deep scan').toEqual(
     [...wantedTypes].sort(),
@@ -903,9 +916,10 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
   page,
 }, testInfo) => {
   // The counterpart to the full curriculum walk above: chromium runs that one, this runs on every
-  // other a11y project (tablet/tablet-portrait/phone) instead — same scan points (every exercise
-  // type, every boss mode, Journey/Story/Demo/Complete/session summary), reached by seeding a
-  // profile straight to each lesson that first introduces one, instead of playing every lesson.
+  // other a11y project (tablet/tablet-portrait/phone) instead — same scan points (Home/Play/My Den/
+  // Practice, Journey/Story/Demo, every exercise type, every boss mode, Complete/session summary),
+  // reached by seeding a profile straight to each lesson that first introduces something new,
+  // instead of playing every lesson. The scanned-label set must equal chromium's.
   test.skip(
     testInfo.project.name === 'chromium',
     'chromium runs the full curriculum walk above instead',
@@ -932,6 +946,34 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
 
   await completeFirstRun(page);
   const profileId = await getSoleProfileId(page);
+
+  // Home, Play, My Den, Practice (fresh-install state, same checks the walk runs there): these
+  // aren't content-dependent, but their layout is viewport-dependent, so every project scans them
+  // too (not just chromium) — the scanned-label set must equal chromium's.
+  await expectKidTouchTarget(page, /Start/);
+  await expectKidTouchTarget(page, /Journey/);
+  await scan('Home');
+  await expectOnlyButtonsRaised(page, 'Home');
+
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await expectKidTouchTarget(page, /Play a full game/);
+  await expectKidTouchTarget(page, /^Hungry Rook,/);
+  await scan('Play');
+  await expectOnlyButtonsRaised(page, 'Play');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
+
+  await page.getByRole('button', { name: 'My Den', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await scan('My Den');
+  await expectOnlyButtonsRaised(page, 'My Den');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
+
+  await page.getByRole('button', { name: 'Practice', exact: true }).click();
+  await expectKidTouchTarget(page, 'Back to Home');
+  await expectKidTouchTarget(page, /Daily warm-up/);
+  await scan('Practice');
+  await page.getByRole('button', { name: 'Back to Home' }).click();
 
   // Journey (scanned once — same label the full walk uses, docs/screens.md §1).
   await page.getByRole('button', { name: /Journey/ }).click();
