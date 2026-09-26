@@ -87,7 +87,7 @@ export function ReviewTaskRunner({
   const task = tasks[index];
 
   if (!task) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   function advance(): void {

@@ -180,7 +180,7 @@ function HighlightSamples(): JSX.Element {
 /** Dev-only visual harness for the board component, at `/#board` in development. */
 export function BoardPlayground(): JSX.Element {
   return (
-    <main className="min-h-screen bg-cream p-6">
+    <main className="min-h-dvh bg-cream p-6">
       <h1 className="mb-4 font-display text-3xl text-ink">Board playground (dev only)</h1>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <PieceGallery />

@@ -53,7 +53,7 @@ export function CompleteStep({ lesson, onPlayAgain, onContinue }: CompleteStepPr
   const minigame = lesson.boss ? services.deps.content.minigame(lesson.boss) : undefined;
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-6 bg-cream px-6 py-10 text-center">
+    <main className="flex min-h-dvh flex-col items-center gap-6 bg-cream px-6 py-10 text-center">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{t('complete.title')}</h1>
       <StarsRow earned={rating} size="4rem" animate />
       <div className="rounded-full bg-[#FBEFD3] px-6 py-3 font-display text-lg font-bold text-[#6E4A07]">

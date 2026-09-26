@@ -49,7 +49,7 @@ export function ProfilePickerScreen(): JSX.Element {
   const goToPasswordScreen = useAppStore((state) => state.goToPasswordScreen);
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-10 bg-cream px-4 py-8 sm:px-10 sm:py-12">
+    <main className="flex min-h-dvh flex-col items-center gap-10 bg-cream px-4 py-8 sm:px-10 sm:py-12">
       <h1 className="text-center font-display text-3xl text-ink sm:text-4xl">
         {t('picker.title')}
       </h1>

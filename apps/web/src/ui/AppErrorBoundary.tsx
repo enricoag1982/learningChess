@@ -11,7 +11,7 @@ import { TapButton } from './primitives.tsx';
 function AppErrorScreen({ message }: { readonly message: string }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-5 bg-cream px-4 text-center">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-5 bg-cream px-4 text-center">
       <Owl className="h-20 w-20" />
       <h1 className="font-display text-2xl text-ink">{t('app-error.title')}</h1>
       <p className="max-w-md text-base text-ink">{t('app-error.body')}</p>

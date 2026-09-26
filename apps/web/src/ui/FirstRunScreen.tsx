@@ -39,7 +39,7 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
   const replay = useNarratedText(services.narrator, text);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
       <h1 className="font-display text-2xl text-ink sm:text-3xl">{t('app.title')}</h1>
       <Owl className="h-24 w-24" />
       <div className="flex w-full max-w-md flex-col items-stretch gap-3">
@@ -83,7 +83,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
       <form
         onSubmit={(event) => {
           void onSubmit(event);
@@ -166,7 +166,7 @@ function SavedStep({
   const { t } = useTranslation();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-line bg-card p-6">
         <h1 className="text-lg font-extrabold text-ink">{t('first-run.saved.title')}</h1>
         <p className="text-sm text-muted">{t('first-run.saved.body', { location })}</p>

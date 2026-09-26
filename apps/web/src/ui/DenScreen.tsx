@@ -116,7 +116,7 @@ export function DenScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const friends = animalFriends(journey.lessons, progress);
@@ -146,7 +146,7 @@ export function DenScreen(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-screen flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
+    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
       <div className="flex items-center gap-4">
         <button
           type="button"

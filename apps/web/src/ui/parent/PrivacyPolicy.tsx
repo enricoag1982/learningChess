@@ -88,7 +88,7 @@ export function PrivacyDialog({ onClose }: PrivacyDialogProps): JSX.Element {
       aria-label={t('parent.privacy.title')}
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
     >
-      <div className="flex max-h-[85vh] w-full max-w-md flex-col gap-4 rounded-2xl border border-line bg-card p-6">
+      <div className="flex max-h-[85dvh] w-full max-w-md flex-col gap-4 rounded-2xl border border-line bg-card p-6">
         <h2 className="text-lg font-extrabold text-ink">{t('parent.privacy.title')}</h2>
         {/* `tabIndex={0}` (axe `scrollable-region-focusable`): keyboard users must be able to
          * focus this region to scroll it, the same as any other scrollable panel would need. */}

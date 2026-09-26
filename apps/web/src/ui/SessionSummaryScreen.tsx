@@ -28,7 +28,7 @@ export function SessionSummaryScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!journey) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const starsEarned = Math.max(0, totalStars(progress) - startTotalStars);
@@ -41,7 +41,7 @@ export function SessionSummaryScreen(): JSX.Element {
   const newRank = journey.rank && journey.rank.id !== startRankId ? journey.rank : undefined;
 
   return (
-    <main className="flex min-h-screen flex-col items-center gap-6 bg-cream px-6 py-10 text-center">
+    <main className="flex min-h-dvh flex-col items-center gap-6 bg-cream px-6 py-10 text-center">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{t('session.summary-title')}</h1>
       <StarsRow earned={Math.min(3, starsEarned)} max={3} size="4rem" animate />
       <div className="rounded-full bg-[#FBEFD3] px-6 py-3 font-display text-lg font-bold text-[#6E4A07]">

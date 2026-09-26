@@ -14,7 +14,7 @@ export function PracticeRunScreen(): JSX.Element {
   const exitPracticeRun = useAppStore((state) => state.exitPracticeRun);
 
   if (practiceTasks.length === 0) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const headerText =

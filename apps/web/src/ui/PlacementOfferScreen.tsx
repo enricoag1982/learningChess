@@ -19,7 +19,7 @@ export function PlacementOfferScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
       <div className="flex w-full max-w-md flex-col items-stretch gap-3">
         <SpeechBubble text={bubbleText} />
         <ReplayButton onClick={replay} label={t('exercise.replay')} />

@@ -102,7 +102,7 @@ export function PasswordScreen(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
       <form
         onSubmit={(event) => {
           void onSubmit(event);

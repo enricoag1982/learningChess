@@ -226,7 +226,7 @@ export function HomeScreen(): JSX.Element {
 
   if (!profile || !journey) {
     // First render before `init()` resolves; a blank cream screen for an instant beats a flash.
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const showStartButton = nextStep !== null || hasWarmUp;
@@ -241,7 +241,7 @@ export function HomeScreen(): JSX.Element {
         : t('home.subtitle-warmup');
 
   return (
-    <main className="flex min-h-screen flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
+    <main className="flex min-h-dvh flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
       <h1 className="font-display text-lg text-muted sm:text-xl">{t('app.title')}</h1>
 
       <div className="flex items-center justify-between gap-4">
