@@ -133,6 +133,8 @@ stars2: 5
 | Components | React Testing Library | Board interaction, lesson flow |
 | End-to-end | Playwright | Create profile → lesson → mini-game → progress persisted |
 | Static | `tsc` strict, ESLint (typescript-eslint `strictTypeChecked` + layer rules), Prettier | Every PR via CI `quality` job |
+| Content snapshot (M8.1) | Vitest `toMatchFileSnapshot` | Every `dist/` output of the content build (`compileAll`), pretty JSON in `packages/content/src/__snapshots__/content/`. Changes only with a deliberate content change: `pnpm --filter @chess-kids/content exec vitest run -u`, review the diff |
+| Storage compat (M8.1) | Vitest + Playwright | `apps/web/test-fixtures/storage/<tag>/`: localStorage + backup files recorded with real `v1.0.0`, `v1.1.0`, `v2.0.0` builds; load and merge snapshots must stay equal; add a fixture per release (folder README) |
 
 ## 9. Rejected
 

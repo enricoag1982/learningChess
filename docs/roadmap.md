@@ -94,6 +94,9 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m7.1` | Time controls: Mon–Fri / Sat–Sun limits, allowed hours ("Play until" / "Not before", parent +15 min window), 5-minute warning (app-level notice on calm screens, once per child per day, spoken) |
 | `m7.2` | Device sharing: merge rules, per-device session logs, "Send to other device" (share sheet), merge import with "Merge into …" / "Add as new child" |
 | `m7.3` | Release `v2.0.0` (M6 + M7) → `m7` |
+| `m8.1` | v4 R0a: golden snapshot of compiled content; storage / backup fixtures recorded with real `v1.0.0`, `v1.1.0`, `v2.0.0` builds, compat unit + e2e tests |
+| `m8.2` | v4 R0b: faster CI (slow tests in a parallel job, sharded e2e, a11y walk once, unused font subsets out of the precache) |
+| `m8.3`… | v4 R1–R5 (`docs/refactor-v4.md` §5) |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
@@ -113,12 +116,13 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 |---|---|---|
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
 | M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships in `v2.0.0` (with M7, 2026-09-25: M6.3 merged after M7.1, no M6-only release point) |
-| M8 | Store apps | Capacitor Android + iPad, native storage, store listings |
-| M9 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| M8 | v4 learning-platform refactor | `docs/refactor-v4.md`; iterations §3 `m8.x`; released as `v4.0.0` |
+| M9 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M10 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 → M7 | Time controls + device sharing (offline, no server; owner 2026-09-25; iterations §3 `m7.x`; ships as `v2.0.0`) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
 | Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
-| v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; after `v2.0.0` |
+| v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; → M8 (started 2026-09-26) |
 
 ## 5. Playtests
 
@@ -145,3 +149,4 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | 5-min warning | App-level notice layer in `App.tsx` (next to `TimeTracker` / `AppUpdater`), shown only on calm screens (Home, Journey, Play, Practice, My Den, lesson complete, session summary), never mid-exercise / game; remaining ≤ 5 min, once per child per day; Owl banner, info style (not tappable), spoken once, gone on the next screen change, `aria-live="polite"`. Reusable for later notices |
 | Device sharing | Option 1 of 4 (share file / QR / parent's cloud drive / family-code sync): merge rules (stars and progress: best of both; attempts, games, time log: union by id; badges: union; streak and minutes: recomputed; settings: newest wins; same child created on 2 devices: "Link to …?" at import) + "Send to other device" via the Web Share API (download fallback). Time limit is per device between shares |
 | Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps. 2026-09-25: owner found the in-app voice mechanical on iPad (device-voice fallback, audio never unlocked); samples int8 / 32 kbps vs full model / 64 kbps / speed 1.0 all fine → keep int8 / 32 kbps (half the size), fix the unlock (M6.3) |
+| v4 numbering (2026-09-26) | v4 refactor = M8 (tags `m8.x`, next free number, owner asked to start it now); Store apps → M9, Paths → M10 |
