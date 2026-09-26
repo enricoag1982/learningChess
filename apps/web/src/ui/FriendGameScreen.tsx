@@ -25,12 +25,10 @@ const FULL_GAME_MOVE_LIMIT = 100;
 /**
  * Sizes `children` to the largest square that fits this wrapper's own available space —
  * `size = min(available width, available height)`, centred (docs/screens.md §1 "Board >= 75% of
- * screen height"). The lesson / versus screens get a square board from `GameLayout`'s own
- * viewport-tuned CSS caps, tuned around a panel that is always at least as tall as the board's
- * `42–46vh` cap; a vs Friend match's per-player strips are much shorter (and, in face-to-face,
- * there are two of them), so that fixed cap would either overflow or leave dead space depending on
- * the strip heights actually rendered. This measures the real box instead, via `ResizeObserver`,
- * and sets an explicit pixel size — exact regardless of strip height or viewport. No-op (renders
+ * screen height"). Same idea as `GameLayout`'s own `FitSquare` (lesson / versus screens), minus its
+ * shrink-only rule: a vs Friend match's per-player strips never change height mid-game. This
+ * measures the real box via `ResizeObserver` and sets an explicit pixel size — exact regardless of
+ * strip height or viewport. No-op (renders
  * unsized, `flex-1`, `aspect-square`) where `ResizeObserver` is unavailable (jsdom in RTL tests,
  * which never exercises real layout/geometry, only DOM structure and interaction).
  */
@@ -522,12 +520,12 @@ export function FriendGameScreen(): JSX.Element {
   const exitFriendGame = useAppStore((state) => state.exitFriendGame);
 
   if (!profile) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
   const gameId = friendSetup.gameId ?? 'full';
   const def = gameDefFor(gameId, services.deps.content);
   if (!def) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const opponent = resolveOpponent(friendSetup.opponent, profiles, t('friend-play.guest'));

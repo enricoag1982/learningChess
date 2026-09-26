@@ -11,6 +11,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | Text | Short; every text also spoken (replay button); icon + label on every action |
 | Actions | One primary action per screen |
 | Board | ≥ 75% of screen height on game screens |
+| Heights | Game screens never scroll: Check / Next always on screen; the board takes the height the panel leaves (floor 240 px, shrink-only within an exercise). `dvh`, never `vh` / `min-h-screen` (owner report, iPad mini 4, 2026-09-26). Checked by `e2e/fit.spec.ts` |
 | Colour roles | Cream background · green = go / done · orange = today / current · gold = stars · blue = computer / info · grey + lock = locked |
 | Errors | Never red; orange + spoken explanation |
 | Type | Fredoka (display) + Nunito (body), self-hosted via Fontsource (SIL OFL) |
