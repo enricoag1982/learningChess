@@ -136,6 +136,7 @@ stars2: 5
 | CI (M8.2) | GitHub Actions `ci.yml` | Parallel jobs `checks` (format, lint, typecheck, unit, build, size, compat, voice), `slow`, `e2e` × 3 shards; `quality` = the one required check, green only if all succeed. Full a11y curriculum walk on chromium; tablet / tablet-portrait / phone reach the same 21 scan points by seeded progress |
 | Content snapshot (M8.1) | Vitest `toMatchFileSnapshot` | Every `dist/` output of the content build (`compileAll`), pretty JSON in `packages/content/src/__snapshots__/content/`. Changes only with a deliberate content change: `pnpm --filter @chess-kids/content exec vitest run -u`, review the diff |
 | Storage compat (M8.1) | Vitest + Playwright | `apps/web/test-fixtures/storage/<tag>/`: localStorage + backup files recorded with real `v1.0.0`, `v1.1.0`, `v2.0.0` builds; load and merge snapshots must stay equal; add a fixture per release (folder README) |
+| Test kit (M8.4) | `@chess-kids/core/testing` | Builders (`makeExercise`, `makeLesson`, …), in-memory fakes of every port + `makeDeps`, `playExerciseToCompletion`; subpath only, never in the app bundle. Core, content and web adapter tests use it instead of local copies |
 
 ## 9. Rejected
 
