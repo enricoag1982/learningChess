@@ -14,6 +14,7 @@
     "lint": "eslint .",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:slow": "pnpm -r --if-present test:slow",
     "build": "pnpm -r build",
     "test:e2e": "pnpm --filter @chess-kids/web test:e2e",
     "size": "pnpm --filter @chess-kids/web size",

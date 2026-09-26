@@ -11,12 +11,16 @@ const { version } = JSON.parse(
 ) as { version: string };
 
 // Separate from vite.config.ts: the PWA plugin has no role in tests and slows them down.
+// `pnpm test` (default `vitest run`): fast unit tests only. `*.slow.test.{ts,tsx}` (none authored
+// yet) is excluded here and would run under `pnpm test:slow` (`vitest.slow.config.ts`) instead —
+// m8.2 item 1, CI's `slow` job.
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(version) },
   plugins: [react()],
   test: {
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}'],
+    exclude: ['**/node_modules/**', 'src/**/*.slow.test.{ts,tsx}'],
     // Full-app RTL flows (a whole game, a mini-game run) take 3–5 s on a loaded machine; the 5 s
     // default timed them out under parallel load (v1.1.0 validation).
     testTimeout: 15_000,

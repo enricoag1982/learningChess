@@ -15,7 +15,8 @@
     "voice-texts": "node scripts/voice-texts.ts",
     "voice-check": "node scripts/voice-check.ts",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests"
   },
   "dependencies": {
     "@chess-kids/core": "workspace:*",
