@@ -89,7 +89,7 @@ tools/                    voice, art, compat, size, content snapshot
 
 | Phase | Scope | Exit check |
 |---|---|---|
-| R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green. Iterations: `m8.1` snapshots + fixtures, `m8.2` CI speed |
+| R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green. Done: `m8.1` snapshots + fixtures, `m8.2` CI speed (3.7 min). R1: `m8.3` docs trim, `m8.4` core test kit + dead exports |
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green |
 | R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal |
@@ -107,8 +107,8 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 | Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
-| Docs | 245 KB | ≈ 150 KB |
-| CI `quality` | ≈ 10 min | ≈ 5 min (+ slow job in parallel) |
+| Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |
+| CI `quality` | ≈ 10 min | ≈ 5 min (+ slow job in parallel) (`m8.2`: 3.7 min) |
 | Initial JS | 181.5 KB gz | ≤ now |
 | Features | — | identical: 92 e2e green, content snapshot equal, old storage and backup files load |
 

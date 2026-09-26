@@ -21,11 +21,10 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Board | Own SVG component | Full control: stars, blocked squares, animal badges, arrows, tap-tap; crisp on tablets |
 | Chess rules | chess.js (BSD-2) + own variant layer | Standard rules from chess.js; variants (no kings, custom win conditions) in own layer |
 | Computer opponent | Own engine (minimax depth 1–4 + controlled mistakes) in a Web Worker | Weak human-like play for kids; no GPL; UI stays smooth. Details: [computer-opponent.md](computer-opponent.md) |
-| App state | Zustand | Minimal; logic stays in domain |
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
 | i18n | i18next | English first, more languages without code changes |
 | Narration | `Narrator` port: pre-generated audio files primary, Web Speech API (device voices) fallback | One port; swapping the underlying voice needs no caller changes |
-| App state | Zustand store: screen, profile, progress, current lesson + step; exercise / game state local to the step component (reducer over core engine functions); services injected (`createServices`) for tests |
+| App state | Zustand (minimal; logic stays in domain): screen, profile, progress, current lesson + step; exercise / game state local to the step component (reducer over core engine functions); services injected (`createServices`) for tests |
 | Content text keys | Content ids are plain strings in core; UI resolves them through one helper (`tContent`); all other UI keys are type-checked |
 | Plural text | i18next plural suffixes (`_one`, `_other`, …) allowed on text leaves; languages compared by base key |
 | Layout | Tablet landscape: board left, panel right; below 1024 px wide: board on top, panel below; phone: one-row top bar with phase chip |
