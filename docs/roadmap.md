@@ -105,10 +105,10 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | # | Item | Scope | Notes |
 |---|---|---|---|
 | F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | Done (`m5.5`) |
-| F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Done (`m5.5`): every remaining World 1–2 lesson (Rook already had `rook-04-easy`/`rook-08-easy`) now has one, on its hardest scored exercise; rules: domain-model.md §3.4 |
-| F3 | Tappable vs not tappable (owner, playtest) | Today info boxes (e.g. "Your moves: 48", stars pill, Owl bubble) look like buttons (same card, border). Proposal: tappable = raised card (border + bottom shadow, pressed state, icon or chevron); info = flat tinted panel, no border, no shadow; audit every screen | Done (`m5.3`): `.tap-raised`/`.info-flat` (`index.css`), shared primitives (`ui/primitives.tsx`), screens.md §1 |
-| F4 | Bear stronger than Wolf | M5.4: tried null-move pruning + late move reductions + history-heuristic ordering (`docs/computer-opponent.md` §6.6); bear vs wolf 13.3% → 20.0% (N = 30, same-seed baseline vs after), still well short of ≥ 70% | Still open. Next: richer `staticEval` for Bear (mobility, king safety, passed pawns — the one M4.2 option not yet tried), isolating each of the 3 techniques' own share (measured together only, for time), wider opening-book coverage |
-| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze (reducer ignores input while `pendingReply` is set). Unreachable today (all 27 mate-in-n are n = 1) | Fixed by v4 R3 (`useExerciseSession`); before any mate-in-2+ content, fix directly |
+| F2 | Easier variants content | `variants` for the hardest exercise of every lesson (Worlds 1–2, `domain-model.md` §3.4) | Done (`m5.5`): one per remaining lesson |
+| F3 | Tappable vs not tappable (owner, playtest) | Info boxes looked like buttons | Done (`m5.3`): `.tap-raised`/`.info-flat` tokens, shared primitives (`ui/primitives.tsx`), `screens.md` §1 |
+| F4 | Bear stronger than Wolf | `computer-opponent.md` §6.6: null-move pruning + LMR + history heuristic; bear vs wolf 13.3% → 20.0% (N = 30), still short of ≥ 70% | Open. Next: richer `staticEval` for Bear, isolating each technique's own share, wider opening-book coverage |
+| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze. Unreachable today (all 27 mate-in-n are n = 1) | Open. Planned fix: v4 R3 (`useExerciseSession`); fix directly first if any mate-in-2+ content is authored sooner |
 
 ## 4. After MVP
 
@@ -143,10 +143,10 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | Topic | Decision |
 |---|---|
-| Illustrations | v1: own flat SVG placeholders. M6 owner pick (current / Fluent 3D / Fluent flat): Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
+| Illustrations | Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
-| v2 scope (2026-09-25) | Offline only: time controls + file-based device sharing with merge. Online (login, remote play, cloud sync) parked: server, child-consent law (COPPA / GDPR Art. 8), privacy-policy rewrite, moderation, for little gain with one child at home |
-| 5-min warning | App-level notice layer in `App.tsx` (next to `TimeTracker` / `AppUpdater`), shown only on calm screens (Home, Journey, Play, Practice, My Den, lesson complete, session summary), never mid-exercise / game; remaining ≤ 5 min, once per child per day; Owl banner, info style (not tappable), spoken once, gone on the next screen change, `aria-live="polite"`. Reusable for later notices |
-| Device sharing | Option 1 of 4 (share file / QR / parent's cloud drive / family-code sync): merge rules (stars and progress: best of both; attempts, games, time log: union by id; badges: union; streak and minutes: recomputed; settings: newest wins; same child created on 2 devices: "Link to …?" at import) + "Send to other device" via the Web Share API (download fallback). Time limit is per device between shares |
-| Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps. 2026-09-25: owner found the in-app voice mechanical on iPad (device-voice fallback, audio never unlocked); samples int8 / 32 kbps vs full model / 64 kbps / speed 1.0 all fine → keep int8 / 32 kbps (half the size), fix the unlock (M6.3) |
-| v4 numbering (2026-09-26) | v4 refactor = M8 (tags `m8.x`, next free number, owner asked to start it now); Store apps → M9, Paths → M10 |
+| v2 scope | Offline only: time controls + file-based device sharing with merge; online (login, remote play, cloud sync) parked — server, child-consent law (COPPA / GDPR Art. 8), moderation, for little gain with one child at home |
+| 5-min warning | App-level notice (reusable for later notices), calm screens only, never mid-exercise/game; once per child per day, spoken, info style (not tappable) |
+| Device sharing | Chosen over QR / parent's cloud drive / family-code sync: share a backup file, merge on import (`domain-model.md` §3.5) + "Send to other device" via the Web Share API, download fallback. Time limit is per device between shares |
+| Voice | Pre-generated audio: Kokoro-82M int8, `af_heart` voice, speed 0.92, MP3 mono 32 kbps (Apache-2.0, generated offline, no cloud TTS, no cost); one narrator voice (Owl, third-person); Web Speech API fallback for texts without audio |
+| v4 numbering | v4 refactor = M8 (`m8.x` tags); Store apps → M9, Paths → M10 |
