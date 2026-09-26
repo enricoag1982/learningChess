@@ -201,16 +201,25 @@ describe('ExerciseStep', () => {
     fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
     await screen.findByText('Look at Rhino.');
     expect(screen.getByText('note-instruction')).toBeTruthy();
-    // Two separate utterances, in order — not one `${instruction} ${note}` concatenation.
-    expect(narrator.spoken.slice(-2)).toEqual(['note-instruction', 'Look at Rhino.']);
+    // The note alone, not the whole instruction re-read (owner report 2026-09-26).
+    expect(narrator.spoken).toEqual(['note-instruction', 'Look at Rhino.']);
 
-    // Replay speaks the same sequence again, from the top.
+    // A second hint note is appended alone too — the instruction is still not repeated.
+    fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
+    await screen.findByText('Try the orange square.');
+    expect(narrator.spoken).toEqual([
+      'note-instruction',
+      'Look at Rhino.',
+      'Try the orange square.',
+    ]);
+
+    // Replay speaks the instruction + current note again, from the top.
     const spokenBeforeReplay = narrator.spoken.length;
     fireEvent.click(screen.getByRole('button', { name: /Say it again/ }));
     await waitFor(() => {
       expect(narrator.spoken.slice(spokenBeforeReplay)).toEqual([
         'note-instruction',
-        'Look at Rhino.',
+        'Try the orange square.',
       ]);
     });
   });

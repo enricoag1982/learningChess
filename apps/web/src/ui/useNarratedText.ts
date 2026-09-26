@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Narrator } from '@chess-kids/core';
 import { speakSequence } from './speakSequence.ts';
 
@@ -25,25 +25,69 @@ export function useNarratedText(narrator: Narrator, text: string): () => void {
 }
 
 /**
- * Same contract as `useNarratedText`, but for two or more texts spoken one after another (M6.3
- * item 1: an exercise's instruction, then its feedback note) — each gets its own generated-audio
- * lookup (`speakSequence.ts`), instead of one string concatenating both, which could never be in
- * the manifest. `texts` is compared by a joined key, not array identity (a fresh array every
- * render), so this only re-speaks when the actual words change.
+ * An exercise (or series-boss round)'s instruction plus its feedback note, without re-reading the
+ * instruction on every note (owner report 2026-09-26: submit re-read the whole instruction before
+ * the feedback, every time). `instruction` is spoken once on mount and again whenever it changes
+ * (e.g. a series-boss round change). `note` is spoken alone — its own `speakSequence` call, never
+ * prefixed with the instruction again — whenever it changes to a non-empty value; `note` becoming
+ * `undefined` (feedback cleared back to a plain instruction) speaks nothing.
+ *
+ * A note that arrives while the instruction is still being read (a guided try's auto-shown hint
+ * level 1, right after mount) does not cut the instruction off: the in-flight instruction's
+ * `speakSequence` run is tracked in a ref, and the note effect waits for it to settle before
+ * speaking — unless superseded meanwhile by a newer note, an instruction change, or unmount, guarded
+ * by a `cancelled` flag set in that effect's own cleanup. The ref itself is cleared once its run
+ * settles, but only while it is still the current one (a newer instruction may already have
+ * replaced it).
+ *
+ * Returns a `replay` callback ("Say it again") that speaks the instruction and current note
+ * together, from the top, same as before this change (dropping a note still waiting on the
+ * instruction, which would otherwise start when the replay supersedes it and cut the replay off).
  */
-export function useNarratedTextSequence(narrator: Narrator, texts: readonly string[]): () => void {
-  const key = texts.join('\u0000');
+export function useInstructionNarration(
+  narrator: Narrator,
+  instruction: string,
+  note: string | undefined,
+): () => void {
+  const instructionRunRef = useRef<Promise<void> | null>(null);
+  /** Drops a note still waiting for the instruction to end — replay speaks it itself. */
+  const cancelWaitingNoteRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
-    void speakSequence(narrator, texts);
+    const run = speakSequence(narrator, [instruction]);
+    instructionRunRef.current = run;
+    void run.then(() => {
+      if (instructionRunRef.current === run) instructionRunRef.current = null;
+    });
     return () => {
       void speakSequence(narrator, []); // stop, without starting a new run
     };
-    // `texts` itself is deliberately not a dep: `key` above is its stable, content-based identity.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [narrator, key]);
+  }, [narrator, instruction]);
+
+  useEffect(() => {
+    if (!note) return; // cleared back to a plain instruction: nothing to speak
+    let cancelled = false;
+    const inFlight = instructionRunRef.current;
+    if (inFlight) {
+      cancelWaitingNoteRef.current = () => {
+        cancelled = true;
+      };
+      void inFlight.then(() => {
+        if (!cancelled) void speakSequence(narrator, [note]);
+      });
+    } else {
+      void speakSequence(narrator, [note]);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [narrator, note, instruction]);
 
   return () => {
-    void speakSequence(narrator, texts);
+    // Replay supersedes the instruction run, which settles it: a note still waiting on that run
+    // would then start and cut the replay off, so drop it (replay speaks the note itself).
+    cancelWaitingNoteRef.current?.();
+    cancelWaitingNoteRef.current = null;
+    void speakSequence(narrator, note ? [instruction, note] : [instruction]);
   };
 }

@@ -54,9 +54,13 @@ inside `touchend`/`click`: the unlock listener covers all four gesture types, ke
 
 ## 5. Sequence
 
-An exercise's instruction and its feedback note (hint/error/praise/…) are spoken as two separate
-utterances (`speakSequence`, `apps/web/src/ui/`), not one concatenated string. A newer sequence (or
-an explicit cancel) stops it before its next text starts; replay buttons replay it from the top.
+An exercise's (or series-boss round's) instruction is spoken once, when it starts. Each feedback
+note (hint/error/praise/…) after that is spoken alone, as its own utterance — never with the
+instruction re-read first (`useInstructionNarration`, `apps/web/src/ui/useNarratedText.ts`, on top of
+`speakSequence`, `apps/web/src/ui/`; owner report 2026-09-26: submit re-read the whole instruction).
+A note arriving while the instruction is still being read waits for it to finish rather than cutting
+it off. "Say it again" replays the instruction + current note together, from the top. A newer
+sequence (or an explicit cancel) stops whatever is currently playing before its next text starts.
 
 ## 6. Missed-text report and Test voice
 
