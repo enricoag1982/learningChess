@@ -1,22 +1,16 @@
 export type * from './domain/profile.ts';
-export { validateNickname, newProfile } from './domain/profile.ts';
+export { validateNickname } from './domain/profile.ts';
 
 export type { Avatar } from './domain/avatars.ts';
-export { AVATARS, isAvatar } from './domain/avatars.ts';
+export { AVATARS } from './domain/avatars.ts';
 
-export { normalizeVoiceText, stripNickname, voiceKey } from './domain/voice-text.ts';
+export { stripNickname, voiceKey } from './domain/voice-text.ts';
 
-export type { ParentLock, CheckPasswordResult } from './domain/parent-lock.ts';
-export {
-  isValidPassword,
-  newParentLock,
-  changePassword,
-  checkPassword,
-} from './domain/parent-lock.ts';
+export type { ParentLock } from './domain/parent-lock.ts';
+export { isValidPassword } from './domain/parent-lock.ts';
 
 export type {
   DemoHighlight,
-  LessonDemo,
   Lesson,
   MiniGame,
   StaticMiniGame,
@@ -27,106 +21,39 @@ export type {
 export type {
   Stars,
   LessonProgress,
-  MasteredVia,
   Attempt,
-  LessonStatus,
   MiniGameProgress,
   GameRecord,
-  GameRecordResult,
 } from './domain/progress.ts';
-export {
-  newLessonProgress,
-  recordExerciseStars,
-  recordBossStars,
-  withResumeStep,
-  withSkippedPhase,
-  withoutSkippedPhase,
-  lessonStatus,
-  lessonStars,
-  totalStars,
-  recordMiniGamePlay,
-} from './domain/progress.ts';
+export { withResumeStep, lessonStatus, lessonStars, totalStars } from './domain/progress.ts';
 
-export type { AnimalFriend, RankState, RankLadderEntry } from './domain/rewards.ts';
+export type { AnimalFriend, RankLadderEntry } from './domain/rewards.ts';
 export { animalFriends, rankLadder } from './domain/rewards.ts';
 
-export type {
-  BadgeCategory,
-  BadgeTier,
-  BadgeConditionType,
-  BadgeCondition,
-  BadgeDef,
-  EarnedBadge,
-  BadgeFacts,
-  NewlyEarnedBadge,
-} from './domain/badges.ts';
-export { evaluateBadges, newEarnedBadge, markSeen } from './domain/badges.ts';
+export type { BadgeCategory, BadgeTier, BadgeDef, EarnedBadge } from './domain/badges.ts';
+export { markSeen } from './domain/badges.ts';
 
 export type { Streak } from './domain/streak.ts';
-export { newStreak, localDayString, isoWeekKey, recordActivityDay } from './domain/streak.ts';
+export { localDayString } from './domain/streak.ts';
 
 export type { SessionLog } from './domain/session-log.ts';
-export {
-  EXTRA_TIME_GRANT_MINUTES,
-  HOURS_OVERRIDE_MINUTES,
-  newSessionLog,
-  addMinutes,
-  lastNDays,
-  timeUsedToday,
-  extraMinutesToday,
-  totalMinutesForDate,
-  isOverLimit,
-  limitForDay,
-  grantExtraMinutes,
-  setHoursOverride,
-  markWarned,
-} from './domain/session-log.ts';
 
-export {
-  allowedHoursReason,
-  isWithinAllowedHours,
-  minutesUntilEnd,
-  shouldWarn,
-} from './domain/time-policy.ts';
+export { minutesUntilEnd, shouldWarn } from './domain/time-policy.ts';
 
-export type {
-  ComputerLevelSetting,
-  PieceStyleSetting,
-  ProfileSettings,
-} from './domain/profile-settings.ts';
+export type { PieceStyleSetting, ProfileSettings } from './domain/profile-settings.ts';
 export {
   DAILY_LIMIT_OPTIONS,
   PLAY_UNTIL_OPTIONS,
   PLAY_FROM_OPTIONS,
   DEFAULT_PROFILE_SETTINGS,
-  isValidDailyLimit,
-  isValidWeekendLimit,
-  isValidPlayUntil,
-  isValidPlayFrom,
-  isValidComputerLevel,
-  isValidPieceStyle,
-  isValidProfileSettings,
 } from './domain/profile-settings.ts';
 
-export type { ReviewBox, ConceptStats, ConceptPoolEntry, ConceptTask } from './domain/review.ts';
-export {
-  newConceptStats,
-  appendResult,
-  accuracy,
-  isWeak,
-  enterReview,
-  applyReviewResult,
-  isDue,
-  conceptPool,
-  pickWarmUp,
-  pickPracticeTasks,
-} from './domain/review.ts';
+export type { ConceptStats, ConceptTask } from './domain/review.ts';
+export { isWeak, isDue } from './domain/review.ts';
 
-export type { UnlockedMiniGame } from './domain/play.ts';
 export { unlockedMiniGames } from './domain/play.ts';
 
 export type {
-  AssessmentKind,
   AssessmentScope,
   AssessmentScore,
   AssessmentResult,
@@ -135,20 +62,16 @@ export type {
 } from './domain/assessment.ts';
 export {
   TEST_OUT_LESSON_TASKS,
-  TEST_OUT_WORLD_TASKS,
   PLACEMENT_TASKS_PER_WORLD,
   planTestOutLesson,
   planTestOutWorld,
   planPlacement,
   scoreTestOut,
   scorePlacementWorld,
-  newAssessmentResult,
-  newUnlock,
 } from './domain/assessment.ts';
 
-export type { LessonStep, LessonPhase, SkippablePhase } from './domain/lesson-session.ts';
+export type { LessonPhase, SkippablePhase } from './domain/lesson-session.ts';
 export {
-  EASIER_AFTER_ERRORS,
   EASIER_VARIANT_STARS,
   lessonSteps,
   stepPhase,
@@ -167,19 +90,8 @@ export type {
   JourneyLessonStatus,
   WorldStatus,
   WorldBossStatus,
-  NextStep,
 } from './domain/journey.ts';
-export {
-  HABITATS,
-  isHabitat,
-  worldLessons,
-  worldStatus,
-  worldBossStatus,
-  lessonAvailability,
-  nextLesson,
-  nextStep,
-  currentRank,
-} from './domain/journey.ts';
+export { HABITATS, worldLessons, nextLesson } from './domain/journey.ts';
 
 export type {
   ProfileRepository,
@@ -198,74 +110,43 @@ export type {
   ContentSource,
   Clock,
   Random,
-  FeatureFlags,
   BotPlayer,
 } from './app/ports.ts';
-export { v1FeatureFlags } from './app/ports.ts';
 
-export type {
-  AppDeps,
-  RecordAttemptInput,
-  RecordExerciseResultInput,
-  RecordBossResultInput,
-  RecordReviewResultInput,
-} from './app/use-cases.ts';
+export type { AppDeps } from './app/use-cases.ts';
 export {
   loadProgress,
   getLessonProgress,
-  getConceptStats,
   recordAttempt,
   recordExerciseResult,
   recordBossResult,
   recordReviewResult,
-  saveResumeStep,
   skipLessonPhase,
   advanceLessonPhase,
 } from './app/use-cases.ts';
 
-export type { RecordMiniGameResultInput } from './app/minigames.ts';
 export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
 
-export type {
-  RecordGameInput,
-  ComputerLevelCondition,
-  ComputerLevelStatus,
-  SuggestedLevelUpdate,
-} from './app/games.ts';
+export type { ComputerLevelCondition, ComputerLevelStatus } from './app/games.ts';
 export {
   recordGame,
   loadGameRecords,
   computerLevelStatus,
-  nextSuggestedLevel,
   suggestedLevel,
   updateSuggestedLevel,
   versusGameRecordResult,
 } from './app/games.ts';
 
-export type { LocalPlayer, FriendGameOption, RecordLocalMatchInput } from './app/friend-play.ts';
-export {
-  friendGameOptions,
-  isFriendOpponent,
-  friendGamesPlayed,
-  recordLocalMatch,
-} from './app/friend-play.ts';
+export type { LocalPlayer } from './app/friend-play.ts';
+export { friendGameOptions, friendGamesPlayed, recordLocalMatch } from './app/friend-play.ts';
 
-export type { Journey, JourneyWorld } from './app/journey.ts';
+export type { Journey } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
 
-export type { SubmitAssessmentInput, ParentUnlockTarget } from './app/assessment.ts';
-export { loadUnlocked, submitAssessment, parentUnlock } from './app/assessment.ts';
+export type { ParentUnlockTarget } from './app/assessment.ts';
+export { submitAssessment, parentUnlock } from './app/assessment.ts';
 
-export type { RewardsCheckResult, DayMinutes } from './app/rewards.ts';
-export {
-  buildBadgeFacts,
-  evaluateAndRecordBadges,
-  recordDailyActivity,
-  recordSessionMinutes,
-  minutesByDay,
-  starsToday,
-  checkRewards,
-} from './app/rewards.ts';
+export { recordSessionMinutes, starsToday, checkRewards } from './app/rewards.ts';
 
 export type { TimeLimitReason, TimeLimitStatus } from './app/time-limit.ts';
 export {
@@ -276,53 +157,22 @@ export {
   markTimeWarning,
 } from './app/time-limit.ts';
 
-export { getOrCreateDeviceId } from './app/device.ts';
-
-export type {
-  ChildOverview,
-  ChildReport,
-  WorldProgressSummary,
-  ConceptAccuracySummary,
-} from './app/report.ts';
+export type { ChildOverview, ChildReport } from './app/report.ts';
 export { buildChildOverview, buildChildReport } from './app/report.ts';
 
-export type { BackupFile, ProfileBackupData, BackupSummary } from './app/backup.ts';
+export type { BackupFile } from './app/backup.ts';
 // Backup values (zod validation) live behind `@chess-kids/core/backup` so zod stays out of the
 // main bundle and the bot worker; only the parent area imports them.
 
-export type { MergeableProfileData } from './domain/merge.ts';
-export {
-  mergeProfileData,
-  mergeLessonProgress,
-  mergeMiniGameProgress,
-  mergeConceptStats,
-  mergeEarnedBadges,
-  mergeStreak,
-  mergeProfileSettings,
-  mergeSessionLogs,
-  mergeUnlocks,
-  rekeyProfileData,
-  emptyProfileData,
-  totalMinutesToday,
-  totalMinutesOverDays,
-} from './domain/merge.ts';
 // M7.2 device sharing: `app/merge.ts`'s `planImport`/`previewChildChange`/`importMerged` (they
 // import `app/backup.ts`, which needs zod) live behind `@chess-kids/core/merge`, same reasoning
 // `@chess-kids/core/backup` documents above.
 
 export { getProfileSettings, updateProfileSettings } from './app/settings.ts';
 
-export type { TodayActivity, TodaySessionPlan } from './app/session.ts';
-export {
-  PRACTICE_TASK_COUNT,
-  planWarmUp,
-  loadWarmUp,
-  loadPracticeTasks,
-  planTodaySession,
-  loadTodaySession,
-} from './app/session.ts';
+export type { TodaySessionPlan } from './app/session.ts';
+export { loadWarmUp, loadPracticeTasks, loadTodaySession } from './app/session.ts';
 
-export type { PasswordFileLocation, VerifyPasswordResult } from './app/profiles.ts';
 export {
   isFirstRun,
   setupParentPassword,
@@ -345,28 +195,21 @@ export type {
   Rank,
   Square,
   Piece,
-  Markers,
   Position,
   Move,
   MoveInput,
-  PositionStatus,
-  ChessRules,
-  SearchBoard,
 } from './domain/chess/index.ts';
 export {
   SQUARES,
-  isSquare,
   parseDiagram,
-  toDiagram,
   DiagramError,
   parseFen,
   toFen,
   FenError,
-  InvalidPositionError,
   chessJsRules,
 } from './domain/chess/index.ts';
 
-export type { VariantOptions, VariantRules } from './domain/variant/index.ts';
+export type { VariantRules } from './domain/variant/index.ts';
 export { createVariantRules } from './domain/variant/index.ts';
 
 export type {
@@ -381,24 +224,11 @@ export type {
   MateInNDef,
   ExerciseDef,
   ExerciseState,
-  MoveOutcome,
-  SelectionResult,
-  PlaceOutcome,
   PalettePiece,
   Hint,
-  MateInNOutcome,
-  SolverMove,
-  StaticCaptureGameDef,
-  MiniGameGoal,
   GameState,
-  GameOutcome,
-  SeriesGameDef,
   SeriesGameState,
-  VersusGameDef,
   VersusState,
-  VersusStatus,
-  VersusMoveOutcome,
-  BossResultSummary,
 } from './domain/exercise/index.ts';
 export {
   startExercise,
@@ -448,8 +278,6 @@ export {
   canTakeBack,
   takeBackVersusMove,
   versusStars,
-  summarizeBossResult,
-  isBossResultWin,
 } from './domain/exercise/index.ts';
 
 // Variant game rules (standard chess and kingless mini-games, played against the bot below) and
