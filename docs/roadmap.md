@@ -94,6 +94,9 @@ Content track: Worlds 1–2 ready by M2, 3–4 by M3, 5 by M4, illustrations by 
 | `m7.1` | Time controls: Mon–Fri / Sat–Sun limits, allowed hours ("Play until" / "Not before", parent +15 min window), 5-minute warning (app-level notice on calm screens, once per child per day, spoken) |
 | `m7.2` | Device sharing: merge rules, per-device session logs, "Send to other device" (share sheet), merge import with "Merge into …" / "Add as new child" |
 | `m7.3` | Release `v2.0.0` (M6 + M7) → `m7` |
+| `m8.1` | v4 R0a: golden snapshot of compiled content; storage / backup fixtures recorded with real `v1.0.0`, `v1.1.0`, `v2.0.0` builds, compat unit + e2e tests |
+| `m8.2` | v4 R0b: faster CI (slow tests in a parallel job, sharded e2e, a11y walk once, unused font subsets out of the precache) |
+| `m8.3`… | v4 R1–R5 (`docs/refactor-v4.md` §5) |
 
 M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` last (design pass covers the new M5.2 / M5.5 screens and refreshes the README screenshots) → `m5`.
 
@@ -102,10 +105,10 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | # | Item | Scope | Notes |
 |---|---|---|---|
 | F1 | Readable documentation | Short, nice-to-read overview: root `README.md` (what the app is, who it is for, how a lesson works, screenshots, run / build) + links into `docs/` | Done (`m5.5`) |
-| F2 | Easier variants content | `variants` for the hardest exercises of every lesson (Worlds 1–2) + content audit | Done (`m5.5`): every remaining World 1–2 lesson (Rook already had `rook-04-easy`/`rook-08-easy`) now has one, on its hardest scored exercise; rules: domain-model.md §3.4 |
-| F3 | Tappable vs not tappable (owner, playtest) | Today info boxes (e.g. "Your moves: 48", stars pill, Owl bubble) look like buttons (same card, border). Proposal: tappable = raised card (border + bottom shadow, pressed state, icon or chevron); info = flat tinted panel, no border, no shadow; audit every screen | Done (`m5.3`): `.tap-raised`/`.info-flat` (`index.css`), shared primitives (`ui/primitives.tsx`), screens.md §1 |
-| F4 | Bear stronger than Wolf | M5.4: tried null-move pruning + late move reductions + history-heuristic ordering (`docs/computer-opponent.md` §6.6); bear vs wolf 13.3% → 20.0% (N = 30, same-seed baseline vs after), still well short of ≥ 70% | Still open. Next: richer `staticEval` for Bear (mobility, king safety, passed pawns — the one M4.2 option not yet tried), isolating each of the 3 techniques' own share (measured together only, for time), wider opening-book coverage |
-| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze (reducer ignores input while `pendingReply` is set). Unreachable today (all 27 mate-in-n are n = 1) | Fixed by v4 R3 (`useExerciseSession`); before any mate-in-2+ content, fix directly |
+| F2 | Easier variants content | `variants` for the hardest exercise of every lesson (Worlds 1–2, `domain-model.md` §3.4) | Done (`m5.5`): one per remaining lesson |
+| F3 | Tappable vs not tappable (owner, playtest) | Info boxes looked like buttons | Done (`m5.3`): `.tap-raised`/`.info-flat` tokens, shared primitives (`ui/primitives.tsx`), `screens.md` §1 |
+| F4 | Bear stronger than Wolf | `computer-opponent.md` §6.6: null-move pruning + LMR + history heuristic; bear vs wolf 13.3% → 20.0% (N = 30), still short of ≥ 70% | Open. Next: richer `staticEval` for Bear, isolating each technique's own share, wider opening-book coverage |
+| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze. Unreachable today (all 27 mate-in-n are n = 1) | Open. Planned fix: v4 R3 (`useExerciseSession`); fix directly first if any mate-in-2+ content is authored sooner |
 
 ## 4. After MVP
 
@@ -113,12 +116,13 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 |---|---|---|
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
 | M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships in `v2.0.0` (with M7, 2026-09-25: M6.3 merged after M7.1, no M6-only release point) |
-| M8 | Store apps | Capacitor Android + iPad, native storage, store listings |
-| M9 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| M8 | v4 learning-platform refactor | `docs/refactor-v4.md`; iterations §3 `m8.x`; released as `v4.0.0` |
+| M9 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M10 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 → M7 | Time controls + device sharing (offline, no server; owner 2026-09-25; iterations §3 `m7.x`; ships as `v2.0.0`) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
 | Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
-| v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; after `v2.0.0` |
+| v4 | Learning platform refactor (owner 2026-09-25) | Same features; one folder per exercise type (incl. tests) behind registries; platform packages (core, content, web) + `subject-chess` pack, reusable for other learning apps (math, programming); −12 % source, −40 % docs, CI ≈ 5 min; proof of reuse `apps/math-demo`. Plan: `docs/refactor-v4.md`; → M8 (started 2026-09-26) |
 
 ## 5. Playtests
 
@@ -139,9 +143,10 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | Topic | Decision |
 |---|---|
-| Illustrations | v1: own flat SVG placeholders. M6 owner pick (current / Fluent 3D / Fluent flat): Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
+| Illustrations | Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
-| v2 scope (2026-09-25) | Offline only: time controls + file-based device sharing with merge. Online (login, remote play, cloud sync) parked: server, child-consent law (COPPA / GDPR Art. 8), privacy-policy rewrite, moderation, for little gain with one child at home |
-| 5-min warning | App-level notice layer in `App.tsx` (next to `TimeTracker` / `AppUpdater`), shown only on calm screens (Home, Journey, Play, Practice, My Den, lesson complete, session summary), never mid-exercise / game; remaining ≤ 5 min, once per child per day; Owl banner, info style (not tappable), spoken once, gone on the next screen change, `aria-live="polite"`. Reusable for later notices |
-| Device sharing | Option 1 of 4 (share file / QR / parent's cloud drive / family-code sync): merge rules (stars and progress: best of both; attempts, games, time log: union by id; badges: union; streak and minutes: recomputed; settings: newest wins; same child created on 2 devices: "Link to …?" at import) + "Send to other device" via the Web Share API (download fallback). Time limit is per device between shares |
-| Voice | Device voices (Web Speech API) up to v1.1. From M6 (2026-09-25): pre-generated audio, Kokoro-82M (open-source, Apache-2.0), generated offline in the repo, no cloud TTS, no cost; one narrator voice (Owl; texts are third-person narration); device voice only for texts without audio. Owner pick (5 samples): Kokoro `af_heart` (US English, female), speed 0.92, MP3 mono 32 kbps. 2026-09-25: owner found the in-app voice mechanical on iPad (device-voice fallback, audio never unlocked); samples int8 / 32 kbps vs full model / 64 kbps / speed 1.0 all fine → keep int8 / 32 kbps (half the size), fix the unlock (M6.3) |
+| v2 scope | Offline only: time controls + file-based device sharing with merge; online (login, remote play, cloud sync) parked — server, child-consent law (COPPA / GDPR Art. 8), moderation, for little gain with one child at home |
+| 5-min warning | App-level notice (reusable for later notices), calm screens only, never mid-exercise/game; once per child per day, spoken, info style (not tappable) |
+| Device sharing | Chosen over QR / parent's cloud drive / family-code sync: share a backup file, merge on import (`domain-model.md` §3.5) + "Send to other device" via the Web Share API, download fallback. Time limit is per device between shares |
+| Voice | Pre-generated audio: Kokoro-82M int8, `af_heart` voice, speed 0.92, MP3 mono 32 kbps (Apache-2.0, generated offline, no cloud TTS, no cost); one narrator voice (Owl, third-person); Web Speech API fallback for texts without audio |
+| v4 numbering | v4 refactor = M8 (`m8.x` tags); Store apps → M9, Paths → M10 |

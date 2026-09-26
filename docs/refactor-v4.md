@@ -85,18 +85,18 @@ tools/                    voice, art, compat, size, content snapshot
 | YAML defaults: text / title keys from ids, world from folder, `stars2` from `stars3`, versus rule presets | 9 |
 | Comments state intent only; history lives in `validation.md` / retrospective; decision rows ≤ 2 lines | 10 |
 
-## 5. Phases (each = PR + tag `m<N>.<i>`; the app ships after every phase)
+## 5. Phases (milestone M8; each iteration = PR + tag `m8.<i>`; the app ships after every one)
 
 | Phase | Scope | Exit check |
 |---|---|---|
-| R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green |
+| R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green. Done: `m8.1` snapshots + fixtures, `m8.2` CI speed (3.7 min). R1: `m8.3` docs trim, `m8.4` core test kit + dead exports |
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green |
 | R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal |
 | R4 Platform / subject split | `stimulus` replaces `position` in the lesson model; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, journey habitats, Den, report, services; import boundary lint | platform builds and tests without `subject-chess` |
 | R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
 
-Start after `v2.0.0` (M7): v2 changes time policy, notice layer and backup / merge, which v4 moves.
+Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs in `apps/web/src/ui/**`, R0–R1 stay out of those files; web test kit, e2e helper reuse and comment trim follow once those fixes merge.
 
 ## 6. Targets
 
@@ -107,8 +107,8 @@ Start after `v2.0.0` (M7): v2 changes time policy, notice layer and backup / mer
 | Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
-| Docs | 245 KB | ≈ 150 KB |
-| CI `quality` | ≈ 10 min | ≈ 5 min (+ slow job in parallel) |
+| Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |
+| CI `quality` | ≈ 10 min | ≈ 5 min (+ slow job in parallel) (`m8.2`: 3.7 min) |
 | Initial JS | 181.5 KB gz | ≤ now |
 | Features | — | identical: 92 e2e green, content snapshot equal, old storage and backup files load |
 
@@ -126,9 +126,9 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 
 ## 8. Decisions for the owner
 
-| # | Question | Recommendation |
-|---|---|---|
-| 1 | Package split | 3 platform packages + 1 subject package, one repo |
-| 2 | Proof of reuse | `apps/math-demo` in the repo (dev / test only, not deployed) |
-| 3 | Timing | After `v2.0.0`; R0–R1 may start earlier (no behaviour change) |
-| 4 | Separate platform repo / npm package | Later, when a second real app starts |
+| # | Question | Recommendation | Status |
+|---|---|---|---|
+| 1 | Package split | 3 platform packages + 1 subject package, one repo | Recommendation applies unless the owner objects before R4 |
+| 2 | Proof of reuse | `apps/math-demo` in the repo (dev / test only, not deployed) | Same, before R5 |
+| 3 | Timing | After `v2.0.0`; R0–R1 may start earlier (no behaviour change) | Decided: start now (owner 2026-09-26) |
+| 4 | Separate platform repo / npm package | Later, when a second real app starts | Later |

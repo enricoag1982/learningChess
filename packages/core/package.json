@@ -12,6 +12,7 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
+    "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests",
     "calibrate": "node scripts/calibrate.ts"
   },
   "dependencies": {

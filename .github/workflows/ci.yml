@@ -1,5 +1,8 @@
 name: CI
 
+# The master ruleset requires only the `quality` check (keep its name stable). Every other job below
+# is a dependency `quality` waits on via `needs` + `if: always()` (m8.2: split for wall-clock speed
+# — `checks`/`slow`/`e2e` run in parallel instead of one long sequential job).
 on:
   pull_request:
   push:
@@ -13,12 +16,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single required check for the master ruleset. Keep the job name stable;
-  # add new checks as steps here (or as jobs listed in `needs`).
-  quality:
-    name: quality
+  # Install + format + lint + typecheck + fast unit/content tests + build + size + compat +
+  # voice:check. Excludes `*.slow.test.ts` (see the `slow` job) and e2e (see the `e2e` job).
+  checks:
+    name: checks
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
 
@@ -56,10 +59,84 @@ jobs:
       - name: Voice coverage
         run: pnpm run --if-present voice:check
 
+  # Slow unit tests only (bot self-play / strength / timing, winnability, deep perft): runs in
+  # parallel with `checks`, off the critical path.
+  slow:
+    name: slow
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Slow unit tests
+        run: pnpm run --if-present test:slow
+
+  # e2e, sharded (m8.2: full a11y curriculum walk now runs on chromium only; other viewports run a
+  # seeded scan instead — shard boundaries picked from measured spec times so the longest shard is
+  # ≈ 3 min).
+  e2e:
+    name: e2e (shard ${{ matrix.shard }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run --if-present build
+
       - name: Install Playwright browser
         run: pnpm --filter @chess-kids/web exec playwright install --with-deps chromium
 
-      - name: E2E smoke test
-        run: pnpm run test:e2e
+      - name: E2E (shard ${{ matrix.shard }}/3)
+        run: pnpm --filter @chess-kids/web exec playwright test --shard=${{ matrix.shard }}/3
         env:
           CI: true
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-shard-${{ matrix.shard }}
+          path: apps/web/playwright-report
+          retention-days: 7
+
+  # Single required check for the master ruleset. Keep the job name stable; it only aggregates the
+  # jobs above — add a new check as a step in one of them, or as a new job listed in `needs`.
+  quality:
+    name: quality
+    needs: [checks, slow, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All required jobs succeeded
+        run: |
+          for result in "${{ needs.checks.result }}" "${{ needs.slow.result }}" "${{ needs.e2e.result }}"; do
+            if [ "$result" != "success" ]; then
+              echo "a required job did not succeed (checks=${{ needs.checks.result }}, slow=${{ needs.slow.result }}, e2e=${{ needs.e2e.result }})"
+              exit 1
+            fi
+          done
