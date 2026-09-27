@@ -11,6 +11,7 @@ import type {
 import { SQUARES } from '@chess-kids/core';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import { modeE2EOf } from '../src/modes/e2e-registry.ts';
 import {
   answerExerciseWrongThenSolve,
   clickSquare,
@@ -73,17 +74,7 @@ async function passThroughTrailingMiniGame(page: Page): Promise<void> {
   if (!game) {
     throw new Error(`passThroughTrailingMiniGame: no mini-game titled "${title ?? ''}"`);
   }
-  if (game.mode === 'series') {
-    for (const round of game.rounds) {
-      await solveExercise(page, round);
-      await page.getByRole('button', { name: /^Next/ }).click();
-    }
-  } else if (game.mode === 'versus') {
-    await playVersusBoss(page, game);
-  } else {
-    const goal = game.goal === 'collect-stars' ? 'collect-stars' : 'capture';
-    await playSolveLine(page, game.position, goal);
-  }
+  await modeE2EOf(game.mode).play(page, game, { text: contentText, solve: solveExercise });
   await page.getByRole('button', { name: 'Continue' }).click();
   await summary.waitFor();
 }

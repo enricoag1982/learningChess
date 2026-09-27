@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { CompiledContent, ExerciseDef, Lesson, Square, TracksCatalog } from '@chess-kids/core';
-import { createVariantRules, chessJsRules, solve } from '@chess-kids/core';
+import { createVariantRules, chessJsRules, findMoveBySan } from '@chess-kids/core';
+import { solutionOf } from '@chess-kids/core/testing';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
@@ -44,24 +45,24 @@ function lessonsBefore(target: Lesson): readonly Lesson[] {
   return ordered.slice(0, index);
 }
 
-/** The first move of `def`'s solution: the shortest solver line for a move-counted goal, or the
- * first listed solution's move for `best-move`. */
+/** The first move of `def`'s own core solution (`solutionOf`) — collect-stars/capture's shortest
+ * solver line, or best-move's first listed SAN, resolved to a board move either way. */
 function firstMoveOf(def: ExerciseDef): { readonly from: Square; readonly to: Square } {
-  if (def.type === 'collect-stars' || def.type === 'capture') {
-    const line = solve(def.position, rules, def.type);
-    const [move] = line ?? [];
-    if (!move) throw new Error(`exercise "${def.id}": no solver line found`);
+  const [action] = solutionOf(def).solution(def, rules);
+  if (action === undefined || action.type !== 'move') {
+    throw new Error(`exercise "${def.id}": type "${def.type}" doesn't move a single piece`);
+  }
+  if (typeof action.move === 'string') {
+    const move = findMoveBySan(
+      rules.legalMoves(def.position, { staticOpponent: true }),
+      action.move,
+    );
+    if (!move) {
+      throw new Error(`exercise "${def.id}": no legal move matches SAN "${action.move}"`);
+    }
     return move;
   }
-  if (def.type === 'best-move') {
-    const [san] = def.solutions;
-    const move = rules
-      .legalMoves(def.position, { staticOpponent: true })
-      .find((candidate) => candidate.san === san);
-    if (!move) throw new Error(`exercise "${def.id}": no legal move matches SAN "${san ?? ''}"`);
-    return move;
-  }
-  throw new Error(`exercise "${def.id}": type "${def.type}" doesn't move a single piece`);
+  return action.move;
 }
 
 // non-functional.md §2: "Respect reduce motion." index.css zeroes animation/transition durations
