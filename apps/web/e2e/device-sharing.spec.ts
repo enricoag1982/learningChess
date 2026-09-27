@@ -10,6 +10,7 @@ import {
   dismissCelebrationIfShown,
   firstJourneyLesson,
   getProfileIdByNickname,
+  openParentArea,
   playLesson,
   seedLessonMastered,
   withAppStorage,
@@ -112,18 +113,6 @@ async function readBestStars(
     const progress = await repos.progress.getLesson(profileId, lessonId);
     return progress?.bestStars ?? {};
   });
-}
-
-/**
- * Opens the parent area from the profile picker (a reload always lands there —
- * app-structure.md §3), with the standard test password (same as `parent-area.spec.ts`'s own
- * helper): "Grown-ups" lives on the picker screen itself, no profile tap needed first.
- */
-async function openParentArea(page: Page): Promise<void> {
-  await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByRole('button', { name: 'Open' }).click();
-  await page.getByRole('heading', { name: 'Parent area' }).waitFor();
 }
 
 test.describe('Device sharing (M7.2): export merges into another device', () => {

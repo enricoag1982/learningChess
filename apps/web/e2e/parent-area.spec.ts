@@ -3,17 +3,10 @@ import {
   completeFirstRun,
   findLesson,
   getProfileIdByNickname,
+  openParentArea,
   seedGameRecordWins,
   seedLessonMastered,
 } from './helpers.ts';
-
-/** From an already-rendered profile picker, opens the parent area with the standard test password. */
-async function openParentArea(page: import('@playwright/test').Page): Promise<void> {
-  await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByRole('button', { name: 'Open' }).click();
-  await page.getByRole('heading', { name: 'Parent area' }).waitFor();
-}
 
 test.describe('Parent area: overview, report, backup (M5.1)', () => {
   test('seed two children → overview → report shows seeded stars/games → export → reset → import the exported file → data back', async ({

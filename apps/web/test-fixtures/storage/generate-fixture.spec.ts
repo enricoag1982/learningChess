@@ -22,6 +22,7 @@ import {
   dismissCelebrationIfShown,
   findWorld,
   getProfileIdByNickname,
+  openParentArea,
   playLesson,
   shownExercise,
   solveExercise,
@@ -32,14 +33,6 @@ import {
 const TAG = 'v2.0.0';
 /** Relative to `apps/web` (playwright's own cwd) — move the result into this package's own copy. */
 const OUT_DIR = join('test-fixtures', 'storage', TAG);
-
-/** From an already-rendered profile picker, opens the parent area with the standard test code. */
-async function openParentArea(page: import('@playwright/test').Page): Promise<void> {
-  await page.getByRole('button', { name: /Grown-ups/ }).click();
-  await page.getByLabel('Parent code', { exact: true }).fill('1234');
-  await page.getByRole('button', { name: 'Open' }).click();
-  await page.getByRole('heading', { name: 'Parent area' }).waitFor();
-}
 
 /** Every scored exercise in the whole bundle — a safe superset of candidates for whichever concept
  * the review scheduler picks (`solveWhicheverExercise` matches by the one actually shown). */
