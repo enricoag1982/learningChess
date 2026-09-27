@@ -67,8 +67,8 @@ export default defineConfig([
       ],
     },
   },
-  // v4 R4a pre-split ratchet (m8.15 C1, docs/refactor-v4.md §R4, design-r4.md §1/§3): platform-bound
-  // paths (left) may not import chess-bound paths (right) or `@chess-kids/core/chess`.
+  // Platform/chess boundary ratchet (docs/refactor-v4.md §R4): platform-bound paths (left) may not
+  // import chess-bound paths (right) or `@chess-kids/core/chess`.
   ...(() => {
     const PLATFORM_BOUND_PATHS = [
       'packages/core/src/index.ts',
@@ -160,7 +160,7 @@ export default defineConfig([
       '**/content/src/modes/static/**',
       '**/content/src/modes/versus/**',
     ];
-    // Ratchet: today's leaks (design-r4.md §1 #1–17), removed one by one as C4–C10 land; 0 by C10.
+    // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
     const RATCHET_IGNORES = [
       'packages/core/src/domain/lesson.ts',
       'packages/core/src/domain/review.ts',

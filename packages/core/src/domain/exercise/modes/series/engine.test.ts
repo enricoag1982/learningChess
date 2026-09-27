@@ -12,8 +12,7 @@ import type { SeriesGameDef } from './def.ts';
 import { completeRound, currentRound, seriesResult, seriesStars, startSeries } from './engine.ts';
 
 /** This suite plays every round as `select-squares`; `EXERCISE_KINDS` is chess's own full
- * registry (`createSubjectRuntime`'s job elsewhere) — `startSeries`/`completeRound` no longer
- * hardcode it (leak #3). */
+ * registry, passed in explicitly since `startSeries`/`completeRound` take any subject's kinds. */
 function start(def: SeriesGameDef<SelectSquaresDef>) {
   return startSeries(def, EXERCISE_KINDS);
 }

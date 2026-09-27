@@ -16,7 +16,7 @@ export interface AnimalFriend {
 
 /** The subject's animal friends (chess: Rhino .. Caterpillar), each tied to the earliest lesson
  * that teaches its character, in `characters`' own key order. A character with no authored lesson
- * yet is left out (design-r4.md §2 leak #5). */
+ * yet is left out. */
 export function animalFriends(
   lessons: readonly Lesson[],
   progresses: readonly LessonProgress[],

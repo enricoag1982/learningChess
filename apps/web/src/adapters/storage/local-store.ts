@@ -25,23 +25,26 @@ export interface OpenLocalStoreOptions {
   readonly version?: number;
   /** Migrations covering every version between the stored one and `version`, in any order. */
   readonly migrations?: readonly Migration[];
+  /** Namespace every key is stored under, e.g. `'chess-kids:'` (`AppConfig.storagePrefix`).
+   * Defaults to `DEFAULT_KEY_PREFIX`. */
+  readonly keyPrefix?: string;
 }
 
-/** Current schema version for `chess-kids:*` storage, used when `options.version` is omitted
- * (`migrations.ts` for what each version adds). */
+/** Current schema version for this storage, used when `options.version` is omitted (`migrations.ts`
+ * for what each version adds). */
 export const SCHEMA_VERSION = 5;
 
-const KEY_PREFIX = 'chess-kids:';
-const VERSION_KEY = `${KEY_PREFIX}schema-version`;
+/** `options.keyPrefix`'s own default, when the caller has no `AppConfig` to read it from. */
+export const DEFAULT_KEY_PREFIX = 'chess-kids:';
 
-function namespacedKey(name: string): string {
-  return `${KEY_PREFIX}${name}`;
+function namespacedKey(keyPrefix: string, name: string): string {
+  return `${keyPrefix}${name}`;
 }
 
-function createStore(storage: Storage): LocalStore {
+function createStore(storage: Storage, keyPrefix: string): LocalStore {
   return {
     read(name: string): unknown {
-      const raw = storage.getItem(namespacedKey(name));
+      const raw = storage.getItem(namespacedKey(keyPrefix, name));
       if (raw === null) return undefined;
       try {
         return JSON.parse(raw) as unknown;
@@ -50,19 +53,19 @@ function createStore(storage: Storage): LocalStore {
       }
     },
     write(name: string, value: unknown): void {
-      storage.setItem(namespacedKey(name), JSON.stringify(value));
+      storage.setItem(namespacedKey(keyPrefix, name), JSON.stringify(value));
     },
     remove(name: string): void {
-      storage.removeItem(namespacedKey(name));
+      storage.removeItem(namespacedKey(keyPrefix, name));
     },
   };
 }
 
-/** True if `storage` holds any `chess-kids:` key other than the version key. */
-function hasNamespacedData(storage: Storage): boolean {
+/** True if `storage` holds any `keyPrefix`-namespaced key other than the version key. */
+function hasNamespacedData(storage: Storage, keyPrefix: string, versionKey: string): boolean {
   for (let i = 0; i < storage.length; i += 1) {
     const key = storage.key(i);
-    if (key !== null && key !== VERSION_KEY && key.startsWith(KEY_PREFIX)) {
+    if (key !== null && key !== versionKey && key.startsWith(keyPrefix)) {
       return true;
     }
   }
@@ -70,8 +73,8 @@ function hasNamespacedData(storage: Storage): boolean {
 }
 
 /** Stored schema version, or `undefined` if the version key is absent. */
-function readStoredVersion(storage: Storage): number | undefined {
-  const raw = storage.getItem(VERSION_KEY);
+function readStoredVersion(storage: Storage, versionKey: string): number | undefined {
+  const raw = storage.getItem(versionKey);
   if (raw === null) return undefined;
   const parsed = Number(raw);
   if (!Number.isInteger(parsed)) {
@@ -82,18 +85,20 @@ function readStoredVersion(storage: Storage): number | undefined {
 
 /** Opens namespaced, versioned JSON storage over `storage`. Fresh storage starts at the target
  * version; below it migrates up one step at a time (a missing step throws); above it, or
- * unversioned `chess-kids:` data, throws without touching anything. */
+ * unversioned namespaced data, throws without touching anything. */
 export function openLocalStore(storage: Storage, options?: OpenLocalStoreOptions): LocalStore {
   const targetVersion = options?.version ?? SCHEMA_VERSION;
   const migrations = options?.migrations ?? [];
-  const store = createStore(storage);
-  const storedVersion = readStoredVersion(storage);
+  const keyPrefix = options?.keyPrefix ?? DEFAULT_KEY_PREFIX;
+  const versionKey = `${keyPrefix}schema-version`;
+  const store = createStore(storage, keyPrefix);
+  const storedVersion = readStoredVersion(storage, versionKey);
 
   if (storedVersion === undefined) {
-    if (hasNamespacedData(storage)) {
+    if (hasNamespacedData(storage, keyPrefix, versionKey)) {
       throw new StorageError('Unversioned chess-kids data found in storage');
     }
-    storage.setItem(VERSION_KEY, String(targetVersion));
+    storage.setItem(versionKey, String(targetVersion));
     return store;
   }
 
@@ -111,7 +116,7 @@ export function openLocalStore(storage: Storage, options?: OpenLocalStoreOptions
       throw new StorageError(`Missing migration to schema version ${String(next)}`);
     }
     migration.migrate(store);
-    storage.setItem(VERSION_KEY, String(next));
+    storage.setItem(versionKey, String(next));
     current = next;
   }
 

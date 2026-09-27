@@ -9,6 +9,7 @@ import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../d
 import type { ConceptStats } from '../domain/review.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
+import type { AppConfig } from '../domain/subject.ts';
 import type { BackupFileWriter, BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -35,7 +36,9 @@ export interface ProfileBackupData {
 /** The backup file itself: one JSON file for either every profile on the device ("Export") or a
  * single one ("Export per child" — same format, `profiles`/`data` just hold the one). */
 export interface BackupFile {
-  readonly app: 'chess-kids';
+  /** `deps.app.backupAppId` — identifies which app wrote the file, so importing into a different
+   * subject's app is rejected. */
+  readonly app: string;
   readonly schemaVersion: number;
   readonly exportedAt: string;
   readonly profiles: readonly Profile[];
@@ -192,7 +195,7 @@ const profileBackupDataSchema = z.object({
 /** Shape-only validation: every field type here already matches the live domain interfaces, so a
  * successful parse is safe to treat as a real {@link BackupFile}. */
 const backupFileSchema = z.object({
-  app: z.literal('chess-kids'),
+  app: z.string(),
   schemaVersion: z.number().int().positive(),
   exportedAt: z.string(),
   profiles: z.array(profileSchema),
@@ -292,7 +295,7 @@ export async function buildBackupFile(
   );
 
   return {
-    app: 'chess-kids',
+    app: deps.app.backupAppId,
     schemaVersion: schemaVersion(deps),
     exportedAt: deps.clock.now().toISOString(),
     profiles,
@@ -309,22 +312,22 @@ function slug(nickname: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-/** `chess-kids-backup-<date>.json`, or `chess-kids-backup-<nickname>-<date>.json` for a per-child
- * export — own filename for clarity when several sit in Downloads. */
-export function backupFileName(now: Date, nickname?: string): string {
+/** `<backupAppId>-backup-<date>.json`, or `...-<nickname>-<date>.json` for a per-child export — own
+ * filename for clarity when several sit in Downloads. */
+export function backupFileName(app: AppConfig, now: Date, nickname?: string): string {
   const date = localDayString(now);
   const nicknameSlug = nickname === undefined ? '' : slug(nickname);
   return nicknameSlug === ''
-    ? `chess-kids-backup-${date}.json`
-    : `chess-kids-backup-${nicknameSlug}-${date}.json`;
+    ? `${app.backupAppId}-backup-${date}.json`
+    : `${app.backupAppId}-backup-${nicknameSlug}-${date}.json`;
 }
 
 /** `<nickname>` or literal `all`, slugged, for the "Send to other device" filename — a different,
  * more explicit shape than {@link backupFileName}'s own (kept unchanged for "Export"). */
-export function shareFileName(now: Date, nickname?: string): string {
+export function shareFileName(app: AppConfig, now: Date, nickname?: string): string {
   const date = localDayString(now);
   const label = nickname === undefined ? '' : slug(nickname);
-  return `chess-for-kids-${label === '' ? 'all' : label}-${date}.json`;
+  return `${app.backupFilePrefix}-${label === '' ? 'all' : label}-${date}.json`;
 }
 
 /** Builds the exact same backup JSON {@link exportBackup} writes to disk, but returns it instead of
@@ -336,7 +339,7 @@ export async function buildShareFile(
   const file = await buildBackupFile(deps, profileIds);
   const nickname = profileIds?.length === 1 ? file.profiles[0]?.nickname : undefined;
   return {
-    filename: shareFileName(deps.clock.now(), nickname),
+    filename: shareFileName(deps.app, deps.clock.now(), nickname),
     contents: JSON.stringify(file, null, 2),
   };
 }
@@ -350,7 +353,7 @@ export async function exportBackup(deps: AppDeps, profileIds?: readonly string[]
   const file = await buildBackupFile(deps, profileIds);
   // Nickname in the filename depends on which call this is, not on how many profiles the result holds.
   const nickname = profileIds?.length === 1 ? file.profiles[0]?.nickname : undefined;
-  const filename = backupFileName(deps.clock.now(), nickname);
+  const filename = backupFileName(deps.app, deps.clock.now(), nickname);
   await requireBackupFileWriter(deps).write(filename, JSON.stringify(file, null, 2));
 }
 
@@ -366,7 +369,7 @@ export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
   }
 
   const result = backupFileSchema.safeParse(json);
-  if (!result.success) {
+  if (!result.success || result.data.app !== deps.app.backupAppId) {
     throw new BackupValidationError('Not a valid backup file.');
   }
 

@@ -22,7 +22,7 @@ describe('createDownloadPasswordFileWriter', () => {
     const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {
       // jsdom does not implement navigation; only the trigger matters here.
     });
-    const writer = createDownloadPasswordFileWriter();
+    const writer = createDownloadPasswordFileWriter('chess-for-kids-parent-code');
 
     const result = await writer.write('1234');
 
@@ -39,7 +39,7 @@ describe('createDownloadPasswordFileWriter', () => {
   it('includes the password in the file text passed to the Blob', async () => {
     const blobSpy = vi.spyOn(globalThis, 'Blob');
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
-    const writer = createDownloadPasswordFileWriter();
+    const writer = createDownloadPasswordFileWriter('chess-for-kids-parent-code');
 
     await writer.write('secret1');
 

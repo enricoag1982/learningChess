@@ -1,6 +1,5 @@
-// Platform base types (design-r4.md §2 `SubjectCore`): the subject-free shapes every exercise def /
-// state / mini-game / lesson is built on. Pure TS, no chess import — a subject (chess, R5's math
-// demo) supplies its own concrete types on top of these.
+// Platform base types: the subject-free shapes every exercise def / state / mini-game / lesson is
+// built on. Pure TS, no chess import — a subject supplies its own concrete types on top of these.
 import type { SubjectRewards } from './badges.ts';
 import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
 import type { MiniGameMode } from './exercise/mode.ts';
@@ -107,9 +106,9 @@ export interface RecordGameInput {
   readonly moves: readonly string[];
 }
 
-/** One subject's whole behaviour behind the platform's uniform interfaces (design-r4.md §2).
- * `rewards`/`gameRecordOf` are optional: a subject without badge facts or its own game log simply
- * omits them (R5's math demo). */
+/** One subject's whole behaviour behind the platform's uniform interfaces. `rewards`/`gameRecordOf`
+ * are optional: a subject without badge facts or its own game log simply omits them (R5's math
+ * demo). */
 export interface SubjectCore<Ctx = unknown, F = unknown> {
   /** e.g. `'chess'`. */
   readonly id: string;
@@ -134,7 +133,7 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping
- * subjects never collides on disk (design-r4.md §2; values unchanged from today's chess app). */
+ * subjects never collides on disk. */
 export interface AppConfig {
   /** localStorage key prefix, e.g. `'chess-kids:'`. */
   readonly storagePrefix: string;
@@ -144,5 +143,6 @@ export interface AppConfig {
   readonly backupFilePrefix: string;
   /** Downloaded parent-code file name prefix. */
   readonly parentCodeFilePrefix: string;
+  /** The running build's own version string (web: `__APP_VERSION__`, from `package.json`). */
   readonly version: string;
 }

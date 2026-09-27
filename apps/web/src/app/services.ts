@@ -75,7 +75,10 @@ export interface Services {
 
 /** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
 export function createServices(storage: Storage = window.localStorage): Services {
-  const store = openLocalStore(storage, { migrations: MIGRATIONS });
+  const store = openLocalStore(storage, {
+    migrations: MIGRATIONS,
+    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+  });
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -86,14 +89,14 @@ export function createServices(storage: Storage = window.localStorage): Services
     ids: createCryptoIds(),
     content: createBundledContentSource(),
     parentLock: new LocalStorageParentLockRepository(store),
-    passwordFile: createDownloadPasswordFileWriter(),
+    passwordFile: createDownloadPasswordFileWriter(CHESS_APP_CONFIG.parentCodeFilePrefix),
     settings: new LocalStorageSettingsRepository(store),
     random: createMathRandom(),
     backupFileWriter: createLazyBackupFileWriter(),
     backupImporter: createLazyBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
     subject: createSubjectRuntime(chessCore),
-    app: CHESS_APP_CONFIG,
+    app: { ...CHESS_APP_CONFIG, version: __APP_VERSION__ },
   };
 
   // Pre-generated Kokoro audio per narrated text (docs/voice.md), Web Speech as the fallback for

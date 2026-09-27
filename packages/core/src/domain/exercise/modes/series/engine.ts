@@ -1,8 +1,8 @@
 import type { AnyKind, ExerciseDefBase, ExerciseStateBase } from '../../../subject.ts';
 import type { SeriesGameDef, SeriesGameState } from './def.ts';
 
-/** Starts a fresh series at its first round, via the given subject's kind registry (design-r4.md
- * §2 `createSubjectRuntime`) — no hardcoded exercise kind here (was leak #3). */
+/** Starts a fresh series at its first round, via the given subject's kind registry — no hardcoded
+ * exercise kind here, any subject's kinds work. */
 export function startSeries<E extends ExerciseDefBase>(
   def: SeriesGameDef<E>,
   kinds: Readonly<Record<string, AnyKind<unknown>>>,

@@ -16,7 +16,7 @@ export type ModeType = MiniGameState['mode'];
 
 /** Every mode's implementation, by `mode`. Only 3 exist, so this is spelled out rather than derived
  * through a generic helper. `series` is `createSeriesMode` over this package's own chess kinds —
- * the same factory `createSubjectRuntime` uses for any other subject (design-r4.md §2). */
+ * the same factory `createSubjectRuntime` uses for any other subject. */
 export const MINI_GAME_MODES = {
   static: staticMode,
   series: createSeriesMode<ExerciseDef>(EXERCISE_KINDS),

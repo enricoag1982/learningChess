@@ -1,6 +1,5 @@
 // Chess-bound exports (`@chess-kids/core/chess`): the subject-chess half of the package, kept out
-// of `./index.ts` so platform code cannot reach it. m8.17 moves this file's contents into the
-// `subject-chess` package unchanged; see docs/refactor-v4.md §R4.
+// of `./index.ts` so platform code cannot reach it (docs/refactor-v4.md §R4).
 export type { LocalPlayer } from './app/friend-play.ts';
 export { friendGameOptions, friendGamesPlayed, recordLocalMatch } from './app/friend-play.ts';
 
@@ -16,7 +15,7 @@ export {
 
 export type { BotPlayer } from './app/bot-player.ts';
 
-// Chess's `SubjectCore` + `AppConfig` (design-r4.md §2, C4).
+// Chess's `SubjectCore` + `AppConfig`.
 export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS } from './chess-core.ts';
 
 export type {

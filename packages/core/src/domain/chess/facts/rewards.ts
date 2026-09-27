@@ -1,6 +1,5 @@
 // Chess's `SubjectCore.rewards`: the 3 badge condition types the generic engine can't compute on
-// its own (game-win, game-event, game-played) — SAN/game-record facts, kept out of `domain/badges.ts`
-// (design-r4.md §2 leak #4).
+// its own (game-win, game-event, game-played) — SAN/game-record facts, kept out of `domain/badges.ts`.
 import type { BadgeCondition } from '../../badges.ts';
 import type { GameRecord } from '../../progress.ts';
 import { chessJsRules } from '../chessjs-rules.ts';

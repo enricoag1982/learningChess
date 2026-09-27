@@ -39,7 +39,10 @@ export function createTestServices(
   content: ContentSource | 'bundled',
   storage: Storage = createMemoryStorage(),
 ): Services {
-  const store = openLocalStore(storage, { migrations: MIGRATIONS });
+  const store = openLocalStore(storage, {
+    migrations: MIGRATIONS,
+    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+  });
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -58,7 +61,7 @@ export function createTestServices(
     backupImporter: new LocalStorageBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
     subject: createSubjectRuntime(chessCore),
-    app: CHESS_APP_CONFIG,
+    app: { ...CHESS_APP_CONFIG, version: __APP_VERSION__ },
   };
 
   const narrator = createFakeNarrator();

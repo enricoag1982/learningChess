@@ -69,7 +69,7 @@ export interface EarnedBadge extends StoredRecord {
 /** Every fact the badge engine's own 7 generic condition types read, derived from stored profile
  * data + content (`app/rewards.ts` builds this) — the engine itself never reads
  * progress/attempts/game records directly. The other 3 types (`game-win`/`game-event`/
- * `game-played`) read the subject's own facts instead (`SubjectCore.rewards`, design-r4.md §2). */
+ * `game-played`) read the subject's own facts instead (`SubjectCore.rewards`). */
 export interface BadgeFacts {
   /** Mastered worlds/tracks, as `'world:<id>'` / `'track:<id>'`. */
   readonly masteredScopes: ReadonlySet<string>;

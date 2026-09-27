@@ -39,7 +39,7 @@ export const localeTreeSchema: z.ZodType<LocaleTree> = z.lazy(() =>
 
 /** Sorts a locale tree's keys alphabetically, recursively — a canonical order independent of
  * authoring/file-system order, so a future deep-merge of the same namespace from two locale roots
- * (design-r4.md §2 leak #17) is deterministic regardless of which root lists a key first. */
+ * is deterministic regardless of which root lists a key first. */
 export function sortLocaleTree(tree: LocaleTree): LocaleTree {
   const sorted: Record<string, string | LocaleTree> = {};
   for (const key of Object.keys(tree).sort()) {

@@ -196,9 +196,8 @@ export {
   seriesStars,
 } from './domain/exercise/modes/series/engine.ts';
 
-// `SubjectCore`/`AppConfig` (design-r4.md §2) and `createSubjectRuntime`: a subject's kind/mode
-// registries + app identifiers, injected via `AppDeps.subject`/`AppDeps.app` — never imported
-// directly by platform code (that would be the leak this seam removes).
+// `SubjectCore`/`AppConfig` and `createSubjectRuntime`: a subject's kind/mode registries + app
+// identifiers, injected via `AppDeps.subject`/`AppDeps.app`, never imported directly.
 export type { AnyKind, AnyMode, SubjectCore, AppConfig } from './domain/subject.ts';
 export type { SubjectRuntime } from './domain/runtime.ts';
 export { createSubjectRuntime } from './domain/runtime.ts';

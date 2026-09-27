@@ -13,7 +13,7 @@ export interface CompiledAll {
   readonly content: CompiledContent;
   readonly tracks: TracksCatalog;
   /** The subject's own extra `dist/` outputs, by file name (chess: `'bot-book.json'` ->
-   * `bot.BotBook`, design-r4.md §2 `SubjectContent.extraOutputs`, leak #15). */
+   * `bot.BotBook`), supplied by the caller so this file stays subject-free. */
   readonly extraOutputs: Readonly<Record<string, unknown>>;
   readonly badges: readonly BadgeDef[];
   /** `dist/voice-texts.json`'s own source (`scripts/voice-texts.ts` writes just its `entries`). */

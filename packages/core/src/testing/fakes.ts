@@ -385,7 +385,7 @@ export function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     settings: makeSettingsRepo(),
     random: seededRandom(1),
     subject: createSubjectRuntime(chessCore),
-    app: CHESS_APP_CONFIG,
+    app: { ...CHESS_APP_CONFIG, version: '0.0.0-test' },
     ...overrides,
   };
 }

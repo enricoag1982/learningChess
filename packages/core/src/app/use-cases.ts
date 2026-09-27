@@ -64,10 +64,10 @@ export interface AppDeps {
    * file without `packages/core` importing a web adapter constant. Optional, same reason as above. */
   readonly storageSchemaVersion?: number;
   /** This profile's subject (chess): kind + mode registries, via `createSubjectRuntime` — the only
-   * way platform code reaches an exercise kind or mini-game mode (design-r4.md §2). */
+   * way platform code reaches an exercise kind or mini-game mode. */
   readonly subject: SubjectRuntime;
-  /** App identifiers (storage prefix, backup id, file name prefixes, version) — chess's today's
-   * hardcoded values, unchanged (design-r4.md §2 `AppConfig`). */
+  /** App identifiers: storage key prefix, backup app id, backup/parent-code file name prefixes,
+   * app version. */
   readonly app: AppConfig;
 }
 

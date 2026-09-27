@@ -30,7 +30,10 @@ function requireData(file: BackupFile, profileId: string): BackupFile['data'][st
 /** Fresh `AppDeps` wired directly to `localStorage` (this file's own repos, no `test-services.ts`
  * indirection — keeps this test close to the real `chess-kids:*` storage shape). */
 function makeDeps(): AppDeps {
-  const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+  const store = openLocalStore(localStorage, {
+    migrations: MIGRATIONS,
+    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+  });
   return {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -47,7 +50,7 @@ function makeDeps(): AppDeps {
     backupImporter: new LocalStorageBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
     subject: createSubjectRuntime(chessCore),
-    app: CHESS_APP_CONFIG,
+    app: { ...CHESS_APP_CONFIG, version: '0.0.0-test' },
   };
 }
 

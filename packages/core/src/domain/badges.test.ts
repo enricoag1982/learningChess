@@ -112,8 +112,8 @@ describe('evaluateBadges', () => {
   });
 
   // game-win / game-event / game-played: chess's own facts (queen-kept, opponent wins, SAN-derived
-  // events) moved to domain/chess/facts/rewards.test.ts (`chessConditionValue`) — the engine itself
-  // only delegates (design-r4.md §2 leak #4), covered generically below.
+  // events) are covered in domain/chess/facts/rewards.test.ts; the engine itself only delegates,
+  // covered generically below.
 
   it('game-win/game-event/game-played delegate to the subject; 0 without one wired up', () => {
     const badge = def('mouse-tamer', { type: 'game-win', opponent: 'computer:1', thresholds: [1] });

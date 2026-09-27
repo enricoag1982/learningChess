@@ -253,9 +253,8 @@ describe('buildBadgeFacts', () => {
     expect(facts.conceptNoHintsInARow['hanging-piece']).toBe(1);
   });
 
-  // Game-record-derived facts (game wins, promotion/castling, queen-kept) moved to
-  // domain/chess/facts/rewards.test.ts (`chessRewardFacts`) — buildBadgeFacts no longer computes
-  // them (design-r4.md §2 leak #4); evaluateAndRecordBadges's own test below covers the wiring.
+  // Game-record-derived facts (wins, promotion/castling, queen-kept) are covered in
+  // domain/chess/facts/rewards.test.ts; evaluateAndRecordBadges's own test below covers the wiring.
 
   it('counts warm-up-sourced review attempts, not practice-sourced ones', async () => {
     const attempts: Attempt[] = [

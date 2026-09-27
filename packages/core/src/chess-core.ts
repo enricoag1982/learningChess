@@ -1,6 +1,5 @@
-// Chess's `SubjectCore` + `AppConfig` (design-r4.md §2, C4): the concrete values every platform
-// seam (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound —
-// m8.17 moves this file into `subject-chess` unchanged.
+// Chess's `SubjectCore` + `AppConfig`: the concrete values every platform seam
+// (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound.
 import { chessGameRecordOf } from './app/games.ts';
 import { chessJsRules } from './domain/chess/chessjs-rules.ts';
 import {
@@ -15,8 +14,7 @@ import type { AppConfig, SubjectCore } from './domain/subject.ts';
 import { createVariantRules, type VariantRules } from './domain/variant/index.ts';
 
 /** The World-2 piece-lesson characters, Rhino .. Caterpillar — key order is `animalFriends`' own
- * friend order (design-r4.md §2 leak #5). Exported so `animalFriends`' callers can pass it, until
- * they read it through a pack instead (m8.16). */
+ * friend order. Exported so `animalFriends`' callers can pass it in. */
 export const CHESS_CHARACTERS = {
   rhino: { topicKey: 'piece.r' },
   elephant: { topicKey: 'piece.b' },
@@ -28,7 +26,7 @@ export const CHESS_CHARACTERS = {
 
 /** Chess's `SubjectCore`: today's 8 exercise kinds, the `static`/`versus` modes (`series` is added
  * by `createSubjectRuntime`, subject-free), its own badge facts (`game-win`/`game-event`/
- * `game-played`, leak #4), its versus→GameRecord translation (leak #7) and animal friends (leak #5). */
+ * `game-played`), its versus→GameRecord translation and animal friends. */
 export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   id: 'chess',
   context: createVariantRules(chessJsRules),
@@ -39,14 +37,12 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   characters: CHESS_CHARACTERS,
 };
 
-/** Chess app's storage / backup / parent-code identifiers — unchanged from today's hardcoded
- * literals (`backup.ts`, `merge.ts`, web `local-store.ts`, `download-password-file-writer.ts`). */
-export const CHESS_APP_CONFIG: AppConfig = {
+/** Chess app's storage / backup / parent-code identifiers, read by `backup.ts`, `merge.ts`, web
+ * `local-store.ts` and `download-password-file-writer.ts`. No `version`: that is the running
+ * build's own, not the subject's — the platform-web shell fills it in (web: `__APP_VERSION__`). */
+export const CHESS_APP_CONFIG: Omit<AppConfig, 'version'> = {
   storagePrefix: 'chess-kids:',
   backupAppId: 'chess-kids',
   backupFilePrefix: 'chess-for-kids',
   parentCodeFilePrefix: 'chess-for-kids-parent-code',
-  // The app's own build stamps this from `__APP_VERSION__` once `AppDeps.app` is wired in
-  // (docs/refactor-v4.md §4 "Build and tooling"); unused until then.
-  version: '2.0.0',
 };

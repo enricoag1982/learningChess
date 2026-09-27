@@ -1,6 +1,5 @@
-// `createSubjectRuntime` (design-r4.md §2): builds a subject's kind + mode registries for platform
-// code, adding the platform `series` mode over the subject's own kinds — the seam leak #3 needed
-// (`kinds/index.ts`, `modes/index.ts` and `modes/series/engine.ts` no longer hardcode chess).
+// `createSubjectRuntime`: builds a subject's kind + mode registries for platform code, adding the
+// platform `series` mode over the subject's own kinds.
 import { createSeriesMode } from './exercise/modes/series/mode.ts';
 import type { AnyKind, AnyMode, SubjectCore } from './subject.ts';
 
