@@ -1,7 +1,9 @@
-import { playMateInN, startExercise } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, narrowStep, widen } from '../adapt.ts';
+import { startExercise } from '../../engine.ts';
+import { errorHintStars } from '../../stars.ts';
+import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import type { MateInNDef, MateInNOutcome, MoveAction } from './def.ts';
+import { mateInNHint, playMateInN } from './engine.ts';
 import { mateInNSolution, mateInNWrongAction } from './solution.ts';
 
 export const mateInNKind: ChessKind<MateInNDef, MoveAction, MateInNOutcome> = {
@@ -17,11 +19,12 @@ export const mateInNKind: ChessKind<MateInNDef, MoveAction, MateInNOutcome> = {
   },
 
   hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+    const bumped = { ...state, hintLevel: level };
+    return { state: bumped, hint: mateInNHint(widen(state), bumped.def, ctx, level) };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return errorHintStars(state.hintLevel, state.errors);
   },
 
   solution(def, ctx) {

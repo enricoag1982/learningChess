@@ -11,8 +11,9 @@ export type {
   ExerciseDef,
 } from './types.ts';
 
-export type { ExerciseState, MateInNOutcome } from './engine.ts';
+export type { ExerciseState } from './engine.ts';
 export type { MoveOutcome } from './kinds/static-move.ts';
+export type { MateInNOutcome } from './kinds/mate-in-n/def.ts';
 export type { Hint } from './hint.ts';
 export type { SelectionResult } from './kinds/select-squares/def.ts';
 export type { PlaceOutcome, PalettePiece } from './kinds/setup/def.ts';
