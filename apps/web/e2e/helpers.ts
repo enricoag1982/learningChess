@@ -3,7 +3,6 @@ import type {
   BestMoveDef,
   ChoiceDef,
   Color,
-  CompiledContent,
   ExerciseDef,
   Lesson,
   MateInNDef,
@@ -26,52 +25,18 @@ import {
   selectSquaresAnswer as coreSelectSquaresAnswer,
   SQUARES,
   solve,
-  worldLessons,
 } from '@chess-kids/core';
-// Node's ESM loader requires this attribute for a JSON import; the content build validates the
-// shape (see `bundled-content-source.ts`), so the cast below is a type conversion, not a check.
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawLocale from '@chess-kids/content/locales/en.json' with { type: 'json' };
+// `helpers.ts` re-exports these two kits so every existing `from './helpers.ts'` import keeps
+// working unchanged: `kit/i18n.ts` (contentText, interpolate, over a standalone i18next instance)
+// and `kit/content.ts` (typed bundled content/catalog, content-derived Journey text, and the
+// content/tracks lookups every spec used to copy locally: findWorld, firstJourneyLesson,
+// firstTwoLessons). `contentText` is also used bare below (exercise/setup solving still lives
+// here — R3b moves it).
+import { contentText } from './kit/i18n.ts';
+export * from './kit/i18n.ts';
+export * from './kit/content.ts';
 
-const content = rawContent as unknown as CompiledContent;
 export const rules: VariantRules = createVariantRules(chessJsRules);
-
-/** A locale namespace as compiled by `packages/content` (nested string tree). */
-type LocaleTree = { readonly [key: string]: LocaleTree | string };
-const locale = rawLocale as unknown as Record<string, LocaleTree>;
-
-/**
- * Resolves a content text key (e.g. `lessons:rook.title`, `characters:rhino.name`, or a
- * namespace-less `piece.r`, resolved against the `common` default namespace) against the real
- * compiled English strings — the same text the app renders via `tContent`/`t()`. Playwright runs
- * outside React/i18next, so exercise solvers that need to match rendered text (choice options,
- * setup palette buttons) resolve it this way instead of hard-coding English copy.
- */
-export function contentText(key: string): string {
-  const separatorIndex = key.indexOf(':');
-  const namespace = separatorIndex < 0 ? 'common' : key.slice(0, separatorIndex);
-  const path = separatorIndex < 0 ? key : key.slice(separatorIndex + 1);
-  let node: LocaleTree | string | undefined = locale[namespace];
-  for (const segment of path.split('.')) {
-    if (typeof node !== 'object') return key;
-    node = node[segment];
-  }
-  return typeof node === 'string' ? node : key;
-}
-
-/** Escapes regex metacharacters so `text` can be embedded literally in a `RegExp` source. */
-function escapeRegExp(text: string): string {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-/**
- * True for a lesson the Owl teaches directly, not yet tied to one piece (docs/app-structure.md:
- * Owl is the guide/narrator). Every other lesson's `character` stands for one piece
- * (`character-meta.ts`'s map, which this e2e helper doesn't duplicate).
- */
-export function isOwlTaught(lesson: Lesson): boolean {
-  return lesson.character === 'owl';
-}
 
 /**
  * True for an exercise/guided-try type that moves one piece across the board (has a slide
@@ -87,105 +52,6 @@ export function isMoveCountedExercise(def: ExerciseDef): boolean {
  * bounce-back animation): `collect-stars`/`capture` (via a solver line) plus `best-move`. */
 export function movesAPiece(def: ExerciseDef): boolean {
   return isMoveCountedExercise(def) || def.type === 'best-move';
-}
-
-/** Replaces every `{{key}}` in a compiled text template with `String(vars[key])`. */
-export function interpolate(
-  template: string,
-  vars: Readonly<Record<string, string | number>>,
-): string {
-  return Object.entries(vars).reduce(
-    (text, [key, value]) => text.replaceAll(`{{${key}}}`, String(value)),
-    template,
-  );
-}
-
-/**
- * A lesson's plain display label — its title when Owl-taught, else its character's name — same as
- * `JourneyScreen`'s `characterLabel`, and the `name` `activateLesson` puts in the Journey's
- * "Finish X first!" message.
- */
-export function lessonLabel(lesson: Lesson): string {
-  return isOwlTaught(lesson)
-    ? contentText(lesson.titleKey)
-    : contentText(`characters:${lesson.character}.name`);
-}
-
-/**
- * Accessible name of a lesson's Journey node for `status` (matches `JourneyScreen`'s
- * `LessonNode`). For a piece lesson, the piece word is wildcarded: only app UI code
- * (`character-meta.ts`) maps character -> piece, which this e2e helper doesn't duplicate.
- */
-export function journeyNodeName(lesson: Lesson, status: 'current' | 'locked'): RegExp {
-  const statusWord = escapeRegExp(contentText(`journey:ui.status-${status}`));
-  const label = escapeRegExp(lessonLabel(lesson));
-  const namePart = isOwlTaught(lesson) ? label : `${label} the .+`;
-  const pattern = contentText('journey:ui.node-name')
-    .replace('{{name}}', namePart)
-    .replace('{{status}}', statusWord);
-  return new RegExp(`^${pattern}$`);
-}
-
-/**
- * A world's own tab button on the Journey map (`JourneyScreen`'s `WorldRow`: `"<order> <title>"`,
- * e.g. `"4 Check & Mate"`). The Journey defaults to whichever world `journey.nextStep` currently
- * points to (`defaultWorldId`), which is the world holding its own unwon world boss — not
- * necessarily the next world's first lesson — so a spec walking lesson to lesson across a world
- * boundary must click this explicitly instead of assuming the right map is already showing.
- */
-export function worldTabName(catalog: TracksCatalog, worldId: string): RegExp {
-  for (const track of catalog.tracks) {
-    const world = track.worlds.find((entry) => entry.id === worldId);
-    if (world !== undefined) {
-      // Anchored on the order digit a kid never sees written out (`"1 Board"`, `"4 Check & Mate"`):
-      // the title alone can also match an unrelated lesson node's own name (e.g. "Setting Up the
-      // Board, locked" contains "Board" too).
-      return new RegExp(`^${String(world.order)} ${escapeRegExp(contentText(world.titleKey))}`);
-    }
-  }
-  throw new Error(`worldTabName: world "${worldId}" not found in the tracks catalog`);
-}
-
-/** A world's own boss mini-game (`World.boss`, distinct from any lesson's own `boss`), if it has one. */
-export function worldBossMiniGame(catalog: TracksCatalog, worldId: string): MiniGame | undefined {
-  for (const track of catalog.tracks) {
-    const world = track.worlds.find((entry) => entry.id === worldId);
-    if (world !== undefined) {
-      return world.boss === undefined ? undefined : findMiniGame(world.boss);
-    }
-  }
-  return undefined;
-}
-
-/** The Journey's "Finish X first!" message for the lesson right before a locked one. */
-export function finishFirstMessage(previousLesson: Lesson): string {
-  return interpolate(contentText('journey:ui.finish-first'), { name: lessonLabel(previousLesson) });
-}
-
-/** Home's Owl greeting for a freshly offered (not resumed, not all-done) lesson (`HomeScreen`). */
-export function homeGreeting(lesson: Lesson): string {
-  return isOwlTaught(lesson)
-    ? interpolate(contentText('home.owl-next-topic'), { topic: contentText(lesson.titleKey) })
-    : interpolate(contentText('home.owl-next'), {
-        character: contentText(`characters:${lesson.character}.name`),
-      });
-}
-
-/**
- * Every lesson of the main track, in Journey/session order (worlds sorted by `order`, each
- * world's lessons via `worldLessons`). Branch tracks are left out: they only ever open once the
- * whole main track is mastered, well past anything these specs need.
- */
-export function lessonsInJourneyOrder(
-  catalog: TracksCatalog,
-  lessons: readonly Lesson[],
-): readonly Lesson[] {
-  const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
-  if (!mainTrack) throw new Error('lessonsInJourneyOrder: catalog has no main track');
-  return mainTrack.worlds
-    .slice()
-    .sort((a, b) => a.order - b.order)
-    .flatMap((world) => worldLessons(world, lessons));
 }
 
 /**
@@ -566,18 +432,6 @@ export async function seedConceptStats(
     },
     { profileId, conceptId, overrides },
   );
-}
-
-export function findLesson(id: string): Lesson {
-  const lesson = content.lessons.find((entry) => entry.id === id);
-  if (!lesson) throw new Error(`fixture content is missing lesson "${id}"`);
-  return lesson;
-}
-
-export function findMiniGame(id: string): MiniGame {
-  const game = content.minigames.find((entry) => entry.id === id);
-  if (!game) throw new Error(`fixture content is missing mini-game "${id}"`);
-  return game;
 }
 
 /** Answer squares for a select-squares exercise (`answer`, or any `derive` kind), via core. */

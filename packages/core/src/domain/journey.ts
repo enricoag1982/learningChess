@@ -89,7 +89,22 @@ function worldsSorted(track: Track): readonly World[] {
   return track.worlds.slice().sort((a, b) => a.order - b.order);
 }
 
-function findWorld(catalog: TracksCatalog, worldId: string): World | undefined {
+/**
+ * Every lesson of the main track, in Journey/session order (worlds sorted by `order`, each
+ * world's lessons via `worldLessons`). Branch tracks are left out: they only ever open once the
+ * whole main track is mastered.
+ */
+export function mainTrackLessons(
+  catalog: TracksCatalog,
+  lessons: readonly Lesson[],
+): readonly Lesson[] {
+  const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
+  if (!mainTrack) throw new Error('mainTrackLessons: catalog has no main track');
+  return worldsSorted(mainTrack).flatMap((world) => worldLessons(world, lessons));
+}
+
+/** The world with this id, in whichever track of `catalog` has it, or `undefined` if none does. */
+export function findWorld(catalog: TracksCatalog, worldId: string): World | undefined {
   for (const track of catalog.tracks) {
     const found = track.worlds.find((world) => world.id === worldId);
     if (found !== undefined) {

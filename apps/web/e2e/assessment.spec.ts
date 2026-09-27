@@ -1,29 +1,19 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { CompiledContent, ExerciseDef, TracksCatalog } from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core';
 import { PLACEMENT_TASKS_PER_WORLD, TEST_OUT_LESSON_TASKS, worldLessons } from '@chess-kids/core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   answerExerciseWrongThenSolve,
+  catalog,
   completeFirstRunToPlacementOffer,
+  content,
   contentText,
+  findWorld,
   journeyNodeName,
   shownExercise,
   solveExercise,
   worldTabName,
 } from './helpers.ts';
-
-const content = rawContent as unknown as CompiledContent;
-const catalog = rawTracks as unknown as TracksCatalog;
-
-function findWorld(id: string) {
-  for (const track of catalog.tracks) {
-    const found = track.worlds.find((world) => world.id === id);
-    if (found) return found;
-  }
-  throw new Error(`world "${id}" not found in tracks.json`);
-}
 
 /** Every scored exercise across a whole world's lessons (the pool `planTestOutWorld`/`planPlacement` sample from). */
 function worldExercisePool(worldId: string): readonly ExerciseDef[] {

@@ -1,30 +1,14 @@
 import { expect, test } from '@playwright/test';
-import type { CompiledContent, Lesson, TracksCatalog } from '@chess-kids/core';
-import { nextLesson } from '@chess-kids/core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   completeExercise,
   completeFirstRun,
+  content,
   dismissCelebrationIfShown,
+  firstJourneyLesson,
   pickProfileFromPicker,
   playLesson,
   startLessonToFirstGuided,
 } from './helpers.ts';
-
-const content = rawContent as unknown as CompiledContent;
-const catalog = rawTracks as unknown as TracksCatalog;
-
-/**
- * The Journey's very first lesson for a brand-new profile (no progress, nothing unlocked) — the
- * same `nextLesson` the app's store calls via `loadJourney`. Computed from the bundled content so
- * this spec stays correct whichever lesson that turns out to be (currently World 1's Squares).
- */
-function firstJourneyLesson(): Lesson {
-  const lesson = nextLesson(catalog, content.lessons, []);
-  if (!lesson) throw new Error('bundled content/tracks: no first lesson found');
-  return lesson;
-}
 
 test.describe('First lesson (whichever the Journey currently offers)', () => {
   test('play the whole lesson end to end, then Continue and reload keep the result', async ({

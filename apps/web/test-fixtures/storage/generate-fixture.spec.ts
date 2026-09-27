@@ -12,16 +12,15 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
-import type { CompiledContent, TracksCatalog, World } from '@chess-kids/core';
 import { PLACEMENT_TASKS_PER_WORLD, worldLessons } from '@chess-kids/core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   answerExerciseWrongThenSolve,
   completeExercise,
   completeFirstRun,
+  content,
   contentText,
   dismissCelebrationIfShown,
+  findWorld,
   getProfileIdByNickname,
   playLesson,
   shownExercise,
@@ -29,21 +28,10 @@ import {
   solveWhicheverExercise,
 } from '../../e2e/helpers.ts';
 
-const content = rawContent as unknown as CompiledContent;
-const catalog = rawTracks as unknown as TracksCatalog;
-
 /** Set to the release tag being generated when this file is copied into its own worktree. */
 const TAG = 'v2.0.0';
 /** Relative to `apps/web` (playwright's own cwd) — move the result into this package's own copy. */
 const OUT_DIR = join('test-fixtures', 'storage', TAG);
-
-function findWorld(id: string): World {
-  for (const track of catalog.tracks) {
-    const world = track.worlds.find((entry) => entry.id === id);
-    if (world !== undefined) return world;
-  }
-  throw new Error(`world "${id}" not found in tracks.json`);
-}
 
 /** From an already-rendered profile picker, opens the parent area with the standard test code. */
 async function openParentArea(page: import('@playwright/test').Page): Promise<void> {

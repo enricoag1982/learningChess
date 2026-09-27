@@ -1,41 +1,13 @@
 import { expect, test } from '@playwright/test';
-import type { CompiledContent, Lesson, TracksCatalog, World } from '@chess-kids/core';
-import { nextLesson, worldLessons } from '@chess-kids/core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   completeFirstRun,
   finishFirstMessage,
+  firstTwoLessons,
   getSoleProfileId,
   journeyNodeName,
   pickProfileFromPicker,
   seedLessonMastered,
 } from './helpers.ts';
-
-const content = rawContent as unknown as CompiledContent;
-const catalog = rawTracks as unknown as TracksCatalog;
-
-function findWorld(id: string): World {
-  for (const track of catalog.tracks) {
-    const found = track.worlds.find((world) => world.id === id);
-    if (found) return found;
-  }
-  throw new Error(`world "${id}" not found in tracks.json`);
-}
-
-/**
- * The Journey's first lesson for a brand-new profile, and the lesson right after it in the same
- * world — computed from the bundled content, same as `lesson.spec.ts`, so this stays correct
- * whichever lesson (and world) that turns out to be.
- */
-function firstTwoLessons(): { readonly first: Lesson; readonly second: Lesson } {
-  const first = nextLesson(catalog, content.lessons, []);
-  if (!first) throw new Error('bundled content/tracks: no first lesson found');
-  const siblings = worldLessons(findWorld(first.world), content.lessons);
-  const second = siblings[siblings.findIndex((lesson) => lesson.id === first.id) + 1];
-  if (!second) throw new Error(`world "${first.world}" needs at least 2 lessons for this test`);
-  return { first, second };
-}
 
 test.describe('Journey map', () => {
   test('locked lesson explains itself, then unlocks once the one before it is done', async ({

@@ -91,7 +91,13 @@ export type {
   WorldStatus,
   WorldBossStatus,
 } from './domain/journey.ts';
-export { HABITATS, worldLessons, nextLesson } from './domain/journey.ts';
+export {
+  HABITATS,
+  worldLessons,
+  nextLesson,
+  mainTrackLessons,
+  findWorld,
+} from './domain/journey.ts';
 
 export type {
   ProfileRepository,

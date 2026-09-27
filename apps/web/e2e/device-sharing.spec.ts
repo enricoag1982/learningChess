@@ -3,28 +3,15 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { CompiledContent, TracksCatalog } from '@chess-kids/core';
-import { nextLesson } from '@chess-kids/core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
   completeFirstRun,
+  content,
   dismissCelebrationIfShown,
+  firstJourneyLesson,
   getProfileIdByNickname,
   playLesson,
   seedLessonMastered,
 } from './helpers.ts';
-
-const content = rawContent as unknown as CompiledContent;
-const catalog = rawTracks as unknown as TracksCatalog;
-
-/** The Journey's very first lesson for a brand-new profile (see `lesson.spec.ts`'s own copy of
- * this helper — kept local here so this file stands alone). */
-function firstJourneyLesson() {
-  const lesson = nextLesson(catalog, content.lessons, []);
-  if (!lesson) throw new Error('bundled content/tracks: no first lesson found');
-  return lesson;
-}
 
 /** A second, different lesson from the same content — device B's own "other progress", so the
  * merge test can tell "both devices' progress kept" apart from one side simply overwriting the
