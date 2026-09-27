@@ -110,3 +110,7 @@ export {
 
 export type { BossResultSummary } from './boss-result.ts';
 export { summarizeBossResult, isBossResultWin } from './boss-result.ts';
+
+// Mini-game-mode registry: the only mode-type dispatch (`modes/index.ts`).
+export type { ModeType, MiniGameState } from './modes/index.ts';
+export { MINI_GAME_MODES, modeOf } from './modes/index.ts';

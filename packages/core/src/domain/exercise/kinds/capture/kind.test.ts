@@ -3,8 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { playMove, starsFor, startExercise } from '../../engine.ts';
+import { playMove, starsFor, startExercise, undo } from '../../engine.ts';
 import type { CaptureDef } from '../../types.ts';
+import { captureKind } from './kind.ts';
 
 const rules = createVariantRules(chessJsRules);
 
@@ -60,5 +61,16 @@ describe('capture', () => {
     solvedLate = playMove(solvedLate, rules, { from: 'd5', to: 'd4' }).state; // captures d4
     expect(solvedLate.moves).toBe(4);
     expect(starsFor(solvedLate)).toBe(1);
+  });
+
+  it('kind.act(undo) matches the engine facade (C2: UndoAction outcome is "undone")', () => {
+    const played = captureKind.act(
+      captureKind.init(def),
+      { type: 'move', move: { from: 'd3', to: 'd4' } },
+      rules,
+    );
+    const undone = captureKind.act(played.state, { type: 'undo' }, rules);
+    expect(undone.outcome).toEqual({ kind: 'undone' });
+    expect(undone.state).toEqual(undo(played.state));
   });
 });

@@ -1,6 +1,6 @@
 import { replaySanLine } from '../../../chess/facts/line.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
-import { anyKidSquare } from '../base.ts';
+import { illegalTapMove } from '../base.ts';
 import type { MateInNDef, MoveAction } from './kind.ts';
 
 /**
@@ -27,8 +27,4 @@ export function mateInNSolution(def: MateInNDef, ctx: VariantRules): readonly Mo
     }));
 }
 
-/** A move that is always illegal (`from === to`), for exactly one error from a fresh state. */
-export function mateInNWrongAction(def: MateInNDef): readonly MoveAction[] {
-  const square = anyKidSquare(def.position);
-  return [{ type: 'move', move: { from: square, to: square } }];
-}
+export const mateInNWrongAction = illegalTapMove;

@@ -12,6 +12,7 @@ import {
   undo,
 } from '../../engine.ts';
 import type { CollectStarsDef } from '../../types.ts';
+import { collectStarsKind } from './kind.ts';
 
 const rules = createVariantRules(chessJsRules);
 
@@ -82,6 +83,17 @@ describe('collect-stars', () => {
   it('is a no-op when there is nothing to undo', () => {
     const state = startExercise(def);
     expect(undo(state)).toEqual(state);
+  });
+
+  it('kind.act(undo) matches the engine facade (C2: UndoAction outcome is "undone")', () => {
+    const played = collectStarsKind.act(
+      collectStarsKind.init(def),
+      { type: 'move', move: { from: 'a1', to: 'a8' } },
+      rules,
+    );
+    const undone = collectStarsKind.act(played.state, { type: 'undo' }, rules);
+    expect(undone.outcome).toEqual({ kind: 'undone' });
+    expect(undone.state).toEqual(undo(played.state));
   });
 
   it('counts an illegal attempt as an error without touching stars or moves', () => {

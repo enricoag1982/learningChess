@@ -31,3 +31,10 @@ export function anyKidSquare(position: Position): Square {
   }
   return square;
 }
+
+/** A move that is always illegal (`from === to`), for exactly one error from a fresh state — every
+ * move kind's `wrongAction` (collect-stars, capture, best-move, mate-in-n). */
+export function illegalTapMove(def: { readonly position: Position }): readonly MoveAction[] {
+  const square = anyKidSquare(def.position);
+  return [{ type: 'move', move: { from: square, to: square } }];
+}

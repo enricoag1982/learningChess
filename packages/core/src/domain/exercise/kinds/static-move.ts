@@ -27,6 +27,14 @@ export type MoveOutcome =
       readonly captured?: PieceType;
     };
 
+/** Reverts the last kid move (collect-stars / capture only). */
+export interface UndoAction {
+  readonly type: 'undo';
+}
+
+/** Result of an `UndoAction`. */
+export type UndoOutcome = { readonly kind: 'undone' };
+
 const NON_MOVE_TYPES = new Set<ExerciseDef['type']>([
   'select-squares',
   'yes-no',

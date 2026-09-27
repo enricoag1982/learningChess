@@ -1,4 +1,4 @@
-import { anyKidSquare } from '../base.ts';
+import { illegalTapMove } from '../base.ts';
 import type { BestMoveDef, MoveAction } from './kind.ts';
 
 /** The first authored solution SAN, played directly (`MoveInput` accepts a plain SAN string). */
@@ -10,8 +10,4 @@ export function bestMoveSolution(def: BestMoveDef): readonly MoveAction[] {
   return [{ type: 'move', move: solutionSan }];
 }
 
-/** A move that is always illegal (`from === to`), for exactly one error from a fresh state. */
-export function bestMoveWrongAction(def: BestMoveDef): readonly MoveAction[] {
-  const square = anyKidSquare(def.position);
-  return [{ type: 'move', move: { from: square, to: square } }];
-}
+export const bestMoveWrongAction = illegalTapMove;

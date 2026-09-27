@@ -255,8 +255,16 @@ export type {
   ExerciseNoteCtx,
   ExerciseNote,
   Resolve,
+  ModeType,
+  MiniGameState,
 } from './domain/exercise/index.ts';
-export { EXERCISE_NOTES, exerciseNote, isEasierOfferNote } from './domain/exercise/index.ts';
+export {
+  EXERCISE_NOTES,
+  exerciseNote,
+  isEasierOfferNote,
+  MINI_GAME_MODES,
+  modeOf,
+} from './domain/exercise/index.ts';
 
 // Exercise-kind registry: the only exercise-type dispatch (`domain/exercise/kinds/index.ts`).
 export type {

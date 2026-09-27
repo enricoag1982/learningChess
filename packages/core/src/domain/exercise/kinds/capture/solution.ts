@@ -1,6 +1,6 @@
 import type { VariantRules } from '../../../variant/rules.ts';
 import { solve } from '../../solver.ts';
-import { anyKidSquare } from '../base.ts';
+import { illegalTapMove } from '../base.ts';
 import type { CaptureDef, MoveAction } from './kind.ts';
 
 /** Shortest capture-everything line (solver), as the move-actions that play it. */
@@ -12,8 +12,4 @@ export function captureSolution(def: CaptureDef, ctx: VariantRules): readonly Mo
   return line.map((move) => ({ type: 'move', move: { from: move.from, to: move.to } }));
 }
 
-/** A move that is always illegal (`from === to`), for exactly one error from a fresh state. */
-export function captureWrongAction(def: CaptureDef): readonly MoveAction[] {
-  const square = anyKidSquare(def.position);
-  return [{ type: 'move', move: { from: square, to: square } }];
-}
+export const captureWrongAction = illegalTapMove;

@@ -16,6 +16,7 @@ import type { SelectSquaresAction } from './select-squares/kind.ts';
 import { selectSquaresKind } from './select-squares/kind.ts';
 import type { PlaceAction } from './setup/kind.ts';
 import { setupKind } from './setup/kind.ts';
+import type { UndoAction } from './static-move.ts';
 import type { AnswerYesNoAction } from './yes-no/kind.ts';
 import { yesNoKind } from './yes-no/kind.ts';
 
@@ -25,7 +26,12 @@ export type DefOf<T extends ExerciseType> = Extract<ExerciseDef, { readonly type
 
 /** Every action an exercise kind's `act` accepts, across every exercise type. */
 export type ExerciseAction =
-  MoveAction | SelectSquaresAction | AnswerYesNoAction | AnswerChoiceAction | PlaceAction;
+  | MoveAction
+  | UndoAction
+  | SelectSquaresAction
+  | AnswerYesNoAction
+  | AnswerChoiceAction
+  | PlaceAction;
 
 /** One chess exercise kind: `ExerciseKind` specialised to this domain's `Hint` / `VariantRules`. */
 export type ChessKind<D extends ExerciseDef, A extends ExerciseAction, O> = ExerciseKind<
