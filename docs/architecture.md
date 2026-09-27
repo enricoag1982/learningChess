@@ -60,7 +60,7 @@ content (YAML lessons ─build─> JSON) ──> loaded by app, validated agains
 ## 4. Repository layout
 
 ```
-packages/core      domain + ports
+packages/core      domain + ports; exercise types in domain/exercise/kinds/<type>/ (registry: kinds/index.ts), mini-game modes in modes/<mode>/, chess facts in domain/chess/facts/
 packages/content   lessons (YAML), schemas, locales, build + import scripts
 apps/web           React UI + web adapters (PWA; Capacitor wraps it)
 apps/native        only if a native UI is ever needed; reuses core

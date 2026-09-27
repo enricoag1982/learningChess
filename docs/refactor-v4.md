@@ -92,7 +92,7 @@ tools/                    voice, art, compat, size, content snapshot
 | R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green. Done: `m8.1` snapshots + fixtures, `m8.2` CI speed (3.7 min). R1: `m8.3` docs trim (279 → 172 KB), `m8.4` core test kit (−2.2 k test lines) + 146 dead exports removed; web test kit, e2e helper reuse, comment trim after the other session's UI fixes merge |
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green. Done: `m8.5` storage collections (−146 lines). Rest after the other session's UI fixes merge |
-| R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal |
+| R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds; `m8.8` YAML defaults (after the other session's lesson edits); R3b web |
 | R4 Platform / subject split | `stimulus` replaces `position` in the lesson model; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, journey habitats, Den, report, services; import boundary lint | platform builds and tests without `subject-chess` |
 | R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
 
@@ -132,3 +132,14 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | 2 | Proof of reuse | `apps/math-demo` in the repo (dev / test only, not deployed) | Same, before R5 |
 | 3 | Timing | After `v2.0.0`; R0–R1 may start earlier (no behaviour change) | Decided: start now (owner 2026-09-26) |
 | 4 | Separate platform repo / npm package | Later, when a second real app starts | Later |
+
+## 9. R3 design (2026-09-27)
+
+| Piece | Decision |
+|---|---|
+| `ExerciseKind<Def, State, Action, Outcome, Hint, Ctx>` | `type`, `input` (static-move / real-move / select / answer / place), `init`, `act → {state, outcome}`, `hint`, `stars`, `textKeys?`; method signatures so precise kinds widen without casts |
+| Registries | `EXERCISE_KINDS` (+ `kindOf`) = the only dispatch on exercise type; `EXERCISE_SOLUTIONS` (`solution`, `wrongAction`) kept out of the app bundle, used by tests / content checks / e2e; `MINI_GAME_MODES` (+ `modeOf`) |
+| Core layout | `domain/chess/facts/` (SAN, pieces, goals, special moves, line replay: one helper per fact) · `domain/exercise/kinds/<type>/` (def, engine, solution, kind, tests) · `domain/exercise/modes/<mode>/`; `engine.ts` = legacy facade (735 → 73 lines) until R3b |
+| Content layout (`m8.7`) | `src/kinds/<type>/` schema · compile · verify; `src/modes/<mode>/`; loader generic. File names match core so R4 merges both halves into `subject-chess/kinds/<type>/` by move |
+| Context | `VariantRules` + `chess: ChessRules` (additive) |
+| Open for R3b | Kind functions still take the general `ExerciseState` (public API used by the web) → `kinds/adapt.ts` narrows; removed when the web moves to kinds |
