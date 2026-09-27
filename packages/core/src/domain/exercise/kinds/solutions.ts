@@ -1,8 +1,5 @@
-/**
- * Every exercise kind's content-test-only `solution` / `wrongAction`, kept out of `EXERCISE_KINDS`
- * (and so out of the app bundle, which only ever reaches that registry): imported only by
- * `/testing` (`playSolution`, `playWrongThenSolve`) and, through it, content tests.
- */
+// Every exercise kind's content-test-only `solution`/`wrongAction`, kept out of `EXERCISE_KINDS`
+// (and the app bundle): imported only by `/testing` and, through it, content tests.
 import type { VariantRules } from '../../variant/rules.ts';
 import type { ExerciseSolution } from '../kind.ts';
 import { bestMoveSolution, bestMoveWrongAction } from './best-move/solution.ts';

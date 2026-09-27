@@ -1,13 +1,13 @@
 import type { StoredRecord } from './profile.ts';
 
-/** One profile's daily-play streak (domain-model.md §2, rewards.md §1 "Forgiving streaks"). */
+/** One profile's daily-play streak. */
 export interface Streak extends StoredRecord {
   readonly profileId: string;
   readonly current: number;
   readonly best: number;
   /** Local calendar day (`YYYY-MM-DD`, device time zone) the streak last counted. */
   readonly lastDay?: string;
-  /** Free skips already used in `lastDay`'s ISO week (1 per week, rewards.md §1). */
+  /** Free skips already used in `lastDay`'s ISO week (1 per week). */
   readonly skipsUsedThisWeek: number;
 }
 
@@ -39,7 +39,7 @@ function daysBetween(a: string, b: string): number {
   return Math.round((toNoonUtc(b) - toNoonUtc(a)) / (24 * 60 * 60 * 1000));
 }
 
-/** ISO-8601 week key (`YYYY-W<n>`) for a `YYYY-MM-DD` day string — the Monday-start week rewards.md §1 counts skips against. */
+/** ISO-8601 week key (`YYYY-W<n>`) for a `YYYY-MM-DD` day string — the Monday-start week skips are counted against. */
 export function isoWeekKey(day: string): string {
   const [year, month, date] = day.split('-').map(Number);
   const asDate = new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, date ?? 1));
@@ -52,12 +52,9 @@ export function isoWeekKey(day: string): string {
   return `${String(isoYear)}-W${String(week)}`;
 }
 
-/**
- * Folds one day's activity into `streak` (rewards.md §1 "Forgiving streaks"): the same day is a
- * no-op; the very next day extends the streak; a single missed day is bridged by one free skip per
- * ISO week (of the missed day) — spending it if available, else the streak restarts at 1 silently.
- * Anything wider than a bridged gap also restarts at 1. `best` only ever grows.
- */
+/** Folds one day's activity into `streak`: the same day is a no-op; the next day extends the
+ * streak; a single missed day is bridged by one free skip per ISO week, else it restarts at 1
+ * silently. `best` only ever grows. */
 export function recordActivityDay(streak: Streak, day: string, now: Date): Streak {
   if (streak.lastDay === day) {
     return streak;

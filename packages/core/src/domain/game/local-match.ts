@@ -3,12 +3,9 @@ import type { Position } from '../chess/types.ts';
 import type { GameResult, GameRulesDef, GameState } from './types.ts';
 import { gameResult, playGameMove, startGame } from './rules.ts';
 
-/**
- * Two-human game (`domain-model.md` §4 "Friend play"): the same variant rules a `versus` boss
- * plays against the bot (`domain/game`), minus every bot concern (level, aids, kid-perspective
- * status) — both sides are a person at this same device. `states` holds every position reached so
- * far, oldest first, so `takeBack` can drop the last one without recomputing anything.
- */
+/** Two-human game: the same variant rules a `versus` boss plays against the bot, minus every bot
+ * concern — both sides are a person at this same device. `states` holds every position reached so
+ * far, oldest first, so `takeBack` can drop the last one. */
 export interface LocalMatchState {
   readonly mode: 'local-match';
   readonly rules: GameRulesDef;
@@ -71,12 +68,8 @@ export function playLocalMove(
   return { state: nextState, outcome: { kind: 'ended', move: played.move, result } };
 }
 
-/**
- * Take back: undoes the last move played, returning to the mover's own turn again. Same-device
- * social contract (`docs/app-structure.md` §6): the UI asks the player now to move ("Allow take
- * back?") before calling this — no bot-style limit, either player may ask at any point while the
- * match is ongoing and at least one ply has been played.
- */
+/** Take back: undoes the last move played, returning to the mover's own turn again. The UI asks the
+ * player now to move first; no bot-style limit, either player may ask at any point mid-match. */
 export function canTakeBack(state: LocalMatchState, chessRules: ChessRules): boolean {
   return state.states.length >= 2 && localMatchResult(state, chessRules).kind === 'ongoing';
 }

@@ -161,12 +161,8 @@ export type { ChildOverview, ChildReport } from './app/report.ts';
 export { buildChildOverview, buildChildReport } from './app/report.ts';
 
 export type { BackupFile } from './app/backup.ts';
-// Backup values (zod validation) live behind `@chess-kids/core/backup` so zod stays out of the
-// main bundle and the bot worker; only the parent area imports them.
-
-// M7.2 device sharing: `app/merge.ts`'s `planImport`/`previewChildChange`/`importMerged` (they
-// import `app/backup.ts`, which needs zod) live behind `@chess-kids/core/merge`, same reasoning
-// `@chess-kids/core/backup` documents above.
+// Backup/merge values (zod validation) live behind `@chess-kids/core/backup`/`/merge` so zod stays
+// out of the main bundle and the bot worker; only the parent area imports them.
 
 export { getProfileSettings, updateProfileSettings } from './app/settings.ts';
 
@@ -210,8 +206,7 @@ export {
   PIECE_BY_LETTER,
 } from './domain/chess/index.ts';
 
-// Chess facts (`domain/chess/facts/`): pure predicates/derivations shared by the exercise engine,
-// solver and content build — subject-free, moves to `platform-core` in R4.
+// Chess facts: pure predicates/derivations shared by the exercise engine, solver and content build.
 export type { Goal, ReplayedLine, FailedReplay, ReplayResult } from './domain/chess/index.ts';
 export {
   enemyCount,
@@ -329,8 +324,7 @@ export {
   versusStars,
 } from './domain/exercise/index.ts';
 
-// Variant game rules (standard chess and kingless mini-games, played against the bot below) and
-// the computer opponent. Namespaced: both reuse names already taken by the static-capture
-// mini-game API above (`GameState`, `playGameMove`, `gameResult`), for a different kind of game.
+// Variant game rules and the computer opponent. Namespaced: both reuse names already taken by the
+// static-capture mini-game API above (`GameState`, `playGameMove`, `gameResult`).
 export * as game from './domain/game/index.ts';
 export * as bot from './domain/bot/index.ts';

@@ -5,11 +5,8 @@ import type { StoredRecord } from './profile.ts';
 import type { Random } from './random.ts';
 import type { ConceptTask } from './review.ts';
 
-/**
- * Test-out / placement (domain-model.md §3.2). `'test-out'`: the kid taps a locked lesson or world
- * on the Journey. `'placement'`: offered once after creating a new player, one run per Basics world
- * in order.
- */
+/** `'test-out'`: the kid taps a locked lesson or world on the Journey. `'placement'`: offered once
+ * after creating a new player, one run per Basics world in order. */
 export type AssessmentKind = 'test-out' | 'placement';
 
 /**
@@ -62,12 +59,8 @@ function samplePool(
   return shuffle(pool, random).slice(0, Math.min(count, pool.length));
 }
 
-/**
- * Spreads `total` task slots across lessons whose exercise-pool sizes are `sizes`, one array index
- * per lesson: at least 1 per lesson with any exercises (world test-out's "≥ 1 per lesson"), extra
- * slots handed out at random to lessons with pool room left — stops early if `total` exceeds what
- * every lesson's own pool can hold. Same length/order as `sizes`.
- */
+/** Spreads `total` task slots across lessons whose exercise-pool sizes are `sizes`: at least 1 per
+ * lesson with any exercises, extra slots at random to lessons with pool room left. */
 function spreadQuota(sizes: readonly number[], total: number, random: Random): readonly number[] {
   const quotas = sizes.map((size) => Math.min(1, size));
   let remaining = total - quotas.reduce((sum, quota) => sum + quota, 0);
@@ -84,14 +77,14 @@ function spreadQuota(sizes: readonly number[], total: number, random: Random): r
   return quotas;
 }
 
-/** Plans a lesson test-out (domain-model.md §3.2): up to {@link TEST_OUT_LESSON_TASKS} tasks from
- * `lesson`'s own scored exercises, picked with `random`. */
+/** Plans a lesson test-out: up to {@link TEST_OUT_LESSON_TASKS} tasks from `lesson`'s own scored
+ * exercises, picked with `random`. */
 export function planTestOutLesson(lesson: Lesson, random: Random): readonly ConceptTask[] {
   return samplePool(poolOf(lesson), TEST_OUT_LESSON_TASKS, random);
 }
 
-/** Plans a world test-out (domain-model.md §3.2): up to {@link TEST_OUT_WORLD_TASKS} tasks spread
- * over every lesson of `world` (≥ 1 each where the lesson has exercises), picked with `random`. */
+/** Plans a world test-out: up to {@link TEST_OUT_WORLD_TASKS} tasks spread over every lesson of
+ * `world` (≥ 1 each where the lesson has exercises), picked with `random`. */
 export function planTestOutWorld(
   world: World,
   lessons: readonly Lesson[],
@@ -115,13 +108,8 @@ export interface PlacementWorldPlan {
   readonly tasks: readonly ConceptTask[];
 }
 
-/**
- * Plans the whole placement test (domain-model.md §3.2): one run per Basics world, in order,
- * `PLACEMENT_TASKS_PER_WORLD` tasks each, sampled from that world's lessons' scored exercises. Skips
- * a `coming-soon` Basics world (no authored lessons yet) — none exist as of M4.5, but this keeps the
- * planner from crashing if content is ever authored out of order. `[]` when the catalog has no main
- * (Basics) track.
- */
+/** Plans the whole placement test: one run per Basics world, in order, `PLACEMENT_TASKS_PER_WORLD`
+ * tasks each. Skips a world with no authored lessons yet. `[]` with no main (Basics) track. */
 export function planPlacement(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
@@ -147,24 +135,22 @@ export interface AssessmentScore {
   readonly passed: boolean;
 }
 
-/** Test-out pass mark (domain-model.md §3.2): ≥ 80% correct, rounded up (lesson 4/5, world 7/8). */
+/** Test-out pass mark: ≥ 80% correct, rounded up (lesson 4/5, world 7/8). */
 export function scoreTestOut(results: readonly boolean[]): AssessmentScore {
   const total = results.length;
   const correct = results.filter(Boolean).length;
   return { correct, total, passed: total > 0 && correct >= Math.ceil(total * 0.8) };
 }
 
-/** Placement pass mark per world (domain-model.md §3.2): ≥ 3/4 (75%, rounded up). */
+/** Placement pass mark per world: ≥ 3/4 (75%, rounded up). */
 export function scorePlacementWorld(results: readonly boolean[]): AssessmentScore {
   const total = results.length;
   const correct = results.filter(Boolean).length;
   return { correct, total, passed: total > 0 && correct >= Math.ceil(total * 0.75) };
 }
 
-/**
- * One taken assessment's result (domain-model.md §2 `Assessment`, §3.2), kept for the parent report.
- * Placement stores one row per world attempted, `scope: { type: 'world', worldId }`.
- */
+/** One taken assessment's result, kept for the parent report. Placement stores one row per world
+ * attempted, `scope: { type: 'world', worldId }`. */
 export interface AssessmentResult extends StoredRecord {
   readonly profileId: string;
   readonly kind: AssessmentKind;
@@ -199,11 +185,8 @@ export function newAssessmentResult(
   };
 }
 
-/**
- * One lesson/world unlocked out of the normal Journey order (domain-model.md §3.2 "the scope's ids
- * join the unlocked set"): a passed test-out/placement, or a direct parent unlock. Read back as
- * `journey.ts`'s `unlocked` parameter (`targetId`s only — `targetType` is for display/bookkeeping).
- */
+/** One lesson/world unlocked out of the normal Journey order: a passed test-out/placement, or a
+ * direct parent unlock. Read back as `journey.ts`'s `unlocked` parameter (`targetId`s only). */
 export interface Unlock extends StoredRecord {
   readonly profileId: string;
   readonly targetType: 'lesson' | 'world';

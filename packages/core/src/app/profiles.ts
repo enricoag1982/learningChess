@@ -8,7 +8,7 @@ import { newProfile, validateNickname } from '../domain/profile.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** True until a parent password has been set up (app-structure.md §2: first run sets it). */
+/** True until a parent password has been set up (first run sets it). */
 export async function isFirstRun(deps: AppDeps): Promise<boolean> {
   const lock = await deps.parentLock.get();
   return lock === undefined;
@@ -144,10 +144,8 @@ export async function changeAvatar(
   return updated;
 }
 
-/**
- * Parent area "Delete": removes the profile and every saved lesson-progress/attempt record for
- * it, and clears `lastProfileId` in settings if this was the last-used profile.
- */
+/** Parent area "Delete": removes the profile and every saved lesson-progress/attempt record for it,
+ * and clears `lastProfileId` in settings if this was the last-used profile. */
 export async function deleteProfile(deps: AppDeps, profileId: string): Promise<void> {
   await deps.progress.deleteProfileData(profileId);
   await deps.gameRecords.deleteProfileData(profileId);
@@ -159,15 +157,9 @@ export async function deleteProfile(deps: AppDeps, profileId: string): Promise<v
   }
 }
 
-/**
- * Parent area "Reset child" (M5.1, app-structure.md §11): clears progress, attempts, concept
- * stats, mini-game progress (all under `ProgressRepository.deleteProfileData`), game records,
- * earned badges, streak and session log — but keeps the profile itself (nickname, avatar,
- * settings) and its assessment results/unlocks (a passed test-out/placement/parent unlock is left
- * alone, matching `deleteProfile`'s own per-repository cascade, minus `profiles.delete` and
- * `assessment.deleteProfileData`). The parent-area UI confirms this with the parent password
- * before calling it (`verifyParentPassword`) — this use case itself performs no such check.
- */
+/** Parent area "Reset child": clears progress, attempts, concept stats, mini-game progress, game
+ * records, earned badges, streak and session log — but keeps the profile itself and its assessment
+ * results/unlocks. The parent-area UI confirms this with the password first. */
 export async function resetProfileData(deps: AppDeps, profileId: string): Promise<void> {
   await requireProfile(deps, profileId);
   await deps.progress.deleteProfileData(profileId);

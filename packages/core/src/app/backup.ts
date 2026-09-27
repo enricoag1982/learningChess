@@ -12,16 +12,12 @@ import type { Streak } from '../domain/streak.ts';
 import type { BackupFileWriter, BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
-// No `new Function` fast path: the production CSP (`script-src 'self'`, M5.4) would report zod's
-// eval probe as a violation. Set before any schema below is built (object schemas read it at init).
+// No `new Function` fast path: the production CSP (`script-src 'self'`) would report zod's eval
+// probe as a violation. Set before any schema below is built (object schemas read it at init).
 z.config({ jitless: true });
 
-/**
- * One profile's full backed-up data (M5.1, app-structure.md §11/§12, `docs/non-functional.md` §3
- * "export each profile's data"): every stored record this app keeps for a child, except its
- * `Profile` row itself (kept alongside, once, in `BackupFile.profiles`) and the parent password
- * (`ParentLockRepository` — a backup never carries it, see `BackupImporter`'s own doc).
- */
+/** One profile's full backed-up data: every stored record this app keeps for a child, except its
+ * `Profile` row (kept alongside, once, in `BackupFile.profiles`) and the parent password. */
 export interface ProfileBackupData {
   readonly settings: ProfileSettings;
   readonly lessonProgress: readonly LessonProgress[];
@@ -36,12 +32,8 @@ export interface ProfileBackupData {
   readonly unlocks: readonly Unlock[];
 }
 
-/**
- * The backup file itself (M5.1 decision: `{ app, schemaVersion, exportedAt, profiles[], data by
- * profile }`), one JSON file for either every profile on the device ("Export") or a single one
- * ("Export per child" — same format, `profiles`/`data` just hold the one). `data` is keyed by
- * profile id so `parent.export-child`'s output is a trivial filter of `parent.export-all`'s own.
- */
+/** The backup file itself: one JSON file for either every profile on the device ("Export") or a
+ * single one ("Export per child" — same format, `profiles`/`data` just hold the one). */
 export interface BackupFile {
   readonly app: 'chess-kids';
   readonly schemaVersion: number;
@@ -197,8 +189,8 @@ const profileBackupDataSchema = z.object({
   unlocks: z.array(unlockSchema),
 });
 
-/** Shape-only validation (`docs/architecture.md` §11 M5.1): every field type here already matches
- * the live domain interfaces, so a successful parse is safe to treat as a real {@link BackupFile}. */
+/** Shape-only validation: every field type here already matches the live domain interfaces, so a
+ * successful parse is safe to treat as a real {@link BackupFile}. */
 const backupFileSchema = z.object({
   app: z.literal('chess-kids'),
   schemaVersion: z.number().int().positive(),
@@ -281,11 +273,8 @@ async function profileBackupData(deps: AppDeps, profileId: string): Promise<Prof
   };
 }
 
-/**
- * Builds a {@link BackupFile} for `profileIds` (every profile on the device when omitted) — the
- * parent area's "Export" (every child) and "Export per child" (`profileIds: [id]`) both call this,
- * same format either way (M5.1 decision).
- */
+/** Builds a {@link BackupFile} for `profileIds` (every profile on the device when omitted) — the
+ * parent area's "Export" and "Export per child" both call this, same format either way. */
 export async function buildBackupFile(
   deps: AppDeps,
   profileIds?: readonly string[],
@@ -320,10 +309,8 @@ function slug(nickname: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-/**
- * `chess-kids-backup-<date>.json`, or `chess-kids-backup-<nickname>-<date>.json` for a per-child
- * export (M5.1 decision: same format, own filename for clarity when several sit in Downloads).
- */
+/** `chess-kids-backup-<date>.json`, or `chess-kids-backup-<nickname>-<date>.json` for a per-child
+ * export — own filename for clarity when several sit in Downloads. */
 export function backupFileName(now: Date, nickname?: string): string {
   const date = localDayString(now);
   const nicknameSlug = nickname === undefined ? '' : slug(nickname);
@@ -332,26 +319,16 @@ export function backupFileName(now: Date, nickname?: string): string {
     : `chess-kids-backup-${nicknameSlug}-${date}.json`;
 }
 
-/**
- * `<nickname>` or literal `all`, slugged, for the "Send to other device" filename (M7.2 device
- * sharing, decision table "File name") — a different, more explicit shape than
- * {@link backupFileName}'s own (kept unchanged for the existing "Export" button, so its filenames
- * and any test/e2e expecting them stay the same). Falls back to `all` for an unsluggable nickname
- * too (an emoji-only nickname, say), same as `backupFileName`'s own empty-slug fallback would need.
- */
+/** `<nickname>` or literal `all`, slugged, for the "Send to other device" filename — a different,
+ * more explicit shape than {@link backupFileName}'s own (kept unchanged for "Export"). */
 export function shareFileName(now: Date, nickname?: string): string {
   const date = localDayString(now);
   const label = nickname === undefined ? '' : slug(nickname);
   return `chess-for-kids-${label === '' ? 'all' : label}-${date}.json`;
 }
 
-/**
- * Builds the exact same backup JSON {@link exportBackup} writes to disk, but returns it instead of
- * writing it (M7.2 "Send to other device": the web UI hands this to `navigator.share`/a `Blob`
- * download — only it can touch those browser APIs, so `packages/core` stays platform-agnostic).
- * `profileIds: [id]` for "send this child" — same one-profile-nickname-in-the-filename rule as
- * {@link exportBackup}.
- */
+/** Builds the exact same backup JSON {@link exportBackup} writes to disk, but returns it instead of
+ * writing it ("Send to other device": the web UI hands this to `navigator.share`/a `Blob` download). */
 export async function buildShareFile(
   deps: AppDeps,
   profileIds?: readonly string[],
@@ -371,24 +348,15 @@ export async function buildShareFile(
  */
 export async function exportBackup(deps: AppDeps, profileIds?: readonly string[]): Promise<void> {
   const file = await buildBackupFile(deps, profileIds);
-  // Whether the filename carries a nickname depends on which call this is ("export all" vs
-  // "export this child"), not on how many profiles the result happens to hold — a device with
-  // only one child must still get the same "export all" filename shape as one with several.
+  // Nickname in the filename depends on which call this is, not on how many profiles the result holds.
   const nickname = profileIds?.length === 1 ? file.profiles[0]?.nickname : undefined;
   const filename = backupFileName(deps.clock.now(), nickname);
   await requireBackupFileWriter(deps).write(filename, JSON.stringify(file, null, 2));
 }
 
-/**
- * Validates `raw` (a backup file's text contents) into a {@link BackupFile} — corrupt JSON, a
- * wrong `app` id, a bad shape, or `schemaVersion` newer than this build's own
- * (`deps.storageSchemaVersion`) all throw {@link BackupValidationError} with a clear message;
- * nothing else is touched (parent area "invalid file = clear error, nothing changed"). A
- * `schemaVersion` at or below the current one needs no data migration: every field this app has
- * ever added to these records is optional with a sensible default when absent (the same "read an
- * older record back as the default" approach `apps/web/src/adapters/storage/migrations.ts` already
- * uses for every migration to date), so an older, valid backup parses straight into this same type.
- */
+/** Validates `raw` into a {@link BackupFile} — corrupt JSON, a wrong `app` id, a bad shape, or a
+ * newer `schemaVersion` all throw {@link BackupValidationError}, nothing else touched. No data
+ * migration needed at or below the current version: every added field is optional with a default. */
 export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
   let json: unknown;
   try {
@@ -402,9 +370,8 @@ export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
     throw new BackupValidationError('Not a valid backup file.');
   }
 
-  // The zod-inferred shape and the hand-written `BackupFile` domain type are structurally close
-  // but not identical (mutable vs `readonly` arrays, zod's own optional-field inference) — safe to
-  // assert through `unknown` since `backupFileSchema` mirrors every field `BackupFile` declares.
+  // zod's inferred shape and the hand-written `BackupFile` type are structurally close but not
+  // identical (mutable vs readonly arrays) — safe to assert since the schema mirrors every field.
   const file = result.data as unknown as BackupFile;
   const current = schemaVersion(deps);
   if (file.schemaVersion > current) {
@@ -443,12 +410,8 @@ export function backupSummary(file: BackupFile): BackupSummary {
   return { profileCount: file.profiles.length, totalStars };
 }
 
-/**
- * Parent area "Import": validates `raw` (throws {@link BackupValidationError} on anything invalid,
- * changing nothing), then atomically replaces every stored profile/progress/reward/assessment
- * record with `raw`'s own (`deps.backupImporter`, "never partial"). Returns the preview summary so
- * the UI can show what was restored.
- */
+/** Parent area "Import": validates `raw`, then atomically replaces every stored record with `raw`'s
+ * own. Returns the preview summary so the UI can show what was restored. */
 export async function importBackup(deps: AppDeps, raw: string): Promise<BackupSummary> {
   const file = parseBackupFile(deps, raw);
   await requireBackupImporter(deps).replaceAll(file);

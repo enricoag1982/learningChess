@@ -9,14 +9,8 @@ import { lastNDays, totalMinutesForDate } from './session-log.ts';
 import type { Streak } from './streak.ts';
 import { localDayString } from './streak.ts';
 
-/**
- * One profile's full backed-up data, merge-ready (M7.2 device sharing, `docs/domain-model.md`'s
- * device-sharing table). Structurally identical to `app/backup.ts`'s `ProfileBackupData` — declared
- * here (not imported) so `domain/merge.ts` stays pure and does not depend on the `app` layer
- * (`docs/architecture.md`'s layering: domain → app → adapters/ui); every caller in `app/merge.ts`
- * passes its own `ProfileBackupData` values straight in, TypeScript's structural typing accepts them
- * with no cast.
- */
+/** One profile's full backed-up data, merge-ready. Structurally identical to `app/backup.ts`'s
+ * `ProfileBackupData` — declared here (not imported) so this stays a pure `domain` module. */
 export interface MergeableProfileData {
   readonly settings: ProfileSettings;
   readonly lessonProgress: readonly LessonProgress[];
@@ -31,10 +25,8 @@ export interface MergeableProfileData {
   readonly unlocks: readonly Unlock[];
 }
 
-// Mirrors the web storage layer's own caps (`apps/web/.../local-progress-repository.ts`,
-// `local-game-record-repository.ts`, `local-assessment-repository.ts`) — duplicated here the same
-// way `local-backup-importer.ts` already duplicates them (an established pattern in that file, not
-// a new one), so `packages/core` (storage-agnostic) never imports a web adapter constant.
+// Mirrors the web storage layer's own caps; duplicated here so `packages/core` never imports a web
+// adapter constant.
 const MAX_ATTEMPTS = 2000;
 const MAX_GAME_RECORDS = 500;
 const MAX_ASSESSMENT_RESULTS = 500;
@@ -46,12 +38,8 @@ function byCreatedAtAsc(
   return a.createdAt.localeCompare(b.createdAt);
 }
 
-/**
- * Union of `local`/`incoming` by `id` — keeping, for a colliding id, whichever side has the later
- * `updatedAt` (decision table "newest kept") — then capped to `max` (oldest dropped first, same
- * `local-backup-importer.ts` rule ordinary play would also produce). Naturally idempotent: re-union
- * of the same `incoming` a second time changes nothing (every id already present, same content).
- */
+// Union by `id`, later `updatedAt` wins a collision, then capped to `max` (oldest dropped first).
+// Idempotent: re-union of the same `incoming` changes nothing.
 function unionById<
   T extends { readonly id: string; readonly createdAt: string; readonly updatedAt: string },
 >(local: readonly T[], incoming: readonly T[], max: number): T[] {
@@ -67,8 +55,7 @@ function unionById<
   return all.length > max ? all.slice(all.length - max) : all;
 }
 
-/** Earliest of two optional ISO timestamps; the defined one if only one is set; `undefined` if
- * neither is (decision table "completedAt: earliest"). */
+/** Earliest of two optional ISO timestamps; the defined one if only one is set; `undefined` if neither is. */
 function earliestDefined(a: string | undefined, b: string | undefined): string | undefined {
   if (a === undefined) return b;
   if (b === undefined) return a;
@@ -106,15 +93,9 @@ function sameBestStars(
   return keysA.length === keysB.length && keysA.every((key) => a[key] === b[key]);
 }
 
-/**
- * Merges one lesson's progress present on both sides (decision table "Lesson progress"):
- * `bestStars` max per exercise, `bossStars` max, `completedAt` earliest, `masteredVia` kept if
- * either has it (local wins a real conflict), `resumeStep`/`skippedPhases` taken together from
- * whichever side has the newer `updatedAt` (never mixed field-by-field, since they describe the
- * same "where the kid is" moment). Returns `local` unchanged (same object) when the combined result
- * is identical to it — keeps a no-op merge from bumping `updatedAt`, and is what makes
- * {@link mergeLessonProgress} idempotent on repeated merges of the same `incoming`.
- */
+// bestStars/bossStars max, completedAt earliest, masteredVia kept if either has it,
+// resumeStep/skippedPhases from whichever side has the newer updatedAt. Returns `local` unchanged
+// when nothing differs, keeping repeated merges of the same `incoming` idempotent.
 function mergeOneLessonProgress(
   local: LessonProgress,
   incoming: LessonProgress,
@@ -149,9 +130,7 @@ function mergeOneLessonProgress(
   };
 }
 
-/** Merges `local`/`incoming` lesson-progress lists (decision table "Lesson progress"): a lesson id
- * present on only one side is kept exactly as-is; one present on both is combined
- * ({@link mergeOneLessonProgress}). */
+/** A lesson id on only one side is kept as-is; one on both is combined ({@link mergeOneLessonProgress}). */
 export function mergeLessonProgress(
   local: readonly LessonProgress[],
   incoming: readonly LessonProgress[],
@@ -172,14 +151,8 @@ export function mergeLessonProgress(
   return result;
 }
 
-/**
- * Merges one mini-game's progress present on both sides (decision table "Mini-game progress" —
- * best-of every "best"/count field): `bestStars` max, `plays`/`wins` max (a device's own count only
- * ever grows locally; a shared file's count is never additive with this device's own, since both
- * devices may have recorded overlapping plays already folded into each count independently —
- * "best of both" avoids double-counting the same play twice while still keeping the higher, truer
- * count of the two).
- */
+// Best-of every field: bestStars/plays/wins max. Not additive — both sides may already include
+// overlapping plays, so "best of both" avoids double-counting.
 function mergeOneMiniGameProgress(
   local: MiniGameProgress,
   incoming: MiniGameProgress,
@@ -212,12 +185,8 @@ export function mergeMiniGameProgress(
   return result;
 }
 
-/**
- * Merges one concept's stats present on both sides (decision table "Concept stats" — the record
- * with the newer `updatedAt`; no per-answer timestamps to merge `recent` itself). Whole-record pick,
- * not field-by-field: `recent`/`box`/`dueAt`/`lastExerciseId` describe one device's own review
- * history together, so mixing fields from both sides would not be a real history either device had.
- */
+// Whole-record pick (newer updatedAt wins): recent/box/dueAt/lastExerciseId describe one device's
+// own review history, so mixing fields would not be a real history either device had.
 function mergeOneConceptStats(local: ConceptStats, incoming: ConceptStats): ConceptStats {
   return incoming.updatedAt > local.updatedAt ? { ...incoming, id: local.id } : local;
 }
@@ -239,15 +208,13 @@ export function mergeConceptStats(
   return result;
 }
 
-/** `"<badgeId>:<tier>"` — mirrors `domain/badges.ts`'s own private `earnedKey`, duplicated here so
- * this module stays free of a same-layer-only dependency on `badges.ts`'s engine internals. */
+/** `"<badgeId>:<tier>"` — mirrors `domain/badges.ts`'s own private `earnedKey`. */
 function earnedBadgeKey(badge: EarnedBadge): string {
   return `${badge.badgeId}:${badge.tier ?? ''}`;
 }
 
-/** Merges one badge/tier present on both sides (decision table "Earned badges" — union by badge id,
- * earliest `at`, `seen` true if either is seen: no second celebration for a badge the kid already
- * saw on the other device). */
+/** Union by badge id: earliest `at`, `seen` true if either is (no second celebration for a badge
+ * already seen on the other device). */
 function mergeOneEarnedBadge(local: EarnedBadge, incoming: EarnedBadge): EarnedBadge {
   const at = local.at < incoming.at ? local.at : incoming.at;
   const seen = local.seen || incoming.seen;
@@ -274,12 +241,8 @@ export function mergeEarnedBadges(
   return result;
 }
 
-/**
- * Merges a streak (decision table "Streak"): `best` = max of both; `current`/`lastDay`/
- * `skipsUsedThisWeek` taken together from whichever side has the later `lastDay` (a tie keeps the
- * side with the higher `current`) — never mixed field-by-field, since they describe one continuous
- * run. `undefined` only when neither side has a streak yet.
- */
+/** `best` = max of both; `current`/`lastDay`/`skipsUsedThisWeek` taken together from whichever side
+ * has the later `lastDay` (tie: higher `current`) since they describe one continuous run. */
 export function mergeStreak(
   local: Streak | undefined,
   incoming: Streak | undefined,
@@ -309,17 +272,13 @@ export function mergeStreak(
   };
 }
 
-/** `undefined` sorts as "oldest" (decision table "missing = oldest") — an empty string precedes
- * every real ISO timestamp. */
+/** `undefined` sorts as "oldest": an empty string precedes every real ISO timestamp. */
 function updatedAtOrOldest(value: string | undefined): string {
   return value ?? '';
 }
 
-/**
- * Merges a profile's settings (decision table "Settings" — newest wins by `updatedAt`; missing =
- * oldest; both missing → local kept). Whole-record pick: a parent's settings are one coherent choice
- * made at one time, not a field to combine.
- */
+/** Newest wins by `updatedAt` (missing = oldest, both missing → local): a parent's settings are one
+ * coherent choice, not a field to combine. */
 export function mergeProfileSettings(
   local: ProfileSettings,
   incoming: ProfileSettings,
@@ -329,15 +288,9 @@ export function mergeProfileSettings(
   return incomingAt > localAt ? incoming : local;
 }
 
-/**
- * Merges session-log rows (decision table "Session logs" — per-device rows so a re-import never
- * double-counts): every row is keyed by (`date`, `deviceId`); a row with no `deviceId` on either
- * side is treated as that side's own un-stamped legacy row, distinct from the other side's — never
- * silently combined with it, so this device's own today's row (with its own `extraMinutes`/
- * `hoursOverrideUntil`/`warnedAt`) is never overwritten by an imported one for the same date. Within
- * one (date, deviceId) pair present on both sides, keeps the larger `minutes`/`extraMinutes` (a
- * device's own count only grows) and the later `hoursOverrideUntil`/`warnedAt`.
- */
+// Keyed by (date, deviceId) so a re-import never double-counts; a row with no deviceId is treated
+// as that side's own legacy row, never merged with the other side's. Larger minutes/extraMinutes,
+// later hoursOverrideUntil/warnedAt win within a matching pair.
 function sessionLogKey(log: SessionLog): string {
   return `${log.date}:${log.deviceId ?? `legacy:${log.id}`}`;
 }
@@ -387,8 +340,7 @@ export function mergeSessionLogs(
   return result;
 }
 
-/** Union of unlocks by `targetType:targetId` (decision table "Unlocks: union") — an unlock has no
- * field worth combining, only whether it exists. */
+/** Union by `targetType:targetId`: an unlock has no field worth combining, only whether it exists. */
 export function mergeUnlocks(local: readonly Unlock[], incoming: readonly Unlock[]): Unlock[] {
   const byKey = new Map(local.map((unlock) => [`${unlock.targetType}:${unlock.targetId}`, unlock]));
   for (const unlock of incoming) {
@@ -398,15 +350,9 @@ export function mergeUnlocks(local: readonly Unlock[], incoming: readonly Unlock
   return [...byKey.values()];
 }
 
-/**
- * Merges one profile's full backed-up data (decision table, every row): the pure heart of M7.2
- * device sharing. `local`/`incoming` must already be for the *same* target profile id (re-keying an
- * incoming child onto a different local profile id is `app/merge.ts`'s job, before this runs).
- * Idempotent: `mergeProfileData(mergeProfileData(local, incoming, now), incoming, now)` deep-equals
- * `mergeProfileData(local, incoming, now)` — every sub-merge above returns its `local` input
- * unchanged when nothing about the combined result actually differs from it, so re-applying the same
- * `incoming` a second time changes nothing further.
- */
+/** Merges one profile's full backed-up data. `local`/`incoming` must already share the same target
+ * profile id (`app/merge.ts` re-keys an incoming child first). Idempotent: re-applying the same
+ * `incoming` changes nothing further. */
 export function mergeProfileData(
   local: MergeableProfileData,
   incoming: MergeableProfileData,
@@ -432,17 +378,13 @@ export function mergeProfileData(
   return merged;
 }
 
-/** Total minutes played on `now`'s own local calendar day, across every device row in
- * `data.sessionLogs` — same `totalMinutesForDate` the live app uses (`app/time-limit.ts`'s
- * `combinedSessionLog`). */
+/** Total minutes played on `now`'s local calendar day, across every device row in `data.sessionLogs`. */
 export function totalMinutesToday(data: MergeableProfileData, now: Date): number {
   return totalMinutesForDate(data.sessionLogs, localDayString(now));
 }
 
 /** Total minutes played over the last `days` local calendar days ending today, across every device
- * row in `data.sessionLogs` — the import preview's own "+N min this week" figure reads this with
- * `days: 7` (decision table "Import preview"), same days window the Overview's own "minutes this
- * week" card uses (`app/report.ts`'s `OVERVIEW_MINUTES_DAYS`). */
+ * row in `data.sessionLogs`. */
 export function totalMinutesOverDays(data: MergeableProfileData, now: Date, days: number): number {
   return lastNDays(now, days).reduce(
     (sum, date) => sum + totalMinutesForDate(data.sessionLogs, date),
@@ -450,9 +392,8 @@ export function totalMinutesOverDays(data: MergeableProfileData, now: Date, days
   );
 }
 
-/** A brand-new local profile's data: `DEFAULT_PROFILE_SETTINGS`, every list empty — the merge base
- * for a local profile id `buildBackupFile` has somehow not populated (never happens in practice,
- * since it always returns one entry per profile; kept as a safe fallback, not a real code path). */
+/** A brand-new local profile's data: default settings, every list empty. Safe fallback, not a real
+ * code path (`buildBackupFile` always returns one entry per profile). */
 export function emptyProfileData(): MergeableProfileData {
   return {
     settings: DEFAULT_PROFILE_SETTINGS,
@@ -468,13 +409,8 @@ export function emptyProfileData(): MergeableProfileData {
   };
 }
 
-/**
- * Re-keys every record in `data` from its own `profileId` to `targetProfileId` (M7.2 "Merge into
- * ‹local child›" when the chosen local profile's id differs from the incoming child's own — every
- * incoming record is re-keyed to the chosen local profile id, decision table "Profile matching").
- * Record ids (`LessonProgress.id`, `Attempt.id`, …) are left untouched: they are independently
- * random per device and never collide with this device's own.
- */
+/** Re-keys every record in `data` to `targetProfileId`, when the chosen local profile's id differs
+ * from the incoming child's own. Record ids are left untouched: independently random, never collide. */
 export function rekeyProfileData(
   data: MergeableProfileData,
   targetProfileId: string,

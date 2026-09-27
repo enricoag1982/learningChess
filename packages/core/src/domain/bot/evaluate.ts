@@ -29,12 +29,8 @@ function pawnAdvance(square: Square, color: Color): number {
   return color === 'w' ? rank - 2 : 7 - rank;
 }
 
-/**
- * A def needs the (more costly) piece map to test its win conditions only when it declares one of
- * `capture-all` / `capture` / `reach`; checkmate / stalemate / no-moves only need the legal-move
- * count and check flag, and `promote` only needs the last move. Precomputing this once per search
- * lets internal (non-leaf) nodes skip building the piece map entirely for plain chess.
- */
+/** A def needs the piece map only when it declares `capture-all`/`capture`/`reach`; checkmate/
+ * stalemate/`promote` do not. Precomputed once so internal nodes skip building it for plain chess. */
 export function needsPiecesForTerminal(def: GameRulesDef): boolean {
   const kinds: ReadonlySet<WinCondition['kind']> = new Set(['capture-all', 'capture', 'reach']);
   return [...def.win.w, ...def.win.b].some((condition) => kinds.has(condition.kind));
@@ -56,11 +52,8 @@ export function boardView(
   };
 }
 
-/**
- * Terminal score from the perspective of `view.toMove`, or `null` when the game is still ongoing.
- * A win scores `WIN_SCORE` minus plies from the root, so a faster win/loss always outranks a
- * slower one of the same kind.
- */
+/** Terminal score from the perspective of `view.toMove`, or `null` while ongoing. A win scores
+ * `WIN_SCORE` minus plies from the root, so a faster win/loss outranks a slower one. */
 export function terminalScore(
   def: GameRulesDef,
   view: GameBoardView,
@@ -104,12 +97,9 @@ export function staticEval(view: GameBoardView, def: GameRulesDef): number {
   return score;
 }
 
-/**
- * Value of the position after `lastMove`, from the perspective of `board.turn()`. Terminal results
- * (via `evaluateTerminal`, the same rules `gameResult` uses) always beat a material score. Always
- * builds the full piece map: used for a one-off "resulting position" value (shallow mode), not in
- * the search's per-node hot loop (see `needsPiecesForTerminal` for that).
- */
+/** Value of the position after `lastMove`, from `board.turn()`'s perspective; terminal results
+ * always beat a material score. Always builds the full piece map — a one-off value (shallow mode),
+ * not the search's hot loop. */
 export function evaluateBoard(
   board: SearchBoard,
   def: GameRulesDef,

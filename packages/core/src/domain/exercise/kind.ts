@@ -1,9 +1,5 @@
-/**
- * The exercise-kind abstraction (subject-free; moves to `platform-core` in R4): one exercise type's
- * whole behaviour — state machine, hint ladder, star rule and (content-test-only) its own solved /
- * one-error action sequences — behind a uniform interface so `engine.ts` can dispatch through a
- * registry (`kinds/index.ts`) instead of a type-by-type `if` chain.
- */
+// The exercise-kind abstraction (subject-free): one exercise type's whole behaviour behind a
+// uniform interface, so `engine.ts` dispatches through a registry (`kinds/index.ts`), not an `if` chain.
 
 /** Fields every exercise kind's state tracks, independent of the exercise's own subject. */
 export interface ExerciseProgress {
@@ -28,11 +24,8 @@ export interface TextKeyRef {
 /** How a kind's action is driven; replaces the old `NON_MOVE_TYPES` set. */
 export type KindInput = 'static-move' | 'real-move' | 'select' | 'answer' | 'place';
 
-/**
- * One exercise type's full behaviour. Method syntax (not arrow-typed fields) is deliberate:
- * TypeScript checks a method's parameter types bivariantly, so a precise
- * `ExerciseKind<SpecificDef, ...>` widens to `AnyExerciseKind` with no `any` and no cast.
- */
+/** One exercise type's full behaviour. Method syntax is deliberate: bivariant parameter checking
+ * lets a precise `ExerciseKind<SpecificDef, ...>` widen to `AnyExerciseKind` with no cast. */
 export interface ExerciseKind<
   Def extends { readonly type: string; readonly id: string; readonly textKey: string },
   State extends ExerciseProgress & { readonly def: Def },
@@ -53,11 +46,8 @@ export interface ExerciseKind<
   stars(state: State): 1 | 2 | 3;
 }
 
-/**
- * A kind's content-test-only action sequences — kept out of `ExerciseKind`/`EXERCISE_KINDS` (the
- * registry `engine.ts`'s real dispatchers reach) so this code, and whatever each type's `solution`
- * pulls in (e.g. the solver), is reachable only from `/testing` and content, never the app bundle.
- */
+/** A kind's content-test-only action sequences — kept out of `ExerciseKind`/`EXERCISE_KINDS` so
+ * this code, and whatever `solution` pulls in, is reachable only from `/testing` and content. */
 export interface ExerciseSolution<
   Def extends { readonly type: string; readonly id: string; readonly textKey: string },
   Action extends { readonly type: string },

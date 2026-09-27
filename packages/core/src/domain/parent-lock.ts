@@ -1,10 +1,7 @@
 import type { StoredRecord } from './profile.ts';
 
-/**
- * Kid-gate, not a security boundary (non-functional.md §3): the password is kept in plain text.
- * `fileLocation` is where the parent can find it again (adapter-specific: a downloaded file's
- * path on web, a Documents file's path in store apps).
- */
+/** Kid-gate, not a security boundary: the password is kept in plain text. `fileLocation` is where
+ * the parent can find it again (adapter-specific). */
 export interface ParentLock extends StoredRecord {
   readonly password: string;
   readonly fileLocation: string;
@@ -66,13 +63,8 @@ export interface CheckPasswordResult {
   readonly waitMs: number;
 }
 
-/**
- * Checks `input` against `lock.password` (non-functional.md §3: 5 wrong attempts → 1-minute wait).
- * - Still locked: rejected without counting against the attempt total; `waitMs` = time left.
- * - Right password: attempt counter and any lock are cleared.
- * - Wrong password: attempt counter += 1; the 5th wrong attempt locks for 60 s and resets the
- *   counter (so the next check starts counting from 0 again once the lock expires).
- */
+/** Checks `input` against `lock.password` (5 wrong attempts → 1-minute wait). Still locked: rejected
+ * without counting. Right: counter/lock cleared. Wrong: counter += 1, the 5th locks for 60 s. */
 export function checkPassword(lock: ParentLock, input: string, now: Date): CheckPasswordResult {
   const nowMs = now.getTime();
 

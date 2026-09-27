@@ -13,8 +13,7 @@ import { getOrCreateDeviceId } from './device.ts';
 import type { BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** `deps.backupImporter`, or a clear error if this `AppDeps` has not wired it up — same pattern
- * `app/backup.ts`'s own private `requireBackupImporter` uses. */
+/** `deps.backupImporter`, or a clear error if this `AppDeps` has not wired it up. */
 function requireBackupImporter(deps: AppDeps): BackupImporter {
   if (deps.backupImporter === undefined) {
     throw new Error('AppDeps.backupImporter is not wired up');
@@ -22,12 +21,9 @@ function requireBackupImporter(deps: AppDeps): BackupImporter {
   return deps.backupImporter;
 }
 
-/**
- * One incoming child's chosen fate (M7.2 device sharing, decision table "Profile matching"):
- * `'add-new'` creates a fresh local profile from the incoming one (its own id kept, since this
- * choice only ever applies when that id matches no local profile); `'merge'` combines its data into
- * `localProfileId` (re-keyed first when that id differs from the incoming child's own).
- */
+/** One incoming child's chosen fate: `'add-new'` creates a fresh local profile from the incoming
+ * one (id kept — only applies when it matches no local profile); `'merge'` combines its data into
+ * `localProfileId` (re-keyed first when that id differs). */
 export interface ChildImportChoice {
   readonly incomingProfileId: string;
   readonly kind: 'add-new' | 'merge';
@@ -37,8 +33,8 @@ export interface ChildImportChoice {
 /** One incoming child's import-preview row (`app/merge.ts`'s `planImport`). */
 export interface ChildImportPlan {
   readonly incomingProfile: Profile;
-  /** `true`: this incoming child's own id already matches a local profile — merges automatically,
-   * no choice control shown at all (decision table "no question"). */
+  /** `true`: this incoming child's id already matches a local profile — merges automatically, no
+   * choice control shown. */
   readonly autoMerge: boolean;
   readonly defaultChoice: ChildImportChoice;
   /** Every local profile, for the "Merge into …" control's own options; `[]` on a fresh device. */
@@ -51,18 +47,14 @@ export interface ImportPlan {
   readonly children: readonly ChildImportPlan[];
 }
 
-/** Case-insensitive, trimmed nickname key — decision table "preselect merge when the nickname
- * matches a local child (case-insensitive, trimmed)". */
+/** Case-insensitive, trimmed nickname key, for preselecting a merge target by nickname match. */
 function nicknameKey(nickname: string): string {
   return nickname.trim().toLowerCase();
 }
 
-/**
- * Parent area "Import" preview (M7.2 device sharing): for each incoming child, whether it merges
- * automatically (same profile id already exists locally) or needs a choice, and that choice's own
- * default — "Merge into ‹local child›" preselected when the nickname matches a local child, else
- * "Add as new child" (decision table "Profile matching"). Read-only: touches no storage.
- */
+/** Parent area "Import" preview: for each incoming child, whether it merges automatically (same
+ * profile id already exists locally) or needs a choice, defaulting to a nickname match else "Add
+ * as new child". Read-only: touches no storage. */
 export async function planImport(deps: AppDeps, incomingFile: BackupFile): Promise<ImportPlan> {
   const localProfiles = await deps.profiles.list();
   const localById = new Map(localProfiles.map((profile) => [profile.id, profile]));
@@ -102,8 +94,8 @@ export async function planImport(deps: AppDeps, incomingFile: BackupFile): Promi
  * this week" card uses (`app/report.ts`'s `OVERVIEW_MINUTES_DAYS`). */
 const PREVIEW_MINUTES_DAYS = 7;
 
-/** What choosing `choice` would change for one incoming child (M7.2 import preview's own
- * "+12 stars, +3 badges, +45 min this week" line — decision table "Import preview"). */
+/** What choosing `choice` would change for one incoming child (import preview's "+12 stars, +3
+ * badges, +45 min this week" line). */
 export interface ImportChangeSummary {
   readonly starsDelta: number;
   readonly badgesDelta: number;
@@ -112,12 +104,9 @@ export interface ImportChangeSummary {
 
 const NO_CHANGE: ImportChangeSummary = { starsDelta: 0, badgesDelta: 0, minutesThisWeekDelta: 0 };
 
-/**
- * Computes {@link ImportChangeSummary} for one incoming child under `choice`, against this device's
- * *current* stored data (read fresh — the parent may change the choice interactively, each call is
- * independent and touches no storage). `'add-new'`: every incoming number, since the local side
- * starts at zero. `'merge'`: the merged result vs. what `localProfileId` has today.
- */
+/** Computes {@link ImportChangeSummary} for one incoming child under `choice`, against this
+ * device's current stored data (read fresh each call). `'add-new'`: every incoming number.
+ * `'merge'`: the merged result vs. what `localProfileId` has today. */
 export async function previewChildChange(
   deps: AppDeps,
   incomingFile: BackupFile,
@@ -155,9 +144,8 @@ export async function previewChildChange(
 }
 
 /** Which local profile id (if any) `incoming` merges into, given `choice` (or its absence — the
- * same nickname-match default `planImport` would offer). `null` = "add as new child". A same-id
- * match with an existing local profile always wins over anything in `choice` (decision table "no
- * question"). */
+ * same nickname-match default `planImport` offers). `null` = "add as new child". A same-id match
+ * always wins over `choice`. */
 function resolveMergeTarget(
   incoming: Profile,
   choice: ChildImportChoice | undefined,
@@ -177,18 +165,9 @@ export interface ImportMergedResult {
   readonly totalStars: number;
 }
 
-/**
- * Parent area "Merge" (M7.2 device sharing): folds `incomingFile`'s children into this device's
- * *current, full* dataset — per `choices` (a same-id child always auto-merges regardless of
- * `choices`; every other incoming child without a matching entry falls back to the nickname-match
- * default, same as {@link planImport} would offer) — and atomically writes the result
- * (`BackupImporter.writeMerged`). Nothing untouched by this import (another local child's data, this
- * device's own `lastProfileId`/`suggestedLevels`/`storagePersisted`/`deviceId`) is changed.
- * Idempotent end to end: importing the same file twice leaves every number exactly as the first
- * import left it (`domain/merge.ts`'s `mergeProfileData` is itself idempotent, and a repeat
- * "add-new" re-targets the same already-existing local profile — its own id, from the first import
- * — as an ordinary merge, never a second copy).
- */
+/** Parent area "Merge": folds `incomingFile`'s children into this device's current, full dataset
+ * per `choices` (falling back to {@link planImport}'s default), and atomically writes the result.
+ * Idempotent end to end: importing the same file twice changes nothing further. */
 export async function importMerged(
   deps: AppDeps,
   incomingFile: BackupFile,
@@ -239,7 +218,6 @@ export async function importMerged(
 
   const mergedFile: BackupFile = {
     app: 'chess-kids',
-    // `buildBackupFile` already stamped this with `deps.storageSchemaVersion` (or `1`).
     schemaVersion: localFile.schemaVersion,
     exportedAt: now.toISOString(),
     profiles,

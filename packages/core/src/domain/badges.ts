@@ -1,12 +1,12 @@
 import type { StoredRecord } from './profile.ts';
 
-/** Badge catalogue category (rewards.md §3). */
+/** Badge catalogue category. */
 export type BadgeCategory = 'milestone' | 'skill' | 'play' | 'habit';
 
-/** Reward tier shown on an earned badge (rewards.md §1 "Clear goals"); `undefined` = no tiers. */
+/** Reward tier shown on an earned badge; `undefined` = no tiers. */
 export type BadgeTier = 'bronze' | 'silver' | 'gold';
 
-/** Every badge condition type (rewards.md §4), plus the params each one reads off `BadgeCondition`. */
+/** Every badge condition type, plus the params each one reads off `BadgeCondition`. */
 export type BadgeConditionType =
   | 'mastered'
   | 'stars-total'
@@ -19,12 +19,9 @@ export type BadgeConditionType =
   | 'warmups'
   | 'comeback';
 
-/**
- * One badge's earning rule (rewards.md §4), compiled from `packages/content/badges.yaml`. Every
- * type is evaluated against `thresholds` (ascending, 1–3 entries: a single-tier badge has one
- * entry, a tiered one three — `evaluateBadges` names them bronze/silver/gold in order); the other
- * fields narrow *what* is counted, one or two of them set per `type` (see the doc on each).
- */
+/** One badge's earning rule, compiled from `packages/content/badges.yaml`. Every type is evaluated
+ * against `thresholds` (ascending, 1–3 entries — `evaluateBadges` names them bronze/silver/gold);
+ * the other fields narrow *what* is counted, one or two set per `type`. */
 export interface BadgeCondition {
   readonly type: BadgeConditionType;
   readonly thresholds: readonly number[];
@@ -42,11 +39,11 @@ export interface BadgeCondition {
   readonly extra?: 'queen-kept';
   /** `game-event`: which `GameRecord.moves` pattern to count. */
   readonly event?: 'promotion' | 'castling';
-  /** `game-played`: `'local'` (vs a friend, profile-metadata driven — M4.3). */
+  /** `game-played`: `'local'` (vs a friend). */
   readonly mode?: 'local';
 }
 
-/** One badge definition, compiled from content (domain-model.md §1 `BadgeDef`). */
+/** One badge definition, compiled from content. */
 export interface BadgeDef {
   readonly id: string;
   readonly category: BadgeCategory;
@@ -57,46 +54,43 @@ export interface BadgeDef {
   readonly condition: BadgeCondition;
 }
 
-/** One earned badge/tier (domain-model.md §2 `Badge`); a tiered badge gets one row per tier reached. */
+/** One earned badge/tier; a tiered badge gets one row per tier reached. */
 export interface EarnedBadge extends StoredRecord {
   readonly profileId: string;
   readonly badgeId: string;
   readonly tier?: BadgeTier;
   /** ISO timestamp this tier was reached. */
   readonly at: string;
-  /** Cleared once shown in a celebration or seen in My Den ("new" dot, rewards.md §1). */
+  /** Cleared once shown in a celebration or seen in My Den ("new" dot). */
   readonly seen: boolean;
 }
 
-/**
- * Every fact the badge engine reads, derived from stored profile data + content (`app/rewards.ts`
- * builds this) — the engine itself never reads progress/attempts/game records directly, keeping
- * `evaluateBadges` pure and easy to test with plain numbers.
- */
+/** Every fact the badge engine reads, derived from stored profile data + content (`app/rewards.ts`
+ * builds this) — the engine itself never reads progress/attempts/game records directly. */
 export interface BadgeFacts {
-  /** Mastered worlds/tracks, as `'world:<id>'` / `'track:<id>'` (domain-model.md §3). */
+  /** Mastered worlds/tracks, as `'world:<id>'` / `'track:<id>'`. */
   readonly masteredScopes: ReadonlySet<string>;
   readonly starsTotal: number;
-  /** Lessons with 3 stars on every exercise (rewards.md §3 "Perfect Lesson"). */
+  /** Lessons with 3 stars on every exercise. */
   readonly perfectLessons: number;
-  /** Lifetime correct-solve count per concept id (e.g. Mate Master's `mate-in-1`). */
+  /** Lifetime correct-solve count per concept id. */
   readonly conceptCorrectTotal: Readonly<Record<string, number>>;
-  /** Current correct-in-a-row streak per concept id (Sharp Eyes). */
+  /** Current correct-in-a-row streak per concept id. */
   readonly conceptCorrectInARow: Readonly<Record<string, number>>;
-  /** Current hint-free-in-a-row streak per concept id (Escape Artist). */
+  /** Current hint-free-in-a-row streak per concept id. */
   readonly conceptNoHintsInARow: Readonly<Record<string, number>>;
   /** Win counts keyed like `BadgeCondition.opponent`: `'any'`, `'computer:<n>'`, a mini-game id. */
   readonly gameWins: Readonly<Record<string, number>>;
-  /** Wins where the kid's queen was never captured (Queen Keeper). */
+  /** Wins where the kid's queen was never captured. */
   readonly queenKeptWins: number;
   /** Promotion move count / games-with-a-castle count, across all non-abandoned games. */
   readonly gameEvents: Readonly<{ promotion: number; castling: number }>;
-  /** Games played vs a friend (`opponent` starting `profile:`/`guest` — M4.3, Friendly Match). */
+  /** Games played vs a friend (`opponent` starting `profile:`/`guest`). */
   readonly localGamesPlayed: number;
-  /** Today's streak, after folding in today's activity (Daily Player). */
+  /** Today's streak, after folding in today's activity. */
   readonly streakCurrent: number;
   readonly warmupsCompleted: number;
-  /** Scored exercises finished (any stars) after >= 2 wrong tries (Never Give Up). */
+  /** Scored exercises finished (any stars) after >= 2 wrong tries. */
   readonly comebackCount: number;
 }
 
@@ -146,13 +140,9 @@ function earnedKey(badgeId: string, tier: BadgeTier | undefined): string {
   return `${badgeId}:${tier ?? ''}`;
 }
 
-/**
- * Pure badge engine (rewards.md §4): for every `defs` entry, compares its current fact value
- * against each of its `thresholds` (ascending) and returns every tier newly crossed that is not
- * already in `earned` — in catalogue order, tiers low-to-high. Badges never lost (rewards.md §1):
- * this only ever adds, and a fact value dropping later (e.g. a streak resetting) does not affect
- * what is already in `earned`, since this function never removes anything itself.
- */
+/** Pure badge engine: for every `defs` entry, compares its current fact value against each of its
+ * `thresholds` and returns every tier newly crossed not already in `earned`. Badges never lost:
+ * this only ever adds. */
 export function evaluateBadges(
   defs: readonly BadgeDef[],
   facts: BadgeFacts,
@@ -198,7 +188,7 @@ export function newEarnedBadge(
   };
 }
 
-/** Marks one earned badge/tier `seen: true` (My Den's "new" dot, rewards.md §1). No-op if unchanged. */
+/** Marks one earned badge/tier `seen: true` (My Den's "new" dot). No-op if unchanged. */
 export function markSeen(badge: EarnedBadge, now: Date): EarnedBadge {
   if (badge.seen) return badge;
   return { ...badge, seen: true, updatedAt: now.toISOString() };

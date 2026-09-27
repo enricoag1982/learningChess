@@ -14,12 +14,9 @@ function hasKing(position: Position, color: Color): boolean {
   );
 }
 
-/**
- * Builds a chess.js instance from a `Position`. Lessons and mini-games may omit either or both
- * kings (lone rook, Pawn Wars, …): those load with `skipValidation` so chess.js accepts them.
- * A position with both kings still goes through chess.js's own FEN validation, so e.g. two white
- * kings is rejected.
- */
+/** Builds a chess.js instance from a `Position`. Lessons/mini-games may omit either or both kings
+ * (lone rook, Pawn Wars, …): those load with `skipValidation`; a position with both kings still
+ * goes through chess.js's own FEN validation (rejects e.g. two white kings). */
 function buildChess(position: Position): Chess {
   const fen = toFen(position);
   const missingKing = !hasKing(position, 'w') || !hasKing(position, 'b');
@@ -51,17 +48,10 @@ function toChessJsMove(move: MoveInput): string | { from: string; to: string; pr
   return { from: move.from, to: move.to, promotion: move.promotion ?? 'q' };
 }
 
-/**
- * chess.js's private, pre-SAN move shape (`from`/`to` are 0x88 board indices: rank × 16 + file,
- * a8 = 0). This is what `_moves`/`_makeMove`/`_undoMove` trade in, before `moves()`/`move()`/
- * `undo()` wrap it as a public `Move` — which always computes full SAN plus a checkmate check
- * (itself another full move generation) for every single move, verbose or not. That is far too
- * slow to call at every node of a search tree: measured ~2ms per verbose `moves()` call on a
- * 35-move middlegame position, ~40x the cost of the plain list below. `SearchBoard` reaches into
- * these internals instead, the same ones chess.js's own public methods use before adding that
- * work; a chess.js upgrade that renames them fails loudly here (the cast stops matching) rather
- * than silently miscomputing.
- */
+/** chess.js's private, pre-SAN move shape (0x88 indices). The public `moves()`/`move()` wrap this
+ * with full SAN + a checkmate check per move — far too slow per search node (~40x this shape's
+ * cost) — so `SearchBoard` reaches into these internals; a chess.js upgrade that renames them
+ * fails loudly here (the cast stops matching) rather than silently miscomputing. */
 interface InternalMove {
   readonly color: Color;
   readonly from: number;
@@ -75,12 +65,8 @@ interface FastChess {
   _moves(options: { legal: true }): InternalMove[];
   _makeMove(move: InternalMove): void;
   _undoMove(): void;
-  /**
-   * chess.js's own incremental Zobrist hash (pieces + side to move + castling + en passant),
-   * XOR-updated in `_makeMove`/`_undoMove` — reading it is O(1), no recomputation. Same
-   * "reach into internals, fail loudly on a chess.js upgrade" trade-off as the members above;
-   * `hash()` (below) is the only place this is read.
-   */
+  /** chess.js's own incremental Zobrist hash, XOR-updated in `_makeMove`/`_undoMove` — O(1) to
+   * read, no recomputation. Same internals trade-off as above; only `hash()` reads this. */
   readonly _hash: bigint;
 }
 
@@ -97,11 +83,8 @@ function squareOf(index: number): Square {
   return `${String.fromCharCode(97 + file)}${String(rank)}` as Square;
 }
 
-/**
- * `SearchBoard`'s move, from the fast internal shape. `san` is a cheap long-algebraic placeholder,
- * not real chess notation: nothing reads it, since every move a bot actually plays or returns to
- * its caller comes from `ChessRules` (real SAN) instead, never from a `SearchBoard`.
- */
+/** `SearchBoard`'s move, from the fast internal shape. `san` is a cheap long-algebraic placeholder,
+ * not real chess notation: every move returned to a caller comes from `ChessRules` instead. */
 function toSearchMove(move: InternalMove): Move {
   const from = squareOf(move.from);
   const to = squareOf(move.to);
@@ -154,9 +137,8 @@ export const chessJsRules: ChessRules = {
     };
   },
 
-  // Reports chess.js semantics directly. A kingless side that has run out of moves is reported
-  // as `stalemate: true` by chess.js; deciding what that means for a mini-game (e.g. a lone rook
-  // that has boxed in a lone king) is the variant layer's job (M1), not this adapter's.
+  // Reports chess.js semantics directly. A kingless side out of moves reports `stalemate: true`;
+  // what that means for a mini-game (e.g. a boxed-in lone king) is the variant layer's job.
   status(position) {
     const chess = buildChess(position);
     return {
@@ -176,10 +158,8 @@ export const chessJsRules: ChessRules = {
     const chess = buildChess(position);
     const fastChess = fast(chess);
     const { markers } = position;
-    // Moves this board has itself generated map back to their internal shape, so playing one of
-    // them (the common case: search always plays a move it just listed) skips a second `_moves`
-    // scan. A move from elsewhere (the root candidate list, sourced from `ChessRules.legalMoves`)
-    // falls back to that scan.
+    // Moves this board generated map back to their internal shape, so playing one (the common
+    // search case) skips a second `_moves` scan; a move from elsewhere falls back to that scan.
     const internalByMove = new Map<Move, InternalMove>();
 
     function pieces(): Partial<Record<Square, Piece>> {

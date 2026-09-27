@@ -5,12 +5,8 @@ import type { StoredRecord } from './profile.ts';
 /** Star rating shown to the kid: `0` = not solved yet. */
 export type Stars = 0 | 1 | 2 | 3;
 
-/**
- * How a lesson reached `mastered` (domain-model.md §2, §3.2): `'test-out'` / `'placement'` passed
- * an assessment for it; `'parent'` is a direct parent-area unlock. Absent (or `'play'`, never
- * actually stored — a documented sentinel, not a real value the app writes) means the ordinary
- * path: mastery purely from `bestStars` reaching 80% of max (`lessonStatus`).
- */
+/** How a lesson reached `mastered`: `'test-out'`/`'placement'` passed an assessment; `'parent'` is
+ * a direct unlock. Absent (or `'play'`, never actually stored) means the ordinary `bestStars` path. */
 export type MasteredVia = 'play' | 'test-out' | 'placement' | 'parent';
 
 /** One profile's saved progress on one lesson. */
@@ -25,11 +21,10 @@ export interface LessonProgress extends StoredRecord {
   readonly resumeStep: number;
   /** First time every exercise had ≥ 1 star. */
   readonly completedAt?: string;
-  /** Set by a passed test-out/placement or a parent unlock (M4.5); see {@link MasteredVia}. */
+  /** Set by a passed test-out/placement or a parent unlock; see {@link MasteredVia}. */
   readonly masteredVia?: MasteredVia;
-  /** Story/Demo/Try phases the kid tapped "Skip" past (playtest 2); absent = none. A phase is
-   * removed from here the next time it is completed normally instead (e.g. a "Play again" replay
-   * that plays it through) — see `withSkippedPhase`/`withoutSkippedPhase`. */
+  /** Story/Demo/Try phases the kid tapped "Skip" past; absent = none. Removed the next time the
+   * phase is completed normally instead — see `withSkippedPhase`/`withoutSkippedPhase`. */
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 
@@ -43,7 +38,8 @@ export interface Attempt extends StoredRecord {
   readonly scored: boolean;
   /** `true` for a warm-up/practice review task; absent/`false` for a lesson exercise or mini-game. */
   readonly review?: boolean;
-  /** Set alongside `review`: which screen the task came from (rewards.md §4 "Warm-up Champ" counts `'warmup'` only — Today's inline warm-up and Practice's own "Daily warm-up" card, never a Practice topic run). */
+  /** Set alongside `review`: which screen the task came from — Today's inline warm-up / Practice's
+   * "Daily warm-up" card (`'warmup'`), or a Practice topic run (`'practice'`). */
   readonly reviewSource?: 'warmup' | 'practice';
   /** First-try correct: solved with no error and no hint. */
   readonly correct: boolean;
@@ -145,12 +141,8 @@ export function withoutSkippedPhase(
   return { ...progress, skippedPhases, updatedAt: now.toISOString() };
 }
 
-/**
- * Lesson status (domain-model.md §3): `new` without progress; `mastered` when the best-stars sum
- * over `lesson.exercises` is ≥ 80% of the 3-star max, *or* `progress.masteredVia` is set to a
- * non-`'play'` value (a passed test-out/placement or a parent unlock, M4.5 — mastery regardless of
- * `bestStars`); `complete` when every exercise has ≥ 1 star; `in-progress` otherwise.
- */
+/** `new` without progress; `mastered` when best-stars sum is ≥ 80% of the 3-star max, or
+ * `masteredVia` is a non-`'play'` value; `complete` when every exercise has ≥ 1 star; else `in-progress`. */
 export function lessonStatus(lesson: Lesson, progress?: LessonProgress): LessonStatus {
   if (progress === undefined) {
     return 'new';
@@ -195,12 +187,8 @@ export function totalStars(progresses: readonly LessonProgress[]): number {
   }, 0);
 }
 
-/**
- * One profile's saved progress on one mini-game, played outside a lesson from the Play screen
- * (rewards.md §2 "Play" tile). Kept separate from `LessonProgress.bossStars`, which only tracks
- * the best play made from inside that mini-game's own lesson boss slot; a boss win also updates
- * this record (`recordBossResult`), so the two stay in sync going forward.
- */
+/** One profile's saved progress on one mini-game, played from the Play screen. Kept separate from
+ * `LessonProgress.bossStars`; a boss win also updates this record (`recordBossResult`). */
 export interface MiniGameProgress extends StoredRecord {
   readonly profileId: string;
   readonly miniGameId: string;
@@ -214,17 +202,13 @@ export interface MiniGameProgress extends StoredRecord {
 /** Outcome of one finished (or left) game vs the computer or a friend, from the kid's side. */
 export type GameRecordResult = 'win' | 'loss' | 'draw' | 'abandoned';
 
-/**
- * One played (or abandoned) game vs the computer or a friend (same device, M4.3) —
- * domain-model.md §2 `GameRecord`. Saved for a full game (`game: 'full'`) and every `versus`
- * mini-game (`game`: its content id), whether played standalone from Play or as a lesson's own
- * boss (vs computer), or from the vs Friend setup sheet (vs a friend).
- */
+/** One played (or abandoned) game vs the computer or a friend (same device). Saved for a full game
+ * (`game: 'full'`) and every `versus` mini-game, standalone or as a lesson boss. */
 export interface GameRecord extends StoredRecord {
   readonly profileId: string;
   /** `'full'` for a full standard game, else the `versus` mini-game's content id (Pawn Wars, …). */
   readonly game: string;
-  /** `computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend (M4.3, same device — online play itself is v2). */
+  /** `computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend (same device). */
   readonly opponent: string;
   readonly result: GameRecordResult;
   /** A `GameResult.reason` (checkmate, stalemate, threefold-repetition, fifty-move, …), or `left` when abandoned. */
@@ -235,10 +219,8 @@ export interface GameRecord extends StoredRecord {
   readonly color?: 'w' | 'b';
 }
 
-/**
- * Folds one more play into `existing` (or starts a fresh record, `id` only used then): keeps the
- * higher of the two `bestStars`, and always bumps `plays` (+ `wins` when `won`).
- */
+/** Folds one more play into `existing` (or starts a fresh record): keeps the higher `bestStars`,
+ * bumps `plays` (+ `wins` when `won`). */
 export function recordMiniGamePlay(
   existing: MiniGameProgress | undefined,
   id: string,

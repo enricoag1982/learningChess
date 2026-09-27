@@ -15,7 +15,7 @@ import type { RewardsRepository } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** `deps.rewards`, or a clear error if this `AppDeps` has not wired it up (see `checkRewards` for
- * the permissive, no-op public entry point every use case actually calls). */
+ * the permissive, no-op entry point every use case actually calls). */
 function requireRewards(deps: AppDeps): RewardsRepository {
   if (deps.rewards === undefined) {
     throw new Error('AppDeps.rewards is not wired up');
@@ -23,7 +23,7 @@ function requireRewards(deps: AppDeps): RewardsRepository {
   return deps.rewards;
 }
 
-/** Lessons with 3 stars on every exercise (rewards.md §3 "Perfect Lesson"; boss stars don't count). */
+/** Lessons with 3 stars on every exercise; boss stars don't count. */
 function perfectLessonsCount(journey: Journey, progresses: readonly LessonProgress[]): number {
   const progressByLesson = new Map(progresses.map((progress) => [progress.lessonId, progress]));
   let count = 0;
@@ -38,7 +38,7 @@ function perfectLessonsCount(journey: Journey, progresses: readonly LessonProgre
   return count;
 }
 
-/** `'world:<id>'` / `'track:<id>'` for every mastered world/track (domain-model.md §3), from `Journey.worlds`. */
+/** `'world:<id>'` / `'track:<id>'` for every mastered world/track, from `Journey.worlds`. */
 function masteredScopes(journey: Journey): ReadonlySet<string> {
   const scopes = new Set<string>();
   const worldsByTrack = new Map<string, boolean[]>();
@@ -60,10 +60,8 @@ interface ConceptFacts {
   readonly noHintsInARow: Readonly<Record<string, number>>;
 }
 
-/**
- * Per-concept lifetime/streak facts (rewards.md §4 "Sharp Eyes"/"Escape Artist"/"Mate Master"),
- * from every scored `Attempt` (lesson or review task alike), oldest first within each concept.
- */
+/** Per-concept lifetime/streak facts, from every scored `Attempt` (lesson or review alike), oldest
+ * first within each concept. */
 function conceptFacts(attempts: readonly Attempt[]): ConceptFacts {
   const byConcept = new Map<string, Attempt[]>();
   for (const attempt of attempts) {
@@ -102,16 +100,9 @@ interface GameFacts {
   readonly localGamesPlayed: number;
 }
 
-/**
- * Win/event facts from `GameRecord`s (rewards.md §4), abandoned games excluded throughout.
- * `gameWins.any`/`gameWins['computer:<n>']` only count full games (`game === 'full'`, "First Win" /
- * the per-level badges); a mini-game win (e.g. Pawn Wars) only counts under its own id
- * (`gameWins[record.game]`), never toward "any". `gameEvents.promotion` sums every promotion move
- * (SAN `=`) across every game; `gameEvents.castling` counts games with >= 1 castling move (SAN
- * `O-O`/`O-O-O`) — a game, not a move, per Castle Builder's "castle in N games" (architecture.md
- * M4.4: this reads `GameRecord.moves` directly, both sides' moves alike — a deliberate MVP
- * simplification, see docs/rewards.md §4).
- */
+// Win/event facts from GameRecords, abandoned games excluded. gameWins.any/['computer:<n>'] count
+// only full games; a mini-game win counts only under its own id. gameEvents.castling counts games
+// with >= 1 castling move (a game, not a move); reads GameRecord.moves directly, both sides alike.
 function gameFacts(records: readonly GameRecord[]): GameFacts {
   const nonAbandoned = records.filter((record) => record.result !== 'abandoned');
   const gameWins: Record<string, number> = { any: 0 };
@@ -145,12 +136,8 @@ function gameFacts(records: readonly GameRecord[]): GameFacts {
 /** Standard chess start position, castling rights included (same as `FullGameScreen`'s `START_FEN`). */
 const STANDARD_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-/**
- * True if the opponent ever captured this profile's queen while replaying `moves` from the standard
- * start (rewards.md §3 "Queen Keeper"). Only meaningful for a full game (`GameRecord.game ===
- * 'full'`, standard start with both queens). `color` is the side the profile played (White vs the
- * computer; either side in a friend game). An unreplayable move (defensive only) stops the scan.
- */
+/** True if the opponent ever captured this profile's queen while replaying `moves` from the
+ * standard start. Only meaningful for a full game. An unreplayable move stops the scan. */
 function queenCapturedByOpponent(moves: readonly string[], color: 'w' | 'b'): boolean {
   let position = parseFen(STANDARD_START_FEN);
   for (const san of moves) {
@@ -164,10 +151,8 @@ function queenCapturedByOpponent(moves: readonly string[], color: 'w' | 'b'): bo
   return false;
 }
 
-/**
- * Every fact `evaluateBadges` needs, freshly derived from stored profile data + the current
- * `Journey` (app/rewards.ts's own concern — the domain engine itself stays pure, `domain/badges.ts`).
- */
+/** Every fact `evaluateBadges` needs, freshly derived from stored profile data + the current
+ * `Journey` (the domain engine itself stays pure, `domain/badges.ts`). */
 export async function buildBadgeFacts(
   deps: AppDeps,
   profileId: string,
@@ -238,7 +223,7 @@ export async function evaluateAndRecordBadges(
   return saved;
 }
 
-/** Folds today's local calendar day into the profile's streak (rewards.md §1 "Forgiving streaks"). */
+/** Folds today's local calendar day into the profile's streak. */
 export async function recordDailyActivity(
   deps: AppDeps,
   profileId: string,
@@ -254,7 +239,7 @@ export async function recordDailyActivity(
   return updated;
 }
 
-/** Adds `minutes` to today's `SessionLog` row for this profile (domain-model.md §2). */
+/** Adds `minutes` to today's `SessionLog` row for this profile. */
 export async function recordSessionMinutes(
   deps: AppDeps,
   profileId: string,
@@ -278,15 +263,9 @@ export interface DayMinutes {
   readonly minutes: number;
 }
 
-/**
- * A profile's played minutes for the last `days` local calendar days, oldest first, ending today
- * (parent report "minutes per day", M5.2's daily-limit check — the lead's own note: read
- * `dailyLimitMinutes` from `app/settings.ts` alongside this). Each day sums every device's row for
- * that date (M7.2 device sharing, `totalMinutesForDate`) — `listSessionLogs` already returns this
- * device's own row alongside any row merged in from a shared file, one profile+date pair can now
- * hold more than one. `0` for a day with no session-log row at all. Permissive without
- * `deps.rewards` wired up (every day reads `0`), same reasoning as `checkRewards`'s own early return.
- */
+/** A profile's played minutes for the last `days` local calendar days, oldest first, ending today.
+ * Each day sums every device's row for that date (`totalMinutesForDate`). `0` without `deps.rewards`
+ * wired up, same reasoning as `checkRewards`'s own early return. */
 export async function minutesByDay(
   deps: AppDeps,
   profileId: string,
@@ -301,12 +280,8 @@ export async function minutesByDay(
   return dayStrings.map((date) => ({ date, minutes: totalMinutesForDate(logs, date) }));
 }
 
-/**
- * Stars earned today (sum of every scored `Attempt.stars`, local day) — the "See you tomorrow"
- * screen's own celebratory line (M5.2, app-structure.md's time controls table). Not deduplicated
- * against a lesson's own `bestStars` record (re-solving an exercise the same day counts again): a
- * fun daily tally, not a formal one, same "no new port needed" reasoning `minutesByDay` documents.
- */
+/** Stars earned today (sum of every scored `Attempt.stars`, local day) — the "See you tomorrow"
+ * screen's celebratory line. Not deduplicated against `bestStars`: a fun daily tally, not a formal one. */
 export async function starsToday(deps: AppDeps, profileId: string, now: Date): Promise<number> {
   const attempts = await deps.progress.listAttempts(profileId);
   const today = localDayString(now);
@@ -321,19 +296,10 @@ export interface RewardsCheckResult {
   readonly newBadges: readonly EarnedBadge[];
 }
 
-/**
- * The one call every "activity" choke point makes (rewards.md §4 events: exercise completed,
- * lesson completed, game finished, warm-up task, session ended): folds today into the streak, then
- * evaluates and persists any newly earned badge/tier against fresh facts. Cheap and idempotent to
- * call more than once for the same event (e.g. a versus lesson boss finish touches this via more
- * than one use case) — the second pass simply finds nothing new.
- *
- * No-ops (returns an empty, unsaved result) when `deps.rewards` is not wired up — every `AppDeps`
- * built before M4.4 (most of this codebase's existing tests) simply gets no badge/streak tracking,
- * same backward-compatible reasoning as `ContentSource.catalog`/`badges` being optional. Also
- * no-ops the badge half alone when `deps.content.catalog()` is not wired (`loadJourney` needs it):
- * the streak still counts today's activity either way.
- */
+/** The one call every "activity" choke point makes: folds today into the streak, then evaluates and
+ * persists any newly earned badge/tier. Idempotent — a second call for the same event finds
+ * nothing new. No-ops (empty result) without `deps.rewards`; badges alone no-op without
+ * `deps.content.catalog()`, the streak still counts either way. */
 export async function checkRewards(deps: AppDeps, profileId: string): Promise<RewardsCheckResult> {
   const now = deps.clock.now();
   if (deps.rewards === undefined) {

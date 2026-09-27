@@ -5,14 +5,9 @@ import type { ExerciseState } from '../../engine.ts';
 import type { Hint } from '../../hint.ts';
 import type { MateInNDef, MateInNOutcome } from './def.ts';
 
-/**
- * Plays a kid move for a `mate-in-n` exercise, under real chess rules (both kings, real turn
- * alternation — never a static opponent, unlike every other move-playing exercise type). A move
- * that delivers checkmate always solves it, even when it is not the scripted one; otherwise the
- * move must match the scripted line for this ply, and its scripted opponent reply (if any) is
- * applied automatically so the kid's turn comes right back around. `undo` is not offered for this
- * type (like `best-move`).
- */
+/** Plays a kid move for a `mate-in-n` exercise, under real chess rules (both kings, real turn
+ * alternation). Any move delivering checkmate solves it; otherwise it must match the scripted
+ * line, whose opponent reply (if any) is applied automatically. */
 export function playMateInN(
   state: ExerciseState,
   rules: ChessRules,

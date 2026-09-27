@@ -30,13 +30,8 @@ export class InvalidPositionError extends Error {
   }
 }
 
-/**
- * One board, built once from a `Position` and mutated in place via `play`/`undo`. For engines
- * (bots, perft) that walk thousands of positions per move: rebuilding a fresh chess.js instance
- * from FEN for every node is too slow, so this reuses a single instance instead. Same kingless
- * handling as `ChessRules` (a missing king skips validation); walls and the static-opponent
- * variant are lesson-only and have no place here.
- */
+/** One board, built once from a `Position` and mutated in place via `play`/`undo` — rebuilding a
+ * fresh chess.js instance per node is too slow for engines (bots, perft) walking thousands of them. */
 export interface SearchBoard {
   /** Legal moves for the side to move. */
   moves(): Move[];
@@ -52,12 +47,9 @@ export interface SearchBoard {
   pieces(): Partial<Record<Square, Piece>>;
   /** Current position (markers carried over unchanged from the board this was built from). */
   position(): Position;
-  /**
-   * Cheap Zobrist-style hash of the current position (pieces, side to move, castling rights, en
-   * passant square) — O(1) per `play`/`undo`, so a search can key a transposition table by it
-   * without ever building a FEN. Not a cryptographic hash; collisions are astronomically unlikely
-   * but not impossible, same trade-off every chess engine's TT makes.
-   */
+  /** Cheap Zobrist-style hash of the current position — O(1) per `play`/`undo`, for keying a
+   * transposition table without building a FEN. Not cryptographic; collisions are astronomically
+   * unlikely, same trade-off every chess engine's TT makes. */
   hash(): bigint;
 }
 

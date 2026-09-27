@@ -5,7 +5,7 @@ import type { Lesson } from './lesson.ts';
 import { lessonStatus } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 
-/** The fixed World-2 piece-lesson characters, in rewards.md §2's catalogue order. */
+/** The fixed World-2 piece-lesson characters, in catalogue order. */
 const ANIMAL_FRIEND_CHARACTERS: readonly {
   readonly character: string;
   readonly piece: PieceType;
@@ -18,7 +18,7 @@ const ANIMAL_FRIEND_CHARACTERS: readonly {
   { character: 'caterpillar', piece: 'p' },
 ];
 
-/** One animal friend (rewards.md §2), earned once its piece lesson is complete. */
+/** One animal friend, earned once its piece lesson is complete. */
 export interface AnimalFriend {
   readonly character: string;
   readonly piece: PieceType;
@@ -26,12 +26,8 @@ export interface AnimalFriend {
   readonly earned: boolean;
 }
 
-/**
- * The fixed World-2 animal friends (Rhino .. Caterpillar), each tied to the earliest lesson that
- * teaches its character — `caterpillar`'s `pawn` lesson, not the later `promotion` lesson, which
- * shares the same character. A character with no authored lesson yet (content in progress) is
- * left out rather than reported as never-earnable.
- */
+/** The fixed World-2 animal friends (Rhino .. Caterpillar), each tied to the earliest lesson that
+ * teaches its character. A character with no authored lesson yet is left out. */
 export function animalFriends(
   lessons: readonly Lesson[],
   progresses: readonly LessonProgress[],
@@ -59,17 +55,14 @@ export function animalFriends(
 /** A rank's place on My Den's ladder, relative to the profile's `currentRank`. */
 export type RankState = 'done' | 'current' | 'locked';
 
-/** One rank on My Den's ladder (rewards.md §2). */
+/** One rank on My Den's ladder. */
 export interface RankLadderEntry {
   readonly rank: RankDef;
   readonly state: RankState;
 }
 
-/**
- * Every rank in `catalog.ranks` (authored easiest to hardest), tagged by its position relative to
- * `currentRank`'s result: every earlier rank is `done`, the current one `current`, every later one
- * `locked`.
- */
+/** Every rank in `catalog.ranks`, tagged by its position relative to `currentRank`'s result: every
+ * earlier rank is `done`, the current one `current`, every later one `locked`. */
 export function rankLadder(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],

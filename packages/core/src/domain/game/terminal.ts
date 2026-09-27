@@ -31,11 +31,8 @@ function occupiesAny(
   return squares.some((square) => pieces[square]?.color === color);
 }
 
-/**
- * A side wins the instant its promote / capture-all / capture / reach condition is met — unlike
- * checkmate and `survive`, these do not wait for a legal-move count or a move-limit check.
- * `checkRules` do not gate here: they only decide `def.checkRules`-based state elsewhere.
- */
+/** A side wins the instant its promote/capture-all/capture/reach condition is met — unlike
+ * checkmate, these do not wait for a legal-move count or move-limit check. */
 function instantWin(
   def: GameRulesDef,
   view: GameBoardView,
@@ -67,14 +64,8 @@ function instantWin(
   return null;
 }
 
-/**
- * Per-position result: the four "instant" win conditions above, plus checkmate / stalemate /
- * no-legal-moves. Does not know about move counts or repeated positions — `gameResult`
- * (`domain/game/rules.ts`) layers the move-limit and history-based draws (50-move, threefold) on
- * top for real games. The bot's search (`domain/bot`) calls this directly against its own fast
- * `SearchBoard`, for the same result without that bookkeeping, which a few plies of lookahead
- * never need.
- */
+/** Per-position result: the four "instant" win conditions above, plus checkmate/stalemate/
+ * no-legal-moves. Does not know move counts or repetition — `gameResult` layers those on top. */
 export function evaluateTerminal(
   def: GameRulesDef,
   view: GameBoardView,

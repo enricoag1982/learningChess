@@ -6,12 +6,9 @@ import type { Random } from './random.ts';
 /** Review box 1–5 (Leitner), or absent = the concept has not entered review yet. */
 export type ReviewBox = 1 | 2 | 3 | 4 | 5;
 
-/**
- * One profile's mastery + review state for one concept (domain-model.md §2, §3.1). `recent` holds
- * up to the last 10 first-try results (`true` = correct), newest last. `box`/`dueAt` are both unset
- * until the concept first enters review (`enterReview`); `lastExerciseId` is the last task shown for
- * this concept, from a lesson exercise or a review task, so the picker can avoid repeating it.
- */
+/** One profile's mastery + review state for one concept. `recent` holds up to the last 10 first-try
+ * results, newest last. `box`/`dueAt` unset until the concept first enters review (`enterReview`);
+ * `lastExerciseId` is the last task shown, so the picker can avoid repeating it. */
 export interface ConceptStats extends StoredRecord {
   readonly profileId: string;
   readonly conceptId: string;
@@ -33,7 +30,7 @@ export function newConceptStats(
   return { id, profileId, conceptId, recent: [], createdAt: nowIso, updatedAt: nowIso };
 }
 
-/** `recent` keeps at most this many results (domain-model.md §2). */
+/** `recent` keeps at most this many results. */
 const RECENT_MAX = 10;
 
 /** Appends one first-try result to `recent` (newest last), dropping the oldest past 10. */
@@ -50,7 +47,7 @@ export function accuracy(stats: ConceptStats): number {
   return stats.recent.filter(Boolean).length / stats.recent.length;
 }
 
-/** Weak concept (domain-model.md §3): at least 3 results and accuracy below 60%. */
+/** Weak concept: at least 3 results and accuracy below 60%. */
 export function isWeak(stats: ConceptStats): boolean {
   return stats.recent.length >= 3 && accuracy(stats) < 0.6;
 }
@@ -59,12 +56,8 @@ function addDays(date: Date, days: number): Date {
   return new Date(date.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
-/**
- * Puts `stats` into review (domain-model.md §3.1, §3.4): box 1, due in 1 day, or due immediately
- * (`immediate`) when the kid needed the easier variant / answered a scored exercise wrong. A
- * concept already in review only moves when `immediate` — a lesson completing again (`immediate:
- * false`) must never push a due date further out than one already earned by an earlier failure.
- */
+/** Puts `stats` into review: box 1, due in 1 day, or due immediately (`immediate`) when the kid
+ * needed the easier variant / answered wrong. Already in review only moves when `immediate`. */
 export function enterReview(stats: ConceptStats, now: Date, immediate: boolean): ConceptStats {
   if (stats.box !== undefined && !immediate) {
     return stats;
@@ -73,7 +66,7 @@ export function enterReview(stats: ConceptStats, now: Date, immediate: boolean):
   return { ...stats, box: 1, dueAt, updatedAt: now.toISOString() };
 }
 
-/** Review interval by box (domain-model.md §3.1): 1→1 day … 5→16 days. */
+/** Review interval by box: 1→1 day … 5→16 days. */
 const REVIEW_INTERVAL_DAYS: Readonly<Record<ReviewBox, number>> = {
   1: 1,
   2: 2,
@@ -82,11 +75,8 @@ const REVIEW_INTERVAL_DAYS: Readonly<Record<ReviewBox, number>> = {
   5: 16,
 };
 
-/**
- * Applies a warm-up/practice review task's result (domain-model.md §3.1): correct (first try, no
- * hint) moves the box up (max 5); anything else resets it to box 1. Always reschedules `dueAt` and
- * remembers `exerciseId` as the last one shown for this concept.
- */
+/** Applies a warm-up/practice review task's result: correct (first try, no hint) moves the box up
+ * (max 5); anything else resets it to box 1. Always reschedules `dueAt`. */
 export function applyReviewResult(
   stats: ConceptStats,
   correct: boolean,
@@ -110,11 +100,8 @@ export interface ConceptPoolEntry {
   readonly exercise: ExerciseDef;
 }
 
-/**
- * `conceptId`'s scored exercise pool (domain-model.md §3.1 "task source"): every scored exercise
- * (never a guided try or an easier variant) of every lesson whose exercise concept matches, across
- * the whole curriculum — not only the lesson that first taught it.
- */
+/** `conceptId`'s scored exercise pool: every scored exercise of every lesson whose exercise concept
+ * matches, across the whole curriculum — not only the lesson that first taught it. */
 export function conceptPool(
   lessons: readonly Lesson[],
   conceptId: string,
@@ -152,12 +139,8 @@ function pickOne(
   return pool[index];
 }
 
-/**
- * Picks the warm-up's tasks (domain-model.md §3.1): concepts in review due oldest-`dueAt`-first,
- * max 1 task per concept, up to {@link WARM_UP_SIZE}; short of that, fills with the weakest
- * concepts still in review (lowest accuracy, then oldest `dueAt`). No concept in review → `[]`.
- * `pool` gives each concept's exercise pool (see `conceptPool`), keyed by concept id.
- */
+/** Picks the warm-up's tasks: concepts in review due oldest-`dueAt`-first, max 1 per concept, up to
+ * {@link WARM_UP_SIZE}; short of that, fills with the weakest concepts still in review. */
 export function pickWarmUp(
   stats: readonly ConceptStats[],
   pool: ReadonlyMap<string, readonly ConceptPoolEntry[]>,
@@ -218,11 +201,8 @@ function shuffle<T>(items: readonly T[], random: Random): T[] {
   return shuffled;
 }
 
-/**
- * Picks `count` practice tasks for one concept (Practice screen's topic run), shuffled by `random`;
- * cycles through the pool again when `count` exceeds it. Avoids opening on `lastExerciseId` when
- * another candidate exists, by moving it to the end of the shuffled order. `[]` for an empty pool.
- */
+/** Picks `count` practice tasks for one concept, shuffled by `random`; cycles the pool again when
+ * `count` exceeds it. Avoids opening on `lastExerciseId` by moving it to the end. */
 export function pickPracticeTasks(
   conceptId: string,
   pool: readonly ConceptPoolEntry[],

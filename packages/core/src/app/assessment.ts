@@ -36,12 +36,9 @@ function findWorld(catalog: TracksCatalog, worldId: string) {
   return undefined;
 }
 
-/**
- * Every lesson/world id currently unlocked out of the normal Journey order for this profile
- * (domain-model.md §3.2): a passed test-out/placement, or a parent unlock. Feeds `journey.ts`'s
- * `unlocked` parameter — see `loadJourney` (`app/journey.ts`) and `planTodaySession`
- * (`app/session.ts`). `undefined` without `deps.assessment` wired (every pre-M4.5 test fixture).
- */
+/** Every lesson/world id currently unlocked out of the normal Journey order for this profile: a
+ * passed test-out/placement, or a parent unlock. Feeds `journey.ts`'s `unlocked` parameter.
+ * `undefined` without `deps.assessment` wired. */
 export async function loadUnlocked(
   deps: AppDeps,
   profileId: string,
@@ -71,16 +68,10 @@ export interface SubmitAssessmentInput {
   readonly score: AssessmentScore;
 }
 
-/**
- * Records one taken assessment run (domain-model.md §3.2): always saves the `AssessmentResult` (for
- * the parent report). A pass also applies its effect: every lesson in `scope` gets
- * `masteredVia: kind`, every one of its exercises floored to >= 1 best star (never lowering an
- * existing higher one), its concept enters review (box 1, due tomorrow — a no-op if already in
- * review), and the scope's own id (the lesson id, or the world id) joins the unlocked set. Then
- * `checkRewards` runs once, so a newly-mastered world's milestone badge fires right away (the lead's
- * own note: a test-out/placement pass must also run the rewards check). A fail changes nothing else
- * (domain-model.md §3.2 "Fail: no penalty, nothing lost").
- */
+/** Records one taken assessment run: always saves the `AssessmentResult`. A pass also applies its
+ * effect: every lesson in `scope` gets `masteredVia: kind`, exercises floored to >= 1 best star,
+ * its concept enters review, and the scope's id joins the unlocked set; then `checkRewards` runs.
+ * A fail changes nothing else. */
 export async function submitAssessment(
   deps: AppDeps,
   input: SubmitAssessmentInput,
@@ -122,17 +113,14 @@ export async function submitAssessment(
   return score;
 }
 
-/** What a parent unlocks directly (app-structure.md §11, domain-model.md §3.2 "Parent unlock"). */
+/** What a parent unlocks directly. */
 export type ParentUnlockTarget =
   | { readonly type: 'lesson'; readonly lessonId: string }
   | { readonly type: 'world'; readonly worldId: string };
 
-/**
- * Parent area "unlock a lesson/world directly": every lesson in `target` gets
- * `masteredVia: 'parent'` (no star floor — this is an admin override, not a passed check; the
- * lesson mastery it grants owes nothing to `bestStars`) and the target's own id joins the unlocked
- * set. Also runs `checkRewards`, same reasoning as a test-out/placement pass.
- */
+/** Parent area "unlock a lesson/world directly": every lesson in `target` gets
+ * `masteredVia: 'parent'` (no star floor — an admin override, not a passed check), and the target's
+ * id joins the unlocked set. Also runs `checkRewards`. */
 export async function parentUnlock(
   deps: AppDeps,
   profileId: string,

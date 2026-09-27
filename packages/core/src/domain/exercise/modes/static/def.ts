@@ -3,11 +3,8 @@ import type { PieceType, Position } from '../../../chess/types.ts';
 import type { ExerciseState } from '../../engine.ts';
 import type { CaptureDef, CollectStarsDef } from '../../types.ts';
 
-/**
- * Mini-game win condition: `capture-all` (Hungry Piece: capture every enemy) or `collect-stars`
- * (Knight Maze / King Walk: reach every star; a static enemy may still make some squares unsafe
- * for a king, enforced by normal move legality — see `VariantRules`).
- */
+/** Mini-game win condition: `capture-all` (Hungry Piece: capture every enemy) or `collect-stars`
+ * (Knight Maze / King Walk: reach every star). */
 export type MiniGameGoal = 'capture-all' | 'collect-stars';
 
 /** Static-opponent mini-game: kid piece(s) vs static enemies / rocks, win = reach `goal`. */
@@ -15,7 +12,7 @@ export interface StaticCaptureGameDef {
   readonly id: string;
   readonly concept: string;
   readonly position: Position;
-  /** Win condition; defaults to `capture-all` (every mini-game before M2.3 was capture-only). */
+  /** Win condition; defaults to `capture-all`. */
   readonly goal?: MiniGameGoal;
   /** Move count within which a win earns 3 stars. */
   readonly par: number;
@@ -44,7 +41,7 @@ export interface StaticGoalSource {
   readonly concept: string;
   readonly textKey: string;
   readonly position: Position;
-  /** Win condition; defaults to `capture-all` (every mini-game before M2.3 was capture-only). */
+  /** Win condition; defaults to `capture-all`. */
   readonly goal?: 'capture-all' | 'collect-stars';
   /** Move count within which the goal is met at "3-star" pace; also used as the solver's stars2. */
   readonly par: number;

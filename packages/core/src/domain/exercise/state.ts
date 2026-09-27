@@ -12,18 +12,12 @@ export interface ExerciseStateOf<D> extends ExerciseProgress {
   readonly moves: number;
   /** Currently selected squares (select-squares only). */
   readonly selected: readonly Square[];
-  /**
-   * Option ids ruled out for a `choice` exercise (wrong pick or hint-removed); disabled in UI.
-   * Optional (defaults to none) so existing `ExerciseState` literals elsewhere stay valid.
-   */
+  /** Option ids ruled out for a `choice` exercise (wrong pick or hint-removed); disabled in UI. */
   readonly wrongOptions?: readonly string[];
 }
 
-/**
- * Builds a fresh `ExerciseStateOf<D>` at `def`'s own authored position. Every kind's `init` calls
- * this directly (not `engine.ts`'s `startExercise`, which dispatches back through the kind — this
- * is the one non-dispatching implementation that dispatch bottoms out at).
- */
+/** Builds a fresh `ExerciseStateOf<D>` at `def`'s own authored position. Every kind's `init` calls
+ * this directly — the one non-dispatching implementation dispatch bottoms out at. */
 export function initState<D extends { readonly position: Position }>(def: D): ExerciseStateOf<D> {
   return {
     def,
