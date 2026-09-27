@@ -1,10 +1,7 @@
 id: knight
-world: pieces
 order: 5
 concept: knight-move
 character: horse
-title: knight.title
-story: knight.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . . . . .
-  text: knight.demo
   highlight: legal-moves d4
 guided:
   - id: knight-g1
     type: collect-stars
-    text: knight-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -31,10 +26,8 @@ guided:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: knight-g2
     type: collect-stars
-    text: knight-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -45,11 +38,9 @@ guided:
       . . * . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
 exercises:
   - id: knight-01
     type: collect-stars
-    text: knight-01
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -60,10 +51,8 @@ exercises:
       . . * . . . . .
       N . . . . . . .
     stars3: 1
-    stars2: 2
   - id: knight-02
     type: collect-stars
-    text: knight-02
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -74,10 +63,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: knight-03
     type: select-squares
-    text: knight-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -91,7 +78,6 @@ exercises:
     from: d4
   - id: knight-04
     type: capture
-    text: knight-04
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -102,10 +88,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: knight-05
     type: select-squares
-    text: knight-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -119,7 +103,6 @@ exercises:
     from: d4
   - id: knight-06
     type: collect-stars
-    text: knight-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -133,7 +116,6 @@ exercises:
     stars2: 5
   - id: knight-07
     type: capture
-    text: knight-07
     board: |
       . . . . . . . .
       . . p . . . . .
@@ -144,10 +126,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 4
-    stars2: 5
   - id: knight-08
     type: collect-stars
-    text: knight-08
     easier: knight-08-easy
     board: |
       . . . . . . . .
@@ -159,11 +139,9 @@ exercises:
       . . . . . . . .
       . . . . . . N *
     stars3: 6
-    stars2: 7
 variants:
   - id: knight-08-easy
     type: collect-stars
-    text: knight-08-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -174,5 +152,4 @@ variants:
       . . . . . . . .
       . . . . . . . .
     stars3: 2
-    stars2: 3
 boss: knight-maze

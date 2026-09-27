@@ -2,14 +2,11 @@ id: safe-or-not
 concept: hanging-piece
 unlockAfter: safe-pieces
 mode: series
-title: safe-or-not.title
-goal: safe-or-not.goal
 errors3: 0
 errors2: 2
 rounds:
   - id: safe-or-not-r1
     type: yes-no
-    text: safe-or-not-r1
     board: |
       . . . . r . . .
       . . . . . . . .
@@ -24,7 +21,6 @@ rounds:
     verify: hanging e4
   - id: safe-or-not-r2
     type: yes-no
-    text: safe-or-not-r2
     board: |
       . . . . r . . .
       . . . . . . . .
@@ -39,7 +35,6 @@ rounds:
     verify: hanging e4
   - id: safe-or-not-r3
     type: yes-no
-    text: safe-or-not-r3
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -54,7 +49,6 @@ rounds:
     verify: hanging h4
   - id: safe-or-not-r4
     type: yes-no
-    text: safe-or-not-r4
     board: |
       . b . . . . . .
       P . . . . . . .
@@ -69,7 +63,6 @@ rounds:
     verify: hanging a7
   - id: safe-or-not-r5
     type: yes-no
-    text: safe-or-not-r5
     board: |
       . b . . . . . .
       P . . . . . . .
@@ -84,7 +77,6 @@ rounds:
     verify: hanging a7
   - id: safe-or-not-r6
     type: yes-no
-    text: safe-or-not-r6
     board: |
       . . . q . . . .
       . . . . . . . .
@@ -99,7 +91,6 @@ rounds:
     verify: hanging d4
   - id: safe-or-not-r7
     type: yes-no
-    text: safe-or-not-r7
     board: |
       . . . q . . . .
       . . . . . . . .
@@ -114,7 +105,6 @@ rounds:
     verify: hanging d4
   - id: safe-or-not-r8
     type: yes-no
-    text: safe-or-not-r8
     board: |
       . . . . . . . q
       . . . . . . . .
@@ -129,7 +119,6 @@ rounds:
     verify: hanging a1
   - id: safe-or-not-r9
     type: yes-no
-    text: safe-or-not-r9
     board: |
       . . . . . . . q
       . . . . . . . .
@@ -144,7 +133,6 @@ rounds:
     verify: hanging a1
   - id: safe-or-not-r10
     type: yes-no
-    text: safe-or-not-r10
     board: |
       . . . . . . . .
       . . . . . . . .

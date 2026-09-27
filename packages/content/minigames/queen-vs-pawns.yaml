@@ -2,8 +2,6 @@ id: queen-vs-pawns
 concept: attack
 unlockAfter: attack
 mode: versus
-title: queen-vs-pawns.title
-goal: queen-vs-pawns.goal
 board: |
   . . . . . . . .
   . p . p . p . p

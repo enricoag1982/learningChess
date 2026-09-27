@@ -1,10 +1,7 @@
 id: pawn
-world: pieces
 order: 6
 concept: pawn-move
 character: caterpillar
-title: pawn.title
-story: pawn.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . P . . . .
     . . . . . . . .
-  text: pawn.demo
   highlight: legal-moves d2
 guided:
   - id: pawn-g1
     type: collect-stars
-    text: pawn-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -31,10 +26,8 @@ guided:
       . . . P . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: pawn-g2
     type: collect-stars
-    text: pawn-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -45,11 +38,9 @@ guided:
       . . . P . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
 exercises:
   - id: pawn-01
     type: collect-stars
-    text: pawn-01
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -60,10 +51,8 @@ exercises:
       . . . . P . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: pawn-02
     type: collect-stars
-    text: pawn-02
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -74,10 +63,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: pawn-03
     type: select-squares
-    text: pawn-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -91,7 +78,6 @@ exercises:
     from: e4
   - id: pawn-04
     type: capture
-    text: pawn-04
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -102,10 +88,8 @@ exercises:
       . . P . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: pawn-05
     type: select-squares
-    text: pawn-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -119,7 +103,6 @@ exercises:
     from: e5
   - id: pawn-06
     type: collect-stars
-    text: pawn-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -130,10 +113,8 @@ exercises:
       . . . P . . . .
       . . . . . . . .
     stars3: 3
-    stars2: 4
   - id: pawn-07
     type: capture
-    text: pawn-07
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -144,10 +125,8 @@ exercises:
       . . P . . . . .
       . . . . . . . .
     stars3: 3
-    stars2: 4
   - id: pawn-08
     type: collect-stars
-    text: pawn-08
     easier: pawn-08-easy
     board: |
       . . . . . . . .
@@ -159,11 +138,9 @@ exercises:
       . P . . . . . .
       . . . . . . . .
     stars3: 3
-    stars2: 4
 variants:
   - id: pawn-08-easy
     type: collect-stars
-    text: pawn-08-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -174,5 +151,4 @@ variants:
       . P . . . . . .
       . . . . . . . .
     stars3: 2
-    stars2: 3
 boss: pawn-wars-4

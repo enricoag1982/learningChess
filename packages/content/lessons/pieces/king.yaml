@@ -1,10 +1,7 @@
 id: king
-world: pieces
 order: 4
 concept: king-move
 character: lion
-title: king.title
-story: king.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . . . . .
-  text: king.demo
   highlight: legal-moves d4
 guided:
   - id: king-g1
     type: collect-stars
-    text: king-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -31,10 +26,8 @@ guided:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: king-g2
     type: collect-stars
-    text: king-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -45,11 +38,9 @@ guided:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
 exercises:
   - id: king-01
     type: collect-stars
-    text: king-01
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -60,10 +51,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 2
-    stars2: 3
   - id: king-02
     type: select-squares
-    text: king-02
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -77,7 +66,6 @@ exercises:
     from: d4
   - id: king-03
     type: collect-stars
-    text: king-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -88,10 +76,8 @@ exercises:
       . . . . . . . .
       . . . . . . . .
     stars3: 2
-    stars2: 3
   - id: king-04
     type: select-squares
-    text: king-04
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -105,7 +91,6 @@ exercises:
     from: e4
   - id: king-05
     type: collect-stars
-    text: king-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -116,10 +101,8 @@ exercises:
       . . . . . . . .
       K . . . . . . .
     stars3: 4
-    stars2: 5
   - id: king-06
     type: collect-stars
-    text: king-06
     easier: king-06-easy
     board: |
       . . . . . . * .
@@ -131,11 +114,9 @@ exercises:
       . . . . . . . .
       K . . . . . . .
     stars3: 7
-    stars2: 8
 variants:
   - id: king-06-easy
     type: collect-stars
-    text: king-06-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -146,5 +127,4 @@ variants:
       . . * . . . . .
       K . . . . . . .
     stars3: 2
-    stars2: 3
 boss: king-walk

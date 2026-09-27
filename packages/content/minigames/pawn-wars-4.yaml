@@ -2,8 +2,6 @@ id: pawn-wars-4
 concept: pawn-move
 unlockAfter: pawn
 mode: versus
-title: pawn-wars-4.title
-goal: pawn-wars-4.goal
 board: |
   . . . . . . . .
   . . p p p p . .

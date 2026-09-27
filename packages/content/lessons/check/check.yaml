@@ -1,10 +1,7 @@
 id: check
-world: check
 order: 1
 concept: check
 character: owl
-title: check.title
-story: check.story
 demo:
   board: |
     . . . . k . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . K . . .
-  text: check.demo
   highlight: squares e4
 guided:
   - id: check-g1
     type: yes-no
-    text: check-g1
     board: |
       . . . . k . . .
       . . . . . . . .
@@ -35,7 +30,6 @@ guided:
     verify: in-check
   - id: check-g2
     type: best-move
-    text: check-g2
     board: |
       . . . k . . . .
       . . . . . . . .
@@ -50,7 +44,6 @@ guided:
 exercises:
   - id: check-01
     type: yes-no
-    text: check-01
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -65,7 +58,6 @@ exercises:
     verify: in-check
   - id: check-02
     type: yes-no
-    text: check-02
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -80,7 +72,6 @@ exercises:
     verify: in-check
   - id: check-03
     type: yes-no
-    text: check-03
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -95,7 +86,6 @@ exercises:
     verify: in-check
   - id: check-04
     type: yes-no
-    text: check-04
     board: |
       . . . . k . . .
       . . . . . . . .
@@ -110,7 +100,6 @@ exercises:
     verify: in-check
   - id: check-05
     type: best-move
-    text: check-05
     board: |
       . . . k . . . .
       . . . . . . . .
@@ -124,7 +113,6 @@ exercises:
     verify: check
   - id: check-06
     type: best-move
-    text: check-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -138,7 +126,6 @@ exercises:
     verify: check
   - id: check-07
     type: best-move
-    text: check-07
     board: |
       . . . . . k . .
       . . . . . . . .
@@ -152,7 +139,6 @@ exercises:
     verify: check
   - id: check-08
     type: best-move
-    text: check-08
     board: |
       . . . . k . . .
       . . . . . . . .

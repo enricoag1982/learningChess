@@ -1,10 +1,7 @@
 id: mate-in-1
-world: check
 order: 4
 concept: mate-in-1
 character: owl
-title: mate-in-1.title
-story: mate-in-1.story
 demo:
   board: |
     . . . . . . k .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . K . R . . .
-  text: mate-in-1.demo
   highlight: squares e8
 guided:
   - id: mate-in-1-g1
     type: mate-in-n
-    text: mate-in-1-g1
     board: |
       . . . . . . k .
       . . . . . p p p
@@ -34,7 +29,6 @@ guided:
     line: [Re8#]
   - id: mate-in-1-g2
     type: mate-in-n
-    text: mate-in-1-g2
     board: |
       k . . . . . . .
       . . . . . Q . .
@@ -49,7 +43,6 @@ guided:
 exercises:
   - id: mate-in-1-01
     type: mate-in-n
-    text: mate-in-1-01
     board: |
       . . . . . . k .
       . . . . . p p p
@@ -63,7 +56,6 @@ exercises:
     line: [Ra8#]
   - id: mate-in-1-02
     type: mate-in-n
-    text: mate-in-1-02
     board: |
       . k . . . . . .
       p p p . . . . .
@@ -77,7 +69,6 @@ exercises:
     line: [Rh8#]
   - id: mate-in-1-03
     type: mate-in-n
-    text: mate-in-1-03
     board: |
       . . . . . . k .
       . . . . . p p p
@@ -91,7 +82,6 @@ exercises:
     line: [Qd8#]
   - id: mate-in-1-04
     type: mate-in-n
-    text: mate-in-1-04
     board: |
       . . . k . . . .
       . . . . . . . .
@@ -105,7 +95,6 @@ exercises:
     line: [Qd7#]
   - id: mate-in-1-05
     type: mate-in-n
-    text: mate-in-1-05
     board: |
       k . . . . . . .
       . . . . . . . Q
@@ -119,7 +108,6 @@ exercises:
     line: [Qb7#]
   - id: mate-in-1-06
     type: mate-in-n
-    text: mate-in-1-06
     board: |
       . . . . . . . k
       Q . . . . . . .
@@ -133,7 +121,6 @@ exercises:
     line: [Qg7#]
   - id: mate-in-1-07
     type: mate-in-n
-    text: mate-in-1-07
     board: |
       . . . . . . . k
       . R . . . . . .
@@ -147,7 +134,6 @@ exercises:
     line: [Ra8#]
   - id: mate-in-1-08
     type: mate-in-n
-    text: mate-in-1-08
     board: |
       k . . . . . . .
       . . R . . . . .
@@ -161,7 +147,6 @@ exercises:
     line: [Rh8#]
   - id: mate-in-1-09
     type: mate-in-n
-    text: mate-in-1-09
     board: |
       . . . . . . . k
       . . . . . . . .
@@ -175,7 +160,6 @@ exercises:
     line: [Ra8#]
   - id: mate-in-1-10
     type: mate-in-n
-    text: mate-in-1-10
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -189,7 +173,6 @@ exercises:
     line: [Rh1#]
   - id: mate-in-1-11
     type: mate-in-n
-    text: mate-in-1-11
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -203,7 +186,6 @@ exercises:
     line: [Qb8#]
   - id: mate-in-1-12
     type: mate-in-n
-    text: mate-in-1-12
     board: |
       . . . . . . . k
       . . . . . . . .

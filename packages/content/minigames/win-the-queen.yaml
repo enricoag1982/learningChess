@@ -2,8 +2,6 @@ id: win-the-queen
 concept: exchange
 unlockAfter: trades
 mode: versus
-title: win-the-queen.title
-goal: win-the-queen.goal
 board: |
   r n b q . b n r
   p p p p p p p p

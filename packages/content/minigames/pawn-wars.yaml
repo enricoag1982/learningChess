@@ -2,8 +2,6 @@ id: pawn-wars
 concept: promotion
 unlockAfter: promotion
 mode: versus
-title: pawn-wars.title
-goal: pawn-wars.goal
 board: |
   . . . . . . . .
   p p p p p p p p

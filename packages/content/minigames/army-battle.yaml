@@ -2,8 +2,6 @@ id: army-battle
 concept: exchange
 unlockAfter: trades
 mode: versus
-title: army-battle.title
-goal: army-battle.goal
 board: |
   . n . . . . n .
   p p p p p p p p

@@ -1,10 +1,7 @@
 id: promotion
-world: pieces
 order: 7
 concept: promotion
 character: caterpillar
-title: promotion.title
-story: promotion.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . . . . .
-  text: promotion.demo
   highlight: legal-moves d7
 guided:
   - id: promotion-g1
     type: best-move
-    text: promotion-g1
     board: |
       . . . . . . . .
       . . . . P . . .
@@ -33,7 +28,6 @@ guided:
     solutions: [e8=Q]
   - id: promotion-g2
     type: choice
-    text: promotion-g2
     board: |
       . . . . . . . .
       . . . . P . . .
@@ -52,7 +46,6 @@ guided:
 exercises:
   - id: promotion-01
     type: best-move
-    text: promotion-01
     board: |
       . . . . . . . .
       . P . . . . . .
@@ -65,7 +58,6 @@ exercises:
     solutions: [b8=Q]
   - id: promotion-02
     type: choice
-    text: promotion-02
     board: |
       . . . . . . . .
       . . . . . . P .
@@ -83,7 +75,6 @@ exercises:
     answer: queen
   - id: promotion-03
     type: best-move
-    text: promotion-03
     easier: promotion-03-easy
     board: |
       . . . n r . . .
@@ -97,7 +88,6 @@ exercises:
     solutions: [dxe8=Q]
   - id: promotion-04
     type: select-squares
-    text: promotion-04
     board: |
       . . . . r . . .
       . . . P . . . .
@@ -111,7 +101,6 @@ exercises:
     from: d7
   - id: promotion-05
     type: yes-no
-    text: promotion-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -126,7 +115,6 @@ exercises:
 variants:
   - id: promotion-03-easy
     type: best-move
-    text: promotion-03-easy
     board: |
       . . . . r . . .
       . . . P . . . .
