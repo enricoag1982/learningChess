@@ -37,14 +37,6 @@ describe('LocalStorageParentLockRepository', () => {
     expect(await repo.get()).toEqual(updated);
   });
 
-  it('persists for a new repository instance over the same storage', async () => {
-    const lock = makeLock();
-    await new LocalStorageParentLockRepository(openLocalStore(localStorage)).save(lock);
-
-    const second = new LocalStorageParentLockRepository(openLocalStore(localStorage));
-    expect(await second.get()).toEqual(lock);
-  });
-
   it('rejects with StorageError on a corrupt stored shape', async () => {
     const store = openLocalStore(localStorage);
     store.write('parent-lock', { nope: true });

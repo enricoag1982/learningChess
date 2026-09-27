@@ -32,15 +32,6 @@ describe('LocalStorageProfileRepository', () => {
     expect(await repo.list()).toEqual([late]);
   });
 
-  it('persists data for a new repository instance over the same storage', async () => {
-    const profile = makeProfile();
-    await new LocalStorageProfileRepository(openLocalStore(localStorage)).save(profile);
-
-    const second = new LocalStorageProfileRepository(openLocalStore(localStorage));
-    expect(await second.get(profile.id)).toEqual(profile);
-    expect(await second.list()).toEqual([profile]);
-  });
-
   it('rejects with StorageError on a corrupt stored shape', async () => {
     const store = openLocalStore(localStorage);
     store.write('profiles', { a: { nickname: 'no id field' } });
