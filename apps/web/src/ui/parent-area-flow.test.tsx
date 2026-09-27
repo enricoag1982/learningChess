@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createProfile, DEFAULT_PROFILE_SETTINGS, updateProfileSettings } from '@chess-kids/core';
 import type { BackupFile } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import type { FakeBackupFileWriter } from '../testing/fake-backup-file-writer.ts';
@@ -17,7 +16,6 @@ import { createTestServices } from '../testing/test-services.ts';
 import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
 
 afterEach(() => {
-  cleanup();
   vi.unstubAllGlobals();
 });
 

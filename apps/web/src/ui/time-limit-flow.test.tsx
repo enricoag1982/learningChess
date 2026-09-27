@@ -1,7 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { lessonSteps, localDayString, updateProfileSettings } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import type { FakeNarrator } from '../testing/fake-narrator.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
@@ -12,8 +11,6 @@ import { AppNotice } from './AppNotice.tsx';
 
 /** Five-minute warning's own kid-facing text (`notice.five-minutes`), spoken and shown verbatim. */
 const FIVE_MINUTES_TEXT = '5 minutes left — pick something short!';
-
-afterEach(cleanup);
 
 function makeServices(): ReturnType<typeof createTestServices> {
   return createTestServices(

@@ -1,12 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import '../i18n.ts';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import App from '../App.tsx';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
-
-afterEach(cleanup);
 
 describe('Today session (M3.4)', () => {
   it('Start today runs the due warm-up first ("Warm-up 1/1"), then lands in the next lesson', async () => {

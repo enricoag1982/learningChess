@@ -1,11 +1,8 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { chessJsRules, parseDiagram } from '@chess-kids/core';
 import type { Move, Square } from '@chess-kids/core';
-import '../../i18n.ts';
 import { Board } from './Board.tsx';
-
-afterEach(cleanup);
 
 // White rook d5 (movable), white knight b1 (movable), star on e8, blocked square on e3.
 // No kings: chessJsRules accepts this (lessons/mini-games routinely omit them).

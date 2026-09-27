@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { BotPlayer, Move, Square } from '@chess-kids/core';
 import { chessJsRules } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
@@ -18,7 +17,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  cleanup();
   window.localStorage.removeItem('chess-kids:test-seed');
 });
 

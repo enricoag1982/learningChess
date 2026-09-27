@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
 import type {
   ContentSource,
@@ -18,8 +18,6 @@ import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { HomeScreen } from './HomeScreen.tsx';
-
-afterEach(cleanup);
 
 /** The real (bundled) content, with test adapters otherwise (fake password writer). */
 function createServicesWithRealContent(): ReturnType<typeof createTestServices> {

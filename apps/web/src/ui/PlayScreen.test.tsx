@@ -1,7 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, recordGame, solve } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
@@ -12,8 +11,6 @@ import {
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
 import { PlayScreen } from './PlayScreen.tsx';
-
-afterEach(cleanup);
 
 /** The real (bundled) content, with test adapters otherwise (fake password writer). */
 function createServicesWithRealContent(): ReturnType<typeof createTestServices> {

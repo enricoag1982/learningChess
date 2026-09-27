@@ -1,14 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { EarnedBadge } from '@chess-kids/core';
-import '../i18n.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { StoreProvider } from '../app/store.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { Celebration } from './Celebration.tsx';
-
-afterEach(cleanup);
 
 function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
   return createTestServices(createBundledContentSource());

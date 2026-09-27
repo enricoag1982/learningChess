@@ -1,7 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createProfile } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
@@ -11,8 +10,6 @@ import {
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
 import type { Services } from '../app/services.ts';
-
-afterEach(cleanup);
 
 function createServicesWithRealContent(): Services {
   return createTestServices(createBundledContentSource());

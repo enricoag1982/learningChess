@@ -1,15 +1,12 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, fireEvent, screen } from '@testing-library/react';
 import type { MiniGame } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
-import '../i18n.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
 import { stubMatchMedia } from '../testing/mock-media-query.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { LessonScreen } from './LessonScreen.tsx';
-
-afterEach(cleanup);
 
 function fixtureBoss(): MiniGame {
   return {

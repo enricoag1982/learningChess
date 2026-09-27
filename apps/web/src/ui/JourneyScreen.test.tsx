@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
 import type {
   ContentSource,
@@ -10,13 +10,10 @@ import type {
   TracksCatalog,
   World,
 } from '@chess-kids/core';
-import '../i18n.ts';
 import { fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { JourneyScreen } from './JourneyScreen.tsx';
-
-afterEach(cleanup);
 
 // World order 2 (not 1): JourneyScreen shows the Owl instead of a character icon for a main
 // track's very first world (matched by `world.order === 1`), which this fixture is not testing.
