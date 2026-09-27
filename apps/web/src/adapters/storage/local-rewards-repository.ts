@@ -1,14 +1,8 @@
 import type { EarnedBadge, RewardsRepository, SessionLog, Streak } from '@chess-kids/core';
+import type { CappedList, KeyedCollection } from './collections.ts';
+import { cappedList, keyedCollection } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
-import { StorageError } from './local-store.ts';
-
-const EARNED_BADGES_RECORD = 'earned-badges';
-const STREAKS_RECORD = 'streaks';
-const SESSION_LOGS_RECORD = 'session-logs';
-
-function streakKey(profileId: string): string {
-  return profileId;
-}
+import { STORAGE_KEYS } from './storage-keys.ts';
 
 function sessionLogKey(profileId: string, date: string): string {
   return `${profileId}:${date}`;
@@ -26,10 +20,6 @@ function isEarnedBadgeShape(value: unknown): value is EarnedBadge {
   );
 }
 
-function isEarnedBadgeArray(value: unknown): value is EarnedBadge[] {
-  return Array.isArray(value) && value.every(isEarnedBadgeShape);
-}
-
 function isStreakShape(value: unknown): value is Streak {
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Record<string, unknown>;
@@ -40,11 +30,6 @@ function isStreakShape(value: unknown): value is Streak {
     typeof record.best === 'number' &&
     typeof record.skipsUsedThisWeek === 'number'
   );
-}
-
-function isStreakRecord(value: unknown): value is Record<string, Streak> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-  return Object.values(value as Record<string, unknown>).every(isStreakShape);
 }
 
 function isSessionLogShape(value: unknown): value is SessionLog {
@@ -58,134 +43,77 @@ function isSessionLogShape(value: unknown): value is SessionLog {
   );
 }
 
-function isSessionLogRecord(value: unknown): value is Record<string, SessionLog> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
-  return Object.values(value as Record<string, unknown>).every(isSessionLogShape);
-}
-
 /**
- * Runs a synchronous computation and reports it as a settled promise, so a thrown `StorageError`
- * surfaces as a rejection instead of a synchronous throw (methods here have no `await` of their
- * own, so they are not declared `async`: `@typescript-eslint/require-await` would flag that).
- */
-function toPromise<T>(compute: () => T): Promise<T> {
-  try {
-    return Promise.resolve(compute());
-  } catch (error: unknown) {
-    return Promise.reject<T>(error instanceof Error ? error : new Error(String(error)));
-  }
-}
-
-/**
- * `RewardsRepository` over one `LocalStore` (M4.4): earned badges as a single capped, append-only
- * list (newest last, same shape `Attempt`/`GameRecord` use); one streak per profile; one session
- * log row per `"<profileId>:<date>"`, same keying pattern `LocalStorageProgressRepository` uses.
+ * `RewardsRepository` over one `LocalStore` (M4.4): earned badges as a single append-only list, no
+ * cap (unlike `Attempt`/`GameRecord`); one streak per profile; one session log row per
+ * `"<profileId>:<date>"`, same keying pattern `LocalStorageProgressRepository` uses.
  */
 export class LocalStorageRewardsRepository implements RewardsRepository {
   private readonly store: LocalStore;
+  private readonly earnedBadges: CappedList<EarnedBadge>;
+  private readonly streaks: KeyedCollection<Streak>;
+  private readonly sessionLogs: KeyedCollection<SessionLog>;
 
   constructor(store: LocalStore) {
     this.store = store;
-  }
-
-  private readEarnedBadges(): EarnedBadge[] {
-    const raw = this.store.read(EARNED_BADGES_RECORD);
-    if (raw === undefined) return [];
-    if (!isEarnedBadgeArray(raw)) {
-      throw new StorageError(`Corrupt earned badge data stored at "${EARNED_BADGES_RECORD}"`);
-    }
-    return raw;
-  }
-
-  private readStreaks(): Map<string, Streak> {
-    const raw = this.store.read(STREAKS_RECORD);
-    if (raw === undefined) return new Map();
-    if (!isStreakRecord(raw)) {
-      throw new StorageError(`Corrupt streak data stored at "${STREAKS_RECORD}"`);
-    }
-    return new Map(Object.entries(raw));
-  }
-
-  private readSessionLogs(): Map<string, SessionLog> {
-    const raw = this.store.read(SESSION_LOGS_RECORD);
-    if (raw === undefined) return new Map();
-    if (!isSessionLogRecord(raw)) {
-      throw new StorageError(`Corrupt session log data stored at "${SESSION_LOGS_RECORD}"`);
-    }
-    return new Map(Object.entries(raw));
-  }
-
-  addEarnedBadge(badge: EarnedBadge): Promise<void> {
-    return toPromise(() => {
-      const all = this.readEarnedBadges();
-      all.push(badge);
-      this.store.write(EARNED_BADGES_RECORD, all);
-    });
-  }
-
-  listEarnedBadges(profileId: string): Promise<EarnedBadge[]> {
-    return toPromise(() =>
-      this.readEarnedBadges().filter((badge) => badge.profileId === profileId),
+    this.earnedBadges = cappedList(store, STORAGE_KEYS.earnedBadges, undefined, isEarnedBadgeShape);
+    this.streaks = keyedCollection(
+      store,
+      STORAGE_KEYS.streaks,
+      (streak) => streak.profileId,
+      isStreakShape,
+    );
+    this.sessionLogs = keyedCollection(
+      store,
+      STORAGE_KEYS.sessionLogs,
+      (log) => sessionLogKey(log.profileId, log.date),
+      isSessionLogShape,
     );
   }
 
+  addEarnedBadge(badge: EarnedBadge): Promise<void> {
+    return this.earnedBadges.add(badge);
+  }
+
+  listEarnedBadges(profileId: string): Promise<EarnedBadge[]> {
+    return this.earnedBadges.list((badge) => badge.profileId === profileId);
+  }
+
+  /** Updates a row in place (e.g. marking a badge seen) instead of appending a duplicate. */
   saveEarnedBadge(badge: EarnedBadge): Promise<void> {
-    return toPromise(() => {
-      const all = this.readEarnedBadges();
+    return this.earnedBadges.list().then((all) => {
       const index = all.findIndex((entry) => entry.id === badge.id);
-      if (index >= 0) {
-        all[index] = badge;
-      } else {
-        all.push(badge);
-      }
-      this.store.write(EARNED_BADGES_RECORD, all);
+      const next =
+        index >= 0 ? all.map((entry, i) => (i === index ? badge : entry)) : [...all, badge];
+      this.store.write(STORAGE_KEYS.earnedBadges, next);
     });
   }
 
   getStreak(profileId: string): Promise<Streak | undefined> {
-    return toPromise(() => this.readStreaks().get(streakKey(profileId)));
+    return this.streaks.get(profileId);
   }
 
   saveStreak(streak: Streak): Promise<void> {
-    return toPromise(() => {
-      const all = this.readStreaks();
-      all.set(streakKey(streak.profileId), streak);
-      this.store.write(STREAKS_RECORD, Object.fromEntries(all));
-    });
+    return this.streaks.put(streak);
   }
 
   getSessionLog(profileId: string, date: string): Promise<SessionLog | undefined> {
-    return toPromise(() => this.readSessionLogs().get(sessionLogKey(profileId, date)));
+    return this.sessionLogs.get(sessionLogKey(profileId, date));
   }
 
   saveSessionLog(log: SessionLog): Promise<void> {
-    return toPromise(() => {
-      const all = this.readSessionLogs();
-      all.set(sessionLogKey(log.profileId, log.date), log);
-      this.store.write(SESSION_LOGS_RECORD, Object.fromEntries(all));
-    });
+    return this.sessionLogs.put(log);
   }
 
   listSessionLogs(profileId: string): Promise<SessionLog[]> {
-    return toPromise(() =>
-      [...this.readSessionLogs().values()].filter((log) => log.profileId === profileId),
-    );
+    return this.sessionLogs.list((log) => log.profileId === profileId);
   }
 
   deleteProfileData(profileId: string): Promise<void> {
-    return toPromise(() => {
-      const badges = this.readEarnedBadges().filter((badge) => badge.profileId !== profileId);
-      this.store.write(EARNED_BADGES_RECORD, badges);
-
-      const streaks = this.readStreaks();
-      streaks.delete(streakKey(profileId));
-      this.store.write(STREAKS_RECORD, Object.fromEntries(streaks));
-
-      const logs = this.readSessionLogs();
-      for (const [key, log] of logs) {
-        if (log.profileId === profileId) logs.delete(key);
-      }
-      this.store.write(SESSION_LOGS_RECORD, Object.fromEntries(logs));
-    });
+    return Promise.all([
+      this.earnedBadges.removeWhere((badge) => badge.profileId === profileId),
+      this.streaks.remove(profileId),
+      this.sessionLogs.removeWhere((log) => log.profileId === profileId),
+    ]).then(() => undefined);
   }
 }

@@ -15,34 +15,32 @@ import type {
   Streak,
   Unlock,
 } from '@chess-kids/core';
+import { toPromise } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { SCHEMA_VERSION } from './local-store.ts';
 import { StorageError } from './local-store.ts';
+import { MAX_ASSESSMENT_RESULTS } from './local-assessment-repository.ts';
+import { MAX_GAME_RECORDS } from './local-game-record-repository.ts';
+import { MAX_ATTEMPTS } from './local-progress-repository.ts';
+import { STORAGE_KEYS } from './storage-keys.ts';
 
-/** Every record name a backup import replaces — every one of these repositories' own `RECORD_NAME`
- * constants, deliberately never `parent-lock` (see `BackupImporter`'s own doc: a restored backup
- * never touches the parent password). */
+/** Every record name a backup import replaces — the same `STORAGE_KEYS` every repository reads and
+ * writes, deliberately never `parentLock` (see `BackupImporter`'s own doc: a restored backup never
+ * touches the parent password). */
 const RECORD_NAMES = [
-  'profiles',
-  'settings',
-  'lesson-progress',
-  'attempts',
-  'minigame-progress',
-  'concept-stats',
-  'game-records',
-  'earned-badges',
-  'streaks',
-  'session-logs',
-  'assessment-results',
-  'unlocks',
+  STORAGE_KEYS.profiles,
+  STORAGE_KEYS.settings,
+  STORAGE_KEYS.lessonProgress,
+  STORAGE_KEYS.attempts,
+  STORAGE_KEYS.minigameProgress,
+  STORAGE_KEYS.conceptStats,
+  STORAGE_KEYS.gameRecords,
+  STORAGE_KEYS.earnedBadges,
+  STORAGE_KEYS.streaks,
+  STORAGE_KEYS.sessionLogs,
+  STORAGE_KEYS.assessmentResults,
+  STORAGE_KEYS.unlocks,
 ] as const;
-
-/** Mirrors each repository's own cap (`local-progress-repository.ts`/`local-game-record-repository.ts`/
- * `local-assessment-repository.ts`) — newest kept, oldest dropped, same "keep it from growing
- * forever" reasoning, so an import lands in exactly the state ordinary play would have produced. */
-const MAX_ATTEMPTS = 2000;
-const MAX_GAME_RECORDS = 500;
-const MAX_ASSESSMENT_RESULTS = 500;
 
 function byCreatedAtAsc(
   a: { readonly createdAt: string },
@@ -158,20 +156,6 @@ function toRawRecords(
 }
 
 const STAGING_PREFIX = 'backup-staging:';
-
-/**
- * Runs a synchronous computation and reports it as a settled promise, so a thrown `StorageError`
- * surfaces as a rejection instead of a synchronous throw (this class's own method has no `await`
- * of its own, so it is not declared `async`: `@typescript-eslint/require-await` would flag that —
- * same reasoning every `LocalStorageXRepository` already documents for its own methods).
- */
-function toPromise<T>(compute: () => T): Promise<T> {
-  try {
-    return Promise.resolve(compute());
-  } catch (error: unknown) {
-    return Promise.reject<T>(error instanceof Error ? error : new Error(String(error)));
-  }
-}
 
 /**
  * `BackupImporter` for the web (M5.1, `docs/architecture.md` §11): writes every replaced record to

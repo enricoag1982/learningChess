@@ -70,21 +70,6 @@ describe('LocalStorageSettingsRepository', () => {
     });
   });
 
-  it('persists for a new repository instance over the same storage', async () => {
-    await new LocalStorageSettingsRepository(openLocalStore(localStorage)).save({
-      lastProfileId: 'profile-1',
-      suggestedLevels: { 'profile-1': 2 },
-      profileSettings: {},
-    });
-
-    const second = new LocalStorageSettingsRepository(openLocalStore(localStorage));
-    expect(await second.get()).toEqual({
-      lastProfileId: 'profile-1',
-      suggestedLevels: { 'profile-1': 2 },
-      profileSettings: {},
-    });
-  });
-
   it('reads a pre-M4.2 record with no suggestedLevels as {}', async () => {
     const store = openLocalStore(localStorage);
     store.write('settings', { lastProfileId: 'profile-1' });

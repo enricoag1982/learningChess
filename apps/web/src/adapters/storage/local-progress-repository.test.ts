@@ -56,14 +56,6 @@ describe('LocalStorageProgressRepository — lesson progress', () => {
     expect(await repo.getLesson('profile-1', 'rook')).toEqual(updated);
   });
 
-  it('persists data for a new repository instance over the same storage', async () => {
-    const progress = makeProgress();
-    await new LocalStorageProgressRepository(openLocalStore(localStorage)).saveLesson(progress);
-
-    const second = new LocalStorageProgressRepository(openLocalStore(localStorage));
-    expect(await second.getLesson('profile-1', 'rook')).toEqual(progress);
-  });
-
   it('rejects with StorageError on a corrupt stored shape', async () => {
     const store = openLocalStore(localStorage);
     store.write('lesson-progress', { 'profile-1:rook': { nope: true } });

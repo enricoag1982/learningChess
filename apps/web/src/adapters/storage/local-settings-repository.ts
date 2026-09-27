@@ -1,8 +1,10 @@
 import type { AppSettings, SettingsRepository } from '@chess-kids/core';
+import type { SingletonRecord } from './collections.ts';
+import { singleton } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { StorageError } from './local-store.ts';
+import { STORAGE_KEYS } from './storage-keys.ts';
 
-const RECORD_NAME = 'settings';
 const DEFAULT_SETTINGS: AppSettings = {
   lastProfileId: null,
   suggestedLevels: {},
@@ -54,42 +56,25 @@ function normalize(stored: {
   };
 }
 
-/**
- * Runs a synchronous computation and reports it as a settled promise, so a thrown
- * `StorageError` surfaces as a rejection instead of a synchronous throw (methods here have no
- * `await` of their own, so they are not declared `async`: `@typescript-eslint/require-await`
- * would flag that).
- */
-function toPromise<T>(compute: () => T): Promise<T> {
-  try {
-    return Promise.resolve(compute());
-  } catch (error: unknown) {
-    return Promise.reject<T>(error instanceof Error ? error : new Error(String(error)));
-  }
-}
-
 /** `SettingsRepository` storing device-wide settings under one `LocalStore` record. */
 export class LocalStorageSettingsRepository implements SettingsRepository {
-  private readonly store: LocalStore;
+  private readonly record: SingletonRecord<unknown>;
 
   constructor(store: LocalStore) {
-    this.store = store;
+    this.record = singleton(store, STORAGE_KEYS.settings);
   }
 
   get(): Promise<AppSettings> {
-    return toPromise(() => {
-      const raw = this.store.read(RECORD_NAME);
+    return this.record.get().then((raw) => {
       if (raw === undefined) return DEFAULT_SETTINGS;
       if (!isAppSettingsShape(raw)) {
-        throw new StorageError(`Corrupt settings data stored at "${RECORD_NAME}"`);
+        throw new StorageError(`Corrupt settings data stored at "${STORAGE_KEYS.settings}"`);
       }
       return normalize(raw);
     });
   }
 
   save(settings: AppSettings): Promise<void> {
-    return toPromise(() => {
-      this.store.write(RECORD_NAME, settings);
-    });
+    return this.record.set(settings);
   }
 }
