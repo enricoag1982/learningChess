@@ -3,42 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../app/store.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
-
-function LockIcon(): JSX.Element {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
-
-function PlusIcon(): JSX.Element {
-  return (
-    <svg
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <path d="M12 5v14M5 12h14" />
-    </svg>
-  );
-}
+import { LockIcon, PlusIcon } from './ds/icons.tsx';
 
 /** Profile picker (kid style): app start whenever a parent lock exists (app-structure.md §3). */
 export function ProfilePickerScreen(): JSX.Element {

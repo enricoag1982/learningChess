@@ -19,85 +19,7 @@ import { OwlIcon } from './art/characters.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-
-function BackIcon(): JSX.Element {
-  return (
-    <svg
-      width="30"
-      height="30"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
-function LockIcon(): JSX.Element {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x={5} y={11} width={14} height={10} rx={2} />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
-
-function ComputerIcon(): JSX.Element {
-  return (
-    <svg
-      width="34"
-      height="34"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#2F5E9E"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x={4} y={7} width={16} height={12} rx={3} />
-      <path d="M12 3v4" />
-      <circle cx={9} cy={13} r={1} fill="#2F5E9E" />
-      <circle cx={15} cy={13} r={1} fill="#2F5E9E" />
-    </svg>
-  );
-}
-
-function FriendIcon(): JSX.Element {
-  return (
-    <svg
-      width="34"
-      height="34"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#B8561A"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx={9} cy={8} r={3.5} />
-      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-      <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
-      <path d="M18 14a6 6 0 0 1 3.5 6" />
-    </svg>
-  );
-}
+import { BackIcon, ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
@@ -330,7 +252,7 @@ export function PlayScreen(): JSX.Element {
                     <span className="flex items-center gap-1 text-xs font-bold" aria-hidden="true">
                       {status.locked ? (
                         <>
-                          <LockIcon />
+                          <LockIcon size={18} />
                           {condition}
                         </>
                       ) : status.games > 0 ? (
@@ -357,7 +279,7 @@ export function PlayScreen(): JSX.Element {
             }}
             className="tap-raised tap-info flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
           >
-            {!fullGameUnlocked && <LockIcon />}
+            {!fullGameUnlocked && <LockIcon size={18} />}
             {fullGameUnlocked ? t('play.full-game') : t('play.full-game-locked')}
           </button>
         </div>
@@ -388,7 +310,7 @@ export function PlayScreen(): JSX.Element {
                 : 'tap-locked bg-[#F3EDE0] text-muted'
             }`}
           >
-            {!friendUnlocked && <LockIcon />}
+            {!friendUnlocked && <LockIcon size={18} />}
             {friendUnlocked ? t('play.vs-friend') : t('play.vs-friend-locked')}
           </button>
         </div>
@@ -430,7 +352,7 @@ export function PlayScreen(): JSX.Element {
                   </span>
                 ) : (
                   <span className="flex items-center gap-1.5 text-xs font-bold">
-                    <LockIcon />
+                    <LockIcon size={18} />
                     {condition}
                   </span>
                 )}

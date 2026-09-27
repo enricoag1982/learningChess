@@ -13,23 +13,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
-
-function CloseIcon(): JSX.Element {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.6}
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
+import { CloseIcon } from './ds/icons.tsx';
 
 /** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

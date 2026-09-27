@@ -1,23 +1,5 @@
 import type { JSX } from 'react';
-
-function ReplayIcon(): JSX.Element {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M4 9v6h4l5 4V5L8 9H4z" />
-      <path d="M16 8.5a5 5 0 0 1 0 7" />
-    </svg>
-  );
-}
+import { ReplayIcon } from './icons.tsx';
 
 export interface ReplayButtonProps {
   readonly onClick: () => void;

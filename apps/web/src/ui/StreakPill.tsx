@@ -1,17 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InfoPill } from './ds/primitives.tsx';
-
-function FlameIcon(): JSX.Element {
-  return (
-    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-      <path
-        d="M12 2c1 3-3 4-3 7.5A3.5 3.5 0 0 0 12 13a2 2 0 0 0 2-2c1.5 1.5 2.5 3 2.5 5a4.5 4.5 0 0 1-9 0C7.5 12 9 9 9 7c1.5 1 1.5-1 3-5z"
-        fill="#B8561A"
-      />
-    </svg>
-  );
-}
+import { FlameIcon } from './ds/icons.tsx';
 
 /** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): flame + current streak days, no pill
  * background or border. Home's top bar (>= 2 days) and My Den both use it. */

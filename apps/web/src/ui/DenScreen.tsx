@@ -20,6 +20,7 @@ import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
 import { InfoPill } from './ds/primitives.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { BackIcon } from './ds/icons.tsx';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
 const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play', 'habit'];
@@ -64,24 +65,6 @@ const RANK_GLYPH: Readonly<Record<string, string>> = {
   queen: '♕',
   king: '♔',
 };
-
-function BackIcon(): JSX.Element {
-  return (
-    <svg
-      width="30"
-      height="30"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
 
 /** The next rank's unlock condition, in words (own condition for `done`/`locked`, "You are here" for `current`). */
 function rankNote(t: TFunction, catalog: TracksCatalog, entry: RankLadderEntry): string {

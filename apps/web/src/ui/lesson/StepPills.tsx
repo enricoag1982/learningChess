@@ -2,44 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LessonPhase, SkippablePhase } from '@chess-kids/core';
 import { PHASE_BAR, PHASES, phaseState } from './phase-track.ts';
-
-function CheckIcon(): JSX.Element {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={3}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
-
-/** Small skip icon for a `skipped` step — mirrors `SkipButton`'s own icon. */
-function SkipIcon(): JSX.Element {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={3}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 5l8 7-8 7V5z" />
-      <path d="M17 5v14" />
-    </svg>
-  );
-}
+import { CheckIcon, SkipIcon } from '../ds/icons.tsx';
 
 export interface StepPillsProps {
   readonly current: LessonPhase;
@@ -70,7 +33,7 @@ export function StepPills({ current, skippedPhases = [] }: StepPillsProps): JSX.
             <span className={`flex items-center gap-1 text-sm font-semibold sm:text-base ${text}`}>
               {skipped ? (
                 <>
-                  <SkipIcon />
+                  <SkipIcon size={14} strokeWidth={3} />
                   <span aria-hidden="true">{t(`lesson.steps.${phase}`)}</span>
                   <span className="sr-only">
                     {t('lesson.steps.skipped', { step: t(`lesson.steps.${phase}`) })}
@@ -78,7 +41,7 @@ export function StepPills({ current, skippedPhases = [] }: StepPillsProps): JSX.
                 </>
               ) : (
                 <>
-                  {done && <CheckIcon />}
+                  {done && <CheckIcon size={16} />}
                   {t(`lesson.steps.${phase}`)}
                 </>
               )}

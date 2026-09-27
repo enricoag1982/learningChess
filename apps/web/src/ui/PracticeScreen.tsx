@@ -9,43 +9,7 @@ import { AvatarIcon } from './art/avatars.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-
-function BackIcon(): JSX.Element {
-  return (
-    <svg
-      width="30"
-      height="30"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
-function WarmUpIcon(): JSX.Element {
-  return (
-    <svg
-      width="34"
-      height="34"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#B8561A"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
-      <circle cx={12} cy={16} r={5} />
-    </svg>
-  );
-}
+import { BackIcon, WarmUpIcon } from './ds/icons.tsx';
 
 /** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {

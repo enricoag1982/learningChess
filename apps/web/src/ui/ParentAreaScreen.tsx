@@ -15,7 +15,6 @@ import { RankPill } from './RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';
 import { ChildReportScreen } from './parent/ChildReport.tsx';
 import { ChildSettingsScreen } from './parent/ChildSettings.tsx';
-import { ChevronRightIcon } from './parent/parent-icons.tsx';
 import { PrivacyScreen } from './parent/PrivacyPolicy.tsx';
 import {
   PARENT_INPUT,
@@ -24,25 +23,7 @@ import {
   PARENT_SECONDARY_BUTTON,
   PARENT_TAPPABLE_ROW,
 } from './parent/parent-styles.ts';
-
-function LockIcon(): JSX.Element {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </svg>
-  );
-}
+import { ChevronRightIcon, LockIcon } from './ds/icons.tsx';
 
 function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.Element {
   const { t } = useTranslation();

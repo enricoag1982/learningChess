@@ -9,33 +9,8 @@ import { AvatarIcon } from './art/avatars.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-
-function BackIcon(): JSX.Element {
-  return (
-    <svg
-      width="30"
-      height="30"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
-function GuestIcon(): JSX.Element {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="h-full w-full">
-      <circle cx={50} cy={38} r={20} fill="#B7C2CB" />
-      <path d="M18 88c0-20 14-32 32-32s32 12 32 32Z" fill="#B7C2CB" />
-    </svg>
-  );
-}
+import { BackIcon } from './ds/icons.tsx';
+import { GuestIcon } from './ds/icons-lazy.tsx';
 
 /** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({

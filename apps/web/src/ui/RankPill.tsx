@@ -3,21 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { RankDef } from '@chess-kids/core';
 import { tContent } from '../content-text.ts';
 import { InfoPill } from './ds/primitives.tsx';
-
-function CrownIcon(): JSX.Element {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M4 18h16l1-9-5 4-4-6-4 6-5-4z"
-        fill="none"
-        stroke="#1F5A41"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import { RankCrownIcon } from './ds/icons.tsx';
 
 /** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): the current rank name, next to the
  * Home/Journey stars pill — crown icon + text, no pill background or border, so it never reads as
@@ -42,7 +28,7 @@ export function RankPill({
           : 'h-14 font-display text-lg font-semibold text-[#1F5A41]'
       }
     >
-      <CrownIcon />
+      <RankCrownIcon />
       {tContent(t, 'journey:ui.rank-pill', { rank: name })}
     </InfoPill>
   );

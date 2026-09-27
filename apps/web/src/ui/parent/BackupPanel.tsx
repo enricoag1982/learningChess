@@ -7,7 +7,7 @@ import type { ChildImportChoice, ImportChangeSummary, ImportPlan } from '@chess-
 import { importMerged, planImport, previewChildChange } from '@chess-kids/core/merge';
 import { useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
-import { ChevronLeftIcon } from './parent-icons.tsx';
+import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import {
   PARENT_INFO_PANEL,
   PARENT_INPUT,

@@ -14,111 +14,45 @@ import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
 
-function PlayIcon(): JSX.Element {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 4l13 8-13 8z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function SwitchPlayerIcon(): JSX.Element {
-  return (
-    <svg
-      width="28"
-      height="28"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="9" cy="8" r="3.5" />
-      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-      <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
-      <path d="M18 14a6 6 0 0 1 3.5 6" />
-    </svg>
-  );
-}
-
+// Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
+// base") — one-off shapes only Home uses, built on the shared `Svg` icon base.
 function JourneyIcon(): JSX.Element {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#2E7D5B"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <Svg size={32} stroke="#2E7D5B">
       <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z" />
       <path d="M9 4v14" />
       <path d="M15 6v14" />
-    </svg>
+    </Svg>
   );
 }
 
 function PracticeTileIcon(): JSX.Element {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#B8561A"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <Svg size={32} stroke="#B8561A">
       <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
       <circle cx={12} cy={16} r={5} />
-    </svg>
+    </Svg>
   );
 }
 
 function PlayTileIcon(): JSX.Element {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#B8561A"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <Svg size={32} stroke="#B8561A">
       <rect x={3} y={3} width={18} height={18} rx={3} />
       <path d="M3 12h18M12 3v18" />
-    </svg>
+    </Svg>
   );
 }
 
 function DenTileIcon(): JSX.Element {
   return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#5B3F7A"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <Svg size={32} stroke="#5B3F7A">
       <path d="M3 11l9-7 9 7" />
       <path d="M5 10v10h14V10" />
       <path d="M10 20v-5h4v5" />
-    </svg>
+    </Svg>
   );
 }
 

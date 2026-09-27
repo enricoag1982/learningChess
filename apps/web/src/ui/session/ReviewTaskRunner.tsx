@@ -2,23 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { ConceptTask, ExerciseState } from '@chess-kids/core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
-
-function CloseIcon(): JSX.Element {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.6}
-      strokeLinecap="round"
-      aria-hidden="true"
-    >
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
+import { CloseIcon } from '../ds/icons.tsx';
 
 /** Dots mirroring the lesson's `StageDots`, sized for a short (3–5 task) review run. */
 function TaskDots({

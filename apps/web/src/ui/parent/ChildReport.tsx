@@ -9,7 +9,8 @@ import { tContent } from '../../content-text.ts';
 import { avatarBackground } from '../art/avatar-meta.ts';
 import { AvatarIcon } from '../art/avatars.tsx';
 import { RankPill } from '../RankPill.tsx';
-import { ChevronLeftIcon, ChevronRightIcon } from './parent-icons.tsx';
+import { ChevronRightIcon } from '../ds/icons.tsx';
+import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });

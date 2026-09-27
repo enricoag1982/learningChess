@@ -30,7 +30,7 @@ import { useAppStore, useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
 import { AvatarIcon } from '../art/avatars.tsx';
-import { ChevronLeftIcon } from './parent-icons.tsx';
+import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,

@@ -5,6 +5,7 @@ import { lessonStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { StarsRow } from '../StarsRow.tsx';
+import { NewGameIcon } from '../ds/icons.tsx';
 
 export interface CompleteStepProps {
   readonly lesson: Lesson;
@@ -12,25 +13,6 @@ export interface CompleteStepProps {
   readonly onPlayAgain: () => void;
   /** Back to Home. */
   readonly onContinue: () => void;
-}
-
-function NewGameIcon(): JSX.Element {
-  return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="#2E7D5B"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <rect x={3} y={3} width={18} height={18} rx={3} />
-      <path d="M3 12h18M12 3v18" />
-    </svg>
-  );
 }
 
 /** Reward stars (1–3) from the percentage of the lesson's max stars actually earned. */

@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeftIcon } from './parent-icons.tsx';
+import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
 /** Repository issues page (non-functional.md §3 "contact"): the same repo the live app deploys

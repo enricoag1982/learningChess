@@ -17,6 +17,7 @@ import { AvatarIcon } from './art/avatars.tsx';
 import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
+import { GuestIcon } from './ds/icons-lazy.tsx';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -63,15 +64,6 @@ function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element
         {children}
       </div>
     </div>
-  );
-}
-
-function GuestIcon(): JSX.Element {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" className="h-full w-full">
-      <circle cx={50} cy={38} r={20} fill="#B7C2CB" />
-      <path d="M18 88c0-20 14-32 32-32s32 12 32 32Z" fill="#B7C2CB" />
-    </svg>
   );
 }
 
