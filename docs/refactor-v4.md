@@ -92,7 +92,7 @@ tools/                    voice, art, compat, size, content snapshot
 | R0 Safety net | Golden snapshot of compiled `content.json`; storage-compat fixtures (localStorage dumps + backup files from v1.0–v2.0 load unchanged); split slow tests (`*.slow.test.ts`: winnability, bot self-play / timing, perft, build) into a parallel CI job; a11y curriculum walk on chromium only, seeded scans elsewhere; skip unused font subsets in the precache (−72 KB) | CI ≈ 5 min; snapshot + fixtures green. Done: `m8.1` snapshots + fixtures, `m8.2` CI speed (3.7 min). R1: `m8.3` docs trim (279 → 172 KB), `m8.4` core test kit (−2.2 k test lines) + 146 dead exports removed; web test kit, e2e helper reuse, comment trim after the other session's UI fixes merge |
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green. Done: `m8.5` storage collections (−146 lines). Rest after the other session's UI fixes merge |
-| R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds; `m8.8` YAML defaults (after the other session's lesson edits); R3b web |
+| R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds done (loader 1 459 → 376 lines); `m8.8` YAML defaults (after the other session's lesson edits); R3b web |
 | R4 Platform / subject split | `stimulus` replaces `position` in the lesson model; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, journey habitats, Den, report, services; import boundary lint | platform builds and tests without `subject-chess` |
 | R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
 
@@ -104,7 +104,7 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 |---|---|---|
 | Files to add an exercise type | ≈ 15 in 4 packages | 1 folder + 1 registry line |
 | Type / mode dispatch sites | ≈ 45 | registries only (≤ 4) |
-| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) |
+| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k: R3a adds per-kind files + legacy facades; recover with core / content compaction (comments, tiny files, dead code) and R3b facade removal) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
 | Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |

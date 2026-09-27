@@ -1,4 +1,5 @@
-import type { AnswerChoiceAction, ChoiceDef } from './def.ts';
+import type { TextKeyRef } from '../../kind.ts';
+import type { AnswerChoiceAction, ChoiceDef, ChoiceOption } from './def.ts';
 
 /** The correct option, straight from `def`. */
 export function choiceSolution(def: ChoiceDef): readonly AnswerChoiceAction[] {
@@ -12,4 +13,14 @@ export function choiceWrongAction(def: ChoiceDef): readonly AnswerChoiceAction[]
     throw new Error(`choice "${def.id}": no option other than the answer`);
   }
   return [{ type: 'answer-choice', optionId: wrong.id }];
+}
+
+/** Every option's own text key (content build's locale check), labelled `option "<id>"`. */
+export function choiceTextKeys(def: ChoiceDef): readonly TextKeyRef[] {
+  return def.options
+    .filter(
+      (option): option is ChoiceOption & { readonly textKey: string } =>
+        option.textKey !== undefined,
+    )
+    .map((option) => ({ key: option.textKey, label: `option "${option.id}"` }));
 }

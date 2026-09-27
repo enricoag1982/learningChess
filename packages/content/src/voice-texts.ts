@@ -27,6 +27,7 @@ import type {
 } from '@chess-kids/core';
 import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
 import type { Locales } from './load.ts';
+import { modeContentOf } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
 
 /** One inventoried narrated text. `source` is a short human label for the report, not machine-read. */
@@ -204,9 +205,8 @@ function collectContentEntries(
 
   for (const minigame of content.minigames) {
     addText(entries, resolve(locales, minigame.goalKey), 'minigame-goal');
-    if (minigame.mode === 'series') {
-      addExerciseDefs(entries, locales, minigame.rounds, 'minigame-round');
-    }
+    const rounds = modeContentOf(minigame.mode).exercises?.(minigame) ?? [];
+    addExerciseDefs(entries, locales, rounds, 'minigame-round');
   }
 }
 
