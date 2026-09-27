@@ -8,7 +8,8 @@
  * removes the need as each moved function becomes single-type and generic on its own.
  */
 import { requestHint, starsFor } from '../engine.ts';
-import type { ExerciseState, Hint } from '../engine.ts';
+import type { ExerciseState } from '../engine.ts';
+import type { Hint } from '../hint.ts';
 import type { VariantRules } from '../../variant/rules.ts';
 import type { ExerciseStateOf } from '../state.ts';
 import type { ExerciseDef } from '../types.ts';

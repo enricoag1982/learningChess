@@ -4,7 +4,7 @@
  * through `kindOf`/`EXERCISE_KINDS` instead of their own `if`/`switch` on `def.type`.
  */
 import type { VariantRules } from '../../variant/rules.ts';
-import type { Hint } from '../engine.ts';
+import type { Hint } from '../hint.ts';
 import type { ExerciseKind } from '../kind.ts';
 import type { ExerciseStateOf } from '../state.ts';
 import type { ExerciseDef } from '../types.ts';

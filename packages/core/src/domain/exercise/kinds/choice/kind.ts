@@ -1,8 +1,10 @@
-import { answerChoice, startExercise } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, widen } from '../adapt.ts';
+import { startExercise } from '../../engine.ts';
+import { errorHintStars } from '../../stars.ts';
+import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
 import type { AnswerChoiceAction, AnswerOutcome, ChoiceDef } from './def.ts';
+import { answerChoice, choiceHint } from './engine.ts';
 import { choiceSolution, choiceWrongAction } from './solution.ts';
 
 export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome> = {
@@ -18,12 +20,14 @@ export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome>
     return { state: narrowState(next), outcome: deriveAnswerOutcome(state, next) };
   },
 
-  hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+  hint(state, level) {
+    const bumped = { ...state, hintLevel: level };
+    const result = choiceHint(widen(bumped), bumped.def, level);
+    return { state: narrowState(result.state), hint: result.hint };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return errorHintStars(state.hintLevel, state.errors);
   },
 
   solution(def) {

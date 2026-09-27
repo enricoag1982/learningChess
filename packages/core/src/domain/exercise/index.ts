@@ -17,9 +17,9 @@ export type {
   SelectionResult,
   PlaceOutcome,
   PalettePiece,
-  Hint,
   MateInNOutcome,
 } from './engine.ts';
+export type { Hint } from './hint.ts';
 export {
   startExercise,
   exerciseMoves,

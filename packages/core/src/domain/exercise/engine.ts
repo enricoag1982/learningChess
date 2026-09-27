@@ -6,16 +6,13 @@ import { kingSquare, piecesEqual } from '../chess/facts/pieces.ts';
 import { findMoveBySan, sameSan } from '../chess/facts/san.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
+import type { Hint } from './hint.ts';
+import { choiceHint } from './kinds/choice/engine.ts';
+import { yesNoHint } from './kinds/yes-no/engine.ts';
 import { solve } from './solver.ts';
 import type { ExerciseStateOf } from './state.ts';
-import type {
-  BestMoveDef,
-  ChoiceDef,
-  ExerciseDef,
-  MateInNDef,
-  SelectSquaresDef,
-  SetupDef,
-} from './types.ts';
+import { errorHintStars } from './stars.ts';
+import type { BestMoveDef, ExerciseDef, MateInNDef, SelectSquaresDef, SetupDef } from './types.ts';
 
 /** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
 export type ExerciseState = ExerciseStateOf<ExerciseDef>;
@@ -72,39 +69,6 @@ export interface PalettePiece {
   readonly type: PieceType;
   readonly count: number;
 }
-
-/** One step of the hint ladder; shape depends on the exercise type. */
-export type Hint =
-  /** select-squares / collect-stars / capture / best-move: piece → target square(s) → the move. */
-  | {
-      readonly kind: 'squares';
-      readonly level: 1 | 2 | 3;
-      readonly squares: readonly Square[];
-      readonly move?: { readonly from: Square; readonly to: Square };
-    }
-  | {
-      readonly kind: 'yes-no';
-      readonly level: 1 | 2 | 3;
-      readonly squares: readonly Square[];
-      /** Level 3 only: reveal the correct answer. */
-      readonly reveal: boolean;
-    }
-  | {
-      readonly kind: 'choice';
-      readonly level: 1 | 2 | 3;
-      /** Levels 1–2: one more wrong option ruled out, if any is left. */
-      readonly removedOptionId?: string;
-      /** Level 3 only: reveal the correct option. */
-      readonly reveal: boolean;
-    }
-  | {
-      readonly kind: 'setup';
-      readonly level: 1 | 2 | 3;
-      readonly piece?: Piece;
-      readonly square?: Square;
-      /** Level 3 only: the piece was placed for the kid. */
-      readonly placed: boolean;
-    };
 
 /** Starts a fresh exercise at its authored position. */
 export function startExercise(def: ExerciseDef): ExerciseState {
@@ -270,38 +234,8 @@ export function submitSelection(
   return { state: nextState, result: { correct, missing, missingSquares, wrong } };
 }
 
-/** Answers a yes-no exercise. Correct → solved; wrong → errors + 1. No-op once solved. */
-export function answerYesNo(state: ExerciseState, value: boolean): ExerciseState {
-  if (state.def.type !== 'yes-no') {
-    throw new Error('answerYesNo: exercise is not yes-no');
-  }
-  if (state.solved) {
-    return state;
-  }
-  if (value === state.def.answer) {
-    return { ...state, solved: true };
-  }
-  return { ...state, errors: state.errors + 1 };
-}
-
-/**
- * Picks an option for a choice exercise. Correct → solved; wrong → errors + 1 and the option is
- * added to `wrongOptions` (disabled in the UI). No-op once solved.
- */
-export function answerChoice(state: ExerciseState, optionId: string): ExerciseState {
-  if (state.def.type !== 'choice') {
-    throw new Error('answerChoice: exercise is not choice');
-  }
-  if (state.solved) {
-    return state;
-  }
-  if (optionId === state.def.answer) {
-    return { ...state, solved: true };
-  }
-  const current = state.wrongOptions ?? [];
-  const wrongOptions = current.includes(optionId) ? current : [...current, optionId];
-  return { ...state, errors: state.errors + 1, wrongOptions };
-}
+export { answerYesNo } from './kinds/yes-no/engine.ts';
+export { answerChoice } from './kinds/choice/engine.ts';
 
 /** Setup exercise: target squares still missing their piece, in board reading order. */
 function remainingSetupSquares(position: Position, target: Position): readonly Square[] {
@@ -545,44 +479,6 @@ function mateInNHint(
   };
 }
 
-function yesNoHint(def: { readonly focus?: Square }, level: 1 | 2 | 3): Hint {
-  const squares = def.focus === undefined ? [] : [def.focus];
-  if (level === 1) {
-    return { kind: 'yes-no', level: 1, squares, reveal: false };
-  }
-  if (level === 2) {
-    return { kind: 'yes-no', level: 2, squares: [], reveal: false };
-  }
-  return { kind: 'yes-no', level: 3, squares, reveal: true };
-}
-
-function choiceHint(
-  state: ExerciseState,
-  def: ChoiceDef,
-  level: 1 | 2 | 3,
-): { readonly state: ExerciseState; readonly hint: Hint } {
-  if (level === 3) {
-    return { state, hint: { kind: 'choice', level: 3, reveal: true } };
-  }
-  const current = state.wrongOptions ?? [];
-  const removedOptionId = def.options
-    .map((option) => option.id)
-    .find((id) => id !== def.answer && !current.includes(id));
-  const nextState =
-    removedOptionId === undefined
-      ? state
-      : { ...state, wrongOptions: [...current, removedOptionId] };
-  return {
-    state: nextState,
-    hint: {
-      kind: 'choice',
-      level,
-      reveal: false,
-      ...(removedOptionId === undefined ? {} : { removedOptionId }),
-    },
-  };
-}
-
 function setupHint(
   state: ExerciseState,
   def: SetupDef,
@@ -641,20 +537,6 @@ function capMoveStars(base: 1 | 2 | 3, hintLevel: 0 | 1 | 2 | 3): 1 | 2 | 3 {
     return base === 3 ? 2 : base;
   }
   return base;
-}
-
-/** Stars from errors + hint level: 3 clean, 2 with ≤1 error or ≤1 hint level, else 1. */
-function errorHintStars(hintLevel: 0 | 1 | 2 | 3, errors: number): 1 | 2 | 3 {
-  if (hintLevel === 3) {
-    return 1;
-  }
-  if (hintLevel === 0 && errors === 0) {
-    return 3;
-  }
-  if (hintLevel <= 1 && errors <= 1) {
-    return 2;
-  }
-  return 1;
 }
 
 /** Stars for a `setup` exercise: more errors tolerated (placing many pieces invites slips). */
