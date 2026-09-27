@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { recordMiniGameResult } from '@chess-kids/core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
-import type { BossPlaySession } from './lesson/BossStep.tsx';
-import { BossStep } from './lesson/BossStep.tsx';
+import type { BossPlaySession } from '../modes/mode-ui.ts';
+import { BossStep } from '../modes/ui-registry.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** A mini-game played standalone from the Play screen: the same `BossStep` a lesson uses, in a

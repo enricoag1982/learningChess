@@ -9,6 +9,10 @@ export const seriesMode: MiniGameMode<SeriesGameDef, SeriesGameState> = {
     return startSeries(def);
   },
 
+  isOver(state) {
+    return state.done;
+  },
+
   isWin(state) {
     return seriesResult(state) === 'won';
   },

@@ -40,6 +40,12 @@ export function useIsCompact(): boolean {
   return !useMediaQuery('(min-width: 640px)');
 }
 
+/** `prefers-reduced-motion: reduce`, read once at call time — for an effect/handler outside render
+ * (a timer delay, a pause length), not `useMediaQuery`'s own live-tracked render value. */
+export function prefersReducedMotion(): boolean {
+  return getMatches('(prefers-reduced-motion: reduce)');
+}
+
 /** Below Tailwind's `lg` breakpoint (1024px): `GameLayout` stacks the board over the panel. In a
  * jsdom test (no `matchMedia`) this defaults to `true`. */
 export function useIsStackedLayout(): boolean {

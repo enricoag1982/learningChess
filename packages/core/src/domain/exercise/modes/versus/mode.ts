@@ -9,6 +9,10 @@ export const versusMode: MiniGameMode<VersusGameDef, VersusState> = {
     return startVersus(def);
   },
 
+  isOver(state) {
+    return state.status !== 'playing';
+  },
+
   isWin(state) {
     return state.status === 'won';
   },

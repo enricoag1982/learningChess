@@ -3,7 +3,7 @@ import type { JSX } from 'react';
 import type { ExerciseDef, Lesson, MiniGame } from '@chess-kids/core';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createAppStore, StoreProvider } from '../app/store.ts';
-import { BossStep } from '../ui/lesson/BossStep.tsx';
+import { BossStep } from '../modes/ui-registry.ts';
 import { DemoStep } from '../ui/lesson/DemoStep.tsx';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
 import { StoryStep } from '../ui/lesson/StoryStep.tsx';

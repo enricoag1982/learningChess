@@ -8,7 +8,7 @@ import type { FakeNarrator } from '../../testing/fake-narrator.ts';
 import { stubMatchMedia } from '../../testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
-import { BossStep } from './BossStep.tsx';
+import { BossStep } from '../ui-registry.ts';
 
 const EMPTY_POSITION = parseDiagram(
   [

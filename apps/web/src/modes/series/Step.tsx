@@ -1,42 +1,21 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type {
-  ExerciseDef,
-  ExerciseState,
-  Lesson,
-  SeriesGameState,
-  SeriesMiniGame,
-} from '@chess-kids/core';
-import {
-  completeRound,
-  currentRound,
-  recordBossResult,
-  seriesResult,
-  seriesStars,
-  startSeries,
-} from '@chess-kids/core';
+import type { ExerciseDef, ExerciseState, SeriesGameState } from '@chess-kids/core';
+import { completeRound, currentRound, startSeries } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { Board } from '../board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
-import { SpeechBubble } from '../ds/SpeechBubble.tsx';
-import { StarsRow } from '../StarsRow.tsx';
-import { useNarratedText } from '../ds/useNarratedText.ts';
-import type { BossPlaySession } from './BossStep.tsx';
-import { SECONDARY_BUTTON } from './button-styles.ts';
-import { GameLayout } from './GameLayout.tsx';
-import { NextButton } from './NextButton.tsx';
-
-export interface SeriesBossStepProps {
-  readonly lesson: Lesson;
-  readonly game: SeriesMiniGame;
-  readonly nextStepIndex: number;
-  readonly session?: BossPlaySession;
-}
+import { Board } from '../../ui/board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
+import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
+import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
+import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
+import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
+import { NextButton } from '../../ui/lesson/NextButton.tsx';
+import { BossResultPanel, useBossRun } from '../boss-run.tsx';
+import type { BossStepProps } from '../mode-ui.ts';
 
 /** Round counter + mistakes-so-far card, shared by a round in progress and the result screen. */
 function SeriesCounters({
@@ -132,54 +111,23 @@ function SeriesRound({
 }
 
 /** A `series` boss mini-game: a fixed sequence of rounds through the normal exercise engine,
- * scored on total mistakes (errors + hint levels) across every round. */
-export function SeriesBossStep({
+ * scored on total mistakes (errors + hint levels) across every round (`MINI_GAME_MODE_UI.series`). */
+export function Step({
   lesson,
   game: minigame,
   nextStepIndex,
   session,
-}: SeriesBossStepProps): JSX.Element {
+}: BossStepProps<'series'>): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const profile = useAppStore((state) => state.profile);
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
-  const refreshProgress = useAppStore((state) => state.refreshProgress);
   const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
 
   const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame));
-  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
-  // exists because "Play again" needs to reset the clock later, which `useState` can't do.
-  const [initialStartedAt] = useState(() => Date.now());
-  const startedAtRef = useRef(initialStartedAt);
-  const savedRef = useRef(false);
-  const [saved, setSaved] = useState(false);
-
-  const result = seriesResult(series);
-  const stars = seriesStars(series);
+  const run = useBossRun(series, { lesson, nextStepIndex, session });
   const goalText = tContent(t, minigame.goalKey);
   const replay = useNarratedText(services.narrator, goalText);
-
-  useEffect(() => {
-    if (result === 'playing' || savedRef.current || !profile) return;
-    savedRef.current = true;
-    const durationMs = Date.now() - startedAtRef.current;
-    const persist = session
-      ? session.save(series, durationMs)
-      : recordBossResult(services.deps, {
-          profileId: profile.id,
-          lesson,
-          state: series,
-          durationMs,
-          nextStep: nextStepIndex,
-        }).then(() => {
-          // Keeps the store's `progress` current: the Complete step reads it straight from the store.
-          void refreshProgress();
-        });
-    void persist.then(() => {
-      setSaved(true);
-    });
-  }, [result, profile, services.deps, lesson, nextStepIndex, series, refreshProgress, session]);
 
   function handleRoundNext(roundState: ExerciseState): void {
     setSeries((current) => completeRound(current, roundState));
@@ -188,9 +136,7 @@ export function SeriesBossStep({
   /** Standalone-only: restarts the series at its first round (a lesson boss never restarts inline). */
   function handlePlayAgain(): void {
     setSeries(startSeries(minigame));
-    startedAtRef.current = Date.now();
-    savedRef.current = false;
-    setSaved(false);
+    run.restart();
   }
 
   return (
@@ -198,7 +144,7 @@ export function SeriesBossStep({
       <h2 className="text-center font-display text-xl text-ink sm:text-3xl">
         {tContent(t, minigame.titleKey)}
       </h2>
-      {result === 'playing' ? (
+      {!run.isOver ? (
         <SeriesRound
           key={series.roundIndex}
           character={lesson.character}
@@ -228,31 +174,16 @@ export function SeriesBossStep({
                 total={minigame.rounds.length}
                 mistakes={series.mistakes}
               />
-              {/* Autosave (recordBossResult, or `session.save` standalone) completes before the
-                  Next/primary button appears. A standalone session also offers "Play again". */}
-              <div className="mt-auto flex flex-col items-center gap-4">
-                <StarsRow earned={stars} animate />
-                {saved &&
-                  (session ? (
-                    <div className="flex w-full gap-3">
-                      <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
-                        {t('play-again')}
-                      </button>
-                      <NextButton
-                        onClick={session.onPrimary}
-                        label={session.primaryLabel}
-                        className="flex-1"
-                      />
-                    </div>
-                  ) : (
-                    <NextButton
-                      onClick={() => {
-                        goToStep(nextStepIndex);
-                      }}
-                      className="w-full"
-                    />
-                  ))}
-              </div>
+              <BossResultPanel
+                stars={run.stars}
+                saved={run.saved}
+                alwaysPlayAgain={false}
+                session={session}
+                onPlayAgain={handlePlayAgain}
+                onNext={() => {
+                  goToStep(nextStepIndex);
+                }}
+              />
             </>
           }
         />

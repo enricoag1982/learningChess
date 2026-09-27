@@ -10,9 +10,9 @@ import {
   versusGameState,
 } from '@chess-kids/core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
+import type { BossPlaySession } from '../modes/mode-ui.ts';
+import { Step as VersusStep } from '../modes/versus/Step.tsx';
 import { animalImage } from './art/animal-images.ts';
-import { VersusStep } from './lesson/VersusStep.tsx';
-import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
 

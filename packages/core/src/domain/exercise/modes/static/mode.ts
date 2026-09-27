@@ -9,6 +9,10 @@ export const staticMode: MiniGameMode<StaticCaptureGameDef, GameState> = {
     return startStaticCaptureGame(def);
   },
 
+  isOver(state) {
+    return gameResult(state) !== 'playing';
+  },
+
   isWin(state) {
     return gameResult(state) === 'won';
   },

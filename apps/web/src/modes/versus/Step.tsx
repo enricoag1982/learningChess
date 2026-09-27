@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, PieceType, Square, VersusMiniGame, VersusState } from '@chess-kids/core';
+import type { PieceType, Square, VersusState } from '@chess-kids/core';
 import {
   bot,
   canTakeBack,
@@ -12,33 +12,27 @@ import {
   kidMoveCount,
   kingSquare,
   playVersusMove,
-  recordBossResult,
   startVersus,
   takeBackVersusMove,
   versusEndReason,
   versusGameState,
   versusPosition,
-  versusStars,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { UndoIcon } from '../../kinds/MoveCountedPlayArea.tsx';
-import { Board } from '../board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
-import { SpeechBubble } from '../ds/SpeechBubble.tsx';
-import { StarsRow } from '../StarsRow.tsx';
-import { useNarratedText } from '../ds/useNarratedText.ts';
-import type { BossPlaySession } from './BossStep.tsx';
-import { SECONDARY_BUTTON } from './button-styles.ts';
-import { GameLayout } from './GameLayout.tsx';
-import { NextButton } from './NextButton.tsx';
+import { Board } from '../../ui/board/Board.tsx';
+import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
+import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
+import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
+import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
+import { SECONDARY_BUTTON } from '../../ui/lesson/button-styles.ts';
+import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
+import { prefersReducedMotion } from '../../ui/useMediaQuery.ts';
+import { BossResultPanel, useBossRun } from '../boss-run.tsx';
+import type { BossStepProps } from '../mode-ui.ts';
 
-export interface VersusStepProps {
-  readonly lesson: Lesson;
-  readonly game: VersusMiniGame;
-  readonly nextStepIndex: number;
-  readonly session?: BossPlaySession;
+export interface VersusStepProps extends BossStepProps<'versus'> {
   /** Fired after every ply with the latest state — for a caller that needs the in-progress game
    * outside `session.save`'s terminal-only call (recording an abandoned game on Leave). */
   readonly onStateChange?: (state: VersusState) => void;
@@ -56,14 +50,6 @@ function readTestSeed(): number | null {
     return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
   } catch {
     return null;
-  }
-}
-
-function prefersReducedMotion(): boolean {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
   }
 }
 
@@ -106,8 +92,9 @@ function dangerSquares(state: VersusState): readonly Square[] {
 }
 
 /** A `versus` boss mini-game: the kid plays their colour against the computer opponent (in a
- * worker), with level-based aids and Owl narrating moves and the result. */
-export function VersusStep({
+ * worker), with level-based aids and Owl narrating moves and the result
+ * (`MINI_GAME_MODE_UI.versus`). */
+export function Step({
   lesson,
   game: minigame,
   nextStepIndex,
@@ -116,10 +103,8 @@ export function VersusStep({
 }: VersusStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const profile = useAppStore((state) => state.profile);
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
-  const refreshProgress = useAppStore((state) => state.refreshProgress);
   const pieceBadges = showPieceBadges(
     pieceStyle,
     isClassicOnlyContext({
@@ -141,12 +126,8 @@ export function VersusStep({
     // Only `versus` should re-trigger this; `onStateChange` may not be memoized by every caller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [versus]);
-  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
-  // exists because "Play again" needs to reset the clock later, which `useState` can't do.
-  const [initialStartedAt] = useState(() => Date.now());
-  const startedAtRef = useRef(initialStartedAt);
-  const savedRef = useRef(false);
-  const [saved, setSaved] = useState(false);
+
+  const run = useBossRun(versus, { lesson, nextStepIndex, session });
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const aids = aidsForLevel(minigame.opponentLevel);
@@ -160,26 +141,6 @@ export function VersusStep({
     },
     [],
   );
-
-  useEffect(() => {
-    if (versus.status === 'playing' || savedRef.current || !profile) return;
-    savedRef.current = true;
-    const durationMs = Date.now() - startedAtRef.current;
-    const persist = session
-      ? session.save(versus, durationMs)
-      : recordBossResult(services.deps, {
-          profileId: profile.id,
-          lesson,
-          state: versus,
-          durationMs,
-          nextStep: nextStepIndex,
-        }).then(() => {
-          void refreshProgress();
-        });
-    void persist.then(() => {
-      setSaved(true);
-    });
-  }, [versus, profile, services.deps, lesson, nextStepIndex, refreshProgress, session]);
 
   function pieceLabel(type: PieceType): string {
     return t(`board.piece.${type}`);
@@ -272,9 +233,7 @@ export function VersusStep({
     setTakeBacksUsed(0);
     setSpokenText(tContent(t, minigame.goalKey));
     setHint(null);
-    startedAtRef.current = Date.now();
-    savedRef.current = false;
-    setSaved(false);
+    run.restart();
     if (timerRef.current !== null) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -293,7 +252,6 @@ export function VersusStep({
   const kidTurn = !thinking && versus.status === 'playing' && isKidTurn(versus);
   const legalMoves = kidTurn ? chessJsRules.legalMoves(position) : [];
   const danger = aids.danger && versus.status === 'playing' ? dangerSquares(versus) : [];
-  const stars = versusStars(versus);
   const moves = kidMoveCount(versus);
   // The checked king's square, whichever side (kid or bot) — `Board`'s check ring applies to any
   // exercise type, and a full game (M3.3) is the first `versus` boss where check is ever possible.
@@ -357,56 +315,22 @@ export function VersusStep({
                 )}
               </div>
             )}
-            {versus.status === 'won' && (
-              <div className="mt-auto flex flex-col items-center gap-4">
-                <StarsRow earned={stars} animate />
-                {saved &&
-                  (session ? (
-                    <div className="flex w-full gap-3">
-                      <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
-                        {t('play-again')}
-                      </button>
-                      <NextButton
-                        onClick={session.onPrimary}
-                        label={session.primaryLabel}
-                        className="flex-1"
-                      />
-                    </div>
-                  ) : (
-                    <NextButton
-                      onClick={() => {
-                        goToStep(nextStepIndex);
-                      }}
-                      className="w-full"
-                    />
-                  ))}
-              </div>
-            )}
-            {(versus.status === 'lost' || versus.status === 'draw') && (
-              <div className="mt-auto flex flex-col items-center gap-4">
-                {versus.status === 'draw' && drawReasonKey && (
-                  <p className="text-center text-base font-bold text-muted">{t(drawReasonKey)}</p>
-                )}
-                <StarsRow earned={stars} animate />
-                {saved && (
-                  <div className="flex w-full gap-3">
-                    <button type="button" onClick={handlePlayAgain} className={SECONDARY_BUTTON}>
-                      {t('play-again')}
-                    </button>
-                    <NextButton
-                      onClick={
-                        session
-                          ? session.onPrimary
-                          : () => {
-                              goToStep(nextStepIndex);
-                            }
-                      }
-                      label={session?.primaryLabel}
-                      className="flex-1"
-                    />
-                  </div>
-                )}
-              </div>
+            {versus.status !== 'playing' && (
+              <BossResultPanel
+                stars={run.stars}
+                saved={run.saved}
+                alwaysPlayAgain={versus.status !== 'won'}
+                note={
+                  versus.status === 'draw' && drawReasonKey ? (
+                    <p className="text-center text-base font-bold text-muted">{t(drawReasonKey)}</p>
+                  ) : undefined
+                }
+                session={session}
+                onPlayAgain={handlePlayAgain}
+                onNext={() => {
+                  goToStep(nextStepIndex);
+                }}
+              />
             )}
           </>
         }

@@ -17,6 +17,8 @@ export interface MiniGameMode<Def, State extends { readonly mode: string; readon
   readonly mode: State['mode'];
   /** Starts a fresh boss/mini-game at its authored content. */
   start(def: Def): State;
+  /** True once play has ended, win or not (the mode's own "not playing any more"). */
+  isOver(state: State): boolean;
   /** True once the mode's own win condition is met. */
   isWin(state: State): boolean;
   /** Stars earned so far; `0` until won/finished. */

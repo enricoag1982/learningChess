@@ -14,20 +14,13 @@ import { useServices } from '../app/store.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';
 import { useInstructionNarration } from '../ui/ds/useNarratedText.ts';
 import { exerciseInstructionText, exerciseNote } from '../ui/lesson/exercise-text.ts';
+import { prefersReducedMotion } from '../ui/useMediaQuery.ts';
 import type { ExerciseUIState, SessionAction } from './kind-ui.ts';
 import { kindUiOf } from './ui-registry.ts';
 
 /** mate-in-n: how long the scripted opponent reply stays hidden before it is shown and narrated. */
 const REPLY_DELAY_MS = 600;
 const REPLY_DELAY_REDUCED_MS = 150;
-
-function prefersReducedMotion(): boolean {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-}
 
 /** Fresh reducer state for a newly-started exercise. `def.lastMove` (the opponent's last move,
  * e.g. the double step before en passant) seeds the last-move highlight from the start. */

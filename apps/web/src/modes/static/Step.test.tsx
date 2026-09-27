@@ -6,7 +6,7 @@ import '../../i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
-import { BossStep } from './BossStep.tsx';
+import { BossStep } from '../ui-registry.ts';
 
 function fixtureBoss(): MiniGame {
   return {

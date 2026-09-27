@@ -6,7 +6,7 @@ import { useInstructionNarration } from './useNarratedText.ts';
 
 // Owner report 2026-09-26: submit re-read the whole instruction before the feedback note, every
 // time. These cover `useInstructionNarration`'s contract directly (the 3 callers' own tests —
-// `lesson/ExerciseStep.test.tsx`, `lesson/SeriesBossStep.test.tsx` — cover it end to end).
+// `lesson/ExerciseStep.test.tsx`, `modes/series/Step.test.tsx` — cover it end to end).
 describe('useInstructionNarration', () => {
   it('speaks the instruction once on mount', async () => {
     const narrator = createFakeNarrator();
