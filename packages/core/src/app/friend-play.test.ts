@@ -5,8 +5,10 @@ import type { VersusMiniGame } from '../domain/lesson.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
-import type { Profile } from '../domain/profile.ts';
-import { seededRandom } from '../domain/random.ts';
+import {
+  makeDeps as buildDeps,
+  makeGameRecordRepo as buildGameRecordRepo,
+} from '../testing/index.ts';
 import {
   friendGameOptions,
   friendGamesPlayed,
@@ -15,114 +17,25 @@ import {
 } from './friend-play.ts';
 import type { Journey } from './journey.ts';
 import type { AppDeps } from './use-cases.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
+import type { GameRecordRepository } from './ports.ts';
 
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
+function makeGameRecordRepo(
+  initial: readonly GameRecord[] = [],
+): GameRecordRepository & { readonly all: readonly GameRecord[] } {
+  const all: GameRecord[] = [...initial];
+  const repo = buildGameRecordRepo(initial);
   return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-function makeClock(iso = '2026-01-01T00:00:00.000Z'): Clock {
-  return { now: () => new Date(iso) };
-}
-
-function makeGameRecordRepo(initial: readonly GameRecord[] = []): GameRecordRepository & {
-  readonly all: readonly GameRecord[];
-} {
-  const records: GameRecord[] = [...initial];
-  return {
+    ...repo,
     add: (record) => {
-      records.push(record);
-      return Promise.resolve();
+      all.push(record);
+      return repo.add(record);
     },
-    listByProfile: (profileId) =>
-      Promise.resolve(records.filter((record) => record.profileId === profileId)),
-    deleteProfileData: (profileId) => {
-      for (let i = records.length - 1; i >= 0; i -= 1) {
-        if (records[i]?.profileId === profileId) records.splice(i, 1);
-      }
-      return Promise.resolve();
-    },
-    get all() {
-      return records;
-    },
+    all,
   };
 }
 
-const stubProgress: ProgressRepository = {
-  listLessons: () => Promise.resolve([]),
-  getLesson: () => Promise.resolve(undefined),
-  saveLesson: () => Promise.resolve(),
-  addAttempt: () => Promise.resolve(),
-  listAttempts: () => Promise.resolve([]),
-  getMiniGame: () => Promise.resolve(undefined),
-  listMiniGames: () => Promise.resolve([]),
-  saveMiniGame: () => Promise.resolve(),
-  getConceptStats: () => Promise.resolve(undefined),
-  listConceptStats: () => Promise.resolve([]),
-  saveConceptStats: () => Promise.resolve(),
-  deleteProfileData: () => Promise.resolve(),
-};
-
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
-function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
-): SettingsRepository {
-  let settings = initial;
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeDeps(gameRecords: GameRecordRepository = makeGameRecordRepo()): AppDeps {
-  return {
-    profiles: {
-      list: () => Promise.resolve<Profile[]>([]),
-      get: () => Promise.resolve(undefined),
-      save: () => Promise.resolve(),
-      delete: () => Promise.resolve(),
-    } satisfies ProfileRepository,
-    progress: stubProgress,
-    gameRecords,
-    clock: makeClock(),
-    ids: makeIds(),
-    content: stubContent,
-    parentLock: {
-      get: () => Promise.resolve(undefined),
-      save: () => Promise.resolve(),
-    } satisfies ParentLockRepository,
-    passwordFile: {
-      write: (password) => Promise.resolve({ location: `fake/${password}.txt` }),
-    } satisfies PasswordFileWriter,
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
-  };
+function makeDeps(gameRecords: GameRecordRepository = buildGameRecordRepo()): AppDeps {
+  return buildDeps({ gameRecords });
 }
 
 describe('recordLocalMatch', () => {

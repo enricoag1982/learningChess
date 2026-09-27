@@ -1,49 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AssessmentResult, AssessmentScope, Unlock } from '../domain/assessment.ts';
+import type { AssessmentScope } from '../domain/assessment.ts';
 import { scorePlacementWorld, scoreTestOut } from '../domain/assessment.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import type { Lesson } from '../domain/lesson.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import { seededRandom } from '../domain/random.ts';
-import type { ConceptStats } from '../domain/review.ts';
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeContentSource,
+  makeDeps as buildDeps,
+  makeAssessmentRepo as buildAssessmentRepo,
+} from '../testing/index.ts';
 import { loadUnlocked, parentUnlock, submitAssessment } from './assessment.ts';
 import { loadJourney } from './journey.ts';
-import type {
-  AppSettings,
-  AssessmentRepository,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
+import type { AssessmentRepository, ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
-
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
-function makeExercise(id: string, concept: string): ExerciseDef {
-  return {
-    id,
-    concept,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
 
 function makeLesson(
   id: string,
@@ -51,26 +22,17 @@ function makeLesson(
   order: number,
   overrides: Partial<Lesson> = {},
 ): Lesson {
-  return {
+  return buildLesson({
     id,
     world,
     order,
     concept: `${id}-concept`,
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
     exercises: [
-      makeExercise(`${id}-01`, `${id}-concept`),
-      makeExercise(`${id}-02`, `${id}-concept`),
+      buildExercise({ id: `${id}-01`, concept: `${id}-concept` }),
+      buildExercise({ id: `${id}-02`, concept: `${id}-concept` }),
     ],
     ...overrides,
-  };
+  });
 }
 
 // w1 (no boss): lessons l1, l2. w2 (has boss "w2-boss"): lesson l3.
@@ -92,138 +54,19 @@ const L3 = makeLesson('l3', 'w2', 1, { boss: 'l3-boss' });
 const LESSONS = [L1, L2, L3];
 
 function makeContent(): ContentSource {
-  return {
-    lessons: () => LESSONS,
-    lesson: (id) => LESSONS.find((lesson) => lesson.id === id),
-    minigames: () => [],
-    minigame: () => undefined,
-    catalog: () => CATALOG,
-  };
-}
-
-function makeProgressRepo(): ProgressRepository {
-  const lessons = new Map<string, LessonProgress>();
-  const attempts: Attempt[] = [];
-  const minigames = new Map<string, MiniGameProgress>();
-  const conceptStats = new Map<string, ConceptStats>();
-  const key = (profileId: string, id: string): string => `${profileId}:${id}`;
-  return {
-    listLessons: (profileId) =>
-      Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
-    getLesson: (profileId, lessonId) => Promise.resolve(lessons.get(key(profileId, lessonId))),
-    saveLesson: (progress) => {
-      lessons.set(key(progress.profileId, progress.lessonId), progress);
-      return Promise.resolve();
-    },
-    addAttempt: (attempt) => {
-      attempts.push(attempt);
-      return Promise.resolve();
-    },
-    listAttempts: (profileId) => Promise.resolve(attempts.filter((a) => a.profileId === profileId)),
-    getMiniGame: (profileId, miniGameId) =>
-      Promise.resolve(minigames.get(key(profileId, miniGameId))),
-    listMiniGames: (profileId) =>
-      Promise.resolve([...minigames.values()].filter((p) => p.profileId === profileId)),
-    saveMiniGame: (progress) => {
-      minigames.set(key(progress.profileId, progress.miniGameId), progress);
-      return Promise.resolve();
-    },
-    getConceptStats: (profileId, conceptId) =>
-      Promise.resolve(conceptStats.get(key(profileId, conceptId))),
-    listConceptStats: (profileId) =>
-      Promise.resolve([...conceptStats.values()].filter((s) => s.profileId === profileId)),
-    saveConceptStats: (stats) => {
-      conceptStats.set(key(stats.profileId, stats.conceptId), stats);
-      return Promise.resolve();
-    },
-    deleteProfileData: () => Promise.resolve(),
-  };
+  return makeContentSource({ lessons: LESSONS, catalog: CATALOG });
 }
 
 function makeAssessmentRepo(): AssessmentRepository {
-  const results: AssessmentResult[] = [];
-  const unlocks: Unlock[] = [];
-  return {
-    addAssessmentResult: (result) => {
-      results.push(result);
-      return Promise.resolve();
-    },
-    listAssessmentResults: (profileId) =>
-      Promise.resolve(results.filter((r) => r.profileId === profileId)),
-    addUnlock: (unlock) => {
-      unlocks.push(unlock);
-      return Promise.resolve();
-    },
-    listUnlocks: (profileId) => Promise.resolve(unlocks.filter((u) => u.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeGameRecordRepo(): GameRecordRepository {
-  return {
-    add: () => Promise.resolve(),
-    listByProfile: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeProfileRepo(): ProfileRepository {
-  return {
-    list: () => Promise.resolve([]),
-    get: () => Promise.resolve(undefined),
-    save: () => Promise.resolve(),
-    delete: () => Promise.resolve(),
-  };
-}
-
-function makeParentLockRepo(): ParentLockRepository {
-  return { get: () => Promise.resolve(undefined), save: () => Promise.resolve() };
-}
-
-function makePasswordFileWriter(): PasswordFileWriter {
-  return { write: () => Promise.resolve({ location: 'fake.txt' }) };
-}
-
-function makeSettingsRepo(): SettingsRepository {
-  let settings: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} };
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeClock(iso: string): Clock {
-  return { now: () => new Date(iso) };
-}
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
+  return buildAssessmentRepo();
 }
 
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
+  return buildDeps({
     assessment: makeAssessmentRepo(),
-    clock: makeClock('2026-01-01T00:00:00.000Z'),
-    ids: makeIds(),
     content: makeContent(),
-    parentLock: makeParentLockRepo(),
-    passwordFile: makePasswordFileWriter(),
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
     ...overrides,
-  };
+  });
 }
 
 describe('submitAssessment', () => {

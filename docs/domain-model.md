@@ -72,17 +72,17 @@ Character 1─1 piece type
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
 | ParentLock | `password` (the parent code; plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
-| Settings (`ProfileSettings`, M5.1) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60 — stored M5.1, enforced live from M5.2; "every day / school days" once M7.1's weekend toggle is on), `weekendLimitMinutes?` (M7.1: absent = same as `dailyLimitMinutes`; same options, Sat/Sun device-local), `playUntil?`/`playFrom?` (M7.1: `'HH:MM'` local or `null`/absent = that edge off; `playUntil` options 18:00–21:00 every 30 min, `playFrom` 07:00/08:00/09:00), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'` — stored, applied from M5.3), `updatedAt?` (M7.2, ISO instant, set by every `updateProfileSettings` call — device-sharing merge's "newest wins", §3.5). No `aids` overrides in v1 (dropped from the earlier placeholder here — `BotLevel.aids` is per-level, not per-profile) |
-| LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`), `skippedPhases?` (playtest 2: `('story'\|'demo'\|'try')[]`, absent = none; set on a "Skip" tap, a phase removed once later played through normally — e.g. a replay) |
+| Settings (`ProfileSettings`) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60), `weekendLimitMinutes?` (absent = same as `dailyLimitMinutes`; Sat/Sun device-local), `playUntil?`/`playFrom?` (`'HH:MM'` local or `null`/absent = that edge off; `playUntil` options 18:00–21:00 every 30 min, `playFrom` 07:00/08:00/09:00), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'`), `updatedAt?` (ISO instant, set by every `updateProfileSettings` call — device-sharing merge's "newest wins", §3.5). No `aids` overrides in v1 — `BotLevel.aids` is per-level, not per-profile |
+| LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`), `skippedPhases?` (`('story'\|'demo'\|'try')[]`, absent = none; set on a "Skip" tap, a phase removed once later played through normally — e.g. a replay) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
-| Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (M4.4, only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
-| Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` — **not stored in v1** (M4.3 decision log): only the `GameRecord`s below are saved; `MatchService` stays a hook for v2 online play |
-| GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend, same device, M4.3), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
+| Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
+| Match | `id`, `mode` (`local` / `online`), `game` (`full` or mini-game id), `players[]` (profile id or guest + colour), `moves[]` (SAN), `status`, `result` — **not stored in v1**: only the `GameRecord`s below are saved; `MatchService` stays a hook for v2 online play |
+| GameRecord | `id`, `profileId`, `game` (`full` or `versus` mini-game id — `first-game`, World 4's own full-game boss, also maps to `full`), `opponent` (`computer:<level>` vs the computer; `profile:<id>` / `guest` vs a friend, same device), `result` (`win` / `loss` / `draw` / `abandoned`), `reason` (draw reason, `checkmate`, or `left`), `moves[]` (SAN), `createdAt` |
 | Badge (`EarnedBadge` in code — `Badge` is `BadgeDef`'s catalogue entry) | `badgeId`, `tier`, `at`, `seen`; one row per tier reached, so a tiered badge gets up to 3 |
-| AssessmentResult (M4.5) | `id`, `profileId`, `kind` (`test-out` / `placement`), `scope`, `correct`, `total`, `passed`, `at` — one row per taken test-out/placement run, pass or fail (§3.2) |
-| Unlock (M4.5) | `id`, `profileId`, `targetType` (`lesson` / `world`), `targetId`, `via` (`test-out` / `placement` / `parent`), `at` — feeds `journey.ts`'s `unlocked` id set (§3.2) |
+| AssessmentResult | `id`, `profileId`, `kind` (`test-out` / `placement`), `scope`, `correct`, `total`, `passed`, `at` — one row per taken test-out/placement run, pass or fail (§3.2) |
+| Unlock | `id`, `profileId`, `targetType` (`lesson` / `world`), `targetId`, `via` (`test-out` / `placement` / `parent`), `at` — feeds `journey.ts`'s `unlocked` id set (§3.2) |
 | Streak | `current`, `best`, `lastDay` (local day, device time zone), `skipsUsedThisWeek` (tracked per ISO week of the day the skip is used, not the missed day) |
-| SessionLog | `date`, `minutes`; one row per profile + local day *per device* (M7.2, §3.5 — was one row per profile + day before device sharing), minutes summed across sessions on that device; `deviceId?` (M7.2, absent = a pre-M7.2 row, read as this device's own) — which device wrote this row, so an imported foreign row for the same profile + day sits alongside this device's own instead of overwriting it; `extraMinutes` (M5.2, absent = 0) — parent "more time" grants for that day, on top of the daily limit; `hoursOverrideUntil?` (M7.1, ISO instant) — parent "more time" for a late/early allowed-hours gate, allowed until this instant, reset (not summed) each grant; `warnedAt?` (M7.1, ISO instant) — the 5-minute warning already shown today. `extraMinutes`/`hoursOverrideUntil`/`warnedAt` are always read/written on *this device's own* row only (never merged in from another device); the daily limit, the parent report, and the 5-minute warning's own "minutes used" instead read the **sum** of every device's row for that profile + day (`totalMinutesForDate`) |
+| SessionLog | `date`, `minutes`; one row per profile + local day *per device*, minutes summed across sessions on that device; `deviceId?` (absent = this device's own) — which device wrote this row, so an imported foreign row for the same profile + day sits alongside this device's own instead of overwriting it; `extraMinutes` (absent = 0) — parent "more time" grants for that day, on top of the daily limit; `hoursOverrideUntil?` (ISO instant) — parent "more time" for a late/early allowed-hours gate, allowed until this instant, reset (not summed) each grant; `warnedAt?` (ISO instant) — the 5-minute warning already shown today. `extraMinutes`/`hoursOverrideUntil`/`warnedAt` are always read/written on *this device's own* row only (never merged in from another device); the daily limit, the parent report, and the 5-minute warning's own "minutes used" instead read the **sum** of every device's row for that profile + day (`totalMinutesForDate`) |
 | TimeEntry (v2) | `start`, `end`, `activity` (`lesson` / `practice` / `play`) |
 | TimePolicy (v2) | `perWeekday` (minutes), `allowedHours`, `playLimit`, `learnLimit` |
 | TimeException (v2) | `date`, `extraMinutes` or policy override, `note` |
@@ -90,13 +90,13 @@ Character 1─1 piece type
 - All stored records: UUID `id`, `createdAt`, `updatedAt` (sync-ready).
 - Derived, not stored: total stars, rank, world status, weak concepts.
 
-**Backup file (M5.1)**: `{ app: 'chess-kids', schemaVersion, exportedAt, profiles[], data }` — `data` is keyed by profile id, each entry holding that profile's own `settings`, `lessonProgress[]`, `attempts[]`, `miniGameProgress[]`, `conceptStats[]`, `gameRecords[]`, `earnedBadges[]`, `streak?`, `sessionLogs[]`, `assessmentResults[]`, `unlocks[]` — every entity above except `Account`/`ParentLock` (never exported) and the device-only `lastProfileId`/`suggestedLevels`/`storagePersisted`/`deviceId`. "Export" (every profile), "export this child" (`data`/`profiles` filtered to one id), and "Send to other device" (M7.2, same JSON, a different filename — §3.5) are the same format. Import (M7.2): always **merges** this file into the device's own data (replace-everything is gone, §3.5) — never the parent password, and the device-only `AppSettings` fields above are carried through unchanged, not blanked.
+**Backup file**: `{ app: 'chess-kids', schemaVersion, exportedAt, profiles[], data }` — `data` is keyed by profile id, each entry holding that profile's own `settings`, `lessonProgress[]`, `attempts[]`, `miniGameProgress[]`, `conceptStats[]`, `gameRecords[]`, `earnedBadges[]`, `streak?`, `sessionLogs[]`, `assessmentResults[]`, `unlocks[]` — every entity above except `Account`/`ParentLock` (never exported) and the device-only `lastProfileId`/`suggestedLevels`/`storagePersisted`/`deviceId`. "Export" (every profile), "export this child" (`data`/`profiles` filtered to one id), and "Send to other device" (same JSON, a different filename — §3.5) are the same format. Import always **merges** this file into the device's own data — never the parent password, and the device-only `AppSettings` fields above are carried through unchanged, not blanked.
 
-### 3.5 Device sharing (M7.2)
+### 3.5 Device sharing
 
-A parent shares a backup file between two devices the same child plays on (`docs/app-structure.md` §13 "Across devices"); import always merges — nothing either device did is lost, and importing the same file twice changes nothing (`mergeProfileData` is idempotent). `AppSettings.deviceId` (random, lazily created on first local session-log write or export) identifies this device's own data across a share.
+A parent shares a backup file between two devices the same child plays on (`docs/app-structure.md` §13); import always merges — nothing either device did is lost, and importing the same file twice changes nothing (`mergeProfileData` is idempotent). `AppSettings.deviceId` (random, lazily created) identifies this device's own data across a share.
 
-**Profile matching** — per incoming child: same profile id as a local one → merges into it, no question. Else the import preview offers a choice, defaulting to "Merge into ‹local child›" when the nickname matches a local child (case-insensitive, trimmed), else "Add as new child"; the parent can override either way. A "Merge into a different local child" choice re-keys every one of that incoming child's records to the chosen local profile id first (record ids, e.g. `LessonProgress.id`, are left as-is — independently random per device, never colliding). Local nickname/avatar are always kept.
+**Profile matching** — same profile id as a local child → merges into it, no question. Else the import preview offers a choice, defaulting to "Merge into ‹local child›" on a nickname match (case-insensitive, trimmed) else "Add as new child"; the parent can override. Merging into a different local child re-keys that incoming child's records to the chosen local profile id (record ids themselves are left as-is — independently random per device, never colliding). Local nickname/avatar are always kept.
 
 **Merge rules**, local vs. incoming, applied per matched profile:
 
@@ -134,8 +134,8 @@ A parent shares a backup file between two devices the same child plays on (`docs
 | Weak concept | Accuracy < 60% |
 | Easier variant | Scored exercise, unsolved, ≥ 2 errors, `easier` set → variant offered (§3.4) |
 | Rank | Highest rank whose `after` is mastered |
-| Full game vs computer | Available after World 4 mastered (Mouse); Rabbit after 3 full-game wins vs Mouse (`GameRecord`s, `opponent: computer:1`, `game: 'full'`) — Fox/Wolf/Bear locked with their own condition until M4. Kid plays White (M3); colour choice is M4 |
-| Game record | Every full game and `versus` mini-game (standalone, a lesson's boss, or vs Friend, M4.3) saves a `GameRecord` — one per profile involved for vs Friend, none for a guest; leaving mid-game ("Stop game?" confirm) saves it `abandoned`, never a loss |
+| Full game vs computer | Available after World 4 mastered (Mouse); every level above unlocks per `computer-opponent.md` §3 (3 full-game wins vs the level below, or a direct win at that level). Kid always plays White (no colour choice) |
+| Game record | Every full game and `versus` mini-game (standalone, a lesson's boss, or vs Friend) saves a `GameRecord` — one per profile involved for vs Friend, none for a guest; leaving mid-game ("Stop game?" confirm) saves it `abandoned`, never a loss |
 | Next step (Home "Today" / Journey highlight) | Next available lesson; once a world's lessons are all done and its world boss is available but unwon, the world boss |
 
 ### 3.1 Review scheduler (Leitner)
@@ -148,7 +148,7 @@ A parent shares a backup file between two devices the same child plays on (`docs
 - Task source (`conceptPool`): a concept's scored exercises across every lesson that teaches it (not only the one that first taught it), never a guided try or a variant; picked via the seeded `Random` port, avoiding `lastExerciseId` when another candidate exists.
 - Review tasks are scored for stats but never change a lesson's own `bestStars` (`recordReviewResult` logs a `review: true` `Attempt` against the task's own lesson id, separate from `recordExerciseResult`).
 
-### 3.2 Assessments (M4.5)
+### 3.2 Assessments
 
 | Kind | Trigger | Content | Pass | Effect |
 |---|---|---|---|---|
@@ -158,11 +158,11 @@ A parent shares a backup file between two devices the same child plays on (`docs
 
 Failing test-out or placement: no penalty, nothing lost — Owl encourages, back to the path; the failed run is still recorded (below).
 
-Every run (pass or fail) and every parent unlock records one `AssessmentResult`: `id`, `profileId`, `kind` (`'test-out'` / `'placement'`), `scope` (`{type: 'lesson', lessonId, worldId}` or `{type: 'world', worldId}`), `correct`, `total`, `passed`, `at` — for the parent report (M5). A pass or a parent unlock also runs `checkRewards` once, so a newly-mastered world's milestone badge fires immediately (same choke point as every other activity, `app/rewards.ts`).
+Every run (pass or fail) and every parent unlock records one `AssessmentResult`: `id`, `profileId`, `kind` (`'test-out'` / `'placement'`), `scope` (`{type: 'lesson', lessonId, worldId}` or `{type: 'world', worldId}`), `correct`, `total`, `passed`, `at` — for the parent report. A pass or a parent unlock also runs `checkRewards` once, so a newly-mastered world's milestone badge fires immediately (same choke point as every other activity, `app/rewards.ts`).
 
 A world mastered via test-out/placement, whose boss is later won directly (Journey or Play), is unaffected — `MiniGameProgress.wins` still increments normally; `masteredVia` only ever short-circuits `lessonStatus()`, never a `MiniGameProgress`.
 
-Not in M4.5 (future): a "world test" (mixed tasks from every concept of an already-in-progress world, an optional part of normal world mastery rather than a kid-initiated skip-ahead) — a distinct idea from test-out, not built here.
+Not built (future idea): a "world test" (mixed tasks from every concept of an already-in-progress world, an optional part of normal world mastery rather than a kid-initiated skip-ahead) — distinct from test-out.
 
 ### 3.3 Session
 - Order: warm-up (if any concept is due; else skipped) → the Journey's next step (a lesson, resumed if in progress, or a pending world boss — same as `nextStep`, §3 table) → one mini-game → session summary (stars earned this session, new animal friends / rank, Owl's closing line) → Home.
@@ -170,7 +170,7 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 - Home's **Start today** shows whenever the Journey has a next step (lesson or world boss) or any concept is due; hidden only once both are exhausted (a mini-game-only remainder with nothing else due is not offered from Home — a known gap, tracked for a later milestone).
 - The kid can leave any time: closing mid-activity (warm-up, lesson, mini-game) abandons the whole session straight to Home, without a summary; finishing an activity normally advances to the next one; the summary's "Done" is the only way out of it.
 - After Basics: next lesson from the least advanced track.
-- Time limit checked between activities only; never interrupts an exercise (M5.2): the activity gate
+- Time limit checked between activities only; never interrupts an exercise: the activity gate
   (`checkActivityGate`, `app/time-limit.ts`) runs on entering a lesson / warm-up / practice run /
   game / mini-game, and on returning to Home — an activity already open always finishes. Over the
   limit → "See you tomorrow" screen (Owl, spoken, today's stars) instead of the activity/Home the
@@ -191,7 +191,7 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 | Content | Lesson `variants[]`: same exercise schema; not stepped, not scored, not in exercise counts, completion or mastery. `easier` only on scored exercises, must name a variant of the same lesson; variants have no `easier`; every variant referenced (build fails otherwise) |
 | Trigger | Scored exercise, unsolved, `errors` ≥ 2 (illegal / wrong moves, wrong answers, selections, placements; hints not counted). Guided tries: never |
 | Offer | Owl note on the error: "This one is tricky. Want an easier one?" + button **Easier one** (next to "Say it again"). Not forced: kid may keep trying the original (normal stars) |
-| Swap | Same lesson step (stage dots unchanged); failed original logged as `Attempt` (`scored`, `correct: false`) → review scheduler (`m3.4`) puts the concept in box 1 (= "concept added to review"); no separate queue |
+| Swap | Same lesson step (stage dots unchanged); failed original logged as `Attempt` (`scored`, `correct: false`) → review scheduler (§3.1) puts the concept in box 1 (= "concept added to review"); no separate queue |
 | Result | Variant solved → original exercise credited 1 star (= "completed"); variant `Attempt` logged with `scored: false`. Replaying the lesson can raise the stars |
 | Resume | App closed mid-variant → resumes at the original exercise |
 
@@ -199,35 +199,35 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 
 | Area | Use cases |
 |---|---|
-| Profiles | `createProfile`, `selectProfile`, `renameProfile`, `changeAvatar`, `deleteProfile`, `resetProfileData` (M5.1: cascades progress/attempts/concept stats/mini-game progress/game records/rewards, keeps the profile itself) |
-| Settings (M5.1, `app/settings.ts`) | `getProfileSettings` (merged over `DEFAULT_PROFILE_SETTINGS`), `updateProfileSettings` (validates, merges a patch, persists) |
-| Report (M5.1, `app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report, gains `dailyLimitMinutes` in M5.2 for the minutes-per-day chart's limit line, `weekendLimitMinutes`/`playUntil`/`playFrom` in M7.1 for its "active rules" line); `minutesByDay` (`app/rewards.ts`) backs both |
-| Time limit (M5.2, M7.1; `app/time-limit.ts`) | `checkActivityGate` (reads settings + today's `SessionLog`, reports `overLimit`/`usedMinutes`/`limitMinutes`/`extraMinutes`, plus M7.1's `reason` (`'limit'`\|`'late'`\|`'early'`\|`null`, hours checked before the daily limit) and `remainingMinutes`), `grantExtraTime` (parent "more time" for a limit gate: +`EXTRA_TIME_GRANT_MINUTES` today, repeatable), `grantHoursOverride` (M7.1, parent "more time" for a late/early gate: allowed `HOURS_OVERRIDE_MINUTES` from now, resets not sums), `markTimeWarning` (M7.1: persists `SessionLog.warnedAt`); domain (`domain/session-log.ts`): `limitForDay` (M7.1 weekday/weekend), `timeUsedToday`, `isOverLimit`, `grantExtraMinutes`, `setHoursOverride`, `markWarned`; domain (`domain/time-policy.ts`, M7.1): `allowedHoursReason`/`isWithinAllowedHours`, `minutesUntilEnd`, `shouldWarn` (all pure, clock-driven); `starsToday` (`app/rewards.ts`) backs the "See you tomorrow" screen's own stars line |
-| Backup (M5.1, `app/backup.ts`) | `buildBackupFile`/`exportBackup` (one profile or every profile), `parseBackupFile`/`backupSummary` (validate + preview), `buildShareFile`/`shareFileName` (M7.2, "Send to other device" — same JSON, a different filename, returned instead of written) |
-| Device sharing (M7.2, `app/merge.ts`, behind `@chess-kids/core/merge`; pure rules in `domain/merge.ts`) | `planImport` (per-child auto-merge/choice + default), `previewChildChange` (a choice's own stars/badges/minutes-this-week delta), `importMerged` (validates nothing further — the file is already `parseBackupFile`-checked — folds the chosen children into this device's full current data and writes it atomically via `BackupImporter.writeMerged`); `getOrCreateDeviceId` (`app/device.ts`) |
-| Assessment (M4.5) | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
-| Session (M3.4) | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
+| Profiles | `createProfile`, `selectProfile`, `renameProfile`, `changeAvatar`, `deleteProfile`, `resetProfileData` (cascades progress/attempts/concept stats/mini-game progress/game records/rewards, keeps the profile itself) |
+| Settings (`app/settings.ts`) | `getProfileSettings` (merged over `DEFAULT_PROFILE_SETTINGS`), `updateProfileSettings` (validates, merges a patch, persists) |
+| Report (`app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report incl. the minutes-per-day chart's limit line and the active time-controls rules); `minutesByDay` (`app/rewards.ts`) backs both |
+| Time limit (`app/time-limit.ts`) | `checkActivityGate` (reads settings + today's `SessionLog`, reports `overLimit`/`usedMinutes`/`limitMinutes`/`extraMinutes`/`reason` (`'limit'`\|`'late'`\|`'early'`\|`null`)/`remainingMinutes`), `grantExtraTime` (+`EXTRA_TIME_GRANT_MINUTES`, repeatable), `grantHoursOverride` (allows `HOURS_OVERRIDE_MINUTES` from now, resets not sums), `markTimeWarning`; domain (`domain/session-log.ts`, `domain/time-policy.ts`): `limitForDay`, `timeUsedToday`, `isOverLimit`, `grantExtraMinutes`, `setHoursOverride`, `markWarned`, `allowedHoursReason`/`isWithinAllowedHours`, `minutesUntilEnd`, `shouldWarn` (all pure, clock-driven); `starsToday` (`app/rewards.ts`) backs the "See you tomorrow" screen |
+| Backup (`app/backup.ts`) | `buildBackupFile`/`exportBackup` (one profile or every profile), `parseBackupFile`/`backupSummary` (validate + preview), `buildShareFile`/`shareFileName` ("Send to other device" — same JSON, a different filename, returned instead of written) |
+| Device sharing (`app/merge.ts`, behind `@chess-kids/core/merge`; pure rules in `domain/merge.ts`) | `planImport` (per-child auto-merge/choice + default), `previewChildChange` (a choice's own stars/badges/minutes-this-week delta), `importMerged` (folds the chosen children into this device's full current data, writes atomically via `BackupImporter.writeMerged`); `getOrCreateDeviceId` (`app/device.ts`) |
+| Assessment | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
+| Session | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
-| Full game (M3.5) | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
-| Friend play (M4.3) | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
-| Rewards (M4.4) | `checkRewards` (the one call every activity choke point makes: folds today into the streak, then evaluates + persists new badges — permissive no-op without `AppDeps.rewards`/`ContentSource.catalog()`); `evaluateAndRecordBadges`, `buildBadgeFacts`, `recordDailyActivity`, `recordSessionMinutes` (its own building blocks, `app/rewards.ts`) |
+| Full game | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
+| Friend play | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
+| Rewards | `checkRewards` (the one call every activity choke point makes: folds today into the streak, then evaluates + persists new badges — permissive no-op without `AppDeps.rewards`/`ContentSource.catalog()`); `evaluateAndRecordBadges`, `buildBadgeFacts`, `recordDailyActivity`, `recordSessionMinutes` (`app/rewards.ts`) |
 
 ## 5. Ports
 
 | Port | Purpose |
 |---|---|
-| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`); `SettingsRepository`'s `AppSettings` also carries `profileSettings` (M5.1, keyed by profile id) alongside the pre-existing `lastProfileId`/`suggestedLevels` |
-| `GameRecordRepository` (M3.5) | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
-| `RewardsRepository` (M4.4, gains `listSessionLogs` in M5.1) | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`/`listSessionLogs`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` (backward-compatible with every pre-M4.4 test fixture) |
-| `AssessmentRepository` (M4.5) | Persistence of `AssessmentResult`/`Unlock` (`addAssessmentResult`/`listAssessmentResults`, `addUnlock`/`listUnlocks`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps`, same backward-compatible pattern as `RewardsRepository` |
-| `BackupFileWriter` / `BackupImporter` (M5.1; `BackupImporter.writeMerged` added M7.2) | Backup export's file destination (web: downloads it, mirrors `PasswordFileWriter`) / import's atomic write — `replaceAll` (legacy, kept for its own tests) and `writeMerged` (M7.2, the only one the app calls now: writes this device's *entire* dataset after `app/merge.ts` has folded the chosen children in, keying session-log rows by device so a foreign one never overwrites this device's own, and carrying `lastProfileId`/`suggestedLevels`/`storagePersisted`/`deviceId` through unchanged instead of blanking them); never the parent password; web: stages the full write, then swaps it in — both optional on `AppDeps`, same backward-compatible pattern |
+| `ProfileRepository`, `ProgressRepository`, `SettingsRepository` | Persistence (async); `ProgressRepository` also holds `ConceptStats` (`getConceptStats`/`listConceptStats`/`saveConceptStats`); `SettingsRepository`'s `AppSettings` also carries `profileSettings` (keyed by profile id) alongside `lastProfileId`/`suggestedLevels` |
+| `GameRecordRepository` | Persistence of `GameRecord` (`add`/`listByProfile`/`deleteProfileData`), separate from `ProgressRepository` |
+| `RewardsRepository` | Persistence of `EarnedBadge`/`Streak`/`SessionLog` (`addEarnedBadge`/`listEarnedBadges`/`saveEarnedBadge`, `getStreak`/`saveStreak`, `getSessionLog`/`saveSessionLog`/`listSessionLogs`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` |
+| `AssessmentRepository` | Persistence of `AssessmentResult`/`Unlock` (`addAssessmentResult`/`listAssessmentResults`, `addUnlock`/`listUnlocks`, `deleteProfileData`), separate from `ProgressRepository`; optional on `AppDeps` |
+| `BackupFileWriter` / `BackupImporter` | Backup export's file destination (web: downloads it, mirrors `PasswordFileWriter`) / import's atomic write — `writeMerged` (the one the app calls: writes this device's entire dataset after `app/merge.ts` has folded the chosen children in, keying session-log rows by device so a foreign one never overwrites this device's own, carrying device-only settings through unchanged) and `replaceAll` (legacy, kept for its own tests); never the parent password; web: stages the full write, then swaps it in; both optional on `AppDeps` |
 | `ContentSource` | Loads compiled content |
 | `Narrator` | Speaks text keys |
 | `Clock` | Current time (deterministic tests for scheduler) |
 | `Random` | Seeded randomness (deterministic tests for bot, task picking) |
 | `AuthService` | v1 guest; parent login parked (later, maybe) |
-| `SyncService` | v1 no-op; v2 (M7.2) file-share merge is `app/merge.ts` directly, no port of its own; this hook stays for the later family-code sync (same merge rules, §3.5) |
+| `SyncService` | v1 no-op; the file-share merge (§3.5) is `app/merge.ts` directly, no port of its own; this hook stays for a later family-code sync (same merge rules) |
 | `MatchService` | v1 local matches; online parked (later, maybe) |
 | `FeatureFlags` | `login`, `online` (false in v1) |
 
@@ -237,7 +237,7 @@ Not in M4.5 (future): a "world test" (mixed tasks from every concept of an alrea
 packages/content/
   tracks.yaml                  tracks, worlds, habitats, ranks
   characters.yaml
-  bot-levels.yaml              computer opponent levels
+  bot-book.yaml                opening book (computer-opponent.md §2); bot levels are TS, not content
   badges.yaml                  badge catalogue
   lessons/<world>/<lesson>.yaml
   minigames/<id>.yaml

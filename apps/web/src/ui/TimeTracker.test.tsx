@@ -24,9 +24,16 @@ async function loggedMinutes(
   return log?.minutes ?? 0;
 }
 
+// Fixed local noon: the tests advance several minutes and read today's log, which would roll over
+// into tomorrow's (empty) row if the real clock were a few minutes before midnight.
+function useFakeTimersAtNoon(): void {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(2026, 0, 15, 12, 0, 0));
+}
+
 describe('TimeTracker (M5.2)', () => {
   it('adds one minute to the session log every real minute while visible and active', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -40,7 +47,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('pauses while the page is hidden', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -52,7 +59,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('pauses once idle for more than 2 minutes without input', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -67,7 +74,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('a tap resets the idle clock, resuming ticks', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -80,7 +87,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('does not track a parent-gate screen (password/parent area)', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -92,7 +99,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('keeps counting across screen changes shorter than a minute', async () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const { store } = await renderWithStore(<TimeTracker />, services);
     const profileId = store.getState().profile?.id;
@@ -107,7 +114,7 @@ describe('TimeTracker (M5.2)', () => {
   });
 
   it('renders nothing and does no-op without a selected profile', () => {
-    vi.useFakeTimers();
+    useFakeTimersAtNoon();
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     const store = createAppStore(services);
     const { container } = render(

@@ -1,57 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
-import { seededRandom } from '../domain/random.ts';
+import { makeDeps as buildDeps, makeSettingsRepo } from '../testing/index.ts';
 import { getProfileSettings, updateProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
-import type {
-  AppSettings,
-  ContentSource,
-  GameRecordRepository,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
-
-function makeSettingsRepo(initial: AppSettings): SettingsRepository {
-  let settings = initial;
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
+import type { AppSettings } from './ports.ts';
 
 function makeDeps(initialSettings: AppSettings): AppDeps {
-  const profiles: ProfileRepository = {
-    list: () => Promise.resolve([]),
-    get: () => Promise.resolve(undefined),
-    save: () => Promise.resolve(),
-    delete: () => Promise.resolve(),
-  };
-  return {
-    profiles,
-    progress: {} as unknown as ProgressRepository,
-    gameRecords: {} as unknown as GameRecordRepository,
-    clock: { now: () => new Date('2026-01-01T00:00:00.000Z') },
-    ids: { next: () => 'id-1' },
-    content: stubContent,
-    parentLock: {} as unknown as ParentLockRepository,
-    passwordFile: {} as unknown as PasswordFileWriter,
-    settings: makeSettingsRepo(initialSettings),
-    random: seededRandom(1),
-  };
+  return buildDeps({ settings: makeSettingsRepo(initialSettings) });
 }
 
 const EMPTY_SETTINGS: AppSettings = {

@@ -1,0 +1,335 @@
+[
+ {
+  "id": "board-explorer",
+  "category": "milestone",
+  "nameKey": "rewards:badges.board-explorer.name",
+  "conditionKey": "rewards:badges.board-explorer.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:board"
+  }
+ },
+ {
+  "id": "piece-master",
+  "category": "milestone",
+  "nameKey": "rewards:badges.piece-master.name",
+  "conditionKey": "rewards:badges.piece-master.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:pieces"
+  }
+ },
+ {
+  "id": "guardian",
+  "category": "milestone",
+  "nameKey": "rewards:badges.guardian.name",
+  "conditionKey": "rewards:badges.guardian.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:attack"
+  }
+ },
+ {
+  "id": "checkmate-champion",
+  "category": "milestone",
+  "nameKey": "rewards:badges.checkmate-champion.name",
+  "conditionKey": "rewards:badges.checkmate-champion.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:check"
+  }
+ },
+ {
+  "id": "rule-master",
+  "category": "milestone",
+  "nameKey": "rewards:badges.rule-master.name",
+  "conditionKey": "rewards:badges.rule-master.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:rules"
+  }
+ },
+ {
+  "id": "basics-graduate",
+  "category": "milestone",
+  "nameKey": "rewards:badges.basics-graduate.name",
+  "conditionKey": "rewards:badges.basics-graduate.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "track:basics"
+  }
+ },
+ {
+  "id": "perfect-lesson",
+  "category": "skill",
+  "nameKey": "rewards:badges.perfect-lesson.name",
+  "conditionKey": "rewards:badges.perfect-lesson.condition",
+  "condition": {
+   "type": "perfect-lessons",
+   "thresholds": [
+    1,
+    5,
+    15
+   ]
+  }
+ },
+ {
+  "id": "star-collector",
+  "category": "skill",
+  "nameKey": "rewards:badges.star-collector.name",
+  "conditionKey": "rewards:badges.star-collector.condition",
+  "condition": {
+   "type": "stars-total",
+   "thresholds": [
+    50,
+    150,
+    400
+   ]
+  }
+ },
+ {
+  "id": "sharp-eyes",
+  "category": "skill",
+  "nameKey": "rewards:badges.sharp-eyes.name",
+  "conditionKey": "rewards:badges.sharp-eyes.condition",
+  "condition": {
+   "type": "concept-correct",
+   "thresholds": [
+    10
+   ],
+   "concept": "hanging-piece",
+   "inARow": true
+  }
+ },
+ {
+  "id": "escape-artist",
+  "category": "skill",
+  "nameKey": "rewards:badges.escape-artist.name",
+  "conditionKey": "rewards:badges.escape-artist.condition",
+  "condition": {
+   "type": "concept-correct",
+   "thresholds": [
+    10
+   ],
+   "concept": "check-escape",
+   "noHints": true
+  }
+ },
+ {
+  "id": "mate-master",
+  "category": "skill",
+  "nameKey": "rewards:badges.mate-master.name",
+  "conditionKey": "rewards:badges.mate-master.condition",
+  "condition": {
+   "type": "concept-correct",
+   "thresholds": [
+    10,
+    25,
+    50
+   ],
+   "concept": "mate-in-1"
+  }
+ },
+ {
+  "id": "butterfly-maker",
+  "category": "skill",
+  "nameKey": "rewards:badges.butterfly-maker.name",
+  "conditionKey": "rewards:badges.butterfly-maker.condition",
+  "condition": {
+   "type": "game-event",
+   "thresholds": [
+    10
+   ],
+   "event": "promotion"
+  }
+ },
+ {
+  "id": "castle-builder",
+  "category": "skill",
+  "nameKey": "rewards:badges.castle-builder.name",
+  "conditionKey": "rewards:badges.castle-builder.condition",
+  "condition": {
+   "type": "game-event",
+   "thresholds": [
+    5
+   ],
+   "event": "castling"
+  }
+ },
+ {
+  "id": "first-win",
+  "category": "play",
+  "nameKey": "rewards:badges.first-win.name",
+  "conditionKey": "rewards:badges.first-win.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "any"
+  }
+ },
+ {
+  "id": "mouse-tamer",
+  "category": "play",
+  "nameKey": "rewards:badges.mouse-tamer.name",
+  "conditionKey": "rewards:badges.mouse-tamer.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "computer:1"
+  }
+ },
+ {
+  "id": "rabbit-catcher",
+  "category": "play",
+  "nameKey": "rewards:badges.rabbit-catcher.name",
+  "conditionKey": "rewards:badges.rabbit-catcher.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "computer:2"
+  }
+ },
+ {
+  "id": "fox-outsmarter",
+  "category": "play",
+  "nameKey": "rewards:badges.fox-outsmarter.name",
+  "conditionKey": "rewards:badges.fox-outsmarter.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "computer:3"
+  }
+ },
+ {
+  "id": "wolf-tamer",
+  "category": "play",
+  "nameKey": "rewards:badges.wolf-tamer.name",
+  "conditionKey": "rewards:badges.wolf-tamer.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "computer:4"
+  }
+ },
+ {
+  "id": "bear-buddy",
+  "category": "play",
+  "nameKey": "rewards:badges.bear-buddy.name",
+  "conditionKey": "rewards:badges.bear-buddy.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "opponent": "computer:5"
+  }
+ },
+ {
+  "id": "queen-keeper",
+  "category": "play",
+  "nameKey": "rewards:badges.queen-keeper.name",
+  "conditionKey": "rewards:badges.queen-keeper.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    1
+   ],
+   "extra": "queen-kept"
+  }
+ },
+ {
+  "id": "pawn-wars-winner",
+  "category": "play",
+  "nameKey": "rewards:badges.pawn-wars-winner.name",
+  "conditionKey": "rewards:badges.pawn-wars-winner.condition",
+  "condition": {
+   "type": "game-win",
+   "thresholds": [
+    3
+   ],
+   "opponent": "pawn-wars"
+  }
+ },
+ {
+  "id": "friendly-match",
+  "category": "play",
+  "nameKey": "rewards:badges.friendly-match.name",
+  "conditionKey": "rewards:badges.friendly-match.condition",
+  "condition": {
+   "type": "game-played",
+   "thresholds": [
+    1
+   ],
+   "mode": "local"
+  }
+ },
+ {
+  "id": "daily-player",
+  "category": "habit",
+  "nameKey": "rewards:badges.daily-player.name",
+  "conditionKey": "rewards:badges.daily-player.condition",
+  "condition": {
+   "type": "streak-days",
+   "thresholds": [
+    3,
+    7,
+    30
+   ]
+  }
+ },
+ {
+  "id": "warm-up-champ",
+  "category": "habit",
+  "nameKey": "rewards:badges.warm-up-champ.name",
+  "conditionKey": "rewards:badges.warm-up-champ.condition",
+  "condition": {
+   "type": "warmups",
+   "thresholds": [
+    10,
+    30
+   ]
+  }
+ },
+ {
+  "id": "never-give-up",
+  "category": "habit",
+  "nameKey": "rewards:badges.never-give-up.name",
+  "conditionKey": "rewards:badges.never-give-up.condition",
+  "condition": {
+   "type": "comeback",
+   "thresholds": [
+    1,
+    10,
+    25
+   ]
+  }
+ }
+]

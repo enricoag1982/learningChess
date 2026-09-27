@@ -231,11 +231,3 @@ export interface BackupImporter {
     },
   ): Promise<void>;
 }
-
-/** Online features are off in v1. */
-export interface FeatureFlags {
-  readonly login: boolean;
-  readonly online: boolean;
-}
-
-export const v1FeatureFlags: FeatureFlags = { login: false, online: false };

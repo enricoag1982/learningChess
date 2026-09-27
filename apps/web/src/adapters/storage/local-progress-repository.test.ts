@@ -1,68 +1,34 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Attempt, ConceptStats, LessonProgress, MiniGameProgress } from '@chess-kids/core';
+import {
+  makeProgress as buildProgress,
+  makeMiniGameProgress as buildMiniGameProgress,
+  makeConceptStats as buildConceptStats,
+  makeAttempt as buildAttempt,
+} from '@chess-kids/core/testing';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 
 function makeProgress(overrides: Partial<LessonProgress> = {}): LessonProgress {
-  return {
-    id: 'lp1',
-    profileId: 'profile-1',
-    lessonId: 'rook',
-    bestStars: {},
-    bossStars: 0,
-    resumeStep: 0,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  };
+  return buildProgress({ id: 'lp1', ...overrides });
 }
 
 function makeMiniGameProgress(overrides: Partial<MiniGameProgress> = {}): MiniGameProgress {
-  return {
-    id: 'mg1',
-    profileId: 'profile-1',
-    miniGameId: 'hungry-rook',
-    bestStars: 3,
-    plays: 1,
-    wins: 1,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  };
+  return buildMiniGameProgress({ id: 'mg1', ...overrides });
 }
 
 function makeConceptStats(overrides: Partial<ConceptStats> = {}): ConceptStats {
-  return {
+  return buildConceptStats({
     id: 'cs1',
-    profileId: 'profile-1',
-    conceptId: 'rook-move',
     recent: [true, false],
     box: 1,
     dueAt: '2026-01-02T00:00:00.000Z',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
     ...overrides,
-  };
+  });
 }
 
 function makeAttempt(overrides: Partial<Attempt> = {}): Attempt {
-  return {
-    id: 'a1',
-    profileId: 'profile-1',
-    lessonId: 'rook',
-    exerciseId: 'rook-01',
-    conceptId: 'rook-move',
-    scored: true,
-    correct: true,
-    stars: 3,
-    hints: 0,
-    errors: 0,
-    moves: 1,
-    durationMs: 1000,
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  };
+  return buildAttempt({ id: 'a1', ...overrides });
 }
 
 beforeEach(() => {

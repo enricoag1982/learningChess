@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { makeExercise as buildExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import {
   newAssessmentResult,
   newUnlock,
@@ -12,47 +13,19 @@ import {
 import type { TracksCatalog, Track, World } from './journey.ts';
 import type { Lesson } from './lesson.ts';
 import { seededRandom } from './random.ts';
-import type { ExerciseDef } from './exercise/types.ts';
-
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
-function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: `${id}-concept`,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
 
 function makeLesson(id: string, world: string, order: number, exerciseCount: number): Lesson {
-  return {
+  return buildLesson({
     id,
     world,
     order,
     concept: `${id}-concept`,
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
     guided: [],
-    exercises: Array.from({ length: exerciseCount }, (_, index) =>
-      makeExercise(`${id}-${String(index + 1)}`),
-    ),
-  };
+    exercises: Array.from({ length: exerciseCount }, (_, index) => {
+      const exerciseId = `${id}-${String(index + 1)}`;
+      return buildExercise({ id: exerciseId, concept: `${exerciseId}-concept` });
+    }),
+  });
 }
 
 const W1: World = { id: 'w1', track: 'basics', order: 1, habitat: 'meadow', titleKey: 'w1' };

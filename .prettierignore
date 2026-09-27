@@ -6,3 +6,5 @@ pnpm-lock.yaml
 **/test-results
 **/*.md
 apps/web/public/audio/**/manifest.json
+**/__snapshots__/**
+apps/web/test-fixtures/storage/**/*.json

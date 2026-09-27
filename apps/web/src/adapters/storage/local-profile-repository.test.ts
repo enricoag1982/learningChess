@@ -1,20 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Profile } from '@chess-kids/core';
+import { makeProfile } from '@chess-kids/core/testing';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProfileRepository } from './local-profile-repository.ts';
-
-function makeProfile(overrides: Partial<Profile> = {}): Profile {
-  return {
-    id: 'p1',
-    accountId: 'local',
-    nickname: 'Rex',
-    avatar: 'fox',
-    locale: 'en',
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-    ...overrides,
-  };
-}
 
 beforeEach(() => {
   localStorage.clear();

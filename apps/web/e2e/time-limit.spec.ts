@@ -8,13 +8,6 @@ import {
   seedPlayUntil,
 } from './helpers.ts';
 
-/** `'HH:MM'` one minute before the real current time — lands "in the past" regardless of when the
- * suite happens to run (M7.1's allowed-hours gate). */
-function oneMinuteAgo(): string {
-  const past = new Date(Date.now() - 60_000);
-  return `${String(past.getHours()).padStart(2, '0')}:${String(past.getMinutes()).padStart(2, '0')}`;
-}
-
 test.describe('Daily time limit (M5.2)', () => {
   test('Start today -> See you tomorrow -> parent password -> +15 min -> lesson starts', async ({
     page,
@@ -119,9 +112,12 @@ test.describe('Allowed hours gate (M7.1)', () => {
   test('playUntil in the past shows "Time to rest!" -> parent password -> activity resumes', async ({
     page,
   }) => {
+    // Browser clock fixed at local noon, "play until" one minute earlier: a real-time "one minute
+    // ago" wraps to 23:59 just after midnight, which is not late yet.
+    await page.clock.setFixedTime(new Date(2026, 0, 15, 12, 0, 0));
     await completeFirstRun(page, 'Kid');
     const profileId = await getSoleProfileId(page);
-    await seedPlayUntil(page, profileId, oneMinuteAgo());
+    await seedPlayUntil(page, profileId, '11:59');
 
     await page.getByRole('button', { name: /Start today/ }).click();
     await page.getByRole('heading', { name: 'Time to rest!' }).waitFor();

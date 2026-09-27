@@ -1,79 +1,36 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars, withResumeStep } from '../domain/progress.ts';
-import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import type { Profile } from '../domain/profile.ts';
-import type { ParentLock } from '../domain/parent-lock.ts';
-import { seededRandom } from '../domain/random.ts';
+import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
+import {
+  EMPTY_POSITION,
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeContentSource,
+  makeDeps as buildDeps,
+  makeProgressRepo as buildProgressRepo,
+  seededRandom,
+} from '../testing/index.ts';
 import { loadPracticeTasks, loadTodaySession, loadWarmUp, planTodaySession } from './session.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  SettingsRepository,
-} from './ports.ts';
+import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
-
-function makeGameRecordRepo(): GameRecordRepository {
-  return {
-    add: () => Promise.resolve(),
-    listByProfile: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
 
 const NOW = new Date('2026-02-01T00:00:00.000Z');
 
-function makeExercise(id: string, concept: string): ExerciseDef {
-  return {
-    id,
-    concept,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
 function makeLesson(id: string, world: string, order: number): Lesson {
-  return {
+  return buildLesson({
     id,
     world,
     order,
     concept: `${id}-concept`,
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
     exercises: [
-      makeExercise(`${id}-01`, `${id}-concept`),
-      makeExercise(`${id}-02`, `${id}-concept`),
+      buildExercise({ id: `${id}-01`, concept: `${id}-concept` }),
+      buildExercise({ id: `${id}-02`, concept: `${id}-concept` }),
     ],
-  };
+  });
 }
 
 function completeProgress(lesson: Lesson): LessonProgress {
@@ -124,115 +81,27 @@ const MG2: MiniGame = { ...MG1, id: 'mg2', unlockAfter: 'l2', titleKey: 'fixture
 function makeContent(
   overrides: Partial<{ lessons: readonly Lesson[]; minigames: readonly MiniGame[] }> = {},
 ): ContentSource {
-  const lessons = overrides.lessons ?? LESSONS;
-  const minigames = overrides.minigames ?? [];
-  const lessonsById = new Map(lessons.map((lesson) => [lesson.id, lesson]));
-  const minigamesById = new Map(minigames.map((game) => [game.id, game]));
-  return {
-    lessons: () => lessons,
-    lesson: (id) => lessonsById.get(id),
-    minigames: () => minigames,
-    minigame: (id) => minigamesById.get(id),
-    catalog: () => CATALOG,
-  };
+  return makeContentSource({
+    lessons: overrides.lessons ?? LESSONS,
+    minigames: overrides.minigames ?? [],
+    catalog: CATALOG,
+  });
 }
 
 function makeProgressRepo(
-  initial: readonly LessonProgress[] = [],
-  initialMiniGames: readonly MiniGameProgress[] = [],
-  initialStats: readonly ConceptStats[] = [],
-): ProgressRepository {
-  const lessons = new Map(initial.map((progress) => [progress.lessonId, progress]));
-  const miniGames = new Map(initialMiniGames.map((progress) => [progress.miniGameId, progress]));
-  const conceptStats = new Map(initialStats.map((stats) => [stats.conceptId, stats]));
-  return {
-    listLessons: (profileId) =>
-      Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
-    getLesson: (_profileId, lessonId) => Promise.resolve(lessons.get(lessonId)),
-    saveLesson: (progress) => {
-      lessons.set(progress.lessonId, progress);
-      return Promise.resolve();
-    },
-    addAttempt: () => Promise.resolve(),
-    listAttempts: () => Promise.resolve<Attempt[]>([]),
-    getMiniGame: (_profileId, miniGameId) => Promise.resolve(miniGames.get(miniGameId)),
-    listMiniGames: (profileId) =>
-      Promise.resolve([...miniGames.values()].filter((p) => p.profileId === profileId)),
-    saveMiniGame: (progress) => {
-      miniGames.set(progress.miniGameId, progress);
-      return Promise.resolve();
-    },
-    getConceptStats: (_profileId, conceptId) => Promise.resolve(conceptStats.get(conceptId)),
-    listConceptStats: (profileId) =>
-      Promise.resolve([...conceptStats.values()].filter((s) => s.profileId === profileId)),
-    saveConceptStats: (stats) => {
-      conceptStats.set(stats.conceptId, stats);
-      return Promise.resolve();
-    },
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeProfileRepo(): ProfileRepository {
-  return {
-    list: () => Promise.resolve<Profile[]>([]),
-    get: () => Promise.resolve(undefined),
-    save: () => Promise.resolve(),
-    delete: () => Promise.resolve(),
-  };
-}
-
-function makeClock(): Clock {
-  return { now: () => NOW };
-}
-
-function makeIds(): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `id-${String(count)}`;
-    },
-  };
-}
-
-function makeParentLockRepo(): ParentLockRepository {
-  return {
-    get: () => Promise.resolve<ParentLock | undefined>(undefined),
-    save: () => Promise.resolve(),
-  };
-}
-
-function makePasswordFileWriter(): PasswordFileWriter {
-  return { write: () => Promise.resolve({ location: 'fake.txt' }) };
-}
-
-function makeSettingsRepo(): SettingsRepository {
-  return {
-    get: () =>
-      Promise.resolve<AppSettings>({
-        lastProfileId: null,
-        suggestedLevels: {},
-        profileSettings: {},
-      }),
-    save: () => Promise.resolve(),
-  };
+  lessons: readonly LessonProgress[] = [],
+  miniGames: readonly MiniGameProgress[] = [],
+  conceptStats: readonly ConceptStats[] = [],
+): AppDeps['progress'] {
+  return buildProgressRepo({ lessons, miniGames, conceptStats });
 }
 
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
-    clock: makeClock(),
-    ids: makeIds(),
+  return buildDeps({
+    clock: { now: () => NOW },
     content: makeContent(),
-    parentLock: makeParentLockRepo(),
-    passwordFile: makePasswordFileWriter(),
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
     ...overrides,
-  };
+  });
 }
 
 function dueStats(conceptId: string, overrides: Partial<ConceptStats> = {}): ConceptStats {

@@ -1,14 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef, ExerciseState } from '@chess-kids/core';
-import {
-  answerChoice,
-  answerYesNo,
-  chessJsRules,
-  createVariantRules,
-  playMove,
-  startExercise,
-} from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core';
+import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
@@ -16,40 +9,8 @@ import { loadContent } from './lesson-load.ts';
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locales = loadLocales(join(packageDir, 'locales'));
 const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
-const rules = createVariantRules(chessJsRules);
 
 const WORLD5_LESSON_IDS = ['castling', 'en-passant', 'draws'];
-
-/**
- * Plays one exercise to completion using its own definition as the answer key — `yes-no` /
- * `best-move` (castling, en passant SAN included) / `choice` (draw-kind), the three types World 5's
- * lessons use.
- */
-function playExerciseToCompletion(def: ExerciseDef): ExerciseState {
-  const state = startExercise(def);
-  if (def.type === 'yes-no') {
-    return answerYesNo(state, def.answer);
-  }
-  if (def.type === 'choice') {
-    return answerChoice(state, def.answer);
-  }
-  if (def.type === 'best-move') {
-    const [solutionSan] = def.solutions;
-    if (solutionSan === undefined) {
-      throw new Error(`best-move exercise "${def.id}" has no solutions`);
-    }
-    const candidates = rules.legalMoves(def.position, { staticOpponent: true });
-    const move = candidates.find(
-      (candidate) => candidate.san.replace(/[+#]+$/, '') === solutionSan.replace(/[+#]+$/, ''),
-    );
-    if (move === undefined) {
-      throw new Error(`best-move exercise "${def.id}": no legal move matches "${solutionSan}"`);
-    }
-    return playMove(state, rules, { from: move.from, to: move.to, promotion: move.promotion })
-      .state;
-  }
-  throw new Error(`playExerciseToCompletion: unsupported exercise type "${def.type}"`);
-}
 
 describe("World 5 lessons play to completion via the engine, using each exercise's own answer", () => {
   for (const lessonId of WORLD5_LESSON_IDS) {

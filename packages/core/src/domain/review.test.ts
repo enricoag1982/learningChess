@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Lesson } from './lesson.ts';
 import type { ExerciseDef } from './exercise/types.ts';
+import { makeExercise as buildExercise, makeLesson } from '../testing/index.ts';
 import { seededRandom } from './random.ts';
 import type { ConceptPoolEntry, ConceptStats } from './review.ts';
 import {
@@ -17,44 +17,8 @@ import {
   pickWarmUp,
 } from './review.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 function makeExercise(id: string, concept: string): ExerciseDef {
-  return {
-    id,
-    concept,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
-function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
-  return {
-    id: 'rook',
-    world: 'pieces',
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: 'lessons:rook.title',
-    storyKey: 'lessons:rook.story',
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: 'lessons:rook.demo',
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [],
-    ...overrides,
-  };
+  return buildExercise({ id, concept });
 }
 
 function stats(overrides: Partial<ConceptStats> = {}): ConceptStats {

@@ -54,6 +54,7 @@ After the Basics, three paths continue: **Openings**, **Tactics**, and **Checkma
 pnpm install
 pnpm dev              # http://localhost:5173
 pnpm test             # unit + content tests
+pnpm test:slow        # slow unit tests (bot self-play / strength / timing, winnability, deep perft)
 pnpm build             # production build
 pnpm test:e2e         # Playwright, against the production build
 ```

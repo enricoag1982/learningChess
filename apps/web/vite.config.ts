@@ -110,6 +110,14 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,json,webp,mp3}'],
+        // Font subsets this app never renders (m8.2 item 4): no Hebrew, Cyrillic or Vietnamese text
+        // anywhere in the app, so `@fontsource-variable`'s own hebrew/cyrillic/cyrillic-ext/
+        // vietnamese woff2 files never get fetched — only latin/latin-ext stay precached (kid
+        // nicknames with accents, e.g. "José", need `latin-ext`). Cuts ≈72 KB from the offline
+        // precache (`scripts/check-size.ts`). The `@font-face` rules themselves are untouched: a
+        // browser fetches a subset only if a character needing it is actually shown, which for the
+        // skipped ones never happens here.
+        globIgnores: ['**/*-hebrew-*.woff2', '**/*-cyrillic-*.woff2', '**/*-vietnamese-*.woff2'],
       },
     }),
   ],

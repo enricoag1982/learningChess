@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { ParentLock } from '../domain/parent-lock.ts';
-import type { Profile } from '../domain/profile.ts';
-import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import { seededRandom } from '../domain/random.ts';
+import {
+  makeDeps as buildDeps,
+  makeProfileRepo,
+  makeProgressRepo,
+  makeGameRecordRepo,
+  makeRewardsRepo,
+} from '../testing/index.ts';
 import {
   changeAvatar,
   changeParentPassword,
@@ -17,130 +20,11 @@ import {
   setupParentPassword,
   verifyParentPassword,
 } from './profiles.ts';
+import type { PasswordFileWriter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  RewardsRepository,
-  SettingsRepository,
-} from './ports.ts';
 
-function makeClock(iso: string): Clock {
-  return { now: () => new Date(iso) };
-}
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-function makeProfileRepo(initial: readonly Profile[] = []): ProfileRepository {
-  const store = new Map(initial.map((profile) => [profile.id, profile]));
-  return {
-    list: () =>
-      Promise.resolve([...store.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt))),
-    get: (id) => Promise.resolve(store.get(id)),
-    save: (profile) => {
-      store.set(profile.id, profile);
-      return Promise.resolve();
-    },
-    delete: (id) => {
-      store.delete(id);
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeProgressRepo(): ProgressRepository & { readonly deletedFor: string[] } {
-  const lessons = new Map<string, LessonProgress>();
-  const deletedFor: string[] = [];
-  return {
-    listLessons: (profileId) =>
-      Promise.resolve([...lessons.values()].filter((p) => p.profileId === profileId)),
-    getLesson: () => Promise.resolve(undefined),
-    saveLesson: (progress) => {
-      lessons.set(`${progress.profileId}:${progress.lessonId}`, progress);
-      return Promise.resolve();
-    },
-    addAttempt: () => Promise.resolve(),
-    listAttempts: () => Promise.resolve<Attempt[]>([]),
-    getMiniGame: () => Promise.resolve(undefined),
-    listMiniGames: () => Promise.resolve<MiniGameProgress[]>([]),
-    saveMiniGame: () => Promise.resolve(),
-    getConceptStats: () => Promise.resolve(undefined),
-    listConceptStats: () => Promise.resolve([]),
-    saveConceptStats: () => Promise.resolve(),
-    deleteProfileData: (profileId) => {
-      deletedFor.push(profileId);
-      for (const [key, progress] of lessons) {
-        if (progress.profileId === profileId) lessons.delete(key);
-      }
-      return Promise.resolve();
-    },
-    deletedFor,
-  };
-}
-
-function makeGameRecordRepo(): GameRecordRepository & { readonly deletedFor: string[] } {
-  const records: GameRecord[] = [];
-  const deletedFor: string[] = [];
-  return {
-    add: (record) => {
-      records.push(record);
-      return Promise.resolve();
-    },
-    listByProfile: (profileId) =>
-      Promise.resolve(records.filter((record) => record.profileId === profileId)),
-    deleteProfileData: (profileId) => {
-      deletedFor.push(profileId);
-      return Promise.resolve();
-    },
-    deletedFor,
-  };
-}
-
-function makeRewardsRepo(): RewardsRepository & { readonly deletedFor: string[] } {
-  const deletedFor: string[] = [];
-  return {
-    addEarnedBadge: () => Promise.resolve(),
-    listEarnedBadges: () => Promise.resolve([]),
-    saveEarnedBadge: () => Promise.resolve(),
-    getStreak: () => Promise.resolve(undefined),
-    saveStreak: () => Promise.resolve(),
-    getSessionLog: () => Promise.resolve(undefined),
-    saveSessionLog: () => Promise.resolve(),
-    listSessionLogs: () => Promise.resolve([]),
-    deleteProfileData: (profileId) => {
-      deletedFor.push(profileId);
-      return Promise.resolve();
-    },
-    deletedFor,
-  };
-}
-
-function makeParentLockRepo(initial?: ParentLock): ParentLockRepository {
-  let lock = initial;
-  return {
-    get: () => Promise.resolve(lock),
-    save: (next) => {
-      lock = next;
-      return Promise.resolve();
-    },
-  };
-}
-
+/** This app writes to "Downloads" (app-structure.md §2); the kit's own fake location format
+ * ("fake/…") is generic, so this test keeps its own. */
 function makePasswordFileWriter(): PasswordFileWriter & { readonly writes: string[] } {
   const writes: string[] = [];
   return {
@@ -152,40 +36,8 @@ function makePasswordFileWriter(): PasswordFileWriter & { readonly writes: strin
   };
 }
 
-function makeSettingsRepo(
-  initial: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings: {} },
-): SettingsRepository {
-  let settings = initial;
-  return {
-    get: () => Promise.resolve(settings),
-    save: (next) => {
-      settings = next;
-      return Promise.resolve();
-    },
-  };
-}
-
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
-    clock: makeClock('2026-01-01T00:00:00.000Z'),
-    ids: makeIds(),
-    content: stubContent,
-    parentLock: makeParentLockRepo(),
-    passwordFile: makePasswordFileWriter(),
-    settings: makeSettingsRepo(),
-    random: seededRandom(1),
-    ...overrides,
-  };
+  return buildDeps({ passwordFile: makePasswordFileWriter(), ...overrides });
 }
 
 describe('isFirstRun', () => {

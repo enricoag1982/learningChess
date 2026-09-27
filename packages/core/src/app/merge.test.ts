@@ -5,199 +5,61 @@ import { newProfile } from '../domain/profile.ts';
 import type { Profile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { LessonProgress } from '../domain/progress.ts';
-import { seededRandom } from '../domain/random.ts';
 import { newEarnedBadge } from '../domain/badges.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import type { BackupFile } from './backup.ts';
+import type { BackupImporter } from './ports.ts';
+import {
+  makeExercise,
+  makeLesson as buildLesson,
+  makeContentSource,
+  makeDeps as buildDeps,
+  makeProfileRepo,
+  makeProgressRepo as buildProgressRepo,
+  makeRewardsRepo as buildRewardsRepo,
+  makeAssessmentRepo,
+  makeBackupImporter,
+} from '../testing/index.ts';
 import { importMerged, planImport, previewChildChange } from './merge.ts';
-import type {
-  AppSettings,
-  AssessmentRepository,
-  BackupImporter,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ParentLockRepository,
-  PasswordFileWriter,
-  ProfileRepository,
-  ProgressRepository,
-  RewardsRepository,
-} from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
-function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: `${id}-concept`,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
-const L1: Lesson = {
+const L1: Lesson = buildLesson({
   id: 'l1',
   world: 'w1',
-  order: 1,
   concept: 'l1-concept',
-  character: 'rhino',
-  titleKey: 'lessons:l1.title',
-  storyKey: 'lessons:l1.story',
-  demo: {
-    position: EMPTY_POSITION,
-    textKey: 'lessons:l1.demo',
-    highlight: { legalMovesFrom: 'd4' },
-  },
-  guided: [],
-  exercises: [makeExercise('l1-01'), makeExercise('l1-02')],
-};
+  exercises: [
+    makeExercise({ id: 'l1-01', concept: 'l1-01-concept' }),
+    makeExercise({ id: 'l1-02', concept: 'l1-02-concept' }),
+  ],
+});
 
-function makeContent(): ContentSource {
-  return {
-    lessons: () => [L1],
-    lesson: (id) => (id === L1.id ? L1 : undefined),
-    minigames: () => [],
-    minigame: () => undefined,
-  };
+function makeContent(): ReturnType<typeof makeContentSource> {
+  return makeContentSource({ lessons: [L1] });
 }
 
-function makeProfileRepo(initial: readonly Profile[] = []): ProfileRepository {
-  const store = new Map(initial.map((profile) => [profile.id, profile]));
-  return {
-    list: () => Promise.resolve([...store.values()]),
-    get: (id) => Promise.resolve(store.get(id)),
-    save: (profile) => {
-      store.set(profile.id, profile);
-      return Promise.resolve();
-    },
-    delete: (id) => {
-      store.delete(id);
-      return Promise.resolve();
-    },
-  };
-}
-
-function makeProgressRepo(lessons: readonly LessonProgress[] = []): ProgressRepository {
-  return {
-    listLessons: (profileId) => Promise.resolve(lessons.filter((p) => p.profileId === profileId)),
-    getLesson: () => Promise.resolve(undefined),
-    saveLesson: () => Promise.resolve(),
-    addAttempt: () => Promise.resolve(),
-    listAttempts: () => Promise.resolve([]),
-    getMiniGame: () => Promise.resolve(undefined),
-    listMiniGames: () => Promise.resolve([]),
-    saveMiniGame: () => Promise.resolve(),
-    getConceptStats: () => Promise.resolve(undefined),
-    listConceptStats: () => Promise.resolve([]),
-    saveConceptStats: () => Promise.resolve(),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeGameRecordRepo(): GameRecordRepository {
-  return {
-    add: () => Promise.resolve(),
-    listByProfile: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
+function makeProgressRepo(lessons: readonly LessonProgress[] = []): AppDeps['progress'] {
+  return buildProgressRepo({ lessons });
 }
 
 function makeRewardsRepo(
   options: { readonly badges?: readonly EarnedBadge[] } = {},
-): RewardsRepository {
-  const badges = options.badges ?? [];
-  return {
-    addEarnedBadge: () => Promise.resolve(),
-    listEarnedBadges: (profileId) =>
-      Promise.resolve(badges.filter((b) => b.profileId === profileId)),
-    saveEarnedBadge: () => Promise.resolve(),
-    getStreak: () => Promise.resolve(undefined),
-    saveStreak: () => Promise.resolve(),
-    getSessionLog: () => Promise.resolve(undefined),
-    saveSessionLog: () => Promise.resolve(),
-    listSessionLogs: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeAssessmentRepo(): AssessmentRepository {
-  return {
-    addAssessmentResult: () => Promise.resolve(),
-    listAssessmentResults: () => Promise.resolve([]),
-    addUnlock: () => Promise.resolve(),
-    listUnlocks: () => Promise.resolve([]),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-/** Captures every `writeMerged` call — this test suite asserts on the `BackupFile` it was asked to
- * write, rather than re-verifying real `localStorage` persistence (that is
- * `local-backup-importer.test.ts`'s own job for the real adapter). */
-function makeBackupImporter(): BackupImporter & { readonly calls: BackupFile[] } {
-  const calls: BackupFile[] = [];
-  return {
-    calls,
-    replaceAll: () => Promise.resolve(),
-    writeMerged: (file) => {
-      calls.push(file);
-      return Promise.resolve();
-    },
-  };
+): AppDeps['rewards'] {
+  return buildRewardsRepo({ badges: options.badges });
 }
 
 function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  let settings: AppSettings = {
-    lastProfileId: null,
-    suggestedLevels: {},
-    profileSettings: {},
-  };
-  return {
-    profiles: makeProfileRepo(),
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
+  return buildDeps({
     rewards: makeRewardsRepo(),
     assessment: makeAssessmentRepo(),
     clock: { now: () => NOW },
-    ids: makeIds(),
     content: makeContent(),
-    parentLock: {} as unknown as ParentLockRepository,
-    passwordFile: {} as unknown as PasswordFileWriter,
-    settings: {
-      get: () => Promise.resolve(settings),
-      save: (next) => {
-        settings = next;
-        return Promise.resolve();
-      },
-    },
-    random: seededRandom(1),
     backupImporter: makeBackupImporter(),
     storageSchemaVersion: 5,
     ...overrides,
-  };
+  });
 }
 
 /** A minimal, valid `BackupFile` for one child, built straight from literal data (not via

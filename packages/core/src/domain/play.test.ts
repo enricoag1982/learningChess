@@ -1,65 +1,28 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ExerciseDef } from './exercise/types.ts';
+import {
+  makeExercise,
+  makeLesson as buildLesson,
+  makeMiniGame as buildMiniGame,
+} from '../testing/index.ts';
 import type { Lesson, MiniGame, StaticMiniGame } from './lesson.ts';
 import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 import { unlockedMiniGames } from './play.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
-function makeExercise(id: string): ExerciseDef {
-  return {
-    id,
-    concept: 'rook-move',
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
-}
-
 function makeLesson(id: string, overrides: Partial<Lesson> = {}): Lesson {
-  return {
+  return buildLesson({
     id,
-    world: 'pieces',
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [makeExercise(`${id}-01`)],
+    exercises: [makeExercise({ id: `${id}-01` })],
     boss: `${id}-boss`,
     ...overrides,
-  };
+  });
 }
 
 function makeMiniGame(unlockAfter: string, id = `${unlockAfter}-boss`): StaticMiniGame {
-  return {
-    mode: 'static',
-    id,
-    concept: 'rook-move',
-    position: EMPTY_POSITION,
-    par: 3,
-    titleKey: `minigames:${id}.title`,
-    goalKey: `minigames:${id}.goal`,
-    unlockAfter,
-  };
+  return buildMiniGame({ id, unlockAfter });
 }
 
 const ROOK = makeLesson('rook');

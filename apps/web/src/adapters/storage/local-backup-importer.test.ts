@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { AppDeps, BackupFile, ContentSource, ProfileSettings } from '@chess-kids/core';
+import type { AppDeps, BackupFile, ProfileSettings } from '@chess-kids/core';
 import { createProfile, DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core';
 import { buildBackupFile } from '@chess-kids/core/backup';
+import { stubContent, makeClock, makeIds, makePasswordFileWriter } from '@chess-kids/core/testing';
 import { LocalStorageBackupImporter } from './local-backup-importer.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
 import { LocalStorageGameRecordRepository } from './local-game-record-repository.ts';
@@ -25,13 +26,6 @@ function requireData(file: BackupFile, profileId: string): BackupFile['data'][st
   return data;
 }
 
-const stubContent: ContentSource = {
-  lessons: () => [],
-  lesson: () => undefined,
-  minigames: () => [],
-  minigame: () => undefined,
-};
-
 /** Fresh `AppDeps` wired directly to `localStorage` (this file's own repos, no `test-services.ts`
  * indirection — keeps this test close to the real `chess-kids:*` storage shape). */
 function makeDeps(): AppDeps {
@@ -42,16 +36,11 @@ function makeDeps(): AppDeps {
     gameRecords: new LocalStorageGameRecordRepository(store),
     rewards: new LocalStorageRewardsRepository(store),
     assessment: new LocalStorageAssessmentRepository(store),
-    clock: { now: () => new Date('2026-01-10T12:00:00.000Z') },
-    ids: {
-      next: (() => {
-        let n = 0;
-        return () => `id-${String((n += 1))}`;
-      })(),
-    },
+    clock: makeClock('2026-01-10T12:00:00.000Z'),
+    ids: makeIds(),
     content: stubContent,
     parentLock: new LocalStorageParentLockRepository(store),
-    passwordFile: { write: () => Promise.resolve({ location: 'x' }) },
+    passwordFile: makePasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),
     random: { next: () => 0.5 },
     backupImporter: new LocalStorageBackupImporter(store),

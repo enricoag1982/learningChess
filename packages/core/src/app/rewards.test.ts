@@ -5,20 +5,19 @@ import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
-import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import type { ConceptStats } from '../domain/review.ts';
-import type { SessionLog } from '../domain/session-log.ts';
-import type { Streak } from '../domain/streak.ts';
-import { seededRandom } from '../domain/random.ts';
-import type {
-  AppSettings,
-  Clock,
-  ContentSource,
-  GameRecordRepository,
-  IdGenerator,
-  ProgressRepository,
-  RewardsRepository,
-} from './ports.ts';
+import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+  makeContentSource,
+  makeDeps as buildDeps,
+  makeClock,
+  makeGameRecordRepo,
+  makeProgressRepo as buildProgressRepo,
+  makeRewardsRepo as buildRewardsRepo,
+  makeAttempt as buildAttempt,
+} from '../testing/index.ts';
+import type { ContentSource, RewardsRepository } from './ports.ts';
 import {
   buildBadgeFacts,
   checkRewards,
@@ -30,211 +29,57 @@ import {
 } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
 
-const EMPTY_POSITION = {
-  pieces: {},
-  markers: { stars: [], blocked: [] },
-  toMove: 'w',
-  castling: '-',
-  enPassant: null,
-} as const;
-
 const NOW = new Date('2026-01-05T12:00:00.000Z'); // a Monday
 
 function makeExercise(id: string, concept = 'rook-move'): ExerciseDef {
-  return {
-    id,
-    concept,
-    textKey: `lessons:${id}`,
-    position: EMPTY_POSITION,
-    type: 'collect-stars',
-    stars3: 1,
-    stars2: 2,
-  };
+  return buildExercise({ id, concept });
 }
 
 function makeLesson(id: string, world: string, exercises: readonly ExerciseDef[]): Lesson {
-  return {
-    id,
-    world,
-    order: 1,
-    concept: 'rook-move',
-    character: 'rhino',
-    titleKey: `lessons:${id}.title`,
-    storyKey: `lessons:${id}.story`,
-    demo: {
-      position: EMPTY_POSITION,
-      textKey: `lessons:${id}.demo`,
-      highlight: { legalMovesFrom: 'd4' },
-    },
-    guided: [],
-    exercises: [...exercises],
-  };
+  return buildLesson({ id, world, exercises: [...exercises] });
 }
 
 const WORLD: World = { id: 'w1', track: 't1', order: 1, habitat: 'meadow', titleKey: 'w1' };
 const TRACK: Track = { id: 't1', kind: 'main', titleKey: 't1', worlds: [WORLD] };
 const CATALOG: TracksCatalog = { tracks: [TRACK], ranks: [{ id: 'pawn', after: 'start' }] };
 
-function makeIds(prefix = 'id'): IdGenerator {
-  let count = 0;
-  return {
-    next: () => {
-      count += 1;
-      return `${prefix}-${String(count)}`;
-    },
-  };
-}
-
-function makeClock(date: Date): Clock {
-  return { now: () => date };
-}
-
-function makeGameRecordRepo(initial: readonly GameRecord[] = []): GameRecordRepository {
-  const store = [...initial];
-  return {
-    add: (record) => {
-      store.push(record);
-      return Promise.resolve();
-    },
-    listByProfile: (profileId) =>
-      Promise.resolve(store.filter((record) => record.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
-}
-
 function makeProgressRepo(
   lessons: readonly LessonProgress[] = [],
   attempts: readonly Attempt[] = [],
-): ProgressRepository {
-  const lessonStore = new Map(lessons.map((p) => [`${p.profileId}:${p.lessonId}`, p]));
-  const attemptStore: Attempt[] = [...attempts];
-  const miniGames = new Map<string, MiniGameProgress>();
-  const conceptStats = new Map<string, ConceptStats>();
-  return {
-    listLessons: (profileId) =>
-      Promise.resolve([...lessonStore.values()].filter((p) => p.profileId === profileId)),
-    getLesson: (profileId, lessonId) =>
-      Promise.resolve(lessonStore.get(`${profileId}:${lessonId}`)),
-    saveLesson: (progress) => {
-      lessonStore.set(`${progress.profileId}:${progress.lessonId}`, progress);
-      return Promise.resolve();
-    },
-    addAttempt: (attempt) => {
-      attemptStore.push(attempt);
-      return Promise.resolve();
-    },
-    listAttempts: (profileId) =>
-      Promise.resolve(attemptStore.filter((a) => a.profileId === profileId)),
-    getMiniGame: (profileId, id) => Promise.resolve(miniGames.get(`${profileId}:${id}`)),
-    listMiniGames: (profileId) =>
-      Promise.resolve([...miniGames.values()].filter((p) => p.profileId === profileId)),
-    saveMiniGame: (progress) => {
-      miniGames.set(`${progress.profileId}:${progress.miniGameId}`, progress);
-      return Promise.resolve();
-    },
-    getConceptStats: (profileId, conceptId) =>
-      Promise.resolve(conceptStats.get(`${profileId}:${conceptId}`)),
-    listConceptStats: (profileId) =>
-      Promise.resolve([...conceptStats.values()].filter((s) => s.profileId === profileId)),
-    saveConceptStats: (stats) => {
-      conceptStats.set(`${stats.profileId}:${stats.conceptId}`, stats);
-      return Promise.resolve();
-    },
-    deleteProfileData: () => Promise.resolve(),
-  };
+): AppDeps['progress'] {
+  return buildProgressRepo({ lessons, attempts });
 }
 
 function makeRewardsRepo(initialEarned: readonly EarnedBadge[] = []): RewardsRepository {
-  const earned: EarnedBadge[] = [...initialEarned];
-  const streaks = new Map<string, Streak>();
-  const logs = new Map<string, SessionLog>();
-  return {
-    addEarnedBadge: (badge) => {
-      earned.push(badge);
-      return Promise.resolve();
-    },
-    listEarnedBadges: (profileId) =>
-      Promise.resolve(earned.filter((b) => b.profileId === profileId)),
-    saveEarnedBadge: (badge) => {
-      const index = earned.findIndex((b) => b.id === badge.id);
-      if (index >= 0) earned[index] = badge;
-      return Promise.resolve();
-    },
-    getStreak: (profileId) => Promise.resolve(streaks.get(profileId)),
-    saveStreak: (streak) => {
-      streaks.set(streak.profileId, streak);
-      return Promise.resolve();
-    },
-    getSessionLog: (profileId, date) => Promise.resolve(logs.get(`${profileId}:${date}`)),
-    saveSessionLog: (log) => {
-      logs.set(`${log.profileId}:${log.date}`, log);
-      return Promise.resolve();
-    },
-    listSessionLogs: (profileId) =>
-      Promise.resolve([...logs.values()].filter((log) => log.profileId === profileId)),
-    deleteProfileData: () => Promise.resolve(),
-  };
+  return buildRewardsRepo({ badges: initialEarned });
 }
 
 function makeContent(lessons: readonly Lesson[], badges: readonly BadgeDef[] = []): ContentSource {
-  return {
-    lessons: () => lessons,
-    lesson: (id) => lessons.find((l) => l.id === id),
-    minigames: () => [],
-    minigame: () => undefined,
-    catalog: () => CATALOG,
-    badges: () => badges,
-  };
+  return makeContentSource({ lessons, badges, catalog: CATALOG });
 }
 
+/** `p1`/`l1`/`ex1`/`hanging-piece` defaults, distinct from the kit's own (`profile-1`/`rook`/…) —
+ * every `starsToday`/`recordDailyActivity`/… call in this file queries by these ids. */
 function makeAttempt(overrides: Partial<Attempt> = {}): Attempt {
-  return {
+  return buildAttempt({
     id: `attempt-${Math.random().toString(36)}`,
     profileId: 'p1',
     lessonId: 'l1',
     exerciseId: 'ex1',
     conceptId: 'hanging-piece',
-    scored: true,
-    correct: true,
-    stars: 3,
-    hints: 0,
-    errors: 0,
-    moves: 1,
-    durationMs: 100,
     createdAt: NOW.toISOString(),
     updatedAt: NOW.toISOString(),
     ...overrides,
-  };
+  });
 }
 
 function baseDeps(overrides: Partial<AppDeps> = {}): AppDeps {
-  return {
-    profiles: {
-      list: () => Promise.resolve([]),
-      get: () => Promise.resolve(undefined),
-      save: () => Promise.resolve(),
-      delete: () => Promise.resolve(),
-    },
-    progress: makeProgressRepo(),
-    gameRecords: makeGameRecordRepo(),
+  return buildDeps({
     rewards: makeRewardsRepo(),
     clock: makeClock(NOW),
-    ids: makeIds(),
     content: makeContent([]),
-    parentLock: { get: () => Promise.resolve(undefined), save: () => Promise.resolve() },
-    passwordFile: { write: () => Promise.resolve({ location: 'x' }) },
-    settings: {
-      get: () =>
-        Promise.resolve<AppSettings>({
-          lastProfileId: null,
-          suggestedLevels: {},
-          profileSettings: {},
-        }),
-      save: () => Promise.resolve(),
-    },
-    random: seededRandom(1),
     ...overrides,
-  };
+  });
 }
 
 describe('recordDailyActivity', () => {

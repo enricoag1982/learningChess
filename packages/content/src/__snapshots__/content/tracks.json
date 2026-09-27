@@ -1,0 +1,117 @@
+{
+ "tracks": [
+  {
+   "id": "basics",
+   "kind": "main",
+   "titleKey": "journey:tracks.basics",
+   "worlds": [
+    {
+     "id": "board",
+     "track": "basics",
+     "order": 1,
+     "habitat": "meadow",
+     "titleKey": "journey:worlds.board"
+    },
+    {
+     "id": "pieces",
+     "track": "basics",
+     "order": 2,
+     "habitat": "savannah",
+     "titleKey": "journey:worlds.pieces"
+    },
+    {
+     "id": "attack",
+     "track": "basics",
+     "order": 3,
+     "habitat": "jungle",
+     "titleKey": "journey:worlds.attack",
+     "boss": "win-the-queen"
+    },
+    {
+     "id": "check",
+     "track": "basics",
+     "order": 4,
+     "habitat": "mountains",
+     "titleKey": "journey:worlds.check",
+     "boss": "first-game"
+    },
+    {
+     "id": "rules",
+     "track": "basics",
+     "order": 5,
+     "habitat": "river",
+     "titleKey": "journey:worlds.rules",
+     "boss": "full-game-rabbit"
+    }
+   ]
+  },
+  {
+   "id": "openings",
+   "kind": "branch",
+   "titleKey": "journey:tracks.openings",
+   "worlds": [
+    {
+     "id": "openings",
+     "track": "openings",
+     "order": 1,
+     "habitat": "forest",
+     "titleKey": "journey:worlds.openings"
+    }
+   ]
+  },
+  {
+   "id": "tactics",
+   "kind": "branch",
+   "titleKey": "journey:tracks.tactics",
+   "worlds": [
+    {
+     "id": "tactics",
+     "track": "tactics",
+     "order": 1,
+     "habitat": "ocean",
+     "titleKey": "journey:worlds.tactics"
+    }
+   ]
+  },
+  {
+   "id": "endgames",
+   "kind": "branch",
+   "titleKey": "journey:tracks.endgames",
+   "worlds": [
+    {
+     "id": "endgames",
+     "track": "endgames",
+     "order": 1,
+     "habitat": "arctic",
+     "titleKey": "journey:worlds.endgames"
+    }
+   ]
+  }
+ ],
+ "ranks": [
+  {
+   "id": "pawn",
+   "after": "start"
+  },
+  {
+   "id": "knight",
+   "after": "world:pieces"
+  },
+  {
+   "id": "bishop",
+   "after": "world:attack"
+  },
+  {
+   "id": "rook",
+   "after": "world:check"
+  },
+  {
+   "id": "queen",
+   "after": "track:basics"
+  },
+  {
+   "id": "king",
+   "after": "all-tracks"
+  }
+ ]
+}
