@@ -10,7 +10,7 @@ import {
   parseFen,
   recordLocalMatch,
 } from '@chess-kids/core';
-import type { FriendBoardMode, FriendOpponentChoice } from '../app/store.ts';
+import type { FriendBoardMode, FriendOpponentChoice } from '../app/slices/play.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';

@@ -1,0 +1,181 @@
+import { computerLevelStatus, loadGameRecords, updateSuggestedLevel } from '@chess-kids/core';
+import type { AppGet, AppSet } from '../store.ts';
+import { gated } from './time.ts';
+import { goHomeGated } from './nav.ts';
+
+/** Where the current standalone mini-game session was opened from: decides where its exit returns to.
+ * `today`: opened as a Today session's world-boss or mini-game activity — see `startToday`. */
+export type MiniGameOrigin = 'play' | 'journey' | 'home' | 'today';
+
+/** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
+export type FriendOpponentChoice =
+  { readonly kind: 'profile'; readonly profileId: string } | { readonly kind: 'guest' };
+
+/** Board mode for a vs Friend match (`docs/app-structure.md` §6). */
+export type FriendBoardMode = 'pass-and-play' | 'face-to-face';
+
+/** The vs Friend setup sheet's current choices, and what the friend game screen reads once "Start" is tapped. */
+export interface FriendSetupState {
+  readonly opponent: FriendOpponentChoice | null;
+  /** `'full'` for the full game, else a `versus` mini-game's content id. */
+  readonly gameId: string | null;
+  readonly boardMode: FriendBoardMode;
+  readonly legalMoveDots: boolean;
+  /** Active profile plays White by default; true swaps starting colours. */
+  readonly swapColours: boolean;
+}
+
+/** Tablet landscape and up (docs/app-structure.md §6): face-to-face's own default board mode. */
+const FACE_TO_FACE_MIN_WIDTH = 768;
+
+/** `window.innerWidth`-based default board mode; never throws (SSR/test environments without `window`). */
+function defaultFriendBoardMode(): FriendBoardMode {
+  try {
+    return window.innerWidth >= FACE_TO_FACE_MIN_WIDTH ? 'face-to-face' : 'pass-and-play';
+  } catch {
+    return 'pass-and-play';
+  }
+}
+
+const DEFAULT_FRIEND_SETUP: FriendSetupState = {
+  opponent: null,
+  gameId: null,
+  boardMode: 'pass-and-play',
+  legalMoveDots: true,
+  swapColours: false,
+};
+
+export interface PlaySlice {
+  /** The mini-game open in a standalone Play session (screen `minigame`); `null` otherwise. */
+  readonly miniGameId: string | null;
+  /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
+  readonly miniGameOrigin: MiniGameOrigin;
+  /** The bot level (1 Mouse .. 5 Bear) of the full game open (screen `full-game`); Play's default selection otherwise. */
+  readonly fullGameLevel: number;
+  /** Owl's "Ready for the Fox?" line (`docs/computer-opponent.md` §5 "Automatic level"), set once
+   * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
+   * it once (`goToHome`/`startFullGame` clear it so it never lingers past the game it is about). */
+  readonly levelUpSuggestion: { readonly level: number } | null;
+  /** The vs Friend setup sheet's current choices (screen `friend-setup`), read by the friend game
+   * screen (`friend-game`) once "Start" is tapped. */
+  readonly friendSetup: FriendSetupState;
+
+  /**
+   * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only) or the
+   * Journey map's world boss node. A Today session's world-boss / mini-game activity opens the
+   * same screen directly (`enterTodayActivity`), with `miniGameOrigin: 'today'`.
+   * `origin` (default `'play'`) decides where `exitMiniGame` returns to.
+   */
+  readonly startMiniGame: (miniGameId: string, origin?: MiniGameOrigin) => void;
+  /**
+   * Leaves the standalone mini-game session for wherever it was opened from; a Today-session
+   * mini-game (`miniGameOrigin: 'today'`) abandons the whole session instead (`leaveToday`).
+   */
+  readonly exitMiniGame: () => void;
+  /** Play's vs Computer "Full game" button: opens a full game vs `level` (1 Mouse .. 5 Bear). */
+  readonly startFullGame: (level: number) => void;
+  /** Leaves the full-game screen back to Play, refreshing progress (game records included). */
+  readonly exitFullGame: () => void;
+  /**
+   * Recomputes and persists the "Automatic level" suggestion (`docs/computer-opponent.md` §5)
+   * after one full game vs computer at `level` is recorded (finished or left — an abandoned game
+   * never counts toward the last-5 tally itself, so this is a no-op either way for those). Sets
+   * `levelUpSuggestion` when it moves the suggestion up a level. Called by `FullGameScreen` right
+   * after its own `recordGame`.
+   */
+  readonly updateAutomaticLevel: (level: number) => Promise<void>;
+  /** Play's "vs Friend" card: opens the setup sheet, resetting its choices (board mode defaults
+   * to face-to-face on a tablet-width screen, pass-and-play otherwise). */
+  readonly goToFriendSetup: () => void;
+  /** Merges `patch` into the setup sheet's current choices. */
+  readonly updateFriendSetup: (patch: Partial<FriendSetupState>) => void;
+  /** The setup sheet's "Start" button: opens the friend game screen with the sheet's current
+   * choices (a no-op without both a second player and a game picked — the button is disabled by
+   * then, this guards a stale click). */
+  readonly startFriendGame: () => void;
+  /** Leaves the friend game screen back to Play, refreshing progress (game records included). */
+  readonly exitFriendGame: () => void;
+}
+
+export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
+  return {
+    miniGameId: null,
+    miniGameOrigin: 'play',
+    fullGameLevel: 1,
+    levelUpSuggestion: null,
+    friendSetup: DEFAULT_FRIEND_SETUP,
+
+    startMiniGame(miniGameId: string, origin: MiniGameOrigin = 'play') {
+      void gated(set, get, () => {
+        set({ screen: 'minigame', miniGameId, miniGameOrigin: origin });
+      });
+    },
+
+    exitMiniGame() {
+      const origin = get().miniGameOrigin;
+      set({ miniGameId: null });
+      if (origin === 'today') {
+        get().leaveToday();
+        return;
+      }
+      if (origin === 'home') {
+        void goHomeGated(set, get);
+      } else {
+        set({ screen: origin === 'journey' ? 'journey' : 'play' });
+      }
+      void get().refreshProgress();
+    },
+
+    startFullGame(level: number) {
+      void gated(set, get, () => {
+        set({ screen: 'full-game', fullGameLevel: level, levelUpSuggestion: null });
+      });
+    },
+
+    exitFullGame() {
+      set({ screen: 'play' });
+      void get().refreshProgress();
+    },
+
+    async updateAutomaticLevel(level: number) {
+      const { profile, journey, services } = get();
+      if (!profile || !journey) return;
+      const records = await loadGameRecords(services.deps, profile.id);
+      const statuses = computerLevelStatus(records, journey);
+      const update = await updateSuggestedLevel(
+        services.deps,
+        profile.id,
+        level as 1 | 2 | 3 | 4 | 5,
+        records,
+        statuses,
+      );
+      if (update?.leveledUp) {
+        set({ levelUpSuggestion: { level: update.level } });
+      }
+    },
+
+    goToFriendSetup() {
+      set({
+        screen: 'friend-setup',
+        friendSetup: { ...DEFAULT_FRIEND_SETUP, boardMode: defaultFriendBoardMode() },
+      });
+    },
+
+    updateFriendSetup(patch: Partial<FriendSetupState>) {
+      set((state) => ({ friendSetup: { ...state.friendSetup, ...patch } }));
+    },
+
+    startFriendGame() {
+      const { friendSetup } = get();
+      if (!friendSetup.opponent || !friendSetup.gameId) return;
+      void gated(set, get, () => {
+        set({ screen: 'friend-game' });
+      });
+    },
+
+    exitFriendGame() {
+      set({ screen: 'play' });
+      void get().refreshProgress();
+    },
+  };
+}
