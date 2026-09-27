@@ -5,10 +5,16 @@ import type {
   BadgeDef,
   CompiledContent,
   ExerciseDef,
+  ExerciseFeedback,
+  ExerciseNoteCtx,
+  Hint,
+  PieceType,
+  Resolve,
+  Stars,
   TracksCatalog,
   World,
 } from '@chess-kids/core';
-import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
+import { PLAY_FROM_OPTIONS, exerciseNote, isEasierOfferNote, voiceKey } from '@chess-kids/core';
 import type { Locales } from './load.ts';
 import { modeContentOf } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
@@ -91,7 +97,7 @@ function resolve(
 
 /** Mirrors `apps/web/src/ui/art/character-meta.ts`'s `CHARACTER_PIECE` — kept in sync by
  * `lessons.test.ts` covering every lesson character. */
-const CHARACTER_PIECE: Readonly<Record<string, string>> = {
+const CHARACTER_PIECE: Readonly<Record<string, PieceType>> = {
   rhino: 'r',
   elephant: 'b',
   lioness: 'q',
@@ -100,7 +106,7 @@ const CHARACTER_PIECE: Readonly<Record<string, string>> = {
   caterpillar: 'p',
 };
 
-function characterPieceOf(character: string): string | null {
+function characterPieceOf(character: string): PieceType | null {
   return CHARACTER_PIECE[character] ?? null;
 }
 
@@ -413,97 +419,95 @@ function collectBadgeSpokenLines(
   }
 }
 
-/** Every `exercise-text.ts` `exerciseNote` text, spoken as its own utterance. Each note shape's
- * domain is bounded and content-derived: every lesson character (and the piece it stands for,
- * defaulting to rook), 1-3 stars, colour × piece type. Error-kind notes also get the
- * easier-variant-offer sentence appended, since `ExerciseStep` shows that offer on them. */
+/** Every `EXERCISE_NOTES` entry's text, spoken as its own utterance — via the same `exerciseNote`
+ * dispatch the app calls, instead of mirroring its logic by hand. Each note shape's domain is
+ * bounded and content-derived: every lesson character (and the piece it stands for, defaulting to
+ * rook), 1-3 stars, colour × piece type, one sample `Hint` per distinct wording. Error-kind notes
+ * (`isEasierOfferNote`) also get the easier-variant-offer sentence appended, since `ExerciseStep`
+ * shows that offer on them. */
 function collectExerciseNoteTexts(
   entries: Map<string, InventoryEntry>,
   locales: Locales,
   content: CompiledContent,
 ): void {
+  const r: Resolve = (key, vars) => resolve(locales, key, vars);
   const characters = [...new Set(content.lessons.map((lesson) => lesson.character))];
-  const easierOffer = resolve(locales, 'exercise.easier-offer');
+  const placeholderCtx: ExerciseNoteCtx = { name: '', piece: 'r', stars: 3 };
 
-  // An error-kind note: inventoried both plain and with the easier-variant offer appended.
-  function addErrorNote(text: string): void {
-    addText(entries, text, 'exercise-note');
-    addText(entries, `${text} ${easierOffer}`, 'exercise-note-easier-offer');
+  function addNote(feedback: ExerciseFeedback, ctx: ExerciseNoteCtx): void {
+    if (feedback.kind === 'instruction') return;
+    const plain = exerciseNote(r, feedback, ctx, false);
+    if (plain === undefined) return;
+    addText(entries, plain.text, 'exercise-note');
+    if (isEasierOfferNote(feedback.kind)) {
+      const withOffer = exerciseNote(r, feedback, ctx, true);
+      if (withOffer) addText(entries, withOffer.text, 'exercise-note-easier-offer');
+    }
   }
 
-  // tap-first (never gets the easier offer: not one of ERROR_FEEDBACK_KINDS).
-  for (const character of characters) {
-    const name = resolve(locales, `characters:${character}.name`);
-    addText(entries, resolve(locales, 'exercise.tap-piece-first', { name }), 'exercise-note');
-  }
+  // Every character's own display name and the piece it stands for (default rook).
+  const ctxByCharacter = characters.map((character) => ({
+    name: resolve(locales, `characters:${character}.name`),
+    piece: characterPieceOf(character) ?? 'r',
+  }));
 
-  // illegal move: one per character (its own piece, same default-to-rook rule as `characterPiece`).
-  for (const character of characters) {
-    const name = resolve(locales, `characters:${character}.name`);
-    const piece = characterPieceOf(character) ?? 'r';
-    addErrorNote(resolve(locales, `exercise.illegal.${piece}`, { name }));
+  // tap-first (never gets the easier offer: not an error kind) and illegal move (its own piece).
+  for (const { name, piece } of ctxByCharacter) {
+    addNote({ kind: 'tap-first' }, { name, piece, stars: 3 });
+    addNote({ kind: 'illegal' }, { name, piece, stars: 3 });
   }
 
   // Plain error notes with no variables.
-  for (const key of [
-    'exercise.select-wrong',
-    'exercise.select-missing',
-    'exercise.select-both',
-    'exercise.answer-wrong',
-    'exercise.move-wrong',
-    'exercise.setup.wrong',
-  ]) {
-    addErrorNote(resolve(locales, key));
-  }
+  addNote({ kind: 'select-wrong' }, placeholderCtx);
+  addNote({ kind: 'select-missing' }, placeholderCtx);
+  addNote({ kind: 'select-both' }, placeholderCtx);
+  addNote({ kind: 'wrong-answer' }, placeholderCtx);
+  addNote({ kind: 'wrong-move' }, placeholderCtx);
+  addNote({ kind: 'wrong-placement' }, placeholderCtx);
 
-  // Hint ladder (never gets the easier offer): the shared answer text, each kind's level-1/2 texts.
-  addText(entries, resolve(locales, 'exercise.hint-answer'), 'exercise-note');
-  for (const character of characters) {
-    const name = resolve(locales, `characters:${character}.name`);
-    addText(entries, resolve(locales, 'exercise.hint-piece', { name }), 'exercise-note');
+  // Hint ladder (never gets the easier offer). Level-1 "squares" (piece hint) is the only shape
+  // that varies by character; every other shape's text is character-independent.
+  for (const { name, piece } of ctxByCharacter) {
+    addNote(
+      { kind: 'hint', hint: { kind: 'squares', level: 1, squares: [] } },
+      { name, piece, stars: 3 },
+    );
   }
-  for (const key of [
-    'exercise.hint-target',
-    'exercise.hint-look',
-    'exercise.hint-think-again',
-    'exercise.hint-remove-option',
-    'exercise.setup.hint-square',
-  ]) {
-    addText(entries, resolve(locales, key), 'exercise-note');
+  const otherHints: readonly Hint[] = [
+    { kind: 'squares', level: 2, squares: [] },
+    { kind: 'squares', level: 3, squares: [] },
+    { kind: 'yes-no', level: 1, squares: [], reveal: false },
+    { kind: 'yes-no', level: 2, squares: [], reveal: false },
+    { kind: 'yes-no', level: 3, squares: [], reveal: true },
+    { kind: 'choice', level: 1, reveal: false },
+    { kind: 'choice', level: 3, reveal: true },
+    { kind: 'setup', level: 2, piece: { color: 'w', type: 'p' }, square: 'a1', placed: false },
+    { kind: 'setup', level: 3, piece: { color: 'w', type: 'p' }, square: 'a1', placed: true },
+  ];
+  for (const hint of otherHints) {
+    addNote({ kind: 'hint', hint }, placeholderCtx);
   }
   for (const color of ['w', 'b'] as const) {
-    for (const piece of PIECE_TYPES) {
-      addText(
-        entries,
-        resolve(locales, 'exercise.setup.hint-piece', {
-          color: resolve(locales, `board.color.${color}`),
-          piece: resolve(locales, `board.piece.${piece}`),
-        }),
-        'exercise-note',
+    for (const type of PIECE_TYPES) {
+      addNote(
+        { kind: 'hint', hint: { kind: 'setup', level: 1, piece: { color, type }, placed: false } },
+        placeholderCtx,
       );
     }
   }
 
   // Praise (solved), 1-3 stars; checkmate concatenates the "Checkmate!" line with the same praise.
-  const praiseKeys = ['exercise.praise-1', 'exercise.praise-2', 'exercise.praise-3'];
-  for (const key of praiseKeys) {
-    addText(entries, resolve(locales, key), 'exercise-note');
-  }
-  const checkmateText = resolve(locales, 'exercise.checkmate');
-  for (const key of praiseKeys) {
-    addText(entries, `${checkmateText} ${resolve(locales, key)}`, 'exercise-note');
+  for (const stars of [1, 2, 3] as const satisfies readonly Stars[]) {
+    addNote({ kind: 'solved' }, { ...placeholderCtx, stars });
+    addNote({ kind: 'checkmate' }, { ...placeholderCtx, stars });
   }
 
   // Opponent's scripted reply (mate-in-n): colour × piece.
   for (const color of ['w', 'b'] as const) {
     for (const piece of PIECE_TYPES) {
-      addText(
-        entries,
-        resolve(locales, 'exercise.opponent-moved', {
-          color: resolve(locales, `exercise.opponent-color.${color}`),
-          piece: resolve(locales, `board.piece.${piece}`),
-        }),
-        'exercise-note',
+      addNote(
+        { kind: 'opponent-reply', reply: { from: 'a1', to: 'a2', san: 'a2', color, piece } },
+        placeholderCtx,
       );
     }
   }

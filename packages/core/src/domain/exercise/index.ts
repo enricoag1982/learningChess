@@ -15,6 +15,14 @@ export type { ExerciseState } from './engine.ts';
 export type { MoveOutcome } from './kinds/static-move.ts';
 export type { MateInNOutcome } from './kinds/mate-in-n/kind.ts';
 export type { Hint } from './hint.ts';
+export type {
+  ExerciseFeedback,
+  ExerciseNoteKind,
+  ExerciseNoteCtx,
+  ExerciseNote,
+  Resolve,
+} from './notes.ts';
+export { EXERCISE_NOTES, exerciseNote, isEasierOfferNote } from './notes.ts';
 export type { SelectionResult } from './kinds/select-squares/kind.ts';
 export type { PlaceOutcome, PalettePiece } from './kinds/setup/kind.ts';
 export {

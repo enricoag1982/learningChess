@@ -1,5 +1,6 @@
 import type {
   ExerciseDef,
+  ExerciseFeedback,
   ExerciseState,
   Hint,
   Move,
@@ -23,29 +24,7 @@ import {
   undo,
 } from '@chess-kids/core';
 
-/** What the Owl bubble should say right now; resolved to text by the component (i18n lives there). */
-export type ExerciseFeedback =
-  | { readonly kind: 'instruction' }
-  | { readonly kind: 'tap-first' }
-  | { readonly kind: 'illegal' }
-  /** select-squares: only wrong picks. */
-  | { readonly kind: 'select-wrong' }
-  /** select-squares: only missing squares. */
-  | { readonly kind: 'select-missing' }
-  /** select-squares: wrong picks and missing squares. */
-  | { readonly kind: 'select-both' }
-  /** yes-no / choice: a wrong pick. */
-  | { readonly kind: 'wrong-answer' }
-  /** best-move: a legal move that is not in `solutions`. */
-  | { readonly kind: 'wrong-move' }
-  /** setup: a piece placed on the wrong square (or an already-filled one). */
-  | { readonly kind: 'wrong-placement' }
-  | { readonly kind: 'hint'; readonly hint: Hint }
-  | { readonly kind: 'solved' }
-  /** mate-in-n: delivered checkmate (any mating move, not only the scripted one). */
-  | { readonly kind: 'checkmate' }
-  /** mate-in-n: the scripted opponent reply, revealed after its short delay. */
-  | { readonly kind: 'opponent-reply'; readonly reply: Move };
+export type { ExerciseFeedback };
 
 export interface ExerciseUIState {
   readonly core: ExerciseState;

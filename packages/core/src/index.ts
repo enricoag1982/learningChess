@@ -250,7 +250,13 @@ export type {
   SeriesGameState,
   VersusState,
   StaticGoalSource,
+  ExerciseFeedback,
+  ExerciseNoteKind,
+  ExerciseNoteCtx,
+  ExerciseNote,
+  Resolve,
 } from './domain/exercise/index.ts';
+export { EXERCISE_NOTES, exerciseNote, isEasierOfferNote } from './domain/exercise/index.ts';
 
 // Exercise-kind registry: the only exercise-type dispatch (`domain/exercise/kinds/index.ts`).
 export type {
