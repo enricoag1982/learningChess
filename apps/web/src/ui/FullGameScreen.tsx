@@ -13,8 +13,8 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
-import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
 
 /** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -177,33 +177,16 @@ export function FullGameScreen(): JSX.Element {
       </div>
 
       {confirmLeave && (
-        <div
-          role="alertdialog"
-          aria-label={t('boss.versus.stop-game-title')}
-          className="fixed inset-0 z-10 flex items-center justify-center bg-black/30 px-4"
-        >
-          <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-3xl border-2 border-line bg-card p-6 text-center">
-            <p className="font-display text-xl text-ink">{t('boss.versus.stop-game-title')}</p>
-            <div className="flex w-full gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfirmLeave(false);
-                }}
-                className={tapClass('dialog')}
-              >
-                {t('boss.versus.stop-game-cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={confirmedLeave}
-                className={tapClass('dialog', 'today')}
-              >
-                {t('boss.versus.stop-game-confirm')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={t('boss.versus.stop-game-title')}
+          cancelLabel={t('boss.versus.stop-game-cancel')}
+          confirmLabel={t('boss.versus.stop-game-confirm')}
+          confirmTone="today"
+          onCancel={() => {
+            setConfirmLeave(false);
+          }}
+          onConfirm={confirmedLeave}
+        />
       )}
     </Screen>
   );

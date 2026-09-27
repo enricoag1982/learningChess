@@ -33,6 +33,7 @@ import { AvatarIcon } from '../art/avatars.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { tapClass } from '../ds/tap.ts';
 import { ScreenHeader } from '../ds/Screen.tsx';
+import { ParentConfirmDialog } from '../ds/parent.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
@@ -104,43 +105,32 @@ function PasswordConfirmDialog({
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 p-4"
+    <ParentConfirmDialog
+      title={title}
+      body={body}
+      cancelLabel={t('parent.cancel')}
+      confirmLabel={confirmLabel}
+      onCancel={onCancel}
+      onSubmit={(event) => {
+        void onSubmit(event);
+      }}
+      confirmDisabled={busy}
     >
-      <form
-        onSubmit={(event) => {
-          void onSubmit(event);
-        }}
-        className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-card p-6"
-      >
-        <h2 className="text-base font-extrabold text-ink">{title}</h2>
-        <p className="text-sm text-muted">{body}</p>
-        <label className="flex flex-col gap-1 text-sm font-bold text-ink">
-          {t('parent.password-label')}
-          <input
-            type="password"
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
-            }}
-            className={PARENT_INPUT}
-            autoComplete="current-password"
-            autoFocus
-          />
-        </label>
-        {error && <p className={PARENT_NOTE}>{error}</p>}
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className={PARENT_SECONDARY_BUTTON}>
-            {t('parent.cancel')}
-          </button>
-          <button type="submit" disabled={busy} className={PARENT_DANGER_BUTTON}>
-            {confirmLabel}
-          </button>
-        </div>
-      </form>
-    </div>
+      <label className="flex flex-col gap-1 text-sm font-bold text-ink">
+        {t('parent.password-label')}
+        <input
+          type="password"
+          value={password}
+          onChange={(event) => {
+            setPassword(event.target.value);
+          }}
+          className={PARENT_INPUT}
+          autoComplete="current-password"
+          autoFocus
+        />
+      </label>
+      {error && <p className={PARENT_NOTE}>{error}</p>}
+    </ParentConfirmDialog>
   );
 }
 
@@ -155,26 +145,14 @@ function DeleteConfirmDialog({
 }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-10 flex items-center justify-center bg-black/40 p-4"
-    >
-      <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-card p-6">
-        <h2 className="text-base font-extrabold text-ink">
-          {t('parent.delete-confirm-title', { name: profile.nickname })}
-        </h2>
-        <p className="text-sm text-muted">{t('parent.delete-confirm-body')}</p>
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className={PARENT_SECONDARY_BUTTON}>
-            {t('parent.delete-cancel')}
-          </button>
-          <button type="button" onClick={onConfirm} className={PARENT_DANGER_BUTTON}>
-            {t('parent.delete-confirm')}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ParentConfirmDialog
+      title={t('parent.delete-confirm-title', { name: profile.nickname })}
+      body={t('parent.delete-confirm-body')}
+      cancelLabel={t('parent.delete-cancel')}
+      confirmLabel={t('parent.delete-confirm')}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+    />
   );
 }
 

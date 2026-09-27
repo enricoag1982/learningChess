@@ -19,6 +19,8 @@ import type { BoardHighlights } from './board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
 import { GuestIcon } from './ds/icons-lazy.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen } from './ds/Screen.tsx';
+import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -420,67 +422,32 @@ function FriendMatch({
       )}
 
       {takeBackAsk && (
-        <div
-          role="alertdialog"
-          aria-label={t('friend-play.take-back-ask-title')}
-          className="fixed inset-0 z-10 flex items-center justify-center bg-black/30 px-4"
-        >
-          <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-3xl border-2 border-line bg-card p-6 text-center">
-            <p className="font-display text-xl text-ink">
-              {t('friend-play.take-back-ask', { name: toMovePlayer.nickname })}
-            </p>
-            <div className="flex w-full gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  respondTakeBack(false);
-                }}
-                className={tapClass('dialog')}
-              >
-                {t('exercise.no')}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  respondTakeBack(true);
-                }}
-                className={tapClass('dialog', 'go')}
-              >
-                {t('exercise.yes')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={t('friend-play.take-back-ask-title')}
+          message={t('friend-play.take-back-ask', { name: toMovePlayer.nickname })}
+          cancelLabel={t('exercise.no')}
+          confirmLabel={t('exercise.yes')}
+          confirmTone="go"
+          onCancel={() => {
+            respondTakeBack(false);
+          }}
+          onConfirm={() => {
+            respondTakeBack(true);
+          }}
+        />
       )}
 
       {confirmStop && (
-        <div
-          role="alertdialog"
-          aria-label={t('boss.versus.stop-game-title')}
-          className="fixed inset-0 z-10 flex items-center justify-center bg-black/30 px-4"
-        >
-          <div className="flex w-full max-w-sm flex-col items-center gap-4 rounded-3xl border-2 border-line bg-card p-6 text-center">
-            <p className="font-display text-xl text-ink">{t('boss.versus.stop-game-title')}</p>
-            <div className="flex w-full gap-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setConfirmStop(false);
-                }}
-                className={tapClass('dialog')}
-              >
-                {t('boss.versus.stop-game-cancel')}
-              </button>
-              <button
-                type="button"
-                onClick={confirmStopNow}
-                className={tapClass('dialog', 'today')}
-              >
-                {t('boss.versus.stop-game-confirm')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={t('boss.versus.stop-game-title')}
+          cancelLabel={t('boss.versus.stop-game-cancel')}
+          confirmLabel={t('boss.versus.stop-game-confirm')}
+          confirmTone="today"
+          onCancel={() => {
+            setConfirmStop(false);
+          }}
+          onConfirm={confirmStopNow}
+        />
       )}
     </main>
   );
@@ -501,12 +468,12 @@ export function FriendGameScreen(): JSX.Element {
   const exitFriendGame = useAppStore((state) => state.exitFriendGame);
 
   if (!profile) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
   const gameId = friendSetup.gameId ?? 'full';
   const def = gameDefFor(gameId, services.deps.content);
   if (!def) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const opponent = resolveOpponent(friendSetup.opponent, profiles, t('friend-play.guest'));
