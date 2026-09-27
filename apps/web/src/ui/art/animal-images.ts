@@ -38,8 +38,6 @@ export const ANIMAL_IMAGES = {
   wolf,
 } as const;
 
-export type AnimalImageId = keyof typeof ANIMAL_IMAGES;
-
 /** Image URL for `id`, falling back to the fox image for an id this module doesn't know (should
  * never happen for a real character/avatar/bot-level id — defensive only). */
 export function animalImage(id: string): string {

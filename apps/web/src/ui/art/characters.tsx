@@ -19,8 +19,3 @@ export function CharacterIcon({ character }: { readonly character: string }): JS
 export function OwlIcon(): JSX.Element {
   return <AnimalImg id="owl" />;
 }
-
-/** The kid's own profile avatar. */
-export function FoxIcon(): JSX.Element {
-  return <AnimalImg id="fox" />;
-}

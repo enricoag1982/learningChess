@@ -26,9 +26,7 @@ export function useSpeak(
   };
 }
 
-/** `useSpeak` in its default always-auto mode, under the name most call sites reach for. */
-export const useSpokenMessage = useSpeak;
-/** Same as {@link useSpeak} in its default mode — the name Story/Demo call sites still use. */
+/** Same as {@link useSpeak} in its default mode — the name Story/Demo call sites use. */
 export const useNarratedText = useSpeak;
 
 /** An exercise's instruction plus its feedback note, without re-reading the instruction on every
