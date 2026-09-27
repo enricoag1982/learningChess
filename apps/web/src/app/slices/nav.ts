@@ -1,11 +1,13 @@
 import type { Profile } from '@chess-kids/core';
 import { isFirstRun, listProfiles } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
-import type { RouteName } from '../routes.ts';
+import type { Route, RouteName } from '../routes.ts';
 import { gated } from './time.ts';
 
 export interface NavSlice {
   readonly screen: RouteName;
+  /** The current screen's own route data (v4 R2 PR C); `screen` always equals `route.name`. */
+  readonly route: Route;
   /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
   readonly init: () => Promise<void>;
   /** Opens the new-player wizard; `returnsToParent` when entered from the parent area's "Add child". */
@@ -35,29 +37,37 @@ function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | n
   return ordered;
 }
 
+/** Shows `route`, keeping `screen` (still read directly by a few call sites) equal to its name.
+ * The one place that touches both fields — every screen change goes through this or `gated`. */
+export function enterRoute(set: AppSet, route: Route): void {
+  set({ route, screen: route.name });
+}
+
 /** `gated`, specialised to "returning to Home" (the gate's other checkpoint alongside entering
  * an activity — domain-model.md §3.3). Exported so `learn`/`today`/`play` share it. */
 export async function goHomeGated(set: AppSet, get: AppGet): Promise<void> {
   await gated(set, get, () => {
-    set({ screen: 'home' });
+    enterRoute(set, { name: 'home' });
   });
 }
 
 export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
   return {
     screen: 'loading',
+    route: { name: 'loading' },
 
     async init() {
       const { services } = get();
       if (await isFirstRun(services.deps)) {
-        set({ screen: 'first-run' });
+        enterRoute(set, { name: 'first-run' });
         return;
       }
       await get().goToPicker();
     },
 
     startNewPlayer(returnsToParent: boolean) {
-      set({ screen: 'new-player', newPlayerReturnsToParent: returnsToParent });
+      set({ newPlayerReturnsToParent: returnsToParent });
+      enterRoute(set, { name: 'new-player' });
     },
 
     async goToPicker() {
@@ -66,11 +76,12 @@ export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
         listProfiles(services.deps),
         services.deps.settings.get(),
       ]);
-      set({ profiles: orderByLastUsed(profiles, settings.lastProfileId), screen: 'picker' });
+      set({ profiles: orderByLastUsed(profiles, settings.lastProfileId) });
+      enterRoute(set, { name: 'picker' });
     },
 
     goToJourney() {
-      set({ screen: 'journey' });
+      enterRoute(set, { name: 'journey' });
     },
 
     goToHome() {
@@ -79,15 +90,15 @@ export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
     },
 
     goToPlay() {
-      set({ screen: 'play' });
+      enterRoute(set, { name: 'play' });
     },
 
     goToDen() {
-      set({ screen: 'den' });
+      enterRoute(set, { name: 'den' });
     },
 
     goToPractice() {
-      set({ screen: 'practice' });
+      enterRoute(set, { name: 'practice' });
     },
   };
 }

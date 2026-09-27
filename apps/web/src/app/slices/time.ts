@@ -13,10 +13,12 @@ import {
 } from '@chess-kids/core';
 import { ROUTE_META } from '../routes.ts';
 import type { AppGet, AppSet, Screen } from '../store.ts';
+import { enterRoute } from './nav.ts';
 
 export interface TimeSlice {
   /** The activity gate's last read (M5.2, domain-model.md §3.3), shown on the "See you tomorrow"
-   * screen (screen `time-limit`); `null` outside one. */
+   * screen (screen `time-limit`); `null` outside one. Stays flat, not routed (see `PlainRouteName`'s
+   * own doc comment): it must survive underneath a pushed `password` screen. */
   readonly timeLimitStatus: TimeLimitStatus | null;
   /** What the gate was about to do when it found the profile over its limit — replayed as-is
    * (no re-check) once the parent grants more time (`grantMoreTimeAndResume`). `null` outside a
@@ -88,7 +90,8 @@ export async function gated(
   }
   const status = await checkActivityGate(services.deps, profile.id);
   if (status.overLimit) {
-    set({ screen: 'time-limit', timeLimitStatus: status, pendingActivity: enterActivity });
+    set({ pendingActivity: enterActivity, timeLimitStatus: status });
+    enterRoute(set, { name: 'time-limit' });
     return;
   }
   await enterActivity();
@@ -104,8 +107,9 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
     async checkTimeNotice(trigger) {
       const { services } = get();
       if (trigger === 'screen') set({ timeNoticeVisible: false });
-      const { profile, screen, lessonId, stepIndex } = get();
+      const { profile, screen, route, stepIndex } = get();
       if (!profile) return;
+      const lessonId = route.name === 'lesson' ? route.lessonId : null;
       if (!isCalmScreen(screen, lessonId, stepIndex, services.deps.content)) return;
       const now = services.deps.clock.now();
       const settings = await getProfileSettings(services.deps, profile.id);
@@ -118,13 +122,15 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
     },
 
     goToPasswordScreen(purpose = 'parent-area') {
-      set({ screen: 'password', passwordPurpose: purpose });
+      set({ passwordPurpose: purpose });
+      enterRoute(set, { name: 'password', purpose });
     },
 
     async goToParentArea() {
       const { services } = get();
       const profiles = await listProfiles(services.deps);
-      set({ profiles, screen: 'parent' });
+      set({ profiles });
+      enterRoute(set, { name: 'parent' });
     },
 
     async grantMoreTimeAndResume() {
@@ -142,7 +148,7 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
       if (pendingActivity) {
         await pendingActivity();
       } else {
-        set({ screen: 'home' });
+        enterRoute(set, { name: 'home' });
       }
     },
 
@@ -152,8 +158,6 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
         pendingActivity: null,
         todayPlan: null,
         todayActivityIndex: 0,
-        lessonId: null,
-        miniGameId: null,
       });
       await get().goToPicker();
     },

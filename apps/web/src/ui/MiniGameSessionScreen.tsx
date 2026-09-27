@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { recordMiniGameResult } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { BossStep } from './lesson/BossStep.tsx';
@@ -17,7 +17,7 @@ export function MiniGameSessionScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
-  const miniGameId = useAppStore((state) => state.miniGameId);
+  const miniGameId = useRoute('minigame')?.miniGameId ?? null;
   const miniGameOrigin = useAppStore((state) => state.miniGameOrigin);
   const exitMiniGame = useAppStore((state) => state.exitMiniGame);
   const advanceToday = useAppStore((state) => state.advanceToday);

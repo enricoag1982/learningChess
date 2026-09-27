@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppStore } from '../app/store.ts';
+import { useAppStore, useRoute } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { Screen } from './ds/Screen.tsx';
@@ -54,8 +54,9 @@ function PlacementSummary({
  */
 export function PlacementScreen(): JSX.Element {
   const { t } = useTranslation();
-  const placementPlan = useAppStore((state) => state.placementPlan);
-  const placementIndex = useAppStore((state) => state.placementIndex);
+  const route = useRoute('placement');
+  const placementPlan = route?.plan ?? [];
+  const placementIndex = route?.index ?? 0;
   const submitPlacementWorldRun = useAppStore((state) => state.submitPlacementWorldRun);
   const advancePlacementWorld = useAppStore((state) => state.advancePlacementWorld);
   const finishPlacement = useAppStore((state) => state.finishPlacement);

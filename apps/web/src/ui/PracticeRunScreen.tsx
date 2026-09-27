@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppStore } from '../app/store.ts';
+import { useAppStore, useRoute } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { BlankScreen } from './ds/Screen.tsx';
 
@@ -10,13 +10,14 @@ import { BlankScreen } from './ds/Screen.tsx';
  */
 export function PracticeRunScreen(): JSX.Element {
   const { t } = useTranslation();
-  const practiceConceptId = useAppStore((state) => state.practiceConceptId);
-  const practiceTasks = useAppStore((state) => state.practiceTasks);
+  const route = useRoute('practice-run');
   const exitPracticeRun = useAppStore((state) => state.exitPracticeRun);
 
-  if (practiceTasks.length === 0) {
+  if (!route || route.tasks.length === 0) {
     return <BlankScreen />;
   }
+  const practiceConceptId = route.conceptId;
+  const practiceTasks = route.tasks;
 
   const headerText =
     practiceConceptId === null

@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import { create } from 'zustand';
 import type { StoreApi } from 'zustand';
-import type { RouteName } from './routes.ts';
+import type { Route, RouteName } from './routes.ts';
 import type { Services } from './services.ts';
 import type { LearnSlice } from './slices/learn.ts';
 import { createLearnSlice } from './slices/learn.ts';
@@ -66,4 +66,10 @@ export function useAppStore<T>(selector: (state: AppState) => T): T {
 /** Convenience: the wired services (rules, narrator, content, use-case deps). */
 export function useServices(): Services {
   return useAppStore((state) => state.services);
+}
+
+/** The current route, narrowed to `name`'s own param shape; `null` when a different route shows. */
+export function useRoute<N extends RouteName>(name: N): Extract<Route, { name: N }> | null {
+  const route = useAppStore((state) => state.route);
+  return route.name === name ? (route as Extract<Route, { name: N }>) : null;
 }

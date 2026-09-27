@@ -1,32 +1,64 @@
-/** Every top-level screen name (`v4 refactor-v4.md` R2 PR C: replaces the old `Screen` union). */
-export type RouteName =
+import type { AssessmentScope, ConceptTask, PlacementWorldPlan } from '@chess-kids/core';
+
+/** Screen names with no route params of their own. `time-limit` is here only until C4b's stack
+ * lands: its status needs to survive underneath a pushed `password` screen (the "Parent: more
+ * time" flow), which a single flat `route` field (no stack yet) cannot do — so it stays a
+ * `pendingActivity`-style flat field on `TimeSlice` for now, same as today. */
+export type PlainRouteName =
   | 'loading'
   | 'first-run'
   | 'new-player'
   | 'picker'
-  | 'password'
   | 'parent'
   | 'home'
   | 'journey'
-  | 'lesson'
   | 'play'
   | 'den'
-  | 'minigame'
-  | 'full-game'
   | 'friend-setup'
   | 'friend-game'
   | 'warmup'
   | 'practice'
-  | 'practice-run'
   | 'today-summary'
   | 'placement-offer'
-  | 'placement'
-  | 'assessment'
   | 'time-limit';
 
-/** A navigable place in the app. Widens with typed params (C4a) as screens move their route data
- * here off the store; `{ name }` alone for now. */
-export type Route = { readonly name: RouteName };
+/** Every top-level screen name (`v4 refactor-v4.md` R2 PR C: replaces the old `Screen` union). */
+export type RouteName =
+  | PlainRouteName
+  | 'password'
+  | 'lesson'
+  | 'minigame'
+  | 'full-game'
+  | 'practice-run'
+  | 'assessment'
+  | 'placement';
+
+/**
+ * A navigable place in the app: `screens`' own route data lives here (v4 R2 PR C), not spread over
+ * the store's flat fields. `today` on `lesson`/`minigame` lands in C4b, once the origin fields it
+ * currently replaces (`lessonOrigin`, `miniGameOrigin`) come out.
+ */
+export type Route =
+  | { readonly name: PlainRouteName }
+  | { readonly name: 'password'; readonly purpose: 'parent-area' | 'more-time' }
+  | { readonly name: 'lesson'; readonly lessonId: string; readonly startStep: number }
+  | { readonly name: 'minigame'; readonly miniGameId: string }
+  | { readonly name: 'full-game'; readonly level: 1 | 2 | 3 | 4 | 5 }
+  | {
+      readonly name: 'practice-run';
+      readonly conceptId: string | null;
+      readonly tasks: readonly ConceptTask[];
+    }
+  | {
+      readonly name: 'assessment';
+      readonly scope: AssessmentScope;
+      readonly tasks: readonly ConceptTask[];
+    }
+  | {
+      readonly name: 'placement';
+      readonly plan: readonly PlacementWorldPlan[];
+      readonly index: number;
+    };
 
 interface RouteMeta {
   /** Counted by `TimeTracker` (M5.2) while a profile is active. */

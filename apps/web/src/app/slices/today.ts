@@ -2,7 +2,7 @@ import type { AnimalFriend, TodaySessionPlan } from '@chess-kids/core';
 import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
 import { gated } from './time.ts';
-import { goHomeGated } from './nav.ts';
+import { enterRoute, goHomeGated } from './nav.ts';
 import { enterLesson } from './learn.ts';
 
 export interface TodaySlice {
@@ -49,14 +49,15 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
       if (profile) {
         await checkRewards(services.deps, profile.id);
       }
-      set({ screen: 'today-summary', todayActivityIndex: index });
+      set({ todayActivityIndex: index });
+      enterRoute(set, { name: 'today-summary' });
       await get().checkForCelebrations();
       return;
     }
     set({ todayActivityIndex: index });
     if (activity.kind === 'warmup') {
       await gated(set, get, () => {
-        set({ screen: 'warmup' });
+        enterRoute(set, { name: 'warmup' });
       });
       return;
     }
@@ -72,7 +73,8 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
       return;
     }
     await gated(set, get, () => {
-      set({ screen: 'minigame', miniGameId, miniGameOrigin: 'today' });
+      set({ miniGameOrigin: 'today' });
+      enterRoute(set, { name: 'minigame', miniGameId });
     });
   }
 
@@ -101,7 +103,7 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
     async advanceToday() {
       const plan = get().todayPlan;
       if (!plan) {
-        set({ screen: 'home' });
+        enterRoute(set, { name: 'home' });
         return;
       }
       await get().refreshProgress();
@@ -112,8 +114,6 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
       set({
         todayPlan: null,
         todayActivityIndex: 0,
-        lessonId: null,
-        miniGameId: null,
       });
       void goHomeGated(set, get);
       void get().refreshProgress();

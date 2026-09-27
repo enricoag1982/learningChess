@@ -229,7 +229,7 @@ describe('HomeScreen next step is a world boss', () => {
     await waitFor(() => {
       expect(store.getState().screen).toBe('minigame');
     });
-    expect(store.getState().miniGameId).toBe('boss-mg');
+    expect(store.getState().route).toEqual({ name: 'minigame', miniGameId: 'boss-mg' });
     expect(store.getState().miniGameOrigin).toBe('today');
   });
 });

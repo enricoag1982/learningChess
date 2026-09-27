@@ -64,7 +64,7 @@ describe('JourneyScreen', () => {
     });
 
     expect(store.getState().screen).toBe('lesson');
-    expect(store.getState().lessonId).toBe('l1');
+    expect(store.getState().route).toMatchObject({ name: 'lesson', lessonId: 'l1' });
   });
 
   it('back button returns to Home', async () => {
@@ -195,7 +195,7 @@ describe('JourneyScreen world boss node', () => {
     });
 
     expect(store.getState().screen).toBe('minigame');
-    expect(store.getState().miniGameId).toBe('boss-mg');
+    expect(store.getState().route).toEqual({ name: 'minigame', miniGameId: 'boss-mg' });
     expect(store.getState().miniGameOrigin).toBe('journey');
 
     store.getState().exitMiniGame();
@@ -211,6 +211,6 @@ describe('JourneyScreen world boss node', () => {
     fireEvent.click(await screen.findByRole('button', { name: /^World boss: .*, locked$/ }));
 
     expect(store.getState().screen).toBe(screenBefore); // unchanged: locked tap is a no-op
-    expect(store.getState().miniGameId).toBeNull();
+    expect(store.getState().route.name).not.toBe('minigame');
   });
 });

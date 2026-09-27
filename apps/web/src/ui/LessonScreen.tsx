@@ -10,7 +10,7 @@ import {
   stepPhase,
   totalStars,
 } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { BossStep } from './lesson/BossStep.tsx';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
 import { DemoStep } from './lesson/DemoStep.tsx';
@@ -67,7 +67,7 @@ export function LessonScreen(): JSX.Element {
   const isCompact = useIsCompact();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
-  const lessonId = useAppStore((state) => state.lessonId);
+  const lessonId = useRoute('lesson')?.lessonId ?? null;
   const stepIndex = useAppStore((state) => state.stepIndex);
   const goToStep = useAppStore((state) => state.goToStep);
   const exitLesson = useAppStore((state) => state.exitLesson);

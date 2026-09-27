@@ -3,7 +3,7 @@ import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { AssessmentScope, AssessmentScore } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { Services } from '../app/services.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
@@ -84,7 +84,7 @@ function AssessmentResult({
  */
 export function AssessmentScreen(): JSX.Element {
   const { t } = useTranslation();
-  const assessmentRun = useAppStore((state) => state.assessmentRun);
+  const assessmentRun = useRoute('assessment');
   const submitAssessmentRun = useAppStore((state) => state.submitAssessmentRun);
   const exitAssessment = useAppStore((state) => state.exitAssessment);
   const resultsRef = useRef<boolean[]>([]);

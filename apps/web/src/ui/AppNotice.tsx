@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { Owl } from './ds/Owl.tsx';
 
 /**
@@ -20,7 +20,7 @@ export function AppNotice(): JSX.Element | null {
   const { t } = useTranslation();
   const services = useServices();
   const screen = useAppStore((state) => state.screen);
-  const lessonId = useAppStore((state) => state.lessonId);
+  const lessonId = useRoute('lesson')?.lessonId ?? null;
   const stepIndex = useAppStore((state) => state.stepIndex);
   const visible = useAppStore((state) => state.timeNoticeVisible);
   const checkTimeNotice = useAppStore((state) => state.checkTimeNotice);

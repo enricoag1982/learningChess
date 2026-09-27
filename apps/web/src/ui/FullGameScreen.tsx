@@ -9,7 +9,7 @@ import {
   versusGameRecordResult,
   versusGameState,
 } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
@@ -78,7 +78,7 @@ export function FullGameScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
-  const level = useAppStore((state) => state.fullGameLevel);
+  const route = useRoute('full-game');
   const exitFullGame = useAppStore((state) => state.exitFullGame);
   const updateAutomaticLevel = useAppStore((state) => state.updateAutomaticLevel);
   const checkForCelebrations = useAppStore((state) => state.checkForCelebrations);
@@ -86,12 +86,13 @@ export function FullGameScreen(): JSX.Element {
   const [current, setCurrent] = useState<VersusState | null>(null);
   const [confirmLeave, setConfirmLeave] = useState(false);
 
-  const botLevel = bot.BOT_LEVELS.find((entry) => entry.level === level);
-  const botName = t(`boss.versus.bot-name.${botLevel?.name ?? 'mouse'}`);
-
-  if (!profile) {
+  if (!profile || !route) {
     return <BlankScreen />;
   }
+  const level = route.level;
+
+  const botLevel = bot.BOT_LEVELS.find((entry) => entry.level === level);
+  const botName = t(`boss.versus.bot-name.${botLevel?.name ?? 'mouse'}`);
 
   const game = fullGameDef(level);
 

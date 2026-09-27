@@ -248,14 +248,22 @@ describe('5-minute warning notice (M7.1)', () => {
     expect(completeIndex).toBeGreaterThan(-1);
 
     act(() => {
-      store.setState({ screen: 'lesson', lessonId: lesson.id, stepIndex: 0 });
+      store.setState({
+        screen: 'lesson',
+        route: { name: 'lesson', lessonId: lesson.id, startStep: 0 },
+        stepIndex: 0,
+      });
     });
     await waitFor(() => {
       expect(store.getState().timeNoticeVisible).toBe(false);
     });
 
     act(() => {
-      store.setState({ screen: 'lesson', lessonId: lesson.id, stepIndex: completeIndex });
+      store.setState({
+        screen: 'lesson',
+        route: { name: 'lesson', lessonId: lesson.id, startStep: 0 },
+        stepIndex: completeIndex,
+      });
     });
     await screen.findByText(FIVE_MINUTES_TEXT);
   });

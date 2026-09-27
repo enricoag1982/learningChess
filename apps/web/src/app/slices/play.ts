@@ -1,7 +1,7 @@
 import { computerLevelStatus, loadGameRecords, updateSuggestedLevel } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
 import { gated } from './time.ts';
-import { goHomeGated } from './nav.ts';
+import { enterRoute, goHomeGated } from './nav.ts';
 
 /** Where the current standalone mini-game session was opened from: decides where its exit returns to.
  * `today`: opened as a Today session's world-boss or mini-game activity — see `startToday`. */
@@ -46,12 +46,8 @@ const DEFAULT_FRIEND_SETUP: FriendSetupState = {
 };
 
 export interface PlaySlice {
-  /** The mini-game open in a standalone Play session (screen `minigame`); `null` otherwise. */
-  readonly miniGameId: string | null;
   /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
   readonly miniGameOrigin: MiniGameOrigin;
-  /** The bot level (1 Mouse .. 5 Bear) of the full game open (screen `full-game`); Play's default selection otherwise. */
-  readonly fullGameLevel: number;
   /** Owl's "Ready for the Fox?" line (`docs/computer-opponent.md` §5 "Automatic level"), set once
    * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
    * it once (`goToHome`/`startFullGame` clear it so it never lingers past the game it is about). */
@@ -99,21 +95,19 @@ export interface PlaySlice {
 
 export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
   return {
-    miniGameId: null,
     miniGameOrigin: 'play',
-    fullGameLevel: 1,
     levelUpSuggestion: null,
     friendSetup: DEFAULT_FRIEND_SETUP,
 
     startMiniGame(miniGameId: string, origin: MiniGameOrigin = 'play') {
       void gated(set, get, () => {
-        set({ screen: 'minigame', miniGameId, miniGameOrigin: origin });
+        set({ miniGameOrigin: origin });
+        enterRoute(set, { name: 'minigame', miniGameId });
       });
     },
 
     exitMiniGame() {
       const origin = get().miniGameOrigin;
-      set({ miniGameId: null });
       if (origin === 'today') {
         get().leaveToday();
         return;
@@ -121,19 +115,20 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
       if (origin === 'home') {
         void goHomeGated(set, get);
       } else {
-        set({ screen: origin === 'journey' ? 'journey' : 'play' });
+        enterRoute(set, { name: origin === 'journey' ? 'journey' : 'play' });
       }
       void get().refreshProgress();
     },
 
     startFullGame(level: number) {
       void gated(set, get, () => {
-        set({ screen: 'full-game', fullGameLevel: level, levelUpSuggestion: null });
+        set({ levelUpSuggestion: null });
+        enterRoute(set, { name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 });
       });
     },
 
     exitFullGame() {
-      set({ screen: 'play' });
+      enterRoute(set, { name: 'play' });
       void get().refreshProgress();
     },
 
@@ -155,10 +150,8 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
     },
 
     goToFriendSetup() {
-      set({
-        screen: 'friend-setup',
-        friendSetup: { ...DEFAULT_FRIEND_SETUP, boardMode: defaultFriendBoardMode() },
-      });
+      set({ friendSetup: { ...DEFAULT_FRIEND_SETUP, boardMode: defaultFriendBoardMode() } });
+      enterRoute(set, { name: 'friend-setup' });
     },
 
     updateFriendSetup(patch: Partial<FriendSetupState>) {
@@ -169,12 +162,12 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
       const { friendSetup } = get();
       if (!friendSetup.opponent || !friendSetup.gameId) return;
       void gated(set, get, () => {
-        set({ screen: 'friend-game' });
+        enterRoute(set, { name: 'friend-game' });
       });
     },
 
     exitFriendGame() {
-      set({ screen: 'play' });
+      enterRoute(set, { name: 'play' });
       void get().refreshProgress();
     },
   };
