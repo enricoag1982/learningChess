@@ -5,13 +5,12 @@ import type { ChildReport, GameRecord, Lesson, Profile } from '@chess-kids/core'
 import { bot, buildChildReport } from '@chess-kids/core';
 import { useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
-import { avatarBackground } from '../art/avatar-meta.ts';
-import { AvatarIcon } from '../art/avatars.tsx';
 import { RankPill } from '../RankPill.tsx';
 import { ChevronRightIcon } from '../ds/icons.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { ScreenHeader } from '../ds/Screen.tsx';
 import { useAsync } from '../ds/useAsync.ts';
+import { AvatarBadge } from '../ds/AvatarBadge.tsx';
 import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
@@ -152,12 +151,10 @@ export function ChildReportScreen({
       >
         {report && (
           <>
-            <span
+            <AvatarBadge
+              avatar={report.profile.avatar}
               className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-              style={{ backgroundColor: avatarBackground(report.profile.avatar) }}
-            >
-              <AvatarIcon avatar={report.profile.avatar} />
-            </span>
+            />
             <div className="flex flex-1 flex-col">
               <span className="text-base font-extrabold text-ink">{report.profile.nickname}</span>
               <RankPill rank={report.rank} compact />

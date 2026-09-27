@@ -33,7 +33,8 @@ import { AvatarIcon } from '../art/avatars.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { tapClass } from '../ds/tap.ts';
 import { ScreenHeader } from '../ds/Screen.tsx';
-import { ParentConfirmDialog } from '../ds/parent.tsx';
+import { ParentConfirmDialog, ParentSection } from '../ds/parent.tsx';
+import { AvatarBadge } from '../ds/AvatarBadge.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
@@ -449,14 +450,12 @@ export function ChildSettingsScreen({
         title={t('parent.settings-title', { name: profile.nickname })}
       />
 
-      <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
+      <ParentSection>
         <div className="flex items-center gap-3">
-          <span
+          <AvatarBadge
+            avatar={profile.avatar}
             className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-            style={{ backgroundColor: avatarBackground(profile.avatar) }}
-          >
-            <AvatarIcon avatar={profile.avatar} />
-          </span>
+          />
           {renaming ? (
             <input
               type="text"
@@ -525,10 +524,10 @@ export function ChildSettingsScreen({
             {t('parent.change-avatar')}
           </button>
         </div>
-      </section>
+      </ParentSection>
 
       {settings && (
-        <section className="flex flex-col gap-4 rounded-xl border border-line bg-card p-4">
+        <ParentSection gap={4}>
           <div className="flex flex-col gap-3">
             <h3 className="text-sm font-extrabold text-ink">{t('parent.daily-limit-heading')}</h3>
             <ToggleRow
@@ -673,16 +672,14 @@ export function ChildSettingsScreen({
               ))}
             </div>
           </div>
-        </section>
+        </ParentSection>
       )}
 
-      <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
-        <h3 className="text-sm font-extrabold text-ink">{t('parent.unlock-lessons-worlds')}</h3>
+      <ParentSection title={t('parent.unlock-lessons-worlds')}>
         <UnlockPanel profileId={profile.id} />
-      </section>
+      </ParentSection>
 
-      <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
-        <h3 className="text-sm font-extrabold text-ink">{t('parent.backup-heading')}</h3>
+      <ParentSection title={t('parent.backup-heading')}>
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
@@ -706,7 +703,7 @@ export function ChildSettingsScreen({
           </button>
         </div>
         {shareNote && <p className={PARENT_NOTE}>{shareNote}</p>}
-      </section>
+      </ParentSection>
 
       <section className="flex flex-col gap-3 rounded-xl border border-today p-4">
         <h3 className="text-sm font-extrabold text-[#8C4012]">{t('parent.danger-heading')}</h3>

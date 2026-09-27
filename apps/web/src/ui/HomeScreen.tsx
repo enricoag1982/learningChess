@@ -4,8 +4,6 @@ import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { InstallBanner } from './InstallBanner.tsx';
 import { RankPill } from './RankPill.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
@@ -16,6 +14,7 @@ import { useNarratedText } from './ds/useNarratedText.ts';
 import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, RoundIconButton } from './ds/Screen.tsx';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 import { useAsync } from './ds/useAsync.ts';
 
 // Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
@@ -179,14 +178,11 @@ export function HomeScreen(): JSX.Element {
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div
-            role="img"
-            aria-label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
+          <AvatarBadge
+            avatar={profile.avatar}
+            label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
             className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full p-2 sm:h-16 sm:w-16"
-            style={{ backgroundColor: avatarBackground(profile.avatar) }}
-          >
-            <AvatarIcon avatar={profile.avatar} />
-          </div>
+          />
           <span className="font-display text-2xl text-ink sm:text-3xl">{profile.nickname}</span>
         </div>
         <div className="flex flex-wrap items-center justify-end gap-3">

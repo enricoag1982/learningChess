@@ -12,8 +12,6 @@ import {
 } from '@chess-kids/core';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/store.ts';
 import { useAppStore, useServices } from '../app/store.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
@@ -21,6 +19,7 @@ import { GuestIcon } from './ds/icons-lazy.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen } from './ds/Screen.tsx';
 import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -87,14 +86,20 @@ function toLocalPlayer(player: PlayerDisplay): LocalPlayer {
 }
 
 function PlayerAvatar({ player }: { readonly player: PlayerDisplay }): JSX.Element {
+  if (player.kind === 'profile') {
+    return (
+      <AvatarBadge
+        avatar={player.avatar}
+        className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-1.5"
+      />
+    );
+  }
   return (
     <span
       className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-      style={{
-        backgroundColor: player.kind === 'profile' ? avatarBackground(player.avatar) : '#EDEFF1',
-      }}
+      style={{ backgroundColor: '#EDEFF1' }}
     >
-      {player.kind === 'profile' ? <AvatarIcon avatar={player.avatar} /> : <GuestIcon />}
+      <GuestIcon />
     </span>
   );
 }

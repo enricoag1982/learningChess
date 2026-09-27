@@ -9,8 +9,6 @@ import {
   isValidPassword,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { RankPill } from './RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';
 import { ChildReportScreen } from './parent/ChildReport.tsx';
@@ -25,6 +23,7 @@ import {
 } from './parent/parent-styles.ts';
 import { ChevronRightIcon, LockIcon } from './ds/icons.tsx';
 import { useAsync } from './ds/useAsync.ts';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.Element {
   const { t } = useTranslation();
@@ -105,12 +104,10 @@ function ChildOverviewCard({
   return (
     <li>
       <button type="button" onClick={onOpen} className={PARENT_TAPPABLE_ROW}>
-        <span
+        <AvatarBadge
+          avatar={overview.profile.avatar}
           className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-          style={{ backgroundColor: avatarBackground(overview.profile.avatar) }}
-        >
-          <AvatarIcon avatar={overview.profile.avatar} />
-        </span>
+        />
         <span className="flex flex-1 flex-col gap-1">
           <span className="flex items-center gap-2">
             <span className="text-base font-extrabold text-ink">{overview.profile.nickname}</span>

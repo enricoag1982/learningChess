@@ -1,10 +1,9 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../app/store.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { LockIcon, PlusIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 /** Profile picker (kid style): app start whenever a parent lock exists (app-structure.md §3). */
 export function ProfilePickerScreen(): JSX.Element {
@@ -33,12 +32,10 @@ export function ProfilePickerScreen(): JSX.Element {
               'flex w-40 flex-col items-center gap-3 rounded-3xl bg-card p-5 sm:w-52',
             )}
           >
-            <span
+            <AvatarBadge
+              avatar={profile.avatar}
               className="h-24 w-24 overflow-hidden rounded-full p-3 sm:h-32 sm:w-32"
-              style={{ backgroundColor: avatarBackground(profile.avatar) }}
-            >
-              <AvatarIcon avatar={profile.avatar} />
-            </span>
+            />
             <span className="font-display text-xl font-semibold text-ink sm:text-2xl">
               {profile.nickname}
             </span>

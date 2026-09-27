@@ -13,14 +13,13 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
 import { animalImage } from './art/animal-images.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { OwlIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 import { useAsync } from './ds/useAsync.ts';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
@@ -166,14 +165,11 @@ export function PlayScreen(): JSX.Element {
         title={t('play.title')}
       >
         <div className="flex items-center gap-2">
-          <div
-            role="img"
-            aria-label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
+          <AvatarBadge
+            avatar={profile.avatar}
+            label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
             className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-            style={{ backgroundColor: avatarBackground(profile.avatar) }}
-          >
-            <AvatarIcon avatar={profile.avatar} />
-          </div>
+          />
           <span className="font-display text-lg text-ink sm:text-xl">{profile.nickname}</span>
         </div>
       </ScreenHeader>

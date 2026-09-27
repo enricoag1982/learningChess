@@ -4,12 +4,11 @@ import type { ConceptStats, Lesson } from '@chess-kids/core';
 import { isDue, isWeak, lessonStatus } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { WarmUpIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 /** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {
@@ -108,14 +107,11 @@ export function PracticeScreen(): JSX.Element {
         title={t('practice.title')}
       >
         <div className="flex items-center gap-2">
-          <div
-            role="img"
-            aria-label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
+          <AvatarBadge
+            avatar={profile.avatar}
+            label={t('home.avatar-alt', { name: avatarName(t, profile.avatar) })}
             className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-full p-1.5"
-            style={{ backgroundColor: avatarBackground(profile.avatar) }}
-          >
-            <AvatarIcon avatar={profile.avatar} />
-          </div>
+          />
           <span className="font-display text-lg text-ink sm:text-xl">{profile.nickname}</span>
         </div>
       </ScreenHeader>

@@ -6,6 +6,27 @@ import { PARENT_DANGER_BUTTON, PARENT_SECONDARY_BUTTON } from '../parent/parent-
  * only from the parent area's own screens, never eagerly.
  */
 
+const SECTION_GAP: Readonly<Record<3 | 4, string>> = { 3: 'gap-3', 4: 'gap-4' };
+
+export interface ParentSectionProps {
+  /** Omitted where the section has no heading of its own (nested `<h3>`s, or none at all). */
+  readonly title?: string;
+  readonly gap?: 3 | 4;
+  readonly children: ReactNode;
+}
+
+/** A card (`<section>`, optional `<h3>`) — the parent area's common "one settings group" shell. */
+export function ParentSection({ title, gap = 3, children }: ParentSectionProps): JSX.Element {
+  return (
+    <section
+      className={`flex flex-col ${SECTION_GAP[gap]} rounded-xl border border-line bg-card p-4`}
+    >
+      {title !== undefined && <h3 className="text-sm font-extrabold text-ink">{title}</h3>}
+      {children}
+    </section>
+  );
+}
+
 export interface ParentConfirmDialogProps {
   readonly title: string;
   readonly body: string;

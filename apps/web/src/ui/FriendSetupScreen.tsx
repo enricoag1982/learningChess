@@ -4,12 +4,11 @@ import { friendGameOptions } from '@chess-kids/core';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/store.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
-import { avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { GuestIcon } from './ds/icons-lazy.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
 /** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({
@@ -120,12 +119,10 @@ export function FriendSetupScreen(): JSX.Element {
                   }`,
                 )}
               >
-                <span
+                <AvatarBadge
+                  avatar={candidate.avatar}
                   className="h-16 w-16 overflow-hidden rounded-full p-2"
-                  style={{ backgroundColor: avatarBackground(candidate.avatar) }}
-                >
-                  <AvatarIcon avatar={candidate.avatar} />
-                </span>
+                />
                 <span className="truncate font-display text-base font-semibold text-ink">
                   {candidate.nickname}
                 </span>
