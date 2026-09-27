@@ -14,12 +14,12 @@ export type {
 export type {
   ExerciseState,
   MoveOutcome,
-  SelectionResult,
   PlaceOutcome,
   PalettePiece,
   MateInNOutcome,
 } from './engine.ts';
 export type { Hint } from './hint.ts';
+export type { SelectionResult } from './kinds/select-squares/def.ts';
 export {
   startExercise,
   exerciseMoves,

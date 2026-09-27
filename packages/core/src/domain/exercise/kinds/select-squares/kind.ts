@@ -1,7 +1,9 @@
-import { startExercise, submitSelection, toggleSquare } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, widen } from '../adapt.ts';
+import { startExercise } from '../../engine.ts';
+import { errorHintStars } from '../../stars.ts';
+import { narrowState, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import type { SelectOutcome, SelectSquaresAction, SelectSquaresDef } from './def.ts';
+import { selectSquaresHint, submitSelection, toggleSquare } from './engine.ts';
 import { selectSquaresSolution, selectSquaresWrongAction } from './solution.ts';
 
 export const selectSquaresKind: ChessKind<SelectSquaresDef, SelectSquaresAction, SelectOutcome> = {
@@ -27,11 +29,12 @@ export const selectSquaresKind: ChessKind<SelectSquaresDef, SelectSquaresAction,
   },
 
   hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+    const bumped = { ...state, hintLevel: level };
+    return { state: bumped, hint: selectSquaresHint(widen(bumped), bumped.def, ctx, level) };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return errorHintStars(state.hintLevel, state.errors);
   },
 
   solution(def, ctx) {
