@@ -13,8 +13,8 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
-import { CloseIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -90,7 +90,7 @@ export function FullGameScreen(): JSX.Element {
   const botName = t(`boss.versus.bot-name.${botLevel?.name ?? 'mouse'}`);
 
   if (!profile) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const game = fullGameDef(level);
@@ -148,16 +148,13 @@ export function FullGameScreen(): JSX.Element {
   };
 
   return (
-    <main className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          type="button"
-          aria-label={t('play.close')}
-          onClick={requestLeave}
-          className={tapClass('round')}
-        >
-          <CloseIcon />
-        </button>
+    <Screen kind="game">
+      <ScreenHeader
+        look="game"
+        action="close"
+        actionLabel={t('play.close')}
+        onAction={requestLeave}
+      >
         <img
           src={animalImage(botLevel?.name ?? 'mouse')}
           alt=""
@@ -167,7 +164,7 @@ export function FullGameScreen(): JSX.Element {
         <span className="min-w-0 flex-1 truncate font-display text-xl text-ink sm:text-2xl">
           {t('play.full-game-vs', { name: botName })}
         </span>
-      </div>
+      </ScreenHeader>
 
       <div className="flex min-h-0 flex-1 flex-col">
         <VersusStep
@@ -208,6 +205,6 @@ export function FullGameScreen(): JSX.Element {
           </div>
         </div>
       )}
-    </main>
+    </Screen>
   );
 }

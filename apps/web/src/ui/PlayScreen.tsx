@@ -19,8 +19,9 @@ import { OwlIcon } from './art/characters.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-import { BackIcon, ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
+import { ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
@@ -73,7 +74,7 @@ export function PlayScreen(): JSX.Element {
   }, [profile?.id]);
 
   if (!profile || !journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const games = unlockedMiniGames(journey.lessons, services.deps.content.minigames(), progress);
@@ -168,19 +169,13 @@ export function PlayScreen(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={tContent(t, 'journey:ui.back')}
-          onClick={goToHome}
-          className={tapClass('round')}
-        >
-          <BackIcon />
-        </button>
-        <h1 className="flex-grow truncate font-display text-2xl text-ink sm:text-3xl">
-          {t('play.title')}
-        </h1>
+    <Screen kind="page">
+      <ScreenHeader
+        action="back"
+        actionLabel={tContent(t, 'journey:ui.back')}
+        onAction={goToHome}
+        title={t('play.title')}
+      >
         <div className="flex items-center gap-2">
           <div
             role="img"
@@ -192,7 +187,7 @@ export function PlayScreen(): JSX.Element {
           </div>
           <span className="font-display text-lg text-ink sm:text-xl">{profile.nickname}</span>
         </div>
-      </div>
+      </ScreenHeader>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
@@ -387,6 +382,6 @@ export function PlayScreen(): JSX.Element {
           <p className="font-display text-lg text-ink">{lockedMessage ?? levelUpBanner}</p>
         </div>
       )}
-    </main>
+    </Screen>
   );
 }

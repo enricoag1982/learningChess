@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
+import { BlankScreen } from './ds/Screen.tsx';
 
 /** A Today session's warm-up activity (domain-model.md §3.1, §3.3): up to 3 review tasks. */
 export function WarmUpScreen(): JSX.Element {
@@ -15,7 +16,7 @@ export function WarmUpScreen(): JSX.Element {
   const tasks = activity?.kind === 'warmup' ? activity.tasks : [];
 
   if (tasks.length === 0) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   return (

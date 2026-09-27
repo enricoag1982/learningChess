@@ -9,6 +9,7 @@ import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen } from './ds/Screen.tsx';
 
 /**
  * Today session's closing screen (domain-model.md §3.3 "session summary"): stars earned this
@@ -29,7 +30,7 @@ export function SessionSummaryScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const starsEarned = Math.max(0, totalStars(progress) - startTotalStars);

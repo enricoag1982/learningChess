@@ -16,6 +16,7 @@ import { StreakPill } from './StreakPill.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, RoundIconButton } from './ds/Screen.tsx';
 
 // Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
 // base") — one-off shapes only Home uses, built on the shared `Svg` icon base.
@@ -165,7 +166,7 @@ export function HomeScreen(): JSX.Element {
 
   if (!profile || !journey) {
     // First render before `init()` resolves; a blank cream screen for an instant beats a flash.
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const showStartButton = nextStep !== null || hasWarmUp;
@@ -199,16 +200,14 @@ export function HomeScreen(): JSX.Element {
           {streak && streak.current >= 2 && <StreakPill days={streak.current} />}
           <RankPill rank={journey.rank} />
           <StarsPill count={stars} />
-          <button
-            type="button"
-            aria-label={t('home.switch-player')}
+          <RoundIconButton
+            label={t('home.switch-player')}
             onClick={() => {
               void goToPicker();
             }}
-            className={tapClass('round')}
           >
             <SwitchPlayerIcon />
-          </button>
+          </RoundIconButton>
         </div>
       </div>
 

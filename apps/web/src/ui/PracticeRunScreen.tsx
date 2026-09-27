@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
+import { BlankScreen } from './ds/Screen.tsx';
 
 /**
  * Practice's task run (domain-model.md §3.3 "Practice screen"): either the daily warm-up (tapped
@@ -14,7 +15,7 @@ export function PracticeRunScreen(): JSX.Element {
   const exitPracticeRun = useAppStore((state) => state.exitPracticeRun);
 
   if (practiceTasks.length === 0) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const headerText =

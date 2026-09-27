@@ -11,6 +11,7 @@ import {
   PARENT_SECONDARY_BUTTON,
 } from './parent/parent-styles.ts';
 import { LockIcon } from './ds/icons.tsx';
+import { Screen } from './ds/Screen.tsx';
 
 const MAX_ATTEMPTS = 5;
 /** How often the countdown re-reads the clock while locked. */
@@ -84,7 +85,7 @@ export function PasswordScreen(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <Screen kind="form" className="px-4 py-8 sm:px-10">
       <form
         onSubmit={(event) => {
           void onSubmit(event);
@@ -140,6 +141,6 @@ export function PasswordScreen(): JSX.Element {
           {t('password-screen.back')}
         </button>
       </form>
-    </main>
+    </Screen>
   );
 }

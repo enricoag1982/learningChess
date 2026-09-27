@@ -9,9 +9,9 @@ import { AvatarIcon } from './art/avatars.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-import { BackIcon } from './ds/icons.tsx';
 import { GuestIcon } from './ds/icons-lazy.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({
@@ -61,7 +61,7 @@ export function FriendSetupScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const otherProfiles = profiles.filter((candidate) => candidate.id !== profile.id);
@@ -87,20 +87,13 @@ export function FriendSetupScreen(): JSX.Element {
   const canStart = friendSetup.opponent !== null && friendSetup.gameId !== null;
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={tContent(t, 'journey:ui.back')}
-          onClick={goToPlay}
-          className={tapClass('round')}
-        >
-          <BackIcon />
-        </button>
-        <h1 className="flex-grow truncate font-display text-2xl text-ink sm:text-3xl">
-          {t('friend-play.setup-title')}
-        </h1>
-      </div>
+    <Screen kind="page">
+      <ScreenHeader
+        action="back"
+        actionLabel={tContent(t, 'journey:ui.back')}
+        onAction={goToPlay}
+        title={t('friend-play.setup-title')}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
@@ -245,6 +238,6 @@ export function FriendSetupScreen(): JSX.Element {
       >
         {t('friend-play.start')}
       </button>
-    </main>
+    </Screen>
   );
 }

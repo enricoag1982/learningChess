@@ -11,6 +11,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { BlankScreen, Screen } from './ds/Screen.tsx';
 
 /** Scope's display name, for the result screen's headline. */
 function scopeName(t: TFunction, scope: AssessmentScope, services: Services): string {
@@ -53,7 +54,7 @@ function AssessmentResult({
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
+    <Screen kind="center" className="gap-6 px-6 py-10">
       <div
         className={`celebration-pop flex w-full max-w-md flex-col items-center gap-5 rounded-[2rem] border-2 p-6 sm:p-8 ${
           outcome.passed ? 'border-go bg-[#E3F1EA]' : 'border-line bg-card'
@@ -77,7 +78,7 @@ function AssessmentResult({
       >
         {t('assessment.continue')}
       </button>
-    </main>
+    </Screen>
   );
 }
 
@@ -96,7 +97,7 @@ export function AssessmentScreen(): JSX.Element {
   const [outcome, setOutcome] = useState<AssessmentScore | null>(null);
 
   if (!assessmentRun) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   if (outcome) {

@@ -11,7 +11,7 @@ import { AvatarIcon } from '../art/avatars.tsx';
 import { RankPill } from '../RankPill.tsx';
 import { ChevronRightIcon } from '../ds/icons.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { tapClass } from '../ds/tap.ts';
+import { ScreenHeader } from '../ds/Screen.tsx';
 import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
@@ -150,15 +150,13 @@ export function ChildReportScreen({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t('parent.back')}
-          className={tapClass('round-sm')}
-        >
-          <ChevronLeftIcon />
-        </button>
+      <ScreenHeader
+        look="parent"
+        action="back"
+        actionLabel={t('parent.back')}
+        onAction={onBack}
+        icon={<ChevronLeftIcon />}
+      >
         {report && (
           <>
             <span
@@ -181,7 +179,7 @@ export function ChildReportScreen({
           {t('parent.settings')}
           <ChevronRightIcon />
         </button>
-      </div>
+      </ScreenHeader>
 
       {!report ? (
         <p className={PARENT_INFO_PANEL}>{t('parent.report.loading')}</p>

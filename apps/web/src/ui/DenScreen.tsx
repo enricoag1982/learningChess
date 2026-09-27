@@ -20,8 +20,8 @@ import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
 import { InfoPill } from './ds/primitives.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-import { BackIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
 const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play', 'habit'];
@@ -100,7 +100,7 @@ export function DenScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const friends = animalFriends(journey.lessons, progress);
@@ -130,21 +130,15 @@ export function DenScreen(): JSX.Element {
   }
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={tContent(t, 'journey:ui.back')}
-          onClick={goToHome}
-          className={tapClass('round')}
-        >
-          <BackIcon />
-        </button>
-        <h1 className="flex-grow truncate font-display text-2xl text-ink sm:text-3xl">
-          {t('den.title', { name: profile.nickname })}
-        </h1>
+    <Screen kind="page">
+      <ScreenHeader
+        action="back"
+        actionLabel={tContent(t, 'journey:ui.back')}
+        onAction={goToHome}
+        title={t('den.title', { name: profile.nickname })}
+      >
         <StarsPill count={stars} />
-      </div>
+      </ScreenHeader>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
@@ -340,6 +334,6 @@ export function DenScreen(): JSX.Element {
           );
         })}
       </div>
-    </main>
+    </Screen>
   );
 }

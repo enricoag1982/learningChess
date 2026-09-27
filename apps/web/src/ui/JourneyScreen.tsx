@@ -21,8 +21,9 @@ import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { TestOutSheet } from './TestOutSheet.tsx';
 import { useMediaQuery } from './useMediaQuery.ts';
-import { BackIcon, CheckIcon, CrownIcon, FlagIcon, LockIcon } from './ds/icons.tsx';
+import { CheckIcon, CrownIcon, FlagIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** Pastel tint per habitat (app-structure.md §8: one habitat per world), for the map panel. */
 const HABITAT_COLOR: Readonly<Record<Habitat, string>> = {
@@ -146,7 +147,7 @@ export function JourneyScreen(): JSX.Element {
   >(null);
 
   if (!journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const worldId = selectedWorldId ?? defaultWorldId(journey);
@@ -240,16 +241,8 @@ export function JourneyScreen(): JSX.Element {
   );
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={tContent(t, 'journey:ui.back')}
-          onClick={goToHome}
-          className={tapClass('round')}
-        >
-          <BackIcon />
-        </button>
+    <Screen kind="page">
+      <ScreenHeader action="back" actionLabel={tContent(t, 'journey:ui.back')} onAction={goToHome}>
         <div className="flex min-w-0 flex-1 flex-col">
           <span className="truncate font-display text-2xl text-ink sm:text-3xl">{worldTitle}</span>
           <span className="text-sm text-muted sm:text-base">
@@ -258,7 +251,7 @@ export function JourneyScreen(): JSX.Element {
               ` · ${tContent(t, 'journey:ui.world-stars', { earned: worldTotals.earned, max: worldTotals.max })}`}
           </span>
         </div>
-      </div>
+      </ScreenHeader>
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="flex gap-2 overflow-x-auto pb-1 lg:w-64 lg:flex-none lg:flex-col lg:overflow-visible lg:pb-0">
@@ -399,7 +392,7 @@ export function JourneyScreen(): JSX.Element {
           )}
         </div>
       </div>
-    </main>
+    </Screen>
   );
 }
 

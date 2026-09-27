@@ -5,6 +5,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
+import { Screen } from './ds/Screen.tsx';
 
 /**
  * "Already know some chess?" offer (app-structure.md §3, domain-model.md §3.2), shown once right
@@ -20,7 +21,7 @@ export function PlacementOfferScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <div className="flex w-full max-w-md flex-col items-stretch gap-3">
         <SpeechBubble text={bubbleText} />
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
@@ -33,6 +34,6 @@ export function PlacementOfferScreen(): JSX.Element {
           {t('placement.offer-no')}
         </button>
       </div>
-    </main>
+    </Screen>
   );
 }

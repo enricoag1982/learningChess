@@ -32,6 +32,7 @@ import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
 import { AvatarIcon } from '../art/avatars.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { tapClass } from '../ds/tap.ts';
+import { ScreenHeader } from '../ds/Screen.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
@@ -461,19 +462,14 @@ export function ChildSettingsScreen({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t('parent.back')}
-          className={tapClass('round-sm')}
-        >
-          <ChevronLeftIcon />
-        </button>
-        <h2 className="flex-1 text-base font-extrabold text-ink">
-          {t('parent.settings-title', { name: profile.nickname })}
-        </h2>
-      </div>
+      <ScreenHeader
+        look="parent"
+        action="back"
+        actionLabel={t('parent.back')}
+        onAction={onBack}
+        icon={<ChevronLeftIcon />}
+        title={t('parent.settings-title', { name: profile.nickname })}
+      />
 
       <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
         <div className="flex items-center gap-3">

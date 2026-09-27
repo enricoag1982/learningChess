@@ -5,8 +5,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { BossStep } from './lesson/BossStep.tsx';
-import { CloseIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /**
  * A mini-game played standalone from the Play screen (app-structure.md §4 Play): the same boss
@@ -27,7 +26,7 @@ export function MiniGameSessionScreen(): JSX.Element {
   const lesson = minigame ? services.deps.content.lesson(minigame.unlockAfter) : undefined;
 
   if (!profile || !minigame || !lesson) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const primaryLabel =
@@ -52,24 +51,21 @@ export function MiniGameSessionScreen(): JSX.Element {
   };
 
   return (
-    <main className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-3 sm:gap-4">
-        <button
-          type="button"
-          aria-label={t('play.close')}
-          onClick={exitMiniGame}
-          className={tapClass('round')}
-        >
-          <CloseIcon />
-        </button>
+    <Screen kind="game">
+      <ScreenHeader
+        look="game"
+        action="close"
+        actionLabel={t('play.close')}
+        onAction={exitMiniGame}
+      >
         <span className="min-w-0 flex-1 truncate font-display text-xl text-ink sm:text-2xl">
           {tContent(t, minigame.titleKey)}
         </span>
-      </div>
+      </ScreenHeader>
 
       <div className="flex min-h-0 flex-1 flex-col">
         <BossStep lesson={lesson} game={minigame} nextStepIndex={0} session={session} />
       </div>
-    </main>
+    </Screen>
   );
 }

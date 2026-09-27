@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { tapClass } from '../ds/tap.ts';
+import { ScreenHeader } from '../ds/Screen.tsx';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
 /** Repository issues page (non-functional.md §3 "contact"): the same repo the live app deploys
@@ -57,17 +57,14 @@ export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t('parent.back')}
-          className={tapClass('round-sm')}
-        >
-          <ChevronLeftIcon />
-        </button>
-        <h2 className="flex-1 text-base font-extrabold text-ink">{t('parent.privacy.title')}</h2>
-      </div>
+      <ScreenHeader
+        look="parent"
+        action="back"
+        actionLabel={t('parent.back')}
+        onAction={onBack}
+        icon={<ChevronLeftIcon />}
+        title={t('parent.privacy.title')}
+      />
       <PrivacyPolicyBody />
     </div>
   );

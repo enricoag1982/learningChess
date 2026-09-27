@@ -9,8 +9,9 @@ import { AvatarIcon } from './art/avatars.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
-import { BackIcon, WarmUpIcon } from './ds/icons.tsx';
+import { WarmUpIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {
@@ -78,7 +79,7 @@ export function PracticeScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
-    return <main className="min-h-dvh bg-cream" />;
+    return <BlankScreen />;
   }
 
   const now = services.deps.clock.now();
@@ -102,19 +103,13 @@ export function PracticeScreen(): JSX.Element {
   );
 
   return (
-    <main className="flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          aria-label={t('practice.back')}
-          onClick={goToHome}
-          className={tapClass('round')}
-        >
-          <BackIcon />
-        </button>
-        <h1 className="flex-grow truncate font-display text-2xl text-ink sm:text-3xl">
-          {t('practice.title')}
-        </h1>
+    <Screen kind="page">
+      <ScreenHeader
+        action="back"
+        actionLabel={t('practice.back')}
+        onAction={goToHome}
+        title={t('practice.title')}
+      >
         <div className="flex items-center gap-2">
           <div
             role="img"
@@ -126,7 +121,7 @@ export function PracticeScreen(): JSX.Element {
           </div>
           <span className="font-display text-lg text-ink sm:text-xl">{profile.nickname}</span>
         </div>
-      </div>
+      </ScreenHeader>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
@@ -204,6 +199,6 @@ export function PracticeScreen(): JSX.Element {
           })}
         </ul>
       )}
-    </main>
+    </Screen>
   );
 }

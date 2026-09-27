@@ -8,6 +8,7 @@ import type { Avatar } from './art/avatar-meta.ts';
 import { AVATARS, avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { tapClass } from './ds/tap.ts';
+import { Screen } from './ds/Screen.tsx';
 
 type Step = 'nickname' | 'avatar';
 
@@ -25,7 +26,7 @@ function NicknameStep({
   const valid = validateNickname(nickname);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-3xl text-ink sm:text-4xl">
         {t('new-player.nickname.title')}
       </h1>
@@ -56,7 +57,7 @@ function NicknameStep({
       >
         {t('new-player.nickname.primary')}
       </button>
-    </main>
+    </Screen>
   );
 }
 
@@ -72,7 +73,7 @@ function AvatarStep({
   const { t } = useTranslation();
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-3xl text-ink sm:text-4xl">{t('new-player.avatar.title')}</h1>
       <div className="grid grid-cols-4 gap-4 sm:gap-6">
         {AVATARS.map((id) => {
@@ -99,7 +100,7 @@ function AvatarStep({
       <button type="button" onClick={onFinish} className={tapClass('hero', 'go')}>
         {t('new-player.avatar.primary')}
       </button>
-    </main>
+    </Screen>
   );
 }
 

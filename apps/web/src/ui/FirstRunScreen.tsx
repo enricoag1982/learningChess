@@ -11,6 +11,7 @@ import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
+import { Screen } from './ds/Screen.tsx';
 
 type Step = 'welcome' | 'password' | 'saved';
 
@@ -22,7 +23,7 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
   const replay = useNarratedText(services.narrator, text);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-2xl text-ink sm:text-3xl">{t('app.title')}</h1>
       <Owl className="h-24 w-24" />
       <div className="flex w-full max-w-md flex-col items-stretch gap-3">
@@ -32,7 +33,7 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
       <button type="button" onClick={onNext} className={tapClass('hero', 'go')}>
         {t('first-run.welcome.primary')}
       </button>
-    </main>
+    </Screen>
   );
 }
 
@@ -62,7 +63,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
   }
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <Screen kind="form" className="px-4 py-8 sm:px-10">
       <form
         onSubmit={(event) => {
           void onSubmit(event);
@@ -129,7 +130,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
           }}
         />
       )}
-    </main>
+    </Screen>
   );
 }
 
@@ -145,7 +146,7 @@ function SavedStep({
   const { t } = useTranslation();
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-cream px-4 py-8 sm:px-10">
+    <Screen kind="form" className="px-4 py-8 sm:px-10">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-2xl border border-line bg-card p-6">
         <h1 className="text-lg font-extrabold text-ink">{t('first-run.saved.title')}</h1>
         <p className="text-sm text-muted">{t('first-run.saved.body', { location })}</p>
@@ -153,7 +154,7 @@ function SavedStep({
           {t('first-run.saved.primary')}
         </button>
       </div>
-    </main>
+    </Screen>
   );
 }
 

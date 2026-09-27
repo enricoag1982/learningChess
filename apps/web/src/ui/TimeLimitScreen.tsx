@@ -10,6 +10,7 @@ import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
+import { Screen } from './ds/Screen.tsx';
 
 /** `TimeLimitStatus.reason` -> the title/body text this screen shows (M5.2 "limit"; M7.1
  * "late"/"early", app-structure.md §13 "Allowed hours"). Falls back to the daily-limit text for
@@ -71,7 +72,7 @@ export function TimeLimitScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{titleText}</h1>
 
       {stars !== null && stars > 0 && (
@@ -106,6 +107,6 @@ export function TimeLimitScreen(): JSX.Element {
           {t('time-limit.more-time')}
         </button>
       </div>
-    </main>
+    </Screen>
   );
 }

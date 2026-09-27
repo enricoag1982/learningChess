@@ -6,6 +6,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { Screen } from './ds/Screen.tsx';
 
 /** Placement's own closing summary (domain-model.md §3.2): how many Basics worlds were passed. */
 function PlacementSummary({
@@ -35,7 +36,7 @@ function PlacementSummary({
   const replay = useNarratedText(services.narrator, bodyText);
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
+    <Screen kind="center" className="gap-6 px-6 py-10">
       <div className="celebration-pop flex w-full max-w-md flex-col items-center gap-5 rounded-[2rem] border-2 border-go bg-[#E3F1EA] p-6 sm:p-8">
         <h1 className="font-display text-3xl text-ink sm:text-4xl">{t(titleKey)}</h1>
         <div className="flex w-full flex-col items-stretch gap-3 text-left">
@@ -50,7 +51,7 @@ function PlacementSummary({
       >
         {t('placement.continue')}
       </button>
-    </main>
+    </Screen>
   );
 }
 

@@ -8,7 +8,7 @@ import { importMerged, planImport, previewChildChange } from '@chess-kids/core/m
 import { useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { tapClass } from '../ds/tap.ts';
+import { ScreenHeader } from '../ds/Screen.tsx';
 import {
   PARENT_INFO_PANEL,
   PARENT_INPUT,
@@ -170,17 +170,14 @@ export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Ele
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t('parent.back')}
-          className={tapClass('round-sm')}
-        >
-          <ChevronLeftIcon />
-        </button>
-        <h2 className="flex-1 text-base font-extrabold text-ink">{t('parent.backup-title')}</h2>
-      </div>
+      <ScreenHeader
+        look="parent"
+        action="back"
+        actionLabel={t('parent.back')}
+        onAction={onBack}
+        icon={<ChevronLeftIcon />}
+        title={t('parent.backup-title')}
+      />
 
       <section className="flex flex-col gap-3 rounded-xl border border-line bg-card p-4">
         <h3 className="text-sm font-extrabold text-ink">{t('parent.backup.share-heading')}</h3>
