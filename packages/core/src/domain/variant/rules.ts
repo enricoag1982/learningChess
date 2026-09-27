@@ -19,6 +19,11 @@ export interface VariantRules {
   ): { readonly position: Position; readonly move: Move } | null;
   /** Squares of `by` pieces attacking `square` (real board geometry; walls block sliding as usual). */
   attackers(position: Position, square: Square, by: Color): Square[];
+  /**
+   * The real chess rules this variant is built on — an exercise kind's `Ctx`. `mate-in-n` plays
+   * under real turn alternation (never walls/static-opponent), so it uses this directly.
+   */
+  readonly chess: ChessRules;
 }
 
 /**
@@ -55,6 +60,8 @@ function stripWalls(position: Position): Position {
 /** Builds `VariantRules` on top of a `ChessRules` adapter. */
 export function createVariantRules(rules: ChessRules): VariantRules {
   return {
+    chess: rules,
+
     legalMoves(position, options, from) {
       const moves = rules.legalMoves(wrapWalls(position), from);
       // Drop moves attributed to a wall piece; real pieces never start on a blocked square.

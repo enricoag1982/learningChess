@@ -1,0 +1,51 @@
+/**
+ * Every compiled exercise, whichever kind, proves two things about its own kind's action
+ * sequences: `wrongAction` costs exactly 1 error and never blocks solving, and `solution` reaches a
+ * clean (3-star) solve from a fresh state.
+ */
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import type { ExerciseDef } from '@chess-kids/core';
+import { kindOf } from '@chess-kids/core';
+import { playSolution, playWrongThenSolve } from '@chess-kids/core/testing';
+import { describe, expect, it } from 'vitest';
+import { loadLocales } from './load.ts';
+import { loadContent } from './lesson-load.ts';
+
+const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
+const locales = loadLocales(join(packageDir, 'locales'));
+const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
+
+function allExercises(): readonly { readonly where: string; readonly exercise: ExerciseDef }[] {
+  const all: { readonly where: string; readonly exercise: ExerciseDef }[] = [];
+  for (const lesson of content.lessons) {
+    for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
+      all.push({ where: `${lesson.id}/${exercise.id}`, exercise });
+    }
+  }
+  for (const minigame of content.minigames) {
+    if (minigame.mode !== 'series') continue;
+    for (const round of minigame.rounds) {
+      all.push({ where: `${minigame.id}/${round.id}`, exercise: round });
+    }
+  }
+  return all;
+}
+
+describe.each(allExercises())('$where ($exercise.type)', ({ exercise }) => {
+  it('solution() solves cleanly from a fresh state, with 3 stars', () => {
+    const solved = playSolution(exercise);
+    expect(solved.solved).toBe(true);
+    expect(kindOf(exercise).stars(solved)).toBe(3);
+  });
+
+  it('wrongAction() costs exactly 1 error and does not block solving', () => {
+    const kind = kindOf(exercise);
+    if (kind.wrongAction === undefined) {
+      return;
+    }
+    const result = playWrongThenSolve(exercise);
+    expect(result.errors).toBe(1);
+    expect(result.solved).toBe(true);
+  });
+});

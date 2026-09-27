@@ -7,6 +7,7 @@ import { findMoveBySan, sameSan } from '../chess/facts/san.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
 import { solve } from './solver.ts';
+import type { ExerciseStateOf } from './state.ts';
 import type {
   BestMoveDef,
   ChoiceDef,
@@ -16,27 +17,8 @@ import type {
   SetupDef,
 } from './types.ts';
 
-/** Immutable exercise progress. */
-export interface ExerciseState {
-  readonly def: ExerciseDef;
-  /** Current position. */
-  readonly position: Position;
-  /** Positions before each played move, for `undo`. */
-  readonly history: readonly Position[];
-  /** Kid moves played (collect-stars / capture / best-move only). */
-  readonly moves: number;
-  /** Currently selected squares (select-squares only). */
-  readonly selected: readonly Square[];
-  /** Wrong submissions / illegal move attempts / wrong answers. */
-  readonly errors: number;
-  readonly hintLevel: 0 | 1 | 2 | 3;
-  readonly solved: boolean;
-  /**
-   * Option ids ruled out for a `choice` exercise (wrong pick or hint-removed); disabled in UI.
-   * Optional (defaults to none) so existing `ExerciseState` literals elsewhere stay valid.
-   */
-  readonly wrongOptions?: readonly string[];
-}
+/** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
+export type ExerciseState = ExerciseStateOf<ExerciseDef>;
 
 /** Result of a piece move attempt (collect-stars / capture / best-move). */
 export type MoveOutcome =

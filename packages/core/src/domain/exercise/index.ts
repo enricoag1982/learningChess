@@ -40,6 +40,31 @@ export {
 export type { SolverMove } from './solver.ts';
 export { solve, optimalMoves } from './solver.ts';
 
+// Exercise-kind registry (`kinds/index.ts`): the only exercise-type dispatch. `ExerciseKind` /
+// `ExerciseStateOf` (`kind.ts` / `state.ts`) are subject-free and move to `platform-core` in R4.
+export type { ExerciseProgress, ExerciseKind, Step, TextKeyRef, KindInput } from './kind.ts';
+export type { ExerciseStateOf } from './state.ts';
+export type {
+  ExerciseType,
+  DefOf,
+  ExerciseAction,
+  ChessKind,
+  ActionOf,
+  OutcomeOf,
+  AnyExerciseKind,
+} from './kinds/index.ts';
+export { EXERCISE_KINDS, kindOf } from './kinds/index.ts';
+export type { MoveAction, AnswerOutcome } from './kinds/base.ts';
+export type {
+  ToggleAction,
+  SubmitAction,
+  SelectSquaresAction,
+  SelectOutcome,
+} from './kinds/select-squares/def.ts';
+export type { AnswerYesNoAction } from './kinds/yes-no/def.ts';
+export type { AnswerChoiceAction } from './kinds/choice/def.ts';
+export type { PlaceAction } from './kinds/setup/def.ts';
+
 export { kingSquare } from '../chess/facts/pieces.ts';
 export {
   isAttacked,

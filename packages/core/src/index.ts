@@ -250,6 +250,34 @@ export type {
   VersusState,
   StaticGoalSource,
 } from './domain/exercise/index.ts';
+
+// Exercise-kind registry: the only exercise-type dispatch (`domain/exercise/kinds/index.ts`).
+export type {
+  ExerciseProgress,
+  ExerciseKind,
+  Step,
+  TextKeyRef,
+  KindInput,
+  ExerciseStateOf,
+  ExerciseType,
+  DefOf,
+  ExerciseAction,
+  ChessKind,
+  ActionOf,
+  OutcomeOf,
+  AnyExerciseKind,
+  MoveAction,
+  AnswerOutcome,
+  ToggleAction,
+  SubmitAction,
+  SelectSquaresAction,
+  SelectOutcome,
+  AnswerYesNoAction,
+  AnswerChoiceAction,
+  PlaceAction,
+} from './domain/exercise/index.ts';
+export { EXERCISE_KINDS, kindOf } from './domain/exercise/index.ts';
+
 export {
   staticGoalExercise,
   startExercise,
