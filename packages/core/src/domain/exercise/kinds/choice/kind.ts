@@ -1,10 +1,19 @@
 import { errorHintStars } from '../../stars.ts';
 import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
+import type { AnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
 import { initState } from '../../state.ts';
-import type { AnswerChoiceAction, AnswerOutcome, ChoiceDef } from './def.ts';
+import type { ChoiceDef } from '../../types.ts';
 import { answerChoice, choiceHint } from './engine.ts';
+
+export type { ChoiceDef, ChoiceOption } from '../../types.ts';
+export type { AnswerOutcome };
+
+export interface AnswerChoiceAction {
+  readonly type: 'answer-choice';
+  readonly optionId: string;
+}
 
 export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome> = {
   type: 'choice',

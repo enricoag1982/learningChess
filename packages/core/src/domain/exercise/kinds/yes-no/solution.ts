@@ -1,4 +1,4 @@
-import type { AnswerYesNoAction, YesNoDef } from './def.ts';
+import type { AnswerYesNoAction, YesNoDef } from './kind.ts';
 
 /** The correct answer, straight from `def`. */
 export function yesNoSolution(def: YesNoDef): readonly AnswerYesNoAction[] {

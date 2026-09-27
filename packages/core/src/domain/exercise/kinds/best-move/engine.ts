@@ -2,7 +2,7 @@ import type { Position } from '../../../chess/types.ts';
 import { findMoveBySan } from '../../../chess/facts/san.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
 import type { Hint } from '../../hint.ts';
-import type { BestMoveDef } from './def.ts';
+import type { BestMoveDef } from './kind.ts';
 
 /** Best-move hint: piece → target square → the move, all from the first listed solution. */
 export function bestMoveHint(

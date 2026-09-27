@@ -2,7 +2,13 @@ import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { moveCountStars, moveHint, playMove } from '../static-move.ts';
 import { initState } from '../../state.ts';
-import type { CollectStarsDef, MoveAction, MoveOutcome } from './def.ts';
+import type { MoveAction } from '../base.ts';
+import type { CollectStarsDef } from '../../types.ts';
+import type { MoveOutcome } from '../static-move.ts';
+
+export type { CollectStarsDef } from '../../types.ts';
+export type { MoveOutcome } from '../static-move.ts';
+export type { MoveAction } from '../base.ts';
 
 export const collectStarsKind: ChessKind<CollectStarsDef, MoveAction, MoveOutcome> = {
   type: 'collect-stars',

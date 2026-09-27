@@ -1,5 +1,5 @@
 import type { TextKeyRef } from '../../kind.ts';
-import type { AnswerChoiceAction, ChoiceDef, ChoiceOption } from './def.ts';
+import type { AnswerChoiceAction, ChoiceDef, ChoiceOption } from './kind.ts';
 
 /** The correct option, straight from `def`. */
 export function choiceSolution(def: ChoiceDef): readonly AnswerChoiceAction[] {

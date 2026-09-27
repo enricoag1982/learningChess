@@ -1,5 +1,5 @@
 import { anyKidSquare } from '../base.ts';
-import type { BestMoveDef, MoveAction } from './def.ts';
+import type { BestMoveDef, MoveAction } from './kind.ts';
 
 /** The first authored solution SAN, played directly (`MoveInput` accepts a plain SAN string). */
 export function bestMoveSolution(def: BestMoveDef): readonly MoveAction[] {

@@ -1,7 +1,7 @@
 import { replaySanLine } from '../../../chess/facts/line.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
 import { anyKidSquare } from '../base.ts';
-import type { MateInNDef, MoveAction } from './def.ts';
+import type { MateInNDef, MoveAction } from './kind.ts';
 
 /**
  * The scripted line's own kid moves, in order — every other ply (indices 0, 2, 4, …): the
