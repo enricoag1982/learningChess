@@ -53,7 +53,7 @@ function AssessmentResult({
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
       <div
         className={`celebration-pop flex w-full max-w-md flex-col items-center gap-5 rounded-[2rem] border-2 p-6 sm:p-8 ${
           outcome.passed ? 'border-go bg-[#E3F1EA]' : 'border-line bg-card'
@@ -96,7 +96,7 @@ export function AssessmentScreen(): JSX.Element {
   const [outcome, setOutcome] = useState<AssessmentScore | null>(null);
 
   if (!assessmentRun) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   if (outcome) {

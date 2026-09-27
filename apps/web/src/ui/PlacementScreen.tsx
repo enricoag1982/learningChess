@@ -35,7 +35,7 @@ function PlacementSummary({
   const replay = useNarratedText(services.narrator, bodyText);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-cream px-6 py-10 text-center">
       <div className="celebration-pop flex w-full max-w-md flex-col items-center gap-5 rounded-[2rem] border-2 border-go bg-[#E3F1EA] p-6 sm:p-8">
         <h1 className="font-display text-3xl text-ink sm:text-4xl">{t(titleKey)}</h1>
         <div className="flex w-full flex-col items-stretch gap-3 text-left">

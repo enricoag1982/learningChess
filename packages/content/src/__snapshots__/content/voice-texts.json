@@ -875,6 +875,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "39281e47c17738e7",
+  "text": "Now your king sits on two diagonals. Tap every square of the long one, from corner to corner.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "392c1ca689560ccd",
   "text": "Rabbit Catcher",
   "source": "badge-earned"
@@ -1053,6 +1058,11 @@
   "key": "464418223c1aa6b5",
   "text": "Finish What Does It Attack? first!",
   "source": "journey"
+ },
+ {
+  "key": "4655699e9e760acc",
+  "text": "A row runs from side to side, a column runs from you to Owl, and a diagonal runs on a slant, like stairs. Most squares sit on two diagonals, one leaning each way. Every line is straight, and every square on it belongs together!",
+  "source": "lesson-story"
  },
  {
   "key": "46b3cffe4438aa7e",
@@ -1530,11 +1540,6 @@
   "source": "exercise-note-easier-offer"
  },
  {
-  "key": "621d960a1cbcc7ad",
-  "text": "Here's the other diagonal. Tap every square your king shares with it.",
-  "source": "lesson-exercise"
- },
- {
   "key": "62ab4d400a4d020e",
   "text": "Wolf took your king!",
   "source": "versus-boss"
@@ -1810,6 +1815,11 @@
   "source": "journey"
  },
  {
+  "key": "76071ba26fd329af",
+  "text": "Your king is in a corner, so he sits on just one diagonal. Tap every square on it.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "76849014684da252",
   "text": "Horse captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?",
   "source": "lesson-exercise"
@@ -1913,11 +1923,6 @@
   "key": "7d9887b0892c0042",
   "text": "Collect every star. Plan Elephant's diagonal path first!",
   "source": "lesson-exercise"
- },
- {
-  "key": "7dfc7c02dd6ac8ee",
-  "text": "A row runs from side to side, a column runs from you to Owl, and a diagonal runs corner to corner. Every line is straight, and every square on it belongs together!",
-  "source": "lesson-story"
  },
  {
   "key": "7e8385e20899919b",
@@ -3363,11 +3368,6 @@
   "key": "e7c0878a15db2d00",
   "text": "5 minutes left — pick something short!",
   "source": "owl-line"
- },
- {
-  "key": "e8632e25088a2029",
-  "text": "This line runs corner to corner. Tap every square on your king's diagonal.",
-  "source": "lesson-exercise"
  },
  {
   "key": "e88970d99f3789c4",

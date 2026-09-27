@@ -24,7 +24,7 @@ function NicknameStep({
   const valid = validateNickname(nickname);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
       <h1 className="font-display text-3xl text-ink sm:text-4xl">
         {t('new-player.nickname.title')}
       </h1>
@@ -71,7 +71,7 @@ function AvatarStep({
   const { t } = useTranslation();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
       <h1 className="font-display text-3xl text-ink sm:text-4xl">{t('new-player.avatar.title')}</h1>
       <div className="grid grid-cols-4 gap-4 sm:gap-6">
         {AVATARS.map((id) => {

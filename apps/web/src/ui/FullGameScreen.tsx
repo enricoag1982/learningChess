@@ -105,7 +105,7 @@ export function FullGameScreen(): JSX.Element {
   const botName = t(`boss.versus.bot-name.${botLevel?.name ?? 'mouse'}`);
 
   if (!profile) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const game = fullGameDef(level);

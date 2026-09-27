@@ -946,6 +946,11 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
 
   await completeFirstRun(page);
   const profileId = await getSoleProfileId(page);
+  // Deterministic bot (as in the full walk above): a time-derived seed can leave the kid's Pawn
+  // Wars pawns all blocked mid-game, which `chooseKidVersusMove` can't play.
+  await page.evaluate(() => {
+    localStorage.setItem('chess-kids:test-seed', '1');
+  });
 
   // Home, Play, My Den, Practice (fresh-install state, same checks the walk runs there): these
   // aren't content-dependent, but their layout is viewport-dependent, so every project scans them

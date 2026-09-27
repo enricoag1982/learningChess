@@ -70,7 +70,7 @@ export function TimeLimitScreen(): JSX.Element {
   const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-8 bg-cream px-4 py-8 text-center sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{titleText}</h1>
 
       {stars !== null && stars > 0 && (

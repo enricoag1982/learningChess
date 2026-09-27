@@ -108,7 +108,7 @@ export function LessonScreen(): JSX.Element {
   }, [step?.kind, checkForCelebrations]);
 
   if (!lesson || !step || !profile) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   if (step.kind === 'complete') {

@@ -200,7 +200,7 @@ export function ParentAreaScreen(): JSX.Element {
       : undefined;
 
   return (
-    <main className="min-h-screen bg-[#F7F4EE] px-4 py-4 sm:px-8 sm:py-6">
+    <main className="min-h-dvh bg-[#F7F4EE] px-4 py-4 sm:px-8 sm:py-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
         {view.kind === 'overview' && (
           <>

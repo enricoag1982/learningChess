@@ -103,7 +103,7 @@ function Screens(): JSX.Element {
     case 'loading':
     default:
       // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.
-      return <main className="min-h-screen bg-cream" />;
+      return <main className="min-h-dvh bg-cream" />;
   }
 }
 

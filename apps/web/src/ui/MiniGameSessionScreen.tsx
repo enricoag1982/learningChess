@@ -42,7 +42,7 @@ export function MiniGameSessionScreen(): JSX.Element {
   const lesson = minigame ? services.deps.content.lesson(minigame.unlockAfter) : undefined;
 
   if (!profile || !minigame || !lesson) {
-    return <main className="min-h-screen bg-cream" />;
+    return <main className="min-h-dvh bg-cream" />;
   }
 
   const primaryLabel =

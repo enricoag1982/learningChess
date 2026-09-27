@@ -103,14 +103,15 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
     fireEvent.click(screen.getByRole('button', { name: /Check/ }));
     expect(screen.getByText('1 mistake so far')).toBeTruthy();
-    // The instruction, then the wrong-pick note, as two separate utterances (M6.3 item 1) — not
-    // one `${instruction} ${note}` concatenation.
+    // The round's instruction, then the wrong-pick note, as two separate utterances — not one
+    // `${instruction} ${note}` concatenation, and the instruction not re-read for the note.
     await waitFor(() => {
       expect(narrator.spoken.slice(-2)).toEqual([
         'sh-r2',
         'Not quite! Take away the orange squares and tap the dashed ones.',
       ]);
     });
+    expect(narrator.spoken.filter((text) => text === 'sh-r2')).toHaveLength(1);
 
     // Deselect the wrong pick, select the right one, and finish.
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));

@@ -26,7 +26,7 @@ import { ReplayButton } from '../ReplayButton.tsx';
 import { SpeechBubble } from '../SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useNarratedText, useNarratedTextSequence } from '../useNarratedText.ts';
+import { useInstructionNarration, useNarratedText } from '../useNarratedText.ts';
 import type { BossPlaySession } from './BossStep.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
@@ -100,9 +100,9 @@ function SeriesRound({
   const stars = starsFor(state.core);
   const instructionText = exerciseInstructionText(t, exercise);
   const note = exerciseNote(t, state.feedback, character, stars);
-  // Two utterances, not one concatenated string (M6.3 item 1) — see `ExerciseStep.tsx`.
-  const spokenTexts = note ? [instructionText, note.text] : [instructionText];
-  const replay = useNarratedTextSequence(services.narrator, spokenTexts);
+  // Instruction spoken once per round; each note spoken alone, never with the instruction re-read
+  // (owner report 2026-09-26) — see `useInstructionNarration`.
+  const replay = useInstructionNarration(services.narrator, instructionText, note?.text);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
     t,

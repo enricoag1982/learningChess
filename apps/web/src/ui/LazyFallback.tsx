@@ -14,7 +14,7 @@ import { Owl } from './Owl.tsx';
 export function LazyFallback(): JSX.Element {
   const { t } = useTranslation();
   return (
-    <main className="flex min-h-screen items-center justify-center bg-cream">
+    <main className="flex min-h-dvh items-center justify-center bg-cream">
       <div
         role="status"
         aria-label={t('loading')}

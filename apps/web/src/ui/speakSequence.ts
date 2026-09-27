@@ -3,7 +3,7 @@ import type { Narrator } from '@chess-kids/core';
 /**
  * Tracks, per `Narrator` instance, which `speakSequence` run is the current one. A fresh call for
  * the same `narrator` — even an empty one, used only to stop the current run without starting a new
- * one (`useNarratedTextSequence`'s cleanup) — always supersedes whatever came before it, the same
+ * one (`useInstructionNarration`'s cleanup) — always supersedes whatever came before it, the same
  * "newer call wins" contract `speak`/`cancel` already give a single utterance
  * (`audio-narrator.ts`'s own token; `docs/voice.md` "Fallback rules"), extended here across a short
  * run of several. A `WeakMap` (not a field on the narrator itself) keeps this out of the `Narrator`
