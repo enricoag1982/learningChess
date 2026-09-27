@@ -5,6 +5,7 @@
  * `packages/content` playthrough test (World 1, 3, 4, 5).
  */
 import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
+import { findMoveBySan } from '../domain/chess/facts/san.ts';
 import type { Square } from '../domain/chess/types.ts';
 import {
   answerChoice,
@@ -23,11 +24,6 @@ import { createVariantRules } from '../domain/variant/rules.ts';
 import type { VariantRules } from '../domain/variant/rules.ts';
 
 const defaultRules = createVariantRules(chessJsRules);
-
-/** Trailing check/mate marks never matter for matching a SAN answer against a legal move. */
-function withoutCheckMarks(san: string): string {
-  return san.replace(/[+#]+$/, '');
-}
 
 /**
  * Plays `def` to a solved (or thrown) end, using `rules` (default: standard variant rules over
@@ -63,9 +59,7 @@ export function playExerciseToCompletion(
         throw new Error(`best-move exercise "${def.id}" has no solutions`);
       }
       const candidates = rules.legalMoves(def.position, { staticOpponent: true });
-      const move = candidates.find(
-        (candidate) => withoutCheckMarks(candidate.san) === withoutCheckMarks(solutionSan),
-      );
+      const move = findMoveBySan(candidates, solutionSan);
       if (move === undefined) {
         throw new Error(`best-move exercise "${def.id}": no legal move matches "${solutionSan}"`);
       }
@@ -76,9 +70,7 @@ export function playExerciseToCompletion(
       let current = state;
       for (const san of def.line) {
         const candidates = chessJsRules.legalMoves(current.position);
-        const move = candidates.find(
-          (candidate) => withoutCheckMarks(candidate.san) === withoutCheckMarks(san),
-        );
+        const move = findMoveBySan(candidates, san);
         if (move === undefined) {
           throw new Error(`mate-in-n exercise "${def.id}": no legal move matches "${san}"`);
         }

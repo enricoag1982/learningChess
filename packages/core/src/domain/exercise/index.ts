@@ -40,8 +40,8 @@ export {
 export type { SolverMove } from './solver.ts';
 export { solve, optimalMoves } from './solver.ts';
 
+export { kingSquare } from '../chess/facts/pieces.ts';
 export {
-  kingSquare,
   isAttacked,
   isDefended,
   isHanging,
@@ -53,7 +53,7 @@ export {
   isInsufficientMaterial,
   canCastle,
   canEnPassant,
-} from './facts.ts';
+} from '../chess/facts/position.ts';
 
 export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
 export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';

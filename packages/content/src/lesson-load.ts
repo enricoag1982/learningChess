@@ -24,11 +24,19 @@ import type {
 import {
   DiagramError,
   FenError,
+  PIECE_BY_LETTER,
   canCastle,
   canEnPassant,
+  castlingMoves,
   chessJsRules,
   createVariantRules,
+  doubleStepBefore,
+  enPassantMoves,
+  enemyCount,
   game,
+  givesCheck,
+  hasKing,
+  hasPieceOf,
   isAttacked,
   isCheckmate,
   isDefended,
@@ -38,10 +46,13 @@ import {
   isSafe,
   isStalemate,
   kingSquare,
+  normalizeSan,
   optimalMoves,
   parseDiagram,
   parseFen,
+  piecesEqual,
   pieceValue,
+  replaySanLine,
   selectSquaresAnswer,
 } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
@@ -94,10 +105,13 @@ function assertValidated<T>(value: T | undefined, context: string): T {
   return value;
 }
 
-/** FEN letter → `Piece` (upper case = white); `choiceOptionSchema` already restricts the alphabet. */
+/** FEN letter → `Piece`; `choiceOptionSchema` already restricts the alphabet to `PIECE_BY_LETTER`'s keys. */
 function pieceFromLetter(letter: string): Piece {
-  const color = letter === letter.toUpperCase() ? 'w' : 'b';
-  return { color, type: letter.toLowerCase() as Piece['type'] };
+  const piece = PIECE_BY_LETTER[letter];
+  if (piece === undefined) {
+    throw new Error(`lesson-load: pieceFromLetter: invalid letter "${letter}"`);
+  }
+  return piece;
 }
 
 function compileChoiceOption(raw: ChoiceOptionYaml): ChoiceOption {
@@ -467,30 +481,18 @@ function computeVerifiedBestMoves(
   }
 
   if (verify.kind === 'castle') {
-    return candidates
-      .filter((move) => {
-        const san = normalizeSan(move.san);
-        return san === 'O-O' || san === 'O-O-O';
-      })
-      .map((move) => move.san);
+    return castlingMoves(candidates).map((move) => move.san);
   }
 
   if (verify.kind === 'en-passant') {
-    // Same rule as `facts.ts`'s `canEnPassant`: only an en passant capture ever lands a pawn move
-    // on the position's own (otherwise empty) en passant square.
-    return candidates
-      .filter(
-        (move) =>
-          move.piece === 'p' && move.captured !== undefined && move.to === position.enPassant,
-      )
-      .map((move) => move.san);
+    return enPassantMoves(candidates, position).map((move) => move.san);
   }
 
   if (verify.kind === 'check') {
     // chess.js's own verbose `moves()` already appends "+"/"#" to a move's SAN based on the real
     // resulting position, independent of `staticOpponent` (which only affects `play`, not move
     // generation) — the simplest and cheapest way to ask "does this move give check".
-    return candidates.filter((move) => /[+#]$/.test(move.san)).map((move) => move.san);
+    return candidates.filter((move) => givesCheck(move.san)).map((move) => move.san);
   }
 
   if (
@@ -623,15 +625,11 @@ function checkLastMove(
   if (ep === null) {
     return;
   }
-  const file = ep.charAt(0);
-  const fromRank = ep.charAt(1) === '6' ? '7' : '2';
-  const toRank = ep.charAt(1) === '6' ? '5' : '4';
-  const expectedFrom = `${file}${fromRank}`;
-  const expectedTo = `${file}${toRank}`;
-  if (lastMove.from !== expectedFrom || lastMove.to !== expectedTo) {
+  const expected = doubleStepBefore(ep);
+  if (lastMove.from !== expected.from || lastMove.to !== expected.to) {
     issues.push(
       `${where}: lastMove "${lastMove.from}${lastMove.to}" is not the double step matching en ` +
-        `passant square ${ep} (expected "${expectedFrom}${expectedTo}")`,
+        `passant square ${ep} (expected "${expected.from}${expected.to}")`,
     );
   }
 }
@@ -989,7 +987,7 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
 
 /** True when `position.toMove`'s side has at least one piece on the board. */
 function hasKidPiece(position: Position): boolean {
-  return Object.values(position.pieces).some((piece) => piece.color === position.toMove);
+  return hasPieceOf(position, position.toMove);
 }
 
 /**
@@ -1000,18 +998,6 @@ function hasKidPiece(position: Position): boolean {
 function needsKidPiece(exercise: ExerciseDef): boolean {
   if (exercise.type === 'setup') return false;
   return !(exercise.type === 'select-squares' && 'squares' in exercise.answer);
-}
-
-/** True when `position` has a `color` king on the board. */
-function hasKing(position: Position, color: Color): boolean {
-  return Object.values(position.pieces).some(
-    (piece) => piece.type === 'k' && piece.color === color,
-  );
-}
-
-/** Strips a trailing check/mate mark, matching the engine's own SAN comparison (`engine.ts`). */
-function normalizeSan(san: string): string {
-  return san.replace(/[+#]+$/, '');
 }
 
 function checkBestMoveShape(exercise: BestMoveDef, where: string, issues: string[]): void {
@@ -1025,19 +1011,6 @@ function checkBestMoveShape(exercise: BestMoveDef, where: string, issues: string
       issues.push(`${where}: solution "${solution}" is not a legal move in the position`);
     }
   }
-}
-
-/** True when both piece maps hold exactly the same pieces on the same squares. */
-function piecesEqual(a: Position['pieces'], b: Position['pieces']): boolean {
-  const aEntries = Object.entries(a);
-  const bEntries = Object.entries(b);
-  if (aEntries.length !== bEntries.length) {
-    return false;
-  }
-  return aEntries.every(([square, piece]) => {
-    const other = b[square as Square];
-    return other !== undefined && other.color === piece.color && other.type === piece.type;
-  });
 }
 
 function checkSetupShape(exercise: SetupDef, where: string, issues: string[]): void {
@@ -1085,16 +1058,16 @@ function checkMateInNShape(exercise: MateInNDef, where: string, issues: string[]
     issues.push(`${where}: mate-in-n requires both kings on the board`);
     return;
   }
-  let position = exercise.position;
-  for (const [index, san] of exercise.line.entries()) {
-    const played = chessJsRules.play(position, san);
-    if (played === null) {
-      issues.push(`${where}: line[${String(index)}] "${san}" is not a legal move`);
-      return;
-    }
-    position = played.position;
+  const replayed = replaySanLine(exercise.position, exercise.line, chessJsRules);
+  if ('failedAt' in replayed) {
+    const san = exercise.line[replayed.failedAt];
+    issues.push(
+      `${where}: line[${String(replayed.failedAt)}] "${String(san)}" is not a legal move`,
+    );
+    return;
   }
-  if (!isCheckmate(position, chessJsRules)) {
+  const finalPosition = replayed.positions[replayed.positions.length - 1];
+  if (finalPosition === undefined || !isCheckmate(finalPosition, chessJsRules)) {
     issues.push(`${where}: the final move in "line" does not deliver checkmate`);
   }
 }
@@ -1108,10 +1081,7 @@ function checkExerciseShape(exercise: ExerciseDef, where: string, issues: string
     return;
   }
   if (exercise.type === 'capture') {
-    const opponentPieces = Object.values(exercise.position.pieces).filter(
-      (piece) => piece.color !== exercise.position.toMove,
-    ).length;
-    if (opponentPieces === 0) {
+    if (enemyCount(exercise.position, exercise.position.toMove) === 0) {
       issues.push(`${where}: capture exercise has no opponent piece`);
     }
     checkOptimalMoves(exercise, where, issues);

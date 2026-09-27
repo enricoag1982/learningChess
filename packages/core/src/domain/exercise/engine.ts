@@ -1,9 +1,11 @@
 import type { ChessRules, Move, MoveInput } from '../chess/rules.ts';
 import { SQUARES } from '../chess/types.ts';
 import type { Color, Piece, PieceType, Position, Square } from '../chess/types.ts';
+import { enemyCount } from '../chess/facts/goals.ts';
+import { kingSquare, piecesEqual } from '../chess/facts/pieces.ts';
+import { findMoveBySan, sameSan } from '../chess/facts/san.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
-import { kingSquare } from './facts.ts';
 import { solve } from './solver.ts';
 import type {
   BestMoveDef,
@@ -153,17 +155,11 @@ export function exerciseMoves(state: ExerciseState, rules: VariantRules, from?: 
 }
 
 function isCaptureSolved(position: Position, kidColor: Position['toMove']): boolean {
-  return !Object.values(position.pieces).some((piece) => piece.color !== kidColor);
-}
-
-/** Strips a trailing check/mate mark so SAN comparisons ignore it (`Qh5+` vs `Qh5`). */
-function normalizeSan(san: string): string {
-  return san.replace(/[+#]+$/, '');
+  return enemyCount(position, kidColor) === 0;
 }
 
 function isSolutionMove(solutions: readonly string[], san: string): boolean {
-  const normalized = normalizeSan(san);
-  return solutions.some((solution) => normalizeSan(solution) === normalized);
+  return solutions.some((solution) => sameSan(solution, san));
 }
 
 /** Plays a kid move for a collect-stars / capture / best-move exercise. */
@@ -325,19 +321,6 @@ export function answerChoice(state: ExerciseState, optionId: string): ExerciseSt
   return { ...state, errors: state.errors + 1, wrongOptions };
 }
 
-/** True when both piece maps hold exactly the same pieces on the same squares. */
-function piecesMatch(a: Position['pieces'], b: Position['pieces']): boolean {
-  const aEntries = Object.entries(a);
-  const bEntries = Object.entries(b);
-  if (aEntries.length !== bEntries.length) {
-    return false;
-  }
-  return aEntries.every(([square, piece]) => {
-    const other = b[square as Square];
-    return other !== undefined && other.color === piece.color && other.type === piece.type;
-  });
-}
-
 /** Setup exercise: target squares still missing their piece, in board reading order. */
 function remainingSetupSquares(position: Position, target: Position): readonly Square[] {
   return SQUARES.filter(
@@ -378,7 +361,7 @@ export function placePiece(
 
   const pieces = { ...state.position.pieces, [square]: piece };
   const position: Position = { ...state.position, pieces };
-  const solved = piecesMatch(pieces, state.def.target.pieces);
+  const solved = piecesEqual(pieces, state.def.target.pieces);
   return {
     state: { ...state, position, solved },
     outcome: { kind: solved ? 'solved' : 'placed', square, piece },
@@ -458,7 +441,7 @@ export function playMateInN(
 
   const plyIndex = state.history.length;
   const scriptedSan = def.line[plyIndex];
-  if (scriptedSan === undefined || normalizeSan(played.move.san) !== normalizeSan(scriptedSan)) {
+  if (scriptedSan === undefined || !sameSan(played.move.san, scriptedSan)) {
     return {
       state: { ...state, errors: state.errors + 1 },
       outcome: { kind: 'wrong', move: played.move },
@@ -541,10 +524,7 @@ function bestMoveHint(
 ): Hint {
   const solutionSan = def.solutions[0];
   const candidates = rules.legalMoves(position, { staticOpponent: true });
-  const move =
-    solutionSan === undefined
-      ? undefined
-      : candidates.find((candidate) => normalizeSan(candidate.san) === normalizeSan(solutionSan));
+  const move = solutionSan === undefined ? undefined : findMoveBySan(candidates, solutionSan);
   if (level === 1) {
     return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
   }
@@ -568,10 +548,7 @@ function mateInNHint(
 ): Hint {
   const san = def.line[state.history.length];
   const candidates = rules.legalMoves(state.position, { staticOpponent: true });
-  const move =
-    san === undefined
-      ? undefined
-      : candidates.find((candidate) => normalizeSan(candidate.san) === normalizeSan(san));
+  const move = san === undefined ? undefined : findMoveBySan(candidates, san);
   if (level === 1) {
     return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
   }

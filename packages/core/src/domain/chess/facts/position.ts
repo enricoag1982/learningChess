@@ -1,6 +1,7 @@
-import type { ChessRules } from '../chess/rules.ts';
-import { SQUARES } from '../chess/types.ts';
-import type { Color, PieceType, Position, Square } from '../chess/types.ts';
+import type { ChessRules } from '../rules.ts';
+import type { Color, PieceType, Position, Square } from '../types.ts';
+import { normalizeSan } from './san.ts';
+import { castlingMoves, enPassantMoves } from './special-moves.ts';
 
 function opponentOf(color: Color): Color {
   return color === 'w' ? 'b' : 'w';
@@ -12,14 +13,6 @@ const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 
 /** Standard value of a piece type (P1 N3 B3 R5 Q9); `k` has no trade value, reported as `0`. */
 export function pieceValue(type: PieceType): number {
   return PIECE_VALUE[type];
-}
-
-/** Square holding the `color` king, if any. */
-export function kingSquare(position: Position, color: Color): Square | undefined {
-  return SQUARES.find((square) => {
-    const piece = position.pieces[square];
-    return piece !== undefined && piece.type === 'k' && piece.color === color;
-  });
 }
 
 /**
@@ -86,11 +79,6 @@ export function isInsufficientMaterial(position: Position, rules: ChessRules): b
   return rules.status(position).insufficientMaterial;
 }
 
-/** Strips a trailing check/mate mark, matching the SAN comparison used elsewhere (`lesson-load.ts`). */
-function stripCheckMark(san: string): string {
-  return san.replace(/[+#]+$/, '');
-}
-
 /** True when the side to move can castle `side` right now (a legal `O-O` / `O-O-O` move exists). */
 export function canCastle(
   position: Position,
@@ -98,20 +86,15 @@ export function canCastle(
   rules: ChessRules,
 ): boolean {
   const target = side === 'kingside' ? 'O-O' : 'O-O-O';
-  return rules.legalMoves(position).some((move) => stripCheckMark(move.san) === target);
+  return castlingMoves(rules.legalMoves(position)).some(
+    (move) => normalizeSan(move.san) === target,
+  );
 }
 
 /**
- * True when the side to move has at least one legal en passant capture right now. A pawn move
- * landing on the position's own en passant square is always an en passant capture (that square is
- * otherwise empty — no ordinary pawn move, capture or not, can end there): chess.js only ever
- * generates such a move when the capture is actually legal.
+ * True when the side to move has at least one legal en passant capture right now.
  */
 export function canEnPassant(position: Position, rules: ChessRules): boolean {
   if (position.enPassant === null) return false;
-  return rules
-    .legalMoves(position)
-    .some(
-      (move) => move.piece === 'p' && move.captured !== undefined && move.to === position.enPassant,
-    );
+  return enPassantMoves(rules.legalMoves(position), position).length > 0;
 }

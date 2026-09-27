@@ -207,6 +207,25 @@ export {
   toFen,
   FenError,
   chessJsRules,
+  PIECE_BY_LETTER,
+} from './domain/chess/index.ts';
+
+// Chess facts (`domain/chess/facts/`): pure predicates/derivations shared by the exercise engine,
+// solver and content build — subject-free, moves to `platform-core` in R4.
+export type { Goal, ReplayedLine, FailedReplay, ReplayResult } from './domain/chess/index.ts';
+export {
+  enemyCount,
+  piecesEqual,
+  hasKing,
+  hasPieceOf,
+  normalizeSan,
+  sameSan,
+  findMoveBySan,
+  givesCheck,
+  castlingMoves,
+  enPassantMoves,
+  doubleStepBefore,
+  replaySanLine,
 } from './domain/chess/index.ts';
 
 export type { VariantRules } from './domain/variant/index.ts';
