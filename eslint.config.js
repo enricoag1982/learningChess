@@ -78,4 +78,29 @@ export default defineConfig([
       'react-hooks/exhaustive-deps': ['warn', { additionalHooks: '(useAsync)' }],
     },
   },
+  {
+    // App code never drives e2e or Playwright directly — only the registries' own `e2e.ts`
+    // siblings and `e2e-actions.ts`/`e2e-registry.ts` do (`kinds/`, `modes/`), for `e2e/kit/*.ts`.
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    ignores: [
+      'apps/web/src/kinds/e2e-actions.ts',
+      'apps/web/src/kinds/e2e-registry.ts',
+      'apps/web/src/kinds/*/e2e.ts',
+      'apps/web/src/modes/e2e-registry.ts',
+      'apps/web/src/modes/*/e2e.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/e2e.ts', '**/sample.ts', '@playwright/test'],
+              message: 'app code never imports an e2e driver, a dev sample or Playwright directly',
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
