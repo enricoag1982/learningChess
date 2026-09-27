@@ -5,7 +5,6 @@ import {
   makeLesson as buildLesson,
   makeProgress,
 } from '../testing/index.ts';
-import type { ExerciseDef } from './exercise/types.ts';
 import type { Lesson } from './lesson.ts';
 import {
   lessonStars,
@@ -19,7 +18,7 @@ import {
   withSkippedPhase,
 } from './progress.ts';
 
-function makeExercise(id: string): ExerciseDef {
+function makeExercise(id: string) {
   return buildExercise({ id });
 }
 

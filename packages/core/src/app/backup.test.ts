@@ -4,7 +4,6 @@ import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import {
   makeExercise as buildExercise,
@@ -34,7 +33,7 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-function makeExercise(id: string): ExerciseDef {
+function makeExercise(id: string) {
   return buildExercise({ id, concept: `${id}-concept` });
 }
 

@@ -5,8 +5,6 @@ import {
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
 } from '../testing/index.ts';
-import type { ExerciseState } from './exercise/state.ts';
-import type { ExerciseDef } from './exercise/types.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
 import {
   easierVariant,
@@ -17,7 +15,7 @@ import {
   stepPhase,
 } from './lesson-session.ts';
 
-function makeExercise(id: string): ExerciseDef {
+function makeExercise(id: string) {
   return buildExercise({ id });
 }
 
@@ -134,7 +132,10 @@ describe('phaseEndIndex', () => {
   });
 });
 
-function exerciseState(def: ExerciseDef, overrides: Partial<ExerciseState> = {}): ExerciseState {
+function exerciseState(
+  def: ReturnType<typeof buildExercise>,
+  overrides: Partial<Parameters<typeof shouldOfferEasier>[0]> = {},
+): Parameters<typeof shouldOfferEasier>[0] {
   return {
     def,
     position: def.position,

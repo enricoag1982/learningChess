@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
@@ -31,11 +30,15 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-05T12:00:00.000Z'); // a Monday
 
-function makeExercise(id: string, concept = 'rook-move'): ExerciseDef {
+function makeExercise(id: string, concept = 'rook-move') {
   return buildExercise({ id, concept });
 }
 
-function makeLesson(id: string, world: string, exercises: readonly ExerciseDef[]): Lesson {
+function makeLesson(
+  id: string,
+  world: string,
+  exercises: readonly ReturnType<typeof buildExercise>[],
+): Lesson {
   return buildLesson({ id, world, exercises: [...exercises] });
 }
 
