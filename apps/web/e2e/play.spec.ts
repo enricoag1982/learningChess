@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import type { MiniGameProgress } from '@chess-kids/core';
 import {
   completeFirstRun,
   findLesson,
@@ -11,25 +12,15 @@ import {
   seedGameRecordWins,
   seedLessonMastered,
   waitForVersusTurnOrEnd,
+  withAppStorage,
 } from './helpers.ts';
 
-/** The `hungry-rook` mini-game's own `MiniGameProgress` record, straight from real storage. */
+/** The `hungry-rook` mini-game's own `MiniGameProgress` record, via the real `LocalStorageProgressRepository`. */
 async function readHungryRookProgress(
   page: Page,
   profileId: string,
-): Promise<
-  { readonly plays: number; readonly wins: number; readonly bestStars: number } | undefined
-> {
-  return page.evaluate((pid) => {
-    const raw = localStorage.getItem('chess-kids:minigame-progress');
-    const all = raw
-      ? (JSON.parse(raw) as Record<
-          string,
-          { readonly plays: number; readonly wins: number; readonly bestStars: number }
-        >)
-      : {};
-    return all[`${pid}:hungry-rook`];
-  }, profileId);
+): Promise<MiniGameProgress | undefined> {
+  return withAppStorage(page, (repos) => repos.progress.getMiniGame(profileId, 'hungry-rook'));
 }
 
 test.describe('Play screen and My Den', () => {

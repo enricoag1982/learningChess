@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { localDayString } from '@chess-kids/core';
 import {
   completeFirstRun,
   content,
@@ -11,6 +12,7 @@ import {
   getProfileIdByNickname,
   playLesson,
   seedLessonMastered,
+  withAppStorage,
 } from './helpers.ts';
 
 /** A second, different lesson from the same content — device B's own "other progress", so the
@@ -35,30 +37,22 @@ async function disableWebShare(page: Page): Promise<void> {
   });
 }
 
-/** Seeds one earned badge directly (same real storage shape as `LocalStorageRewardsRepository`'s
- * append-only `earned-badges` list) — there is no play-through fast enough to earn one for real in
- * this spec, and the merge rule under test ("union by badge id, seen if either is seen") only cares
- * that the row exists. */
+/** Seeds one earned badge directly (via the real `LocalStorageRewardsRepository`) — there is no
+ * play-through fast enough to earn one for real in this spec, and the merge rule under test
+ * ("union by badge id, seen if either is seen") only cares that the row exists. */
 async function seedEarnedBadge(page: Page, profileId: string, badgeId: string): Promise<void> {
-  await page.evaluate(
-    ({ profileId, badgeId }) => {
-      const key = 'chess-kids:earned-badges';
-      const raw = localStorage.getItem(key);
-      const all: unknown[] = raw ? (JSON.parse(raw) as unknown[]) : [];
-      const now = new Date().toISOString();
-      all.push({
-        id: `seed-badge-${badgeId}`,
-        profileId,
-        badgeId,
-        at: now,
-        seen: true,
-        createdAt: now,
-        updatedAt: now,
-      });
-      localStorage.setItem(key, JSON.stringify(all));
-    },
-    { profileId, badgeId },
-  );
+  await withAppStorage(page, async (repos) => {
+    const now = new Date().toISOString();
+    await repos.rewards.addEarnedBadge({
+      id: `seed-badge-${badgeId}`,
+      profileId,
+      badgeId,
+      at: now,
+      seen: true,
+      createdAt: now,
+      updatedAt: now,
+    });
+  });
 }
 
 /**
@@ -76,85 +70,48 @@ async function seedTodayMinutesForDevice(
   minutes: number,
   deviceId: string,
 ): Promise<void> {
-  await page.evaluate(
-    ({ profileId, minutes, deviceId }) => {
-      const key = 'chess-kids:session-logs';
-      const raw = localStorage.getItem(key);
-      const all: Record<string, unknown> = raw ? (JSON.parse(raw) as Record<string, unknown>) : {};
-      const now = new Date();
-      const date = [
-        now.getFullYear(),
-        String(now.getMonth() + 1).padStart(2, '0'),
-        String(now.getDate()).padStart(2, '0'),
-      ].join('-');
-      all[`${profileId}:${date}`] = {
-        id: `seed-session-log-${deviceId}`,
-        profileId,
-        date,
-        minutes,
-        deviceId,
-        createdAt: now.toISOString(),
-        updatedAt: now.toISOString(),
-      };
-      localStorage.setItem(key, JSON.stringify(all));
-    },
-    { profileId, minutes, deviceId },
-  );
+  await withAppStorage(page, async (repos) => {
+    const now = new Date();
+    await repos.rewards.saveSessionLog({
+      id: `seed-session-log-${deviceId}`,
+      profileId,
+      date: localDayString(now),
+      minutes,
+      deviceId,
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    });
+  });
 }
 
-/** Number of earned-badge rows for `profileId`, read straight from localStorage. */
+/** Number of earned-badge rows for `profileId`, via the real `LocalStorageRewardsRepository`. */
 async function earnedBadgeCount(page: Page, profileId: string): Promise<number> {
-  return page.evaluate((profileId) => {
-    const raw = localStorage.getItem('chess-kids:earned-badges');
-    const all: readonly { readonly profileId: string }[] = raw
-      ? (JSON.parse(raw) as readonly { readonly profileId: string }[])
-      : [];
-    return all.filter((badge) => badge.profileId === profileId).length;
-  }, profileId);
+  return withAppStorage(page, async (repos) => {
+    const badges = await repos.rewards.listEarnedBadges(profileId);
+    return badges.length;
+  });
 }
 
 /** Today's own played minutes for `profileId`, summed across every device row (same shape
- * `totalMinutesForDate` reads) — read straight from localStorage. */
+ * `totalMinutesForDate` reads). */
 async function minutesTodaySummed(page: Page, profileId: string): Promise<number> {
-  return page.evaluate((profileId) => {
-    type SessionLogRow = {
-      readonly profileId: string;
-      readonly date: string;
-      readonly minutes: number;
-    };
-    const raw = localStorage.getItem('chess-kids:session-logs');
-    const all: Record<string, SessionLogRow> = raw
-      ? (JSON.parse(raw) as Record<string, SessionLogRow>)
-      : {};
-    const today = new Date();
-    const date = [
-      today.getFullYear(),
-      String(today.getMonth() + 1).padStart(2, '0'),
-      String(today.getDate()).padStart(2, '0'),
-    ].join('-');
-    return Object.values(all)
-      .filter((log) => log.profileId === profileId && log.date === date)
-      .reduce((sum, log) => sum + log.minutes, 0);
-  }, profileId);
+  return withAppStorage(page, async (repos) => {
+    const logs = await repos.rewards.listSessionLogs(profileId);
+    const today = localDayString(new Date());
+    return logs.filter((log) => log.date === today).reduce((sum, log) => sum + log.minutes, 0);
+  });
 }
 
-/** One lesson's saved `bestStars`, read straight from localStorage's real storage shape, or `{}`. */
+/** One lesson's saved `bestStars`, via the real `LocalStorageProgressRepository`, or `{}`. */
 async function readBestStars(
   page: Page,
   profileId: string,
   lessonId: string,
 ): Promise<Readonly<Record<string, number>>> {
-  return page.evaluate(
-    ({ profileId, lessonId }) => {
-      type LessonProgressRow = { readonly bestStars: Record<string, number> };
-      const raw = localStorage.getItem('chess-kids:lesson-progress');
-      const all: Record<string, LessonProgressRow> = raw
-        ? (JSON.parse(raw) as Record<string, LessonProgressRow>)
-        : {};
-      return all[`${profileId}:${lessonId}`]?.bestStars ?? {};
-    },
-    { profileId, lessonId },
-  );
+  return withAppStorage(page, async (repos) => {
+    const progress = await repos.progress.getLesson(profileId, lessonId);
+    return progress?.bestStars ?? {};
+  });
 }
 
 /**

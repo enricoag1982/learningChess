@@ -8,7 +8,7 @@ import type {
   MiniGame,
   TracksCatalog,
 } from '@chess-kids/core';
-import { nextLesson, SQUARES, worldLessons } from '@chess-kids/core';
+import { SQUARES } from '@chess-kids/core';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
@@ -20,6 +20,7 @@ import {
   contentText,
   dismissCelebrationIfShown,
   findMiniGame,
+  firstTwoLessons,
   getSoleProfileId,
   isMoveCountedExercise,
   journeyNodeName,
@@ -42,19 +43,6 @@ import {
 
 const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
-
-/** The first two lessons of a brand-new profile's first world (siblings, same world) — the second
- * one naturally locked, no seeding needed (M4.5's own onboarding/test-out a11y walk below). */
-function firstTwoLessons(): { readonly first: Lesson; readonly second: Lesson } {
-  const first = nextLesson(catalog, content.lessons, []);
-  if (!first) throw new Error('bundled content/tracks: no first lesson found');
-  const world = catalog.tracks.flatMap((track) => track.worlds).find((w) => w.id === first.world);
-  if (!world) throw new Error(`world "${first.world}" not found in tracks.json`);
-  const siblings = worldLessons(world, content.lessons);
-  const second = siblings[siblings.findIndex((lesson) => lesson.id === first.id) + 1];
-  if (!second) throw new Error(`world "${first.world}" needs at least 2 lessons for this test`);
-  return { first, second };
-}
 
 /**
  * Clears any concept stats this walk's own deep-scanning has produced (M3.4: an exercise scanned
