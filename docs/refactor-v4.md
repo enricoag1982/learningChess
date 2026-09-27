@@ -104,7 +104,7 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 |---|---|---|
 | Files to add an exercise type | ≈ 15 in 4 packages | 1 folder + 1 registry line |
 | Type / mode dispatch sites | ≈ 45 | registries only (≤ 4) |
-| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction); next: web B / C, R3b facade removal) |
+| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction) → `m8.11` 32.0 k; next: web compaction (comments, slice boilerplate, initial JS ≤ 186.9 KB), R3b facade removal) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
 | Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |
@@ -149,6 +149,6 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | PR | Scope | Key decisions |
 |---|---|---|
 | A test kits (`m8.8`) | vitest `setupFiles`; `src/testing/` (`renderApp`, `createTestServices`, fixtures, board, bot, fake narrator, seeds); `e2e/kit/` (content + journey via core `mainTrackLessons` / `findWorld`, i18n via the app's own options, `withAppStorage` over the real repositories, page flows); `e2e/helpers.ts` = barrel | e2e reuses app / core code instead of re-implementing i18n, journey order, storage shapes |
-| B design system | `ui/ds/`: icon set (44 inline icons → one base), `TapButton` looks + `tone` (was `role`, clashed with ARIA), `Screen`, `ScreenHeader`, `RoundIconButton`, `ConfirmDialog`, `NarratedBubble`, `useSpeak`, `useAsync`, `AvatarBadge`; parent-only pieces lazy | Same DOM, roles, labels, class sets; built CSS byte-identical |
-| C navigation | Typed `Route` union + stack (`navigate`, `replace`, `back`, `reset`), `ROUTE_META` (tracked / calm / gated), gate resume as data (`NavOp`, no closure); store slices (nav, profile, rewards, time, learn, today, play); one profile-load path; comment trim (≈ −820 lines) | Removes the 5 origin fields; screens read params via `useRoute` |
+| B design system (`m8.10`) | `ui/ds/`: icon set (44 inline icons → one base), `TapButton` looks + `tone` (was `role`, clashed with ARIA), `Screen`, `ScreenHeader`, `RoundIconButton`, `ConfirmDialog`, `NarratedBubble`, `useSpeak`, `useAsync`, `AvatarBadge`; parent-only pieces lazy | Same DOM, roles, labels, class sets; built CSS byte-identical |
+| C navigation (`m8.11`) | Typed `Route` union + stack (`navigate`, `replace`, `back`, `reset`), `ROUTE_META` (tracked / calm / gated), gate resume as data (`NavOp`, no closure); store slices (nav, profile, rewards, time, learn, today, play); one profile-load path; comment trim (≈ −820 lines) | Removes the 5 origin fields; screens read params via `useRoute` |
 | R3b web kinds | `ExerciseKindUI` per kind, `useExerciseSession` (fixes F5), mode UI registry, e2e solving via core `solution()` | After C |
