@@ -1,10 +1,16 @@
-import type { AppDeps, BotPlayer, Narrator, VariantRules } from '@chess-kids/core';
+import type {
+  AppDeps,
+  BackupFileWriter,
+  BackupImporter,
+  BotPlayer,
+  Narrator,
+  VariantRules,
+} from '@chess-kids/core';
 import { chessJsRules, createVariantRules } from '@chess-kids/core';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
-import { createDownloadBackupFileWriter } from '../adapters/download-backup-file-writer.ts';
 import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
 import type { AudioNarratorOutcome } from '../adapters/narration/audio-narrator.ts';
 import { createAudioNarrator } from '../adapters/narration/audio-narrator.ts';
@@ -12,15 +18,44 @@ import { createGatedNarrator } from '../adapters/narration/gated-narrator.ts';
 import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
 import { createMathRandom } from '../adapters/random.ts';
 import { LocalStorageAssessmentRepository } from '../adapters/storage/local-assessment-repository.ts';
-import { LocalStorageBackupImporter } from '../adapters/storage/local-backup-importer.ts';
 import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game-record-repository.ts';
 import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
 import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
 import { LocalStorageRewardsRepository } from '../adapters/storage/local-rewards-repository.ts';
 import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
+import type { LocalStore } from '../adapters/storage/local-store.ts';
 import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
 import { MIGRATIONS } from '../adapters/storage/migrations.ts';
+
+/** `AppDeps.backupFileWriter`/`backupImporter`: read only from the lazy-loaded Parent area
+ * (`app/backup.ts`, `app/merge.ts`), so their implementations are fetched on first use instead of
+ * shipping in the initial bundle. */
+function createLazyBackupFileWriter(): BackupFileWriter {
+  return {
+    async write(filename, contents) {
+      const { createDownloadBackupFileWriter } =
+        await import('../adapters/download-backup-file-writer.ts');
+      return createDownloadBackupFileWriter().write(filename, contents);
+    },
+  };
+}
+
+/** Same reasoning as `createLazyBackupFileWriter`. */
+function createLazyBackupImporter(store: LocalStore): BackupImporter {
+  return {
+    async replaceAll(file) {
+      const { LocalStorageBackupImporter } =
+        await import('../adapters/storage/local-backup-importer.ts');
+      return new LocalStorageBackupImporter(store).replaceAll(file);
+    },
+    async writeMerged(file, options) {
+      const { LocalStorageBackupImporter } =
+        await import('../adapters/storage/local-backup-importer.ts');
+      return new LocalStorageBackupImporter(store).writeMerged(file, options);
+    },
+  };
+}
 
 /** The app's wired-up use-case dependencies, plus the pieces the UI reaches for directly. */
 export interface Services {
@@ -55,8 +90,8 @@ export function createServices(storage: Storage = window.localStorage): Services
     passwordFile: createDownloadPasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),
     random: createMathRandom(),
-    backupFileWriter: createDownloadBackupFileWriter(),
-    backupImporter: new LocalStorageBackupImporter(store),
+    backupFileWriter: createLazyBackupFileWriter(),
+    backupImporter: createLazyBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
   };
 
