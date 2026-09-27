@@ -1,8 +1,9 @@
-import type { ExerciseState } from '../domain/exercise/engine.ts';
-import { starsFor } from '../domain/exercise/engine.ts';
-import { summarizeBossResult } from '../domain/exercise/boss-result.ts';
-import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
-import type { VersusState } from '../domain/exercise/versus.ts';
+import type { ExerciseState } from '../domain/exercise/state.ts';
+import { starsFor } from '../domain/exercise/kinds/index.ts';
+import { modeOf } from '../domain/exercise/modes/index.ts';
+import type { GameState } from '../domain/exercise/modes/static/def.ts';
+import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
+import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { SkippablePhase } from '../domain/lesson-session.ts';
@@ -234,7 +235,7 @@ export async function recordBossResult(
 ): Promise<LessonProgress> {
   const { profileId, lesson, state, durationMs, nextStep } = input;
   const now = deps.clock.now();
-  const summary = summarizeBossResult(state);
+  const summary = modeOf(state).summarise(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),

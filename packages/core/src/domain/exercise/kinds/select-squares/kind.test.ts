@@ -3,16 +3,19 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import {
-  requestHint,
-  starsFor,
-  startExercise,
-  submitSelection,
-  toggleSquare,
-} from '../../engine.ts';
+import { requestHint, starsFor } from '../index.ts';
+import { initState } from '../../state.ts';
+import type { ExerciseState, ExerciseStateOf } from '../../state.ts';
+import { submitSelection, toggleSquare } from './engine.ts';
 import type { SelectSquaresDef } from '../../types.ts';
 
 const rules = createVariantRules(chessJsRules);
+
+/** `requestHint` dispatches generically; this test drives one exercise type throughout, so it
+ * narrows the result back to call the type-specific helpers below. */
+function narrow(state: ExerciseState): ExerciseStateOf<SelectSquaresDef> {
+  return state as ExerciseStateOf<SelectSquaresDef>;
+}
 
 describe('select-squares', () => {
   it('derives 14 legal-move squares for a rook on d4', () => {
@@ -37,7 +40,7 @@ describe('select-squares', () => {
       answer: { derive: 'legal-moves', from: 'd4' },
     };
 
-    let state = startExercise(def);
+    let state = initState(def);
     for (const square of [
       'd5',
       'd6',
@@ -84,7 +87,7 @@ describe('select-squares', () => {
       answer: { derive: 'legal-moves', from: 'd4' },
     };
 
-    const state = startExercise(def);
+    const state = initState(def);
     const { result } = submitSelection(toggleSquare(state, 'd5'), rules);
 
     expect(result.missing).toBe(10); // 11 legal squares total, 1 selected
@@ -113,7 +116,7 @@ describe('select-squares', () => {
       answer: { derive: 'legal-moves', from: 'd4' },
     };
 
-    let state = startExercise(def);
+    let state = initState(def);
     state = toggleSquare(state, 'd5');
     state = toggleSquare(state, 'e5'); // not a legal rook move
 
@@ -151,7 +154,7 @@ describe('select-squares', () => {
       answer: { squares: ['d5', 'd6'] },
     };
 
-    const state = startExercise(def);
+    const state = initState(def);
     const { hint } = requestHint(state, rules);
     expect(hint).toEqual({ kind: 'squares', level: 1, squares: [] });
   });
@@ -178,15 +181,15 @@ describe('select-squares', () => {
       answer: { squares: ['d5'] },
     };
 
-    const clean = submitSelection(toggleSquare(startExercise(def), 'd5'), rules).state;
+    const clean = submitSelection(toggleSquare(initState(def), 'd5'), rules).state;
     expect(starsFor(clean)).toBe(3);
 
-    let oneHint = startExercise(def);
-    oneHint = requestHint(oneHint, rules).state;
+    let oneHint = initState(def);
+    oneHint = narrow(requestHint(oneHint, rules).state);
     oneHint = submitSelection(toggleSquare(oneHint, 'd5'), rules).state;
     expect(starsFor(oneHint)).toBe(2);
 
-    let twoErrors = startExercise(def);
+    let twoErrors = initState(def);
     twoErrors = submitSelection(toggleSquare(twoErrors, 'e5'), rules).state; // wrong, error 1
     twoErrors = toggleSquare(twoErrors, 'e5'); // undo the wrong pick
     twoErrors = submitSelection(toggleSquare(twoErrors, 'f5'), rules).state; // wrong again, error 2
@@ -218,7 +221,7 @@ describe('select-squares', () => {
       answer: { derive: 'attacked-by', from: 'e4' },
     };
 
-    let state = startExercise(def);
+    let state = initState(def);
     state = toggleSquare(state, 'd5');
     state = toggleSquare(state, 'f5');
     const { result, state: submitted } = submitSelection(state, rules);
@@ -249,7 +252,7 @@ describe('select-squares', () => {
       answer: { derive: 'attacked-by', from: 'e4' },
     };
 
-    const state = startExercise(def);
+    const state = initState(def);
     const { result } = submitSelection(toggleSquare(toggleSquare(state, 'd5'), 'e5'), rules);
 
     expect(result.wrong).toEqual(['e5']);
@@ -277,7 +280,7 @@ describe('select-squares', () => {
       answer: { derive: 'check-escapes' },
     };
 
-    let state = startExercise(def);
+    let state = initState(def);
     state = toggleSquare(state, 'f1');
     state = toggleSquare(state, 'h1');
     const { result, state: submitted } = submitSelection(state, rules);
@@ -308,7 +311,7 @@ describe('select-squares', () => {
       answer: { derive: 'check-escapes' },
     };
 
-    const { hint } = requestHint(startExercise(def), rules);
+    const { hint } = requestHint(initState(def), rules);
     expect(hint).toEqual({ kind: 'squares', level: 1, squares: ['g1'] });
   });
 });

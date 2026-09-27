@@ -2,12 +2,15 @@ import { SQUARES } from '../../../chess/types.ts';
 import type { Square } from '../../../chess/types.ts';
 import { kingSquare } from '../../../chess/facts/pieces.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { Hint } from '../../hint.ts';
 import type { SelectionResult, SelectSquaresDef } from './kind.ts';
 
 /** Adds or removes a square from the current selection (select-squares). No-op once solved. */
-export function toggleSquare(state: ExerciseState, square: Square): ExerciseState {
+export function toggleSquare(
+  state: ExerciseStateOf<SelectSquaresDef>,
+  square: Square,
+): ExerciseStateOf<SelectSquaresDef> {
   if (state.solved) {
     return state;
   }
@@ -50,12 +53,9 @@ export function selectSquaresAnswer(def: SelectSquaresDef, rules: VariantRules):
 
 /** Checks the current selection against the answer (select-squares). */
 export function submitSelection(
-  state: ExerciseState,
+  state: ExerciseStateOf<SelectSquaresDef>,
   rules: VariantRules,
-): { readonly state: ExerciseState; readonly result: SelectionResult } {
-  if (state.def.type !== 'select-squares') {
-    throw new Error('submitSelection: exercise is not select-squares');
-  }
+): { readonly state: ExerciseStateOf<SelectSquaresDef>; readonly result: SelectionResult } {
   const answer = selectSquaresAnswer(state.def, rules);
   const wrong = state.selected.filter((square) => !answer.includes(square));
   const missingSquares = answer.filter((square) => !state.selected.includes(square));
@@ -67,7 +67,7 @@ export function submitSelection(
 }
 
 export function selectSquaresHint(
-  state: ExerciseState,
+  state: ExerciseStateOf<SelectSquaresDef>,
   def: SelectSquaresDef,
   rules: VariantRules,
   level: 1 | 2 | 3,

@@ -7,9 +7,11 @@ import type {
   ExerciseStateOf,
   ExerciseType,
   Hint,
+  Move,
   OutcomeOf,
   Position,
   Square,
+  VariantRules,
 } from '@chess-kids/core';
 import type { JSX, ReactNode } from 'react';
 
@@ -91,4 +93,15 @@ export function hintSquares(hint: Hint | null): readonly Square[] | undefined {
   if (hint === null) return undefined;
   if (hint.kind === 'squares' || hint.kind === 'yes-no') return hint.squares;
   return undefined;
+}
+
+/** Legal kid moves right now, for a move kind's board (`[]` once solved) — used only by the 4 move
+ * kinds' own `PlayArea`, so unlike core's old `exerciseMoves` it never needs the `input` check. */
+export function moveKindLegalMoves(
+  state: ExerciseStateOf<ExerciseDef>,
+  rules: VariantRules,
+  from?: Square,
+): readonly Move[] {
+  if (state.solved) return [];
+  return rules.legalMoves(state.position, { staticOpponent: true }, from);
 }

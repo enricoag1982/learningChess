@@ -1,5 +1,6 @@
 import type { Position, Square } from '../chess/types.ts';
 import type { ExerciseProgress } from './kind.ts';
+import type { ExerciseDef } from './types.ts';
 
 /** Immutable exercise progress, `def`'s own type carried through. */
 export interface ExerciseStateOf<D> extends ExerciseProgress {
@@ -15,6 +16,9 @@ export interface ExerciseStateOf<D> extends ExerciseProgress {
   /** Option ids ruled out for a `choice` exercise (wrong pick or hint-removed); disabled in UI. */
   readonly wrongOptions?: readonly string[];
 }
+
+/** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
+export type ExerciseState = ExerciseStateOf<ExerciseDef>;
 
 /** Builds a fresh `ExerciseStateOf<D>` at `def`'s own authored position. Every kind's `init` calls
  * this directly — the one non-dispatching implementation dispatch bottoms out at. */

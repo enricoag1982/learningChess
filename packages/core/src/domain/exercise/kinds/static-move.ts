@@ -6,8 +6,8 @@ import type { VariantRules } from '../../variant/rules.ts';
 import { applyKidMove } from '../apply-move.ts';
 import type { Hint } from '../hint.ts';
 import { solve } from '../solver.ts';
-import type { ExerciseState } from '../engine.ts';
-import type { ExerciseDef } from '../types.ts';
+import type { ExerciseStateOf } from '../state.ts';
+import type { BestMoveDef, CaptureDef, CollectStarsDef } from '../types.ts';
 
 /** Result of a piece move attempt (collect-stars / capture / best-move). */
 export type MoveOutcome =
@@ -35,13 +35,6 @@ export interface UndoAction {
 /** Result of an `UndoAction`. */
 export type UndoOutcome = { readonly kind: 'undone' };
 
-const NON_MOVE_TYPES = new Set<ExerciseDef['type']>([
-  'select-squares',
-  'yes-no',
-  'choice',
-  'setup',
-]);
-
 function isCaptureSolved(position: Position, kidColor: Position['toMove']): boolean {
   return enemyCount(position, kidColor) === 0;
 }
@@ -51,17 +44,11 @@ function isSolutionMove(solutions: readonly string[], san: string): boolean {
 }
 
 /** Plays a kid move for a collect-stars / capture / best-move exercise. */
-export function playMove(
-  state: ExerciseState,
+export function playMove<D extends CollectStarsDef | CaptureDef | BestMoveDef>(
+  state: ExerciseStateOf<D>,
   rules: VariantRules,
   move: MoveInput,
-): { readonly state: ExerciseState; readonly outcome: MoveOutcome } {
-  if (NON_MOVE_TYPES.has(state.def.type)) {
-    throw new Error(`playMove: ${state.def.type} exercises use a different action`);
-  }
-  if (state.def.type === 'mate-in-n') {
-    throw new Error(`playMove: ${state.def.type} exercises use a different action`);
-  }
+): { readonly state: ExerciseStateOf<D>; readonly outcome: MoveOutcome } {
   if (state.solved) {
     return { state, outcome: { kind: 'illegal' } };
   }
@@ -78,7 +65,7 @@ export function playMove(
         outcome: { kind: 'wrong', move: applied.move },
       };
     }
-    const nextState: ExerciseState = {
+    const nextState: ExerciseStateOf<D> = {
       ...state,
       position: applied.position,
       history: [...state.history, state.position],
@@ -100,7 +87,7 @@ export function playMove(
       ? applied.position.markers.stars.length === 0
       : isCaptureSolved(applied.position, kidColor);
 
-  const nextState: ExerciseState = {
+  const nextState: ExerciseStateOf<D> = {
     ...state,
     position: applied.position,
     history: [...state.history, state.position],
@@ -116,8 +103,10 @@ export function playMove(
   return { state: nextState, outcome };
 }
 
-/** Undoes the last kid move (collect-stars / capture / best-move). No-op at the start of the exercise. */
-export function undo(state: ExerciseState): ExerciseState {
+/** Undoes the last kid move (collect-stars / capture). No-op at the start of the exercise. */
+export function undo<D extends CollectStarsDef | CaptureDef>(
+  state: ExerciseStateOf<D>,
+): ExerciseStateOf<D> {
   const previous = state.history[state.history.length - 1];
   if (previous === undefined) {
     return state;
@@ -131,14 +120,21 @@ export function undo(state: ExerciseState): ExerciseState {
   };
 }
 
-function goalMove(state: ExerciseState, rules: VariantRules): { from: Square; to: Square } | null {
+function goalMove<D extends CollectStarsDef | CaptureDef>(
+  state: ExerciseStateOf<D>,
+  rules: VariantRules,
+): { from: Square; to: Square } | null {
   const goal = state.def.type === 'collect-stars' ? 'collect-stars' : 'capture';
   const line = solve(state.position, rules, goal);
   return line?.[0] ?? null;
 }
 
 /** collect-stars / capture hint: piece → target square → the move, from the solver's shortest line. */
-export function moveHint(state: ExerciseState, rules: VariantRules, level: 1 | 2 | 3): Hint {
+export function moveHint<D extends CollectStarsDef | CaptureDef>(
+  state: ExerciseStateOf<D>,
+  rules: VariantRules,
+  level: 1 | 2 | 3,
+): Hint {
   const move = goalMove(state, rules);
   if (level === 1) {
     return { kind: 'squares', level: 1, squares: move === null ? [] : [move.from] };

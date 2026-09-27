@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { submitSelection, toggleSquare } from '../../engine.ts';
-import type { ExerciseState } from '../../engine.ts';
+import { submitSelection, toggleSquare } from '../../kinds/select-squares/engine.ts';
+import type { ExerciseState, ExerciseStateOf } from '../../state.ts';
 import type { SelectSquaresDef } from '../../types.ts';
 import type { SeriesGameDef } from './def.ts';
 import { completeRound, currentRound, seriesResult, seriesStars, startSeries } from './engine.ts';
@@ -12,6 +12,12 @@ import { completeRound, currentRound, seriesResult, seriesStars, startSeries } f
 const rules = createVariantRules(chessJsRules);
 
 const EMPTY_BOARD = parseDiagram(Array.from({ length: 8 }, () => '. . . . . . . .').join('\n'));
+
+/** A series round's own state is generic (any exercise type); every round here is authored as
+ * select-squares, so this test narrows it to call that kind's own engine directly. */
+function asSelectSquares(state: ExerciseState): ExerciseStateOf<SelectSquaresDef> {
+  return state as ExerciseStateOf<SelectSquaresDef>;
+}
 
 function roundDef(id: string, answer: readonly ('a1' | 'h8' | 'a2')[]): SelectSquaresDef {
   return {
@@ -50,7 +56,7 @@ describe('series mini-game (Square Hunt / Setup Race)', () => {
 
   it('completeRound folds errors into mistakes and advances to the next round', () => {
     let series = startSeries(def);
-    const solved = submitSelection(toggleSquare(series.round, 'a1'), rules);
+    const solved = submitSelection(toggleSquare(asSelectSquares(series.round), 'a1'), rules);
     expect(solved.result.correct).toBe(true);
 
     series = completeRound(series, solved.state);
@@ -75,11 +81,11 @@ describe('series mini-game (Square Hunt / Setup Race)', () => {
 
   it('marks the series done after the last round; stars from total mistakes (3 <= errors3, 2 <= errors2, else 1)', () => {
     let series = startSeries(def);
-    const firstSolved = submitSelection(toggleSquare(series.round, 'a1'), rules);
+    const firstSolved = submitSelection(toggleSquare(asSelectSquares(series.round), 'a1'), rules);
     series = completeRound(series, firstSolved.state); // 0 mistakes so far
 
     // Round 2: one wrong try (error), then the correct square.
-    const wrong = submitSelection(toggleSquare(series.round, 'a2'), rules);
+    const wrong = submitSelection(toggleSquare(asSelectSquares(series.round), 'a2'), rules);
     expect(wrong.result.correct).toBe(false);
     const reselected = toggleSquare(toggleSquare(wrong.state, 'a2'), 'h8'); // deselect wrong, pick right
     const solved = submitSelection(reselected, rules);
@@ -96,9 +102,9 @@ describe('series mini-game (Square Hunt / Setup Race)', () => {
 
   it('1 star ("finished") once total mistakes exceed errors2', () => {
     let series = startSeries({ ...def, errors3: 0, errors2: 0 });
-    const solved1 = submitSelection(toggleSquare(series.round, 'a1'), rules);
+    const solved1 = submitSelection(toggleSquare(asSelectSquares(series.round), 'a1'), rules);
     series = completeRound(series, solved1.state);
-    const wrong = submitSelection(toggleSquare(series.round, 'a2'), rules);
+    const wrong = submitSelection(toggleSquare(asSelectSquares(series.round), 'a2'), rules);
     const reselected = toggleSquare(toggleSquare(wrong.state, 'a2'), 'h8');
     const solved2 = submitSelection(reselected, rules);
     series = completeRound(series, solved2.state);

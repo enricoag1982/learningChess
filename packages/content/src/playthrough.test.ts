@@ -6,8 +6,8 @@ import {
   createVariantRules,
   gameResult,
   gameStars,
+  kindOf,
   playGameMove,
-  playMove,
   solve,
   startExercise,
   startStaticCaptureGame,
@@ -26,8 +26,8 @@ const NEW_LESSON_IDS = ['bishop', 'queen', 'king', 'knight'];
 /**
  * Content-only (no UI, no e2e) proof that a lesson's movement exercises are actually completable
  * end to end through the real exercise engine, not just that a solution exists (`lessons.test.ts`
- * already checks the solver finds one at `stars3`). Every solver move is replayed through
- * `playMove`; the resulting state must end up `solved`.
+ * already checks the solver finds one at `stars3`). Every solver move is replayed through the
+ * exercise's own kind (`kindOf(def).act`); the resulting state must end up `solved`.
  */
 describe('World 2 lessons play to completion via the engine, using solver lines', () => {
   for (const lessonId of NEW_LESSON_IDS) {
@@ -49,7 +49,7 @@ describe('World 2 lessons play to completion via the engine, using solver lines'
 
         let state = startExercise(exercise);
         for (const move of line ?? []) {
-          const result = playMove(state, rules, move);
+          const result = kindOf(exercise).act(state, { type: 'move', move }, rules);
           expect(
             result.outcome.kind,
             `${lesson.id}/${exercise.id}: move ${move.from}-${move.to} was rejected`,

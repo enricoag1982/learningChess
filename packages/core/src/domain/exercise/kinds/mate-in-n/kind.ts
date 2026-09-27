@@ -1,6 +1,5 @@
 import type { Move } from '../../../chess/rules.ts';
 import { errorHintStars } from '../../stars.ts';
-import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { initState } from '../../state.ts';
 import type { MoveAction } from '../base.ts';
@@ -29,12 +28,12 @@ export const mateInNKind: ChessKind<MateInNDef, MoveAction, MateInNOutcome> = {
   },
 
   act(state, action, ctx) {
-    return narrowStep(playMateInN(widen(state), ctx.chess, action.move));
+    return playMateInN(state, ctx.chess, action.move);
   },
 
   hint(state, level, ctx) {
     const bumped = { ...state, hintLevel: level };
-    return { state: bumped, hint: mateInNHint(widen(state), bumped.def, ctx, level) };
+    return { state: bumped, hint: mateInNHint(state, bumped.def, ctx, level) };
   },
 
   stars(state) {

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import type { CaptureDef } from '../domain/exercise/types.ts';
-import type { ExerciseState } from '../domain/exercise/engine.ts';
-import type { GameState } from '../domain/exercise/minigame.ts';
-import { playVersusMove, startVersus } from '../domain/exercise/versus.ts';
-import type { VersusState } from '../domain/exercise/versus.ts';
+import type { ExerciseStateOf } from '../domain/exercise/state.ts';
+import type { GameState } from '../domain/exercise/modes/static/def.ts';
+import { playVersusMove, startVersus } from '../domain/exercise/modes/versus/engine.ts';
+import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
 import type { VersusMiniGame } from '../domain/lesson.ts';
 import type { MiniGame } from '../domain/lesson.ts';
 import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
@@ -20,7 +20,10 @@ const EMPTY_POSITION = {
   enPassant: null,
 } as const;
 
-function exerciseState(def: CaptureDef, overrides: Partial<ExerciseState> = {}): ExerciseState {
+function exerciseState(
+  def: CaptureDef,
+  overrides: Partial<ExerciseStateOf<CaptureDef>> = {},
+): ExerciseStateOf<CaptureDef> {
   return {
     def,
     position: def.position,

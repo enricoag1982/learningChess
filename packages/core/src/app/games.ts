@@ -1,6 +1,6 @@
 import type { BotLevel } from '../domain/bot/levels.ts';
-import type { VersusState } from '../domain/exercise/versus.ts';
-import { versusEndReason } from '../domain/exercise/versus.ts';
+import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
+import { versusEndReason } from '../domain/exercise/modes/versus/engine.ts';
 import type { GameRecord, GameRecordResult } from '../domain/progress.ts';
 import type { Journey } from './journey.ts';
 import { checkRewards } from './rewards.ts';

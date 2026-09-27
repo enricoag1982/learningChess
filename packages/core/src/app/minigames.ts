@@ -1,7 +1,8 @@
-import { isBossResultWin, summarizeBossResult } from '../domain/exercise/boss-result.ts';
-import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
-import { versusGameState } from '../domain/exercise/versus.ts';
-import type { VersusState } from '../domain/exercise/versus.ts';
+import { modeOf } from '../domain/exercise/modes/index.ts';
+import type { GameState } from '../domain/exercise/modes/static/def.ts';
+import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
+import { versusGameState } from '../domain/exercise/modes/versus/engine.ts';
+import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
 import type { MiniGame } from '../domain/lesson.ts';
 import type { MiniGameProgress } from '../domain/progress.ts';
 import { recordMiniGamePlay } from '../domain/progress.ts';
@@ -45,7 +46,7 @@ export async function saveMiniGamePlay(
 ): Promise<MiniGameProgress> {
   const { profileId, game, state } = input;
   const now = deps.clock.now();
-  const summary = summarizeBossResult(state);
+  const summary = modeOf(state).summarise(state);
   const existing = await deps.progress.getMiniGame(profileId, game.id);
   const updated = recordMiniGamePlay(
     existing,
@@ -53,7 +54,7 @@ export async function saveMiniGamePlay(
     profileId,
     game.id,
     summary.stars,
-    isBossResultWin(state),
+    modeOf(state).isWin(state),
     now,
   );
   await deps.progress.saveMiniGame(updated);
@@ -86,7 +87,7 @@ export async function recordMiniGameResult(
 ): Promise<MiniGameProgress> {
   const { profileId, game, state, durationMs } = input;
   const now = deps.clock.now();
-  const summary = summarizeBossResult(state);
+  const summary = modeOf(state).summarise(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),

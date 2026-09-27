@@ -4,8 +4,9 @@ import { chessJsRules } from '../chess/chessjs-rules.ts';
 import { parseDiagram } from '../chess/diagram.ts';
 import { parseFen } from '../chess/fen.ts';
 import { createVariantRules } from '../variant/rules.ts';
-import { playMove, startExercise } from './engine.ts';
+import { playMove } from './kinds/static-move.ts';
 import { optimalMoves, solve } from './solver.ts';
+import { initState } from './state.ts';
 import type { CaptureDef, CollectStarsDef } from './types.ts';
 
 const rules = createVariantRules(chessJsRules);
@@ -28,7 +29,7 @@ describe('solve', () => {
       stars3: 3,
       stars2: 4,
     };
-    let state = startExercise(def);
+    let state = initState(def);
     for (const move of line ?? []) {
       const result = playMove(state, rules, move);
       expect(result.outcome.kind).not.toBe('illegal');

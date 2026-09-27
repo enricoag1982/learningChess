@@ -1,7 +1,7 @@
 import { SQUARES } from '../../../chess/types.ts';
 import type { Piece, Position, Square } from '../../../chess/types.ts';
 import { piecesEqual } from '../../../chess/facts/pieces.ts';
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { Hint } from '../../hint.ts';
 import type { PalettePiece, PlaceOutcome, SetupDef } from './kind.ts';
 
@@ -18,13 +18,10 @@ export function remainingSetupSquares(position: Position, target: Position): rea
  * on the board. No-op (outcome `wrong`) once solved.
  */
 export function placePiece(
-  state: ExerciseState,
+  state: ExerciseStateOf<SetupDef>,
   square: Square,
   piece: Piece,
-): { readonly state: ExerciseState; readonly outcome: PlaceOutcome } {
-  if (state.def.type !== 'setup') {
-    throw new Error('placePiece: exercise is not setup');
-  }
+): { readonly state: ExerciseStateOf<SetupDef>; readonly outcome: PlaceOutcome } {
   if (state.solved) {
     return { state, outcome: { kind: 'wrong', square, piece } };
   }
@@ -53,10 +50,7 @@ export function placePiece(
 }
 
 /** Remaining setup pieces, grouped by colour + type with counts, in board reading order. */
-export function setupPalette(state: ExerciseState): readonly PalettePiece[] {
-  if (state.def.type !== 'setup') {
-    throw new Error('setupPalette: exercise is not setup');
-  }
+export function setupPalette(state: ExerciseStateOf<SetupDef>): readonly PalettePiece[] {
   const def = state.def;
   const counts = new Map<string, PalettePiece>();
   for (const square of remainingSetupSquares(state.position, def.target)) {
@@ -72,10 +66,10 @@ export function setupPalette(state: ExerciseState): readonly PalettePiece[] {
 }
 
 export function setupHint(
-  state: ExerciseState,
+  state: ExerciseStateOf<SetupDef>,
   def: SetupDef,
   level: 1 | 2 | 3,
-): { readonly state: ExerciseState; readonly hint: Hint } {
+): { readonly state: ExerciseStateOf<SetupDef>; readonly hint: Hint } {
   const square = remainingSetupSquares(state.position, def.target)[0];
   const piece = square === undefined ? undefined : def.target.pieces[square];
 

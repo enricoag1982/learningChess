@@ -1,6 +1,6 @@
 import type { Move } from '../../../chess/rules.ts';
 import type { PieceType, Position } from '../../../chess/types.ts';
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { CaptureDef, CollectStarsDef } from '../../types.ts';
 
 /** Mini-game win condition: `capture-all` (Hungry Piece: capture every enemy) or `collect-stars`
@@ -24,7 +24,7 @@ export interface StaticCaptureGameDef {
 export interface GameState {
   readonly mode: 'static';
   readonly def: StaticCaptureGameDef;
-  readonly exercise: ExerciseState;
+  readonly exercise: ExerciseStateOf<CaptureDef | CollectStarsDef>;
   readonly ended: boolean;
 }
 

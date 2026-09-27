@@ -1,5 +1,5 @@
-import { startExercise } from '../../engine.ts';
-import type { ExerciseState } from '../../engine.ts';
+import { startExercise } from '../../kinds/index.ts';
+import type { ExerciseState } from '../../state.ts';
 import type { ExerciseDef } from '../../types.ts';
 import type { SeriesGameDef, SeriesGameState } from './def.ts';
 

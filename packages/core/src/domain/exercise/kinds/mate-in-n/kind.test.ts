@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { playMateInN, playMove, requestHint, starsFor, startExercise } from '../../engine.ts';
+import { requestHint, starsFor } from '../index.ts';
+import { initState } from '../../state.ts';
+import { playMateInN } from './engine.ts';
 import type { MateInNDef } from '../../types.ts';
 
 const rules = createVariantRules(chessJsRules);
@@ -34,7 +36,7 @@ describe('mate-in-n', () => {
   };
 
   it('a mating move solves it even when it is not the scripted one', () => {
-    const state = startExercise(mateIn1);
+    const state = initState(mateIn1);
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'd1', to: 'd8' });
 
     expect(outcome).toMatchObject({ kind: 'solved' });
@@ -43,7 +45,7 @@ describe('mate-in-n', () => {
   });
 
   it('a legal but non-mating, non-scripted move counts an error and leaves the position unchanged', () => {
-    const state = startExercise(mateIn1);
+    const state = initState(mateIn1);
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'b1', to: 'b2' });
 
     expect(outcome).toMatchObject({ kind: 'wrong' });
@@ -53,7 +55,7 @@ describe('mate-in-n', () => {
   });
 
   it('an illegal move counts an error without touching the position', () => {
-    const state = startExercise(mateIn1);
+    const state = initState(mateIn1);
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'g2', to: 'g5' });
 
     expect(outcome).toEqual({ kind: 'illegal' });
@@ -61,18 +63,13 @@ describe('mate-in-n', () => {
   });
 
   it('is a no-op once solved', () => {
-    let state = startExercise(mateIn1);
+    let state = initState(mateIn1);
     state = playMateInN(state, chessJsRules, { from: 'b1', to: 'b8' }).state;
     expect(state.solved).toBe(true);
 
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'g2', to: 'g3' });
     expect(outcome).toEqual({ kind: 'illegal' });
     expect(next).toBe(state);
-  });
-
-  it('playMove refuses a mate-in-n exercise', () => {
-    const state = startExercise(mateIn1);
-    expect(() => playMove(state, rules, { from: 'b1', to: 'b8' })).toThrow();
   });
 
   // Fool's-mate-shaped mate-in-2 (kid = White): 1.Ne7+ Kh8 2.Qa8# — Kf8 is also legal but the
@@ -100,7 +97,7 @@ describe('mate-in-n', () => {
   };
 
   it('the scripted kid move applies the scripted opponent reply too', () => {
-    const state = startExercise(mateIn2);
+    const state = initState(mateIn2);
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'c6', to: 'e7' });
 
     expect(outcome).toMatchObject({
@@ -114,7 +111,7 @@ describe('mate-in-n', () => {
   });
 
   it('finishes with the final kid move after the scripted reply', () => {
-    let state = startExercise(mateIn2);
+    let state = initState(mateIn2);
     state = playMateInN(state, chessJsRules, { from: 'c6', to: 'e7' }).state;
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'a1', to: 'a8' });
 
@@ -123,7 +120,7 @@ describe('mate-in-n', () => {
   });
 
   it('a move that neither mates nor matches the scripted line is wrong', () => {
-    const state = startExercise(mateIn2);
+    const state = initState(mateIn2);
     const { state: next, outcome } = playMateInN(state, chessJsRules, { from: 'b1', to: 'b2' });
 
     expect(outcome).toMatchObject({ kind: 'wrong' });
@@ -132,7 +129,7 @@ describe('mate-in-n', () => {
   });
 
   it('hint ladder: piece, then target square, then the scripted move', () => {
-    const state = startExercise(mateIn2);
+    const state = initState(mateIn2);
 
     const hint1 = requestHint(state, rules);
     expect(hint1.hint).toEqual({ kind: 'squares', level: 1, squares: ['c6'] });
@@ -150,7 +147,7 @@ describe('mate-in-n', () => {
   });
 
   it('hints the second kid move once the first ply has been played', () => {
-    let state = startExercise(mateIn2);
+    let state = initState(mateIn2);
     state = playMateInN(state, chessJsRules, { from: 'c6', to: 'e7' }).state;
 
     const { hint } = requestHint(state, rules);
@@ -158,11 +155,11 @@ describe('mate-in-n', () => {
   });
 
   it('grades stars like best-move: 3 clean, capped by errors/hints', () => {
-    let clean = startExercise(mateIn1);
+    let clean = initState(mateIn1);
     clean = playMateInN(clean, chessJsRules, { from: 'b1', to: 'b8' }).state;
     expect(starsFor(clean)).toBe(3);
 
-    let oneError = startExercise(mateIn1);
+    let oneError = initState(mateIn1);
     oneError = playMateInN(oneError, chessJsRules, { from: 'b1', to: 'b2' }).state; // wrong
     oneError = playMateInN(oneError, chessJsRules, { from: 'b1', to: 'b8' }).state; // mates
     expect(oneError.errors).toBe(1);

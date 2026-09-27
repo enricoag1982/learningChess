@@ -1,5 +1,5 @@
 import type { VariantRules } from '../../../variant/rules.ts';
-import { selectSquaresAnswer } from '../../engine.ts';
+import { selectSquaresAnswer } from './engine.ts';
 import type { SelectSquaresAction, SelectSquaresDef } from './kind.ts';
 
 /** Toggles every answer square, then submits. */

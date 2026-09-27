@@ -5,7 +5,7 @@
  * (World 1, 3, 4, 5) and by the content package's own kind-solution test.
  */
 import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
-import type { ExerciseState } from '../domain/exercise/engine.ts';
+import type { ExerciseState } from '../domain/exercise/state.ts';
 import { kindOf } from '../domain/exercise/kinds/index.ts';
 import { solutionOf } from '../domain/exercise/kinds/solutions.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';

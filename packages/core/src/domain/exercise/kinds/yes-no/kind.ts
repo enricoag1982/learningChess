@@ -1,5 +1,4 @@
 import { errorHintStars } from '../../stars.ts';
-import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
 import type { AnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
@@ -24,8 +23,8 @@ export const yesNoKind: ChessKind<YesNoDef, AnswerYesNoAction, AnswerOutcome> = 
   },
 
   act(state, action) {
-    const next = answerYesNo(widen(state), action.value);
-    return { state: narrowState(next), outcome: deriveAnswerOutcome(state, next) };
+    const next = answerYesNo(state, action.value);
+    return { state: next, outcome: deriveAnswerOutcome(state, next) };
   },
 
   hint(state, level) {

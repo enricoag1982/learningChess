@@ -1,12 +1,13 @@
 import type { Square } from '../../../chess/types.ts';
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { Hint } from '../../hint.ts';
+import type { YesNoDef } from '../../types.ts';
 
 /** Answers a yes-no exercise. Correct → solved; wrong → errors + 1. No-op once solved. */
-export function answerYesNo(state: ExerciseState, value: boolean): ExerciseState {
-  if (state.def.type !== 'yes-no') {
-    throw new Error('answerYesNo: exercise is not yes-no');
-  }
+export function answerYesNo(
+  state: ExerciseStateOf<YesNoDef>,
+  value: boolean,
+): ExerciseStateOf<YesNoDef> {
   if (state.solved) {
     return state;
   }

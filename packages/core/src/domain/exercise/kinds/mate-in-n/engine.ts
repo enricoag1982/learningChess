@@ -1,7 +1,7 @@
 import type { ChessRules, MoveInput } from '../../../chess/rules.ts';
 import { findMoveBySan, sameSan } from '../../../chess/facts/san.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { Hint } from '../../hint.ts';
 import type { MateInNDef, MateInNOutcome } from './kind.ts';
 
@@ -9,13 +9,10 @@ import type { MateInNDef, MateInNOutcome } from './kind.ts';
  * alternation). Any move delivering checkmate solves it; otherwise it must match the scripted
  * line, whose opponent reply (if any) is applied automatically. */
 export function playMateInN(
-  state: ExerciseState,
+  state: ExerciseStateOf<MateInNDef>,
   rules: ChessRules,
   move: MoveInput,
-): { readonly state: ExerciseState; readonly outcome: MateInNOutcome } {
-  if (state.def.type !== 'mate-in-n') {
-    throw new Error('playMateInN: exercise is not mate-in-n');
-  }
+): { readonly state: ExerciseStateOf<MateInNDef>; readonly outcome: MateInNOutcome } {
   if (state.solved) {
     return { state, outcome: { kind: 'illegal' } };
   }
@@ -27,7 +24,7 @@ export function playMateInN(
   }
 
   if (rules.status(played.position).checkmate) {
-    const nextState: ExerciseState = {
+    const nextState: ExerciseStateOf<MateInNDef> = {
       ...state,
       position: played.position,
       history: [...state.history, state.position],
@@ -56,7 +53,7 @@ export function playMateInN(
   if (repliedPlay === null) {
     throw new Error(`playMateInN: scripted reply "${replySan}" is illegal`);
   }
-  const nextState: ExerciseState = {
+  const nextState: ExerciseStateOf<MateInNDef> = {
     ...state,
     position: repliedPlay.position,
     history: [...state.history, state.position, played.position],
@@ -70,7 +67,7 @@ export function playMateInN(
 
 /** mate-in-n hint: piece → target square → the move, from the scripted line's move for this ply. */
 export function mateInNHint(
-  state: ExerciseState,
+  state: ExerciseStateOf<MateInNDef>,
   def: MateInNDef,
   rules: VariantRules,
   level: 1 | 2 | 3,

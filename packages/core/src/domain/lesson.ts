@@ -1,7 +1,7 @@
 import type { Position, Square } from './chess/types.ts';
-import type { StaticCaptureGameDef } from './exercise/minigame.ts';
+import type { StaticCaptureGameDef } from './exercise/modes/static/def.ts';
 import type { ExerciseDef } from './exercise/types.ts';
-import type { VersusGameDef } from './exercise/versus.ts';
+import type { VersusGameDef } from './exercise/modes/versus/def.ts';
 
 /**
  * A demo's board highlight: every square one piece can reach from `legalMovesFrom` (most lessons),

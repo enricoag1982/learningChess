@@ -1,5 +1,4 @@
 import { errorHintStars } from '../../stars.ts';
-import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
 import type { AnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
@@ -24,14 +23,14 @@ export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome>
   },
 
   act(state, action) {
-    const next = answerChoice(widen(state), action.optionId);
-    return { state: narrowState(next), outcome: deriveAnswerOutcome(state, next) };
+    const next = answerChoice(state, action.optionId);
+    return { state: next, outcome: deriveAnswerOutcome(state, next) };
   },
 
   hint(state, level) {
     const bumped = { ...state, hintLevel: level };
-    const result = choiceHint(widen(bumped), bumped.def, level);
-    return { state: narrowState(result.state), hint: result.hint };
+    const result = choiceHint(bumped, bumped.def, level);
+    return { state: result.state, hint: result.hint };
   },
 
   stars(state) {

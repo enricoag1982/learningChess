@@ -1,4 +1,4 @@
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseState } from '../../state.ts';
 import type { ExerciseDef } from '../../types.ts';
 
 /**

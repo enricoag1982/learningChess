@@ -4,10 +4,19 @@ import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import type { Position } from '../../../chess/types.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { placePiece, requestHint, setupPalette, starsFor, startExercise } from '../../engine.ts';
+import { requestHint, starsFor } from '../index.ts';
+import { initState } from '../../state.ts';
+import type { ExerciseState, ExerciseStateOf } from '../../state.ts';
+import { placePiece, setupPalette } from './engine.ts';
 import type { SetupDef } from '../../types.ts';
 
 const rules = createVariantRules(chessJsRules);
+
+/** `requestHint` dispatches generically; this test drives one exercise type throughout, so it
+ * narrows the result back to call the type-specific helpers below. */
+function narrow(state: ExerciseState): ExerciseStateOf<SetupDef> {
+  return state as ExerciseStateOf<SetupDef>;
+}
 
 describe('setup', () => {
   const emptyPosition: Position = {
@@ -39,14 +48,14 @@ describe('setup', () => {
   };
 
   it('lists remaining target pieces in board reading order, grouped with counts', () => {
-    expect(setupPalette(startExercise(def))).toEqual([
+    expect(setupPalette(initState(def))).toEqual([
       { color: 'b', type: 'r', count: 1 },
       { color: 'w', type: 'r', count: 1 },
     ]);
   });
 
   it('places a piece on its correct, free target square', () => {
-    const result = placePiece(startExercise(def), 'h8', { color: 'b', type: 'r' });
+    const result = placePiece(initState(def), 'h8', { color: 'b', type: 'r' });
     expect(result.outcome).toEqual({
       kind: 'placed',
       square: 'h8',
@@ -57,7 +66,7 @@ describe('setup', () => {
   });
 
   it('is solved once every target piece is placed', () => {
-    let state = startExercise(def);
+    let state = initState(def);
     state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state;
     const result = placePiece(state, 'a1', { color: 'w', type: 'r' });
     expect(result.outcome.kind).toBe('solved');
@@ -66,7 +75,7 @@ describe('setup', () => {
   });
 
   it('a wrong piece for the square counts an error and places nothing', () => {
-    const result = placePiece(startExercise(def), 'a1', { color: 'b', type: 'r' });
+    const result = placePiece(initState(def), 'a1', { color: 'b', type: 'r' });
     expect(result.outcome).toEqual({
       kind: 'wrong',
       square: 'a1',
@@ -77,7 +86,7 @@ describe('setup', () => {
   });
 
   it('placing on an already-occupied square counts an error', () => {
-    let state = startExercise(def);
+    let state = initState(def);
     state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state;
     const result = placePiece(state, 'h8', { color: 'b', type: 'r' });
     expect(result.outcome.kind).toBe('wrong');
@@ -85,7 +94,7 @@ describe('setup', () => {
   });
 
   it('hint ladder: next palette piece, then its square, then places it', () => {
-    let state = startExercise(def);
+    let state = initState(def);
 
     const hint1 = requestHint(state, rules);
     expect(hint1.hint).toEqual({
@@ -94,7 +103,7 @@ describe('setup', () => {
       piece: { color: 'b', type: 'r' },
       placed: false,
     });
-    state = hint1.state;
+    state = narrow(hint1.state);
 
     const hint2 = requestHint(state, rules);
     expect(hint2.hint).toEqual({
@@ -104,7 +113,7 @@ describe('setup', () => {
       square: 'h8',
       placed: false,
     });
-    state = hint2.state;
+    state = narrow(hint2.state);
 
     const hint3 = requestHint(state, rules);
     expect(hint3.hint).toEqual({
@@ -114,13 +123,13 @@ describe('setup', () => {
       square: 'h8',
       placed: true,
     });
-    state = hint3.state;
+    state = narrow(hint3.state);
     expect(state.position.pieces.h8).toEqual({ color: 'b', type: 'r' });
     expect(setupPalette(state)).toEqual([{ color: 'w', type: 'r', count: 1 }]);
   });
 
   it('grades stars: allows up to 2 errors for 2 stars (placing many pieces invites slips)', () => {
-    let state = startExercise(def);
+    let state = initState(def);
     state = placePiece(state, 'a1', { color: 'b', type: 'r' }).state; // wrong, error 1
     state = placePiece(state, 'h8', { color: 'w', type: 'r' }).state; // wrong, error 2
     state = placePiece(state, 'h8', { color: 'b', type: 'r' }).state; // correct

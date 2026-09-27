@@ -1,7 +1,6 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CaptureDef, CollectStarsDef, MoveAction, Square, UndoAction } from '@chess-kids/core';
-import { exerciseMoves } from '@chess-kids/core';
 import { useServices } from '../app/store.ts';
 import { InfoPanel } from '../ui/ds/primitives.tsx';
 import { StarsRow } from '../ui/StarsRow.tsx';
@@ -10,6 +9,7 @@ import { ExerciseControls } from './ExerciseControls.tsx';
 import { ExerciseFrame } from './ExercisePlay.tsx';
 import { panelBody } from './panel-body.tsx';
 import type { ExerciseUIState, UiAction } from './kind-ui.ts';
+import { moveKindLegalMoves } from './kind-ui.ts';
 import { MoveBoard } from './MoveBoard.tsx';
 
 /** Shared with `VersusStep`'s take-back button — the one place a move-counted "undo" icon lives. */
@@ -88,7 +88,7 @@ export function MoveCountedPlayArea({
   const board = (
     <MoveBoard
       position={state.core.position}
-      legalMoves={exerciseMoves(state.core, services.rules)}
+      legalMoves={moveKindLegalMoves(state.core, services.rules)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}

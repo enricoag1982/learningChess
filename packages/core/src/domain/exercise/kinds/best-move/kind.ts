@@ -1,5 +1,4 @@
 import { errorHintStars } from '../../stars.ts';
-import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { playMove } from '../static-move.ts';
 import { initState } from '../../state.ts';
@@ -21,7 +20,7 @@ export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
   },
 
   act(state, action, ctx) {
-    return narrowStep(playMove(widen(state), ctx, action.move));
+    return playMove(state, ctx, action.move);
   },
 
   hint(state, level, ctx) {

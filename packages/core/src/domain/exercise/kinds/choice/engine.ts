@@ -1,4 +1,4 @@
-import type { ExerciseState } from '../../engine.ts';
+import type { ExerciseStateOf } from '../../state.ts';
 import type { Hint } from '../../hint.ts';
 import type { ChoiceDef } from '../../types.ts';
 
@@ -6,10 +6,10 @@ import type { ChoiceDef } from '../../types.ts';
  * Picks an option for a choice exercise. Correct → solved; wrong → errors + 1 and the option is
  * added to `wrongOptions` (disabled in the UI). No-op once solved.
  */
-export function answerChoice(state: ExerciseState, optionId: string): ExerciseState {
-  if (state.def.type !== 'choice') {
-    throw new Error('answerChoice: exercise is not choice');
-  }
+export function answerChoice(
+  state: ExerciseStateOf<ChoiceDef>,
+  optionId: string,
+): ExerciseStateOf<ChoiceDef> {
   if (state.solved) {
     return state;
   }
@@ -22,10 +22,10 @@ export function answerChoice(state: ExerciseState, optionId: string): ExerciseSt
 }
 
 export function choiceHint(
-  state: ExerciseState,
+  state: ExerciseStateOf<ChoiceDef>,
   def: ChoiceDef,
   level: 1 | 2 | 3,
-): { readonly state: ExerciseState; readonly hint: Hint } {
+): { readonly state: ExerciseStateOf<ChoiceDef>; readonly hint: Hint } {
   if (level === 3) {
     return { state, hint: { kind: 'choice', level: 3, reveal: true } };
   }

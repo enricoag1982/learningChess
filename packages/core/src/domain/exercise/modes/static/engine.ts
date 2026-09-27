@@ -1,6 +1,7 @@
 import type { MoveInput } from '../../../chess/rules.ts';
 import type { VariantRules } from '../../../variant/rules.ts';
-import { playMove, startExercise } from '../../engine.ts';
+import { playMove } from '../../kinds/static-move.ts';
+import { initState } from '../../state.ts';
 import type { CaptureDef, CollectStarsDef } from '../../types.ts';
 import { staticGoalExercise } from './def.ts';
 import type { GameOutcome, GameState, StaticCaptureGameDef } from './def.ts';
@@ -18,7 +19,7 @@ function toGoalDef(def: StaticCaptureGameDef): CaptureDef | CollectStarsDef {
 
 /** Starts a fresh mini-game at its authored position. */
 export function startStaticCaptureGame(def: StaticCaptureGameDef): GameState {
-  return { mode: 'static', def, exercise: startExercise(toGoalDef(def)), ended: false };
+  return { mode: 'static', def, exercise: initState(toGoalDef(def)), ended: false };
 }
 
 /** Plays one kid move. Reuses the capture exercise engine for legality and win detection. */

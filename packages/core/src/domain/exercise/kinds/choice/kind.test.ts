@@ -3,10 +3,19 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { answerChoice, requestHint, starsFor, startExercise } from '../../engine.ts';
+import { requestHint, starsFor } from '../index.ts';
+import { initState } from '../../state.ts';
+import type { ExerciseState, ExerciseStateOf } from '../../state.ts';
+import { answerChoice } from './engine.ts';
 import type { ChoiceDef } from '../../types.ts';
 
 const rules = createVariantRules(chessJsRules);
+
+/** `requestHint` dispatches generically; this test drives one exercise type throughout, so it
+ * narrows the result back to call the type-specific helpers below. */
+function narrow(state: ExerciseState): ExerciseStateOf<ChoiceDef> {
+  return state as ExerciseStateOf<ChoiceDef>;
+}
 
 describe('choice', () => {
   const position = parseDiagram(
@@ -37,13 +46,13 @@ describe('choice', () => {
   };
 
   it('solves on the correct option', () => {
-    const state = answerChoice(startExercise(def), 'queen');
+    const state = answerChoice(initState(def), 'queen');
     expect(state.solved).toBe(true);
     expect(starsFor(state)).toBe(3);
   });
 
   it('a wrong pick counts an error and disables that option', () => {
-    let state = answerChoice(startExercise(def), 'rook');
+    let state = answerChoice(initState(def), 'rook');
     expect(state.errors).toBe(1);
     expect(state.wrongOptions).toEqual(['rook']);
     expect(state.solved).toBe(false);
@@ -54,28 +63,28 @@ describe('choice', () => {
   });
 
   it('picking the same wrong option twice only disables it once', () => {
-    let state = answerChoice(startExercise(def), 'rook');
+    let state = answerChoice(initState(def), 'rook');
     state = answerChoice(state, 'rook');
     expect(state.errors).toBe(2);
     expect(state.wrongOptions).toEqual(['rook']);
   });
 
   it('is a no-op once solved', () => {
-    const solved = answerChoice(startExercise(def), 'queen');
+    const solved = answerChoice(initState(def), 'queen');
     expect(answerChoice(solved, 'rook')).toEqual(solved);
   });
 
   it('hint ladder removes one wrong option per level, then reveals', () => {
-    let state = startExercise(def);
+    let state = initState(def);
 
     const hint1 = requestHint(state, rules);
     expect(hint1.hint).toMatchObject({ kind: 'choice', level: 1, reveal: false });
-    state = hint1.state;
+    state = narrow(hint1.state);
     expect(state.wrongOptions).toHaveLength(1);
     expect(state.wrongOptions?.[0]).not.toBe('queen');
 
     const hint2 = requestHint(state, rules);
-    state = hint2.state;
+    state = narrow(hint2.state);
     expect(state.wrongOptions).toHaveLength(2);
     expect(state.wrongOptions).toEqual(expect.arrayContaining(['rook', 'bishop']));
 
@@ -84,10 +93,10 @@ describe('choice', () => {
   });
 
   it('caps stars at 1 after a level-3 hint even with no errors', () => {
-    let state = startExercise(def);
-    state = requestHint(state, rules).state;
-    state = requestHint(state, rules).state;
-    state = requestHint(state, rules).state;
+    let state = initState(def);
+    state = narrow(requestHint(state, rules).state);
+    state = narrow(requestHint(state, rules).state);
+    state = narrow(requestHint(state, rules).state);
     state = answerChoice(state, 'queen');
     expect(starsFor(state)).toBe(1);
   });

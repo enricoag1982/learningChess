@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
 import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
-import type { ExerciseState } from '../domain/exercise/engine.ts';
-import { starsFor } from '../domain/exercise/engine.ts';
-import type { GameState, SeriesGameState } from '../domain/exercise/minigame.ts';
-import { gameStars, seriesStars } from '../domain/exercise/minigame.ts';
+import type { ExerciseState, ExerciseStateOf } from '../domain/exercise/state.ts';
+import { starsFor } from '../domain/exercise/kinds/index.ts';
+import type { GameState } from '../domain/exercise/modes/static/def.ts';
+import { gameStars } from '../domain/exercise/modes/static/engine.ts';
+import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
+import { seriesStars } from '../domain/exercise/modes/series/engine.ts';
 import type { ExerciseDef, CaptureDef } from '../domain/exercise/types.ts';
-import { playVersusMove, startVersus, versusStars } from '../domain/exercise/versus.ts';
-import type { VersusGameDef } from '../domain/exercise/versus.ts';
+import {
+  playVersusMove,
+  startVersus,
+  versusStars,
+} from '../domain/exercise/modes/versus/engine.ts';
+import type { VersusGameDef } from '../domain/exercise/modes/versus/def.ts';
 import type { GameRulesDef } from '../domain/game/types.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import {
@@ -77,7 +83,9 @@ function gameState(id: string, overrides: Partial<GameState> = {}): GameState {
   return {
     mode: 'static',
     def,
-    exercise: exerciseState(captureDef),
+    // A series round's state stays type-general (any exercise type); a static goal is always
+    // capture/collect-stars, narrowed here the same way `staticGoalExercise` guarantees it is.
+    exercise: exerciseState(captureDef) as ExerciseStateOf<CaptureDef>,
     ended: false,
     ...overrides,
   };
@@ -505,7 +513,7 @@ describe('recordBossResult', () => {
           stars2: 2,
         },
         { solved: true, moves: 2 },
-      ),
+      ) as ExerciseStateOf<CaptureDef>,
     });
     expect(gameStars(state)).toBe(3);
 
@@ -700,7 +708,7 @@ describe('recordBossResult', () => {
           stars2: 2,
         },
         { solved: true, moves: 2 },
-      ),
+      ) as ExerciseStateOf<CaptureDef>,
     });
 
     await recordBossResult(deps, {

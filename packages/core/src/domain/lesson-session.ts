@@ -1,4 +1,4 @@
-import type { ExerciseState } from './exercise/engine.ts';
+import type { ExerciseState } from './exercise/state.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { Lesson, MiniGame } from './lesson.ts';
 

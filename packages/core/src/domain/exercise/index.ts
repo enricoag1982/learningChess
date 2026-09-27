@@ -11,7 +11,7 @@ export type {
   ExerciseDef,
 } from './types.ts';
 
-export type { ExerciseState } from './engine.ts';
+export type { ExerciseState, ExerciseStateOf } from './state.ts';
 export type { MoveOutcome, UndoAction, UndoOutcome } from './kinds/static-move.ts';
 export type { MateInNOutcome } from './kinds/mate-in-n/kind.ts';
 export type { Hint } from './hint.ts';
@@ -25,30 +25,14 @@ export type {
 export { EXERCISE_NOTES, exerciseNote, isEasierOfferNote } from './notes.ts';
 export type { SelectionResult } from './kinds/select-squares/kind.ts';
 export type { PlaceOutcome, PalettePiece } from './kinds/setup/kind.ts';
-export {
-  startExercise,
-  exerciseMoves,
-  playMove,
-  toggleSquare,
-  submitSelection,
-  selectSquaresAnswer,
-  answerYesNo,
-  answerChoice,
-  placePiece,
-  setupPalette,
-  undo,
-  requestHint,
-  starsFor,
-  playMateInN,
-} from './engine.ts';
+export { selectSquaresAnswer } from './kinds/select-squares/engine.ts';
+export { setupPalette } from './kinds/setup/engine.ts';
 
 export type { SolverMove } from './solver.ts';
 export { solve, optimalMoves } from './solver.ts';
 
-// Exercise-kind registry (`kinds/index.ts`): the only exercise-type dispatch. `ExerciseKind` /
-// `ExerciseStateOf` (`kind.ts` / `state.ts`) are subject-free and move to `platform-core` in R4.
+// Exercise-kind registry (`kinds/index.ts`): the only exercise-type dispatch.
 export type { ExerciseProgress, ExerciseKind, Step, TextKeyRef, KindInput } from './kind.ts';
-export type { ExerciseStateOf } from './state.ts';
 export type {
   ExerciseType,
   DefOf,
@@ -58,7 +42,7 @@ export type {
   OutcomeOf,
   AnyExerciseKind,
 } from './kinds/index.ts';
-export { EXERCISE_KINDS, kindOf } from './kinds/index.ts';
+export { EXERCISE_KINDS, kindOf, startExercise, requestHint, starsFor } from './kinds/index.ts';
 export type { MoveAction, AnswerOutcome } from './kinds/base.ts';
 export type {
   ToggleAction,
@@ -88,13 +72,34 @@ export {
 export type { StaticGoalSource } from './modes/static/def.ts';
 export { staticGoalExercise } from './modes/static/def.ts';
 
-export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
-export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';
+export type {
+  StaticCaptureGameDef,
+  MiniGameGoal,
+  GameState,
+  GameOutcome,
+} from './modes/static/def.ts';
+export {
+  startStaticCaptureGame,
+  playGameMove,
+  gameResult,
+  gameStars,
+} from './modes/static/engine.ts';
 
-export type { SeriesGameDef, SeriesGameState } from './minigame.ts';
-export { startSeries, currentRound, completeRound, seriesResult, seriesStars } from './minigame.ts';
+export type { SeriesGameDef, SeriesGameState } from './modes/series/def.ts';
+export {
+  startSeries,
+  currentRound,
+  completeRound,
+  seriesResult,
+  seriesStars,
+} from './modes/series/engine.ts';
 
-export type { VersusGameDef, VersusState, VersusStatus, VersusMoveOutcome } from './versus.ts';
+export type {
+  VersusGameDef,
+  VersusState,
+  VersusStatus,
+  VersusMoveOutcome,
+} from './modes/versus/def.ts';
 export {
   startVersus,
   versusPosition,
@@ -106,10 +111,7 @@ export {
   canTakeBack,
   takeBackVersusMove,
   versusStars,
-} from './versus.ts';
-
-export type { BossResultSummary } from './boss-result.ts';
-export { summarizeBossResult, isBossResultWin } from './boss-result.ts';
+} from './modes/versus/engine.ts';
 
 // Mini-game-mode registry: the only mode-type dispatch (`modes/index.ts`).
 export type { ModeType, MiniGameState } from './modes/index.ts';

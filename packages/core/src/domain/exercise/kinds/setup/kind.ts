@@ -1,5 +1,4 @@
 import type { Color, Piece, PieceType, Square } from '../../../chess/types.ts';
-import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { initState } from '../../state.ts';
 import type { SetupDef } from '../../types.ts';
@@ -36,13 +35,13 @@ export const setupKind: ChessKind<SetupDef, PlaceAction, PlaceOutcome> = {
   },
 
   act(state, action) {
-    return narrowStep(placePiece(widen(state), action.square, action.piece));
+    return placePiece(state, action.square, action.piece);
   },
 
   hint(state, level) {
     const bumped = { ...state, hintLevel: level };
-    const result = setupHint(widen(bumped), bumped.def, level);
-    return { state: narrowState(result.state), hint: result.hint };
+    const result = setupHint(bumped, bumped.def, level);
+    return { state: result.state, hint: result.hint };
   },
 
   stars(state) {

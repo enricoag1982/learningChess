@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
-import { exerciseMoves } from '@chess-kids/core';
 import { useServices } from '../../app/store.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
 import { panelBody } from '../panel-body.tsx';
 import type { PlayAreaProps } from '../kind-ui.ts';
+import { moveKindLegalMoves } from '../kind-ui.ts';
 import { MoveBoard } from '../MoveBoard.tsx';
 
 export function PlayArea({
@@ -22,7 +22,7 @@ export function PlayArea({
   const board = (
     <MoveBoard
       position={state.core.position}
-      legalMoves={exerciseMoves(state.core, services.rules)}
+      legalMoves={moveKindLegalMoves(state.core, services.rules)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}

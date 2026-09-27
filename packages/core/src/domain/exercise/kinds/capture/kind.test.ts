@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../../chess/chessjs-rules.ts';
 import { parseDiagram } from '../../../chess/diagram.ts';
 import { createVariantRules } from '../../../variant/rules.ts';
-import { playMove, starsFor, startExercise, undo } from '../../engine.ts';
+import { starsFor } from '../index.ts';
+import { initState } from '../../state.ts';
+import { playMove, undo } from '../static-move.ts';
 import type { CaptureDef } from '../../types.ts';
 import { captureKind } from './kind.ts';
 
@@ -33,7 +35,7 @@ describe('capture', () => {
   };
 
   it('is solved once every opponent piece is captured', () => {
-    let state = startExercise(def);
+    let state = initState(def);
     expect(state.solved).toBe(false);
 
     const first = playMove(state, rules, { from: 'd3', to: 'd4' });
@@ -48,13 +50,13 @@ describe('capture', () => {
   });
 
   it('grades stars by move count', () => {
-    let solvedIn2 = startExercise(def);
+    let solvedIn2 = initState(def);
     solvedIn2 = playMove(solvedIn2, rules, { from: 'd3', to: 'd4' }).state;
     solvedIn2 = playMove(solvedIn2, rules, { from: 'd4', to: 'd5' }).state;
     expect(starsFor(solvedIn2)).toBe(3);
 
     // Same captures, reached by going around instead of straight up the d-file: 4 moves.
-    let solvedLate = startExercise(def);
+    let solvedLate = initState(def);
     solvedLate = playMove(solvedLate, rules, { from: 'd3', to: 'a3' }).state; // wasted move
     solvedLate = playMove(solvedLate, rules, { from: 'a3', to: 'a5' }).state; // wasted move
     solvedLate = playMove(solvedLate, rules, { from: 'a5', to: 'd5' }).state; // captures d5

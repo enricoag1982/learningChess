@@ -1,4 +1,3 @@
-import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { moveCountStars, moveHint, playMove, undo } from '../static-move.ts';
 import { initState } from '../../state.ts';
@@ -24,14 +23,14 @@ export const collectStarsKind: ChessKind<
 
   act(state, action, ctx) {
     if (action.type === 'undo') {
-      return { state: narrowState(undo(widen(state))), outcome: { kind: 'undone' } };
+      return { state: undo(state), outcome: { kind: 'undone' } };
     }
-    return narrowStep(playMove(widen(state), ctx, action.move));
+    return playMove(state, ctx, action.move);
   },
 
   hint(state, level, ctx) {
     const bumped = { ...state, hintLevel: level };
-    return { state: bumped, hint: moveHint(widen(bumped), ctx, level) };
+    return { state: bumped, hint: moveHint(bumped, ctx, level) };
   },
 
   stars(state) {
