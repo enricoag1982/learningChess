@@ -1,6 +1,8 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { bot } from '@chess-kids/core/chess';
+import { loadBotBook } from '../src/bot-book-load.ts';
 import { compileAll } from '../src/compile-all.ts';
 import { ContentError } from '../src/load.ts';
 
@@ -20,7 +22,9 @@ function fail(issues: readonly string[]): never {
 
 let compiled: ReturnType<typeof compileAll>;
 try {
-  compiled = compileAll(packageDir);
+  compiled = compileAll(packageDir, {
+    'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')),
+  });
 } catch (error) {
   if (error instanceof ContentError) {
     fail(error.issues);
@@ -28,7 +32,8 @@ try {
   throw error;
 }
 
-const { locales, content, tracks, botBook, badges } = compiled;
+const { locales, content, tracks, badges } = compiled;
+const botBook = compiled.extraOutputs['bot-book.json'] as bot.BotBook;
 
 await rm(distDir, { recursive: true, force: true });
 await mkdir(distDir, { recursive: true });

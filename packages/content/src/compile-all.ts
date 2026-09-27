@@ -1,8 +1,6 @@
 import { join } from 'node:path';
 import type { BadgeDef, CompiledContent, TracksCatalog } from '@chess-kids/core';
-import type { bot } from '@chess-kids/core/chess';
 import { loadBadges } from './badges-load.ts';
-import { loadBotBook } from './bot-book-load.ts';
 import { ContentError, compareToReference, loadLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import { loadTracks } from './tracks-load.ts';
@@ -14,20 +12,25 @@ export interface CompiledAll {
   readonly locales: Locales;
   readonly content: CompiledContent;
   readonly tracks: TracksCatalog;
-  readonly botBook: bot.BotBook;
+  /** The subject's own extra `dist/` outputs, by file name (chess: `'bot-book.json'` ->
+   * `bot.BotBook`, design-r4.md §2 `SubjectContent.extraOutputs`, leak #15). */
+  readonly extraOutputs: Readonly<Record<string, unknown>>;
   readonly badges: readonly BadgeDef[];
   /** `dist/voice-texts.json`'s own source (`scripts/voice-texts.ts` writes just its `entries`). */
   readonly voiceTexts: VoiceInventory;
 }
 
 /** Runs the whole content pipeline in memory — `scripts/build.ts`'s own compile steps, extracted so
- * both that script and `content-snapshot.test.ts` share one implementation. */
-export function compileAll(packageDir: string): CompiledAll {
+ * both that script and `content-snapshot.test.ts` share one implementation. `extraOutputs` builds
+ * each of the subject's own extra `dist/` files from `packageDir` (chess: `bot-book.json`). */
+export function compileAll(
+  packageDir: string,
+  extraOutputs: Readonly<Record<string, (root: string) => unknown>>,
+): CompiledAll {
   const localesDir = join(packageDir, 'locales');
   const lessonsDir = join(packageDir, 'lessons');
   const minigamesDir = join(packageDir, 'minigames');
   const tracksPath = join(packageDir, 'tracks.yaml');
-  const botBookPath = join(packageDir, 'bot-book.yaml');
   const badgesPath = join(packageDir, 'badges.yaml');
 
   const locales = loadLocales(localesDir);
@@ -39,9 +42,11 @@ export function compileAll(packageDir: string): CompiledAll {
 
   const content = loadContent(lessonsDir, minigamesDir, locales);
   const tracks = loadTracks(tracksPath, locales, content.minigames, content.lessons);
-  const botBook = loadBotBook(botBookPath);
+  const resolvedExtraOutputs = Object.fromEntries(
+    Object.entries(extraOutputs).map(([name, build]) => [name, build(packageDir)]),
+  );
   const badges = loadBadges(badgesPath, locales, tracks, content.lessons, content.minigames);
   const voiceTexts = buildVoiceInventory(locales, content, tracks, badges);
 
-  return { locales, content, tracks, botBook, badges, voiceTexts };
+  return { locales, content, tracks, extraOutputs: resolvedExtraOutputs, badges, voiceTexts };
 }

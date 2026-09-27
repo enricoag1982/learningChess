@@ -20,6 +20,12 @@ export const langSchema = z.string().regex(LANG_PATTERN);
 /** Validates a namespace file name (without extension) or a single locale tree key. */
 export const keySchema = z.string().regex(KEY_PATTERN);
 
+/** Locale key reference: one or more kebab-case segments joined by dots, e.g. `rook-01` or
+ * `rook.story`. Platform-generic (no subject knows about `characters:`/`lessons:` here); a
+ * subject's own compile step prefixes the namespace. */
+const TEXT_REF_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$/;
+export const textRefSchema = z.string().regex(TEXT_REF_PATTERN);
+
 /** Validates a translated leaf value: a non-empty string (i18next `{{var}}` interpolation allowed). */
 export const textLeafSchema = z.string().min(1);
 

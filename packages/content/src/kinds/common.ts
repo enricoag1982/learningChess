@@ -13,16 +13,14 @@ import {
   type Position,
 } from '@chess-kids/core/chess';
 import { z } from 'zod';
-import { keySchema } from '../schema.ts';
+import { keySchema, textRefSchema } from '../schema.ts';
+
+// Re-exported for kind schema files that already import it from here.
+export { textRefSchema };
 
 /** Algebraic square, e.g. `e4`. */
 const SQUARE_PATTERN = /^[a-h][1-8]$/;
 export const squareSchema = z.string().regex(SQUARE_PATTERN);
-
-/** Locale key reference: one or more kebab-case segments joined by dots, e.g. `rook-01` or
- * `rook.story`. Compiles to `lessons:<value>` (or `characters:<value>` for character names). */
-const TEXT_REF_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$/;
-export const textRefSchema = z.string().regex(TEXT_REF_PATTERN);
 
 /** Fields shared by anything authored as a board diagram or FEN (see `parseDiagram` / `parseFen`). */
 export const positionFields = {

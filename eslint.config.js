@@ -176,12 +176,10 @@ export default defineConfig([
       'packages/core/src/domain/exercise/modes/series/engine.test.ts',
       'packages/content/src/lesson-schema.ts',
       'packages/content/src/lesson-load.ts',
-      'packages/content/src/compile-all.ts',
       'packages/content/src/voice-texts.ts',
       'packages/content/src/kinds/kind-content.ts',
       'packages/content/src/kinds/compile-exercise.ts',
       'packages/content/src/modes/mode-content.ts',
-      'packages/content/src/modes/common.ts',
     ];
     return [
       {

@@ -5,10 +5,13 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { loadBotBook } from './bot-book-load.ts';
 import { compileAll } from './compile-all.ts';
 
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
-const compiled = compileAll(packageDir);
+const compiled = compileAll(packageDir, {
+  'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')),
+});
 
 const UPDATE_HINT = 'pnpm --filter @chess-kids/content exec vitest run -u, then review the diff';
 
@@ -37,7 +40,7 @@ describe('content snapshot', () => {
   });
 
   it('bot-book.json', async () => {
-    await expect(pretty(compiled.botBook)).toMatchFileSnapshot(
+    await expect(pretty(compiled.extraOutputs['bot-book.json'])).toMatchFileSnapshot(
       snapshotPath('bot-book.json'),
       UPDATE_HINT,
     );
