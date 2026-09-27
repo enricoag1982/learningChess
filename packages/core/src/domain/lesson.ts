@@ -2,6 +2,7 @@ import type { Position, Square } from './chess/types.ts';
 import type { StaticCaptureGameDef } from './exercise/modes/static/def.ts';
 import type { ExerciseDef } from './exercise/types.ts';
 import type { VersusGameDef } from './exercise/modes/versus/def.ts';
+import type { Lesson as LessonBase, MiniGameBase } from './subject.ts';
 
 /**
  * A demo's board highlight: every square one piece can reach from `legalMovesFrom` (most lessons),
@@ -18,35 +19,9 @@ export interface LessonDemo {
   readonly highlight: DemoHighlight;
 }
 
-/** One lesson: story, demo, guided tries, scored exercises, optional boss mini-game. */
-export interface Lesson {
-  readonly id: string;
-  readonly world: string;
-  readonly order: number;
-  /** Concept id (e.g. `rook-move`), used for mastery and review tracking. */
-  readonly concept: string;
-  /** Character id (e.g. `rhino`); display name at `characters:<character>.name`. */
-  readonly character: string;
-  readonly titleKey: string;
-  readonly storyKey: string;
-  readonly demo: LessonDemo;
-  /** Easy tries shown before the exercises; hints on, not scored. */
-  readonly guided: readonly ExerciseDef[];
-  readonly exercises: readonly ExerciseDef[];
-  /** Easier variants, reachable only via a scored exercise's `easier`; never stepped through,
-   * scored or counted in completion / mastery. Absent = none. */
-  readonly variants?: readonly ExerciseDef[];
-  /** Id of the mini-game unlocked by completing this lesson. */
-  readonly boss?: string;
-}
-
-/** Fields every mini-game's content shares, regardless of `mode`. */
-interface MiniGameBase {
-  readonly titleKey: string;
-  readonly goalKey: string;
-  /** Lesson id that unlocks this mini-game. */
-  readonly unlockAfter: string;
-}
+/** One lesson: story, demo, guided tries, scored exercises, optional boss mini-game. The chess
+ * instantiation of the platform's generic `Lesson<E, Demo>` (`subject.ts`); shape unchanged. */
+export type Lesson = LessonBase<ExerciseDef, LessonDemo>;
 
 /** Static-opponent mini-game (Hungry Piece, Knight Maze, King Walk, …). */
 export interface StaticMiniGame extends StaticCaptureGameDef, MiniGameBase {

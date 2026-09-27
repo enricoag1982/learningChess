@@ -160,7 +160,6 @@ export default defineConfig([
     ];
     // Ratchet: today's leaks (design-r4.md §1 #1–17), removed one by one as C4–C10 land; 0 by C10.
     const RATCHET_IGNORES = [
-      'packages/core/src/index.ts',
       'packages/core/src/domain/lesson.ts',
       'packages/core/src/domain/review.ts',
       'packages/core/src/domain/review.test.ts',
