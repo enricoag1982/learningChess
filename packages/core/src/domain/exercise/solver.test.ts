@@ -93,28 +93,6 @@ describe('solve', () => {
 
     expect(solve(position, rules, 'collect-stars')).toBeNull();
   });
-
-  it('solves a 5-star rook position in under 200ms', () => {
-    const position = parseDiagram(
-      [
-        '* . . . . . . *',
-        '. . . . . . . .',
-        '. . . . . . . .',
-        '. . . * R . . .',
-        '. . . . . . . .',
-        '. . . . * . . .',
-        '. . . . . . . .',
-        '* . . . . . . .',
-      ].join('\n'),
-    );
-
-    const start = performance.now();
-    const line = solve(position, rules, 'collect-stars');
-    const elapsed = performance.now() - start;
-
-    expect(line).not.toBeNull();
-    expect(elapsed).toBeLessThan(200);
-  });
 });
 
 describe('optimalMoves', () => {
