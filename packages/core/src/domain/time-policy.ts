@@ -19,13 +19,8 @@ function overrideActive(overrideUntil: string | undefined, now: Date): boolean {
   return overrideUntil !== undefined && now.getTime() < Date.parse(overrideUntil);
 }
 
-/**
- * Why `now` falls outside the allowed-hours window (M7.1, app-structure.md §13 "Allowed hours"),
- * or `null` while it is within it. A parent's hours override (`overrideUntil`,
- * `SessionLog.hoursOverrideUntil`) lifts either edge until it expires. Boundaries: `playFrom` is
- * inclusive ("not before 07:00" allows exactly 07:00), `playUntil` is exclusive ("until 20:00"
- * stops being allowed exactly at 20:00) — matching each label's own wording.
- */
+/** Why `now` falls outside the allowed-hours window, or `null` while within it. A parent's hours
+ * override lifts either edge until it expires. `playFrom` is inclusive, `playUntil` exclusive. */
 export function allowedHoursReason(
   settings: Pick<ProfileSettings, 'playFrom' | 'playUntil'>,
   now: Date,
@@ -38,11 +33,8 @@ export function allowedHoursReason(
   return null;
 }
 
-/**
- * `true` while `now` is inside the allowed-hours window (M7.1) — `playFrom`/`playUntil` both
- * absent/`null` (pre-M7.1 default) always reads as "within hours". See {@link allowedHoursReason}
- * for the boundary rules and the override.
- */
+/** `true` while `now` is inside the allowed-hours window — both `playFrom`/`playUntil` absent/`null`
+ * always reads as "within hours". See {@link allowedHoursReason} for the boundary rules. */
 export function isWithinAllowedHours(
   settings: Pick<ProfileSettings, 'playFrom' | 'playUntil'>,
   now: Date,
@@ -67,11 +59,8 @@ function minutesUntilHoursEdge(
   return hhmmToMinutes(playUntil) - nowMinutesOfDay(now);
 }
 
-/**
- * Minutes left before either boundary ends today's play (M7.1 5-minute warning): the daily limit
- * (incl. extra granted today) and the allowed-hours `playUntil` edge (incl. an active override),
- * whichever comes first. `null` when neither boundary is set (both off) — nothing to warn about.
- */
+/** Minutes left before either boundary ends today's play: the daily limit (incl. extra granted
+ * today) and the allowed-hours `playUntil` edge, whichever comes first. `null` when both are off. */
 export function minutesUntilEnd(
   settings: Pick<ProfileSettings, 'dailyLimitMinutes' | 'weekendLimitMinutes' | 'playUntil'>,
   log: SessionLog | undefined,
@@ -86,12 +75,8 @@ export function minutesUntilEnd(
   return Math.min(limitRemaining, hoursRemaining);
 }
 
-/**
- * `true` once the 5-minute warning (M7.1, app-structure.md §13 "5-min warning") should show:
- * `remainingMinutes` (from {@link minutesUntilEnd}) at or under 5 and still positive, and not
- * already shown today (`log.warnedAt`, "once per child per day" — a stale, not-today log's
- * `warnedAt` never counts, same midnight-reset reasoning `timeUsedToday` documents).
- */
+/** `true` once the 5-minute warning should show: `remainingMinutes` at or under 5 and still
+ * positive, and not already shown today (a stale, not-today log's `warnedAt` never counts). */
 export function shouldWarn(
   remainingMinutes: number | null,
   log: SessionLog | undefined,

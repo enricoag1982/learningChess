@@ -170,10 +170,8 @@ export function hasKeyPath(tree: LocaleTree, dotPath: string): boolean {
   return typeof node === 'string';
 }
 
-/**
- * Checks that `fullKey` (e.g. `journey:tracks.basics`) resolves to a leaf in the `en` locale — a
- * pluralized leaf (`<key>_other`, always present per CLDR) satisfies a plain (non-suffixed) key too.
- */
+/** Checks that `fullKey` resolves to a leaf in the `en` locale — a pluralized leaf (`<key>_other`)
+ * satisfies a plain key too. */
 export function checkTextKey(
   fullKey: string,
   locales: Locales,

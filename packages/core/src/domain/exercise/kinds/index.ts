@@ -1,8 +1,5 @@
-/**
- * The exercise-kind registry — the only place exercise-type dispatch happens in `packages/core`.
- * `engine.ts`'s legacy per-type functions stay the public API; they (and everything else) go
- * through `kindOf`/`EXERCISE_KINDS` instead of their own `if`/`switch` on `def.type`.
- */
+// The exercise-kind registry — the only place exercise-type dispatch happens in `packages/core`.
+// `engine.ts`'s legacy per-type functions go through `kindOf`/`EXERCISE_KINDS`, not their own `switch`.
 import type { VariantRules } from '../../variant/rules.ts';
 import type { Hint } from '../hint.ts';
 import type { ExerciseKind, KindInput } from '../kind.ts';
@@ -11,15 +8,15 @@ import type { ExerciseDef } from '../types.ts';
 import type { MoveAction } from './base.ts';
 import { bestMoveKind } from './best-move/kind.ts';
 import { captureKind } from './capture/kind.ts';
-import type { AnswerChoiceAction } from './choice/def.ts';
+import type { AnswerChoiceAction } from './choice/kind.ts';
 import { choiceKind } from './choice/kind.ts';
 import { collectStarsKind } from './collect-stars/kind.ts';
 import { mateInNKind } from './mate-in-n/kind.ts';
-import type { SelectSquaresAction } from './select-squares/def.ts';
+import type { SelectSquaresAction } from './select-squares/kind.ts';
 import { selectSquaresKind } from './select-squares/kind.ts';
-import type { PlaceAction } from './setup/def.ts';
+import type { PlaceAction } from './setup/kind.ts';
 import { setupKind } from './setup/kind.ts';
-import type { AnswerYesNoAction } from './yes-no/def.ts';
+import type { AnswerYesNoAction } from './yes-no/kind.ts';
 import { yesNoKind } from './yes-no/kind.ts';
 
 export type { ExerciseDef } from '../types.ts';
@@ -65,11 +62,8 @@ export function kindOf(def: ExerciseDef): AnyExerciseKind {
   return EXERCISE_KINDS[def.type];
 }
 
-/**
- * Throws (`${fnName}: ${def.type} exercises use a different action`) unless `def`'s kind takes
- * `input`. The one guard every legacy multi-type facade in `engine.ts` needs (e.g. `playMove`,
- * open to every type except its own `'static-move'` kinds).
- */
+/** Throws unless `def`'s kind takes `input`. The one guard every legacy multi-type facade in
+ * `engine.ts` needs (e.g. `playMove`). */
 export function assertKind(def: ExerciseDef, input: KindInput, fnName: string): void {
   if (kindOf(def).input !== input) {
     throw new Error(`${fnName}: ${def.type} exercises use a different action`);

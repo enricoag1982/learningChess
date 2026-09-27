@@ -1,10 +1,7 @@
 id: trades
-world: attack
 order: 5
 concept: exchange
 character: owl
-title: trades.title
-story: trades.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     R . . . . . . q
-  text: trades.demo
   highlight: squares h1
 guided:
   - id: trades-g1
     type: choice
-    text: trades-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -38,7 +33,6 @@ guided:
     verify: trade Rxh1
   - id: trades-g2
     type: best-move
-    text: trades-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -53,7 +47,6 @@ guided:
 exercises:
   - id: trades-01
     type: choice
-    text: trades-01
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -71,7 +64,6 @@ exercises:
     verify: trade Nxd5
   - id: trades-02
     type: choice
-    text: trades-02
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -89,7 +81,6 @@ exercises:
     verify: trade Rxh1
   - id: trades-03
     type: choice
-    text: trades-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -107,7 +98,6 @@ exercises:
     verify: trade Rxh1
   - id: trades-04
     type: choice
-    text: trades-04
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -125,7 +115,6 @@ exercises:
     verify: trade Bxf4
   - id: trades-05
     type: choice
-    text: trades-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -143,7 +132,6 @@ exercises:
     verify: trade Nxc3
   - id: trades-06
     type: choice
-    text: trades-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -161,7 +149,6 @@ exercises:
     verify: trade Nxc3
   - id: trades-07
     type: best-move
-    text: trades-07
     board: |
       q . . . . . . .
       . . . . . . . .
@@ -175,7 +162,6 @@ exercises:
     verify: good-trade
   - id: trades-08
     type: best-move
-    text: trades-08
     board: |
       . . . . . . . .
       . . . . . . . .

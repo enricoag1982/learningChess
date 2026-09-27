@@ -13,11 +13,8 @@ import type { AppDeps } from './use-cases.ts';
 /** Board part of the standard chess start position's FEN. */
 const START_BOARD = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
-/**
- * `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings on
- * the board, standard start position — `first-game`, later world bosses vs stronger levels), the
- * same id the Play screen's own "Full game" flow records; otherwise the mini-game's own id.
- */
+/** `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings,
+ * standard start position), the same id the Play screen's "Full game" flow records; else its own id. */
 function gameRecordId(state: VersusState): string {
   const { def } = state;
   const board = toFen(def.position).split(' ')[0];
@@ -40,11 +37,8 @@ export interface RecordMiniGameResultInput {
   readonly durationMs: number;
 }
 
-/**
- * Keeps the profile's best stars / plays / wins for a mini-game (rewards.md §2 "Play" tile),
- * without recording an `Attempt`. `recordBossResult` uses it for a lesson's own boss (the lesson
- * already records that attempt), so the Play tile reflects both routes to the same mini-game.
- */
+/** Keeps the profile's best stars / plays / wins for a mini-game, without recording an `Attempt`.
+ * `recordBossResult` uses it for a lesson's own boss, so the Play tile reflects both routes. */
 export async function saveMiniGamePlay(
   deps: AppDeps,
   input: Omit<RecordMiniGameResultInput, 'durationMs'>,
@@ -64,9 +58,8 @@ export async function saveMiniGamePlay(
   );
   await deps.progress.saveMiniGame(updated);
 
-  // A `versus` play (vs the bot) also gets its own `GameRecord` (domain-model.md §2), whether
-  // played standalone from Play or as a lesson's own boss — `static`/`series` mini-games have no
-  // computer opponent to record one against.
+  // A `versus` play also gets its own `GameRecord`; `static`/`series` mini-games have no computer
+  // opponent to record one against.
   if (state.mode === 'versus') {
     const { result, reason } = versusGameRecordResult(state);
     await recordGame(deps, {
@@ -78,19 +71,15 @@ export async function saveMiniGamePlay(
       moves: versusGameState(state).history.map((move) => move.san),
     });
   } else {
-    // A `versus` play's own finish already runs this via `recordGame` above; `static`/`series`
-    // finishes have no `GameRecord` of their own, so this is their only "game finished" check
-    // (rewards.md §4) — also today's counted activity even for a mini-game with no badge riding on it.
+    // static/series finishes have no GameRecord, so this is their only "game finished" check.
     await checkRewards(deps, profileId);
   }
 
   return updated;
 }
 
-/**
- * Records one mini-game played from the Play screen: an `Attempt` with `scored: false` (outside
- * its lesson it never counts towards mastery) plus the best stars / plays / wins.
- */
+/** Records one mini-game played from the Play screen: an `Attempt` with `scored: false` (outside
+ * its lesson it never counts towards mastery) plus the best stars / plays / wins. */
 export async function recordMiniGameResult(
   deps: AppDeps,
   input: RecordMiniGameResultInput,

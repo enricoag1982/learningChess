@@ -1,12 +1,5 @@
-/**
- * Bridges the still-general `engine.ts` functions (kept accepting/returning the broad
- * `ExerciseState` — no public API/behaviour change) to a specific kind's narrower
- * `ExerciseStateOf<D>`. Every one of these functions returns its input `state` with only
- * `position` / `history` / `moves` / `selected` / `errors` / `hintLevel` / `solved` / `wrongOptions`
- * changed — `def` itself is never reassigned — so narrowing the result back to the caller's own
- * `D` is safe. Centralised here instead of one cast per kind file; `kinds/<type>/engine.ts` (4a-f)
- * removes the need as each moved function becomes single-type and generic on its own.
- */
+// Bridges the still-general `engine.ts` functions (broad `ExerciseState`, no public API change) to
+// a specific kind's narrower `ExerciseStateOf<D>`. `def` is never reassigned, so narrowing is safe.
 import { requestHint, starsFor } from '../engine.ts';
 import type { ExerciseState } from '../engine.ts';
 import type { Hint } from '../hint.ts';
@@ -37,7 +30,7 @@ export function narrowState<D extends ExerciseDef>(state: ExerciseState): Exerci
   return narrow<D>(state);
 }
 
-/** `requestHint`, narrowed to a specific kind's `D`; the bumped `level` it computes matches the caller's own. */
+/** `requestHint`, narrowed to a specific kind's `D`. */
 export function delegateHint<D extends ExerciseDef>(
   state: ExerciseStateOf<D>,
   ctx: VariantRules,

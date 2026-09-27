@@ -1,5 +1,6 @@
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { stringify } from 'yaml';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import {
@@ -14,6 +15,7 @@ import {
   validExercise,
   validSetupExercise,
   validYesNoExercise,
+  write,
   writeDefaultLocales,
   writeLesson,
   writeMiniGame,
@@ -237,5 +239,72 @@ describe('loadContent', () => {
     writeDefaultLocales();
 
     expect(issuesOf()).toEqual([]);
+  });
+
+  describe('YAML defaults', () => {
+    it('defaults exercise text to id', () => {
+      writeLesson({ exercises: [validExercise({ text: undefined })] });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      expect(content.lessons[0]?.exercises[0]?.textKey).toBe('lessons:demo-01');
+    });
+
+    it('defaults lesson world to its folder name', () => {
+      writeLesson({ world: undefined });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      expect(content.lessons[0]?.world).toBe('w1');
+    });
+
+    it('defaults lesson title/story to <id>.title/<id>.story', () => {
+      writeLesson({ title: undefined, story: undefined });
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      expect(content.lessons[0]?.titleKey).toBe('lessons:demo-lesson.title');
+      expect(content.lessons[0]?.storyKey).toBe('lessons:demo-lesson.story');
+    });
+
+    it('defaults demo text to <lesson-id>.demo', () => {
+      writeLesson({ demo: { board: diagram({ d4: 'R' }), highlight: 'legal-moves d4' } });
+      writeMiniGame();
+      write(
+        'locales/en/lessons.yaml',
+        stringify({
+          'demo-lesson': { title: 'Title', story: 'Story', demo: 'Demo' },
+          'demo-01': 'Exercise',
+          mg1: { title: 'Title', goal: 'Goal' },
+        }),
+      );
+      write('locales/en/characters.yaml', stringify({ char1: { name: 'Char' } }));
+
+      expect(issuesOf()).toEqual([]);
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      expect(content.lessons[0]?.demo.textKey).toBe('lessons:demo-lesson.demo');
+    });
+
+    it('defaults mini-game title/goal to <id>.title/<id>.goal', () => {
+      writeLesson();
+      writeMiniGame({ title: undefined, goal: undefined });
+      writeDefaultLocales();
+
+      expect(issuesOf()).toEqual([]);
+      const locales = loadLocales(join(dir, 'locales'));
+      const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+      expect(content.minigames[0]?.titleKey).toBe('lessons:mg1.title');
+      expect(content.minigames[0]?.goalKey).toBe('lessons:mg1.goal');
+    });
   });
 });

@@ -244,14 +244,14 @@ packages/content/
   locales/<lang>/*.yaml        text by key
 ```
 
+Optional, default when absent: exercise `text` ← `id`; lesson `world` ← folder name; `title`/`story` ← `<id>.title`/`<id>.story`; demo `text` ← `<id>.demo`; mini-game `title`/`goal` ← `<id>.title`/`<id>.goal`; `stars2` ← `stars3 + 1`.
+
 Lesson:
 ```yaml
 id: rook
-world: pieces
 order: 1
 concept: rook-move
 character: rhino
-story: rook.story
 demo:
   board: |
     . . . . . . . .
@@ -264,9 +264,8 @@ demo:
     . . . . . . . .
   highlight: legal-moves d4
 exercises:
-  - id: rook-01
+  - id: rook-02
     type: collect-stars
-    text: rook-01
     board: |
       . . . . * . . .
       . . . . . . . .
@@ -277,7 +276,7 @@ exercises:
       . . . . . . . .
       R . . . . . . .
     stars3: 3
-    stars2: 5
+    stars2: 5              # explicit: default (stars3 + 1 = 4) doesn't match the optimal solve
 boss: hungry-rook
 ```
 
@@ -306,5 +305,5 @@ Locale (`locales/en/lessons.yaml`):
 ```yaml
 rook:
   story: Rhino charges straight ahead, as far as he wants!
-rook-01: Help Rhino collect all the stars.
+rook-02: Help Rhino collect all the stars.
 ```

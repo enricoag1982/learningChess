@@ -11,11 +11,8 @@ export interface MoveAction {
 /** Result of a yes-no / choice answer attempt. */
 export type AnswerOutcome = { readonly kind: 'solved' | 'wrong' | 'ignored' };
 
-/**
- * Derives a yes-no / choice `AnswerOutcome` by comparing progress before/after `answerYesNo` /
- * `answerChoice`, which return only the next state (no outcome of their own): newly solved, a fresh
- * error, or unchanged (already solved — a no-op).
- */
+/** Derives a yes-no / choice `AnswerOutcome` by comparing progress before/after: newly solved, a
+ * fresh error, or unchanged. */
 export function deriveAnswerOutcome(
   before: { readonly errors: number; readonly solved: boolean },
   after: { readonly errors: number; readonly solved: boolean },
@@ -25,12 +22,8 @@ export function deriveAnswerOutcome(
   return { kind: 'ignored' };
 }
 
-/**
- * Any square holding a piece of the side to move — used to build a universally-illegal `move`
- * (`from === to`, which chess.js never generates for any position) for a move-based kind's
- * `wrongAction`. Every move-based exercise type requires the kid to have a piece on the board
- * (content-checked at build time), so this never throws for compiled content.
- */
+/** Any square holding a piece of the side to move — used to build a universally-illegal `move`
+ * (`from === to`) for a move-based kind's `wrongAction`. Never throws for compiled content. */
 export function anyKidSquare(position: Position): Square {
   const square = SQUARES.find((sq) => position.pieces[sq]?.color === position.toMove);
   if (square === undefined) {

@@ -1,4 +1,4 @@
-/** Kid aids for one level (`docs/computer-opponent.md` §4). */
+/** Kid aids for one level. */
 export interface BotAids {
   readonly takeBack: 'unlimited' | 'limited' | 'none';
   /** Only meaningful when `takeBack === 'limited'`; `Infinity` for `'unlimited'`, `0` for `'none'`. */
@@ -7,7 +7,7 @@ export interface BotAids {
   readonly danger: boolean;
 }
 
-/** One difficulty profile for the computer opponent (`docs/computer-opponent.md` §3). */
+/** One difficulty profile for the computer opponent. */
 export interface BotLevel {
   readonly level: 1 | 2 | 3 | 4 | 5;
   readonly name: 'mouse' | 'rabbit' | 'fox' | 'wolf' | 'bear';
@@ -32,7 +32,7 @@ const MOUSE_RABBIT_AIDS: BotAids = { takeBack: 'unlimited', takeBackLimit: Infin
 const FOX_AIDS: BotAids = { takeBack: 'limited', takeBackLimit: 3, danger: false };
 const WOLF_BEAR_AIDS: BotAids = { takeBack: 'none', takeBackLimit: 0, danger: false };
 
-/** Mouse → Bear, values from `docs/computer-opponent.md` §3. */
+/** Mouse → Bear. */
 export const BOT_LEVELS: readonly BotLevel[] = [
   {
     level: 1,

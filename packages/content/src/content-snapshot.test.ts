@@ -1,11 +1,7 @@
-// Golden snapshot (docs/refactor-v4.md R0 "Golden snapshot of compiled content.json"): every dist
-// output, pretty-printed for reviewable diffs. These files change ONLY when content or the build
-// pipeline changes on purpose — a v4 refactor PR (docs/refactor-v4.md R2-R4, "content snapshot
-// equal") must leave every one of them byte-identical. A mismatch means either a real content/build
-// change (review the diff, then update with the command below) or an accidental behaviour change
-// (fix the code instead). To update after a deliberate change:
-//   pnpm --filter @chess-kids/content exec vitest run -u
-// then review the diff under src/__snapshots__/content/ before committing it.
+// Golden snapshot: every dist output, pretty-printed for reviewable diffs. These files change only
+// when content or the build pipeline changes on purpose — a mismatch means either a real change
+// (review the diff, update with `pnpm --filter @chess-kids/content exec vitest run -u`) or an
+// accidental behaviour change (fix the code instead).
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -25,7 +21,7 @@ function snapshotPath(...segments: readonly string[]): string {
   return join('__snapshots__', 'content', ...segments);
 }
 
-describe('content snapshot (docs/refactor-v4.md R0)', () => {
+describe('content snapshot', () => {
   it('content.json', async () => {
     await expect(pretty(compiled.content)).toMatchFileSnapshot(
       snapshotPath('content.json'),
@@ -55,8 +51,7 @@ describe('content snapshot (docs/refactor-v4.md R0)', () => {
   });
 
   it('voice-texts.json', async () => {
-    // Same shape `scripts/voice-texts.ts` writes to dist/voice-texts.json: `{ key, text, source }`
-    // only, entries already sorted by key (`buildVoiceInventory`'s own contract).
+    // Same shape `scripts/voice-texts.ts` writes to dist/voice-texts.json.
     const entries = compiled.voiceTexts.entries.map(({ key, text, source }) => ({
       key,
       text,

@@ -19,18 +19,13 @@ export interface VariantRules {
   ): { readonly position: Position; readonly move: Move } | null;
   /** Squares of `by` pieces attacking `square` (real board geometry; walls block sliding as usual). */
   attackers(position: Position, square: Square, by: Color): Square[];
-  /**
-   * The real chess rules this variant is built on — an exercise kind's `Ctx`. `mate-in-n` plays
-   * under real turn alternation (never walls/static-opponent), so it uses this directly.
-   */
+  /** The real chess rules this variant is built on. `mate-in-n` plays under real turn alternation
+   * (never walls/static-opponent), so it uses this directly. */
   readonly chess: ChessRules;
 }
 
-/**
- * Occupies every blocked square with a wall piece of the side to move: sliding pieces cannot land
- * on or pass through it, a knight cannot land on it either, but a knight's jump is otherwise
- * unaffected (knight moves never depend on the squares in between).
- */
+/** Occupies every blocked square with a wall piece: sliding pieces cannot land on or pass through
+ * it; a knight cannot land on it either, but its jump is otherwise unaffected. */
 function wrapWalls(position: Position): Position {
   const { blocked } = position.markers;
   if (blocked.length === 0) {

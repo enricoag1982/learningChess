@@ -26,12 +26,8 @@ interface SimResult {
   readonly kidMoves: number;
 }
 
-/**
- * Plays one full game of `minigame` — a seeded kid stand-in (`kidLevel`) against the mini-game's
- * own authored opponent bot level — using the same `domain/game` + `domain/bot` machinery the real
- * `versus` boss plays against (`VersusStep`/`versus.ts`), not the exercise engine. Two independent
- * seeded `Random` streams (kid / opponent) keep every seed's game fully reproducible.
- */
+/** Plays one full game of `minigame` — a seeded kid stand-in against the mini-game's own authored
+ * opponent bot level. Two independent seeded `Random` streams keep every seed reproducible. */
 function simulateVersusGame(minigame: VersusMiniGame, seed: number, kidLevel: BotLevel): SimResult {
   let state = game.startGame(minigame.rules, minigame.position);
   const kidRandom = bot.seededRandom(seed * 2 + 1);
@@ -42,9 +38,8 @@ function simulateVersusGame(minigame: VersusMiniGame, seed: number, kidLevel: Bo
   }
 
   let kidMoves = 0;
-  // Generous ply cap so an ongoing (never-terminal) simulation still ends deterministically instead
-  // of looping forever; real games end via `gameResult` (moveLimit, promote, capture-all, …) well
-  // before this.
+  // Generous ply cap so a never-terminal simulation still ends deterministically; real games end
+  // via `gameResult` well before this.
   const MAX_PLIES = 300;
   for (let ply = 0; ply < MAX_PLIES; ply += 1) {
     const result = game.gameResult(state, chessJsRules);
@@ -102,7 +97,7 @@ function measureWinnability(
   };
 }
 
-const FOX = bot.BOT_LEVELS[2]; // level 3, the spec's minimum kid stand-in
+const FOX = bot.BOT_LEVELS[2]; // level 3, the minimum kid stand-in
 const RABBIT = bot.BOT_LEVELS[1]; // level 2, close to a beginner kid
 if (FOX === undefined || RABBIT === undefined) {
   throw new Error('expected BOT_LEVELS to have at least 3 levels (rabbit, fox)');
@@ -110,9 +105,9 @@ if (FOX === undefined || RABBIT === undefined) {
 
 const SEEDS = 20;
 
-describe('versus mini-game winnability (M3.2b docs/roadmap.md §3.1 m3.2)', () => {
-  // army-battle and win-the-queen: a fox-level (bot 3) kid stand-in comfortably wins >= 80% of
-  // seeded games against the mini-game's own bot 1 within its authored moveLimit.
+describe('versus mini-game winnability', () => {
+  // army-battle and win-the-queen: a fox-level stand-in comfortably wins >= 80% of seeded games
+  // against the mini-game's own bot 1 within its authored moveLimit.
   it.each([
     { id: 'army-battle', minWinRate: 0.8, seeds: SEEDS },
     { id: 'win-the-queen', minWinRate: 0.8, seeds: SEEDS },
@@ -127,11 +122,7 @@ describe('versus mini-game winnability (M3.2b docs/roadmap.md §3.1 m3.2)', () =
     expect(report.winRate).toBeGreaterThanOrEqual(minWinRate);
   });
 
-  /**
-   * `queen-vs-pawns`: queen d1 vs 4 spaced pawns (b7 d7 f7 h7). The 8-pawn version was measured too
-   * hard (Mouse pushes a pawn every move; even a bear stand-in won < 50%), so the kid's version uses
-   * 4 pawns (docs/curriculum.md); a rabbit-level stand-in (close to a beginner) must win >= 80%.
-   */
+  // `queen-vs-pawns`: queen d1 vs 4 spaced pawns; a rabbit-level stand-in must win >= 80%.
   it(`queen-vs-pawns: a rabbit-level stand-in wins >= 80% of ${String(SEEDS)} seeded games`, () => {
     const minigame = findVersusMiniGame('queen-vs-pawns');
     const report = measureWinnability(minigame, RABBIT, SEEDS);
@@ -143,12 +134,8 @@ describe('versus mini-game winnability (M3.2b docs/roadmap.md §3.1 m3.2)', () =
     expect(report.winRate).toBeGreaterThanOrEqual(0.8);
   }, 20_000);
 
-  /**
-   * `first-game` (M3.3, World 4's world boss): standard starting position, real check rules, kid
-   * White vs Mouse (bot 1). A fox-level (bot 3) kid stand-in must checkmate Mouse within the
-   * authored `moveLimit` in >= 80% of seeded games — the spec's minimum kid level for this check
-   * (`docs/roadmap.md` §3.1 m3.3).
-   */
+  // `first-game` (World 4's world boss): standard start, kid White vs Mouse. A fox-level stand-in
+  // must checkmate Mouse within the authored moveLimit in >= 80% of seeded games.
   it('first-game: a fox-level stand-in wins by checkmate >= 80% of 10 seeded games', () => {
     const minigame = findVersusMiniGame('first-game');
     const seeds = 10;
@@ -163,17 +150,8 @@ describe('versus mini-game winnability (M3.2b docs/roadmap.md §3.1 m3.2)', () =
     expect(report.winRate).toBeGreaterThanOrEqual(0.8);
   }, 60_000); // duration is logged, not asserted: shared CI / sandbox CPU made a 20 s bound flaky
 
-  /**
-   * `full-game-rabbit` (M4.1, World 5's world boss): standard starting position, real check rules,
-   * kid White vs. Rabbit (bot 2). A fox-level (bot 3) kid stand-in must checkmate Rabbit within the
-   * authored `moveLimit` in >= 80% of seeded games per the M4.1 spec — measured short of that: 7/10
-   * seeded games (10-seed) and 22/30 (extended sample), 0 losses either way, the rest draws (move
-   * limit or insufficient material from trades fox's evaluation does not always avoid). Rabbit's
-   * `alwaysMateInOne` + 25% search share (`domain/bot/levels.ts`, out of this task's scope) makes it
-   * a noticeably tougher, longer opponent than Mouse; a wolf-level stand-in reaches 100% but its
-   * depth-3 search blows the 20s budget (~4s/game). Asserted at a lower, still meaningful bar (kid
-   * never loses to Rabbit in any sampled game) — flagged as a spec deviation in the M4.1 report.
-   */
+  // `full-game-rabbit` (World 5's world boss): standard start, kid White vs Rabbit. Rabbit is a
+  // noticeably tougher opponent than Mouse, so this asserts a lower, still meaningful win rate.
   it('full-game-rabbit: a fox-level stand-in wins by checkmate (no losses) over 10 seeded games', () => {
     const minigame = findVersusMiniGame('full-game-rabbit');
     const seeds = 10;

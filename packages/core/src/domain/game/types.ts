@@ -29,11 +29,8 @@ export type GameResult =
   | { readonly kind: 'win'; readonly winner: Color; readonly reason: string }
   | { readonly kind: 'draw'; readonly reason: string };
 
-/**
- * Immutable variant-game progress. `positions` holds every position reached so far (index 0 = the
- * start position), for threefold-repetition detection; `halfmoveClock` is the 50-move counter
- * (resets on a pawn move or a capture).
- */
+/** Immutable variant-game progress. `positions` holds every position reached so far, for
+ * threefold-repetition detection; `halfmoveClock` is the 50-move counter. */
 export interface GameState {
   readonly position: Position;
   readonly history: readonly Move[];

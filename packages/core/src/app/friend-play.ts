@@ -8,10 +8,8 @@ import { checkRewards } from './rewards.ts';
 import type { Journey } from './journey.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/**
- * The second player in a vs Friend match (`docs/app-structure.md` §6): another profile on this
- * device, or a guest — no password, no saved `GameRecord` for them.
- */
+/** The second player in a vs Friend match: another profile on this device, or a guest — no
+ * password, no saved `GameRecord` for them. */
 export type LocalPlayer =
   { readonly kind: 'profile'; readonly profileId: string } | { readonly kind: 'guest' };
 
@@ -22,20 +20,12 @@ export interface FriendGameOption {
   readonly titleKey: string;
 }
 
-/**
- * The only mini-game ids vs Friend ever offers (M4.3 decision log "Games"): the standalone Pawn
- * Wars / Win the Queen mini-games, never a lesson- or world-specific reuse of their rules (e.g.
- * World 4's own `first-game` boss, or World 2's `pawn-wars-4` — both `versus` too, but not this
- * list) — those stay vs-computer-only.
- */
+/** The only mini-game ids vs Friend ever offers: the standalone Pawn Wars / Win the Queen
+ * mini-games, never a lesson- or world-specific reuse of their rules. */
 const FRIEND_MINI_GAME_IDS: readonly string[] = ['pawn-wars', 'win-the-queen'];
 
-/**
- * Games the active profile may offer a friend (`docs/app-structure.md` §6 "Availability"): the
- * full game once unlocked (World 4 mastered — the same gate `computerLevelStatus`'s Mouse level
- * uses), Pawn Wars once unlocked (after Promotion) and Win the Queen once unlocked (after Trades).
- * Only games already unlocked for this profile are offered; parent unlock is a later milestone.
- */
+/** Games the active profile may offer a friend: the full game once unlocked (World 4 mastered),
+ * Pawn Wars and Win the Queen once each is unlocked. Only already-unlocked games are offered. */
 export function friendGameOptions(
   gameRecords: readonly GameRecord[],
   journey: Journey,
@@ -61,7 +51,8 @@ export function isFriendOpponent(opponent: string): boolean {
   return opponent === 'guest' || opponent.startsWith('profile:');
 }
 
-/** This profile's `GameRecord`s played vs a friend (My Den's "Games with friends" count), excluding abandoned ones — same convention as `computerLevelStatus`'s own tally. */
+/** This profile's `GameRecord`s played vs a friend (My Den's "Games with friends" count), excluding
+ * abandoned ones. */
 export function friendGamesPlayed(records: readonly GameRecord[]): number {
   return records.filter(
     (record) => isFriendOpponent(record.opponent) && record.result !== 'abandoned',
@@ -102,12 +93,8 @@ export interface RecordLocalMatchInput {
   readonly moves: readonly string[];
 }
 
-/**
- * Saves one `GameRecord` (domain-model.md §2) per profile involved in a vs Friend match — a guest
- * gets none. No stars, mastery or review effects (M4.3 decision log): this only appends to the
- * game log, same as a vs-computer `recordGame`. `Match` itself is not stored in v1 (decision log);
- * this is the whole of what a finished/left local match leaves behind.
- */
+/** Saves one `GameRecord` per profile involved in a vs Friend match — a guest gets none. No stars,
+ * mastery or review effects: only appends to the game log, same as a vs-computer `recordGame`. */
 export async function recordLocalMatch(
   deps: AppDeps,
   input: RecordLocalMatchInput,
@@ -134,7 +121,6 @@ export async function recordLocalMatch(
     });
   }
   await Promise.all(records.map((record) => deps.gameRecords.add(record)));
-  // rewards.md §4 "game finished": Friendly Match, Queen Keeper, … for every profile involved.
   for (const record of records) {
     await checkRewards(deps, record.profileId);
   }

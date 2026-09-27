@@ -12,10 +12,8 @@ export interface SolverMove {
   readonly to: Square;
 }
 
-/**
- * Deterministic key for everything move generation depends on: piece placement (square + colour +
- * type, sorted by square), castling rights and en passant square.
- */
+/** Deterministic key for everything move generation depends on: piece placement, castling rights
+ * and en passant square. */
 function placementKey(position: Position): string {
   const placement = Object.entries(position.pieces)
     .sort(([a], [b]) => (a < b ? -1 : 1))
@@ -29,15 +27,9 @@ function stateKey(position: Position): string {
   return `${placementKey(position)}|${[...position.markers.stars].sort().join(',')}`;
 }
 
-/**
- * Applies an already-legal move to the board, the way a static-opponent kid move always does:
- * turn stays with the kid, en passant right is cleared, and a landed-on star is collected.
- *
- * Move generation itself always goes through `VariantRules.legalMoves` (real chess.js rules,
- * walls included); this only replays a move that is already known to be legal, so it can update
- * the piece map directly instead of paying for a full chess.js round trip. That keeps the search
- * fast enough for lesson-sized positions (see the performance test).
- */
+/** Applies an already-legal move to the board, the way a static-opponent kid move always does:
+ * turn stays with the kid, en passant cleared, a landed-on star collected. Updates the piece map
+ * directly rather than a full chess.js round trip, to keep the search fast. */
 function applyForSearch(position: Position, move: Move, rules: VariantRules): Position {
   if (position.castling !== '-') {
     // Castling moves the rook and changes rights: replay through the rules instead.
@@ -84,14 +76,9 @@ function pathTo(node: Node): SolverMove[] {
   return path;
 }
 
-/**
- * Shortest line of kid moves (opponent static) reaching `goal` from `position`, or `null` when
- * none exists within `maxDepth` plies. Breadth-first over `VariantRules.legalMoves`, deduplicated
- * by piece placement + remaining stars so lesson-sized positions (few kid pieces, up to ~8
- * stars/targets) solve quickly. Legal moves only ever depend on the piece placement (walls and
- * side to move are fixed for the whole search; stars never block movement), so they are cached
- * per placement instead of recomputed for every star subset that placement can appear with.
- */
+/** Shortest line of kid moves (opponent static) reaching `goal` from `position`, or `null` within
+ * `maxDepth` plies. Breadth-first, deduplicated by piece placement + remaining stars; legal moves
+ * are cached per placement since they never depend on the star subset. */
 export function solve(
   position: Position,
   rules: VariantRules,

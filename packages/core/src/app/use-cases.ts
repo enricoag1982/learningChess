@@ -40,15 +40,12 @@ import { checkRewards } from './rewards.ts';
 export interface AppDeps {
   readonly profiles: ProfileRepository;
   readonly progress: ProgressRepository;
-  /** Full games and versus mini-games played vs the computer (M3.5). */
+  /** Full games and versus mini-games played vs the computer. */
   readonly gameRecords: GameRecordRepository;
-  /** Earned badges, streak, session log (M4.4). Optional so every existing `AppDeps` fixture built
-   * before M4.4 keeps typechecking unchanged (same reasoning as `ContentSource.catalog`/`badges`);
-   * `checkRewards` (`app/rewards.ts`) simply no-ops without it. */
+  /** Earned badges, streak, session log. Optional so an `AppDeps` fixture keeps typechecking
+   * unchanged; `checkRewards` simply no-ops without it. */
   readonly rewards?: RewardsRepository;
-  /** Assessment results + unlocked lesson/world ids (M4.5). Optional for the same backward-compat
-   * reason `rewards` is; `app/assessment.ts`'s use cases no-op/throw without it, same pattern as
-   * `checkRewards`/`requireRewards`. */
+  /** Assessment results + unlocked lesson/world ids. Optional, same reason `rewards` is. */
   readonly assessment?: AssessmentRepository;
   readonly clock: Clock;
   readonly ids: IdGenerator;
@@ -56,17 +53,14 @@ export interface AppDeps {
   readonly parentLock: ParentLockRepository;
   readonly passwordFile: PasswordFileWriter;
   readonly settings: SettingsRepository;
-  /** Seeded in tests; drives warm-up/practice task selection (M3.4). */
+  /** Seeded in tests; drives warm-up/practice task selection. */
   readonly random: Random;
-  /** Backup export's file destination (M5.1). Optional for the same backward-compat reason
-   * `rewards`/`assessment` are; `app/backup.ts`'s `exportBackup` throws a clear error without it. */
+  /** Backup export's file destination. Optional: `app/backup.ts`'s `exportBackup` throws without it. */
   readonly backupFileWriter?: BackupFileWriter;
-  /** Backup import's atomic replace (M5.1), same optional-port reasoning as `backupFileWriter`. */
+  /** Backup import's atomic replace, same optional-port reasoning as `backupFileWriter`. */
   readonly backupImporter?: BackupImporter;
-  /** Current `chess-kids:*` local storage schema version (`apps/web/src/adapters/storage/local-store.ts`'s
-   * `SCHEMA_VERSION`) — injected so `app/backup.ts` can stamp/validate a backup file's own
-   * `schemaVersion` without `packages/core` (storage-agnostic) importing a web adapter constant.
-   * Optional for the same backward-compat reason `backupFileWriter`/`backupImporter` are. */
+  /** Current local storage schema version, injected so `app/backup.ts` can stamp/validate a backup
+   * file without `packages/core` importing a web adapter constant. Optional, same reason as above. */
   readonly storageSchemaVersion?: number;
 }
 
@@ -83,14 +77,8 @@ export async function getConceptStats(
   return newConceptStats(deps.ids.next(), profileId, conceptId, deps.clock.now());
 }
 
-/**
- * Folds one scored attempt's outcome into its concept's stats (domain-model.md §3.1): always
- * appends `correct` to `recent`; an attempt that needed `EASIER_AFTER_ERRORS` errors or more —
- * the same threshold the easier-variant offer uses, "the kid needed the easier variant / failed
- * an exercise twice" — also puts the concept in review, due immediately. A single stray error (or
- * a hint used with no error) still counts against accuracy but does not, on its own, schedule a
- * review task for the very next session.
- */
+/** Folds one scored attempt's outcome into its concept's stats: always appends `correct` to
+ * `recent`; `EASIER_AFTER_ERRORS`-or-more errors also puts the concept in review, due immediately. */
 async function recordConceptOutcome(
   deps: AppDeps,
   profileId: string,
@@ -135,14 +123,9 @@ export interface RecordAttemptInput {
   readonly durationMs: number;
 }
 
-/**
- * Logs one `Attempt` without touching lesson progress. Used on its own when the kid leaves an
- * unsolved exercise for its easier variant: that failed attempt always has `errors >=
- * EASIER_AFTER_ERRORS` by construction (the offer only appears past that threshold), which is
- * what the M3.4 review scheduler reads to put the concept back into review, due immediately. Also
- * folds a scored attempt's outcome into that concept's stats (`recordConceptOutcome`) — the single
- * place both this and `recordExerciseResult` (which calls it) go through.
- */
+/** Logs one `Attempt` without touching lesson progress. Used on its own when the kid leaves an
+ * unsolved exercise for its easier variant (that failed attempt always has `errors >=
+ * EASIER_AFTER_ERRORS`); also folds a scored attempt's outcome into concept stats. */
 export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): Promise<void> {
   const { profileId, lesson, state, scored, durationMs } = input;
   const now = deps.clock.now();
@@ -181,26 +164,17 @@ export interface RecordExerciseResultInput {
   readonly durationMs: number;
   /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
-  /**
-   * Set when `state` is an easier variant: the scored exercise id it replaces; solving credits that
-   * exercise `EASIER_VARIANT_STARS` (domain-model.md §3.4).
-   */
+  /** Set when `state` is an easier variant: the scored exercise id it replaces; solving credits that
+   * exercise `EASIER_VARIANT_STARS`. */
   readonly standsInFor?: string;
-  /** Set when this solve leaves a skippable phase normally — Try's last guided try, `stepPhase` of
-   * `nextStep` no longer `'try'` (`LessonScreen` computes it): unmarks it from `skippedPhases` if a
-   * previous "Skip" had set it (playtest 2) — this is a "Play again" replay playing it through. */
+  /** Set when this solve leaves a skippable phase normally (`LessonScreen` computes it): unmarks it
+   * from `skippedPhases` if a previous "Skip" had set it — a "Play again" playing it through. */
   readonly completesPhase?: SkippablePhase;
 }
 
-/**
- * Records an exercise attempt: always saves an `Attempt`; when solved, also updates the lesson's
- * best stars — for `standsInFor` if set, else for this exercise when `scored`. Always advances
- * `resumeStep` and saves progress. The moment this call is what first completes the lesson (every
- * exercise now >= 1 star — whether directly or via an easier variant crediting the original), the
- * lesson's concept enters review (domain-model.md §3.1), due in 1 day unless an earlier
- * `EASIER_AFTER_ERRORS`-or-more attempt already put it in sooner (`enterReview`'s non-immediate
- * case never delays that).
- */
+/** Records an exercise attempt: always saves an `Attempt`; when solved, updates the lesson's best
+ * stars (`standsInFor` if set, else this exercise when `scored`); advances `resumeStep`. The call
+ * that first completes the lesson also enters its concept into review, due in 1 day. */
 export async function recordExerciseResult(
   deps: AppDeps,
   input: RecordExerciseResultInput,
@@ -232,10 +206,8 @@ export async function recordExerciseResult(
     await deps.progress.saveConceptStats(enterReview(stats, now, false));
   }
 
-  // rewards.md §4 "exercise completed" event: only a real completion (solved, scored one way or
-  // another) counts as today's activity / a chance at a new badge — never a guided try, and never
-  // an unsolved attempt logged on the way to an easier variant (`recordAttempt` above already ran
-  // for that case, on its own, with nothing solved).
+  // "exercise completed" event: only a real completion counts, never a guided try or an unsolved
+  // attempt logged on the way to an easier variant.
   if (state.solved && stars !== 0 && (scored || standsInFor !== undefined)) {
     await checkRewards(deps, profileId);
   }
@@ -253,13 +225,9 @@ export interface RecordBossResultInput {
   readonly nextStep: number;
 }
 
-/**
- * Records a boss mini-game attempt: always saves an `Attempt` (bosses are always scored), updates
- * the lesson's best boss stars, advances `resumeStep`, and saves progress. A boss is always also
- * one mini-game in content (`lesson.boss`'s id): this also folds the play into that mini-game's
- * own `MiniGameProgress` (`saveMiniGamePlay`, no second attempt), so the Play screen's tile reflects a win made
- * from inside the lesson too, not only from a standalone Play session.
- */
+/** Records a boss mini-game attempt: always saves an `Attempt`, updates the lesson's best boss
+ * stars, advances `resumeStep`. Also folds the play into the boss's own `MiniGameProgress`
+ * (`saveMiniGamePlay`), so the Play screen's tile reflects a win made from inside the lesson too. */
 export async function recordBossResult(
   deps: AppDeps,
   input: RecordBossResultInput,
@@ -295,7 +263,6 @@ export async function recordBossResult(
     await saveMiniGamePlay(deps, { profileId, game: minigame, state });
   }
 
-  // rewards.md §4 "game finished" / "exercise completed" event: a boss is always a finished play.
   await checkRewards(deps, profileId);
 
   return progress;
@@ -307,18 +274,13 @@ export interface RecordReviewResultInput {
   readonly task: ConceptTask;
   readonly state: ExerciseState;
   readonly durationMs: number;
-  /** Which screen this task ran on (rewards.md §4 "Warm-up Champ"): `'warmup'` for Today's inline
-   * warm-up or Practice's own "Daily warm-up" card, `'practice'` for a Practice topic run. */
+  /** `'warmup'` for Today's inline warm-up or Practice's "Daily warm-up" card, `'practice'` for a
+   * Practice topic run. */
   readonly reviewSource: 'warmup' | 'practice';
 }
 
-/**
- * Records a warm-up or Practice review task (domain-model.md §3.1, §3.3): always saves a scored,
- * `review: true` `Attempt` against the task's own lesson id — never touching that lesson's
- * `bestStars` — then moves the concept's Leitner box (`applyReviewResult`): up on a first-try
- * correct answer, back to box 1 otherwise, always rescheduling `dueAt` and remembering the task's
- * exercise id so the next pick avoids repeating it.
- */
+/** Records a warm-up or Practice review task: saves a scored, `review: true` `Attempt` (never
+ * touching lesson `bestStars`), then moves the concept's Leitner box (`applyReviewResult`). */
 export async function recordReviewResult(
   deps: AppDeps,
   input: RecordReviewResultInput,
@@ -352,8 +314,6 @@ export async function recordReviewResult(
   stats = applyReviewResult(stats, correct, task.exercise.id, now);
   await deps.progress.saveConceptStats(stats);
 
-  // rewards.md §4 "warm-up task" activity + "Warm-up Champ" badge (only `reviewSource: 'warmup'`
-  // attempts count towards it, see `Attempt.reviewSource`'s own doc).
   await checkRewards(deps, profileId);
 
   return stats;
@@ -372,11 +332,8 @@ export async function saveResumeStep(
   return saved;
 }
 
-/**
- * Marks `phase` skipped (kid tapped "Skip" on Story/Demo/Try, playtest 2) and moves the resume
- * point past it (`nextStep`, `phaseEndIndex`'s own result). No attempt logged: Story/Demo never
- * track one, and any guided try already played inside Try logged its own via `recordExerciseResult`.
- */
+/** Marks `phase` skipped (kid tapped "Skip" on Story/Demo/Try) and moves the resume point past it.
+ * No attempt logged: Story/Demo never track one. */
 export async function skipLessonPhase(
   deps: AppDeps,
   profileId: string,
@@ -392,11 +349,8 @@ export async function skipLessonPhase(
   return progress;
 }
 
-/**
- * Moves the resume point like `saveResumeStep`, and also unmarks `completedPhase` if it was
- * previously skipped — Story/Demo's own "Next" (normal advance, not "Skip"): a "Play again" replay
- * that this time plays the phase through instead of skipping it again.
- */
+/** Moves the resume point like `saveResumeStep`, and unmarks `completedPhase` if it was previously
+ * skipped — a "Play again" replay that this time plays the phase through. */
 export async function advanceLessonPhase(
   deps: AppDeps,
   profileId: string,

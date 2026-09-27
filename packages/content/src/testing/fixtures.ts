@@ -1,9 +1,5 @@
-/**
- * Shared `loadContent` test fixtures (lesson/exercise/mini-game builders, a scratch content
- * directory, `load`/`issuesOf`): used by `lesson-load.test.ts` (generic checks) and every
- * `kinds/<type>/*.test.ts` / `modes/<mode>/*.test.ts` (kind/mode-specific checks) — one temp
- * directory per test, via `fixturesBeforeEach`/`fixturesAfterEach` in each file's own hooks.
- */
+// Shared `loadContent` test fixtures (lesson/exercise/mini-game builders, a scratch content
+// directory, `load`/`issuesOf`) — one temp directory per test, via `fixturesBeforeEach`/`AfterEach`.
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
@@ -270,10 +266,8 @@ export function validSaveVerifyExercise(
   };
 }
 
-/**
- * Rook a1: an undefended pawn on a8 and a knight-defended pawn on h1 — only Rxa8 is take-free.
- * (Not a bishop on g2: that square sits on the same a8-h1 diagonal, so it would defend both ends.)
- */
+/** Rook a1: an undefended pawn on a8 and a knight-defended pawn on h1 — only Rxa8 is take-free.
+ * (Not a bishop on g2: that square sits on the same a8-h1 diagonal, defending both ends.) */
 export function validTakeFreeVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
@@ -288,11 +282,8 @@ export function validTakeFreeVerifyExercise(
   };
 }
 
-/**
- * Rook a1: an undefended queen on a8 (good trade regardless) and a knight-defended rook on h1
- * (equal value, defended: not a good trade). See `validTakeFreeVerifyExercise` on why a knight,
- * not a bishop, defends h1 here.
- */
+/** Rook a1: an undefended queen on a8 (good trade regardless) and a knight-defended rook on h1
+ * (equal value, defended: not a good trade). */
 export function validGoodTradeVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
@@ -322,12 +313,8 @@ export function validCheckVerifyExercise(
   };
 }
 
-/**
- * White king e1 in check from the black rook on e8 (e-file): king can step to d1/d2/f1/f2
- * (`escape-king`), the rook on b4 or the knight on d6 can interpose on e4 (`escape-block`), or the
- * knight can capture the checking rook, Nxe8 (`escape-capture`). Neither white piece attacks the
- * black king on a8, so the start position itself is not already giving black an illegal check.
- */
+/** White king e1 in check from the black rook on e8: king steps to d1/d2/f1/f2 (`escape-king`), the
+ * rook or knight can interpose on e4 (`escape-block`), or the knight can capture, Nxe8 (`escape-capture`). */
 export function validEscapeCheckVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
@@ -381,10 +368,8 @@ export function validChoiceTradeExercise(
   };
 }
 
-/**
- * White king e1, rooks a1/h1, both castling rights, black king far away on e8: both `O-O` and
- * `O-O-O` are legal right now (M4.1 `castle` verify).
- */
+/** White king e1, rooks a1/h1, both castling rights, black king far away on e8: both `O-O` and
+ * `O-O-O` are legal right now. */
 export function validCastleVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
@@ -399,10 +384,8 @@ export function validCastleVerifyExercise(
   };
 }
 
-/**
- * White pawn e5, black pawn d5 (just double-stepped from d7, en passant square d6): `exd6` is the
- * only legal en passant capture (M4.1 `en-passant` verify).
- */
+/** White pawn e5, black pawn d5 (just double-stepped from d7, en passant square d6): `exd6` is the
+ * only legal en passant capture. */
 export function validEnPassantVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {
@@ -449,7 +432,7 @@ export function validCanEnPassantVerifyExercise(
   };
 }
 
-/** Lone kings: a dead draw by material (M4.1 `insufficient-material` verify). */
+/** Lone kings: a dead draw by material. */
 export function validInsufficientMaterialVerifyExercise(
   overrides: Record<string, unknown> = {},
 ): Record<string, unknown> {

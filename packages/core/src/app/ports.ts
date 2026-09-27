@@ -21,10 +21,7 @@ export interface ProfileRepository {
   delete(id: string): Promise<void>;
 }
 
-/**
- * Persistence of lesson progress, attempts, and standalone mini-game progress (Play screen).
- * Async so cloud adapters can replace local ones.
- */
+/** Persistence of lesson progress, attempts, and standalone mini-game progress (Play screen). */
 export interface ProgressRepository {
   listLessons(profileId: string): Promise<LessonProgress[]>;
   getLesson(profileId: string, lessonId: string): Promise<LessonProgress | undefined>;
@@ -34,7 +31,7 @@ export interface ProgressRepository {
   getMiniGame(profileId: string, miniGameId: string): Promise<MiniGameProgress | undefined>;
   listMiniGames(profileId: string): Promise<MiniGameProgress[]>;
   saveMiniGame(progress: MiniGameProgress): Promise<void>;
-  /** One concept's mastery + review state (M3.4 Leitner scheduler), if any attempt has touched it. */
+  /** One concept's mastery + review state (Leitner scheduler), if any attempt has touched it. */
   getConceptStats(profileId: string, conceptId: string): Promise<ConceptStats | undefined>;
   listConceptStats(profileId: string): Promise<ConceptStats[]>;
   saveConceptStats(stats: ConceptStats): Promise<void>;
@@ -42,11 +39,8 @@ export interface ProgressRepository {
   deleteProfileData(profileId: string): Promise<void>;
 }
 
-/**
- * Persistence of `GameRecord` (domain-model.md §2): full games and versus mini-games, vs the
- * computer or a friend (same device, M4.3). Kept separate from `ProgressRepository` — records
- * here are an append-only game log, not lesson/mastery state.
- */
+/** Persistence of `GameRecord`: full games and versus mini-games, vs the computer or a friend
+ * (same device). Kept separate from `ProgressRepository` — an append-only log, not mastery state. */
 export interface GameRecordRepository {
   add(record: GameRecord): Promise<void>;
   listByProfile(profileId: string): Promise<GameRecord[]>;
@@ -54,11 +48,7 @@ export interface GameRecordRepository {
   deleteProfileData(profileId: string): Promise<void>;
 }
 
-/**
- * Persistence of `EarnedBadge` / `Streak` / `SessionLog` (domain-model.md §2, M4.4). Kept separate
- * from `ProgressRepository` — same reasoning as `GameRecordRepository`: these are reward/habit
- * records, not lesson/mastery state.
- */
+/** Persistence of `EarnedBadge` / `Streak` / `SessionLog`: reward/habit records, not mastery state. */
 export interface RewardsRepository {
   addEarnedBadge(badge: EarnedBadge): Promise<void>;
   listEarnedBadges(profileId: string): Promise<EarnedBadge[]>;
@@ -67,18 +57,14 @@ export interface RewardsRepository {
   saveStreak(streak: Streak): Promise<void>;
   getSessionLog(profileId: string, date: string): Promise<SessionLog | undefined>;
   saveSessionLog(log: SessionLog): Promise<void>;
-  /** Every session-log row for a profile (M5.1 parent report / `minutesByDay`, M5.2's daily limit). */
+  /** Every session-log row for a profile (parent report `minutesByDay`, the daily limit). */
   listSessionLogs(profileId: string): Promise<SessionLog[]>;
   /** Deletes every earned badge, the streak, and every session-log row for a profile (parent area "Delete"). */
   deleteProfileData(profileId: string): Promise<void>;
 }
 
-/**
- * Persistence of `AssessmentResult` / `Unlock` (domain-model.md §2, §3.2, M4.5). Kept separate from
- * `ProgressRepository`, same reasoning as `RewardsRepository`; optional on `AppDeps` for the same
- * backward-compatible reason — `app/assessment.ts`'s use cases simply throw a clear error if used
- * without it wired up (same pattern `checkRewards`/`requireRewards` uses).
- */
+/** Persistence of `AssessmentResult` / `Unlock`. Optional on `AppDeps`: `app/assessment.ts`'s use
+ * cases throw a clear error if used without it wired up. */
 export interface AssessmentRepository {
   addAssessmentResult(result: AssessmentResult): Promise<void>;
   listAssessmentResults(profileId: string): Promise<AssessmentResult[]>;
@@ -88,13 +74,13 @@ export interface AssessmentRepository {
   deleteProfileData(profileId: string): Promise<void>;
 }
 
-/** Persistence of the single parent gate (non-functional.md §3). One lock per device. */
+/** Persistence of the single parent gate. One lock per device. */
 export interface ParentLockRepository {
   get(): Promise<ParentLock | undefined>;
   save(lock: ParentLock): Promise<void>;
 }
 
-/** Writes the parent password somewhere the parent can find again (app-structure.md §2). */
+/** Writes the parent password somewhere the parent can find again. */
 export interface PasswordFileWriter {
   write(password: string): Promise<{ location: string }>;
 }
@@ -104,25 +90,18 @@ export interface PasswordFileWriter {
 export interface AppSettings {
   /** Profile to show first at the next app start (picker orders it first); `null` if none yet. */
   readonly lastProfileId: string | null;
-  /** Play's vs Computer "Automatic level" (`docs/computer-opponent.md` §5): each profile's own
-   * suggested `BotLevel.level`, by profile id. Absent for a profile with no suggestion yet (its
-   * chip defaults to the highest currently unlocked level instead — `games.ts`'s `suggestedLevel`). */
+  /** Play's vs Computer "Automatic level": each profile's own suggested `BotLevel.level`, by
+   * profile id. Absent for a profile with no suggestion yet (`games.ts`'s `suggestedLevel`). */
   readonly suggestedLevels: Readonly<Record<string, number>>;
-  /** Parent area "Settings per child" (M5.1, app-structure.md §11), by profile id. Absent for a
-   * profile with none saved yet — reads back as `DEFAULT_PROFILE_SETTINGS` (`app/settings.ts`). */
+  /** Parent area "Settings per child", by profile id. Absent for a profile with none saved yet —
+   * reads back as `DEFAULT_PROFILE_SETTINGS`. */
   readonly profileSettings: Readonly<Record<string, ProfileSettings>>;
-  /** Result of the one `navigator.storage.persist()` request on this device, made after its first
-   * profile is created (non-functional.md §1 "Storage eviction"); `undefined` until it settles or
-   * when the API is unavailable. Shown in the parent area. */
+  /** Result of the one `navigator.storage.persist()` request, made after the first profile is
+   * created; `undefined` until it settles or when unavailable. */
   readonly storagePersisted?: boolean;
-  /**
-   * This device's own random id (M7.2 device sharing, `app/device.ts`'s `getOrCreateDeviceId`),
-   * created once, lazily, the first time it is needed (a local session-log write, or a "Send to
-   * other device"/export) — never regenerated afterwards. Stamped onto this device's own
-   * `SessionLog` rows so an import on another device can tell them apart from its own, and read
-   * back by a merge import to know which of an imported file's rows are "this same device" (a
-   * parent re-importing their own earlier export). Absent until first created.
-   */
+  /** This device's own random id (`app/device.ts`'s `getOrCreateDeviceId`), created once lazily and
+   * never regenerated. Stamps this device's `SessionLog` rows and lets a merge import tell its own
+   * rows apart from a foreign device's. Absent until first created. */
   readonly deviceId?: string;
 }
 
@@ -150,19 +129,10 @@ export interface ContentSource {
   lesson(id: string): Lesson | undefined;
   minigames(): readonly MiniGame[];
   minigame(id: string): MiniGame | undefined;
-  /**
-   * Tracks/worlds/ranks catalog (built from `packages/content/tracks.yaml`), used by
-   * `loadJourney` (`app/journey.ts`). Optional so every existing `ContentSource` (real or test
-   * fixture) keeps typechecking unchanged.
-   * TODO(M2.5a): wire this into `apps/web/src/adapters/content/bundled-content-source.ts`
-   * (`import tracks from '@chess-kids/content/tracks.json'`) and into its test fixtures.
-   */
+  /** Tracks/worlds/ranks catalog, used by `loadJourney`. Optional so an existing `ContentSource`
+   * fixture keeps typechecking unchanged. */
   catalog?(): TracksCatalog;
-  /**
-   * The badge catalogue (built from `packages/content/badges.yaml`, M4.4). Optional for the same
-   * reason `catalog` is: every existing `ContentSource` (real or test fixture) keeps typechecking
-   * unchanged; a fixture that never calls `evaluateBadges` simply never wires this up.
-   */
+  /** The badge catalogue. Optional for the same reason `catalog` is. */
   badges?(): readonly BadgeDef[];
 }
 
@@ -176,50 +146,28 @@ export interface Random {
   next(): number;
 }
 
-/**
- * The computer opponent for `versus` mini-games (Pawn Wars, …). Runs in a Web Worker on the web
- * (`docs/architecture.md` §2) so the search never blocks the UI thread; `level` is a `BotLevel.level`
- * (1 Mouse .. 5 Bear) and `seed` drives `domain/bot`'s deterministic `Random`, so the same position
- * + level + seed always replies with the same move. `null` only when the side to move has none.
- */
+/** The computer opponent for `versus` mini-games. Runs in a Web Worker so search never blocks the
+ * UI thread; same position + level + seed always replies with the same move (deterministic `Random`). */
 export interface BotPlayer {
   chooseMove(state: GameState, level: number, seed: number): Promise<Move | null>;
 }
 
-/**
- * Writes a backup file somewhere the parent can find again (M5.1 `app-structure.md` §11, mirrors
- * `PasswordFileWriter`'s own reasoning) — web downloads it; a Capacitor adapter can later write to
- * Documents instead. `filename`/`contents` (the backup JSON, already stringified) are computed by
- * `app/backup.ts` so naming stays a use-case concern, not an adapter one.
- */
+/** Writes a backup file somewhere the parent can find again — web downloads it, a Capacitor adapter
+ * could write to Documents. `filename`/`contents` are computed by `app/backup.ts`. */
 export interface BackupFileWriter {
   write(filename: string, contents: string): Promise<void>;
 }
 
-/**
- * Parent area "Import" (M5.1): replaces every locally stored profile/progress/reward/assessment
- * record with `file`'s own — atomically (`docs/architecture.md` §11: a web adapter stages the full
- * write, then swaps it in) so a failure partway never leaves mixed old/new data. Never touches the
- * parent password (`ParentLockRepository`) or `AppSettings.lastProfileId`/`suggestedLevels` — a
- * restored backup starts at the picker with fresh level suggestions, same as first-time storage.
- */
+/** Parent area "Import": replaces every locally stored record with `file`'s own, atomically (a web
+ * adapter stages the full write, then swaps it in) so a failure partway never leaves mixed data.
+ * Never touches the parent password or `AppSettings.lastProfileId`/`suggestedLevels`. */
 export interface BackupImporter {
   replaceAll(file: BackupFile): Promise<void>;
-  /**
-   * M7.2 device sharing (`app/merge.ts`'s `importMerged`, the only caller): atomically writes
-   * `file` as this device's *entire* new dataset — every local profile, whether touched by this
-   * merge or not, since `importMerged` has already read the full local state and folded the chosen
-   * children's merged data back into it. Same staging-then-swap mechanism as `replaceAll`
-   * (`docs/architecture.md` §11), but differs in two ways "replace" never needed: session-log rows
-   * are keyed by (profile, date, device) — `options.localDeviceId` says which of a profile's rows
-   * is *this* device's own, so a foreign device's row for the same day is stored alongside it, never
-   * overwriting it; and `options.deviceSettings` (this device's own current `lastProfileId`/
-   * `suggestedLevels`/`storagePersisted`/`deviceId`, read just before the write) is carried straight
-   * through instead of being blanked — a merge import never resets the device back to
-   * first-time-storage the way an M5.1 "replace everything" restore did. Optional for the same
-   * backward-compatible reason every other `AppDeps` port is (`app/merge.ts`'s `requireBackupImporter`
-   * throws a clear error without it, same pattern `app/backup.ts` already uses for `replaceAll`).
-   */
+  /** Device sharing (`app/merge.ts`'s `importMerged`): atomically writes `file` as this device's
+   * entire new dataset. Session-log rows are keyed by (profile, date, device) —
+   * `options.localDeviceId` says which rows are this device's own, so a foreign device's row for
+   * the same day is stored alongside it, never overwritten; `options.deviceSettings` is carried
+   * through unchanged rather than reset. Optional: `requireBackupImporter` throws without it. */
   writeMerged?(
     file: BackupFile,
     options: {

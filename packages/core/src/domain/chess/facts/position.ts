@@ -7,7 +7,7 @@ function opponentOf(color: Color): Color {
   return color === 'w' ? 'b' : 'w';
 }
 
-/** Standard piece values (`docs/curriculum.md` World 3 "Piece values"): P1 N3 B3 R5 Q9, king unused. */
+/** Standard piece values: P1 N3 B3 R5 Q9, king unused. */
 const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
 /** Standard value of a piece type (P1 N3 B3 R5 Q9); `k` has no trade value, reported as `0`. */
@@ -15,11 +15,8 @@ export function pieceValue(type: PieceType): number {
   return PIECE_VALUE[type];
 }
 
-/**
- * True when `square` is attacked by the opposing side: the occupant's own opponent if `square`
- * holds a piece, else the side not to move (an empty square's "danger" is from the mover's
- * opponent's point of view).
- */
+/** True when `square` is attacked by the opposing side: the occupant's own opponent if occupied,
+ * else the side not to move. */
 export function isAttacked(position: Position, square: Square, rules: ChessRules): boolean {
   const occupant = position.pieces[square];
   const by = opponentOf(occupant ? occupant.color : position.toMove);
@@ -40,13 +37,8 @@ export function isHanging(position: Position, square: Square, rules: ChessRules)
   return isAttacked(position, square, rules) && !isDefended(position, square, rules);
 }
 
-/**
- * True when the piece on `square` is safe: not attacked by a lower-value enemy piece, and either
- * not attacked at all or defended by its own side. Stricter than `!isHanging`: a piece defended
- * only by lower-value pieces than the attacker is still "safe" there, but one an enemy pawn (say)
- * attacks is never safe even when defended — trading it away would still be a bad trade for its
- * owner (`docs/curriculum.md` World 3 "Safe or not?" / "Trades"). `false` if empty.
- */
+/** True when the piece on `square` is safe: not attacked by a lower-value enemy piece, and either
+ * not attacked at all or defended. Stricter than `!isHanging`. `false` if empty. */
 export function isSafe(position: Position, square: Square, rules: ChessRules): boolean {
   const occupant = position.pieces[square];
   if (occupant === undefined) return false;
@@ -91,9 +83,7 @@ export function canCastle(
   );
 }
 
-/**
- * True when the side to move has at least one legal en passant capture right now.
- */
+/** True when the side to move has at least one legal en passant capture right now. */
 export function canEnPassant(position: Position, rules: ChessRules): boolean {
   if (position.enPassant === null) return false;
   return enPassantMoves(rules.legalMoves(position), position).length > 0;

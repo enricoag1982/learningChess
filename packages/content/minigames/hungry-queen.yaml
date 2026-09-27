@@ -1,8 +1,6 @@
 id: hungry-queen
 concept: queen-move
 unlockAfter: queen
-title: hungry-queen.title
-goal: hungry-queen.goal
 board: |
   n . . p . . . b
   . . . . . . . .

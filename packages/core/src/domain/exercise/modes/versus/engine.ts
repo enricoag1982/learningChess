@@ -31,10 +31,8 @@ export function versusEndReason(state: VersusState): string | undefined {
   return state.endReason;
 }
 
-/**
- * The underlying variant-game state (`domain/game`), for the caller that needs more than the bare
- * position — chiefly a `BotPlayer` adapter, whose `chooseMove` port takes this same shape.
- */
+/** The underlying variant-game state, for a caller that needs more than the bare position —
+ * chiefly a `BotPlayer` adapter, whose `chooseMove` port takes this same shape. */
 export function versusGameState(state: VersusState): VariantGameState {
   return current(state);
 }
@@ -59,11 +57,8 @@ function statusFor(result: GameResult, kidColor: Color): VersusStatus {
   return result.winner === kidColor ? 'won' : 'lost';
 }
 
-/**
- * Plays one ply — the kid's move or, once the bot has chosen one (`BotPlayer`), the bot's own —
- * against the shared variant-game rules. `rules` is plain `ChessRules` (no walls/static-opponent:
- * `versus` boards never use them), the same one `chooseMove` used to pick the bot's move.
- */
+/** Plays one ply — the kid's move or the bot's own — against the shared variant-game rules.
+ * `rules` is plain `ChessRules` (no walls/static-opponent: `versus` boards never use them). */
 export function playVersusMove(
   state: VersusState,
   rules: ChessRules,
@@ -92,12 +87,9 @@ export function playVersusMove(
   return { state: nextState, outcome: { kind: 'ended', move: played.move, status } };
 }
 
-/**
- * Take back: undoes the kid's last move and the bot's reply to it, returning to the kid's turn
- * before that move. Only ever offered while it is the kid's turn again with at least one full
- * round played (`docs/computer-opponent.md` §4: unlimited at Mouse/Rabbit, 3/game at Fox, none at
- * Wolf/Bear — the aid-level gate is the caller's job, this only guards the shape of `states`).
- */
+/** Take back: undoes the kid's last move and the bot's reply, returning to the kid's turn before
+ * that move. Only while it is the kid's turn again with a full round played; the per-level aid gate
+ * is the caller's job — this only guards the shape of `states`. */
 export function canTakeBack(state: VersusState): boolean {
   return state.status === 'playing' && isKidTurn(state) && state.states.length >= 3;
 }

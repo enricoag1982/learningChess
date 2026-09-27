@@ -96,12 +96,11 @@ apps/native        only if a native UI is ever needed; reuses core
 | Moves | SAN (e.g. `Rxa8#`) |
 | Bulk puzzles | Import script from Lichess puzzle database (CSV, CC0), filtered by theme/rating |
 
-Example:
+Example (`text` and `stars2` default — see domain-model.md §6 — shown here explicit-only where they differ):
 ```yaml
 id: rook-02
 concept: rook-move
 type: collect-stars
-text: rook-02          # key in locales/<lang>/lessons.yaml
 board: |               # rank 8 on top; * = star, x = blocked
   . . . . * . . .
   . . . . . . . .
@@ -112,7 +111,7 @@ board: |               # rank 8 on top; * = star, x = blocked
   . . . . . . . .
   R . . . . . . .
 stars3: 3              # moves for 3 stars
-stars2: 5
+stars2: 5              # explicit: default (stars3 + 1) doesn't match the optimal solve
 ```
 
 ## 7. Mobile path

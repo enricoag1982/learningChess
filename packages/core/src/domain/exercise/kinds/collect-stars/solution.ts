@@ -1,7 +1,7 @@
 import type { VariantRules } from '../../../variant/rules.ts';
 import { solve } from '../../solver.ts';
 import { anyKidSquare } from '../base.ts';
-import type { CollectStarsDef, MoveAction } from './def.ts';
+import type { CollectStarsDef, MoveAction } from './kind.ts';
 
 /** Shortest star-collecting line (solver), as the move-actions that play it. */
 export function collectStarsSolution(

@@ -16,6 +16,9 @@ import {
 } from './evaluate.ts';
 import type { BotLevel } from './levels.ts';
 
+// Alpha-beta move search (Bear adds tt/killers/history/null-move/LMR/quiescence; every other level
+// runs the plain search). See `docs/computer-opponent.md` §3/§8.
+
 function other(color: Color): Color {
   return color === 'w' ? 'b' : 'w';
 }
@@ -24,18 +27,10 @@ function sameMove(a: Move, b: Move): boolean {
   return a.from === b.from && a.to === b.to && (a.promotion ?? null) === (b.promotion ?? null);
 }
 
-/** No killer moves for this ply — a shared constant so `orderMoves`'s default parameter never
- * allocates a fresh array on the (common) call with none to offer. */
+// Shared constant so `orderMoves`'s default parameter never allocates on the common no-killers call.
 const NO_KILLERS: readonly Move[] = [];
 
-/** MVV score for a capture (highest-value victim first); `-1` for a non-capture, always below the
- * least valuable capture (pawn takes pawn scores `0`). Victim value only, no attacker (LVA)
- * tiebreak: adding one changed which of several same-value captures sorts first for every level,
- * not only Bear — and so, at Fox's shallow depth 2, which equally-scored move a `NEAR_BEST_MARGIN`
- * pool ends up offering `pickUniform`, which measurably (if narrowly) changed Fox's own endgame
- * conversion rate (`packages/content`'s `first-game` winnability check, 80% → 75% over 40 seeds) —
- * a real behaviour change to three levels with no documented speed problem, for a tiebreak whose
- * own benefit is marginal next to `tt`/`killers`/`quiesce` (Bear-only, see `negamax`). */
+// MVV score for a capture (highest-value victim first); -1 for a non-capture, below every capture.
 function captureScore(move: Move): number {
   if (move.captured === undefined) {
     return -1;
@@ -43,19 +38,12 @@ function captureScore(move: Move): number {
   return PIECE_VALUE[move.captured];
 }
 
-/** History-heuristic key: colour + from + to (no piece/promotion — a quiet move's own identity is
- * fully carried by which square moved where, for the colour whose history table this scores). */
+// History-heuristic key: colour + from + to (a quiet move's identity, no piece/promotion needed).
 function historyKey(move: Move): string {
   return `${move.color}${move.from}${move.to}`;
 }
 
-/** History heuristic (`docs/computer-opponent.md` §3/§8, Bear-only — see `negamax`'s doc comment
- * on why every one of these tables is scoped to Bear alone): a quiet move that caused a beta
- * cutoff anywhere in this `chooseBySearch` call, weighted by the depth it cut off at (a cutoff deep
- * in the tree says more than one a ply from a leaf), read back by `orderMoves` as a tiebreak below
- * captures/TT/killers — the same "try what worked before, elsewhere in the tree, first" idea as
- * killer moves, but keyed by the move itself (not just the ply) so it also helps order moves at a
- * *different* ply that killers never reach. */
+// Bear-only history heuristic: quiet moves that caused a cutoff elsewhere, weighted by depth.
 type HistoryTable = Map<string, number>;
 
 function recordHistory(history: HistoryTable, move: Move, depth: number): void {
@@ -63,17 +51,8 @@ function recordHistory(history: HistoryTable, move: Move, depth: number): void {
   history.set(key, (history.get(key) ?? 0) + depth * depth);
 }
 
-/**
- * Move ordering for one search node (`docs/computer-opponent.md` §3/§8 "Bear speed"): the
- * transposition-table move from a previous pass first (it is this node's best move so far — trying
- * it first lets alpha-beta prune the rest fastest), then captures by MVV-LVA, then this ply's
- * killer moves (quiet moves that caused a beta cutoff at the same ply elsewhere in the tree), then
- * every other quiet move by its history score (Bear only — `history` is `undefined` for every other
- * level, same as before this table existed), then the rest in generation order. Skips the sort on a
- * node where none of that applies (most nodes, deep in the tree, with no captures, no TT hit, no
- * killer and an empty/no history table) — cheap and worth checking first, since this runs at every
- * node.
- */
+// Move ordering: TT move first, then MVV captures, then this ply's killers, then history score
+// (Bear only), then generation order. Skips the sort when none of that applies to this node.
 function orderMoves(
   moves: readonly Move[],
   ttMove?: Move,
@@ -102,7 +81,7 @@ function orderMoves(
   return [...moves].sort((a, b) => score(b) - score(a));
 }
 
-/** Killer moves that caused a beta cutoff, per ply from the search root; at most `MAX_KILLERS_PER_PLY` each. */
+// Killer moves (caused a beta cutoff) per ply from the search root, at most MAX_KILLERS_PER_PLY each.
 type Killers = Move[][];
 
 const MAX_KILLERS_PER_PLY = 2;
@@ -122,9 +101,8 @@ function recordKiller(killers: Killers, ply: number, move: Move): void {
   }
 }
 
-/** One node's cached search result, keyed by `SearchBoard.hash()` (`docs/computer-opponent.md`
- * §3/§8): `exact` when the true value was found, `lower`/`upper` when only a bound was (the search
- * stopped early on a cutoff) — same fail-soft convention `negamax` already returns. */
+// One node's cached result, keyed by SearchBoard.hash(); `exact` when the true value was found,
+// `lower`/`upper` when only a bound was (search stopped early on a cutoff).
 interface TTEntry {
   readonly depth: number;
   readonly score: number;
@@ -134,20 +112,12 @@ interface TTEntry {
 
 type TranspositionTable = Map<bigint, TTEntry>;
 
-/** Any score at least this close to `WIN_SCORE` (either sign) is a mate score, not a material one
- * (`terminalScore` never returns anything between an ordinary material eval and `WIN_SCORE - a
- * handful of plies`) — used to convert a mate score to/from the TT's node-relative storage below. */
+// A score this close to WIN_SCORE is a mate score, not a material one; used to convert a mate
+// score to/from the TT's node-relative storage below.
 const MATE_THRESHOLD = WIN_SCORE - 200;
 
-/**
- * `terminalScore` counts mate distance from the whole search's root (`WIN_SCORE - plyFromRoot`),
- * so the same mate found again through a transposition at a *different* `plyFromRoot` is a
- * different number of plies away — storing the raw root-relative score in `tt` would return a
- * stale distance (or even the wrong side's mate) the next time it is probed. Converting to
- * node-relative (`score ± plyFromRoot`) before storing, and back after probing, keeps every mate
- * score correct regardless of which branch reaches that node. A plain material score is unaffected
- * (never close to `WIN_SCORE`), so this is a no-op for the overwhelming majority of nodes.
- */
+// terminalScore counts mate distance from the search root, so the same mate reached via a
+// transposition at a different plyFromRoot needs re-basing before it is stored / after it is read.
 function toTT(score: number, plyFromRoot: number): number {
   if (score >= MATE_THRESHOLD) {
     return score + plyFromRoot;
@@ -158,7 +128,7 @@ function toTT(score: number, plyFromRoot: number): number {
   return score;
 }
 
-/** Inverse of `toTT` — node-relative back to this probe's own root-relative distance. */
+// Inverse of `toTT`.
 function fromTT(score: number, plyFromRoot: number): number {
   if (score >= MATE_THRESHOLD) {
     return score - plyFromRoot;
@@ -169,66 +139,36 @@ function fromTT(score: number, plyFromRoot: number): number {
   return score;
 }
 
-/**
- * Bear-only search extras, bundled into one optional parameter instead of three separate ones
- * threaded through `negamax`/`quiesce`/`searchRoot`/`chooseBySearch` (`docs/computer-opponent.md`
- * §3/§8): `quiescenceDepth` (unchanged from before this bundle existed), `rules` (needed only to
- * build the position `negamax` searches after a null move — see `tryNullMove` — every other
- * function here already gets its board from the caller), and `history` (the table above).
- * `undefined` for every level but Bear, same as `quiescenceDepth` alone used to be — so this is a
- * rename, not a new behaviour, for anything that stays `undefined`.
- */
+// Bear-only search extras bundled into one optional param: quiescenceDepth, rules (to build the
+// post-null-move position) and the history table. undefined for every other level.
 interface BearSearch {
   readonly quiescenceDepth: number;
   readonly rules: ChessRules;
   readonly history: HistoryTable;
 }
 
-/** Plies of reduction for a null-move search (`tryNullMove`): standard `R = 2`. */
+// Null-move reduction (standard R = 2).
 const NULL_MOVE_REDUCTION = 2;
 
-/** Never tries a null move below this depth — `depth - 1 - NULL_MOVE_REDUCTION` must stay ≥ 0, and
- * a null move this close to a leaf has too little search left under it to say anything useful. */
+// Never null-moves below this depth: `depth - 1 - NULL_MOVE_REDUCTION` must stay >= 0.
 const NULL_MOVE_MIN_DEPTH = 3;
 
-/** A null move that flips `toMove` with nothing else changed would wrongly leave an en passant
- * capture on the table that was never really available (nobody just played the double step that
- * creates one) — standard null-move handling clears it. Castling rights are untouched: passing the
- * move affects neither side's own right to castle later. */
+// A null move must still clear en passant (nobody actually played the double step that made it
+// available); castling rights are untouched since passing affects neither side's own right.
 function nullMovePosition(position: Position): Position {
   return { ...position, toMove: other(position.toMove), enPassant: null };
 }
 
-/** Null-move pruning's own "not in a likely zugzwang" guard (`tryNullMove`): skip when the side to
- * move has only its king and pawns left, the position class where "passing" can be *better* than
- * every legal move (the whole idea a null move tests), so the pruning it enables is unsound there. */
+// Null-move pruning is unsound in likely zugzwang: skip when the side to move has only king+pawns.
 function hasNonPawnMaterial(pieces: Position['pieces'], color: Color): boolean {
   return Object.values(pieces).some(
     (piece) => piece.color === color && piece.type !== 'p' && piece.type !== 'k',
   );
 }
 
-/**
- * Null-move pruning (`docs/computer-opponent.md` §3/§8 "Bear speed"): before searching this node's
- * own moves, asks "if the side to move got a free pass, would the opponent's best reply still stay
- * at or below `beta`?" at a shallow, reduced depth. A wide-open, quiet, roughly-equal position is
- * exactly the case flagged in §6.5/§9 as Bear's weak spot — most legal moves there score near-
- * identically, which is also exactly when a free pass still fails to reach `beta`: the position was
- * never in danger of dropping below it in the first place, so the *actual* move search below can be
- * skipped outright. Returns a fail-soft score `>= beta` on a successful cutoff, `null` otherwise (no
- * conclusion — the normal move loop runs as usual). Guards: not in check (a null move cannot escape
- * one), not already searching for a mate score either side (`Math.abs(beta) < MATE_THRESHOLD` — a
- * null move's own shallow reply search is a poor judge of an actual mate line), and not a likely
- * zugzwang position (`hasNonPawnMaterial`). Builds a fresh `SearchBoard` from the flipped position
- * (`nullMovePosition`) rather than reaching into `board`'s own undo stack for a "move" that is not
- * really a legal chess move — cheap next to a real subtree, since this only ever runs at `depth >=
- * NULL_MOVE_MIN_DEPTH` (a handful of nodes near the root of Bear's own shallow, depth-4 tree, not
- * the hot per-node path the rest of this file is written for). At Bear's own shallow depth the
- * reduced verification is often no more than a single quiescence call (`depth - 1 - R` bottoms out
- * at 0) — measured (`packages/core/scripts/calibrate.ts`, `docs/computer-opponent.md` §9) against a
- * same-size baseline sample rather than trusted on theory alone, since a shallow-verification
- * technique like this is exactly the kind small-sample calibration noise can make look like a
- * regression (or an improvement) that a same-seed baseline comparison shows is not there. */
+// Null-move pruning: if the side to move got a free pass, would the reply still stay <= beta? If
+// so this node's real moves can be skipped. Guards: not in check, no mate score in flight, not
+// likely zugzwang (`hasNonPawnMaterial`). Returns a fail-soft score >= beta, or null (search as usual).
 function tryNullMove(
   board: SearchBoard,
   def: GameRulesDef,
@@ -266,40 +206,31 @@ function tryNullMove(
   return score >= beta ? score : null;
 }
 
-/** Late move reductions (`docs/computer-opponent.md` §3/§8 "Bear speed"): a quiet move ordered
- * late (`orderMoves` already tried the TT move, captures and killers first — by this index, none
- * of those explain why it might be good) is searched one ply shallower first; only a move that
- * still beats `alpha` at that reduced depth earns the full-depth re-search `negamax`'s own loop
- * would otherwise always pay for. Skips a move that gives check (a check is never "quiet" in the
- * sense this reduction assumes — it forces a reply, so judging it at a shallower depth is more
- * likely to misjudge it) and the first `LMR_FULL_MOVE_COUNT` moves at a node (ordering already put
- * the moves most likely to matter there). */
+// Late move reductions: a quiet move ordered late is searched one ply shallower first; only a
+// move that still beats alpha at that depth earns a full-depth re-search. Skips checks and the
+// first LMR_FULL_MOVE_COUNT moves (already tried first by ordering).
 const LMR_MIN_DEPTH = 3;
 const LMR_FULL_MOVE_COUNT = 3;
 const LMR_REDUCTION = 1;
 
-/** Thrown to unwind a search past its `TIME_BUDGET_MS` deadline (see `chooseBySearch`); caught
- * only where it is thrown from, so it never escapes as a real error. */
+// Thrown to unwind a search past its time budget; caught only where thrown, never escapes as an error.
 class SearchAborted extends Error {
   constructor() {
     super('search aborted: past its time budget');
   }
 }
 
-/** How often (in visited nodes) `negamax`/`quiesce` check the deadline — a `performance.now()`
- * call at every single node would itself cost more than it saves. */
+// How often (in visited nodes) the deadline is checked — a performance.now() call per node would
+// itself cost more than it saves.
 const DEADLINE_CHECK_INTERVAL = 256;
 
-/** Mutable node counter threaded through one `chooseBySearch`/`searchBestMove` call, so
- * `negamax`/`quiesce` can check the deadline every `DEADLINE_CHECK_INTERVAL` nodes without passing
- * the count back up through every return. */
+// Mutable node counter threaded through one search call so the deadline can be checked without
+// passing the count back up through every return.
 interface SearchClock {
   nodes: number;
   readonly deadline: number;
 }
 
-/** Ticks `clock` and throws `SearchAborted` once past `clock.deadline` (checked only ever
- * `DEADLINE_CHECK_INTERVAL` nodes — see `DEADLINE_CHECK_INTERVAL`). */
 function checkDeadline(clock: SearchClock): void {
   clock.nodes += 1;
   if (clock.nodes % DEADLINE_CHECK_INTERVAL === 0 && performance.now() >= clock.deadline) {
@@ -307,14 +238,8 @@ function checkDeadline(clock: SearchClock): void {
   }
 }
 
-/**
- * A move that immediately wins the game for its own colour (checkmate or a declared variant win).
- * Runs on every move for every level but Mouse, so this goes through the fast `SearchBoard`
- * (`ChessRules.play`/`legalMoves`/`status` each rebuild a chess.js instance and compute full SAN —
- * fine once per real move, far too slow to redo here for every candidate). `board.play` accepts a
- * `ChessRules`-sourced move like these `legalMoves` fine: it falls back to matching by square when
- * a move did not come from its own `moves()`.
- */
+// A move that immediately wins for its own colour. Runs per candidate for every level but Mouse,
+// so it uses the fast SearchBoard rather than rebuilding a chess.js instance each time.
 function findImmediateWin(
   def: GameRulesDef,
   board: SearchBoard,
@@ -339,10 +264,8 @@ function squaresOf(pieces: Position['pieces'], color: Color, type: PieceType): S
     .map(([square]) => square as Square);
 }
 
-/**
- * Drops queen moves from the candidate list during the level's opening "queen stays home" window,
- * unless the queen is currently attacked or moving it is the only legal option.
- */
+// Drops queen moves during the level's opening "queen stays home" window, unless the queen is
+// attacked or moving it is the only legal option.
 function applyQueenHome(
   moves: readonly Move[],
   state: GameState,
@@ -368,20 +291,12 @@ function applyQueenHome(
   return withoutQueen.length > 0 ? withoutQueen : [...moves];
 }
 
-/** Plies of captures-only search past `negamax`'s normal horizon, Bear only (`level.level === 5`,
- * `docs/computer-opponent.md` §3/§8: "Level 5 quiescence (captures only, depth-capped) at the
- * leaves"). Judges a trade sequence started right at the search's own edge by where it actually
- * settles, instead of a static snapshot mid-exchange. Depth-capped so a wide-open middlegame with
- * many captures on the board still terminates quickly. */
+// Plies of captures-only search past negamax's horizon, Bear only; depth-capped so a wide-open
+// middlegame with many captures still terminates quickly.
 const QUIESCENCE_DEPTH = 4;
 
-/**
- * Captures-only search from a leaf `negamax` would otherwise statically evaluate (Bear's own
- * "capture check", see `QUIESCENCE_DEPTH`). Standard "stand pat" quiescence: the static value
- * always is a legal score (the side to move need not capture), so it bounds `alpha` from below
- * before any capture is tried; recursion is capped by `depthLeft`, not only by running out of
- * captures, so it always terminates.
- */
+// Standard "stand pat" quiescence: the static value already bounds alpha from below (the side to
+// move need not capture), then captures are tried until depthLeft runs out.
 function quiesce(
   board: SearchBoard,
   def: GameRulesDef,
@@ -425,9 +340,7 @@ function quiesce(
         clock,
       );
     } finally {
-      // Always undo, even when `clock`'s deadline throws `SearchAborted` out of the recursive
-      // call: `board` is shared for the rest of this `chooseBySearch` call (`preferSafe`, the next
-      // depth's pass), so it must never be left with an un-undone move on an abort.
+      // Always undo, even on an aborted search: `board` is shared for the rest of this call.
       board.undo();
     }
     if (score >= beta) {
@@ -440,26 +353,9 @@ function quiesce(
   return localAlpha;
 }
 
-/**
- * Alpha-beta negamax. Checks `evaluateTerminal` at every node (a variant can win mid-tree, e.g.
- * capturing the flagged piece), not only at the leaves; `needsPieces` skips building the (more
- * costly) piece map for that check when the def has no such condition, which plain chess never
- * does — only checkmate, decided from the legal-move count and check flag alone.
- *
- * `tt`/`killers`/`quiesce`/null-move/LMR/history (`docs/computer-opponent.md` §3/§8/§9 "Bear
- * speed"/"Bear strength") are all scoped to Bear (`bear !== undefined`, this call's `useTt`) and
- * nowhere else: `tt` caches each node's
- * result by `SearchBoard.hash()` so a cutoff-strength entry (depth ≥ what is needed here)
- * short-circuits the node outright, its move seeding `orderMoves` even below that depth; `killers`
- * feeds the same ordering with quiet moves that cut off a sibling node at this ply before.
- * Rabbit/Fox/Wolf skip both and keep exactly their pre-M4.2 search: `tt`/`killers` reorder
- * equally-scored quiet moves (the *value* alpha-beta returns is unaffected — a transposition table
- * only prunes on a provably safe bound — but *which* equally-good move a shallow, `NEAR_BEST_MARGIN`
- * near-best pool then contains can shift), which measurably changed Fox's own endgame conversion
- * rate in `packages/content`'s `first-game` winnability check (80% → 75% over 40 seeds) — a cost
- * with no offsetting benefit at these levels, whose unoptimised depths (2-3) were never slow. Bear
- * (depth 4 + this quiescence) is the one level `docs/architecture.md` §11 actually flags as slow.
- */
+// Alpha-beta negamax. Checks evaluateTerminal at every node (a variant can win mid-tree, not only
+// at the leaves). tt/killers/quiesce/null-move/LMR/history are Bear-only (`bear !== undefined`);
+// every other level runs its original, unoptimised search unchanged.
 function negamax(
   board: SearchBoard,
   def: GameRulesDef,
@@ -540,9 +436,6 @@ function negamax(
     board.play(move);
     let score: number;
     try {
-      // Late move reductions (Bear only, `LMR_MIN_DEPTH`'s own doc comment): a quiet move this far
-      // down the already-good-first ordering, that does not itself give check, is tried one ply
-      // shallower first — only re-searched at the full depth below when that still beats alpha.
       const isQuiet = move.captured === undefined;
       const isPriority =
         (ttEntry?.move !== undefined && sameMove(move, ttEntry.move)) ||
@@ -641,7 +534,7 @@ function chooseShallow(
   return pickUniform(top, random);
 }
 
-/** Opponent's best immediate capture value after this move, as a simple "does this hang a piece?" check. */
+// Opponent's best immediate capture value after this move — a simple "does this hang a piece?" check.
 function hangRisk(board: SearchBoard): number {
   let risk = 0;
   for (const reply of board.moves()) {
@@ -652,7 +545,7 @@ function hangRisk(board: SearchBoard): number {
   return risk;
 }
 
-/** Bear's "capture check": among the near-best moves, prefer the ones that leave the least hanging. */
+// Bear's "capture check": among the near-best moves, prefer the ones that leave the least hanging.
 function preferSafe(pool: readonly ScoredMove[], board: SearchBoard): ScoredMove[] {
   const withRisk = pool.map((entry) => {
     board.play(entry.move);
@@ -665,34 +558,17 @@ function preferSafe(pool: readonly ScoredMove[], board: SearchBoard): ScoredMove
 }
 
 const NEAR_BEST_MARGIN = 0.3;
-/** Bear's own near-best margin: much tighter than `NEAR_BEST_MARGIN` (see `nearBestMargin`). */
+// Bear's own near-best margin: much tighter than NEAR_BEST_MARGIN (see `nearBestMargin`).
 const BEAR_NEAR_BEST_MARGIN = 0.05;
 
-/**
- * How close to the best score still counts as "near-best" (`chooseBySearch`'s pool, picked from
- * uniformly). `NEAR_BEST_MARGIN` for every search-based level but Bear, unchanged from before
- * M4.2 (Rabbit/Fox/Wolf's own play stays exactly as it was — see `negamax`'s own doc comment on
- * why `tt`/`killers` are scoped the same way). Calibration (`docs/computer-opponent.md` §8) showed
- * `NEAR_BEST_MARGIN` alone was far too loose for Bear once real self-play made testing it possible
- * for the first time: at a quiet position with no immediate tactics, `staticEval`'s own centre/
- * development bonuses are small (0.1-0.15 each), so 0.3 swept in nearly every legal move — 25 of
- * ~29 in one measured case, including outright bad ones (an aimless king move, a knight to the
- * rim) — and `bear vs wolf` won only 2/20 seeded games as a result, worse than chance. Bear is
- * the one level meant to "play sensibly" (`docs/computer-opponent.md` §2) at its strongest, so it
- * keeps a little variety (never fully deterministic) with a much narrower pool instead.
- */
+// Bear needs a much narrower near-best pool than the other levels to avoid picking outright weak
+// moves while still keeping some variety (never fully deterministic).
 function nearBestMargin(level: BotLevel): number {
   return level.level === 5 ? BEAR_NEAR_BEST_MARGIN : NEAR_BEST_MARGIN;
 }
 
-/**
- * One depth of the root move loop: alpha rises across siblings as usual so pruning actually
- * engages (root search is otherwise close to unpruned: the first ply never repeats a position to
- * reuse a bound from). A move that fails low only gets a bound, not an exact score, but that bound
- * is already below `alpha - NEAR_BEST_MARGIN`, so it is correctly excluded from the near-best pool
- * either way. `tt`/`killers` persist across the whole iterative-deepening run (`chooseBySearch`),
- * so a shallower pass's results seed a deeper pass's move ordering.
- */
+// One depth of the root move loop: alpha rises across siblings so pruning engages even though the
+// root itself repeats no position. tt/killers persist across the whole iterative-deepening run.
 function searchRoot(
   ordered: readonly Move[],
   board: SearchBoard,
@@ -735,28 +611,13 @@ function searchRoot(
   return scored;
 }
 
-/** Wall-clock budget for one `chooseBySearch` call (`docs/computer-opponent.md` §3/§8 "Bear
- * speed"). `checkDeadline` (via `clock`) can abort mid-depth, not only between depths — a single
- * depth-4 pass can itself run well past budget (measured ~1-4s unbounded on a middlegame position,
- * against this 250ms target), so an abort has to be able to interrupt it. An aborted depth's
- * partial `scored` is always discarded (`chooseBySearch`'s `catch`, `searchRoot`'s own
- * `board.undo()` on the way out keeps `board` itself consistent either way) — `chooseBySearch`
- * only ever uses a depth's results once that whole depth finished, so every depth it does use is a
- * complete, exact alpha-beta pass. The move that pass returns is therefore a deterministic function
- * of the position and seed (`docs/computer-opponent.md` §1 "Testable"); only *how many* depths a
- * call completes before the deadline can vary with machine load — `tt`/`killers` (plus the
- * reference-set performance test) keep that at `level.depth` on essentially every position on a
- * CI-sized machine, so this almost never actually bites in practice. */
+// Wall-clock budget for one chooseBySearch call; checkDeadline can abort mid-depth since a single
+// depth-4 pass can itself run well past it. Only a fully completed depth's result is ever used, so
+// the chosen move stays a deterministic function of the position and seed.
 const TIME_BUDGET_MS = 250;
 
-/**
- * Searches to `level.depth`, one ply at a time (iterative deepening): each shallower pass orders
- * the next one by its own best-first, so alpha rises quickly once the real depth is reached and
- * most root siblings cut off fast, instead of the near-unpruned root a single depth-4 pass is.
- * The shallow passes this repeats are cheap next to the final one (each roughly a `branching`th of
- * the next), so the added work is small next to what better ordering saves. A single transposition
- * table and killer-move table are shared across every depth in this call (see `TIME_BUDGET_MS`).
- */
+// Iterative deepening to level.depth: each shallower pass orders the next by its own best-first,
+// so alpha rises quickly and most root siblings cut off fast. tt/killers are shared across depths.
 function chooseBySearch(
   candidates: readonly Move[],
   board: SearchBoard,
@@ -780,9 +641,8 @@ function chooseBySearch(
       scored = searchRoot(ordered, board, def, needsPieces, depth, tt, killers, bear, clock);
     } catch (error) {
       if (error instanceof SearchAborted) {
-        // Past budget mid-depth: `board` is already back to this call's own position (every
-        // `board.play` on the aborted path was undone on the way out — see `negamax`/`quiesce`'s
-        // `finally`), and `scored` still holds the last depth that fully completed.
+        // Past budget mid-depth: board is already undone back to this call's own position, and
+        // `scored` still holds the last depth that fully completed.
         break;
       }
       throw error;
@@ -793,9 +653,7 @@ function chooseBySearch(
     }
   }
   if (scored.length === 0) {
-    // Defensive only: even depth 1 never completed before the deadline (Bear's own quiescence
-    // could in principle explode on a position with long forced capture chains). Falls back to a
-    // plain 1-ply choice so a move is still returned — legal, if not this level's usual strength.
+    // Defensive only: even depth 1 never completed. Falls back to a plain 1-ply choice.
     return chooseShallow(candidates, board, def, random);
   }
   const best = Math.max(...scored.map((entry) => entry.score));
@@ -809,13 +667,8 @@ function chooseBySearch(
   );
 }
 
-/**
- * The single best move at `depth` plies for the side to move, by the same iterative-deepening
- * alpha-beta search `chooseBySearch` uses — but no randomness and no near-best pool: exactly one,
- * highest-scoring move. Used by `mateHint` (`domain/bot/hint.ts`), not by `chooseMove`'s own
- * probability-weighted levels. No time budget (a depth-2 hint search never approaches one) and no
- * quiescence (a shallow nudge, not Bear's own tactical check).
- */
+/** Best move at `depth` plies by the same search `chooseBySearch` uses, but no randomness and no
+ * near-best pool — used by `mateHint`, not by `chooseMove`'s probability-weighted levels. */
 export function searchBestMove(state: GameState, rules: ChessRules, depth: number): Move | null {
   const legalMoves = rules.legalMoves(state.position);
   if (legalMoves.length === 0) {
@@ -841,14 +694,8 @@ export function searchBestMove(state: GameState, rules: ChessRules, depth: numbe
   return best?.move ?? null;
 }
 
-/**
- * Picks the level's next move. `alwaysMateInOne` levels take a forced mate (or immediate variant
- * win) first; then, while `level.book` and `book` (the compiled `bot-book.yaml`, passed in — see
- * `BotBook`) still has a line matching the game so far, a book move; otherwise a die roll against
- * `random` / `shallow` / the rest (search) picks the mode, after the "queen stays home" window (if
- * any) trims the candidate list. `null` only when there is no legal move at all (the caller should
- * not still be asking).
- */
+/** Picks the level's next move: a forced mate/variant win first (if `alwaysMateInOne`), then a
+ * book move, then random / shallow / search by die roll. `null` only with no legal move at all. */
 export function chooseMove(
   state: GameState,
   level: BotLevel,

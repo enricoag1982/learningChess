@@ -6,6 +6,8 @@ export const miniGameCommonFields = {
   id: keySchema,
   concept: keySchema,
   unlockAfter: keySchema,
-  title: textRefSchema,
-  goal: textRefSchema,
+  /** Defaults to `<id>.title` when absent. */
+  title: textRefSchema.optional(),
+  /** Defaults to `<id>.goal` when absent. */
+  goal: textRefSchema.optional(),
 };

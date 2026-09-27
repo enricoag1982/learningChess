@@ -13,10 +13,10 @@ export type {
 
 export type { ExerciseState } from './engine.ts';
 export type { MoveOutcome } from './kinds/static-move.ts';
-export type { MateInNOutcome } from './kinds/mate-in-n/def.ts';
+export type { MateInNOutcome } from './kinds/mate-in-n/kind.ts';
 export type { Hint } from './hint.ts';
-export type { SelectionResult } from './kinds/select-squares/def.ts';
-export type { PlaceOutcome, PalettePiece } from './kinds/setup/def.ts';
+export type { SelectionResult } from './kinds/select-squares/kind.ts';
+export type { PlaceOutcome, PalettePiece } from './kinds/setup/kind.ts';
 export {
   startExercise,
   exerciseMoves,
@@ -57,10 +57,10 @@ export type {
   SubmitAction,
   SelectSquaresAction,
   SelectOutcome,
-} from './kinds/select-squares/def.ts';
-export type { AnswerYesNoAction } from './kinds/yes-no/def.ts';
-export type { AnswerChoiceAction } from './kinds/choice/def.ts';
-export type { PlaceAction } from './kinds/setup/def.ts';
+} from './kinds/select-squares/kind.ts';
+export type { AnswerYesNoAction } from './kinds/yes-no/kind.ts';
+export type { AnswerChoiceAction } from './kinds/choice/kind.ts';
+export type { PlaceAction } from './kinds/setup/kind.ts';
 
 export { kingSquare } from '../chess/facts/pieces.ts';
 export {

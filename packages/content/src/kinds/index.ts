@@ -15,7 +15,7 @@ import { selectSquares } from './select-squares/content.ts';
 import { setup } from './setup/content.ts';
 import { yesNo } from './yes-no/content.ts';
 
-export type { ChoiceOptionYaml } from './choice/schema.ts';
+export type { ChoiceOptionYaml } from './choice/content.ts';
 export type { CompileContext } from './kind-content.ts';
 
 /** Any exercise kind's content, widened from its own precise type. */

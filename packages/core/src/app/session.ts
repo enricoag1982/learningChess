@@ -30,7 +30,7 @@ function poolsFor(
   return pools;
 }
 
-/** Today's warm-up tasks (domain-model.md §3.1): `[]` when no concept is in review. */
+/** Today's warm-up tasks: `[]` when no concept is in review. */
 export function planWarmUp(
   lessons: readonly Lesson[],
   conceptStats: readonly ConceptStats[],
@@ -57,7 +57,7 @@ export async function loadWarmUp(
   return planWarmUp(lessons, conceptStats, deps.clock.now(), deps.random);
 }
 
-/** Practice screen's default task count for one topic run (domain-model.md §3.3 "Practice screen"). */
+/** Practice screen's default task count for one topic run. */
 export const PRACTICE_TASK_COUNT = 5;
 
 /** Loads `count` Practice tasks for one concept (see `pickPracticeTasks`). */
@@ -75,7 +75,7 @@ export async function loadPracticeTasks(
   return pickPracticeTasks(conceptId, pool, stats?.lastExerciseId, count, deps.random);
 }
 
-/** One activity of a Today session, in play order (domain-model.md §3.3). */
+/** One activity of a Today session, in play order. */
 export type TodayActivity =
   | { readonly kind: 'warmup'; readonly tasks: readonly ConceptTask[] }
   | { readonly kind: 'lesson'; readonly lesson: Lesson }
@@ -87,12 +87,8 @@ export interface TodaySessionPlan {
   readonly activities: readonly TodayActivity[];
 }
 
-/**
- * Picks the session's one mini-game (domain-model.md §3.3 "Today session"): the most recently
- * unlocked one with best stars < 3, else the most recently unlocked one regardless of stars;
- * `undefined` when nothing is unlocked yet. "Recently" is unlock order: world order, then lesson
- * order within it — the same order lessons are authored and taught in.
- */
+/** Picks the session's one mini-game: the most recently unlocked one with best stars < 3, else the
+ * most recently unlocked one regardless; `undefined` when nothing is unlocked yet. */
 function pickSessionMiniGame(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
@@ -135,12 +131,8 @@ function pickSessionMiniGame(
   return (needsPlay ?? ranked[0])?.minigame;
 }
 
-/**
- * Plans a Today session (domain-model.md §3.3): warm-up (if any concept is due or weak) → the
- * Journey's next step (a lesson, or a pending world boss — same as {@link nextStep}) → one mini-game
- * (see `pickSessionMiniGame`), skipping any activity that has nothing to offer. Pure: every input is
- * already-loaded data, nothing is read or written here (see `loadTodaySession` for the async wrapper).
- */
+/** Plans a Today session: warm-up (if due/weak) → the Journey's next step ({@link nextStep}) → one
+ * mini-game (`pickSessionMiniGame`), skipping any activity with nothing to offer. Pure. */
 export function planTodaySession(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
@@ -150,7 +142,7 @@ export function planTodaySession(
   conceptStats: readonly ConceptStats[],
   now: Date,
   random: Random,
-  /** Lesson/world ids unlocked out of order by a test-out/placement/parent unlock (M4.5). */
+  /** Lesson/world ids unlocked out of order by a test-out/placement/parent unlock. */
   unlocked?: ReadonlySet<string>,
 ): TodaySessionPlan {
   const activities: TodayActivity[] = [];

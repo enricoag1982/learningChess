@@ -1,7 +1,7 @@
 import type { VariantRules } from '../../../variant/rules.ts';
 import { solve } from '../../solver.ts';
 import { anyKidSquare } from '../base.ts';
-import type { CaptureDef, MoveAction } from './def.ts';
+import type { CaptureDef, MoveAction } from './kind.ts';
 
 /** Shortest capture-everything line (solver), as the move-actions that play it. */
 export function captureSolution(def: CaptureDef, ctx: VariantRules): readonly MoveAction[] {

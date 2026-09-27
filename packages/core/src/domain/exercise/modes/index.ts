@@ -1,8 +1,5 @@
-/**
- * The mini-game-mode registry — the only place mode-type dispatch happens in `packages/core`.
- * `boss-result.ts`'s legacy functions go through `modeOf`/`MINI_GAME_MODES` instead of their own
- * `if` chain on `state.mode`.
- */
+// The mini-game-mode registry — the only place mode-type dispatch happens. `boss-result.ts`'s
+// legacy functions go through `modeOf`/`MINI_GAME_MODES` instead of their own `if` chain.
 import type { MiniGameMode } from '../mode.ts';
 import type { GameState, StaticCaptureGameDef } from './static/def.ts';
 import { staticMode } from './static/mode.ts';
@@ -15,9 +12,8 @@ import { versusMode } from './versus/mode.ts';
 export type MiniGameState = GameState | SeriesGameState | VersusState;
 export type ModeType = MiniGameState['mode'];
 
-/** Every mode's implementation, by `mode`. Only 3 modes exist (no per-mode action union to key off,
- * unlike exercise kinds — modes' own actions stay named functions), so this is spelled out rather
- * than derived through a generic `ChessMode<T>` helper. */
+/** Every mode's implementation, by `mode`. Only 3 exist, so this is spelled out rather than derived
+ * through a generic helper. */
 export const MINI_GAME_MODES = {
   static: staticMode,
   series: seriesMode,

@@ -10,11 +10,8 @@ interface ExerciseBase {
   readonly position: Position;
   /** Id of an entry in the lesson's `variants`, offered after `EASIER_AFTER_ERRORS` errors on this (scored) exercise. */
   readonly easier?: string;
-  /**
-   * The opponent's last move, display only (M4.1): the board highlights `from`/`to` from the start,
-   * before the kid's own first move — needed for en passant, so the kid sees the double step that
-   * makes the capture legal. Never affects legality or scoring; loader-checked against `position`.
-   */
+  /** The opponent's last move, display only: the board highlights `from`/`to` from the start —
+   * needed for en passant, so the kid sees the double step that makes the capture legal. */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
 }
 
@@ -35,12 +32,9 @@ export interface CaptureDef extends ExerciseBase {
 /** Tap the correct set of squares. */
 export interface SelectSquaresDef extends ExerciseBase {
   readonly type: 'select-squares';
-  /**
-   * Explicit answer, or derived from the position: every legal destination of the piece on `from`
-   * (`legal-moves`), every square the piece on `from` attacks, own or enemy pieces included
-   * (`attacked-by`), or every square the side to move's king can legally move to, position must
-   * have that king in check (`check-escapes`).
-   */
+  /** Explicit answer, or derived: every legal destination of the piece on `from` (`legal-moves`),
+   * every square it attacks (`attacked-by`), or every escape square with the king in check
+   * (`check-escapes`). */
   readonly answer:
     | { readonly squares: readonly Square[] }
     | { readonly derive: 'legal-moves'; readonly from: Square }
@@ -82,11 +76,8 @@ export interface SetupDef extends ExerciseBase {
   readonly target: Position;
 }
 
-/**
- * Deliver checkmate under real chess rules (both kings, real turn alternation — never a static
- * opponent). `line` is the full scripted sequence in SAN — kid move, opponent reply, kid move, …,
- * final kid move (which mates) — so `line.length === 2 * n - 1`.
- */
+/** Deliver checkmate under real chess rules (both kings, real turn alternation). `line` is the full
+ * scripted SAN sequence: kid, opponent, kid, …, final kid move that mates (`length === 2*n - 1`). */
 export interface MateInNDef extends ExerciseBase {
   readonly type: 'mate-in-n';
   readonly n: number;

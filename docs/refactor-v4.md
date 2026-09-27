@@ -104,7 +104,7 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 |---|---|---|
 | Files to add an exercise type | ≈ 15 in 4 packages | 1 folder + 1 registry line |
 | Type / mode dispatch sites | ≈ 45 | registries only (≤ 4) |
-| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k: R3a adds per-kind files + legacy facades; recover with core / content compaction (comments, tiny files, dead code) and R3b facade removal) |
+| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction); next: web B / C, R3b facade removal) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
 | Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |

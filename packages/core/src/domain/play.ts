@@ -2,23 +2,17 @@ import type { Lesson, MiniGame } from './lesson.ts';
 import { lessonStatus } from './progress.ts';
 import type { LessonProgress, Stars } from './progress.ts';
 
-/** One mini-game's Play-screen state (app-structure.md §7: "Mini-game appears in Play after its lesson"). */
+/** One mini-game's Play-screen state. */
 export interface UnlockedMiniGame {
   readonly minigame: MiniGame;
   readonly unlocked: boolean;
-  /**
-   * Best stars from the unlocking lesson's own boss slot (`LessonProgress.bossStars`) — every
-   * mini-game in content is exactly one lesson's boss, so this is a real (if possibly stale)
-   * lower bound. The Play screen merges in the profile's stored `MiniGameProgress`, taking
-   * whichever of the two is higher, so a play made straight from Play still counts.
-   */
+  /** Best stars from the unlocking lesson's own boss slot — a possibly-stale lower bound; the Play
+   * screen merges in the stored `MiniGameProgress`, taking whichever is higher. */
   readonly bestStars: Stars;
 }
 
-/**
- * Every mini-game in content, with whether its `unlockAfter` lesson is complete (or mastered) and
- * that lesson's boss best stars so far.
- */
+/** Every mini-game in content, with whether its `unlockAfter` lesson is complete (or mastered) and
+ * that lesson's boss best stars so far. */
 export function unlockedMiniGames(
   lessons: readonly Lesson[],
   minigames: readonly MiniGame[],

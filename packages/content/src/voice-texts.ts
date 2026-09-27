@@ -1,23 +1,6 @@
-/**
- * Inventory of every narrated string (`docs/voice.md`): every `apps/web/src` call site of
- * `narrator.speak(...)` / `useNarratedText(...)` (~26, found by grep + manual trace), resolved to
- * literal English text via the same locale content the app renders from, deduped by `voiceKey`
- * (`packages/core`). `scripts/voice-texts.ts` writes this to `dist/voice-texts.json` and prints
- * the report; that report should be read before running `tools/voice/generate.py` on its output.
- *
- * Sources:
- * 1. Lesson/mini-game content (story, demo, guided/exercise/variant instructions, boss goals,
- *    series-round instructions) — one literal string per content entry, no templating.
- * 2. UI "owl line" templates (Home/Journey/Play/Assessment/Placement/Celebration/Den) — each is a
- *    single i18next key, expanded over the *bounded* domain of its variables (character/lesson/
- *    world/mini-game/badge names, bot level names, piece labels, small counts), derived from
- *    compiled content, never guessed.
- * 3. Two runtime string *concatenations* outside i18next (not a single `t()` call, so no manifest
- *    key can match them verbatim): the exercise instruction+feedback-note line (`exercise-text.ts`,
- *    every exercise × ~15 note shapes — unbounded, intentionally skipped, logged below: those reads
- *    fall back to Web Speech, same as any other narrated text with no generated audio) and the Den
- *    badge name+tier/condition line (bounded: 25 badges × ≤3 tiers/thresholds — expanded in full).
- */
+// Inventory of every narrated string, resolved to literal English text via the same locale content
+// the app renders from, deduped by `voiceKey`: content strings, UI "owl line" templates expanded
+// over each bounded domain, and runtime string concatenations outside i18next expanded to match.
 import type {
   BadgeDef,
   CompiledContent,
@@ -37,7 +20,7 @@ export interface InventoryEntry {
   readonly source: string;
 }
 
-/** A template whose bounded variable domain could not be established (or was too large) — logged, not generated. */
+/** A template whose bounded variable domain could not be established — logged, not generated. */
 export interface SkippedTemplate {
   readonly source: string;
   readonly reason: string;
@@ -48,12 +31,8 @@ export interface VoiceInventory {
   readonly skipped: readonly SkippedTemplate[];
 }
 
-// ---------------------------------------------------------------------------------------------
-// Minimal i18next-alike resolver: namespace (before `:`, default `common`) + dot path, `_one`/
-// `_other` pluralisation keyed on a `count` var, `{{var}}` interpolation. Covers exactly what this
-// app's own locale content uses (checked against `packages/content/locales/en/*.yaml`) — not a
-// general-purpose i18next reimplementation.
-// ---------------------------------------------------------------------------------------------
+// Minimal i18next-alike resolver: namespace + dot path, `_one`/`_other` pluralisation on a `count`
+// var, `{{var}}` interpolation. Covers exactly what this app's locale content uses.
 
 function resolveTree(tree: LocaleTree, dotPath: string): string | LocaleTree | undefined {
   let node: LocaleTree | string = tree;
@@ -73,9 +52,8 @@ function interpolate(template: string, vars: Readonly<Record<string, string | nu
   });
 }
 
-/** Grown-up-only strings (`docs/non-functional.md` §3: parent area, password, backup, privacy
- * policy) are never narrated to the kid — enforced here, not just by omission below, so a future
- * source added without checking this rule fails loudly instead of silently narrating one. */
+/** Grown-up-only strings are never narrated to the kid — enforced here so a future source added
+ * without checking this rule fails loudly instead of silently narrating one. */
 const EXCLUDED_KEY_PREFIXES = ['parent.', 'new-player.', 'backup.', 'privacy.'];
 
 /** Resolves `fullKey` (e.g. `lessons:rook.story`, or `home.owl-next` for the default `common` namespace) to text. */
@@ -109,14 +87,10 @@ function resolve(
   return interpolate(node, vars);
 }
 
-// ---------------------------------------------------------------------------------------------
-// Domains derived from content (never guessed — `docs/roadmap.md`/CLAUDE.md content-review rule).
-// ---------------------------------------------------------------------------------------------
+// Domains derived from content, never guessed.
 
-/** `apps/web/src/ui/art/character-meta.ts`'s `CHARACTER_PIECE` (single-letter `PieceType`, matches
- * the `piece.<letter>` locale keys — see `common.yaml`'s `piece:` block) — kept in sync by
- * `lessons.test.ts` covering every lesson character, so a future character shows up here as a new
- * lesson too, not silently falling through to the "Owl-taught" branch below. */
+/** Mirrors `apps/web/src/ui/art/character-meta.ts`'s `CHARACTER_PIECE` — kept in sync by
+ * `lessons.test.ts` covering every lesson character. */
 const CHARACTER_PIECE: Readonly<Record<string, string>> = {
   rhino: 'r',
   elephant: 'b',
@@ -132,9 +106,8 @@ function characterPieceOf(character: string): string | null {
 
 const PIECE_CHARACTERS = new Set(Object.keys(CHARACTER_PIECE));
 
-/** `apps/web/src/ui/lesson-character-labels.ts`'s `unlockLabel`/`journeyNodeLabel` rule: an
- * Owl-taught lesson (World 1, no piece character) is named by its own title; a piece character's
- * *first* lesson is named by the character; every later lesson of that character by its own title. */
+/** An Owl-taught lesson is named by its own title; a piece character's first lesson is named by
+ * the character; every later lesson of that character by its own title. */
 function lessonDisplayName(
   locales: Locales,
   lesson: { character: string; titleKey: string },
@@ -144,8 +117,7 @@ function lessonDisplayName(
     : resolve(locales, lesson.titleKey);
 }
 
-/** `docs/computer-opponent.md` §3: fixed Mouse → Bear ladder, mirrored here (not re-exported from
- * `@chess-kids/core`, so kept as the same 5-name literal the domain layer itself uses). */
+/** Fixed Mouse → Bear ladder, mirrored here (not re-exported from `@chess-kids/core`). */
 const BOT_LEVEL_NAMES = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'] as const;
 
 const PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
@@ -163,17 +135,12 @@ function levelConditionTexts(locales: Locales): readonly string[] {
   ];
 }
 
-// ---------------------------------------------------------------------------------------------
-// Collection.
-// ---------------------------------------------------------------------------------------------
-
 function addText(entries: Map<string, InventoryEntry>, text: string, source: string): void {
   if (text.trim() === '') return;
   const key = voiceKey(text);
   const existing = entries.get(key);
   if (existing !== undefined && existing.text !== text) {
-    // sha256 collision on genuinely different text — astronomically unlikely at this inventory's
-    // scale; fail loudly rather than silently dropping one of the two texts' audio.
+    // sha256 collision on genuinely different text — fail loudly rather than silently drop audio.
     throw new Error(`voice-texts: key collision between "${existing.text}" and "${text}"`);
   }
   entries.set(key, { key, text, source });
@@ -287,9 +254,7 @@ function collectUiTemplates(
       'play',
     );
   }
-  // `unlockLabel` (`lesson-character-labels.ts`): the piece word for a piece character's *first*
-  // lesson, else the lesson's own title — same rule as `lessonDisplayName` above, restated here
-  // because `unlockLabel` uses the piece *word* ("Rook"), not the character *name* ("Rhino").
+  // `unlockLabel`: the piece word for a piece character's first lesson, else the lesson's title.
   const firstLessonOfCharacter = new Map<string, string>();
   for (const lesson of content.lessons) {
     if (!firstLessonOfCharacter.has(lesson.character)) {
@@ -396,8 +361,7 @@ function collectUiTemplates(
     );
   }
 
-  // Plain owl lines with no variables (Session summary / Time limit / Practice / Den / Play /
-  // Friend setup / First run) — included for completeness; `resolve` throws if any stop resolving.
+  // Plain owl lines with no variables, included for completeness.
   for (const key of [
     'session.summary-closing',
     'time-limit.body',
@@ -412,7 +376,7 @@ function collectUiTemplates(
     addText(entries, resolve(locales, key), 'owl-line');
   }
 
-  // Time limit "too early" (M7.1): bounded by the parent's "Not before" options.
+  // Time limit "too early": bounded by the parent's "Not before" options.
   for (const time of PLAY_FROM_OPTIONS) {
     if (time !== null)
       addText(entries, resolve(locales, 'time-limit.early-body', { time }), 'owl-line');
@@ -420,9 +384,7 @@ function collectUiTemplates(
 }
 
 /** Den's badge tile: `${name}` / `${name}, <tier>` when earned, `${name}. <condition>` when not —
- * a JS-level concatenation outside i18next (`DenScreen.tsx`'s `speakBadge`), so no single manifest
- * key would match the interpolated form; bounded (25 badges × ≤3 tiers/thresholds), expanded here
- * to match exactly what the runtime concatenates. */
+ * a JS-level concatenation outside i18next, expanded here to match what the runtime concatenates. */
 const TIER_NAMES = ['tier.bronze', 'tier.silver', 'tier.gold'];
 
 function collectBadgeSpokenLines(
@@ -451,20 +413,10 @@ function collectBadgeSpokenLines(
   }
 }
 
-/**
- * Every `exercise-text.ts`'s `exerciseNote` text (`ExerciseStep`/`SeriesBossStep`/
- * `ReviewExerciseStep`), spoken as its own utterance since M6.3 item 1 (no longer concatenated with
- * the instruction — that stays covered by `collectContentEntries`'s lesson-guided/lesson-exercise/
- * minigame-round entries). Each note shape's own domain is bounded and content-derived, same rule
- * as `collectUiTemplates` above: every lesson character (its display name and the piece it stands
- * for — `character-meta.ts`'s `characterPiece` default-to-rook rule for a non-piece character like
- * Owl, mirrored here via `characterPieceOf(...) ?? 'r'`), 1–3 stars, and colour × piece type for the
- * opponent-moved / setup-hint lines (same pairing `collectUiTemplates` already expands for
- * versus-boss). Also includes every one of those with `withEasierOffer`'s (`exercise-text.ts`)
- * sentence appended — only `ExerciseStep` ever shows that offer, and only for its own error feedback
- * kinds (`ERROR_FEEDBACK_KINDS` there): illegal, select-wrong, select-missing, select-both,
- * wrong-answer, wrong-move, wrong-placement.
- */
+/** Every `exercise-text.ts` `exerciseNote` text, spoken as its own utterance. Each note shape's
+ * domain is bounded and content-derived: every lesson character (and the piece it stands for,
+ * defaulting to rook), 1-3 stars, colour × piece type. Error-kind notes also get the
+ * easier-variant-offer sentence appended, since `ExerciseStep` shows that offer on them. */
 function collectExerciseNoteTexts(
   entries: Map<string, InventoryEntry>,
   locales: Locales,
@@ -473,7 +425,7 @@ function collectExerciseNoteTexts(
   const characters = [...new Set(content.lessons.map((lesson) => lesson.character))];
   const easierOffer = resolve(locales, 'exercise.easier-offer');
 
-  /** An error-kind note: inventoried both plain and with the easier-variant offer appended. */
+  // An error-kind note: inventoried both plain and with the easier-variant offer appended.
   function addErrorNote(text: string): void {
     addText(entries, text, 'exercise-note');
     addText(entries, `${text} ${easierOffer}`, 'exercise-note-easier-offer');
@@ -504,8 +456,7 @@ function collectExerciseNoteTexts(
     addErrorNote(resolve(locales, key));
   }
 
-  // Hint ladder (never gets the easier offer): the shared "here is the answer" once; each kind's
-  // own level-1/2 texts; setup's level-1 "place the <color> <piece> next" over colour × piece.
+  // Hint ladder (never gets the easier offer): the shared answer text, each kind's level-1/2 texts.
   addText(entries, resolve(locales, 'exercise.hint-answer'), 'exercise-note');
   for (const character of characters) {
     const name = resolve(locales, `characters:${character}.name`);
@@ -533,8 +484,7 @@ function collectExerciseNoteTexts(
     }
   }
 
-  // Praise (solved), 1-3 stars; checkmate is its own JS-level concatenation of the "Checkmate!"
-  // line and the same praise line (`exercise-text.ts`'s `exerciseNote`, "checkmate" case).
+  // Praise (solved), 1-3 stars; checkmate concatenates the "Checkmate!" line with the same praise.
   const praiseKeys = ['exercise.praise-1', 'exercise.praise-2', 'exercise.praise-3'];
   for (const key of praiseKeys) {
     addText(entries, resolve(locales, key), 'exercise-note');
@@ -559,9 +509,8 @@ function collectExerciseNoteTexts(
   }
 }
 
-/** Builds the full inventory (`entries`, deduped by `voiceKey`, sorted by key) plus the report's
- * `skipped` list — pure function of already-loaded content, so both `scripts/voice-texts.ts` (real
- * content, writes `dist/voice-texts.json`) and this file's own tests (real content, no I/O) share it. */
+/** Builds the full inventory (deduped by `voiceKey`, sorted by key) plus the report's `skipped`
+ * list — a pure function of already-loaded content. */
 export function buildVoiceInventory(
   locales: Locales,
   content: CompiledContent,
@@ -573,12 +522,9 @@ export function buildVoiceInventory(
   collectUiTemplates(entries, locales, content, catalog, badges);
   collectBadgeSpokenLines(entries, locales, badges);
   collectExerciseNoteTexts(entries, locales, content);
-  // Parent area "Test voice" check (M6.3 item 2, `ChildSettings.tsx`): its one fixed sentence.
   addText(entries, resolve(locales, 'voice-check.sentence'), 'voice-check');
 
-  // M6.3 item 1: every note text is now inventoried directly above (`collectExerciseNoteTexts`), so
-  // nothing is skipped any more — kept as an empty list, not removed, so a future unbounded template
-  // still has somewhere to log itself.
+  // Nothing is skipped any more; kept as an empty list so a future unbounded template can log itself.
   const skipped: SkippedTemplate[] = [];
 
   return {

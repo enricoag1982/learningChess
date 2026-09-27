@@ -33,7 +33,8 @@ export interface Lesson {
   /** Easy tries shown before the exercises; hints on, not scored. */
   readonly guided: readonly ExerciseDef[];
   readonly exercises: readonly ExerciseDef[];
-  /** Easier variants, reachable only via a scored exercise's `easier`; never stepped through, scored or counted in completion / mastery. Absent = none. */
+  /** Easier variants, reachable only via a scored exercise's `easier`; never stepped through,
+   * scored or counted in completion / mastery. Absent = none. */
   readonly variants?: readonly ExerciseDef[];
   /** Id of the mini-game unlocked by completing this lesson. */
   readonly boss?: string;
@@ -47,12 +48,12 @@ interface MiniGameBase {
   readonly unlockAfter: string;
 }
 
-/** Static-opponent mini-game (Hungry Piece, Knight Maze, King Walk, …): unchanged since M1.2. */
+/** Static-opponent mini-game (Hungry Piece, Knight Maze, King Walk, …). */
 export interface StaticMiniGame extends StaticCaptureGameDef, MiniGameBase {
   readonly mode: 'static';
 }
 
-/** Series mini-game (Square Hunt, Setup Race, and M3's Safe or Not? / Escape the Check / …). */
+/** Series mini-game (Square Hunt, Setup Race, Safe or Not?, Escape the Check, …). */
 export interface SeriesMiniGame extends MiniGameBase {
   readonly mode: 'series';
   readonly id: string;
@@ -64,12 +65,12 @@ export interface SeriesMiniGame extends MiniGameBase {
   readonly errors2: number;
 }
 
-/** `versus` mini-game (Pawn Wars, …): variant rules played against the computer opponent (M2.6). */
+/** `versus` mini-game (Pawn Wars, …): variant rules played against the computer opponent. */
 export interface VersusMiniGame extends VersusGameDef, MiniGameBase {
   readonly mode: 'versus';
 }
 
-/** Mini-game content: `static` (capture-all / collect-stars), `series` (M2.4), or `versus` (M2.6). */
+/** Mini-game content: `static` (capture-all / collect-stars), `series`, or `versus`. */
 export type MiniGame = StaticMiniGame | SeriesMiniGame | VersusMiniGame;
 
 /** Whole compiled content bundle written to `content.json`. */

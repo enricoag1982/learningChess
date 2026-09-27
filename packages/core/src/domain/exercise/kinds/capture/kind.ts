@@ -2,7 +2,13 @@ import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { moveCountStars, moveHint, playMove } from '../static-move.ts';
 import { initState } from '../../state.ts';
-import type { CaptureDef, MoveAction, MoveOutcome } from './def.ts';
+import type { MoveAction } from '../base.ts';
+import type { CaptureDef } from '../../types.ts';
+import type { MoveOutcome } from '../static-move.ts';
+
+export type { CaptureDef } from '../../types.ts';
+export type { MoveOutcome } from '../static-move.ts';
+export type { MoveAction } from '../base.ts';
 
 export const captureKind: ChessKind<CaptureDef, MoveAction, MoveOutcome> = {
   type: 'capture',

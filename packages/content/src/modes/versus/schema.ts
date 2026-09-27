@@ -5,11 +5,8 @@ import { miniGameCommonFields } from '../common.ts';
 /** FEN letter of a non-king piece type, for a `capture` win condition (`p`, `n`, `b`, `r`, `q`). */
 const NON_KING_PIECE_PATTERN = /^[pnbrq]$/;
 
-/**
- * One side's win condition, as authored (`docs/domain-model.md` §1.4): the parameterless kinds are
- * a bare string, the parameterised ones a single-key object. Compiled to a `WinCondition` by
- * `compile.ts`.
- */
+/** One side's win condition, as authored: the parameterless kinds are a bare string, the
+ * parameterised ones a single-key object. Compiled to a `WinCondition` by `compile.ts`. */
 const winConditionSchema = z.union([
   z.literal('checkmate'),
   z.literal('promote'),
@@ -21,11 +18,8 @@ const winConditionSchema = z.union([
 
 export type WinConditionYaml = z.infer<typeof winConditionSchema>;
 
-/**
- * A `versus` mini-game's rules (Pawn Wars, …): variant game rules plus which win conditions belong
- * to the kid vs. the opponent — `compile.ts` maps `kid`/`opponent` to `w`/`b` by `kidColor`.
- * `checkRules` is not authored: it is derived from `kings` (only ever true when both are present).
- */
+/** A `versus` mini-game's rules (Pawn Wars, …): variant game rules plus which win conditions belong
+ * to the kid vs. the opponent. `checkRules` is not authored: derived from `kings`. */
 const versusRulesSchema = z
   .object({
     kings: z.boolean(),
@@ -39,10 +33,8 @@ const versusRulesSchema = z
   })
   .strict();
 
-/**
- * A `versus` mini-game (M2.6): variant rules played against the computer opponent, not a static or
- * scripted one. `kidColor` defaults to `w`; `par` is the kid-move threshold for 3 stars.
- */
+/** A `versus` mini-game: variant rules played against the computer opponent, not a static or
+ * scripted one. `kidColor` defaults to `w`; `par` is the kid-move threshold for 3 stars. */
 export const schema = z
   .object({
     ...miniGameCommonFields,

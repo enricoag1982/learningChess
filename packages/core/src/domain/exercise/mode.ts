@@ -1,8 +1,5 @@
-/**
- * The mini-game-mode abstraction: `static` / `series` / `versus` bosses behind a uniform interface
- * so `boss-result.ts` can dispatch through a registry (`modes/index.ts`) instead of its own
- * type-by-type `if` chain — the mode counterpart of `kind.ts`'s exercise kinds.
- */
+// The mini-game-mode abstraction: static/series/versus bosses behind a uniform interface, so
+// `boss-result.ts` dispatches through a registry (`modes/index.ts`) — the mode counterpart of `kind.ts`.
 
 /** The attempt-log fields a boss/mini-game result reduces to, whichever mode played it. */
 export interface BossResultSummary {
@@ -14,11 +11,8 @@ export interface BossResultSummary {
   readonly moves: number;
 }
 
-/**
- * One mini-game mode's whole behaviour. Method syntax (not arrow-typed fields) is deliberate, same
- * reason as `ExerciseKind`: bivariant parameter checking lets a precise `MiniGameMode<D, S>` widen
- * to `AnyMiniGameMode` with no `any` and no cast.
- */
+/** One mini-game mode's whole behaviour. Method syntax is deliberate, same reason as `ExerciseKind`:
+ * bivariant checking lets a precise `MiniGameMode<D, S>` widen to `AnyMiniGameMode` with no cast. */
 export interface MiniGameMode<Def, State extends { readonly mode: string; readonly def: Def }> {
   readonly mode: State['mode'];
   /** Starts a fresh boss/mini-game at its authored content. */

@@ -3,8 +3,14 @@ import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { playMove } from '../static-move.ts';
 import { initState } from '../../state.ts';
-import type { BestMoveDef, MoveAction, MoveOutcome } from './def.ts';
+import type { MoveAction } from '../base.ts';
+import type { BestMoveDef } from '../../types.ts';
+import type { MoveOutcome } from '../static-move.ts';
 import { bestMoveHint } from './engine.ts';
+
+export type { BestMoveDef } from '../../types.ts';
+export type { MoveOutcome } from '../static-move.ts';
+export type { MoveAction } from '../base.ts';
 
 export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
   type: 'best-move',

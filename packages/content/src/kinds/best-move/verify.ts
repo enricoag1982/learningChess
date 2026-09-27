@@ -49,13 +49,8 @@ function parseBestMoveVerify(raw: string): BestMoveVerify {
   };
 }
 
-/**
- * The exact set of legal kid moves (SAN) satisfying a `best-move` `verify` rule in `position`, or
- * `null` (with an issue pushed) when the rule's own precondition is not met — `attack <sq>` needs
- * an enemy piece on `<sq>`, `save <sq>` needs the kid's own, not-yet-safe piece there. `take-free`
- * and `good-trade` have no precondition of their own (an empty result is instead reported by the
- * caller, alongside a mismatch, as the general "empty computed set" issue).
- */
+/** The exact set of legal kid moves (SAN) satisfying a `best-move` `verify` rule in `position`, or
+ * `null` (issue pushed) when the rule's own precondition is not met. */
 function computeVerifiedBestMoves(
   verify: BestMoveVerify,
   position: Position,
@@ -122,9 +117,8 @@ function computeVerifiedBestMoves(
   }
 
   if (verify.kind === 'check') {
-    // chess.js's own verbose `moves()` already appends "+"/"#" to a move's SAN based on the real
-    // resulting position, independent of `staticOpponent` (which only affects `play`, not move
-    // generation) — the simplest and cheapest way to ask "does this move give check".
+    // chess.js's verbose moves() already appends "+"/"#" based on the real resulting position —
+    // the simplest way to ask "does this move give check".
     return candidates.filter((move) => givesCheck(move.san)).map((move) => move.san);
   }
 
@@ -165,12 +159,8 @@ function computeVerifiedBestMoves(
     .map((move) => move.san);
 }
 
-/**
- * A `best-move` exercise's optional `verify` (`schema.ts`): computes the exact set of legal kid
- * moves satisfying the named rule and fails the build unless `solutions` equals that set,
- * order-insensitive (SAN, check/mate marks ignored like the engine's own comparison). Load-time
- * only: never affects the compiled `BestMoveDef`.
- */
+/** A `best-move` exercise's optional `verify`: computes the exact set of legal kid moves satisfying
+ * the named rule and fails the build unless `solutions` equals that set. Load-time only. */
 export function checkBestMoveVerify(
   exercise: BestMoveDef,
   verify: string | undefined,

@@ -1,10 +1,7 @@
 id: queen
-world: pieces
 order: 3
 concept: queen-move
 character: lioness
-title: queen.title
-story: queen.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . . . . .
-  text: queen.demo
   highlight: legal-moves d4
 guided:
   - id: queen-g1
     type: collect-stars
-    text: queen-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -31,10 +26,8 @@ guided:
       . . . . . . . .
       . . . Q . . . .
     stars3: 1
-    stars2: 2
   - id: queen-g2
     type: collect-stars
-    text: queen-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -45,11 +38,9 @@ guided:
       . . . . . . . .
       . . . Q . . . *
     stars3: 1
-    stars2: 2
 exercises:
   - id: queen-01
     type: collect-stars
-    text: queen-01
     board: |
       * . . . . . . *
       . . . . . . . .
@@ -60,10 +51,8 @@ exercises:
       . . . . . . . .
       Q . . . . . . .
     stars3: 2
-    stars2: 3
   - id: queen-02
     type: collect-stars
-    text: queen-02
     board: |
       . . . . . . . *
       . . . . . . . .
@@ -74,10 +63,8 @@ exercises:
       . . . . . . . .
       Q . . . . . . .
     stars3: 1
-    stars2: 2
   - id: queen-03
     type: select-squares
-    text: queen-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -91,7 +78,6 @@ exercises:
     from: d4
   - id: queen-04
     type: collect-stars
-    text: queen-04
     board: |
       * . . . . . . .
       . . . . . . . .
@@ -102,10 +88,8 @@ exercises:
       . . . . . . . .
       Q . . . . . . .
     stars3: 2
-    stars2: 3
   - id: queen-05
     type: capture
-    text: queen-05
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -116,10 +100,8 @@ exercises:
       . . . . . . . .
       Q . . . . . . .
     stars3: 1
-    stars2: 2
   - id: queen-06
     type: select-squares
-    text: queen-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -133,7 +115,6 @@ exercises:
     from: d4
   - id: queen-07
     type: capture
-    text: queen-07
     board: |
       p . . . p . . .
       . . . . . . . .
@@ -144,10 +125,8 @@ exercises:
       . . . . . . . .
       . . . . . . . p
     stars3: 3
-    stars2: 4
   - id: queen-08
     type: collect-stars
-    text: queen-08
     easier: queen-08-easy
     board: |
       * . . . . . . *
@@ -163,7 +142,6 @@ exercises:
 variants:
   - id: queen-08-easy
     type: collect-stars
-    text: queen-08-easy
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -174,5 +152,4 @@ variants:
       . . . . . . . .
       * . . . . . . *
     stars3: 2
-    stars2: 3
 boss: hungry-queen

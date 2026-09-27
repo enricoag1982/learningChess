@@ -14,11 +14,11 @@ import { loadJourney } from './journey.ts';
 import { getProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** Days shown in the parent report's "minutes per day" list (app-structure.md §11's own row). */
+/** Days shown in the parent report's "minutes per day" list. */
 const REPORT_MINUTES_DAYS = 14;
 /** Days the Overview's "minutes today / last 7 days" card reads (`buildChildOverview`). */
 const OVERVIEW_MINUTES_DAYS = 7;
-/** Most recent games / assessments the report keeps (app-structure.md §11: "last 10"). */
+/** Most recent games / assessments the report keeps. */
 const REPORT_RECENT_COUNT = 10;
 
 /** `deps.profiles.get`, or a clear error if the profile does not exist. */
@@ -40,12 +40,8 @@ export interface ChildOverview {
   readonly streakCurrent: number;
 }
 
-/**
- * Builds one child's Overview card (app-structure.md §11): avatar/nickname come from `profile`
- * itself, alongside rank, total stars, minutes today / over the last 7 days, and the current streak.
- * Lighter than {@link buildChildReport} — no per-world/concept/game/badge detail, since the
- * Overview only shows one line per stat.
- */
+/** Builds one child's Overview card: rank, total stars, minutes today / over the last 7 days, and
+ * the current streak. Lighter than {@link buildChildReport} — no per-world/concept/game/badge detail. */
 export async function buildChildOverview(deps: AppDeps, profileId: string): Promise<ChildOverview> {
   const [profile, journey, days, streak] = await Promise.all([
     requireProfile(deps, profileId),
@@ -71,8 +67,8 @@ export interface WorldProgressSummary {
   readonly lessonsMastered: number;
   readonly starsEarned: number;
   readonly starsMax: number;
-  /** Lessons in this world with `LessonProgress.skippedPhases` non-empty (playtest 2) — the
-   * report's own small "intro skipped" per-lesson line. */
+  /** Lessons in this world with `LessonProgress.skippedPhases` non-empty — the report's small
+   * "intro skipped" per-lesson line. */
   readonly skippedIntroLessons: readonly Lesson[];
 }
 
@@ -84,7 +80,7 @@ export interface ConceptAccuracySummary {
   readonly weak: boolean;
 }
 
-/** Everything the parent area's per-child report screen shows (app-structure.md §11). */
+/** Everything the parent area's per-child report screen shows. */
 export interface ChildReport {
   readonly profile: Profile;
   readonly rank: RankDef | undefined;
@@ -94,10 +90,9 @@ export interface ChildReport {
   /** Concept ids from `conceptAccuracy` with `weak: true`, in the same order. */
   readonly weakConcepts: readonly string[];
   readonly minutesByDay: readonly DayMinutes[];
-  /** `ProfileSettings.dailyLimitMinutes` (M5.2): the minutes-per-day chart's own limit line. */
+  /** The minutes-per-day chart's own limit line. */
   readonly dailyLimitMinutes: number | null;
-  /** `ProfileSettings.weekendLimitMinutes`/`playUntil`/`playFrom` (M7.1, app-structure.md §13):
-   * the "active rules" line under the minutes-per-day chart. */
+  /** The "active rules" line under the minutes-per-day chart. */
   readonly weekendLimitMinutes: number | null | undefined;
   readonly playUntil: string | null | undefined;
   readonly playFrom: string | null | undefined;
@@ -145,13 +140,9 @@ function worldProgress(
   };
 }
 
-/**
- * Builds one child's full parent-area report (app-structure.md §11): progress by world, concept
- * accuracy + weak-concept list (from the last up to 10 results each, `domain/review.ts`'s own
- * cap), minutes per day over the last 14 days, the last 10 games and assessment runs (newest
- * first), and every earned badge. Permissive without `deps.rewards`/`deps.assessment` wired up
- * (badges/assessments read `[]`), same reasoning `checkRewards`/`loadUnlocked` already use.
- */
+/** Builds one child's full parent-area report: progress by world, concept accuracy + weak-concept
+ * list, minutes per day, the last 10 games and assessment runs, and every earned badge. Permissive
+ * without `deps.rewards`/`deps.assessment` wired up (reads `[]`). */
 export async function buildChildReport(deps: AppDeps, profileId: string): Promise<ChildReport> {
   const [
     profile,

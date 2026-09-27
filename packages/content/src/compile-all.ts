@@ -19,13 +19,8 @@ export interface CompiledAll {
   readonly voiceTexts: VoiceInventory;
 }
 
-/**
- * Runs the whole content pipeline in memory — `scripts/build.ts`'s own compile steps (locale
- * validation, then content/tracks/bot-book/badges/voice-text-inventory), extracted so both that
- * script and `content-snapshot.test.ts` (which snapshots every `dist/` output without spawning the
- * build or touching disk beyond reading source content) share one implementation. Same source
- * files, same order, same `ContentError` on any content issue `build.ts` would itself throw on.
- */
+/** Runs the whole content pipeline in memory — `scripts/build.ts`'s own compile steps, extracted so
+ * both that script and `content-snapshot.test.ts` share one implementation. */
 export function compileAll(packageDir: string): CompiledAll {
   const localesDir = join(packageDir, 'locales');
   const lessonsDir = join(packageDir, 'lessons');

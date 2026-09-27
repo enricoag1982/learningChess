@@ -1,10 +1,7 @@
 id: bishop
-world: pieces
 order: 2
 concept: bishop-move
 character: elephant
-title: bishop.title
-story: bishop.story
 demo:
   board: |
     . . . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . . . .
     . . . . . . . .
-  text: bishop.demo
   highlight: legal-moves d4
 guided:
   - id: bishop-g1
     type: collect-stars
-    text: bishop-g1
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -31,10 +26,8 @@ guided:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
   - id: bishop-g2
     type: collect-stars
-    text: bishop-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -45,11 +38,9 @@ guided:
       . . . . . . . .
       . . . . . . . .
     stars3: 1
-    stars2: 2
 exercises:
   - id: bishop-01
     type: collect-stars
-    text: bishop-01
     board: |
       . . . . . . . *
       . . . . . . . .
@@ -60,10 +51,8 @@ exercises:
       . . . . . . . .
       * . . . . . . .
     stars3: 2
-    stars2: 3
   - id: bishop-02
     type: collect-stars
-    text: bishop-02
     board: |
       . . . . . . . .
       * . . . . . * .
@@ -74,10 +63,8 @@ exercises:
       . . . . . . . .
       . . . . . . * .
     stars3: 4
-    stars2: 5
   - id: bishop-03
     type: yes-no
-    text: bishop-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -91,7 +78,6 @@ exercises:
     focus: e4
   - id: bishop-04
     type: select-squares
-    text: bishop-04
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -105,7 +91,6 @@ exercises:
     from: d4
   - id: bishop-05
     type: collect-stars
-    text: bishop-05
     board: |
       . . . . . . . *
       . . . . . . . .
@@ -116,10 +101,8 @@ exercises:
       . B . . . . . .
       . . . . . . . .
     stars3: 4
-    stars2: 5
   - id: bishop-06
     type: capture
-    text: bishop-06
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -130,10 +113,8 @@ exercises:
       . . . . . . . .
       p . . . . . . .
     stars3: 1
-    stars2: 2
   - id: bishop-07
     type: select-squares
-    text: bishop-07
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -147,7 +128,6 @@ exercises:
     from: d4
   - id: bishop-08
     type: capture
-    text: bishop-08
     easier: bishop-08-easy
     board: |
       . . . . . . . p
@@ -159,11 +139,9 @@ exercises:
       . . . . . . . .
       p . . . . . p .
     stars3: 5
-    stars2: 6
 variants:
   - id: bishop-08-easy
     type: capture
-    text: bishop-08-easy
     board: |
       . . . . . . . p
       . . . . . . . .
@@ -174,5 +152,4 @@ variants:
       . . . . . . . .
       p . . . . . . .
     stars3: 2
-    stars2: 3
 boss: hungry-bishop

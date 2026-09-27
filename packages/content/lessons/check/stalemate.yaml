@@ -1,10 +1,7 @@
 id: stalemate
-world: check
 order: 5
 concept: stalemate
 character: owl
-title: stalemate.title
-story: stalemate.story
 demo:
   board: |
     . Q . . . . . .
@@ -15,12 +12,10 @@ demo:
     . . . . . . . .
     . . . . . K . .
     . . . . . . . k
-  text: stalemate.demo
   highlight: squares g1 g2 h2
 guided:
   - id: stalemate-g1
     type: yes-no
-    text: stalemate-g1
     board: |
       . Q . . . . . .
       . . . . . . . .
@@ -36,7 +31,6 @@ guided:
     verify: stalemate
   - id: stalemate-g2
     type: mate-in-n
-    text: stalemate-g2
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -51,7 +45,6 @@ guided:
 exercises:
   - id: stalemate-01
     type: yes-no
-    text: stalemate-01
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -67,7 +60,6 @@ exercises:
     verify: stalemate
   - id: stalemate-02
     type: yes-no
-    text: stalemate-02
     board: |
       . . . . . . . k
       . . . . . . . .
@@ -83,7 +75,6 @@ exercises:
     verify: stalemate
   - id: stalemate-03
     type: yes-no
-    text: stalemate-03
     board: |
       . . . . . . . .
       . . . . . . . .
@@ -99,7 +90,6 @@ exercises:
     verify: stalemate
   - id: stalemate-04
     type: yes-no
-    text: stalemate-04
     board: |
       . . . . k . . .
       . . . . . . . .
@@ -115,7 +105,6 @@ exercises:
     verify: stalemate
   - id: stalemate-05
     type: mate-in-n
-    text: stalemate-05
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -130,7 +119,6 @@ exercises:
     trap: stalemate
   - id: stalemate-06
     type: mate-in-n
-    text: stalemate-06
     board: |
       . . . . . . . k
       . . . . . . . .

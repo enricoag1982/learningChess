@@ -2,14 +2,11 @@ id: escape-the-check
 concept: check-escape
 unlockAfter: escape-check
 mode: series
-title: escape-the-check.title
-goal: escape-the-check.goal
 errors3: 0
 errors2: 2
 rounds:
   - id: escape-the-check-r1
     type: select-squares
-    text: escape-the-check-r1
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -22,7 +19,6 @@ rounds:
     derive: check-escapes
   - id: escape-the-check-r2
     type: select-squares
-    text: escape-the-check-r2
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -35,7 +31,6 @@ rounds:
     derive: check-escapes
   - id: escape-the-check-r3
     type: select-squares
-    text: escape-the-check-r3
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -48,7 +43,6 @@ rounds:
     derive: check-escapes
   - id: escape-the-check-r4
     type: select-squares
-    text: escape-the-check-r4
     board: |
       . . . . . . . k
       . . . . . . . .
@@ -61,7 +55,6 @@ rounds:
     derive: check-escapes
   - id: escape-the-check-r5
     type: best-move
-    text: escape-the-check-r5
     board: |
       . . . . . . . k
       . . . . . . . .
@@ -75,7 +68,6 @@ rounds:
     verify: escape-king
   - id: escape-the-check-r6
     type: best-move
-    text: escape-the-check-r6
     board: |
       . . . . . . r .
       . . . . . . . .
@@ -89,7 +81,6 @@ rounds:
     verify: escape-king
   - id: escape-the-check-r7
     type: best-move
-    text: escape-the-check-r7
     board: |
       . . . . . . . k
       . . . . . . . .
@@ -103,7 +94,6 @@ rounds:
     verify: escape-block
   - id: escape-the-check-r8
     type: best-move
-    text: escape-the-check-r8
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -117,7 +107,6 @@ rounds:
     verify: escape-block
   - id: escape-the-check-r9
     type: best-move
-    text: escape-the-check-r9
     board: |
       k . . . . . . .
       . . . . . . . .
@@ -131,7 +120,6 @@ rounds:
     verify: escape-capture
   - id: escape-the-check-r10
     type: best-move
-    text: escape-the-check-r10
     board: |
       k . . . . . . .
       . . . . . . . .

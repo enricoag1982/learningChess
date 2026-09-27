@@ -28,7 +28,7 @@ export interface RecordGameInput {
   readonly moves: readonly string[];
 }
 
-/** Saves one `GameRecord` (domain-model.md §2): a finished full game / versus mini-game, or a left one. */
+/** Saves one `GameRecord`: a finished full game / versus mini-game, or a left one. */
 export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise<GameRecord> {
   const { profileId, game, opponentLevel, result, reason, moves } = input;
   const now = deps.clock.now().toISOString();
@@ -45,9 +45,7 @@ export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise
   };
   await deps.gameRecords.add(record);
 
-  // rewards.md §4 "game finished" event: an abandoned game is never a real finish (never a win,
-  // never today's counted activity — domain-model.md §3 "leaving mid-game ... never a loss" applies
-  // the same way here: it also never triggers a badge/streak check).
+  // An abandoned game is never a real finish: never a win, never a badge/streak check.
   if (result !== 'abandoned') {
     await checkRewards(deps, profileId);
   }
@@ -94,19 +92,10 @@ function fullGameTally(
   };
 }
 
-/**
- * Per-level status for the Play screen's vs Computer card (`docs/computer-opponent.md` §3). Mouse
- * unlocks with World 4 ("check") mastered — the same rule as the pre-M3.5 "Full game" button
- * (`app-structure.md` §7). Every level above it unlocks with 3 full-game wins vs the level right
- * below (Rabbit vs Mouse, Fox vs Rabbit, Wolf vs Fox, Bear vs Wolf) — *or*, once there is already
- * any recorded full-game win directly against this level, it stays unlocked regardless of that
- * count (M4.2 decision log): covers a world boss fought directly at a level before the kid has
- * separately racked up 3 Play-screen wins one level down (e.g. World 5's boss vs Rabbit, ahead of
- * Fox's own "beat Rabbit 3x") — an early win like that should never show as "locked" again just
- * because the strict tally has not caught up. Fox's other M4.2 unlock path, the Openings world's
- * own boss, is content not yet authored (`docs/computer-opponent.md` §3's "or … later"); once it
- * exists it is just one more full-game win recorded against Fox, already covered by this same rule.
- */
+/** Per-level status for the Play screen's vs Computer card. Mouse unlocks with World 4 ("check")
+ * mastered. Every level above unlocks with 3 full-game wins vs the level below, or — once any
+ * full-game win is recorded directly against this level — stays unlocked regardless of that count
+ * (covers a world boss fought at a level before 3 separate Play-screen wins caught up). */
 export function computerLevelStatus(
   records: readonly GameRecord[],
   journey: Journey,
@@ -151,9 +140,9 @@ const LAST_N_GAMES = 5;
 const LEVEL_UP_MIN_WINS = 4;
 const LEVEL_DOWN_MAX_WINS = 1;
 
-/** One update to a profile's "Automatic level" suggestion (`docs/computer-opponent.md` §5), from
- * `nextSuggestedLevel` after a completed full game. `leveledUp` tells the caller whether to show
- * Owl's suggestion line ("Ready for the Fox?") — the drop is silent. */
+/** One update to a profile's "Automatic level" suggestion, from `nextSuggestedLevel` after a
+ * completed full game. `leveledUp` tells the caller whether to show Owl's suggestion line — the
+ * drop is silent. */
 export interface SuggestedLevelUpdate {
   readonly level: BotLevel['level'];
   readonly leveledUp: boolean;
@@ -168,14 +157,9 @@ function recentFullGames(records: readonly GameRecord[], level: number): GameRec
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-/**
- * The "Automatic level" suggestion update after one full game vs computer at `level` finishes
- * (`docs/computer-opponent.md` §5): among the last `LAST_N_GAMES` full games at `level` (most
- * recent first) — computed only once that many have actually been played, so a single early result
- * cannot swing it — `>= 4` wins suggests the next level, but only when it is already unlocked
- * (`statuses`); `<= 1` win drops one level, silently, never below Mouse. Otherwise `null`: no
- * change. Never skips more than one level either way, since it only ever moves `level` by one.
- */
+/** The "Automatic level" suggestion update after one full game finishes: among the last
+ * `LAST_N_GAMES` full games at `level`, `>= 4` wins suggests the next level (only if unlocked),
+ * `<= 1` win drops one level silently (never below Mouse). Otherwise `null`. */
 export function nextSuggestedLevel(
   records: readonly GameRecord[],
   level: BotLevel['level'],
@@ -204,14 +188,8 @@ function highestUnlocked(statuses: readonly ComputerLevelStatus[]): BotLevel['le
   return unlockedLevels.length > 0 ? (Math.max(...unlockedLevels) as BotLevel['level']) : 1;
 }
 
-/**
- * Play's vs Computer level chips default to this (`docs/computer-opponent.md` §5): the profile's
- * stored suggestion (`AppSettings.suggestedLevels`), as long as it still names an unlocked level —
- * a level never re-locks (`computerLevelStatus`), so this only ever guards a suggestion from before
- * a level was unlocked at all. No suggestion stored yet (a fresh profile, or one that has not
- * finished 5 full games at any level to earn one — `nextSuggestedLevel`) falls back to the highest
- * level already unlocked, the most relevant default for a kid who just unlocked a new one.
- */
+/** Play's vs Computer level chips default to this: the profile's stored suggestion, as long as it
+ * still names an unlocked level. No suggestion stored yet falls back to the highest unlocked level. */
 export function suggestedLevel(
   stored: number | undefined,
   statuses: readonly ComputerLevelStatus[],
@@ -225,11 +203,8 @@ export function suggestedLevel(
   return highestUnlocked(statuses);
 }
 
-/**
- * Persists `nextSuggestedLevel`'s update (if any) for `profileId`, folding it into the shared
- * `AppSettings.suggestedLevels` map. Returns the update (or `null`) so the caller can decide
- * whether to show Owl's "Ready for the Fox?" line (`leveledUp`).
- */
+/** Persists `nextSuggestedLevel`'s update (if any) for `profileId`, folding it into the shared
+ * `AppSettings.suggestedLevels` map. */
 export async function updateSuggestedLevel(
   deps: AppDeps,
   profileId: string,

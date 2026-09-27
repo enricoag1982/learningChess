@@ -1,8 +1,6 @@
 id: hungry-bishop
 concept: bishop-move
 unlockAfter: bishop
-title: hungry-bishop.title
-goal: hungry-bishop.goal
 board: |
   . . . . . . . n
   p . p . . . . .
