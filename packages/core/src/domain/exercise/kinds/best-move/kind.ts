@@ -1,7 +1,9 @@
 import { playMove, startExercise } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, narrowStep, widen } from '../adapt.ts';
+import { errorHintStars } from '../../stars.ts';
+import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import type { BestMoveDef, MoveAction, MoveOutcome } from './def.ts';
+import { bestMoveHint } from './engine.ts';
 import { bestMoveSolution, bestMoveWrongAction } from './solution.ts';
 
 export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
@@ -17,11 +19,12 @@ export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
   },
 
   hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+    const bumped = { ...state, hintLevel: level };
+    return { state: bumped, hint: bestMoveHint(bumped.def, bumped.position, ctx, level) };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return errorHintStars(state.hintLevel, state.errors);
   },
 
   solution(def) {

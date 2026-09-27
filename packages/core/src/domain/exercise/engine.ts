@@ -5,6 +5,7 @@ import { findMoveBySan, sameSan } from '../chess/facts/san.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
 import type { Hint } from './hint.ts';
+import { bestMoveHint } from './kinds/best-move/engine.ts';
 import { choiceHint } from './kinds/choice/engine.ts';
 import { selectSquaresHint } from './kinds/select-squares/engine.ts';
 import { setupHint, setupStars } from './kinds/setup/engine.ts';
@@ -12,7 +13,7 @@ import { yesNoHint } from './kinds/yes-no/engine.ts';
 import { solve } from './solver.ts';
 import type { ExerciseStateOf } from './state.ts';
 import { errorHintStars } from './stars.ts';
-import type { BestMoveDef, ExerciseDef, MateInNDef } from './types.ts';
+import type { ExerciseDef, MateInNDef } from './types.ts';
 
 /** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
 export type ExerciseState = ExerciseStateOf<ExerciseDef>;
@@ -261,30 +262,6 @@ function moveHint(state: ExerciseState, rules: VariantRules, level: 1 | 2 | 3): 
     level: 3,
     squares: move === null ? [] : [move.from, move.to],
     ...(move === null ? {} : { move }),
-  };
-}
-
-/** Best-move hint: piece → target square → the move, all from the first listed solution. */
-function bestMoveHint(
-  def: BestMoveDef,
-  position: Position,
-  rules: VariantRules,
-  level: 1 | 2 | 3,
-): Hint {
-  const solutionSan = def.solutions[0];
-  const candidates = rules.legalMoves(position, { staticOpponent: true });
-  const move = solutionSan === undefined ? undefined : findMoveBySan(candidates, solutionSan);
-  if (level === 1) {
-    return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
-  }
-  if (level === 2) {
-    return { kind: 'squares', level: 2, squares: move === undefined ? [] : [move.to] };
-  }
-  return {
-    kind: 'squares',
-    level: 3,
-    squares: move === undefined ? [] : [move.from, move.to],
-    ...(move === undefined ? {} : { move: { from: move.from, to: move.to } }),
   };
 }
 
