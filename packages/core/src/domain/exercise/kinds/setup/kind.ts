@@ -1,7 +1,8 @@
-import { placePiece, startExercise } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, narrowStep, widen } from '../adapt.ts';
+import { startExercise } from '../../engine.ts';
+import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import type { PlaceAction, PlaceOutcome, SetupDef } from './def.ts';
+import { placePiece, setupHint, setupStars } from './engine.ts';
 import { setupSolution, setupWrongAction } from './solution.ts';
 
 export const setupKind: ChessKind<SetupDef, PlaceAction, PlaceOutcome> = {
@@ -16,12 +17,14 @@ export const setupKind: ChessKind<SetupDef, PlaceAction, PlaceOutcome> = {
     return narrowStep(placePiece(widen(state), action.square, action.piece));
   },
 
-  hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+  hint(state, level) {
+    const bumped = { ...state, hintLevel: level };
+    const result = setupHint(widen(bumped), bumped.def, level);
+    return { state: narrowState(result.state), hint: result.hint };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return setupStars(state.hintLevel, state.errors);
   },
 
   solution(def) {

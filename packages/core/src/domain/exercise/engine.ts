@@ -1,19 +1,18 @@
 import type { ChessRules, Move, MoveInput } from '../chess/rules.ts';
-import { SQUARES } from '../chess/types.ts';
-import type { Color, Piece, PieceType, Position, Square } from '../chess/types.ts';
+import type { PieceType, Position, Square } from '../chess/types.ts';
 import { enemyCount } from '../chess/facts/goals.ts';
-import { piecesEqual } from '../chess/facts/pieces.ts';
 import { findMoveBySan, sameSan } from '../chess/facts/san.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
 import type { Hint } from './hint.ts';
 import { choiceHint } from './kinds/choice/engine.ts';
 import { selectSquaresHint } from './kinds/select-squares/engine.ts';
+import { setupHint, setupStars } from './kinds/setup/engine.ts';
 import { yesNoHint } from './kinds/yes-no/engine.ts';
 import { solve } from './solver.ts';
 import type { ExerciseStateOf } from './state.ts';
 import { errorHintStars } from './stars.ts';
-import type { BestMoveDef, ExerciseDef, MateInNDef, SetupDef } from './types.ts';
+import type { BestMoveDef, ExerciseDef, MateInNDef } from './types.ts';
 
 /** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
 export type ExerciseState = ExerciseStateOf<ExerciseDef>;
@@ -36,13 +35,6 @@ export type MoveOutcome =
       readonly captured?: PieceType;
     };
 
-/** Result of a `setup` placement attempt. */
-export interface PlaceOutcome {
-  readonly kind: 'placed' | 'wrong' | 'solved';
-  readonly square: Square;
-  readonly piece: Piece;
-}
-
 /** Result of a kid move in a `mate-in-n` exercise. */
 export type MateInNOutcome =
   | { readonly kind: 'illegal' }
@@ -52,13 +44,6 @@ export type MateInNOutcome =
   | { readonly kind: 'moved'; readonly move: Move; readonly reply: Move }
   /** Delivered checkmate — any mating move, not only the scripted one. */
   | { readonly kind: 'solved'; readonly move: Move };
-
-/** One remaining piece in a `setup` exercise's palette. */
-export interface PalettePiece {
-  readonly color: Color;
-  readonly type: PieceType;
-  readonly count: number;
-}
 
 /** Starts a fresh exercise at its authored position. */
 export function startExercise(def: ExerciseDef): ExerciseState {
@@ -172,71 +157,7 @@ export {
 export { answerYesNo } from './kinds/yes-no/engine.ts';
 export { answerChoice } from './kinds/choice/engine.ts';
 
-/** Setup exercise: target squares still missing their piece, in board reading order. */
-function remainingSetupSquares(position: Position, target: Position): readonly Square[] {
-  return SQUARES.filter(
-    (square) => target.pieces[square] !== undefined && position.pieces[square] === undefined,
-  );
-}
-
-/**
- * Places `piece` on `square` for a setup exercise: correct when `square` holds that exact piece in
- * `target` and is still free. Wrong → errors + 1, nothing placed. Solved once every target piece is
- * on the board. No-op (outcome `wrong`) once solved.
- */
-export function placePiece(
-  state: ExerciseState,
-  square: Square,
-  piece: Piece,
-): { readonly state: ExerciseState; readonly outcome: PlaceOutcome } {
-  if (state.def.type !== 'setup') {
-    throw new Error('placePiece: exercise is not setup');
-  }
-  if (state.solved) {
-    return { state, outcome: { kind: 'wrong', square, piece } };
-  }
-
-  const targetPiece = state.def.target.pieces[square];
-  const isCorrect =
-    targetPiece !== undefined &&
-    targetPiece.color === piece.color &&
-    targetPiece.type === piece.type &&
-    state.position.pieces[square] === undefined;
-
-  if (!isCorrect) {
-    return {
-      state: { ...state, errors: state.errors + 1 },
-      outcome: { kind: 'wrong', square, piece },
-    };
-  }
-
-  const pieces = { ...state.position.pieces, [square]: piece };
-  const position: Position = { ...state.position, pieces };
-  const solved = piecesEqual(pieces, state.def.target.pieces);
-  return {
-    state: { ...state, position, solved },
-    outcome: { kind: solved ? 'solved' : 'placed', square, piece },
-  };
-}
-
-/** Remaining setup pieces, grouped by colour + type with counts, in board reading order. */
-export function setupPalette(state: ExerciseState): readonly PalettePiece[] {
-  if (state.def.type !== 'setup') {
-    throw new Error('setupPalette: exercise is not setup');
-  }
-  const def = state.def;
-  const counts = new Map<string, PalettePiece>();
-  for (const square of remainingSetupSquares(state.position, def.target)) {
-    const piece = def.target.pieces[square];
-    if (piece === undefined) {
-      continue;
-    }
-    const key = `${piece.color}${piece.type}`;
-    const existing = counts.get(key);
-    counts.set(key, { color: piece.color, type: piece.type, count: (existing?.count ?? 0) + 1 });
-  }
-  return [...counts.values()];
-}
+export { placePiece, setupPalette } from './kinds/setup/engine.ts';
 
 /** Undoes the last kid move (collect-stars / capture / best-move). No-op at the start of the exercise. */
 export function undo(state: ExerciseState): ExerciseState {
@@ -391,27 +312,6 @@ function mateInNHint(
   };
 }
 
-function setupHint(
-  state: ExerciseState,
-  def: SetupDef,
-  level: 1 | 2 | 3,
-): { readonly state: ExerciseState; readonly hint: Hint } {
-  const square = remainingSetupSquares(state.position, def.target)[0];
-  const piece = square === undefined ? undefined : def.target.pieces[square];
-
-  if (level === 1 || piece === undefined || square === undefined) {
-    return {
-      state,
-      hint: { kind: 'setup', level, placed: false, ...(piece === undefined ? {} : { piece }) },
-    };
-  }
-  if (level === 2) {
-    return { state, hint: { kind: 'setup', level: 2, piece, square, placed: false } };
-  }
-  const placed = placePiece(state, square, piece);
-  return { state: placed.state, hint: { kind: 'setup', level: 3, piece, square, placed: true } };
-}
-
 /** Advances the hint ladder by one level (capped at 3) and returns the hint for that level. */
 export function requestHint(
   state: ExerciseState,
@@ -449,20 +349,6 @@ function capMoveStars(base: 1 | 2 | 3, hintLevel: 0 | 1 | 2 | 3): 1 | 2 | 3 {
     return base === 3 ? 2 : base;
   }
   return base;
-}
-
-/** Stars for a `setup` exercise: more errors tolerated (placing many pieces invites slips). */
-function setupStars(hintLevel: 0 | 1 | 2 | 3, errors: number): 1 | 2 | 3 {
-  if (hintLevel === 3) {
-    return 1;
-  }
-  if (hintLevel === 0 && errors === 0) {
-    return 3;
-  }
-  if (hintLevel <= 1 && errors <= 2) {
-    return 2;
-  }
-  return 1;
 }
 
 /** Stars earned so far; `0` until solved. */
