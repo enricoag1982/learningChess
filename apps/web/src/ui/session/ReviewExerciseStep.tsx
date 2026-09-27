@@ -1,16 +1,13 @@
-import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ConceptTask, ExerciseState, Piece } from '@chess-kids/core';
+import type { ConceptTask, ExerciseState } from '@chess-kids/core';
 import { recordReviewResult } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
-import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { buildExercisePlayArea } from '../lesson/exercise-play-area.tsx';
-import { GameLayout } from '../lesson/GameLayout.tsx';
 import { NextButton } from '../lesson/NextButton.tsx';
 
 export interface ReviewExerciseStepProps {
@@ -40,12 +37,9 @@ export function ReviewExerciseStep({
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
-  const isStacked = useIsStackedLayout();
   const exercise = task.exercise;
   const lesson = services.deps.content.lesson(task.lessonId);
   const character = lesson?.character ?? 'owl';
-
-  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
 
   const {
     state,
@@ -74,42 +68,30 @@ export function ReviewExerciseStep({
     },
   });
 
-  const { board, belowBoard, controls } = buildExercisePlayArea({
-    t,
-    rules: services.rules,
-    exercise,
-    state,
-    dispatch,
-    selectedPiece,
-    onSelectPiece: setSelectedPiece,
-    isStacked,
-    checkSquare,
-    showHint,
-  });
-
-  const panel = (
+  const top = (
     <>
       <SpeechBubble text={instructionText} note={note} />
       <ReplayButton onClick={replay} label={t('exercise.replay')} className="w-full" />
-      {solved ? (
-        <div className="mt-auto flex flex-col items-center gap-4">
-          <StarsRow earned={stars} animate />
-          {saved && <NextButton onClick={onNext} className="w-full" />}
-        </div>
-      ) : (
-        <div className="mt-auto flex flex-col gap-4">{controls}</div>
-      )}
     </>
   );
 
-  if (exercise.type === 'choice' && !exercise.showBoard) {
-    return <div className="flex min-h-0 flex-1 flex-col gap-4">{panel}</div>;
-  }
+  const done = solved ? (
+    <div className="mt-auto flex flex-col items-center gap-4">
+      <StarsRow earned={stars} animate />
+      {saved && <NextButton onClick={onNext} className="w-full" />}
+    </div>
+  ) : null;
+
   return (
-    <GameLayout
-      board={board}
-      panel={panel}
-      belowBoard={solved ? undefined : (belowBoard ?? undefined)}
+    <ExercisePlay
+      def={exercise}
+      state={state}
+      dispatch={dispatch}
+      checkSquare={checkSquare}
+      showHint={showHint}
+      pieceBadges={false}
+      top={top}
+      done={done}
     />
   );
 }

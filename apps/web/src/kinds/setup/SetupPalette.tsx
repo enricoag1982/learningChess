@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Hint, PalettePiece, Piece } from '@chess-kids/core';
-import { PieceIcon } from '../board/pieces.tsx';
+import { PieceIcon } from '../../ui/board/pieces.tsx';
 
 export interface SetupPaletteProps {
   readonly palette: readonly PalettePiece[];

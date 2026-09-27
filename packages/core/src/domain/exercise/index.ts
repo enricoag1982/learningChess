@@ -12,7 +12,7 @@ export type {
 } from './types.ts';
 
 export type { ExerciseState } from './engine.ts';
-export type { MoveOutcome } from './kinds/static-move.ts';
+export type { MoveOutcome, UndoAction, UndoOutcome } from './kinds/static-move.ts';
 export type { MateInNOutcome } from './kinds/mate-in-n/kind.ts';
 export type { Hint } from './hint.ts';
 export type {

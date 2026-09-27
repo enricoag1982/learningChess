@@ -22,6 +22,7 @@ import {
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
+import { UndoIcon } from '../../kinds/MoveCountedPlayArea.tsx';
 import { Board } from '../board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
@@ -30,7 +31,6 @@ import { StarsRow } from '../StarsRow.tsx';
 import { useNarratedText } from '../ds/useNarratedText.ts';
 import type { BossPlaySession } from './BossStep.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
-import { UndoIcon } from './exercise-icons.tsx';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
 

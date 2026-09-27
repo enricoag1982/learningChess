@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SECONDARY_BUTTON } from './button-styles.ts';
+import { SECONDARY_BUTTON } from '../../ui/lesson/button-styles.ts';
 
 function CheckIcon(): JSX.Element {
   return (

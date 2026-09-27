@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDef, Lesson, Piece, SkippablePhase } from '@chess-kids/core';
+import type { ExerciseDef, Lesson, SkippablePhase } from '@chess-kids/core';
 import {
   EASIER_VARIANT_STARS,
   easierVariant,
@@ -9,15 +9,13 @@ import {
   recordExerciseResult,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
-import { useIsStackedLayout } from '../useMediaQuery.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
-import { buildExercisePlayArea } from './exercise-play-area.tsx';
-import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
 import { SkipButton } from './SkipButton.tsx';
 
@@ -62,10 +60,6 @@ function ExerciseAttempt({
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
-  const isStacked = useIsStackedLayout();
-
-  /** setup only: the palette piece currently selected, waiting for a square tap. */
-  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
 
   const session = useExerciseSession(exercise, {
     character: lesson.character,
@@ -116,23 +110,7 @@ function ExerciseAttempt({
     onTakeEasier?.();
   }
 
-  const { board, belowBoard, controls } = buildExercisePlayArea({
-    t,
-    rules: services.rules,
-    exercise,
-    state,
-    dispatch,
-    selectedPiece,
-    onSelectPiece: setSelectedPiece,
-    isStacked,
-    checkSquare,
-    // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
-    // auto-hint (`useExerciseSession`'s mount effect, unaffected by this setting).
-    showHint: hintsEnabled,
-    pieceBadges: showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world })),
-  });
-
-  const panel = (
+  const top = (
     <>
       <SpeechBubble text={instructionText} note={note} />
       {/* Easier-variant offer shares the replay row so Hint/Undo stay on screen; offered, never
@@ -147,36 +125,37 @@ function ExerciseAttempt({
           </button>
         )}
       </div>
-      {solved ? (
-        <div className="mt-auto flex flex-col items-center gap-4">
-          {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
-          {!guided && <StarsRow earned={shownStars} animate />}
-          {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
-          {saved && (
-            <NextButton
-              onClick={() => {
-                goToStep(nextStepIndex);
-              }}
-              className="w-full"
-            />
-          )}
-        </div>
-      ) : (
-        <div className="mt-auto flex flex-col gap-4">{controls}</div>
-      )}
     </>
   );
 
-  // A choice exercise with its board hidden gets the panel's full width instead of GameLayout's
-  // board+panel split, which would otherwise leave an empty board-shaped gap.
-  if (exercise.type === 'choice' && !exercise.showBoard) {
-    return <div className="flex min-h-0 flex-1 flex-col gap-4">{panel}</div>;
-  }
+  const done = solved ? (
+    <div className="mt-auto flex flex-col items-center gap-4">
+      {/* Guided tries are never scored (teaching-process.md §3.3): praise + Next only. */}
+      {!guided && <StarsRow earned={shownStars} animate />}
+      {/* Autosave (recordExerciseResult) completes before the Next button appears. */}
+      {saved && (
+        <NextButton
+          onClick={() => {
+            goToStep(nextStepIndex);
+          }}
+          className="w-full"
+        />
+      )}
+    </div>
+  ) : null;
+
   return (
-    <GameLayout
-      board={board}
-      panel={panel}
-      belowBoard={solved ? undefined : (belowBoard ?? undefined)}
+    <ExercisePlay
+      def={exercise}
+      state={state}
+      dispatch={dispatch}
+      checkSquare={checkSquare}
+      // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
+      // auto-hint (`useExerciseSession`'s mount effect, unaffected by this setting).
+      showHint={hintsEnabled}
+      pieceBadges={showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }))}
+      top={top}
+      done={done}
     />
   );
 }

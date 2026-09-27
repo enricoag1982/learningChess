@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ChoiceOption } from '@chess-kids/core';
 import { tContent } from '../../content-text.ts';
-import { PieceIcon } from '../board/pieces.tsx';
+import { PieceIcon } from '../../ui/board/pieces.tsx';
 
 export interface ChoiceOptionsProps {
   readonly options: readonly ChoiceOption[];

@@ -257,6 +257,9 @@ export type {
   Resolve,
   ModeType,
   MiniGameState,
+  MoveOutcome,
+  UndoAction,
+  UndoOutcome,
 } from './domain/exercise/index.ts';
 export {
   EXERCISE_NOTES,
