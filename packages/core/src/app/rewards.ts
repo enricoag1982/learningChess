@@ -1,8 +1,6 @@
 import type { BadgeFacts, EarnedBadge } from '../domain/badges.ts';
 import { evaluateBadges, newEarnedBadge } from '../domain/badges.ts';
-import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
-import { parseFen } from '../domain/chess/fen.ts';
-import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
+import type { Attempt, LessonProgress } from '../domain/progress.ts';
 import { totalStars } from '../domain/progress.ts';
 import { addMinutes, lastNDays, totalMinutesForDate } from '../domain/session-log.ts';
 import type { SessionLog } from '../domain/session-log.ts';
@@ -94,85 +92,21 @@ function conceptFacts(attempts: readonly Attempt[]): ConceptFacts {
   return { correctTotal, correctInARow, noHintsInARow };
 }
 
-interface GameFacts {
-  readonly gameWins: Readonly<Record<string, number>>;
-  readonly gameEvents: { promotion: number; castling: number };
-  readonly localGamesPlayed: number;
-}
-
-// Win/event facts from GameRecords, abandoned games excluded. gameWins.any/['computer:<n>'] count
-// only full games; a mini-game win counts only under its own id. gameEvents.castling counts games
-// with >= 1 castling move (a game, not a move); reads GameRecord.moves directly, both sides alike.
-function gameFacts(records: readonly GameRecord[]): GameFacts {
-  const nonAbandoned = records.filter((record) => record.result !== 'abandoned');
-  const gameWins: Record<string, number> = { any: 0 };
-  for (const record of nonAbandoned.filter((r) => r.result === 'win')) {
-    if (record.game === 'full') {
-      gameWins.any = (gameWins.any ?? 0) + 1;
-      gameWins[record.opponent] = (gameWins[record.opponent] ?? 0) + 1;
-    } else {
-      gameWins[record.game] = (gameWins[record.game] ?? 0) + 1;
-    }
-  }
-
-  let promotion = 0;
-  let castling = 0;
-  for (const record of nonAbandoned) {
-    let castledThisGame = false;
-    for (const san of record.moves) {
-      if (san.includes('=')) promotion += 1;
-      if (san.startsWith('O-O')) castledThisGame = true;
-    }
-    if (castledThisGame) castling += 1;
-  }
-
-  const localGamesPlayed = nonAbandoned.filter(
-    (record) => record.opponent === 'guest' || record.opponent.startsWith('profile:'),
-  ).length;
-
-  return { gameWins, gameEvents: { promotion, castling }, localGamesPlayed };
-}
-
-/** Standard chess start position, castling rights included (same as `FullGameScreen`'s `START_FEN`). */
-const STANDARD_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-/** True if the opponent ever captured this profile's queen while replaying `moves` from the
- * standard start. Only meaningful for a full game. An unreplayable move stops the scan. */
-function queenCapturedByOpponent(moves: readonly string[], color: 'w' | 'b'): boolean {
-  let position = parseFen(STANDARD_START_FEN);
-  for (const san of moves) {
-    const played = chessJsRules.play(position, san);
-    if (played === null) return false;
-    if (played.move.color !== color && played.move.captured === 'q') {
-      return true;
-    }
-    position = played.position;
-  }
-  return false;
-}
-
-/** Every fact `evaluateBadges` needs, freshly derived from stored profile data + the current
- * `Journey` (the domain engine itself stays pure, `domain/badges.ts`). */
+/** Every fact the badge engine's own 7 generic condition types need, freshly derived from stored
+ * profile data + the current `Journey` (the domain engine itself stays pure, `domain/badges.ts`).
+ * The other 3 types read `deps.subject.rewards` instead (`evaluateAndRecordBadges`). */
 export async function buildBadgeFacts(
   deps: AppDeps,
   profileId: string,
   journey: Journey,
   streakCurrent: number,
 ): Promise<BadgeFacts> {
-  const [progresses, attempts, records] = await Promise.all([
+  const [progresses, attempts] = await Promise.all([
     deps.progress.listLessons(profileId),
     deps.progress.listAttempts(profileId),
-    deps.gameRecords.listByProfile(profileId),
   ]);
 
   const { correctTotal, correctInARow, noHintsInARow } = conceptFacts(attempts);
-  const { gameWins, gameEvents, localGamesPlayed } = gameFacts(records);
-  const queenKeptWins = records.filter(
-    (record) =>
-      record.game === 'full' &&
-      record.result === 'win' &&
-      !queenCapturedByOpponent(record.moves, record.color ?? 'w'),
-  ).length;
 
   return {
     masteredScopes: masteredScopes(journey),
@@ -181,10 +115,6 @@ export async function buildBadgeFacts(
     conceptCorrectTotal: correctTotal,
     conceptCorrectInARow: correctInARow,
     conceptNoHintsInARow: noHintsInARow,
-    gameWins,
-    queenKeptWins,
-    gameEvents,
-    localGamesPlayed,
     streakCurrent,
     warmupsCompleted: attempts.filter(
       (attempt) => attempt.review === true && attempt.reviewSource === 'warmup',
@@ -208,11 +138,19 @@ export async function evaluateAndRecordBadges(
     return [];
   }
   const rewards = requireRewards(deps);
-  const [facts, earned] = await Promise.all([
+  const [facts, earned, records] = await Promise.all([
     buildBadgeFacts(deps, profileId, journey, streakCurrent),
     rewards.listEarnedBadges(profileId),
+    deps.gameRecords.listByProfile(profileId),
   ]);
-  const newlyEarned = evaluateBadges(defs, facts, earned);
+  const subjectRewards = deps.subject.rewards;
+  const newlyEarned = evaluateBadges(
+    defs,
+    facts,
+    earned,
+    subjectRewards,
+    subjectRewards?.facts(records),
+  );
 
   const saved: EarnedBadge[] = [];
   for (const { badgeId, tier } of newlyEarned) {

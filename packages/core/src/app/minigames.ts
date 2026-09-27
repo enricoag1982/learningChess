@@ -5,20 +5,16 @@ import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
 import type { MiniGame } from '../domain/lesson.ts';
 import type { MiniGameProgress } from '../domain/progress.ts';
 import { recordMiniGamePlay } from '../domain/progress.ts';
-import { toFen } from '../domain/chess/fen.ts';
+import { isStandardStart } from '../domain/chess/facts/start.ts';
 import { recordGame, versusGameRecordResult } from './games.ts';
 import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
-
-/** Board part of the standard chess start position's FEN. */
-const START_BOARD = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
 /** `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings,
  * standard start position), the same id the Play screen's "Full game" flow records; else its own id. */
 function gameRecordId(state: VersusState): string {
   const { def } = state;
-  const board = toFen(def.position).split(' ')[0];
-  return def.rules.kings && board === START_BOARD ? 'full' : def.id;
+  return def.rules.kings && isStandardStart(def.position) ? 'full' : def.id;
 }
 
 /** All saved mini-game progress for a profile (Play screen's best-stars tiles). */

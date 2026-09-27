@@ -1,6 +1,7 @@
 // Platform base types (design-r4.md §2 `SubjectCore`): the subject-free shapes every exercise def /
 // state / mini-game / lesson is built on. Pure TS, no chess import — a subject (chess, R5's math
 // demo) supplies its own concrete types on top of these.
+import type { SubjectRewards } from './badges.ts';
 import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
 import type { MiniGameMode } from './exercise/mode.ts';
 
@@ -95,7 +96,7 @@ export type AnyMode = MiniGameMode<unknown, MiniGameStateBase>;
 /** One subject's whole behaviour behind the platform's uniform interfaces (design-r4.md §2).
  * `rewards`/`gameRecordOf` are optional: a subject without badge facts or its own game log simply
  * omits them (R5's math demo). */
-export interface SubjectCore<Ctx = unknown> {
+export interface SubjectCore<Ctx = unknown, F = unknown> {
   /** e.g. `'chess'`. */
   readonly id: string;
   /** The kind context every `ExerciseKind.act`/`hint` call receives (chess: `VariantRules`). */
@@ -103,6 +104,9 @@ export interface SubjectCore<Ctx = unknown> {
   readonly kinds: Readonly<Record<string, AnyKind<Ctx>>>;
   /** `static`/`versus`-shaped modes; `createSubjectRuntime` adds the platform `series` mode. */
   readonly modes: Readonly<Record<string, AnyMode>>;
+  /** The subject's own facts for badge condition types the engine's 7 generic ones don't cover
+   * (chess: `game-win`/`game-event`/`game-played`). */
+  readonly rewards?: SubjectRewards<F>;
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping

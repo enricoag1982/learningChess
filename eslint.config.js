@@ -173,7 +173,6 @@ export default defineConfig([
       'packages/core/src/app/use-cases.test.ts',
       'packages/core/src/app/minigames.ts',
       'packages/core/src/app/minigames.test.ts',
-      'packages/core/src/app/rewards.ts',
       'packages/core/src/app/rewards.test.ts',
       'packages/core/src/app/backup.test.ts',
       'packages/core/src/app/ports.ts',

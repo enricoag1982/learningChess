@@ -12,10 +12,6 @@ const EMPTY_FACTS: BadgeFacts = {
   conceptCorrectTotal: {},
   conceptCorrectInARow: {},
   conceptNoHintsInARow: {},
-  gameWins: {},
-  queenKeptWins: 0,
-  gameEvents: { promotion: 0, castling: 0 },
-  localGamesPlayed: 0,
   streakCurrent: 0,
   warmupsCompleted: 0,
   comebackCount: 0,
@@ -115,41 +111,18 @@ describe('evaluateBadges', () => {
     ]);
   });
 
-  it('game-win: extra "queen-kept" reads queenKeptWins regardless of opponent', () => {
-    const badge = def('queen-keeper', { type: 'game-win', extra: 'queen-kept', thresholds: [1] });
-    expect(evaluateBadges([badge], { ...EMPTY_FACTS, queenKeptWins: 1 }, [])).toEqual([
-      { badgeId: 'queen-keeper', tier: undefined },
-    ]);
-  });
+  // game-win / game-event / game-played: chess's own facts (queen-kept, opponent wins, SAN-derived
+  // events) moved to domain/chess/facts/rewards.test.ts (`chessConditionValue`) — the engine itself
+  // only delegates (design-r4.md §2 leak #4), covered generically below.
 
-  it('game-win: opponent keys into gameWins', () => {
-    const badge = def('mouse-tamer', {
-      type: 'game-win',
-      opponent: 'computer:1',
-      thresholds: [1],
-    });
-    const facts = { ...EMPTY_FACTS, gameWins: { 'computer:1': 1, 'computer:2': 0 } };
-    expect(evaluateBadges([badge], facts, [])).toEqual([
+  it('game-win/game-event/game-played delegate to the subject; 0 without one wired up', () => {
+    const badge = def('mouse-tamer', { type: 'game-win', opponent: 'computer:1', thresholds: [1] });
+    expect(evaluateBadges([badge], EMPTY_FACTS, [])).toEqual([]);
+
+    const subject = { conditionValue: () => 1, facts: () => ({}) };
+    expect(evaluateBadges([badge], EMPTY_FACTS, [], subject, {})).toEqual([
       { badgeId: 'mouse-tamer', tier: undefined },
     ]);
-  });
-
-  it('game-event reads the named event count', () => {
-    const promo = def('butterfly-maker', {
-      type: 'game-event',
-      event: 'promotion',
-      thresholds: [10],
-    });
-    const castle = def('castle-builder', {
-      type: 'game-event',
-      event: 'castling',
-      thresholds: [5],
-    });
-    const facts = { ...EMPTY_FACTS, gameEvents: { promotion: 10, castling: 4 } };
-    expect(evaluateBadges([promo], facts, [])).toEqual([
-      { badgeId: 'butterfly-maker', tier: undefined },
-    ]);
-    expect(evaluateBadges([castle], facts, [])).toEqual([]);
   });
 
   it('evaluates every def in catalogue order, independent of each other', () => {

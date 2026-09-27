@@ -2,19 +2,26 @@
 // seam (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound —
 // m8.17 moves this file into `subject-chess` unchanged.
 import { chessJsRules } from './domain/chess/chessjs-rules.ts';
+import {
+  chessRewardFacts,
+  chessConditionValue,
+  type ChessRewardFacts,
+} from './domain/chess/facts/rewards.ts';
 import { EXERCISE_KINDS } from './domain/exercise/kinds/index.ts';
 import { staticMode } from './domain/exercise/modes/static/mode.ts';
 import { versusMode } from './domain/exercise/modes/versus/mode.ts';
 import type { AppConfig, SubjectCore } from './domain/subject.ts';
 import { createVariantRules, type VariantRules } from './domain/variant/index.ts';
 
-/** Chess's `SubjectCore`: today's 8 exercise kinds and the `static`/`versus` modes (`series` is
- * added by `createSubjectRuntime`, subject-free). */
-export const chessCore: SubjectCore<VariantRules> = {
+/** Chess's `SubjectCore`: today's 8 exercise kinds, the `static`/`versus` modes (`series` is added
+ * by `createSubjectRuntime`, subject-free), and its own badge facts (`game-win`/`game-event`/
+ * `game-played`, design-r4.md §2 leak #4). */
+export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   id: 'chess',
   context: createVariantRules(chessJsRules),
   kinds: EXERCISE_KINDS,
   modes: { static: staticMode, versus: versusMode },
+  rewards: { facts: chessRewardFacts, conditionValue: chessConditionValue },
 };
 
 /** Chess app's storage / backup / parent-code identifiers — unchanged from today's hardcoded
