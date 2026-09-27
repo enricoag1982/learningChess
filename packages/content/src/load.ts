@@ -6,6 +6,7 @@ import {
   langSchema,
   leafKeySchema,
   PLURAL_SUFFIX_PATTERN,
+  sortNamespaces,
   textLeafSchema,
   type LocaleTree,
 } from './schema.ts';
@@ -83,7 +84,7 @@ function loadLanguage(
     }
   }
 
-  return namespaces;
+  return sortNamespaces(namespaces);
 }
 
 /** Reads and parses one namespace YAML file, then validates it as a {@link LocaleTree}. */
