@@ -4,10 +4,10 @@ import { animalFriends, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsRow } from './StarsRow.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /**
  * Today session's closing screen (domain-model.md §3.3 "session summary"): stars earned this

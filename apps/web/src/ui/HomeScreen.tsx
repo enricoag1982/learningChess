@@ -9,11 +9,11 @@ import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { InstallBanner } from './InstallBanner.tsx';
 import { RankPill } from './RankPill.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 function PlayIcon(): JSX.Element {
   return (

@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { StarsRow } from '../StarsRow.tsx';
-import { InfoPanel } from '../primitives.tsx';
+import { InfoPanel } from '../ds/primitives.tsx';
 
 export function HintIcon(): JSX.Element {
   return (

@@ -5,10 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { starsToday } from '@chess-kids/core';
 import type { TimeLimitReason } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /** `TimeLimitStatus.reason` -> the title/body text this screen shows (M5.2 "limit"; M7.1
  * "late"/"early", app-structure.md §13 "Allowed hours"). Falls back to the daily-limit text for

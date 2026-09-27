@@ -6,9 +6,9 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 function BackIcon(): JSX.Element {
   return (

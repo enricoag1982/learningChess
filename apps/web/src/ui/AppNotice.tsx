@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
-import { Owl } from './Owl.tsx';
+import { Owl } from './ds/Owl.tsx';
 
 /**
  * 5-minute warning banner (M7.1, app-structure.md §13 "5-min warning"): the store's

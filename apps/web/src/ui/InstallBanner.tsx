@@ -7,7 +7,7 @@ import {
   readInstallBannerEnv,
   shouldShowInstallBanner,
 } from '../adapters/install-banner.ts';
-import { Owl } from './Owl.tsx';
+import { Owl } from './ds/Owl.tsx';
 
 /** Real `navigator`/`window`/`localStorage`, read once — `useState`'s lazy initialiser runs
  * exactly at mount, same "once on mount" timing an effect would give, without the extra

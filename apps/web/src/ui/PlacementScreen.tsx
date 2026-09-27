@@ -2,10 +2,10 @@ import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ReplayButton.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /** Placement's own closing summary (domain-model.md §3.2): how many Basics worlds were passed. */
 function PlacementSummary({

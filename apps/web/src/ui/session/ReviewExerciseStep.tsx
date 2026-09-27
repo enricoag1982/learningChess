@@ -10,11 +10,11 @@ import {
   starsFor,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
-import { ReplayButton } from '../ReplayButton.tsx';
-import { SpeechBubble } from '../SpeechBubble.tsx';
+import { ReplayButton } from '../ds/ReplayButton.tsx';
+import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useInstructionNarration } from '../useNarratedText.ts';
+import { useInstructionNarration } from '../ds/useNarratedText.ts';
 import { createExerciseReducer, initExerciseState } from '../lesson/exercise-reducer.ts';
 import { exerciseInstructionText, exerciseNote } from '../lesson/exercise-text.ts';
 import { buildExercisePlayArea } from '../lesson/exercise-play-area.tsx';

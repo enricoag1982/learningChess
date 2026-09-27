@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InfoPill } from './primitives.tsx';
+import { InfoPill } from './ds/primitives.tsx';
 
 function FlameIcon(): JSX.Element {
   return (

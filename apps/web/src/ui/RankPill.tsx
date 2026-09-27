@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { RankDef } from '@chess-kids/core';
 import { tContent } from '../content-text.ts';
-import { InfoPill } from './primitives.tsx';
+import { InfoPill } from './ds/primitives.tsx';
 
 function CrownIcon(): JSX.Element {
   return (

@@ -2,7 +2,7 @@ import type { TFunction } from 'i18next';
 import type { ExerciseDef, Hint, PieceType, Stars } from '@chess-kids/core';
 import { characterName, tContent } from '../../content-text.ts';
 import { characterPiece } from '../art/character-meta.ts';
-import type { SpeechBubbleNote } from '../SpeechBubble.tsx';
+import type { SpeechBubbleNote } from '../ds/SpeechBubble.tsx';
 import type { ExerciseFeedback } from './exercise-reducer.ts';
 
 /** The piece-specific "that's not how I move" line (docs/screens.md: errors are never red). */

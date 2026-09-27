@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /**
  * "Already know some chess?" offer (app-structure.md §3, domain-model.md §3.2), shown once right

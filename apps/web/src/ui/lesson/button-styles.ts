@@ -1,4 +1,4 @@
-import { tapButtonClass } from '../primitives-styles.ts';
+import { tapButtonClass } from '../ds/primitives-styles.ts';
 
 /** Shared button styling for the lesson's secondary (outline) and primary (filled green) actions —
  * both raised tappables (docs/screens.md §1, roadmap F3), built from the shared `tapButtonClass`. */

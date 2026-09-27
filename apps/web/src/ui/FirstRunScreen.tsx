@@ -5,10 +5,10 @@ import { isValidPassword, setupParentPassword } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
 import { PARENT_INPUT, PARENT_NOTE, PARENT_PRIMARY_BUTTON } from './parent/parent-styles.ts';
-import { Owl } from './Owl.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { Owl } from './ds/Owl.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 type Step = 'welcome' | 'password' | 'saved';
 

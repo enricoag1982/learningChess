@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import type { Narrator } from '@chess-kids/core';
-import { createFakeNarrator } from '../testing/fake-narrator.ts';
+import { createFakeNarrator } from '../../testing/fake-narrator.ts';
 import { useInstructionNarration } from './useNarratedText.ts';
 
 // Owner report 2026-09-26: submit re-read the whole instruction before the feedback note, every

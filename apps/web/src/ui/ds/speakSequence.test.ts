@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createFakeNarrator } from '../testing/fake-narrator.ts';
+import { createFakeNarrator } from '../../testing/fake-narrator.ts';
 import { speakSequence } from './speakSequence.ts';
 
 /** Lets every already-queued microtask (the loop's own `await`s) run before continuing. */

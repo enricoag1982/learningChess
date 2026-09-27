@@ -14,12 +14,12 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
 import { CharacterIcon } from './art/characters.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { ReplayButton } from './ds/ReplayButton.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
-import { InfoPill } from './primitives.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { InfoPill } from './ds/primitives.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
 const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play', 'habit'];

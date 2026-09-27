@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Owl } from './Owl.tsx';
+import { Owl } from './ds/Owl.tsx';
 
 /**
  * `Suspense` fallback for a lazy-loaded screen (`App.tsx`, `non-functional.md` §4 "Lazy loading"):

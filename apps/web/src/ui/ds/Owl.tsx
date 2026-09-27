@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { OwlIcon } from './art/characters.tsx';
+import { OwlIcon } from '../art/characters.tsx';
 
 /** The narrator's round avatar, shown beside every speech bubble. */
 export function Owl({ className = 'h-16 w-16' }: { readonly className?: string }): JSX.Element {

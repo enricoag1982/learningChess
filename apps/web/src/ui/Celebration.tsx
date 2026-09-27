@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { SpeechBubble } from './SpeechBubble.tsx';
-import { useNarratedText } from './useNarratedText.ts';
+import { ReplayButton } from './ds/ReplayButton.tsx';
+import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { useNarratedText } from './ds/useNarratedText.ts';
 
 /**
  * Full-screen badge celebration (rewards.md §1 "Rare celebrations"), shown over whichever screen
