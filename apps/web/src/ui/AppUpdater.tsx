@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react';
 import type { AppUpdate } from '../adapters/app-update.ts';
+import type { Screen } from '../app/store.ts';
 import { useAppStore } from '../app/store.ts';
+import { ROUTE_META } from '../app/routes.ts';
 
-/** Screens an update is safe to apply at — never mid-lesson/game/assessment/time-limit/parent
- * (playtest 2, `docs/non-functional.md` §1 "App update"). */
-function isSafeUpdateScreen(screen: string): boolean {
-  return screen === 'home' || screen === 'picker';
+/** Screens an update is safe to apply at (`ROUTE_META`'s `safeUpdate` flag) — never
+ * mid-lesson/game/assessment/time-limit/parent (playtest 2, `docs/non-functional.md` §1 "App update"). */
+function isSafeUpdateScreen(screen: Screen): boolean {
+  return ROUTE_META[screen].safeUpdate === true;
 }
 
 /**

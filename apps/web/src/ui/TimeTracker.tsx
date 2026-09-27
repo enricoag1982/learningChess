@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { recordSessionMinutes } from '@chess-kids/core';
 import type { Screen } from '../app/store.ts';
 import { useAppStore, useServices } from '../app/store.ts';
+import { ROUTE_META } from '../app/routes.ts';
 
 /** One real minute — the log records played time in whole minutes (domain-model.md §2 `SessionLog`). */
 const TICK_MS = 60_000;
@@ -12,19 +13,9 @@ const IDLE_LIMIT_MS = 2 * 60_000;
  * in the password/settings screens. */
 const INPUT_EVENTS = ['pointerdown', 'keydown'] as const;
 
-/** Screens where a kid profile is actively playing or browsing (app-structure.md's time controls
- * table: "lessons, practice, play, Home / Journey / Den browsing" all count) — everything except
- * onboarding, the picker, and the parent gate/area, where no kid activity is happening. */
+/** Screens where a kid profile is actively playing or browsing (`ROUTE_META`'s `tracked` flag). */
 function isTrackedScreen(screen: Screen): boolean {
-  return (
-    screen !== 'loading' &&
-    screen !== 'first-run' &&
-    screen !== 'new-player' &&
-    screen !== 'picker' &&
-    screen !== 'password' &&
-    screen !== 'parent' &&
-    screen !== 'time-limit'
-  );
+  return ROUTE_META[screen].tracked;
 }
 
 /**

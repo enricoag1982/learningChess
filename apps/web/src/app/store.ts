@@ -60,6 +60,8 @@ import {
   updateSuggestedLevel,
 } from '@chess-kids/core';
 import { requestPersistentStorageIfNeeded } from '../adapters/persistent-storage.ts';
+import type { RouteName } from './routes.ts';
+import { ROUTE_META } from './routes.ts';
 import type { Services } from './services.ts';
 
 /** Rare celebrations (rewards.md §1): at most this many full-screen badge celebrations per app
@@ -68,45 +70,10 @@ import type { Services } from './services.ts';
 const MAX_CELEBRATIONS_PER_SESSION = 2;
 
 /** Which top-level screen is showing. `loading` is the instant before `init()` resolves. */
-export type Screen =
-  | 'loading'
-  | 'first-run'
-  | 'new-player'
-  | 'picker'
-  | 'password'
-  | 'parent'
-  | 'home'
-  | 'journey'
-  | 'lesson'
-  | 'play'
-  | 'den'
-  | 'minigame'
-  | 'full-game'
-  | 'friend-setup'
-  | 'friend-game'
-  | 'warmup'
-  | 'practice'
-  | 'practice-run'
-  | 'today-summary'
-  | 'placement-offer'
-  | 'placement'
-  | 'assessment'
-  | 'time-limit';
+export type Screen = RouteName;
 
-/** Screens the 5-minute warning (M7.1, app-structure.md §13 "5-min warning") may show on: every
- * screen listed here, plus the lesson screen but only on its own lesson-complete step (checked
- * separately below) — never mid-exercise/game/boss/assessment. */
-const CALM_SCREENS: ReadonlySet<Screen> = new Set([
-  'home',
-  'journey',
-  'play',
-  'practice',
-  'den',
-  'today-summary',
-]);
-
-/** `true` while `screen` is one the 5-minute warning may show on right now (M7.1) — see
- * {@link CALM_SCREENS}; for `screen: 'lesson'`, only once `lessonId`/`stepIndex` land on that
+/** `true` while `screen` is one the 5-minute warning (M7.1) may show on right now — see
+ * `ROUTE_META`'s `calm` flag; for `screen: 'lesson'`, only once `lessonId`/`stepIndex` land on that
  * lesson's own `'complete'` step (`lessonSteps`, same step `LessonScreen` renders as `CompleteStep`). */
 function isCalmScreen(
   screen: Screen,
@@ -114,7 +81,7 @@ function isCalmScreen(
   stepIndex: number,
   content: ContentSource,
 ): boolean {
-  if (CALM_SCREENS.has(screen)) return true;
+  if (ROUTE_META[screen].calm) return true;
   if (screen !== 'lesson' || lessonId === null) return false;
   const lesson = content.lesson(lessonId);
   if (!lesson) return false;
