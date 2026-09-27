@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { animalFriends, totalStars } from '@chess-kids/core';
+import { CHESS_CHARACTERS } from '@chess-kids/core/chess';
 import { useAppStore } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
@@ -30,7 +31,7 @@ export function SessionSummaryScreen(): JSX.Element {
   const startFriendChars = new Set(
     startFriends.filter((friend) => friend.earned).map((friend) => friend.character),
   );
-  const newFriends = animalFriends(journey.lessons, progress).filter(
+  const newFriends = animalFriends(journey.lessons, progress, CHESS_CHARACTERS).filter(
     (friend) => friend.earned && !startFriendChars.has(friend.character),
   );
   const newRank = journey.rank && journey.rank.id !== startRankId ? journey.rank : undefined;

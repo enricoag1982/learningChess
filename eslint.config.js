@@ -167,7 +167,6 @@ export default defineConfig([
       'packages/core/src/domain/review.test.ts',
       'packages/core/src/domain/lesson-session.ts',
       'packages/core/src/domain/lesson-session.test.ts',
-      'packages/core/src/domain/rewards.ts',
       'packages/core/src/domain/progress.test.ts',
       'packages/core/src/app/use-cases.ts',
       'packages/core/src/app/use-cases.test.ts',

@@ -127,6 +127,10 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
     game: MiniGameBase,
     state: MiniGameStateBase,
   ): Omit<RecordGameInput, 'profileId'> | null;
+  /** Lesson characters that double as an "animal friend" once their lesson is done (World 2:
+   * `rhino` → `piece.r`); key order is `animalFriends`' own friend order. Absent id = a
+   * narrator-taught character (Owl), never a friend. */
+  readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping

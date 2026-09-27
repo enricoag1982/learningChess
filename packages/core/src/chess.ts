@@ -17,7 +17,7 @@ export {
 export type { BotPlayer } from './app/bot-player.ts';
 
 // Chess's `SubjectCore` + `AppConfig` (design-r4.md §2, C4).
-export { chessCore, CHESS_APP_CONFIG } from './chess-core.ts';
+export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS } from './chess-core.ts';
 
 export type {
   Color,

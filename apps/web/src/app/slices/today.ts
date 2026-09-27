@@ -1,5 +1,6 @@
 import type { AnimalFriend, TodaySessionPlan } from '@chess-kids/core';
 import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@chess-kids/core';
+import { CHESS_CHARACTERS } from '@chess-kids/core/chess';
 import { backAndRefresh, type SliceCreator } from '../store.ts';
 import { enterLesson } from './learn.ts';
 
@@ -86,7 +87,7 @@ export const createTodaySlice: SliceCreator<TodaySlice> = (set, get) => {
         todayPlan: plan,
         todayActivityIndex: 0,
         todaySessionStartTotalStars: totalStars(progress),
-        todaySessionStartFriends: animalFriends(journey.lessons, progress),
+        todaySessionStartFriends: animalFriends(journey.lessons, progress, CHESS_CHARACTERS),
         todaySessionStartRankId: journey.rank?.id ?? null,
       });
       await enterTodayActivity(0);
