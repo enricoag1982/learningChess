@@ -214,7 +214,7 @@ export function JourneyScreen(): JSX.Element {
   function activateBoss(bossStatus: WorldBossStatus, miniGameId: string): void {
     if (bossStatus !== 'available' && bossStatus !== 'won') return;
     setLockedMessage(null);
-    startMiniGame(miniGameId, 'journey');
+    startMiniGame(miniGameId);
   }
 
   const lessonsOfCurrent = current ? worldLessons(current.world, journey.lessons) : [];

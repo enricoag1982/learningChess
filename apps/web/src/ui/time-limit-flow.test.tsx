@@ -7,6 +7,7 @@ import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
+import { setRoute } from '../app/store.ts';
 import { AppNotice } from './AppNotice.tsx';
 
 /** Five-minute warning's own kid-facing text (`notice.five-minutes`), spoken and shown verbatim. */
@@ -248,22 +249,16 @@ describe('5-minute warning notice (M7.1)', () => {
     expect(completeIndex).toBeGreaterThan(-1);
 
     act(() => {
-      store.setState({
-        screen: 'lesson',
-        route: { name: 'lesson', lessonId: lesson.id, startStep: 0 },
-        stepIndex: 0,
-      });
+      setRoute(store, { name: 'lesson', lessonId: lesson.id, startStep: 0 });
+      store.setState({ stepIndex: 0 });
     });
     await waitFor(() => {
       expect(store.getState().timeNoticeVisible).toBe(false);
     });
 
     act(() => {
-      store.setState({
-        screen: 'lesson',
-        route: { name: 'lesson', lessonId: lesson.id, startStep: 0 },
-        stepIndex: completeIndex,
-      });
+      setRoute(store, { name: 'lesson', lessonId: lesson.id, startStep: 0 });
+      store.setState({ stepIndex: completeIndex });
     });
     await screen.findByText(FIVE_MINUTES_TEXT);
   });

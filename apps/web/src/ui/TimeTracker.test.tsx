@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { localDayString } from '@chess-kids/core';
-import { createAppStore, StoreProvider } from '../app/store.ts';
+import { createAppStore, setRoute, StoreProvider } from '../app/store.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
@@ -91,7 +91,7 @@ describe('TimeTracker (M5.2)', () => {
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('renderWithStore: no profile selected');
 
-    store.setState({ screen: 'password' });
+    setRoute(store, { name: 'password', purpose: 'parent-area' });
     await vi.advanceTimersByTimeAsync(60_000);
     expect(await loggedMinutes(services, profileId)).toBe(0);
   });
@@ -105,7 +105,7 @@ describe('TimeTracker (M5.2)', () => {
 
     await vi.advanceTimersByTimeAsync(40_000);
     act(() => {
-      store.setState({ screen: 'journey' });
+      setRoute(store, { name: 'journey' });
     });
     await vi.advanceTimersByTimeAsync(40_000);
     expect(await loggedMinutes(services, profileId)).toBe(1);

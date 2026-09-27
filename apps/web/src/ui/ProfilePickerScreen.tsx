@@ -44,7 +44,7 @@ export function ProfilePickerScreen(): JSX.Element {
         <button
           type="button"
           onClick={() => {
-            startNewPlayer(false);
+            startNewPlayer();
           }}
           className="flex w-40 flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-[#CDBF9F] p-5 text-muted sm:w-52"
         >

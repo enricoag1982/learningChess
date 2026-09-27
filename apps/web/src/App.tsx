@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import type { JSX } from 'react';
+import type { ComponentType, JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
+import type { RouteName } from './app/routes.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import type { AppUpdate } from './adapters/app-update.ts';
@@ -53,58 +54,42 @@ const AssessmentScreen = lazy(() =>
   import('./ui/AssessmentScreen.tsx').then((module) => ({ default: module.AssessmentScreen })),
 );
 
+/** The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one. */
+function LoadingScreen(): JSX.Element {
+  return <main className="min-h-dvh bg-cream" />;
+}
+
+/** Route → component table (v4 R2 PR C), replacing the old `screen` switch. */
+const ROUTE_SCREENS: Readonly<Record<RouteName, ComponentType>> = {
+  loading: LoadingScreen,
+  'first-run': FirstRunScreen,
+  'new-player': NewPlayerScreen,
+  picker: ProfilePickerScreen,
+  password: PasswordScreen,
+  parent: ParentAreaScreen,
+  lesson: LessonScreen,
+  home: HomeScreen,
+  journey: JourneyScreen,
+  play: PlayScreen,
+  den: DenScreen,
+  minigame: MiniGameSessionScreen,
+  'full-game': FullGameScreen,
+  'friend-setup': FriendSetupScreen,
+  'friend-game': FriendGameScreen,
+  warmup: WarmUpScreen,
+  practice: PracticeScreen,
+  'practice-run': PracticeRunScreen,
+  'today-summary': SessionSummaryScreen,
+  'placement-offer': PlacementOfferScreen,
+  placement: PlacementScreen,
+  assessment: AssessmentScreen,
+  'time-limit': TimeLimitScreen,
+};
+
 function Screens(): JSX.Element {
   const screen = useAppStore((state) => state.screen);
-  switch (screen) {
-    case 'first-run':
-      return <FirstRunScreen />;
-    case 'new-player':
-      return <NewPlayerScreen />;
-    case 'picker':
-      return <ProfilePickerScreen />;
-    case 'password':
-      return <PasswordScreen />;
-    case 'parent':
-      return <ParentAreaScreen />;
-    case 'lesson':
-      return <LessonScreen />;
-    case 'home':
-      return <HomeScreen />;
-    case 'journey':
-      return <JourneyScreen />;
-    case 'play':
-      return <PlayScreen />;
-    case 'den':
-      return <DenScreen />;
-    case 'minigame':
-      return <MiniGameSessionScreen />;
-    case 'full-game':
-      return <FullGameScreen />;
-    case 'friend-setup':
-      return <FriendSetupScreen />;
-    case 'friend-game':
-      return <FriendGameScreen />;
-    case 'warmup':
-      return <WarmUpScreen />;
-    case 'practice':
-      return <PracticeScreen />;
-    case 'practice-run':
-      return <PracticeRunScreen />;
-    case 'today-summary':
-      return <SessionSummaryScreen />;
-    case 'placement-offer':
-      return <PlacementOfferScreen />;
-    case 'placement':
-      return <PlacementScreen />;
-    case 'assessment':
-      return <AssessmentScreen />;
-    case 'time-limit':
-      return <TimeLimitScreen />;
-    case 'loading':
-    default:
-      // The instant before `init()` resolves: a blank cream screen beats a flash of the wrong one.
-      return <main className="min-h-dvh bg-cream" />;
-  }
+  const ScreenComponent = ROUTE_SCREENS[screen];
+  return <ScreenComponent />;
 }
 
 /** Never applies an update on its own: the default for tests and any render that does not pass

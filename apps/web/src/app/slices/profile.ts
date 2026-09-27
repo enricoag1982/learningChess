@@ -44,8 +44,6 @@ export interface ProfileSlice {
   readonly conceptStats: readonly ConceptStats[];
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
-  /** New-player wizard: return to Parent area instead of Home once it creates the profile. */
-  readonly newPlayerReturnsToParent: boolean;
 
   /** First run only: after the "Saved" screen, either straight to the new-player wizard, straight to
    * Home (a single existing profile — the M1-upgrade path), or the picker (more than one). */
@@ -134,13 +132,13 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
     gameRecords: [],
     conceptStats: [],
     journey: null,
-    newPlayerReturnsToParent: false,
 
     async finishFirstRun() {
       const { services } = get();
       const profiles = await listProfiles(services.deps);
       if (profiles.length === 0) {
-        set({ screen: 'new-player', newPlayerReturnsToParent: false, profiles });
+        set({ profiles });
+        void get().navigate({ name: 'new-player' });
         return;
       }
       const [only] = profiles;
@@ -150,7 +148,8 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
         await selectProfile(services.deps, only.id);
         const settings = await getProfileSettings(services.deps, only.id);
         await activateProfile(set, get, only, settings);
-        set({ profiles, screen: 'home' });
+        set({ profiles });
+        get().reset({ name: 'home' });
         return;
       }
       await get().goToPicker();
@@ -163,9 +162,14 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
       // profile creation happens first on this device — a no-op every time after (see
       // `requestPersistentStorageIfNeeded`'s own doc comment).
       await requestPersistentStorageIfNeeded(services.deps);
-      if (get().newPlayerReturnsToParent) {
+      // Where the wizard returns to (picker vs parent area's "Add child") is read straight off the
+      // stack — `startNewPlayer` pushed 'new-player' on top of whichever it was.
+      const { stack } = get();
+      const returnsToParent = stack[stack.length - 2]?.name === 'parent';
+      if (returnsToParent) {
         const profiles = await listProfiles(services.deps);
-        set({ profiles, screen: 'parent' });
+        set({ profiles });
+        void get().back();
         return;
       }
       await selectProfile(services.deps, profile.id);
@@ -173,13 +177,11 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
       // (voice on), no need to round-trip `getProfileSettings` for a row that cannot exist yet.
       await activateProfile(set, get, profile, DEFAULT_PROFILE_SETTINGS);
       const profiles = await listProfiles(services.deps);
-      set({
-        profiles,
-        // app-structure.md §3 / domain-model.md §3.2: offered once, right after creating a new
-        // player (not when a parent added a child from the parent area — that path stays on
-        // `finishNewPlayer`'s own early return above, straight back to 'parent').
-        screen: 'placement-offer',
-      });
+      set({ profiles });
+      // app-structure.md §3 / domain-model.md §3.2: offered once, right after creating a new
+      // player (not when a parent added a child from the parent area — that path stays on
+      // `finishNewPlayer`'s own early return above, straight back to 'parent').
+      get().reset({ name: 'home' }, { name: 'placement-offer' });
     },
 
     async selectProfileAndHome(profileId: string) {
@@ -189,7 +191,7 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
       await selectProfile(services.deps, profileId);
       const settings = await getProfileSettings(services.deps, profileId);
       await activateProfile(set, get, profile, settings);
-      set({ screen: 'home' });
+      get().reset({ name: 'home' });
     },
 
     async refreshProfiles() {

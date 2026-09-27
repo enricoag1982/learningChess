@@ -1,8 +1,6 @@
 import type { AnimalFriend, TodaySessionPlan } from '@chess-kids/core';
 import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
-import { gated } from './time.ts';
-import { enterRoute, goHomeGated } from './nav.ts';
 import { enterLesson } from './learn.ts';
 
 export interface TodaySlice {
@@ -33,14 +31,17 @@ export interface TodaySlice {
 export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
   /**
    * Opens a Today session's activity at `index` (`todayPlan.activities`), or the summary once
-   * `index` runs past the end. Shared by `startToday`/`advanceToday`. Each activity is its own
-   * gate checkpoint (`gated`) — the session pauses at "See you tomorrow" instead of continuing
-   * once the limit is reached between two of its activities.
+   * `index` runs past the end. Shared by `startToday`/`advanceToday`. `index === 0` pushes (the
+   * session's first activity, on top of Home); every later activity replaces the current one in
+   * place, so "back" never unwinds through the whole session. Each activity is its own gate
+   * checkpoint (`navigate`/`replace` both check `ROUTE_META`'s gated routes) — the session pauses
+   * at "See you tomorrow" instead of continuing once the limit is reached between two activities.
    */
   async function enterTodayActivity(index: number): Promise<void> {
     const { services } = get();
     const plan = get().todayPlan;
     const activity = plan?.activities[index];
+    const enter = index === 0 ? get().navigate : get().replace;
     if (!plan || !activity) {
       // rewards.md §4 "session ended" event: folds the session into the streak/badges one more
       // time (picks up anything only true once the whole session is done, e.g. Warm-up Champ) —
@@ -50,19 +51,17 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
         await checkRewards(services.deps, profile.id);
       }
       set({ todayActivityIndex: index });
-      enterRoute(set, { name: 'today-summary' });
+      await enter({ name: 'today-summary' });
       await get().checkForCelebrations();
       return;
     }
     set({ todayActivityIndex: index });
     if (activity.kind === 'warmup') {
-      await gated(set, get, () => {
-        enterRoute(set, { name: 'warmup' });
-      });
+      await enter({ name: 'warmup' });
       return;
     }
     if (activity.kind === 'lesson') {
-      await enterLesson(set, get, activity.lesson.id, 'today');
+      await enterLesson(get, activity.lesson.id, { today: true, enter });
       return;
     }
     const miniGameId = activity.kind === 'world-boss' ? activity.world.boss : activity.miniGame.id;
@@ -72,10 +71,7 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
       await enterTodayActivity(index + 1);
       return;
     }
-    await gated(set, get, () => {
-      set({ miniGameOrigin: 'today' });
-      enterRoute(set, { name: 'minigame', miniGameId });
-    });
+    await enter({ name: 'minigame', miniGameId, today: true });
   }
 
   return {
@@ -103,7 +99,9 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
     async advanceToday() {
       const plan = get().todayPlan;
       if (!plan) {
-        enterRoute(set, { name: 'home' });
+        // Defensive: `advanceToday` is only ever called while a session is open. Straight to
+        // Home, ungated, same as the "no plan" guard everywhere else in this slice.
+        get().reset({ name: 'home' });
         return;
       }
       await get().refreshProgress();
@@ -111,20 +109,14 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
     },
 
     leaveToday() {
-      set({
-        todayPlan: null,
-        todayActivityIndex: 0,
-      });
-      void goHomeGated(set, get);
+      set({ todayPlan: null, todayActivityIndex: 0 });
+      void get().back('home', { gate: true });
       void get().refreshProgress();
     },
 
     finishToday() {
-      set({
-        todayPlan: null,
-        todayActivityIndex: 0,
-      });
-      void goHomeGated(set, get);
+      set({ todayPlan: null, todayActivityIndex: 0 });
+      void get().back('home', { gate: true });
       void get().refreshProgress();
     },
   };

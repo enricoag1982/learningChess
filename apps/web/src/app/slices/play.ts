@@ -1,11 +1,5 @@
 import { computerLevelStatus, loadGameRecords, updateSuggestedLevel } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
-import { gated } from './time.ts';
-import { enterRoute, goHomeGated } from './nav.ts';
-
-/** Where the current standalone mini-game session was opened from: decides where its exit returns to.
- * `today`: opened as a Today session's world-boss or mini-game activity — see `startToday`. */
-export type MiniGameOrigin = 'play' | 'journey' | 'home' | 'today';
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
 export type FriendOpponentChoice =
@@ -46,11 +40,10 @@ const DEFAULT_FRIEND_SETUP: FriendSetupState = {
 };
 
 export interface PlaySlice {
-  /** Where the open standalone mini-game session was entered from; decides `exitMiniGame`'s target. */
-  readonly miniGameOrigin: MiniGameOrigin;
   /** Owl's "Ready for the Fox?" line (`docs/computer-opponent.md` §5 "Automatic level"), set once
    * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
-   * it once (`goToHome`/`startFullGame` clear it so it never lingers past the game it is about). */
+   * it once (`ROUTE_ENTER` on `full-game`, and `goToHome`, clear it so it never lingers past the
+   * game it is about). */
   readonly levelUpSuggestion: { readonly level: number } | null;
   /** The vs Friend setup sheet's current choices (screen `friend-setup`), read by the friend game
    * screen (`friend-game`) once "Start" is tapped. */
@@ -58,14 +51,14 @@ export interface PlaySlice {
 
   /**
    * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only) or the
-   * Journey map's world boss node. A Today session's world-boss / mini-game activity opens the
-   * same screen directly (`enterTodayActivity`), with `miniGameOrigin: 'today'`.
-   * `origin` (default `'play'`) decides where `exitMiniGame` returns to.
+   * Journey map's world boss node — pushed on top of whichever, so `exitMiniGame`'s plain `back()`
+   * returns to it unaided. A Today session's world-boss / mini-game activity opens the same screen
+   * via `enterTodayActivity` instead, with the route's own `today` flag.
    */
-  readonly startMiniGame: (miniGameId: string, origin?: MiniGameOrigin) => void;
+  readonly startMiniGame: (miniGameId: string) => void;
   /**
    * Leaves the standalone mini-game session for wherever it was opened from; a Today-session
-   * mini-game (`miniGameOrigin: 'today'`) abandons the whole session instead (`leaveToday`).
+   * mini-game (the current route's `today` flag) abandons the whole session instead (`leaveToday`).
    */
   readonly exitMiniGame: () => void;
   /** Play's vs Computer "Full game" button: opens a full game vs `level` (1 Mouse .. 5 Bear). */
@@ -95,40 +88,29 @@ export interface PlaySlice {
 
 export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
   return {
-    miniGameOrigin: 'play',
     levelUpSuggestion: null,
     friendSetup: DEFAULT_FRIEND_SETUP,
 
-    startMiniGame(miniGameId: string, origin: MiniGameOrigin = 'play') {
-      void gated(set, get, () => {
-        set({ miniGameOrigin: origin });
-        enterRoute(set, { name: 'minigame', miniGameId });
-      });
+    startMiniGame(miniGameId: string) {
+      void get().navigate({ name: 'minigame', miniGameId });
     },
 
     exitMiniGame() {
-      const origin = get().miniGameOrigin;
-      if (origin === 'today') {
+      const top = get().stack[get().stack.length - 1];
+      if (top?.name === 'minigame' && top.today) {
         get().leaveToday();
-        return;
-      }
-      if (origin === 'home') {
-        void goHomeGated(set, get);
       } else {
-        enterRoute(set, { name: origin === 'journey' ? 'journey' : 'play' });
+        void get().back();
       }
       void get().refreshProgress();
     },
 
     startFullGame(level: number) {
-      void gated(set, get, () => {
-        set({ levelUpSuggestion: null });
-        enterRoute(set, { name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 });
-      });
+      void get().navigate({ name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 });
     },
 
     exitFullGame() {
-      enterRoute(set, { name: 'play' });
+      void get().back();
       void get().refreshProgress();
     },
 
@@ -151,7 +133,7 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
 
     goToFriendSetup() {
       set({ friendSetup: { ...DEFAULT_FRIEND_SETUP, boardMode: defaultFriendBoardMode() } });
-      enterRoute(set, { name: 'friend-setup' });
+      void get().navigate({ name: 'friend-setup' });
     },
 
     updateFriendSetup(patch: Partial<FriendSetupState>) {
@@ -161,13 +143,11 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
     startFriendGame() {
       const { friendSetup } = get();
       if (!friendSetup.opponent || !friendSetup.gameId) return;
-      void gated(set, get, () => {
-        enterRoute(set, { name: 'friend-game' });
-      });
+      void get().navigate({ name: 'friend-game' });
     },
 
     exitFriendGame() {
-      enterRoute(set, { name: 'play' });
+      void get().back('play');
       void get().refreshProgress();
     },
   };

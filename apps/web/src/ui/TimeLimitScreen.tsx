@@ -3,7 +3,7 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { starsToday } from '@chess-kids/core';
 import type { TimeLimitReason } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { tapClass } from './ds/tap.ts';
@@ -46,7 +46,7 @@ export function TimeLimitScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
-  const timeLimitStatus = useAppStore((state) => state.timeLimitStatus);
+  const timeLimitStatus = useRoute('time-limit')?.status ?? null;
   const goToPasswordScreen = useAppStore((state) => state.goToPasswordScreen);
   const switchPlayerFromTimeLimit = useAppStore((state) => state.switchPlayerFromTimeLimit);
   const { value: stars } = useAsync(

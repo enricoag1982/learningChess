@@ -1,6 +1,5 @@
-import type { ContentSource, TimeLimitStatus } from '@chess-kids/core';
+import type { ContentSource } from '@chess-kids/core';
 import {
-  checkActivityGate,
   combinedSessionLog,
   getProfileSettings,
   grantExtraTime,
@@ -13,20 +12,8 @@ import {
 } from '@chess-kids/core';
 import { ROUTE_META } from '../routes.ts';
 import type { AppGet, AppSet, Screen } from '../store.ts';
-import { enterRoute } from './nav.ts';
 
 export interface TimeSlice {
-  /** The activity gate's last read (M5.2, domain-model.md §3.3), shown on the "See you tomorrow"
-   * screen (screen `time-limit`); `null` outside one. Stays flat, not routed (see `PlainRouteName`'s
-   * own doc comment): it must survive underneath a pushed `password` screen. */
-  readonly timeLimitStatus: TimeLimitStatus | null;
-  /** What the gate was about to do when it found the profile over its limit — replayed as-is
-   * (no re-check) once the parent grants more time (`grantMoreTimeAndResume`). `null` outside a
-   * `time-limit` screen. */
-  readonly pendingActivity: (() => void | Promise<void>) | null;
-  /** Which flow the password screen is for: the ordinary parent-area gate, or the "See you
-   * tomorrow" screen's "Parent: more time" (M5.2) — decides what a correct password does next. */
-  readonly passwordPurpose: 'parent-area' | 'more-time';
   /** The 5-minute warning banner (M7.1, `ui/AppNotice.tsx`): visible only on a calm screen, at
    * most once per child per day (`SessionLog.warnedAt`). */
   readonly timeNoticeVisible: boolean;
@@ -43,10 +30,11 @@ export interface TimeSlice {
    * (`purpose: 'more-time'`, M5.2) — decides what a correct password does next. Defaults to the
    * ordinary parent-area gate. */
   readonly goToPasswordScreen: (purpose?: 'parent-area' | 'more-time') => void;
-  /** Password screen, once the password is verified (`passwordPurpose === 'parent-area'`). */
+  /** Password screen, once the password is verified (`purpose === 'parent-area'`). */
   readonly goToParentArea: () => Promise<void>;
-  /** Password screen, once the password is verified with `passwordPurpose === 'more-time'`
-   * (M5.2): grants more time for today, then replays `pendingActivity` (or Home, without one). */
+  /** Password screen, once the password is verified with `purpose === 'more-time'` (M5.2): grants
+   * more time for today, then replays the `time-limit` route's `resume` (or lands on Home, if for
+   * some reason there is none) — unchecked, no re-gating. */
   readonly grantMoreTimeAndResume: () => Promise<void>;
   /** "See you tomorrow" screen's "Switch player": abandons whatever was gated and opens the
    * picker (M5.2). */
@@ -69,47 +57,17 @@ function isCalmScreen(
   return lessonSteps(lesson, content.minigames())[stepIndex]?.kind === 'complete';
 }
 
-/**
- * Time-limit gate (M5.2, domain-model.md §3.3 "checked between activities only"): runs
- * `enterActivity` (a plain `set(...)` closure, its whole point of entering the activity) if the
- * active profile is under its daily limit; otherwise shows "See you tomorrow" instead and
- * remembers `enterActivity` as `pendingActivity`, so granting more time
- * (`grantMoreTimeAndResume`) can resume exactly where the kid was headed, unchecked. A no-op
- * gate (straight to `enterActivity`) without an active profile — never blocks
- * first-run/picker/parent-area navigation, only kid-mode activities and Home.
- */
-export async function gated(
-  set: AppSet,
-  get: AppGet,
-  enterActivity: () => void | Promise<void>,
-): Promise<void> {
-  const { profile, services } = get();
-  if (!profile) {
-    await enterActivity();
-    return;
-  }
-  const status = await checkActivityGate(services.deps, profile.id);
-  if (status.overLimit) {
-    set({ pendingActivity: enterActivity, timeLimitStatus: status });
-    enterRoute(set, { name: 'time-limit' });
-    return;
-  }
-  await enterActivity();
-}
-
 export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
   return {
-    timeLimitStatus: null,
-    pendingActivity: null,
-    passwordPurpose: 'parent-area',
     timeNoticeVisible: false,
 
     async checkTimeNotice(trigger) {
       const { services } = get();
       if (trigger === 'screen') set({ timeNoticeVisible: false });
-      const { profile, screen, route, stepIndex } = get();
+      const { profile, screen, stack, stepIndex } = get();
       if (!profile) return;
-      const lessonId = route.name === 'lesson' ? route.lessonId : null;
+      const top = stack[stack.length - 1];
+      const lessonId = top?.name === 'lesson' ? top.lessonId : null;
       if (!isCalmScreen(screen, lessonId, stepIndex, services.deps.content)) return;
       const now = services.deps.clock.now();
       const settings = await getProfileSettings(services.deps, profile.id);
@@ -122,43 +80,39 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
     },
 
     goToPasswordScreen(purpose = 'parent-area') {
-      set({ passwordPurpose: purpose });
-      enterRoute(set, { name: 'password', purpose });
+      void get().navigate({ name: 'password', purpose });
     },
 
     async goToParentArea() {
       const { services } = get();
       const profiles = await listProfiles(services.deps);
       set({ profiles });
-      enterRoute(set, { name: 'parent' });
+      await get().replace({ name: 'parent' });
     },
 
     async grantMoreTimeAndResume() {
-      const { profile, pendingActivity, timeLimitStatus, services } = get();
+      const { profile, stack, services } = get();
       if (!profile) return;
+      const timeLimitRoute = stack[stack.length - 2];
+      if (!timeLimitRoute || timeLimitRoute.name !== 'time-limit') return;
       // M7.1: a late/early gate grants a 15-minute hours override instead of extending the
       // daily limit — `checkActivityGate` never over-reports "limit" once hours are also
       // blocking (`app/time-limit.ts`'s own priority), so `reason` alone decides which to grant.
-      if (timeLimitStatus?.reason === 'late' || timeLimitStatus?.reason === 'early') {
+      if (timeLimitRoute.status?.reason === 'late' || timeLimitRoute.status?.reason === 'early') {
         await grantHoursOverride(services.deps, profile.id);
       } else {
         await grantExtraTime(services.deps, profile.id);
       }
-      set({ timeLimitStatus: null, pendingActivity: null });
-      if (pendingActivity) {
-        await pendingActivity();
-      } else {
-        enterRoute(set, { name: 'home' });
+      const { resume } = timeLimitRoute;
+      await get().back(); // pop password
+      await get().back(); // pop time-limit
+      if (resume) {
+        await get().applyResume(resume);
       }
     },
 
     async switchPlayerFromTimeLimit() {
-      set({
-        timeLimitStatus: null,
-        pendingActivity: null,
-        todayPlan: null,
-        todayActivityIndex: 0,
-      });
+      set({ todayPlan: null, todayActivityIndex: 0 });
       await get().goToPicker();
     },
   };

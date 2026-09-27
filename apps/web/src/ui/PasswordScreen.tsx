@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verifyParentPassword } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { formatCountdown } from './parent/countdown.ts';
 import {
   PARENT_INPUT,
@@ -25,7 +25,7 @@ export function PasswordScreen(): JSX.Element {
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToParentArea = useAppStore((state) => state.goToParentArea);
   const grantMoreTimeAndResume = useAppStore((state) => state.grantMoreTimeAndResume);
-  const passwordPurpose = useAppStore((state) => state.passwordPurpose);
+  const passwordPurpose = useRoute('password')?.purpose ?? 'parent-area';
 
   const [input, setInput] = useState('');
   const [wrongAttempts, setWrongAttempts] = useState<number | null>(null);

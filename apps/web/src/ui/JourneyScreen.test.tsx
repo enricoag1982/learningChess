@@ -64,7 +64,8 @@ describe('JourneyScreen', () => {
     });
 
     expect(store.getState().screen).toBe('lesson');
-    expect(store.getState().route).toMatchObject({ name: 'lesson', lessonId: 'l1' });
+    const { stack } = store.getState();
+    expect(stack[stack.length - 1]).toMatchObject({ name: 'lesson', lessonId: 'l1' });
   });
 
   it('back button returns to Home', async () => {
@@ -185,6 +186,9 @@ describe('JourneyScreen world boss node', () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
     const { store } = await renderWithStore(<JourneyScreen />, services);
+    // `exitMiniGame` now reads its target off the stack (no more `miniGameOrigin`): put Journey
+    // on top first, same as the app does before this screen ever shows.
+    store.getState().goToJourney();
     await completeLesson(services, bl);
     await act(async () => {
       await store.getState().refreshProgress();
@@ -195,9 +199,10 @@ describe('JourneyScreen world boss node', () => {
     });
 
     expect(store.getState().screen).toBe('minigame');
-    expect(store.getState().route).toEqual({ name: 'minigame', miniGameId: 'boss-mg' });
-    expect(store.getState().miniGameOrigin).toBe('journey');
+    const { stack } = store.getState();
+    expect(stack[stack.length - 1]).toEqual({ name: 'minigame', miniGameId: 'boss-mg' });
 
+    // Opened from Journey (pushed on top of it): exiting returns there.
     store.getState().exitMiniGame();
     expect(store.getState().screen).toBe('journey');
   });
@@ -211,6 +216,7 @@ describe('JourneyScreen world boss node', () => {
     fireEvent.click(await screen.findByRole('button', { name: /^World boss: .*, locked$/ }));
 
     expect(store.getState().screen).toBe(screenBefore); // unchanged: locked tap is a no-op
-    expect(store.getState().route.name).not.toBe('minigame');
+    const { stack } = store.getState();
+    expect(stack[stack.length - 1]?.name).not.toBe('minigame');
   });
 });

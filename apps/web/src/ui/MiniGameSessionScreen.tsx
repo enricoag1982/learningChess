@@ -17,8 +17,12 @@ export function MiniGameSessionScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
-  const miniGameId = useRoute('minigame')?.miniGameId ?? null;
-  const miniGameOrigin = useAppStore((state) => state.miniGameOrigin);
+  const route = useRoute('minigame');
+  const miniGameId = route?.miniGameId ?? null;
+  // Its own exit's target and label read straight off the stack (no more `miniGameOrigin`): a
+  // standalone session sits directly on whatever opened it (Play, Journey, or Home for a Today
+  // activity — the `today` flag above takes over from there instead).
+  const below = useAppStore((state) => state.stack[state.stack.length - 2]);
   const exitMiniGame = useAppStore((state) => state.exitMiniGame);
   const advanceToday = useAppStore((state) => state.advanceToday);
 
@@ -29,14 +33,13 @@ export function MiniGameSessionScreen(): JSX.Element {
     return <BlankScreen />;
   }
 
-  const primaryLabel =
-    miniGameOrigin === 'today'
-      ? t('continue')
-      : miniGameOrigin === 'journey'
-        ? t('play.back-to-journey')
-        : miniGameOrigin === 'home'
-          ? t('play.back-to-home')
-          : t('play.back-to-play');
+  const primaryLabel = route?.today
+    ? t('continue')
+    : below?.name === 'journey'
+      ? t('play.back-to-journey')
+      : below?.name === 'home'
+        ? t('play.back-to-home')
+        : t('play.back-to-play');
 
   const session: BossPlaySession = {
     save: (state, durationMs) =>
@@ -47,7 +50,7 @@ export function MiniGameSessionScreen(): JSX.Element {
         durationMs,
       }).then(() => undefined),
     primaryLabel,
-    onPrimary: miniGameOrigin === 'today' ? () => void advanceToday() : exitMiniGame,
+    onPrimary: route?.today ? () => void advanceToday() : exitMiniGame,
   };
 
   return (

@@ -213,7 +213,7 @@ export function ParentAreaScreen(): JSX.Element {
               <button
                 type="button"
                 onClick={() => {
-                  startNewPlayer(true);
+                  startNewPlayer();
                 }}
                 className={PARENT_SECONDARY_BUTTON}
               >

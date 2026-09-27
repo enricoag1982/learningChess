@@ -18,6 +18,10 @@ import { createTimeSlice } from './slices/time.ts';
 import type { TodaySlice } from './slices/today.ts';
 import { createTodaySlice } from './slices/today.ts';
 
+/** Test-only stack override — see `slices/nav.ts`'s own doc comment. Re-exported here so ui tests
+ * only need one import path for the store. */
+export { setRoute } from './slices/nav.ts';
+
 /** Which top-level screen is showing. `loading` is the instant before `init()` resolves. */
 export type Screen = RouteName;
 
@@ -68,8 +72,9 @@ export function useServices(): Services {
   return useAppStore((state) => state.services);
 }
 
-/** The current route, narrowed to `name`'s own param shape; `null` when a different route shows. */
+/** The current route (the stack's top), narrowed to `name`'s own param shape; `null` when a
+ * different route shows. */
 export function useRoute<N extends RouteName>(name: N): Extract<Route, { name: N }> | null {
-  const route = useAppStore((state) => state.route);
-  return route.name === name ? (route as Extract<Route, { name: N }>) : null;
+  const route = useAppStore((state) => state.stack[state.stack.length - 1]);
+  return route?.name === name ? (route as Extract<Route, { name: N }>) : null;
 }
