@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { chessJsRules, parseDiagram } from '@chess-kids/core';
+import { chessJsRules, parseDiagram, toFen } from '@chess-kids/core';
 import type { Move } from '@chess-kids/core';
 import { boardCell as cell } from '../../testing/board.ts';
 import { Board } from './Board.tsx';
@@ -27,6 +27,11 @@ describe('Board — rendering', () => {
     expect(screen.getAllByRole('row')).toHaveLength(8);
     expect(screen.getAllByRole('gridcell')).toHaveLength(64);
     expect(screen.getAllByRole('button')).toHaveLength(64);
+  });
+
+  it('carries the shown position as data-fen (e2e, no board parsing)', () => {
+    render(<Board position={POSITION} legalMoves={LEGAL_MOVES} label="Chess board" />);
+    expect(screen.getByRole('grid').getAttribute('data-fen')).toBe(toFen(POSITION));
   });
 
   it('names piece, star, blocked and empty squares (white orientation)', () => {

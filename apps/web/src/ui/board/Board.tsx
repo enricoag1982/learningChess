@@ -3,6 +3,7 @@ import type { CSSProperties, JSX, KeyboardEvent, PointerEvent as ReactPointerEve
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { Color, Move, Piece, Position, Square } from '@chess-kids/core';
+import { toFen } from '@chess-kids/core';
 import { BlockedIcon, PieceBadge, PieceIcon, StarIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
@@ -149,7 +150,8 @@ interface CaptureFadeState {
 const DRAG_THRESHOLD_PX = 6;
 
 /** Renders `position`; tap-tap or drag moves constrained to `legalMoves`; `role="grid"` with one
- * labelled button per square (a11y). Holds no chess rules of its own. */
+ * labelled button per square (a11y) and `data-fen` on it (e2e — `toFen(position)`, no board parsing
+ * needed). Holds no chess rules of its own. */
 export function Board({
   position,
   legalMoves,
@@ -402,6 +404,7 @@ export function Board({
           ref={boardRef}
           role="grid"
           aria-label={label}
+          data-fen={toFen(position)}
           className="grid h-full w-full grid-cols-8 grid-rows-8"
         >
           {CELLS.map((row) => (
