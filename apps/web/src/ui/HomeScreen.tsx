@@ -15,6 +15,7 @@ import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 // Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
 // base") — one-off shapes only Home uses, built on the shared `Svg` icon base.
@@ -86,7 +87,11 @@ function HomeTile({
           '--tap-ledge': ledge,
         } as CSSProperties
       }
-      className="tap-raised flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4"
+      className={tapClass(
+        'custom',
+        'none',
+        'flex min-h-24 flex-col items-center justify-center gap-2 rounded-[2rem] py-4',
+      )}
     >
       <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white sm:h-16 sm:w-16">
         {icon}
@@ -200,7 +205,7 @@ export function HomeScreen(): JSX.Element {
             onClick={() => {
               void goToPicker();
             }}
-            className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+            className={tapClass('round')}
           >
             <SwitchPlayerIcon />
           </button>
@@ -220,7 +225,11 @@ export function HomeScreen(): JSX.Element {
             onClick={() => {
               void startToday();
             }}
-            className="tap-raised tap-today flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] bg-today px-8 text-white sm:h-36 sm:w-96"
+            className={tapClass(
+              'custom',
+              'today',
+              'flex h-28 flex-col items-center justify-center gap-1 rounded-[2rem] px-8 sm:h-36 sm:w-96',
+            )}
           >
             <span className="flex items-center gap-3 font-display text-2xl font-semibold sm:text-3xl">
               <PlayIcon />

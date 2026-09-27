@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
+import { tapClass } from '../ds/tap.ts';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
 /** Repository issues page (non-functional.md §3 "contact"): the same repo the live app deploys
@@ -61,7 +62,7 @@ export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round-sm')}
         >
           <ChevronLeftIcon />
         </button>

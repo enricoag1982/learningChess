@@ -20,6 +20,7 @@ import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { BackIcon, ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
@@ -173,7 +174,7 @@ export function PlayScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <BackIcon />
         </button>
@@ -230,13 +231,17 @@ export function PlayScreen(): JSX.Element {
                     onClick={() => {
                       selectLevel(status);
                     }}
-                    className={`tap-raised flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 text-left ${
-                      status.locked
-                        ? 'tap-locked bg-[#F3EDE0] text-muted'
-                        : selected
-                          ? 'tap-info bg-info text-white'
-                          : 'bg-[#EEF3FA] text-[#24497D]'
-                    }`}
+                    className={tapClass(
+                      'custom',
+                      'none',
+                      `flex flex-col items-start gap-0.5 rounded-2xl px-4 py-2 text-left ${
+                        status.locked
+                          ? 'tap-locked bg-[#F3EDE0] text-muted'
+                          : selected
+                            ? 'tap-info bg-info text-white'
+                            : 'bg-[#EEF3FA] text-[#24497D]'
+                      }`,
+                    )}
                   >
                     <span className="flex items-center gap-1.5" aria-hidden="true">
                       <img
@@ -277,7 +282,11 @@ export function PlayScreen(): JSX.Element {
             onClick={() => {
               startFullGame(effectiveLevel);
             }}
-            className="tap-raised tap-info flex h-16 items-center justify-center gap-2 rounded-2xl bg-info px-4 font-display text-lg font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
+            className={tapClass(
+              'custom',
+              'info',
+              'flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted',
+            )}
           >
             {!fullGameUnlocked && <LockIcon size={18} />}
             {fullGameUnlocked ? t('play.full-game') : t('play.full-game-locked')}
@@ -304,11 +313,15 @@ export function PlayScreen(): JSX.Element {
                 : `${t('play.vs-friend')}, ${t('play.vs-friend-locked')}`
             }
             onClick={activateFriend}
-            className={`tap-raised flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold ${
-              friendUnlocked
-                ? 'tap-today bg-today text-white'
-                : 'tap-locked bg-[#F3EDE0] text-muted'
-            }`}
+            className={tapClass(
+              'custom',
+              'none',
+              `flex h-16 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold ${
+                friendUnlocked
+                  ? 'tap-today bg-today text-white'
+                  : 'tap-locked bg-[#F3EDE0] text-muted'
+              }`,
+            )}
           >
             {!friendUnlocked && <LockIcon size={18} />}
             {friendUnlocked ? t('play.vs-friend') : t('play.vs-friend-locked')}
@@ -339,9 +352,13 @@ export function PlayScreen(): JSX.Element {
                 onClick={() => {
                   activateGame(minigame, unlocked);
                 }}
-                className={`tap-raised flex min-h-24 w-full flex-col justify-between gap-2 rounded-[1.5rem] p-3 text-left ${
-                  unlocked ? 'bg-card text-ink' : 'tap-locked bg-[#F3EDE0] text-muted'
-                }`}
+                className={tapClass(
+                  'custom',
+                  'none',
+                  `flex min-h-24 w-full flex-col justify-between gap-2 rounded-[1.5rem] p-3 text-left ${
+                    unlocked ? 'bg-card text-ink' : 'tap-locked bg-[#F3EDE0] text-muted'
+                  }`,
+                )}
               >
                 <span className="font-display text-base font-semibold leading-tight sm:text-lg">
                   {title}

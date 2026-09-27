@@ -14,6 +14,7 @@ import { animalImage } from './art/animal-images.ts';
 import { VersusStep } from './lesson/VersusStep.tsx';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { CloseIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -153,7 +154,7 @@ export function FullGameScreen(): JSX.Element {
           type="button"
           aria-label={t('play.close')}
           onClick={requestLeave}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <CloseIcon />
         </button>
@@ -192,14 +193,14 @@ export function FullGameScreen(): JSX.Element {
                 onClick={() => {
                   setConfirmLeave(false);
                 }}
-                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
+                className={tapClass('dialog')}
               >
                 {t('boss.versus.stop-game-cancel')}
               </button>
               <button
                 type="button"
                 onClick={confirmedLeave}
-                className="tap-raised tap-today flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
+                className={tapClass('dialog', 'today')}
               >
                 {t('boss.versus.stop-game-confirm')}
               </button>

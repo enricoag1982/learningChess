@@ -21,6 +21,7 @@ import { StreakPill } from './StreakPill.tsx';
 import { InfoPill } from './ds/primitives.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { BackIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
 const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play', 'habit'];
@@ -135,7 +136,7 @@ export function DenScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <BackIcon />
         </button>
@@ -304,9 +305,13 @@ export function DenScreen(): JSX.Element {
                         onClick={() => {
                           tapBadge(def, display, name);
                         }}
-                        className={`tap-raised relative flex min-h-16 w-full flex-col items-center gap-1 rounded-2xl px-2 py-3 text-center ${
-                          display.earned ? 'bg-white' : 'bg-[#F3EDE0]'
-                        }`}
+                        className={tapClass(
+                          'custom',
+                          'none',
+                          `relative flex min-h-16 w-full flex-col items-center gap-1 rounded-2xl px-2 py-3 text-center ${
+                            display.earned ? 'bg-white' : 'bg-[#F3EDE0]'
+                          }`,
+                        )}
                       >
                         {display.isNew && (
                           <span

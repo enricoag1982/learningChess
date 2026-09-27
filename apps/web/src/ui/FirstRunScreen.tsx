@@ -10,6 +10,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { LockIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 type Step = 'welcome' | 'password' | 'saved';
 
@@ -28,11 +29,7 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
         <SpeechBubble text={text} bubbleClassName="text-xl sm:text-2xl text-center" />
         <ReplayButton onClick={replay} label={t('exercise.replay')} className="self-center" />
       </div>
-      <button
-        type="button"
-        onClick={onNext}
-        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
-      >
+      <button type="button" onClick={onNext} className={tapClass('hero', 'go')}>
         {t('first-run.welcome.primary')}
       </button>
     </main>

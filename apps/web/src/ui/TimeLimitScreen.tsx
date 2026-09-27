@@ -9,6 +9,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { tapClass } from './ds/tap.ts';
 
 /** `TimeLimitStatus.reason` -> the title/body text this screen shows (M5.2 "limit"; M7.1
  * "late"/"early", app-structure.md §13 "Allowed hours"). Falls back to the daily-limit text for
@@ -91,7 +92,7 @@ export function TimeLimitScreen(): JSX.Element {
           onClick={() => {
             void switchPlayerFromTimeLimit();
           }}
-          className="tap-raised tap-go h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
+          className={tapClass('block', 'go')}
         >
           {t('home.switch-player')}
         </button>
@@ -100,7 +101,7 @@ export function TimeLimitScreen(): JSX.Element {
           onClick={() => {
             goToPasswordScreen('more-time');
           }}
-          className="tap-raised h-20 rounded-[2rem] bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
+          className={tapClass('block')}
         >
           {t('time-limit.more-time')}
         </button>

@@ -4,6 +4,7 @@ import { useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { tapClass } from './ds/tap.ts';
 
 export interface TestOutSheetProps {
   /** The offer question, already resolved (e.g. "Want to show me you already know Rhino?"). */
@@ -43,14 +44,22 @@ export function TestOutSheet({ bodyText, onYes, onNo }: TestOutSheetProps): JSX.
           <button
             type="button"
             onClick={onYes}
-            className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
+            className={tapClass(
+              'custom',
+              'go',
+              'flex h-16 items-center justify-center rounded-2xl font-display text-lg font-semibold',
+            )}
           >
             {tContent(t, 'journey:ui.test-out-yes')}
           </button>
           <button
             type="button"
             onClick={onNo}
-            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
+            className={tapClass(
+              'custom',
+              'neutral',
+              'flex h-16 items-center justify-center rounded-2xl font-display text-lg font-semibold',
+            )}
           >
             {tContent(t, 'journey:ui.test-out-no')}
           </button>

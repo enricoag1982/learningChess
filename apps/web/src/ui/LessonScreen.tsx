@@ -21,6 +21,7 @@ import { StoryStep } from './lesson/StoryStep.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { useIsCompact } from './useMediaQuery.ts';
 import { CloseIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Exercise stage dots + "N of M", shown only while working through the scored exercises. */
 function StageDots({
@@ -164,7 +165,7 @@ export function LessonScreen(): JSX.Element {
           type="button"
           aria-label={t('lesson.close')}
           onClick={exitLesson}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <CloseIcon />
         </button>

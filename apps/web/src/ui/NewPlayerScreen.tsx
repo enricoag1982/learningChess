@@ -7,6 +7,7 @@ import { avatarName } from '../content-text.ts';
 import type { Avatar } from './art/avatar-meta.ts';
 import { AVATARS, avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
+import { tapClass } from './ds/tap.ts';
 
 type Step = 'nickname' | 'avatar';
 
@@ -51,7 +52,7 @@ function NicknameStep({
         type="button"
         disabled={!valid}
         onClick={onNext}
-        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white disabled:opacity-40 sm:h-20 sm:text-2xl"
+        className={tapClass('hero', 'go', 'disabled:opacity-40')}
       >
         {t('new-player.nickname.primary')}
       </button>
@@ -95,11 +96,7 @@ function AvatarStep({
           );
         })}
       </div>
-      <button
-        type="button"
-        onClick={onFinish}
-        className="tap-raised tap-go flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] bg-go px-8 font-display text-xl font-semibold text-white sm:h-20 sm:text-2xl"
-      >
+      <button type="button" onClick={onFinish} className={tapClass('hero', 'go')}>
         {t('new-player.avatar.primary')}
       </button>
     </main>

@@ -16,8 +16,8 @@ function AppErrorScreen({ message }: { readonly message: string }): JSX.Element 
       <h1 className="font-display text-2xl text-ink">{t('app-error.title')}</h1>
       <p className="max-w-md text-base text-ink">{t('app-error.body')}</p>
       <TapButton
-        variant="primary"
-        role="go"
+        look="primary"
+        tone="go"
         className="w-64 flex-none"
         onClick={() => {
           window.location.reload();

@@ -8,6 +8,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { tapClass } from './ds/tap.ts';
 
 /**
  * Today session's closing screen (domain-model.md §3.3 "session summary"): stars earned this
@@ -91,7 +92,11 @@ export function SessionSummaryScreen(): JSX.Element {
       <button
         type="button"
         onClick={finishToday}
-        className="tap-raised tap-go mt-auto h-20 w-full max-w-lg rounded-3xl bg-go font-display text-xl font-semibold text-white"
+        className={tapClass(
+          'custom',
+          'go',
+          'mt-auto h-20 w-full max-w-lg rounded-3xl font-display text-xl font-semibold',
+        )}
       >
         {t('session.summary-done')}
       </button>

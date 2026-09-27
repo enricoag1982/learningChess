@@ -8,6 +8,7 @@ import { importMerged, planImport, previewChildChange } from '@chess-kids/core/m
 import { useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
+import { tapClass } from '../ds/tap.ts';
 import {
   PARENT_INFO_PANEL,
   PARENT_INPUT,
@@ -174,7 +175,7 @@ export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Ele
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round-sm')}
         >
           <ChevronLeftIcon />
         </button>

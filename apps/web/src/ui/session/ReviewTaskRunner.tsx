@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 import type { ConceptTask, ExerciseState } from '@chess-kids/core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
 import { CloseIcon } from '../ds/icons.tsx';
+import { tapClass } from '../ds/tap.ts';
 
 /** Dots mirroring the lesson's `StageDots`, sized for a short (3–5 task) review run. */
 function TaskDots({
@@ -90,7 +91,7 @@ export function ReviewTaskRunner({
           type="button"
           aria-label={closeAriaLabel}
           onClick={onClose}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <CloseIcon />
         </button>

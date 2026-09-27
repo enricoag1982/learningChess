@@ -4,6 +4,7 @@ import { useAppStore } from '../app/store.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { LockIcon, PlusIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Profile picker (kid style): app start whenever a parent lock exists (app-structure.md §3). */
 export function ProfilePickerScreen(): JSX.Element {
@@ -26,7 +27,11 @@ export function ProfilePickerScreen(): JSX.Element {
             onClick={() => {
               void selectProfileAndHome(profile.id);
             }}
-            className="tap-raised flex w-40 flex-col items-center gap-3 rounded-3xl bg-card p-5 sm:w-52"
+            className={tapClass(
+              'custom',
+              'none',
+              'flex w-40 flex-col items-center gap-3 rounded-3xl bg-card p-5 sm:w-52',
+            )}
           >
             <span
               className="h-24 w-24 overflow-hidden rounded-full p-3 sm:h-32 sm:w-32"
@@ -59,7 +64,7 @@ export function ProfilePickerScreen(): JSX.Element {
         onClick={() => {
           goToPasswordScreen();
         }}
-        className="tap-raised flex h-16 items-center gap-3 rounded-2xl bg-card px-5 text-ink"
+        className={tapClass('custom', 'neutral', 'flex h-16 items-center gap-3 rounded-2xl px-5')}
       >
         <LockIcon />
         <span className="flex flex-col items-start">

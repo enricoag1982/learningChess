@@ -10,6 +10,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { BackIcon, WarmUpIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {
@@ -107,7 +108,7 @@ export function PracticeScreen(): JSX.Element {
           type="button"
           aria-label={t('practice.back')}
           onClick={goToHome}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <BackIcon />
         </button>
@@ -138,7 +139,11 @@ export function PracticeScreen(): JSX.Element {
         onClick={() => {
           void startPracticeWarmUp();
         }}
-        className="tap-raised flex items-center gap-4 rounded-[2rem] bg-card p-5 text-left disabled:cursor-default disabled:opacity-70"
+        className={tapClass(
+          'custom',
+          'none',
+          'flex items-center gap-4 rounded-[2rem] bg-card p-5 text-left disabled:cursor-default disabled:opacity-70',
+        )}
       >
         <span className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-[#FBE3D2]">
           <WarmUpIcon />
@@ -178,7 +183,11 @@ export function PracticeScreen(): JSX.Element {
                           total: stats ? stats.recent.length : 0,
                         })}`
                   }
-                  className="tap-raised flex w-full items-center justify-between gap-4 rounded-3xl bg-card p-4 text-left"
+                  className={tapClass(
+                    'custom',
+                    'none',
+                    'flex w-full items-center justify-between gap-4 rounded-3xl bg-card p-4 text-left',
+                  )}
                 >
                   <div className="flex flex-col gap-1">
                     <span className="font-display text-lg text-ink sm:text-xl">{title}</span>

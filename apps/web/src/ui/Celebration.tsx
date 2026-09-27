@@ -6,6 +6,7 @@ import { BadgeIcon } from './BadgeIcon.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { tapClass } from './ds/tap.ts';
 
 /**
  * Full-screen badge celebration (rewards.md §1 "Rare celebrations"), shown over whichever screen
@@ -63,7 +64,11 @@ export function Celebration(): JSX.Element | null {
           onClick={() => {
             void dismissCelebration();
           }}
-          className="tap-raised tap-go mt-2 h-16 w-full max-w-xs rounded-3xl bg-go font-display text-xl font-semibold text-white"
+          className={tapClass(
+            'custom',
+            'go',
+            'mt-2 h-16 w-full max-w-xs rounded-3xl font-display text-xl font-semibold',
+          )}
         >
           {t('celebration.continue')}
         </button>

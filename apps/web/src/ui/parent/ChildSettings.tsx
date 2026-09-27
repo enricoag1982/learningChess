@@ -31,6 +31,7 @@ import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
 import { AvatarIcon } from '../art/avatars.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
+import { tapClass } from '../ds/tap.ts';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
@@ -55,7 +56,11 @@ function AvatarPicker({ onPick }: { readonly onPick: (avatar: string) => void })
           onClick={() => {
             onPick(id);
           }}
-          className="tap-raised flex h-11 w-11 items-center justify-center overflow-hidden rounded-full p-1.5"
+          className={tapClass(
+            'custom',
+            'none',
+            'flex h-11 w-11 items-center justify-center overflow-hidden rounded-full p-1.5',
+          )}
           style={{ backgroundColor: avatarBackground(id) }}
         >
           <AvatarIcon avatar={id} />
@@ -309,7 +314,11 @@ function ToggleRow({
       onClick={() => {
         onChange(!checked);
       }}
-      className="tap-raised flex min-h-[44px] items-center justify-between gap-3 rounded-xl bg-card px-4 py-2 text-left"
+      className={tapClass(
+        'custom',
+        'none',
+        'flex min-h-[44px] items-center justify-between gap-3 rounded-xl bg-card px-4 py-2 text-left',
+      )}
     >
       <span className="text-sm font-bold text-ink">{label}</span>
       <span
@@ -457,7 +466,7 @@ export function ChildSettingsScreen({
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round-sm')}
         >
           <ChevronLeftIcon />
         </button>

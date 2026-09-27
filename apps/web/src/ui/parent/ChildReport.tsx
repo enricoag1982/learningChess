@@ -11,6 +11,7 @@ import { AvatarIcon } from '../art/avatars.tsx';
 import { RankPill } from '../RankPill.tsx';
 import { ChevronRightIcon } from '../ds/icons.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
+import { tapClass } from '../ds/tap.ts';
 import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
@@ -154,7 +155,7 @@ export function ChildReportScreen({
           type="button"
           onClick={onBack}
           aria-label={t('parent.back')}
-          className="tap-raised flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round-sm')}
         >
           <ChevronLeftIcon />
         </button>

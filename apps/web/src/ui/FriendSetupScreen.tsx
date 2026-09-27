@@ -11,6 +11,7 @@ import { ReplayButton } from './ds/ReplayButton.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
 import { BackIcon } from './ds/icons.tsx';
 import { GuestIcon } from './ds/icons-lazy.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({
@@ -27,9 +28,11 @@ function ChoiceChip({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`tap-raised flex h-16 min-h-16 items-center justify-center rounded-2xl px-5 font-display text-lg font-semibold ${
-        selected ? 'tap-go bg-go text-white' : 'bg-card text-ink'
-      }`}
+      className={tapClass(
+        'custom',
+        selected ? 'go' : 'neutral',
+        'flex h-16 min-h-16 items-center justify-center rounded-2xl px-5 font-display text-lg font-semibold',
+      )}
     >
       {label}
     </button>
@@ -90,7 +93,7 @@ export function FriendSetupScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToPlay}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <BackIcon />
         </button>
@@ -115,11 +118,15 @@ export function FriendSetupScreen(): JSX.Element {
                 onClick={() => {
                   chooseOpponent({ kind: 'profile', profileId: candidate.id });
                 }}
-                className={`tap-raised flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
-                  isOpponentSelected({ kind: 'profile', profileId: candidate.id })
-                    ? 'tap-border-go bg-white'
-                    : 'bg-card'
-                }`}
+                className={tapClass(
+                  'custom',
+                  'none',
+                  `flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
+                    isOpponentSelected({ kind: 'profile', profileId: candidate.id })
+                      ? 'tap-border-go bg-white'
+                      : 'bg-card'
+                  }`,
+                )}
               >
                 <span
                   className="h-16 w-16 overflow-hidden rounded-full p-2"
@@ -140,9 +147,13 @@ export function FriendSetupScreen(): JSX.Element {
               onClick={() => {
                 chooseOpponent({ kind: 'guest' });
               }}
-              className={`tap-raised flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
-                isOpponentSelected({ kind: 'guest' }) ? 'tap-border-go bg-white' : 'bg-card'
-              }`}
+              className={tapClass(
+                'custom',
+                'none',
+                `flex w-28 flex-col items-center gap-2 rounded-3xl p-3 ${
+                  isOpponentSelected({ kind: 'guest' }) ? 'tap-border-go bg-white' : 'bg-card'
+                }`,
+              )}
             >
               <span className="h-16 w-16 overflow-hidden rounded-full bg-[#EDEFF1] p-2">
                 <GuestIcon />
@@ -226,7 +237,11 @@ export function FriendSetupScreen(): JSX.Element {
         type="button"
         disabled={!canStart}
         onClick={startFriendGame}
-        className="tap-raised tap-go mt-auto flex h-20 items-center justify-center gap-3 rounded-3xl bg-go px-6 font-display text-2xl font-semibold text-white disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted"
+        className={tapClass(
+          'next',
+          'go',
+          'mt-auto disabled:cursor-default disabled:bg-[#DDE8F6] disabled:text-muted',
+        )}
       >
         {t('friend-play.start')}
       </button>

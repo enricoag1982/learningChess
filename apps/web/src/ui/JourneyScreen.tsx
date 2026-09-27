@@ -22,6 +22,7 @@ import { StarsRow } from './StarsRow.tsx';
 import { TestOutSheet } from './TestOutSheet.tsx';
 import { useMediaQuery } from './useMediaQuery.ts';
 import { BackIcon, CheckIcon, CrownIcon, FlagIcon, LockIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Pastel tint per habitat (app-structure.md §8: one habitat per world), for the map panel. */
 const HABITAT_COLOR: Readonly<Record<Habitat, string>> = {
@@ -245,7 +246,7 @@ export function JourneyScreen(): JSX.Element {
           type="button"
           aria-label={tContent(t, 'journey:ui.back')}
           onClick={goToHome}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <BackIcon />
         </button>
@@ -318,7 +319,11 @@ export function JourneyScreen(): JSX.Element {
                 onClick={() => {
                   offerTestOutWorld(current.world);
                 }}
-                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go px-6 font-display text-base font-semibold text-white"
+                className={tapClass(
+                  'custom',
+                  'go',
+                  'flex h-16 items-center justify-center rounded-2xl px-6 font-display text-base font-semibold',
+                )}
               >
                 {tContent(t, 'journey:ui.show-you-know-it')}
               </button>
@@ -365,7 +370,11 @@ export function JourneyScreen(): JSX.Element {
                       : characterName(t, lesson.character);
                   offerTestOutLesson(lockedMessage.lessonId, lockedMessage.worldId, name);
                 }}
-                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go font-display text-base font-semibold text-white"
+                className={tapClass(
+                  'custom',
+                  'go',
+                  'flex h-16 items-center justify-center rounded-2xl font-display text-base font-semibold',
+                )}
               >
                 {tContent(t, 'journey:ui.show-you-know-it')}
               </button>
@@ -415,9 +424,13 @@ function WorldRow({
     <button
       type="button"
       onClick={onSelect}
-      className={`tap-raised flex h-16 min-w-[180px] flex-shrink-0 items-center gap-3 rounded-2xl px-3 lg:min-w-0 lg:w-full ${
-        selected ? 'tap-border-go bg-white' : muted ? 'bg-[#F3EDE0]' : 'bg-card'
-      }`}
+      className={tapClass(
+        'custom',
+        'none',
+        `flex h-16 min-w-[180px] flex-shrink-0 items-center gap-3 rounded-2xl px-3 lg:min-w-0 lg:w-full ${
+          selected ? 'tap-border-go bg-white' : muted ? 'bg-[#F3EDE0]' : 'bg-card'
+        }`,
+      )}
     >
       <span
         className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${

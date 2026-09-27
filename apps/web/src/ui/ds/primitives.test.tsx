@@ -5,9 +5,9 @@ import { render, screen } from '@testing-library/react';
 import { InfoPanel, InfoPill, TapButton } from './primitives.tsx';
 
 describe('TapButton', () => {
-  it('renders the raised marker class, plus a role class for a colour role', () => {
+  it('renders the raised marker class, plus a tone class for a colour tone', () => {
     render(
-      <TapButton variant="primary" role="go">
+      <TapButton look="primary" tone="go">
         Go
       </TapButton>,
     );
@@ -16,8 +16,8 @@ describe('TapButton', () => {
     expect(button.className).toContain('tap-go');
   });
 
-  it('carries no colour-role class for the default neutral role', () => {
-    render(<TapButton variant="secondary">Neutral</TapButton>);
+  it('carries no colour-tone class for the default neutral tone', () => {
+    render(<TapButton look="secondary">Neutral</TapButton>);
     const button = screen.getByRole('button', { name: 'Neutral' });
     expect(button.className).toContain('tap-raised');
     expect(button.className).not.toMatch(/tap-(go|today|info)\b/);
@@ -25,7 +25,7 @@ describe('TapButton', () => {
 
   it('is a real native disabled button when disabled (the CSS `:disabled` rule needs it)', () => {
     render(
-      <TapButton variant="chip" disabled onClick={vi.fn()}>
+      <TapButton look="custom" disabled onClick={vi.fn()}>
         Locked
       </TapButton>,
     );
@@ -35,7 +35,7 @@ describe('TapButton', () => {
   });
 
   it('defaults to a native button type (never submits a form by accident)', () => {
-    render(<TapButton variant="primary">Submit-looking</TapButton>);
+    render(<TapButton look="primary">Submit-looking</TapButton>);
     expect(screen.getByRole('button').getAttribute('type')).toBe('button');
   });
 });

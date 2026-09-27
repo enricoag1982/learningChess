@@ -1,23 +1,25 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, JSX, ReactNode } from 'react';
-import type { TapRole, TapVariant } from './primitives-styles.ts';
-import { infoPanelClass, infoPillClass, tapButtonClass } from './primitives-styles.ts';
+import type { TapLook, TapTone } from './tap.ts';
+import { tapClass } from './tap.ts';
+import { infoPanelClass, infoPillClass } from './primitives-styles.ts';
 
 /**
  * Shared "tappable vs info" primitives (docs/screens.md §1, roadmap F3): `TapButton` for anything
  * tappable (raised: border + ledge shadow, pressed/disabled/reduced-motion states, focus ring —
  * all from `.tap-raised` in `index.css`), `InfoPanel`/`InfoPill` for read-only content (flat: no
  * border/shadow, tinted background, smaller radius). Screens either render these directly or, for
- * a native `<button>` that needs its own extra markup/props, import `tapButtonClass`/
- * `infoPanelClass`/`infoPillClass` straight from `primitives-styles.ts` — the lesson
- * (`lesson/button-styles.ts`) and parent-area (`parent/parent-styles.ts`) shared class constants
- * are themselves built from those, so every screen ends up on one token system, not ad-hoc
+ * a native `<button>` that needs its own extra markup/props, import `tapClass`/`infoPanelClass`/
+ * `infoPillClass` straight from `tap.ts`/`primitives-styles.ts` — the lesson (`lesson/
+ * button-styles.ts`) and parent-area (`parent/parent-styles.ts`) shared class constants are
+ * themselves built from those, so every screen ends up on one token system, not ad-hoc
  * borders/shadows of its own.
  */
 
 export interface TapButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
-  readonly variant: TapVariant;
-  /** Fill role (default `neutral`: `card`/`line`, docs/screens.md §1.1). */
-  readonly role?: TapRole;
+  readonly look?: TapLook;
+  /** Fill tone (default `neutral`: `card`/`ink`, docs/screens.md §1.1). Named `tone`, not `role`:
+   * the latter collides with the ARIA `role` attribute a caller may also need to pass. */
+  readonly tone?: TapTone;
   readonly type?: 'button' | 'submit';
   readonly children: ReactNode;
 }
@@ -26,19 +28,15 @@ export interface TapButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElem
  * (`.tap-raised` in `index.css`). Every tappable already carries an icon or a label by the
  * existing rule (docs/screens.md §1) — `children` is exactly that. */
 export function TapButton({
-  variant,
-  role = 'neutral',
+  look = 'custom',
+  tone = 'neutral',
   type = 'button',
   className = '',
   children,
   ...rest
 }: TapButtonProps): JSX.Element {
   return (
-    <button
-      type={type}
-      className={`${tapButtonClass(variant, role)} ${className}`.trim()}
-      {...rest}
-    >
+    <button type={type} className={`${tapClass(look, tone)} ${className}`.trim()} {...rest}>
       {children}
     </button>
   );

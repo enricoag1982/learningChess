@@ -18,6 +18,7 @@ import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
 import { GuestIcon } from './ds/icons-lazy.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -194,15 +195,11 @@ function PlayerStrip({
             type="button"
             onClick={onTakeBack}
             disabled={!canTakeBack}
-            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink disabled:opacity-40"
+            className={tapClass('wide', 'neutral', 'disabled:opacity-40')}
           >
             {t('friend-play.take-back')}
           </button>
-          <button
-            type="button"
-            onClick={onStop}
-            className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink"
-          >
+          <button type="button" onClick={onStop} className={tapClass('wide')}>
             {t('friend-play.stop')}
           </button>
         </div>
@@ -211,18 +208,10 @@ function PlayerStrip({
           <div className="flex flex-col items-end gap-2">
             <p className="font-display text-base font-semibold text-ink">{resultText}</p>
             <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={onPlayAgain}
-                className="tap-raised flex h-16 items-center justify-center rounded-2xl bg-card px-4 font-display text-base font-semibold text-ink"
-              >
+              <button type="button" onClick={onPlayAgain} className={tapClass('wide')}>
                 {t('play-again')}
               </button>
-              <button
-                type="button"
-                onClick={onBackToPlay}
-                className="tap-raised tap-go flex h-16 items-center justify-center rounded-2xl bg-go px-4 font-display text-base font-semibold text-white"
-              >
+              <button type="button" onClick={onBackToPlay} className={tapClass('wide', 'go')}>
                 {t('play.back-to-play')}
               </button>
             </div>
@@ -446,7 +435,7 @@ function FriendMatch({
                 onClick={() => {
                   respondTakeBack(false);
                 }}
-                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
+                className={tapClass('dialog')}
               >
                 {t('exercise.no')}
               </button>
@@ -455,7 +444,7 @@ function FriendMatch({
                 onClick={() => {
                   respondTakeBack(true);
                 }}
-                className="tap-raised tap-go flex h-14 flex-1 items-center justify-center rounded-2xl bg-go font-display text-lg font-semibold text-white"
+                className={tapClass('dialog', 'go')}
               >
                 {t('exercise.yes')}
               </button>
@@ -478,14 +467,14 @@ function FriendMatch({
                 onClick={() => {
                   setConfirmStop(false);
                 }}
-                className="tap-raised flex h-14 flex-1 items-center justify-center rounded-2xl bg-card font-display text-lg font-semibold text-ink"
+                className={tapClass('dialog')}
               >
                 {t('boss.versus.stop-game-cancel')}
               </button>
               <button
                 type="button"
                 onClick={confirmStopNow}
-                className="tap-raised tap-today flex h-14 flex-1 items-center justify-center rounded-2xl bg-today font-display text-lg font-semibold text-white"
+                className={tapClass('dialog', 'today')}
               >
                 {t('boss.versus.stop-game-confirm')}
               </button>

@@ -4,6 +4,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { ReplayButton } from './ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { useNarratedText } from './ds/useNarratedText.ts';
+import { tapClass } from './ds/tap.ts';
 
 /**
  * "Already know some chess?" offer (app-structure.md §3, domain-model.md §3.2), shown once right
@@ -25,18 +26,10 @@ export function PlacementOfferScreen(): JSX.Element {
         <ReplayButton onClick={replay} label={t('exercise.replay')} />
       </div>
       <div className="flex w-full max-w-md flex-col gap-4">
-        <button
-          type="button"
-          onClick={acceptPlacement}
-          className="tap-raised tap-go h-20 rounded-[2rem] bg-go font-display text-xl font-semibold text-white sm:text-2xl"
-        >
+        <button type="button" onClick={acceptPlacement} className={tapClass('block', 'go')}>
           {t('placement.offer-yes')}
         </button>
-        <button
-          type="button"
-          onClick={declinePlacement}
-          className="tap-raised h-20 rounded-[2rem] bg-card font-display text-xl font-semibold text-ink sm:text-2xl"
-        >
+        <button type="button" onClick={declinePlacement} className={tapClass('block')}>
           {t('placement.offer-no')}
         </button>
       </div>

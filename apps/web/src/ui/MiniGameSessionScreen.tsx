@@ -6,6 +6,7 @@ import { tContent } from '../content-text.ts';
 import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { BossStep } from './lesson/BossStep.tsx';
 import { CloseIcon } from './ds/icons.tsx';
+import { tapClass } from './ds/tap.ts';
 
 /**
  * A mini-game played standalone from the Play screen (app-structure.md §4 Play): the same boss
@@ -57,7 +58,7 @@ export function MiniGameSessionScreen(): JSX.Element {
           type="button"
           aria-label={t('play.close')}
           onClick={exitMiniGame}
-          className="tap-raised flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-card text-ink"
+          className={tapClass('round')}
         >
           <CloseIcon />
         </button>
