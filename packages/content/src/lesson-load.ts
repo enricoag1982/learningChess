@@ -1,136 +1,30 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import type {
-  Color,
   CompiledContent,
   DemoHighlight,
   ExerciseDef,
   Lesson,
   MiniGame,
-  Piece,
   Position,
   Square,
-  VersusMiniGame,
 } from '@chess-kids/core';
-import {
-  chessJsRules,
-  createVariantRules,
-  doubleStepBefore,
-  game,
-  hasKing,
-  hasPieceOf,
-  optimalMoves,
-  staticGoalExercise,
-} from '@chess-kids/core';
+import { hasPieceOf } from '@chess-kids/core';
 import { solutionOf } from '@chess-kids/core/testing';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
-import { contentKindOf } from './kinds/index.ts';
+import { compileExercises } from './kinds/compile-exercise.ts';
 import { compilePosition } from './kinds/common.ts';
-import { makeCompileContext } from './kinds/kind-content.ts';
+import { contentKindOf } from './kinds/index.ts';
 import { ContentError, type Locales } from './load.ts';
-import type { LocaleTree } from './schema.ts';
 import {
-  type ExerciseYaml,
-  type WinConditionYaml,
-  lessonSchema,
-  miniGameSchema,
-} from './lesson-schema.ts';
-
-const rules = createVariantRules(chessJsRules);
-
-/** Parses `lastMove`'s `<from><to>` shape (`lesson-schema.ts`'s regex already restricted it). */
-function parseLastMove(raw: string): { readonly from: Square; readonly to: Square } {
-  return { from: raw.slice(0, 2) as Square, to: raw.slice(2, 4) as Square };
-}
-
-/**
- * Exercise field `lastMove` (M4.1, display only): checks it against `position` — a piece must sit
- * on `to` (something must have just moved there), and, when the position has an en passant square,
- * `lastMove` must be exactly the double step that produced it, so the board never shows the kid a
- * "last move" that could not have just happened.
- */
-function checkLastMove(
-  position: Position,
-  lastMove: { readonly from: Square; readonly to: Square },
-  where: string,
-  issues: string[],
-): void {
-  if (position.pieces[lastMove.to] === undefined) {
-    issues.push(`${where}: lastMove "${lastMove.from}${lastMove.to}": no piece on ${lastMove.to}`);
-  }
-  const ep = position.enPassant;
-  if (ep === null) {
-    return;
-  }
-  const expected = doubleStepBefore(ep);
-  if (lastMove.from !== expected.from || lastMove.to !== expected.to) {
-    issues.push(
-      `${where}: lastMove "${lastMove.from}${lastMove.to}" is not the double step matching en ` +
-        `passant square ${ep} (expected "${expected.from}${expected.to}")`,
-    );
-  }
-}
-
-/**
- * Compiles one exercise (`guided` / `exercises` / `variants` / series `rounds` entry): parses its
- * position and `lastMove` (shared by every kind), then hands the rest to its own kind's `compile`
- * (`kinds/<type>/compile.ts`, via the `EXERCISE_KIND_CONTENT` registry) through a `CompileContext`
- * that supplies the head (`id`/`concept`/`textKey`/`position`) and tail (`easier`/`lastMove`) every
- * exercise shares.
- */
-function compileExercise(
-  relPath: string,
-  fieldPath: string,
-  raw: ExerciseYaml,
-  concept: string,
-  issues: string[],
-): ExerciseDef | null {
-  const position = compilePosition(relPath, `${fieldPath}.board`, raw, issues);
-  if (position === null) {
-    return null;
-  }
-  let lastMove: { readonly from: Square; readonly to: Square } | undefined;
-  if (raw.lastMove !== undefined) {
-    lastMove = parseLastMove(raw.lastMove);
-    checkLastMove(position, lastMove, `${relPath}: ${fieldPath}`, issues);
-  }
-  const ctx = makeCompileContext(
-    relPath,
-    fieldPath,
-    issues,
-    { id: raw.id, concept, textKey: `lessons:${raw.text}`, position },
-    { easier: raw.easier, lastMove },
-  );
-  return contentKindOf(raw.type).compile(raw, ctx);
-}
-
-/** Compiles an array of exercises; `null` (with issues pushed) if any of them failed. */
-function compileExercises(
-  relPath: string,
-  fieldPath: string,
-  raw: readonly ExerciseYaml[],
-  concept: string,
-  issues: string[],
-): readonly ExerciseDef[] | null {
-  const compiled: ExerciseDef[] = [];
-  let allOk = true;
-  for (const [index, entry] of raw.entries()) {
-    const exercise = compileExercise(
-      relPath,
-      `${fieldPath}[${String(index)}]`,
-      entry,
-      concept,
-      issues,
-    );
-    if (exercise === null) {
-      allOk = false;
-      continue;
-    }
-    compiled.push(exercise);
-  }
-  return allOk ? compiled : null;
-}
+  makeMiniGameCompileContext,
+  modeContentOf,
+  rawModeOf,
+  type ModeVerifyContext,
+} from './modes/index.ts';
+import type { LocaleTree } from './schema.ts';
+import { lessonSchema, miniGameSchema } from './lesson-schema.ts';
 
 /** Parses a demo's `highlight` string (schema-validated) into a `DemoHighlight`. */
 function compileDemoHighlight(raw: string): DemoHighlight {
@@ -194,49 +88,11 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
   };
 }
 
-/** One authored win condition (`lesson-schema.ts`'s `winConditionSchema`) → domain `WinCondition`. */
-function compileWinCondition(raw: WinConditionYaml): game.WinCondition {
-  if (typeof raw === 'string') {
-    return { kind: raw };
-  }
-  if ('capture' in raw) {
-    return { kind: 'capture', piece: raw.capture as Piece['type'] };
-  }
-  if ('reach' in raw) {
-    return { kind: 'reach', squares: raw.reach as readonly Square[] };
-  }
-  return { kind: 'survive', moves: raw.survive };
-}
-
 /**
- * A `versus` mini-game's authored `rules` (kid/opponent win lists) → `GameRulesDef` (`w`/`b` win
- * lists), by `kidColor`. `checkRules` is derived from `kings`: check/checkmate/stalemate only ever
- * apply when both kings are on the board (`domain-model.md` §1.4).
+ * Compiles one mini-game file: schema-validates it, then hands it to its own mode's `compile`
+ * (`modes/<mode>/compile.ts`, via the `MINI_GAME_MODE_CONTENT` registry) through a
+ * `MiniGameCompileContext` (board/FEN parsing, `series`' own exercise-array compiling).
  */
-function compileVersusRules(
-  raw: {
-    readonly kings: boolean;
-    readonly noMoves: 'lose' | 'draw';
-    readonly win: {
-      readonly kid: readonly WinConditionYaml[];
-      readonly opponent: readonly WinConditionYaml[];
-    };
-  },
-  kidColor: Color,
-  moveLimit: number | undefined,
-): game.GameRulesDef {
-  const kidWin = raw.win.kid.map(compileWinCondition);
-  const opponentWin = raw.win.opponent.map(compileWinCondition);
-  const win = kidColor === 'w' ? { w: kidWin, b: opponentWin } : { w: opponentWin, b: kidWin };
-  return {
-    kings: raw.kings,
-    checkRules: raw.kings,
-    noMoves: raw.noMoves,
-    win,
-    ...(moveLimit === undefined ? {} : { moveLimit }),
-  };
-}
-
 function compileMiniGameFile(filePath: string, relPath: string, issues: string[]): MiniGame | null {
   let raw: string;
   try {
@@ -261,132 +117,13 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
   }
   const data = result.data;
 
-  if (data.mode === 'series') {
-    const rounds = compileExercises(relPath, 'rounds', data.rounds, data.concept, issues);
-    if (rounds === null) {
-      return null;
-    }
-    return {
-      mode: 'series',
-      id: data.id,
-      concept: data.concept,
-      rounds,
-      errors3: data.errors3,
-      errors2: data.errors2,
-      titleKey: `lessons:${data.title}`,
-      goalKey: `lessons:${data.goal}`,
-      unlockAfter: data.unlockAfter,
-    };
-  }
-
-  if (data.mode === 'versus') {
-    const versusPosition = compilePosition(relPath, 'board', data, issues);
-    if (versusPosition === null) {
-      return null;
-    }
-    const kidColor = data.kidColor ?? 'w';
-    return {
-      mode: 'versus',
-      id: data.id,
-      concept: data.concept,
-      rules: compileVersusRules(data.rules, kidColor, data.moveLimit),
-      position: versusPosition,
-      opponentLevel: data.opponent.bot as 1 | 2 | 3 | 4 | 5,
-      kidColor,
-      ...(data.par === undefined ? {} : { par: data.par }),
-      titleKey: `lessons:${data.title}`,
-      goalKey: `lessons:${data.goal}`,
-      unlockAfter: data.unlockAfter,
-    };
-  }
-
-  const position = compilePosition(relPath, 'board', data, issues);
-  if (position === null) {
-    return null;
-  }
-
-  return {
-    mode: 'static',
-    id: data.id,
-    concept: data.concept,
-    position,
-    goal: data.type ?? 'capture-all',
-    par: data.par,
-    moveLimit: data.moveLimit,
-    titleKey: `lessons:${data.title}`,
-    goalKey: `lessons:${data.goal}`,
-    unlockAfter: data.unlockAfter,
-  };
+  const ctx = makeMiniGameCompileContext(relPath, issues);
+  return modeContentOf(rawModeOf(data)).compile(data, ctx);
 }
 
 /** True when `position.toMove`'s side has at least one piece on the board. */
 function hasKidPiece(position: Position): boolean {
   return hasPieceOf(position, position.toMove);
-}
-
-/**
- * `versus` mini-game checks (domain-model.md §1.4: "position valid, win conditions valid"): the
- * board matches `rules.kings` (both present / both absent), and the game is not already over at
- * its own start position (an instant win/draw there means the boss is unplayable).
- */
-function checkVersusMiniGame(miniGame: VersusMiniGame, where: string, issues: string[]): void {
-  if (
-    miniGame.rules.kings &&
-    (!hasKing(miniGame.position, 'w') || !hasKing(miniGame.position, 'b'))
-  ) {
-    issues.push(`${where}: rules.kings is true but the start position is missing a king`);
-  }
-  if (
-    !miniGame.rules.kings &&
-    (hasKing(miniGame.position, 'w') || hasKing(miniGame.position, 'b'))
-  ) {
-    issues.push(`${where}: rules.kings is false but the start position has a king`);
-  }
-  const started = game.startGame(miniGame.rules, miniGame.position);
-  const result = game.gameResult(started, chessJsRules);
-  if (result.kind !== 'ongoing') {
-    issues.push(`${where}: the game is already over at its start position (${result.kind})`);
-  }
-}
-
-function checkMiniGame(miniGame: MiniGame, where: string, issues: string[]): void {
-  if (miniGame.mode === 'series') {
-    for (const [index, round] of miniGame.rounds.entries()) {
-      contentKindOf(round.type).verify?.(round, `${where}: rounds[${String(index)}]`, issues);
-    }
-    return;
-  }
-  if (miniGame.mode === 'versus') {
-    checkVersusMiniGame(miniGame, where, issues);
-    return;
-  }
-  const asExercise = staticGoalExercise({
-    id: miniGame.id,
-    concept: miniGame.concept,
-    textKey: miniGame.titleKey,
-    position: miniGame.position,
-    goal: miniGame.goal,
-    par: miniGame.par,
-  });
-  if (asExercise.type === 'collect-stars' && miniGame.position.markers.stars.length === 0) {
-    issues.push(`${where}: collect-stars mini-game has no star`);
-    return;
-  }
-  const optimal = optimalMoves(asExercise, rules);
-  if (optimal === null) {
-    issues.push(`${where}: no solution found (not solvable within the search depth)`);
-    return;
-  }
-  if (optimal !== miniGame.par) {
-    issues.push(
-      `${where}: par is ${String(miniGame.par)} but the optimal solve is ${String(optimal)} move(s)`,
-    );
-  }
-  if (miniGame.moveLimit !== undefined && miniGame.moveLimit <= miniGame.par) {
-    issues.push(
-      `${where}: moveLimit (${String(miniGame.moveLimit)}) must be greater than par (${String(miniGame.par)})`,
-    );
-  }
 }
 
 /** Looks up a dot-separated key path in a locale tree (e.g. `rook.story`). */
@@ -418,10 +155,11 @@ function checkTextKey(fullKey: string, locales: Locales, where: string, issues: 
 
 /**
  * Per-exercise semantic checks, shared by a lesson's own guided/exercises/variants and a series
- * mini-game's rounds: the instruction text key resolves, a kid piece sits on the position unless
- * this kind says otherwise (`needsKidPiece`, default `true`), every extra text key the kind's
- * `solution` reports (e.g. `choice`'s option texts, via core's `textKeys`) resolves too, and the
- * kind's own semantic/shape check (`verify`, e.g. "collect-stars exercise has no star").
+ * mini-game's rounds (via `ModeVerifyContext.checkExercise`): the instruction text key resolves, a
+ * kid piece sits on the position unless this kind says otherwise (`needsKidPiece`, default `true`),
+ * every extra text key the kind's `solution` reports (e.g. `choice`'s option texts, via core's
+ * `textKeys`) resolves too, and the kind's own semantic/shape check (`verify`, e.g. "collect-stars
+ * exercise has no star").
  */
 function checkExerciseSemantics(
   exercise: ExerciseDef,
@@ -525,6 +263,18 @@ function validateSemantics(
     checkEasierVariants(lesson, lessonWhere, issues);
   }
 
+  const modeVerifyCtx: ModeVerifyContext = {
+    issues,
+    claimId,
+    checkTextKey: (fullKey, where) => {
+      checkTextKey(fullKey, locales, where, issues);
+    },
+    checkExercise: (exercise, where) => {
+      checkExerciseSemantics(exercise, where, locales, issues);
+    },
+    hasKidPiece,
+  };
+
   for (const minigame of minigames) {
     const where = `minigames/${minigame.id}.yaml`;
     claimId(minigame.id, where);
@@ -533,22 +283,7 @@ function validateSemantics(
     if (!lessonIds.has(minigame.unlockAfter)) {
       issues.push(`${where}: unlockAfter references unknown lesson "${minigame.unlockAfter}"`);
     }
-
-    if (minigame.mode === 'series') {
-      for (const [index, round] of minigame.rounds.entries()) {
-        const roundWhere = `${where}: rounds[${String(index)}]`;
-        claimId(round.id, roundWhere);
-        checkTextKey(round.textKey, locales, roundWhere, issues);
-        const kind = contentKindOf(round.type);
-        if ((kind.needsKidPiece?.(round) ?? true) && !hasKidPiece(round.position)) {
-          issues.push(`${roundWhere}: side to move has no piece`);
-        }
-      }
-    } else if (!hasKidPiece(minigame.position)) {
-      issues.push(`${where}: side to move has no piece`);
-    }
-
-    checkMiniGame(minigame, where, issues);
+    modeContentOf(minigame.mode).verify(minigame, where, modeVerifyCtx);
   }
 }
 

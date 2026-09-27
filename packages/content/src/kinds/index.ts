@@ -54,3 +54,5 @@ export const exerciseSchema = z
     checkExactlyOnePosition(raw, ctx);
     contentKindOf(raw.type).refine?.(raw, ctx);
   });
+
+export type ExerciseYaml = z.infer<typeof exerciseSchema>;
