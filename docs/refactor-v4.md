@@ -93,7 +93,7 @@ tools/                    voice, art, compat, size, content snapshot
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green. Done: `m8.5` storage collections (−146 lines). Rest after the other session's UI fixes merge |
 | R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds done (loader 1 459 → 376 lines); `m8.8` YAML defaults done; `m8.13` web kinds done; `m8.14` web modes + e2e via core solutions done — R3 done |
-| R4 Platform / subject split | `stimulus` replaces `position` in the lesson model; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, journey habitats, Den, report, services; import boundary lint | platform builds and tests without `subject-chess` |
+| R4 Platform / subject split | Seams first (in place), then package moves; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, Den, report, services; import boundary lint (design §11) | platform builds and tests without `subject-chess`. Iterations: `m8.15` core + content seams, `m8.16` web seams, `m8.17` package moves, `m8.18` docs |
 | R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
 
 Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs in `apps/web/src/ui/**`, R0–R1 stay out of those files; web test kit, e2e helper reuse and comment trim follow once those fixes merge.
@@ -128,7 +128,7 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 
 | # | Question | Recommendation | Status |
 |---|---|---|---|
-| 1 | Package split | 3 platform packages + 1 subject package, one repo | Recommendation applies unless the owner objects before R4 |
+| 1 | Package split | 3 platform packages + 1 subject package, one repo | Applied (R4 start 2026-09-27; no objection) |
 | 2 | Proof of reuse | `apps/math-demo` in the repo (dev / test only, not deployed) | Same, before R5 |
 | 3 | Timing | After `v2.0.0`; R0–R1 may start earlier (no behaviour change) | Decided: start now (owner 2026-09-26) |
 | 4 | Separate platform repo / npm package | Later, when a second real app starts | Later |
@@ -153,3 +153,21 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | B design system (`m8.10`) | `ui/ds/`: icon set (44 inline icons → one base), `TapButton` looks + `tone` (was `role`, clashed with ARIA), `Screen`, `ScreenHeader`, `RoundIconButton`, `ConfirmDialog`, `NarratedBubble`, `useSpeak`, `useAsync`, `AvatarBadge`; parent-only pieces lazy | Same DOM, roles, labels, class sets; built CSS byte-identical |
 | C navigation (`m8.11`) | Typed `Route` union + stack (`navigate`, `replace`, `back`, `reset`), `ROUTE_META` (tracked / calm / gated), gate resume as data (`NavOp`, no closure); store slices (nav, profile, rewards, time, learn, today, play); one profile-load path; comment trim (≈ −820 lines) | Removes the 5 origin fields; screens read params via `useRoute` |
 | R3b web kinds | `ExerciseKindUI` per kind, `useExerciseSession` (fixes F5), mode UI registry, e2e solving via core `solution()` | Done (`m8.13`, `m8.14`) |
+
+## 11. R4 design (2026-09-27)
+
+| Piece | Decision |
+|---|---|
+| Packages | `@learn/platform-core` (pure TS), `@learn/platform-content` (Node, zod), `@learn/platform-web` (React), `@learn/subject-chess`, app `@learn/chess-kids`; not published (§8 #4) |
+| Order | Seams in today's packages under an ESLint ratchet (leaky files listed, count → 0), then `git mv` commits with an import codemod only (no logic) |
+| `SubjectCore` | `id`, `context` (kind ctx = rules), `kinds`, `modes` (platform adds `series`), `notes` + `noteVars`, `characters` (`{topicKey}`; absent = narrator), `settings` slot (defaults, validation, lazy backup shape), `rewards?` (facts from game records → badge condition values), `gameRecordOf?`; `createSubjectRuntime(core)` builds the registries |
+| `AppConfig` | Storage prefix, backup app id, file prefixes, version; chess values unchanged (`chess-kids:`, `chess-kids`) |
+| `SubjectContent` | Stimulus head / tail compile, demo schema, badge fields, extra outputs (`bot-book.json`), voice templates |
+| `SubjectWeb` | Services, locales, kind / mode UIs, surface (Story, Demo, View), character badge, routes + slice + Home tiles (augmentable interfaces), art, Den glyphs / stats, lazy parent panels, dev playgrounds; e2e drivers in `subject-chess/e2e` |
+| Stimulus | Type-level only: chess `position` / `lastMove` stay flat in defs and demo → content JSON byte-equal |
+| Stays platform | Journey habitats (animal theme), `GameRecord` (generic 2-player log), storage keys, schema version, backup format |
+| Locales | Platform + subject roots deep-merged per namespace (duplicate key = build error); snapshot sorted once (order-only diff) |
+| Boundaries | ESLint: platform never imports subject; platform-core / -content no React; subject core / content no web; apps only via package `exports`; `chess.js` only in the rules adapter |
+| Build | Packages export TS source; `resolve.dedupe` for react / i18next / zustand / zod; Tailwind `@source` per package; CI job names unchanged; Pages uploads `apps/chess-kids/dist` (same URL, same `sw.js`) |
+| R5 needs | Generic `choice` kind in platform, `number-entry` kind, math stimulus + surface, Home grid columns from tile count, `defineAppConfig` + `mountApp` (m8.17) |
+
