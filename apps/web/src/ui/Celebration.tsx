@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 
 /**
@@ -30,7 +28,6 @@ export function Celebration(): JSX.Element | null {
   const tierLabel = activeCelebration?.tier ? t(`tier.${activeCelebration.tier}`) : undefined;
 
   const bubbleText = t('celebration.owl-line', { name: badgeName });
-  const replay = useNarratedText(services.narrator, activeCelebration ? bubbleText : '');
 
   if (!activeCelebration || !badgeDef) {
     return null;
@@ -54,10 +51,12 @@ export function Celebration(): JSX.Element | null {
           )}
         </div>
 
-        <div className="flex w-full flex-col items-stretch gap-3">
-          <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-          <ReplayButton onClick={replay} label={t('exercise.replay')} />
-        </div>
+        <NarratedBubble
+          text={bubbleText}
+          layout="column"
+          avatarClassName="h-12 w-12"
+          bubbleClassName="text-lg"
+        />
 
         <button
           type="button"

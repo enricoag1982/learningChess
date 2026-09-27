@@ -6,9 +6,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { WarmUpIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
@@ -76,7 +74,6 @@ export function PracticeScreen(): JSX.Element {
   const startPracticeTopic = useAppStore((state) => state.startPracticeTopic);
 
   const bubbleText = t('practice.owl-line');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
     return <BlankScreen />;
@@ -123,10 +120,12 @@ export function PracticeScreen(): JSX.Element {
         </div>
       </ScreenHeader>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble
+        text={bubbleText}
+        layout="row"
+        avatarClassName="h-12 w-12"
+        bubbleClassName="text-lg"
+      />
 
       <button
         type="button"

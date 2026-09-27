@@ -7,10 +7,8 @@ import { useAppStore, useServices } from '../app/store.ts';
 import type { Services } from '../app/services.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { characterPieceOrNull } from './art/character-meta.ts';
-import { ReplayButton } from './ds/ReplayButton.tsx';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { BlankScreen, Screen } from './ds/Screen.tsx';
 
 /** Scope's display name, for the result screen's headline. */
@@ -51,7 +49,6 @@ function AssessmentResult({
   const bubbleText = outcome.passed
     ? t('assessment.pass-body', { count: lessonCount, name })
     : t('assessment.fail-body');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
     <Screen kind="center" className="gap-6 px-6 py-10">
@@ -63,10 +60,7 @@ function AssessmentResult({
         <h1 className="font-display text-3xl text-ink sm:text-4xl">
           {t(outcome.passed ? 'assessment.pass-title' : 'assessment.fail-title')}
         </h1>
-        <div className="flex w-full flex-col items-stretch gap-3 text-left">
-          <SpeechBubble text={bubbleText} />
-          <ReplayButton onClick={replay} label={t('exercise.replay')} />
-        </div>
+        <NarratedBubble text={bubbleText} layout="column" className="text-left" />
         <p className="text-base font-semibold text-muted">
           {t('assessment.score', { correct: outcome.correct, total: outcome.total })}
         </p>

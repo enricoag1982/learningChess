@@ -1,11 +1,9 @@
 import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ds/ReplayButton.tsx';
+import { useAppStore } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { Screen } from './ds/Screen.tsx';
 
 /** Placement's own closing summary (domain-model.md §3.2): how many Basics worlds were passed. */
@@ -32,17 +30,11 @@ function PlacementSummary({
       : allPassed
         ? t('placement.summary-all-body')
         : t('placement.summary-passed-body', { count: passedCount });
-  const services = useServices();
-  const replay = useNarratedText(services.narrator, bodyText);
-
   return (
     <Screen kind="center" className="gap-6 px-6 py-10">
       <div className="celebration-pop flex w-full max-w-md flex-col items-center gap-5 rounded-[2rem] border-2 border-go bg-[#E3F1EA] p-6 sm:p-8">
         <h1 className="font-display text-3xl text-ink sm:text-4xl">{t(titleKey)}</h1>
-        <div className="flex w-full flex-col items-stretch gap-3 text-left">
-          <SpeechBubble text={bodyText} />
-          <ReplayButton onClick={replay} label={t('exercise.replay')} />
-        </div>
+        <NarratedBubble text={bodyText} layout="column" className="text-left" />
       </div>
       <button
         type="button"

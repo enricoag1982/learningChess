@@ -5,10 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { starsToday } from '@chess-kids/core';
 import type { TimeLimitReason } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
 
@@ -69,8 +67,6 @@ export function TimeLimitScreen(): JSX.Element {
     timeLimitStatus?.reason ?? null,
     timeLimitStatus?.playFrom ?? null,
   );
-  const replay = useNarratedText(services.narrator, bubbleText);
-
   return (
     <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{titleText}</h1>
@@ -82,10 +78,7 @@ export function TimeLimitScreen(): JSX.Element {
         </div>
       )}
 
-      <div className="flex w-full max-w-md flex-col items-stretch gap-3">
-        <SpeechBubble text={bubbleText} />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble text={bubbleText} layout="stack" />
 
       <div className="flex w-full max-w-md flex-col gap-4">
         <button

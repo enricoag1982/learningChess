@@ -1,13 +1,11 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { animalFriends, totalStars } from '@chess-kids/core';
-import { useAppStore, useServices } from '../app/store.ts';
+import { useAppStore } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsRow } from './StarsRow.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen } from './ds/Screen.tsx';
 
@@ -18,7 +16,6 @@ import { BlankScreen } from './ds/Screen.tsx';
  */
 export function SessionSummaryScreen(): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
   const journey = useAppStore((state) => state.journey);
   const progress = useAppStore((state) => state.progress);
   const startTotalStars = useAppStore((state) => state.todaySessionStartTotalStars);
@@ -27,7 +24,6 @@ export function SessionSummaryScreen(): JSX.Element {
   const finishToday = useAppStore((state) => state.finishToday);
 
   const bubbleText = t('session.summary-closing');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!journey) {
     return <BlankScreen />;
@@ -85,10 +81,12 @@ export function SessionSummaryScreen(): JSX.Element {
         </div>
       ))}
 
-      <div className="flex flex-col items-center gap-3 sm:flex-row">
-        <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble
+        text={bubbleText}
+        layout="center-row"
+        avatarClassName="h-12 w-12"
+        bubbleClassName="text-lg"
+      />
 
       <button
         type="button"

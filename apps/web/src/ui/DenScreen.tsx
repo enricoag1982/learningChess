@@ -14,12 +14,10 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
 import { CharacterIcon } from './art/characters.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
 import { InfoPill } from './ds/primitives.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
@@ -97,7 +95,6 @@ export function DenScreen(): JSX.Element {
   const markBadgeSeen = useAppStore((state) => state.markBadgeSeen);
 
   const bubbleText = t('den.owl-line');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
     return <BlankScreen />;
@@ -140,10 +137,12 @@ export function DenScreen(): JSX.Element {
         <StarsPill count={stars} />
       </ScreenHeader>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble
+        text={bubbleText}
+        layout="row"
+        avatarClassName="h-12 w-12"
+        bubbleClassName="text-lg"
+      />
 
       <div className="flex flex-wrap gap-2">
         <InfoPill

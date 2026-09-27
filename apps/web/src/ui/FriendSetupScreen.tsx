@@ -6,9 +6,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { GuestIcon } from './ds/icons-lazy.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
@@ -58,7 +56,6 @@ export function FriendSetupScreen(): JSX.Element {
   const goToPlay = useAppStore((state) => state.goToPlay);
 
   const bubbleText = t('friend-play.setup-owl-line');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   if (!profile || !journey) {
     return <BlankScreen />;
@@ -95,10 +92,12 @@ export function FriendSetupScreen(): JSX.Element {
         title={t('friend-play.setup-title')}
       />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble
+        text={bubbleText}
+        layout="row"
+        avatarClassName="h-12 w-12"
+        bubbleClassName="text-lg"
+      />
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-xl text-ink">{t('friend-play.second-player-heading')}</h2>

@@ -16,9 +16,7 @@ import { animalImage } from './art/animal-images.ts';
 import { avatarBackground } from './art/avatar-meta.ts';
 import { AvatarIcon } from './art/avatars.tsx';
 import { OwlIcon } from './art/characters.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
@@ -57,7 +55,6 @@ export function PlayScreen(): JSX.Element {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [storedSuggestion, setStoredSuggestion] = useState<number | undefined>(undefined);
   const bubbleText = t('play.owl-line');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   useEffect(() => {
     if (!profile) return;
@@ -189,10 +186,12 @@ export function PlayScreen(): JSX.Element {
         </div>
       </ScreenHeader>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <SpeechBubble text={bubbleText} avatarClassName="h-12 w-12" bubbleClassName="text-lg" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble
+        text={bubbleText}
+        layout="row"
+        avatarClassName="h-12 w-12"
+        bubbleClassName="text-lg"
+      />
 
       {/* Both cards below are flat, no border (docs/screens.md §1 "Cards that contain buttons",
           v1.1.0 part B, the rule's own named example): each wraps raised level chips/buttons, so a

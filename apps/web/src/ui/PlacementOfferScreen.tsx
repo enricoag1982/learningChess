@@ -1,9 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppStore, useServices } from '../app/store.ts';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { useAppStore } from '../app/store.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
 
@@ -13,19 +11,14 @@ import { Screen } from './ds/Screen.tsx';
  */
 export function PlacementOfferScreen(): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
   const acceptPlacement = useAppStore((state) => state.acceptPlacement);
   const declinePlacement = useAppStore((state) => state.declinePlacement);
 
   const bubbleText = t('placement.offer-question');
-  const replay = useNarratedText(services.narrator, bubbleText);
 
   return (
     <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
-      <div className="flex w-full max-w-md flex-col items-stretch gap-3">
-        <SpeechBubble text={bubbleText} />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} />
-      </div>
+      <NarratedBubble text={bubbleText} layout="stack" />
       <div className="flex w-full max-w-md flex-col gap-4">
         <button type="button" onClick={acceptPlacement} className={tapClass('block', 'go')}>
           {t('placement.offer-yes')}

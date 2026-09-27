@@ -4,25 +4,37 @@ import { speakSequence } from './speakSequence.ts';
 
 /**
  * Speaks `text` through `narrator` whenever it changes (including on mount), and returns a
- * `replay` callback for a "Listen again" / "Say it again" button. Subtitles are the caller's job:
- * this only drives the voice side of "every text is spoken, and repeatable" (non-functional.md §2).
+ * `replay` callback for a "Listen again" / "Say it again" button. `mode: 'replay-only'` (default
+ * `'auto'`) skips the auto-speak effect — only `replay` ever speaks — for a caller that narrates on
+ * its own schedule instead. Subtitles are the caller's job: this only drives the voice side of
+ * "every text is spoken, and repeatable" (non-functional.md §2).
  */
-export function useNarratedText(narrator: Narrator, text: string): () => void {
+export function useSpeak(
+  narrator: Narrator,
+  text: string,
+  mode: 'auto' | 'replay-only' = 'auto',
+): () => void {
   useEffect(() => {
-    // Nothing to say (e.g. text still loading): leave whatever is playing alone.
-    if (text === '') return;
+    // Nothing to say (e.g. text still loading), or a caller driving speech itself: leave whatever
+    // is playing alone.
+    if (mode === 'replay-only' || text === '') return;
     narrator.cancel();
     void narrator.speak(text);
     return () => {
       narrator.cancel();
     };
-  }, [narrator, text]);
+  }, [narrator, text, mode]);
 
   return () => {
     narrator.cancel();
     void narrator.speak(text);
   };
 }
+
+/** `useSpeak` in its default always-auto mode, under the name most call sites reach for. */
+export const useSpokenMessage = useSpeak;
+/** Same as {@link useSpeak} in its default mode — the name Story/Demo/R3b call sites still use. */
+export const useNarratedText = useSpeak;
 
 /**
  * An exercise (or series-boss round)'s instruction plus its feedback note, without re-reading the

@@ -6,9 +6,7 @@ import { useAppStore, useServices } from '../app/store.ts';
 import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
 import { PARENT_INPUT, PARENT_NOTE, PARENT_PRIMARY_BUTTON } from './parent/parent-styles.ts';
 import { Owl } from './ds/Owl.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
-import { SpeechBubble } from './ds/SpeechBubble.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
+import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
@@ -18,18 +16,18 @@ type Step = 'welcome' | 'password' | 'saved';
 /** Step 1 (kid style): Owl explains a grown-up helps set things up first. */
 function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
   const text = t('first-run.welcome.owl');
-  const replay = useNarratedText(services.narrator, text);
 
   return (
     <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-2xl text-ink sm:text-3xl">{t('app.title')}</h1>
       <Owl className="h-24 w-24" />
-      <div className="flex w-full max-w-md flex-col items-stretch gap-3">
-        <SpeechBubble text={text} bubbleClassName="text-xl sm:text-2xl text-center" />
-        <ReplayButton onClick={replay} label={t('exercise.replay')} className="self-center" />
-      </div>
+      <NarratedBubble
+        text={text}
+        layout="stack"
+        bubbleClassName="text-xl sm:text-2xl text-center"
+        replayClassName="self-center"
+      />
       <button type="button" onClick={onNext} className={tapClass('hero', 'go')}>
         {t('first-run.welcome.primary')}
       </button>
