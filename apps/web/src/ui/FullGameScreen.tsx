@@ -22,11 +22,8 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const FULL_GAME_MOVE_LIMIT = 100;
 const FULL_GAME_PAR = 60;
 
-/**
- * `VersusStep` requires a `lesson` prop, but never reads it once `session` is set (its only use is
- * `recordBossResult`, in the lesson-boss branch this screen never takes) — a harmless stand-in, not
- * a real lesson. `demo`/`guided`/`exercises` are unused for the same reason.
- */
+/** `VersusStep` requires a `lesson` prop but never reads it once `session` is set — a harmless
+ * stand-in, not a real lesson. */
 const FULL_GAME_LESSON: Lesson = {
   id: 'full-game',
   world: 'check',
@@ -68,12 +65,8 @@ function fullGameDef(level: number): VersusMiniGame {
   };
 }
 
-/**
- * Play's "Full game" button: the same versus UI World 4's `first-game` boss uses
- * (`VersusStep`, reused as-is), at a level the kid picked on the Play screen. Unlike a lesson's
- * boss or a standalone mini-game session, a full game keeps no `MiniGameProgress`/`Attempt` — only
- * a `GameRecord` (`domain-model.md` §2), whether finished normally or left mid-game.
- */
+/** Play's "Full game" button: `VersusStep` at a level the kid picked. Unlike a lesson boss or
+ * standalone mini-game, keeps no `MiniGameProgress`/`Attempt`, only a `GameRecord`. */
 export function FullGameScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

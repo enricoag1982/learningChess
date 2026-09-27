@@ -3,17 +3,8 @@ import type { TapLook, TapTone } from './tap.ts';
 import { tapClass } from './tap.ts';
 import { infoPanelClass, infoPillClass } from './primitives-styles.ts';
 
-/**
- * Shared "tappable vs info" primitives (docs/screens.md §1, roadmap F3): `TapButton` for anything
- * tappable (raised: border + ledge shadow, pressed/disabled/reduced-motion states, focus ring —
- * all from `.tap-raised` in `index.css`), `InfoPanel`/`InfoPill` for read-only content (flat: no
- * border/shadow, tinted background, smaller radius). Screens either render these directly or, for
- * a native `<button>` that needs its own extra markup/props, import `tapClass`/`infoPanelClass`/
- * `infoPillClass` straight from `tap.ts`/`primitives-styles.ts` — the lesson (`lesson/
- * button-styles.ts`) and parent-area (`parent/parent-styles.ts`) shared class constants are
- * themselves built from those, so every screen ends up on one token system, not ad-hoc
- * borders/shadows of its own.
- */
+/** Shared "tappable vs info" primitives (docs/screens.md §1): `TapButton` for anything tappable
+ * (raised, `.tap-raised`), `InfoPanel`/`InfoPill` for read-only content (flat). */
 
 export interface TapButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   readonly look?: TapLook;
@@ -25,8 +16,7 @@ export interface TapButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElem
 }
 
 /** A tappable control: raised card, border, ledge shadow, pressed/disabled/reduced-motion states
- * (`.tap-raised` in `index.css`). Every tappable already carries an icon or a label by the
- * existing rule (docs/screens.md §1) — `children` is exactly that. */
+ * (`.tap-raised`). `children` is the icon or label docs/screens.md §1 requires. */
 export function TapButton({
   look = 'custom',
   tone = 'neutral',
@@ -67,9 +57,8 @@ export interface InfoPillProps extends HTMLAttributes<HTMLDivElement> {
   readonly children: ReactNode;
 }
 
-/** A flat info pill (docs/screens.md §1 "Pills" / "Info = no box"): rank / stars / streak, or any
- * other small read-only counter — icon + text, no border, no shadow, and (default `tint`) no
- * background box either, so it never reads as a tappable chip. */
+/** A flat info pill (docs/screens.md §1): icon + text, no border/shadow, and (default `tint`) no
+ * background box, so it never reads as a tappable chip. */
 export function InfoPill({
   tint = '',
   className = '',

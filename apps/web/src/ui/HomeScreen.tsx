@@ -57,9 +57,8 @@ function DenTileIcon(): JSX.Element {
   );
 }
 
-/** One Home tile (Journey / Play / My Den): icon in a white circle over a coloured label. Border =
- * `fg` (already a darker shade of `bg`, docs/screens.md §1 "Raised look"), ledge = `ledge`, a
- * darker shade still — verified against the cream page with a contrast calc, docs/screens.md §1.1. */
+/** One Home tile (Journey/Play/My Den): icon in a white circle over a coloured label (docs/screens.md
+ * §1: border = `fg`, ledge = a still-darker shade, both contrast-checked against the cream page). */
 function HomeTile({
   icon,
   label,

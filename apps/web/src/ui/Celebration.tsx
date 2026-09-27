@@ -6,14 +6,8 @@ import { BadgeIcon } from './BadgeIcon.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 
-/**
- * Full-screen badge celebration (rewards.md §1 "Rare celebrations"), shown over whichever screen
- * is current (`App.tsx` renders it alongside `<Screens />`) whenever the store's `activeCelebration`
- * is set — `checkForCelebrations` only ever sets it right after lesson complete, a game's result,
- * or the Today session summary, and caps at 2 per app sitting; every other newly earned badge shows
- * as a "new" dot in My Den instead. Animation is CSS-only (`celebration-pop`, `index.css`), so
- * `prefers-reduced-motion` is already handled globally.
- */
+/** Full-screen badge celebration (rewards.md §1), shown over the current screen whenever
+ * `activeCelebration` is set, capped per app sitting; other badges show as a My Den "new" dot. */
 export function Celebration(): JSX.Element | null {
   const { t } = useTranslation();
   const services = useServices();

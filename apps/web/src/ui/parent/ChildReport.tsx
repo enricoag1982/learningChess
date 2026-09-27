@@ -17,9 +17,8 @@ const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeri
 
 /** `'2026-01-05'` -> `'Jan 5'`. */
 function formatDate(iso: string): string {
-  // A plain `YYYY-MM-DD` date string parses as UTC midnight; read back with UTC fields so the
-  // shown day never shifts a day off in a negative-UTC-offset timezone (same reasoning
-  // `domain/session-log.ts`'s own local-day helpers document, the other way around).
+  // Parses as UTC midnight; read back with UTC fields so the day never shifts in a
+  // negative-UTC-offset timezone.
   const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
   return DATE_FORMAT.format(new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, day ?? 1)));
 }
@@ -68,12 +67,8 @@ function limitLabel(t: TFunction, minutes: number | null): string {
     : t('parent.daily-limit-minutes', { count: minutes });
 }
 
-/**
- * One-line summary of the active time-control rules (app-structure.md §13), e.g. "Mon–Fri
- * 30 min · Sat–Sun 60 min · until 20:00" — shown under the minutes-per-day chart, alongside (not
- * replacing) its own existing "Daily limit: N min" line. `null` when nothing is set (no limit, no
- * allowed-hours window) — nothing to show.
- */
+/** One-line summary of the active time-control rules (app-structure.md §13), e.g. "Mon–Fri
+ * 30 min · Sat–Sun 60 min · until 20:00"; `null` when nothing is set. */
 function activeRulesLine(t: TFunction, report: ChildReport): string | null {
   const parts: string[] = [];
   if (report.weekendLimitMinutes !== undefined) {
@@ -116,9 +111,8 @@ export interface ChildReportScreenProps {
   readonly onOpenSettings: () => void;
 }
 
-/** Parent area "child report" (app-structure.md §11): progress by world, concept accuracy + weak
- * list, minutes per day, games, badges, assessments — read-only, own screen between the Overview
- * and the child's Settings. */
+/** Parent area "child report" (app-structure.md §11): progress, concept accuracy, minutes,
+ * games, badges, assessments — read-only, between the Overview and Settings. */
 export function ChildReportScreen({
   profileId,
   profiles,
@@ -127,9 +121,6 @@ export function ChildReportScreen({
 }: ChildReportScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  // The caller remounts this component with `key={profileId}` (`ParentAreaScreen.tsx`) when the
-  // report opens for a different child, so `report` always starts fresh (no stale previous child's
-  // data) for a `profileId` change.
   const { value: report } = useAsync(
     () => buildChildReport(services.deps, profileId),
     [services, profileId],
@@ -177,8 +168,8 @@ export function ChildReportScreen({
         <>
           <Section title={t('parent.report.progress-heading')}>
             <ul className="flex flex-col gap-2">
-              {/* A branch-track world with no authored lessons yet (docs/curriculum.md "Next")
-                  would only ever show as a noisy "0/0" row — skip it until it has content. */}
+              {/* A branch-track world with no authored lessons yet would show as a noisy "0/0"
+                  row — skip it until it has content. */}
               {report.worlds
                 .filter((entry) => entry.lessonsTotal > 0)
                 .map((entry) => (
@@ -193,8 +184,7 @@ export function ChildReportScreen({
                           name: tContent(t, entry.world.titleKey),
                         })}
                       </span>
-                      {/* "Intro skipped" (playtest 2): one line per lesson that had a Story/Demo/Try
-                          "Skip" tap, small muted text — never shown when none did. */}
+                      {/* One line per lesson with a Story/Demo/Try "Skip" tap; hidden if none did. */}
                       {entry.skippedIntroLessons.length > 0 && (
                         <span className="text-xs text-muted">
                           {t('parent.report.intro-skipped', {

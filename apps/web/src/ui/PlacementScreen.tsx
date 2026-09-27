@@ -47,11 +47,8 @@ function PlacementSummary({
   );
 }
 
-/**
- * The placement test (domain-model.md §3.2): one run per Basics world in order, stopping at the
- * first failed world; the kid can close it (top-bar X) at any point and keeps whatever already
- * passed. Reuses the review task runner per world, same as a world test-out (`showHint={false}`).
- */
+/** The placement test (domain-model.md §3.2): one run per Basics world in order, stopping at the
+ * first failed world; closing it any time keeps whatever already passed. */
 export function PlacementScreen(): JSX.Element {
   const { t } = useTranslation();
   const route = useRoute('placement');

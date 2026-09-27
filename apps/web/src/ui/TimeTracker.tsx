@@ -8,9 +8,8 @@ import { ROUTE_META } from '../app/routes.ts';
 const TICK_MS = 60_000;
 /** No tracked input for this long pauses tracking (app-structure.md's time controls table). */
 const IDLE_LIMIT_MS = 2 * 60_000;
-/** Counts as "the kid is doing something" for the idle check — pointer covers tap/drag/click alike
- * (`Board`'s own pointer-event model, `docs/architecture.md` §11), keydown covers a parent typing
- * in the password/settings screens. */
+/** Counts as "the kid is doing something" for the idle check — pointer covers tap/drag/click,
+ * keydown covers a parent typing in the password/settings screens. */
 const INPUT_EVENTS = ['pointerdown', 'keydown'] as const;
 
 /** Screens where a kid profile is actively playing or browsing (`ROUTE_META`'s `tracked` flag). */
@@ -18,12 +17,8 @@ function isTrackedScreen(screen: Screen): boolean {
   return ROUTE_META[screen].tracked;
 }
 
-/**
- * Foreground time tracker (domain-model.md §3.3 "what counts"): while a kid profile is on a
- * tracked screen, adds one minute to today's `SessionLog` every real minute the tab is visible
- * and the kid has touched/typed something within the last {@link IDLE_LIMIT_MS} — paused
- * otherwise, so a phone left in a pocket never racks up play time. Renders nothing.
- */
+/** Foreground time tracker (domain-model.md §3.3): while on a tracked screen, adds one minute to
+ * today's `SessionLog` every real minute the tab is visible and input is recent; else paused. */
 export function TimeTracker(): null {
   const services = useServices();
   const profile = useAppStore((state) => state.profile);

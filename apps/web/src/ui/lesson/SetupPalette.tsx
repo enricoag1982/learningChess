@@ -30,8 +30,7 @@ export function SetupPalette({
   const hintedKey = hint?.kind === 'setup' && hint.piece ? pieceKey(hint.piece) : null;
 
   return (
-    // Flat, no border (docs/screens.md §1 "Cards that contain buttons", v1.1.0 part B): the tray
-    // itself is a row of raised piece buttons, so an outer card border would compete with them.
+    // Flat, no border (docs/screens.md §1): a row of raised piece buttons, so a card border would compete.
     <div className="info-flat flex flex-col gap-2 rounded-3xl bg-[#F3EDE0] p-4">
       <span className="text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
         {t('exercise.setup.palette-label')}

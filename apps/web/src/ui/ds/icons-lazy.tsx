@@ -2,14 +2,8 @@ import type { JSX } from 'react';
 import { Svg } from './icons.tsx';
 import type { IconProps } from './icons.tsx';
 
-/**
- * Icons used only by parent-area/friend-play (lazy-loaded) screens: kept out of `icons.tsx` so
- * they never reach the initial bundle (refactor-v4.md §4 "Initial JS must not grow").
- * `ChevronLeftIcon`'s 4 callers must all be genuinely lazy-only for that to hold — `PrivacyScreen`
- * (parent area) lives in its own file, not `PrivacyPolicy.tsx`, precisely so it is (lead review
- * 2026-09-27: `PrivacyPolicy.tsx` is also reachable eagerly, via `FirstRunScreen.tsx`, which was
- * pulling this whole module — `GuestIcon` included — into the initial bundle too).
- */
+/** Icons used only by parent-area/friend-play (lazy-loaded) screens: kept out of `icons.tsx` so
+ * they never reach the initial bundle. Every caller here must stay genuinely lazy-only. */
 
 /** Parent-area back chevron (ChildSettings, BackupPanel, ChildReport, PrivacyScreen). */
 export function ChevronLeftIcon({

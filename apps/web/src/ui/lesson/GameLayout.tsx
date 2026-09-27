@@ -9,14 +9,9 @@ export interface GameLayoutProps {
   readonly belowBoard?: ReactNode;
 }
 
-/**
- * The board: the largest square that fits the space the panel leaves over, measured
- * (`ResizeObserver`) rather than a fixed viewport share — the panel's height varies (instruction
- * length, note, tray, boss counters), so no fixed cap both fits the tallest panel and stays large
- * on the rest. Shrink-only while mounted, so a note coming and going does not grow/shrink the
- * board under the kid's finger; a window resize re-fits it both ways. No-op where
- * `ResizeObserver` is unavailable (jsdom).
- */
+/** The board: the largest square that fits the space the panel leaves over, measured
+ * (`ResizeObserver`, since the panel's height varies); shrink-only while mounted so a note coming
+ * and going does not grow/shrink the board under the kid's finger. No-op in jsdom. */
 function FitSquare({ children }: { readonly children: ReactNode }): JSX.Element {
   const areaRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);
@@ -64,12 +59,8 @@ function FitSquare({ children }: { readonly children: ReactNode }): JSX.Element 
   );
 }
 
-/**
- * Shared game-screen layout (Demo, Exercise, Boss): landscape (≥1024px, `lg`) puts the board on
- * the left with the panel on the right; portrait (phone and iPad portrait alike) stacks the panel
- * at its natural height below the board (docs/screens.md §1). Floor 240px (`min-h-60`): below that
- * a very short screen scrolls instead. Fit checked by `e2e/fit.spec.ts`.
- */
+/** Shared game-screen layout (Demo, Exercise, Boss): landscape puts the board left, panel right;
+ * portrait stacks the panel below (docs/screens.md §1). Floor 240px, else scrolls. */
 export function GameLayout({ board, panel, belowBoard }: GameLayoutProps): JSX.Element {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-6">

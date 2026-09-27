@@ -44,12 +44,8 @@ export interface ExercisePlayArea {
   readonly controls: JSX.Element;
 }
 
-/**
- * One exercise's board + input controls, of any exercise type — the part `ExerciseStep` and a
- * `series` boss's current round both need, built as a plain function (not a component) so neither
- * caller pays for an extra render layer. Callers own the reducer, the solved/not-solved framing,
- * autosave and the Next button; this only renders one round's play.
- */
+/** One exercise's board + input controls, shared by `ExerciseStep` and a `series` boss's round, a
+ * plain function so neither caller pays for an extra render layer. */
 export function buildExercisePlayArea({
   t,
   rules,
@@ -165,9 +161,8 @@ export function buildExercisePlayArea({
       />
     );
   } else if (exercise.type === 'mate-in-n') {
-    // While the scripted reply is pending, the board keeps showing the position right after the
-    // kid's own move (not the reply, already applied in `state.core`) — and stays uninteractive —
-    // until `exercise-reducer.ts`'s `reveal-reply` fires, ~600ms later (150ms, reduced motion).
+    // While the reply is pending, the board shows the position right after the kid's own move
+    // (not the reply, already applied in `state.core`) until `reveal-reply` fires.
     const displayPosition = state.pendingReply ? state.pendingReply.position : state.core.position;
     const lastMoveHighlight = state.pendingReply
       ? { from: state.pendingReply.move.from, to: state.pendingReply.move.to }

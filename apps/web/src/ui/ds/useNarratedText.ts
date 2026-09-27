@@ -2,13 +2,8 @@ import { useEffect, useRef } from 'react';
 import type { Narrator } from '@chess-kids/core';
 import { speakSequence } from './speakSequence.ts';
 
-/**
- * Speaks `text` through `narrator` whenever it changes (including on mount), and returns a
- * `replay` callback for a "Listen again" / "Say it again" button. `mode: 'replay-only'` (default
- * `'auto'`) skips the auto-speak effect — only `replay` ever speaks — for a caller that narrates on
- * its own schedule instead. Subtitles are the caller's job: this only drives the voice side of
- * "every text is spoken, and repeatable" (non-functional.md §2).
- */
+/** Speaks `text` through `narrator` on every change (incl. mount); returns a `replay` callback.
+ * `mode: 'replay-only'` skips the auto-speak effect for a caller narrating on its own schedule. */
 export function useSpeak(
   narrator: Narrator,
   text: string,
@@ -33,29 +28,12 @@ export function useSpeak(
 
 /** `useSpeak` in its default always-auto mode, under the name most call sites reach for. */
 export const useSpokenMessage = useSpeak;
-/** Same as {@link useSpeak} in its default mode — the name Story/Demo/R3b call sites still use. */
+/** Same as {@link useSpeak} in its default mode — the name Story/Demo call sites still use. */
 export const useNarratedText = useSpeak;
 
-/**
- * An exercise (or series-boss round)'s instruction plus its feedback note, without re-reading the
- * instruction on every note (owner report 2026-09-26: submit re-read the whole instruction before
- * the feedback, every time). `instruction` is spoken once on mount and again whenever it changes
- * (e.g. a series-boss round change). `note` is spoken alone — its own `speakSequence` call, never
- * prefixed with the instruction again — whenever it changes to a non-empty value; `note` becoming
- * `undefined` (feedback cleared back to a plain instruction) speaks nothing.
- *
- * A note that arrives while the instruction is still being read (a guided try's auto-shown hint
- * level 1, right after mount) does not cut the instruction off: the in-flight instruction's
- * `speakSequence` run is tracked in a ref, and the note effect waits for it to settle before
- * speaking — unless superseded meanwhile by a newer note, an instruction change, or unmount, guarded
- * by a `cancelled` flag set in that effect's own cleanup. The ref itself is cleared once its run
- * settles, but only while it is still the current one (a newer instruction may already have
- * replaced it).
- *
- * Returns a `replay` callback ("Say it again") that speaks the instruction and current note
- * together, from the top, same as before this change (dropping a note still waiting on the
- * instruction, which would otherwise start when the replay supersedes it and cut the replay off).
- */
+/** An exercise's instruction plus its feedback note, without re-reading the instruction on every
+ * note; a note arriving mid-instruction waits for it (guarded by a `cancelled` ref) instead of
+ * cutting it off. `replay` speaks both together, dropping any note still waiting. */
 export function useInstructionNarration(
   narrator: Narrator,
   instruction: string,

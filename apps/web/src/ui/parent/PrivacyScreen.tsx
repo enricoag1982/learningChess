@@ -8,10 +8,8 @@ export interface PrivacyScreenProps {
   readonly onBack: () => void;
 }
 
-/** Parent area "Privacy" row's own screen (`ParentAreaScreen.tsx`'s local view router) — its own
- * file, not `PrivacyPolicy.tsx` (lead review 2026-09-27): that module is also reached eagerly, via
- * `FirstRunScreen.tsx`'s `PrivacyDialog`, so this component's own `ChevronLeftIcon` stays lazy-only
- * only by living somewhere that eager path never imports. */
+/** Parent area "Privacy" row's own screen — its own file, not `PrivacyPolicy.tsx`, since that
+ * module is also reached eagerly and must never import the lazy-only `ChevronLeftIcon`. */
 export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
   const { t } = useTranslation();
   return (

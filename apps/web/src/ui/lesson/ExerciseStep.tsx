@@ -34,7 +34,7 @@ export interface ExerciseStepProps {
   /** Guided tries: hint level 1 auto-shown, never scored. */
   readonly guided: boolean;
   readonly nextStepIndex: number;
-  /** "Skip" (playtest 2): only ever set for a guided try (`guided`) — Exercises/Boss never skip. */
+  /** "Skip": only ever set for a guided try (`guided`) — Exercises/Boss never skip. */
   readonly onSkip?: () => void;
   /** Set when solving this leaves a skippable phase normally (Try's last guided step) — see
    * `RecordExerciseResultInput.completesPhase`. */
@@ -172,8 +172,6 @@ function ExerciseAttempt({
   const instructionText = exerciseInstructionText(t, exercise);
   const baseNote = exerciseNote(t, state.feedback, lesson.character, shownStars);
   const note = offerEasier ? withEasierOffer(t, baseNote, state.feedback) : baseNote;
-  // Instruction spoken once; each note spoken alone, never with the instruction re-read (owner
-  // report 2026-09-26) — see `useInstructionNarration`.
   const replay = useInstructionNarration(services.narrator, instructionText, note?.text);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
@@ -195,14 +193,11 @@ function ExerciseAttempt({
   const panel = (
     <>
       <SpeechBubble text={instructionText} note={note} />
-      {/* The easier-variant offer shares the replay row (not a row of its own) so Hint / Undo stay
-          on screen for the kid who is stuck (tablet 1024×768, desktop 1280×720). Offered, never
-          forced (teaching-process.md §3.3): the kid may keep trying the original. */}
+      {/* Easier-variant offer shares the replay row so Hint/Undo stay on screen; offered, never
+          forced (teaching-process.md §3.3). */}
       <div className="flex gap-3">
         <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
-        {/* Guided tries only (playtest 2): skips the rest of Try, straight to the first scored
-            exercise. Never alongside the easier-variant offer — that only ever appears on a
-            scored exercise (`easier` is undefined for a guided try, see `ExerciseStep` below). */}
+        {/* Guided tries only: skips the rest of Try, straight to the first scored exercise. */}
         {guided && onSkip && <SkipButton onClick={onSkip} />}
         {offerEasier && (
           <button type="button" onClick={handleTakeEasier} className={SECONDARY_BUTTON}>
@@ -244,10 +239,8 @@ function ExerciseAttempt({
   );
 }
 
-/**
- * One lesson step's exercise: a guided try, a scored exercise, or — once the kid takes the offer —
- * its easier variant, credited back to the original on solve (teaching-process.md §3.3).
- */
+/** One lesson step's exercise: a guided try, a scored exercise, or — once the kid takes the offer —
+ * its easier variant, credited back to the original on solve (teaching-process.md §3.3). */
 export function ExerciseStep(props: ExerciseStepProps): JSX.Element {
   const { lesson, exercise, guided } = props;
   const variant = guided ? undefined : easierVariant(lesson, exercise);

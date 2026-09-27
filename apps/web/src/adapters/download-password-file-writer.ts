@@ -21,12 +21,8 @@ function triggerDownload(filename: string, text: string): void {
   URL.revokeObjectURL(url);
 }
 
-/**
- * `PasswordFileWriter` for the web: browsers cannot write to a fixed path, so this downloads a
- * plain-text copy of the password to the browser's Downloads folder instead (app-structure.md §2:
- * "copy saved as `Downloads/chess-for-kids-parent-code.txt` at setup, at every change and on
- * \"Download parent code file\" in the grown-ups area").
- */
+/** `PasswordFileWriter` for the web: browsers cannot write to a fixed path, so this downloads a
+ * plain-text copy of the password to Downloads instead (app-structure.md §2). */
 export function createDownloadPasswordFileWriter(): PasswordFileWriter {
   return {
     write(password: string): Promise<{ location: string }> {

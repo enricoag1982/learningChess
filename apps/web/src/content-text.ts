@@ -1,13 +1,7 @@
 import type { TFunction } from 'i18next';
 
-/**
- * Translates a key loaded from `packages/content` (a lesson's `storyKey`/`textKey`, a mini-game's
- * `titleKey`/`goalKey`, …). Those keys are inherently dynamic — read from built YAML/JSON content,
- * not authored as TypeScript literals — so they can't be checked against the literal key union
- * `t()` otherwise enforces for UI strings written directly in this app. This is the one,
- * intentional boundary where that check is relaxed; every other `t()` call in the app keeps the
- * full typo-safety.
- */
+/** Translates a key loaded from `packages/content` (dynamic YAML/JSON, not a TS literal), the one
+ * intentional boundary where `t()`'s literal-key typo-safety is relaxed. */
 export function tContent(
   t: TFunction,
   key: string,

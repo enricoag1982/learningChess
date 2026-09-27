@@ -26,12 +26,8 @@ export interface NarratedBubbleProps {
   readonly speak?: 'auto' | 'replay-only';
 }
 
-/**
- * Owl bubble + "Say it again" wired to the narrator, one screen's own instruction line —
- * `useSpeak` + `SpeechBubble` + `ReplayButton` written out identically 13 times (refactor-v4.md §2
- * finding 6). `layout` picks the wrapper shape; a screen that places the bubble and replay button
- * apart from each other (Story/Demo) wires those two itself instead.
- */
+/** Owl bubble + "Say it again" wired to the narrator. `layout` picks the wrapper shape; a screen
+ * that places the bubble and replay button apart wires those two itself instead. */
 export function NarratedBubble({
   text,
   layout,

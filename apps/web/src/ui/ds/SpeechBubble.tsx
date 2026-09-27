@@ -1,9 +1,8 @@
 import type { JSX } from 'react';
 import { Owl } from './Owl.tsx';
 
-/** Visual tone for a note under the instruction: orange for hints/errors, green for praise. Flat
- * (info, docs/screens.md §1): a left accent bar carries the tone instead of a full box border, so
- * it never reads as a tappable card. */
+/** Visual tone for a note: orange for hints/errors, green for praise. Flat (docs/screens.md §1):
+ * a left accent bar carries the tone, never a full box border. */
 const NOTE_STYLES: Record<'attention' | 'praise', string> = {
   attention: 'border-l-4 border-today bg-[#FCEEE3] text-[#7A3A0F]',
   praise: 'border-l-4 border-go bg-[#E3F1EA] text-go',
@@ -23,12 +22,8 @@ export interface SpeechBubbleProps {
   readonly bubbleClassName?: string;
 }
 
-/**
- * Owl avatar + speech bubble. `text` (the instruction, or a screen's one line) is always shown;
- * `note`, when given, appears as a second, visually distinct line under it. Speaking `text` (and
- * replaying it) is the caller's job via `useNarratedText` and `ReplayButton`, so each screen can
- * place its replay control wherever its responsive layout needs.
- */
+/** Owl avatar + speech bubble; `note`, when given, appears as a second line under `text`.
+ * Speaking/replaying is the caller's job via `useNarratedText`/`ReplayButton`. */
 export function SpeechBubble({
   text,
   note,
@@ -40,8 +35,7 @@ export function SpeechBubble({
       <Owl className={avatarClassName} />
       <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
         <div className="relative w-full">
-          {/* The bubble's tail, pointing at the Owl (docs/screens.md §1 "Owl bubble ... keeps its
-              tail"): a small rotated square, same fill, tucked behind the bubble's left edge. */}
+          {/* The bubble's tail: a small rotated square, same fill, behind the left edge. */}
           <span
             aria-hidden="true"
             className="absolute top-4 -left-1.5 h-3 w-3 rotate-45 bg-[#F1EADA]"

@@ -2,9 +2,8 @@ import type { EarnedBadge, Streak } from '@chess-kids/core';
 import { markSeen } from '@chess-kids/core';
 import type { AppGet, AppSet } from '../store.ts';
 
-/** Rare celebrations (rewards.md §1): at most this many full-screen badge celebrations per app
- * sitting (reset when a profile is selected); every other newly earned badge still shows as a
- * "new" dot in My Den. */
+/** Rare celebrations (rewards.md §1): at most this many full-screen ones per app sitting; every
+ * other badge still shows as a "new" dot in My Den. */
 const MAX_CELEBRATIONS_PER_SESSION = 2;
 
 export interface RewardsSlice {
@@ -17,13 +16,8 @@ export interface RewardsSlice {
   /** Celebrations already shown this app sitting (reset on profile select); caps at {@link MAX_CELEBRATIONS_PER_SESSION}. */
   readonly celebrationsShownThisSession: number;
 
-  /**
-   * Re-reads this profile's earned badges/streak and, when nothing is already showing and this
-   * session is still under {@link MAX_CELEBRATIONS_PER_SESSION}, queues the oldest unseen badge as
-   * `activeCelebration` (rewards.md §1 "Rare celebrations"). Called after the exact 3 moments a
-   * celebration may show (lesson complete, a full game's result, the Today session summary) — every
-   * other newly earned badge stays unseen until My Den shows/clears its own "new" dot.
-   */
+  /** Re-reads badges/streak and, under the session cap with nothing already showing, queues the
+   * oldest unseen badge as `activeCelebration` (rewards.md §1). */
   readonly checkForCelebrations: () => Promise<void>;
   /** Marks `activeCelebration` seen, counts it against this session's cap, and clears it — then
    * queues the next one, if any and still under cap. */
@@ -46,11 +40,8 @@ export async function loadRewards(
 }
 
 export function createRewardsSlice(set: AppSet, get: AppGet): RewardsSlice {
-  /**
-   * Queues the oldest unseen earned badge as `activeCelebration` (rewards.md §1), when nothing is
-   * already showing and this app sitting is still under {@link MAX_CELEBRATIONS_PER_SESSION}.
-   * Assumes `earnedBadges`/`activeCelebration`/`celebrationsShownThisSession` are already current.
-   */
+  /** Queues the oldest unseen badge as `activeCelebration`, under cap; assumes the reward fields
+   * are already current. */
   function queueNextCelebration(): void {
     const { activeCelebration, celebrationsShownThisSession, earnedBadges } = get();
     if (activeCelebration || celebrationsShownThisSession >= MAX_CELEBRATIONS_PER_SESSION) return;

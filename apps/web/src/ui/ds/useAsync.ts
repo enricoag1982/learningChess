@@ -7,14 +7,9 @@ export interface UseAsyncResult<T> {
   readonly reload: () => Promise<void>;
 }
 
-/**
- * Runs `load()` once on mount and again whenever `deps` changes, replacing 8 hand-written "fetch
- * on mount" effects (refactor-v4.md §2 finding 6). `value` keeps its old contents until the new
- * load settles (never flashes back to `undefined`); state is set only inside `.then`, guarded by a
- * cancel flag so a superseded run's result is dropped, same as each effect already did by hand.
- * `enabled: false` skips the effect entirely (a caller with nothing to load yet).
- * `reload()` reruns `load()` on demand — a save/unlock action's own manual refresh.
- */
+/** Runs `load()` once on mount and again whenever `deps` changes; `value` keeps its old contents
+ * until the new load settles, guarded by a cancel flag against a superseded run. `enabled: false`
+ * skips the effect; `reload()` reruns `load()` on demand. */
 export function useAsync<T>(
   load: () => Promise<T>,
   deps: DependencyList,
@@ -36,8 +31,7 @@ export function useAsync<T>(
     return () => {
       cancelled = true;
     };
-    // `deps` is the caller's own array (`react-hooks/exhaustive-deps`'s `additionalHooks` checks it
-    // at each call site instead), not a literal here.
+    // `deps` is checked at each call site instead, not a literal here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, enabled]);
 

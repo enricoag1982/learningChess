@@ -90,9 +90,8 @@ function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.El
   );
 }
 
-/** One child's Overview card (app-structure.md §11): avatar, nickname, rank, total stars, minutes
- * today / last 7 days, streak — a tappable row (docs/screens.md §1 "tappable vs info", roadmap F3)
- * that opens that child's report. */
+/** One child's Overview card (app-structure.md §11): avatar, nickname, rank, stars, minutes,
+ * streak — a tappable row (docs/screens.md §1) that opens that child's report. */
 function ChildOverviewCard({
   overview,
   onOpen,
@@ -152,10 +151,8 @@ export function ParentAreaScreen(): JSX.Element {
   const [codeFileLocation, setCodeFileLocation] = useState<string | null>(null);
   const [view, setView] = useState<ParentView>({ kind: 'overview' });
 
-  // Also re-fetches on every return to `'overview'` (not only when `profiles` itself changes): a
-  // child's stats can change on the Report/Settings screens (reset, an import) without the
-  // `profiles` array reference changing at all, and the Overview must show fresh numbers each time
-  // it is shown again, not just the ones from when it first mounted.
+  // Re-fetches on every return to `'overview'`, not only when `profiles` changes: a child's stats
+  // can change (reset, an import) without the `profiles` array reference changing.
   const { value: overviews = {} } = useAsync(
     () =>
       Promise.all(

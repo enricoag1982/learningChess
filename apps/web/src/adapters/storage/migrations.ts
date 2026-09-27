@@ -1,11 +1,7 @@
 import type { Migration } from './local-store.ts';
 
-/**
- * Every schema migration this build knows, applied in order by `openLocalStore` (`local-store.ts`).
- * v2 adds `concept-stats`; v3 adds `game-records`; v4 adds `earned-badges`/`streaks`/
- * `session-logs`; v5 adds `assessment-results`/`unlocks`. None need existing data transformed — a
- * profile with none yet reads back an empty list/undefined, so every step only bumps the version.
- */
+/** Every schema migration this build knows, applied in order by `openLocalStore`. None need
+ * existing data transformed — a profile with none yet reads back an empty list/undefined. */
 export const MIGRATIONS: readonly Migration[] = [
   {
     to: 2,

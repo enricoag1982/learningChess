@@ -5,9 +5,7 @@ import { Owl } from './ds/Owl.tsx';
 import { TapButton } from './ds/primitives.tsx';
 
 /** What a child (or the parent helping) sees instead of a blank page when the app cannot start or
- * a screen crashes: Owl, a short message, the error text (small, for the parent to
- * report) and "Try again" (reload). Found on an iPad mini 4 (iOS 15): one startup exception left
- * an empty page with nothing to report. */
+ * a screen crashes: Owl, a short message, the error text, and "Try again". */
 function AppErrorScreen({ message }: { readonly message: string }): JSX.Element {
   const { t } = useTranslation();
   return (

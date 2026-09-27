@@ -8,11 +8,8 @@ export interface SkipButtonProps {
   readonly className?: string;
 }
 
-/**
- * "Skip" (playtest 2, teaching-process.md §2): Story/Demo/Try only, never Exercises/Boss. One tap
- * skips the rest of the current phase and marks it in the progress track (`StepPills`). Built on
- * `SECONDARY_BUTTON` (already ≥64px tall) — a shared primitive this task does not restyle.
- */
+/** "Skip" (teaching-process.md §2): Story/Demo/Try only, never Exercises/Boss. One tap skips the
+ * rest of the current phase and marks it in `StepPills`. */
 export function SkipButton({ onClick, className = '' }: SkipButtonProps): JSX.Element {
   const { t } = useTranslation();
   return (

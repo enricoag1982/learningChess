@@ -1,12 +1,8 @@
 import type { LocalStore } from './local-store.ts';
 import { StorageError } from './local-store.ts';
 
-/**
- * Runs a synchronous computation and reports it as a settled promise, so a thrown `StorageError`
- * surfaces as a rejection instead of a synchronous throw. The one place this conversion happens —
- * every collection below, plus the backup importer's own staging writes, share it instead of each
- * declaring its own copy.
- */
+/** Runs a synchronous computation and reports it as a settled promise, so a thrown `StorageError`
+ * surfaces as a rejection instead of a synchronous throw. */
 export function toPromise<T>(compute: () => T): Promise<T> {
   try {
     return Promise.resolve(compute());
@@ -28,12 +24,8 @@ export interface KeyedCollection<T> {
   removeWhere(predicate: (record: T) => boolean): Promise<void>;
 }
 
-/**
- * A `LocalStore` record holding `Record<string, T>`, addressed by a key derived from each record
- * (e.g. an id, or `"<profileId>:<lessonId>"`). `isRecord` is the same per-type shape guard every
- * repository already had; a value failing it (or the stored value not being a plain object) is
- * `StorageError`, same as corrupt JSON already is.
- */
+/** A `LocalStore` record holding `Record<string, T>`, addressed by a key derived from each record
+ * (e.g. an id, or `"<profileId>:<lessonId>"`); a value failing `isRecord` is `StorageError`. */
 export function keyedCollection<T>(
   store: LocalStore,
   name: string,
@@ -96,12 +88,8 @@ export interface CappedList<T> {
   removeWhere(predicate: (record: T) => boolean): Promise<void>;
 }
 
-/**
- * A `LocalStore` record holding `T[]`. `add` appends, then drops the oldest entries once the list
- * grows past `cap` (kept exactly as each repository already capped its own); `cap: undefined`
- * never trims (`earned-badges`/`unlocks`, which have none today). `isRecord` guards each element,
- * same reasoning as `keyedCollection`.
- */
+/** A `LocalStore` record holding `T[]`; `add` appends and drops the oldest once past `cap`
+ * (`undefined` never trims). `isRecord` guards each element, same as `keyedCollection`. */
 export function cappedList<T>(
   store: LocalStore,
   name: string,
@@ -149,12 +137,8 @@ export interface SingletonRecord<T> {
   set(value: T): Promise<void>;
 }
 
-/**
- * A `LocalStore` record holding one `T` (or nothing yet). No shape guard here: a singleton's value
- * is either used as-is or needs field-by-field defaulting (`AppSettings`'s older
- * records), which stays behaviour-specific in the repository, on top of the raw value this returns.
- * `defaults`, if given, is returned in place of `undefined` when nothing has been stored yet.
- */
+/** A `LocalStore` record holding one `T` (or nothing yet); no shape guard here, since defaulting
+ * stays behaviour-specific in the repository. `defaults` returns in place of `undefined`. */
 export function singleton<T>(store: LocalStore, name: string, defaults?: T): SingletonRecord<T> {
   return {
     get() {

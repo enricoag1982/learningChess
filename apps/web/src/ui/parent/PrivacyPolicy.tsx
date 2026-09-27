@@ -2,21 +2,12 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
-/** Repository issues page (non-functional.md §3 "contact"): the same repo the live app deploys
- * from (`CLAUDE.md`'s live URL, `docs/architecture.md` §10 "Web hosting"). */
+/** Repository issues page (non-functional.md §3 "contact"). */
 const ISSUES_URL = 'https://github.com/enricoag1982/learningChess/issues';
 
-/**
- * Privacy policy body (non-functional.md §3, `docs/privacy-policy.md` — same text, kept in
- * sync by hand since one lives in i18n and the other in plain Markdown for the repo root): plain
- * English, fits one tablet screen. Shared by `PrivacyScreen` (parent area, `PrivacyScreen.tsx`) and
- * `PrivacyDialog` (first-run overlay, right below) so the wording only ever lives in one place —
- * exported (not just this file's own use) so `PrivacyScreen.tsx` can stay a separate, lazy-only
- * module: this one is reached before the parent gate too (`FirstRunScreen.tsx`), so it must stay in
- * the eager bundle, while `PrivacyScreen`'s own `ScreenHeader`/`ChevronLeftIcon` need not (lead
- * review 2026-09-27: `ChevronLeftIcon` in particular, since `icons-lazy.tsx`'s other export,
- * `GuestIcon`, was being pulled into the eager bundle right along with it).
- */
+/** Privacy policy body (non-functional.md §3, kept in sync by hand with `docs/privacy-policy.md`):
+ * shared by `PrivacyScreen` (parent area) and `PrivacyDialog` (first-run overlay), reached before
+ * the parent gate, so exported here to stay in the eager bundle while `PrivacyScreen` stays lazy. */
 export function PrivacyPolicyBody(): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -55,9 +46,8 @@ export interface PrivacyDialogProps {
   readonly onClose: () => void;
 }
 
-/** First-run password step's "Read our privacy policy" link: an in-screen overlay, not a new
- * store screen (the parent hasn't set the password yet, so the parent area
- * itself is not reachable here). */
+/** First-run password step's privacy link: an in-screen overlay, not a store screen (the parent
+ * area is not reachable yet). */
 export function PrivacyDialog({ onClose }: PrivacyDialogProps): JSX.Element {
   const { t } = useTranslation();
   return (

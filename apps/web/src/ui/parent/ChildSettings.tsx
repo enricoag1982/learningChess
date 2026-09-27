@@ -194,9 +194,8 @@ function LimitChipRow({
   );
 }
 
-/** One allowed-hours chip row ("Play until" / "Not before") — `options` are `'HH:MM'`
- * strings shown as-is, plus `null` for "off" (`parent.daily-limit-off`, same wording as the daily
- * limit's own "Off" chip). */
+/** One allowed-hours chip row ("Play until"/"Not before"): `options` are `'HH:MM'` strings shown
+ * as-is, plus `null` for "off". */
 function HoursChipRow({
   label,
   options,
@@ -315,12 +314,8 @@ export interface ChildSettingsScreenProps {
   readonly onDeleted: () => void;
 }
 
-/**
- * Parent area "child settings" (app-structure.md §11): rename / avatar / delete, daily limit /
- * voice / sound / hints / computer level / piece style, unlock lessons & worlds (`UnlockPanel`),
- * export this child's data, and reset. Voice/sound/hints/computer level take effect next profile
- * select; daily limit is enforced live, from the next activity gate check.
- */
+/** Parent area "child settings" (app-structure.md §11): rename/avatar/delete, per-child settings,
+ * unlock lessons & worlds, export, reset. Daily limit is enforced live; the rest next profile select. */
 export function ChildSettingsScreen({
   profile,
   onBack,
@@ -345,9 +340,7 @@ export function ChildSettingsScreen({
   const [journey, setJourney] = useState<Journey | null>(null);
   const [gameRecords, setGameRecords] = useState<readonly GameRecord[]>([]);
 
-  // No effect resyncing `nickname` to `profile.nickname`: the caller remounts this component with
-  // `key={profile.id}` (`ParentAreaScreen.tsx`) whenever it opens a different child's settings, so
-  // `useState(profile.nickname)` above is always the right initial value.
+  // No effect resyncing `nickname`: the caller remounts this with `key={profile.id}` per child.
   useEffect(() => {
     let cancelled = false;
     void Promise.all([
@@ -382,12 +375,8 @@ export function ChildSettingsScreen({
     await refreshProfiles();
   }
 
-  // Queues patches one after another (the daily-limit block can have up to four chip rows a
-  // parent could tap in quick succession — weekday, weekend, "Play until", "Not before"): each
-  // `updateProfileSettings` call reads-merges-saves the *stored* settings, so two overlapping
-  // calls would race and the slower one's read misses the faster one's not-yet-saved field,
-  // silently dropping it once both saves land. Chaining onto `patchQueueRef` instead makes every
-  // patch start its own read only after the previous one's save has completed.
+  // Queues patches (up to four chip rows a parent could tap in quick succession): each
+  // read-merge-save call races on the stored settings otherwise, silently dropping a field.
   const patchQueueRef = useRef<Promise<void>>(Promise.resolve());
 
   async function patchSettings(patch: Partial<ProfileSettings>): Promise<void> {
@@ -395,8 +384,7 @@ export function ChildSettingsScreen({
       const updated = await updateProfileSettings(services.deps, profile.id, patch);
       setSettings(updated);
     });
-    // The queue itself must never reject (a failed patch would otherwise wedge every later one
-    // behind a rejected promise); the caller's own `await run` below still sees the real error.
+    // The queue must never reject, or every later patch would wedge behind it.
     patchQueueRef.current = run.catch(() => undefined);
     await run;
   }

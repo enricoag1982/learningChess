@@ -27,11 +27,8 @@ export interface OpenLocalStoreOptions {
   readonly migrations?: readonly Migration[];
 }
 
-/**
- * Current schema version for `chess-kids:*` storage, used when `options.version` is omitted (see
- * `migrations.ts` for what each version adds) — a migration only bumps the version, since the
- * relevant repository reads a missing key as "none yet", same as a fresh profile.
- */
+/** Current schema version for `chess-kids:*` storage, used when `options.version` is omitted
+ * (`migrations.ts` for what each version adds). */
 export const SCHEMA_VERSION = 5;
 
 const KEY_PREFIX = 'chess-kids:';
@@ -83,14 +80,9 @@ function readStoredVersion(storage: Storage): number | undefined {
   return parsed;
 }
 
-/**
- * Opens namespaced, versioned JSON storage over `storage` (e.g. `window.localStorage`).
- *
- * - Fresh storage (no version key, no `chess-kids:` data) starts at the target version.
- * - A stored version below the target is migrated up one step at a time; a missing step throws.
- * - A stored version above the target, or `chess-kids:` data with no version key, throws without
- *   touching anything: this is data the running app must not guess about.
- */
+/** Opens namespaced, versioned JSON storage over `storage`. Fresh storage starts at the target
+ * version; below it migrates up one step at a time (a missing step throws); above it, or
+ * unversioned `chess-kids:` data, throws without touching anything. */
 export function openLocalStore(storage: Storage, options?: OpenLocalStoreOptions): LocalStore {
   const targetVersion = options?.version ?? SCHEMA_VERSION;
   const migrations = options?.migrations ?? [];

@@ -60,10 +60,8 @@ function hintNoteText(t: TFunction, hint: Hint, name: string): string {
   });
 }
 
-/**
- * The note under the instruction for the current feedback, or `undefined` while just reading the
- * instruction (teaching-process.md §3.3: wrong move → explanation; hint ladder; praise on solve).
- */
+/** The note under the instruction for the current feedback, or `undefined` while just reading the
+ * instruction (teaching-process.md §3.3). */
 export function exerciseNote(
   t: TFunction,
   feedback: ExerciseFeedback,
@@ -118,10 +116,8 @@ const ERROR_FEEDBACK_KINDS = new Set<ExerciseFeedback['kind']>([
   'wrong-placement',
 ]);
 
-/**
- * Appends the "want an easier one?" sentence to `note`'s text when `feedback` is an error (never on
- * a hint, toggle or undo, so those don't re-narrate the offer); `note` unchanged otherwise.
- */
+/** Appends the "want an easier one?" sentence to `note`'s text when `feedback` is an error (never
+ * on a hint, toggle or undo); `note` unchanged otherwise. */
 export function withEasierOffer(
   t: TFunction,
   note: SpeechBubbleNote | undefined,

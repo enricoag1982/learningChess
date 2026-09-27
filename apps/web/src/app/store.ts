@@ -25,8 +25,7 @@ export { setRoute } from './slices/nav.ts';
 /** Which top-level screen is showing. `loading` is the instant before `init()` resolves. */
 export type Screen = RouteName;
 
-/** App-wide state: which screen shows, every profile on the device, the active one and its
- * progress — composed from `app/slices/*.ts` (v4 R2 PR C), one file per domain. */
+/** App-wide state, composed from `app/slices/*.ts`, one file per domain. */
 export interface AppState
   extends NavSlice, ProfileSlice, RewardsSlice, TimeSlice, LearnSlice, TodaySlice, PlaySlice {
   readonly services: Services;

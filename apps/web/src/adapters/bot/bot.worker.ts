@@ -3,12 +3,8 @@ import { bot, chessJsRules } from '@chess-kids/core';
 import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
-/**
- * The computer opponent's search, off the UI thread (`docs/architecture.md` §2). No `WebWorker`
- * lib in `tsconfig.json` (it conflicts with `DOM`, already needed everywhere else in this app), so
- * `self` is cast to the `Worker` interface `DOM` already declares: the same one-argument
- * `postMessage`/`onmessage` shape a dedicated worker's global scope has.
- */
+/** The computer opponent's search, off the UI thread. No `WebWorker` lib in `tsconfig.json`
+ * (conflicts with `DOM`), so `self` is cast to the `Worker` interface `DOM` already declares. */
 const ctx: Worker = self as unknown as Worker;
 
 function chooseMove(state: game.GameState, level: number, seed: number): Move | null {

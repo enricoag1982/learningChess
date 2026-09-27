@@ -175,11 +175,8 @@ const EXERCISES: readonly { readonly label: string; readonly def: ExerciseDef }[
   { label: 'attacked-by', def: ATTACKED_BY_EXERCISE },
 ];
 
-/**
- * Full-viewport preview of one exercise, wrapped the same way `LessonScreen` wraps `ExerciseStep`
- * (see `LessonScreen.tsx`): `GameLayout`'s `lg:` side-by-side breakpoint reacts to the *page*
- * viewport, so a small boxed preview would clip at desktop widths instead of laying out correctly.
- */
+/** Full-viewport preview of one exercise, wrapped like `LessonScreen` wraps `ExerciseStep`:
+ * `GameLayout`'s `lg:` breakpoint reacts to the page viewport, not a boxed preview. */
 function ExercisePreview({
   lesson,
   def,

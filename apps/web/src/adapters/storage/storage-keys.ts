@@ -1,9 +1,5 @@
-/**
- * Every `LocalStore` record name this app writes (`chess-kids:<name>`, `architecture.md` §11),
- * `parent-lock` apart — the one thing a restored/merged backup must never touch (`local-backup-
- * importer.ts`'s own doc). One source of truth so a repository and the importer can never drift
- * to different strings for the same record.
- */
+/** Every `LocalStore` record name this app writes; one source of truth so a repository and the
+ * backup importer never drift to different strings for the same record. */
 export const STORAGE_KEYS = {
   profiles: 'profiles',
   settings: 'settings',

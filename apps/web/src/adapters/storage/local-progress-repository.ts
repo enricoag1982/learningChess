@@ -71,10 +71,8 @@ function isConceptStatsShape(value: unknown): value is ConceptStats {
   );
 }
 
-/**
- * `ProgressRepository` over one `LocalStore`: lesson progress keyed by `"<profileId>:<lessonId>"`,
- * attempts as a single capped, append-only list (newest last).
- */
+/** `ProgressRepository` over one `LocalStore`: lesson progress keyed by `"<profileId>:<lessonId>"`,
+ * attempts as a single capped, append-only list (newest last). */
 export class LocalStorageProgressRepository implements ProgressRepository {
   private readonly lessons: KeyedCollection<LessonProgress>;
   private readonly attempts: CappedList<Attempt>;

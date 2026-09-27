@@ -35,10 +35,8 @@ export interface BoardHighlights {
   readonly focus?: readonly Square[];
   /** Orange glow ring: the checked king's square (all exercise types, whenever it applies). */
   readonly check?: Square;
-  /**
-   * best-move exercises: a legal-but-wrong move attempt. The piece at `from` slides to `to` and
-   * bounces back; the position itself never changes, so this is a distinct field from `lastMove`.
-   */
+  /** best-move exercises: a legal-but-wrong attempt — slides to `to` and bounces back, never
+   * changing the position (so distinct from `lastMove`). */
   readonly wrongMove?: { readonly from: Square; readonly to: Square };
   /** Steady orange ring: a `versus` boss's own piece that is attacked and undefended. */
   readonly danger?: readonly Square[];
@@ -58,16 +56,13 @@ export interface BoardProps {
   readonly highlights?: BoardHighlights;
   /** Show file/rank labels on the edge squares. Default `false` (kids: no notation). */
   readonly showCoordinates?: boolean;
-  /** Face-to-face vs Friend (docs/app-structure.md §6): draws the side opposite `orientation`
-   * rotated 180° so that player reads their own pieces upright. Purely visual, a11y unaffected. */
+  /** Face-to-face vs Friend: draws the side opposite `orientation` rotated 180°, visual only. */
   readonly rotateTopPieces?: boolean;
-  /** vs Friend's "legal-move dots" setting: `false` hides the possible-move dot/ring but leaves
-   * every square exactly as draggable/tappable — a difficulty toggle, not an interactivity one. */
+  /** vs Friend's difficulty toggle: `false` hides the possible-move dot/ring; squares stay tappable. */
   readonly showLegalMoveDots?: boolean;
   /** Accessible name of the board, e.g. "Chess board". */
   readonly label: string;
-  /** Animal-badge piece look (docs/app-structure.md "Piece look on board"): a small corner badge
-   * naming each piece's taught animal — callers compute this from `showPieceBadges`. */
+  /** Small corner badge naming each piece's taught animal; callers gate this on `showPieceBadges`. */
   readonly pieceBadges?: boolean;
 }
 
@@ -153,11 +148,8 @@ interface CaptureFadeState {
 /** A drag/tap threshold in CSS pixels: smaller pointer movements count as a tap. */
 const DRAG_THRESHOLD_PX = 6;
 
-/**
- * The chess board: an 8x8 grid of squares that renders `position`, supports tap-tap and drag
- * moves constrained to `legalMoves`, and exposes itself to screen readers as a `role="grid"` with
- * one labelled button per square. It holds no chess rules of its own.
- */
+/** Renders `position`; tap-tap or drag moves constrained to `legalMoves`; `role="grid"` with one
+ * labelled button per square (a11y). Holds no chess rules of its own. */
 export function Board({
   position,
   legalMoves,

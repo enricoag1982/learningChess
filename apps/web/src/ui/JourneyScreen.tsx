@@ -554,10 +554,8 @@ function LessonNode({
   const rating = status === 'complete' ? ratingStars(earned, max) : 0;
   const bossWon = (progress?.bossStars ?? 0) >= 2;
 
-  // Owl-taught lessons (World 1: no piece character) are labelled by their title, e.g. "Squares";
-  // a piece character's first lesson by the character's name ("Rhino"), a later lesson of the same
-  // character ("Promotion") by its own title ("Caterpillar Transforms!"), so two nodes never
-  // show the same label (`journeyNodeLabel`, like Play's `unlockLabel`).
+  // Owl-taught lessons labelled by title; a piece character's first lesson by its name, a later
+  // one by its own title — so two nodes never show the same label (`journeyNodeLabel`).
   const piece = characterPieceOrNull(lesson.character);
   const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
   const characterLabel = journeyNodeLabel(t, lesson, firstLessonOfCharacter);

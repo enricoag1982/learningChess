@@ -27,10 +27,8 @@ const silentNarrator: Narrator = {
   },
 };
 
-/**
- * `Narrator` over the Web Speech API. Prefers an on-device English voice (works offline); falls
- * back to a silent no-op narrator when Web Speech is unavailable (subtitles carry the text then).
- */
+/** `Narrator` over the Web Speech API. Prefers an on-device English voice; falls back to a
+ * silent no-op narrator when Web Speech is unavailable. */
 export function createWebSpeechNarrator(speech?: SpeechSynthesis): Narrator {
   const synth = speech ?? browserSpeechSynthesis();
   if (synth === undefined) {
@@ -41,9 +39,8 @@ export function createWebSpeechNarrator(speech?: SpeechSynthesis): Narrator {
   const refreshVoice = (): void => {
     voice = pickVoice(synth.getVoices());
   };
-  // Safari < 16 (iPad mini 4, iOS 15): `SpeechSynthesis` is not an `EventTarget` — calling
-  // `addEventListener` threw at startup and left a blank page. The event-handler property is
-  // harmless there, and `speak` re-picks a voice if none was found yet.
+  // Safari < 16 (iOS 15): `SpeechSynthesis` is not an `EventTarget` — `addEventListener` threw at
+  // startup and left a blank page; the event-handler property is harmless there.
   const events = synth as Partial<Pick<EventTarget, 'addEventListener'>> & {
     onvoiceschanged?: (() => void) | null;
   };

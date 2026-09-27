@@ -22,11 +22,8 @@ export function firstLessonsByCharacter(
   return first;
 }
 
-/**
- * The condition text for a locked mini-game: the piece word for the first lesson of a piece
- * character ("Pawn"), else the lesson's title (Owl-taught lessons, and later lessons of the same
- * character such as "Caterpillar Transforms!").
- */
+/** The condition text for a locked mini-game: the piece word for a piece character's first
+ * lesson ("Pawn"), else the lesson's title. */
 export function unlockLabel(
   t: TFunction,
   lesson: { readonly id: string; readonly character: string; readonly titleKey: string },
@@ -38,13 +35,8 @@ export function unlockLabel(
     : tContent(t, lesson.titleKey);
 }
 
-/**
- * Journey map node label for a lesson: the character's name for the first lesson of that piece
- * character ("Caterpillar"), else the lesson's own title, so a repeated character's later lesson
- * ("Promotion") reads as "Caterpillar Transforms!" instead of a second, indistinguishable
- * "Caterpillar" node. Owl-taught lessons (no piece character, World 1) always use
- * their own title, unchanged.
- */
+/** Journey map node label: the character's name for its first lesson, else the lesson's own title
+ * — so a repeated character's later lesson never shows an indistinguishable second node. */
 export function journeyNodeLabel(
   t: TFunction,
   lesson: { readonly id: string; readonly character: string; readonly titleKey: string },

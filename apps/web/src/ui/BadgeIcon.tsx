@@ -16,11 +16,8 @@ export interface BadgeIconProps {
   readonly className?: string;
 }
 
-/**
- * A round medal/rosette (docs/screens.md §1 "grey + lock = locked"): earned shows a checkmark
- * filled by tier colour; locked shows a plain grey outline with a small lock glyph instead (never
- * the checkmark — a locked badge must never read as "done").
- */
+/** A round medal/rosette (docs/screens.md §1: grey + lock = locked): earned shows a checkmark
+ * filled by tier colour; locked shows a grey outline with a lock glyph, never the checkmark. */
 export function BadgeIcon({ tier, locked = false, className }: BadgeIconProps): JSX.Element {
   const color = locked ? '#8C8C8C' : TIER_COLOR[tier ?? 'none'];
   return (

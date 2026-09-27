@@ -72,11 +72,7 @@ function Knight({ color }: { readonly color: Color }): JSX.Element {
   return (
     <>
       <Base />
-      {/* Horse head + neck in profile, facing left: a separate pointed ear sits on the poll; the
-          head/neck silhouette reads (front to back) a long, slightly convex nose bridge down to
-          a sharp muzzle point, a straight mouth edge back to the jaw, a concave throat notch (the
-          classic knight "waist"), a convex chest down to the base, then a convex mane-side neck
-          arching back up to the poll. */}
+      {/* Horse head + neck in profile, facing left, with the classic knight "waist" throat notch. */}
       <path
         d="M23,7
            C26,7.5 29,9.5 31.5,13
@@ -93,13 +89,9 @@ function Knight({ color }: { readonly color: Color }): JSX.Element {
            C20,4 21.5,4.5 23,7
            Z"
       />
-      {/* pointed ear, on top of the poll */}
       <path d="M18.5,6.5 C16.8,3 20,0.5 23,3 C24,5 22.5,7.8 19.5,8.8 Z" />
-      {/* eye */}
       <circle cx={11} cy={9} r={1.8} fill={markStroke} stroke="none" />
-      {/* nostril, near the muzzle tip */}
       <circle cx={4.5} cy={16.5} r={1.2} fill={markStroke} stroke="none" />
-      {/* mouth line, from the muzzle tip back to the jaw corner */}
       <path
         d="M5,18.5 L9,20.8"
         fill="none"
@@ -107,7 +99,6 @@ function Knight({ color }: { readonly color: Color }): JSX.Element {
         strokeWidth={1.4}
         strokeLinecap="round"
       />
-      {/* mane ridge along the back of the neck */}
       <path
         d="M28,10 L25,11"
         fill="none"
@@ -196,9 +187,8 @@ const SHAPES: Record<PieceType, (props: { readonly color: Color }) => JSX.Elemen
   k: King,
 };
 
-/** One SVG piece drawing (our own artwork, viewBox 0 0 45 45, `aria-hidden`).
- * With no `size`, it fills its container (for the responsive board); pass `size` for a fixed
- * pixel drawing (e.g. the piece gallery). */
+/** One SVG piece drawing (our own artwork, `aria-hidden`). With no `size`, fills its container;
+ * pass `size` for a fixed pixel drawing (e.g. the piece gallery). */
 export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
   const colours = PALETTE[piece.color];
   const Shape = SHAPES[piece.type];
@@ -227,10 +217,8 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
   );
 }
 
-/** Small animal-face badge overlaid on a piece's corner (docs/app-structure.md "Piece look on
- * board"). Purely decorative — a square's accessible name already names the piece — so `aria-hidden`;
- * drawn as an SVG `<image>` (not `<img>`) so it composes with the badge's ring/background in one
- * element at this very small size. */
+/** Small animal-face badge overlaid on a piece's corner. Purely decorative (`aria-hidden`); drawn
+ * as an SVG `<image>` so it composes with the badge's ring/background at this small size. */
 export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
   const character = characterForPiece(type);
   return (

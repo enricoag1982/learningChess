@@ -5,9 +5,8 @@ import { tContent } from '../content-text.ts';
 import { InfoPill } from './ds/primitives.tsx';
 import { RankCrownIcon } from './ds/icons.tsx';
 
-/** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): the current rank name, next to the
- * Home/Journey stars pill — crown icon + text, no pill background or border, so it never reads as
- * a bare button label or a tappable chip. */
+/** Info pill (docs/screens.md §1): the current rank name — crown icon + text, no background or
+ * border, so it never reads as a tappable chip. */
 export function RankPill({
   rank,
   compact = false,

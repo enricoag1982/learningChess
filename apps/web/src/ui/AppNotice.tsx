@@ -4,18 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { Owl } from './ds/Owl.tsx';
 
-/**
- * 5-minute warning banner (app-structure.md §13 "5-min warning"): the store's
- * `timeNoticeVisible` (`checkTimeNotice`) decides whether it shows — this component only re-runs
- * that check on every screen change (mounted once in `App.tsx` alongside `TimeTracker`/
- * `AppUpdater`; `TimeTracker`'s own minute tick runs the other trigger). "Screen change" includes
- * reaching the lesson screen's own lesson-complete step — `lessonId`/`stepIndex` are also
- * dependencies here, since that step alone turns `screen: 'lesson'` calm without the `Screen`
- * value itself ever changing (`isCalmScreen`, `app/store.ts`). Owl, info style (`docs/screens.md`
- * §1 "Info only": flat, no border/ledge, not tappable), spoken once via `useNarratedText` (fires
- * exactly when `visible` flips from `false` to `true`, since that is the only moment its own text
- * argument changes from `''`), gone on the next screen change.
- */
+/** 5-minute warning banner: `timeNoticeVisible` (`checkTimeNotice`) decides whether it shows; this
+ * re-runs that check on every screen change, incl. reaching the lesson-complete step. */
 export function AppNotice(): JSX.Element | null {
   const { t } = useTranslation();
   const services = useServices();

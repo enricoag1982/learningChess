@@ -8,15 +8,12 @@ export interface PhaseChipProps {
   /** Position within the phase (e.g. guided try 1 of 2); omitted where there is only one step. */
   readonly current?: number;
   readonly total?: number;
-  /** Story/Demo/Try skipped so far (playtest 2), shown in the mini track under the label. */
+  /** Story/Demo/Try skipped so far, shown in the mini track under the label. */
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 
-/**
- * Phone top bar (< 640px, docs/screens.md §1): one compact label naming the current phase,
- * replacing the full `StepPills` track that would wrap there. Info, not tappable (F3): flat tint,
- * small radius, `StepPills`' orange "current" bar as a left edge.
- */
+/** Phone top bar: one compact label naming the current phase, replacing the full `StepPills`
+ * track that would wrap there. Info, not tappable: flat tint, small radius. */
 export function PhaseChip({
   phase,
   current,

@@ -22,11 +22,8 @@ export interface MiniBoardProps {
   readonly pieceBadges?: boolean;
 }
 
-/**
- * A small, non-interactive board diagram: the Story step's "here's how I move" illustration.
- * Unlike `Board`, nothing here responds to taps or drags — it only ever shows a fixed position
- * plus optional dot markers, so the lesson can pre-render legal-move dots without a kid's tap.
- */
+/** A small, non-interactive board diagram: the Story step's "here's how I move" illustration.
+ * Unlike `Board`, nothing here responds to taps or drags. */
 export function MiniBoard({
   position,
   highlightSquares = [],

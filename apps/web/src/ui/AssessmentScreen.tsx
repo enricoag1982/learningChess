@@ -76,12 +76,8 @@ function AssessmentResult({
   );
 }
 
-/**
- * Test-out run (domain-model.md §3.2): reuses the review task runner (`showHint={false}`, no
- * easier variants — the runner never offers one), scoring the whole run via `onRecord` rather than
- * moving the Leitner review box per task. Shows the pass/fail result once done, then returns to the
- * Journey (`exitAssessment`, which refreshes progress).
- */
+/** Test-out run (domain-model.md §3.2): reuses `ReviewTaskRunner` (no hints/easier variants),
+ * scoring the whole run via `onRecord` instead of moving the Leitner box per task. */
 export function AssessmentScreen(): JSX.Element {
   const { t } = useTranslation();
   const assessmentRun = useRoute('assessment');

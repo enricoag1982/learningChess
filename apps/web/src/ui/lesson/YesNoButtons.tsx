@@ -44,11 +44,8 @@ export interface YesNoButtonsProps {
   readonly onAnswer: (value: boolean) => void;
 }
 
-/**
- * Yes / No answer buttons for a yes-no exercise. Both start identical and neutral (neither is a
- * "primary" green action, which would bias the kid toward it) — icon + label, colour is never the
- * only signal. Once a wrong pick is made, only that button turns orange and disables.
- */
+/** Yes/No answer buttons: both start identical and neutral (neither biased green); a wrong pick
+ * turns that button orange and disables it. */
 export function YesNoButtons({ wrongValue, onAnswer }: YesNoButtonsProps): JSX.Element {
   const { t } = useTranslation();
   const yesWrong = wrongValue === true;

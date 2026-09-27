@@ -73,11 +73,8 @@ interface SeriesRoundProps {
   readonly onNext: (roundState: ExerciseState) => void;
 }
 
-/**
- * One round of a series boss: the same exercise UI as `ExerciseStep` (any exercise type, hints
- * allowed), but scored only as part of the series' total mistakes — no per-round stars, and moving
- * on is an explicit "Next" tap (never a timed auto-advance) once it is solved.
- */
+/** One round of a series boss: `ExerciseStep`'s own UI, scored only as part of the series' total
+ * mistakes — no per-round stars, moving on is an explicit "Next" tap. */
 function SeriesRound({
   character,
   worldId,
@@ -100,8 +97,6 @@ function SeriesRound({
   const stars = starsFor(state.core);
   const instructionText = exerciseInstructionText(t, exercise);
   const note = exerciseNote(t, state.feedback, character, stars);
-  // Instruction spoken once per round; each note spoken alone, never with the instruction re-read
-  // (owner report 2026-09-26) — see `useInstructionNarration`.
   const replay = useInstructionNarration(services.narrator, instructionText, note?.text);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
@@ -150,12 +145,8 @@ function SeriesRound({
   );
 }
 
-/**
- * A `series` boss mini-game (Square Hunt, Setup Race, …): a fixed sequence of rounds, each played
- * through the normal exercise engine and reusing `ExerciseStep`'s own UI building blocks
- * (`buildExercisePlayArea`); scored on total mistakes (errors + hint levels) across every round,
- * not a single win condition.
- */
+/** A `series` boss mini-game: a fixed sequence of rounds through the normal exercise engine,
+ * scored on total mistakes (errors + hint levels) across every round. */
 export function SeriesBossStep({
   lesson,
   game: minigame,

@@ -52,9 +52,8 @@ interface PendingImport {
   /** By incoming profile id — every non-auto-merge child's current choice (auto-merge children have
    * no entry: `importMerged` always merges them regardless, decision table "no question"). */
   readonly choices: Readonly<Record<string, ChildImportChoice>>;
-  /** By incoming profile id — the change summary for that child's *current* choice, recomputed
-   * whenever it changes (`refreshChange`). Loads in as each one resolves, so the preview never
-   * blocks on every child at once. */
+  /** By incoming profile id — the change summary for the current choice, recomputed on change and
+   * loaded in as each one resolves. */
   readonly changes: Readonly<Record<string, ImportChangeSummary>>;
 }
 
@@ -64,13 +63,8 @@ export interface BackupScreenProps {
   readonly onImported: () => void;
 }
 
-/**
- * Parent area "Backup" (app-structure.md §11, §13 "Across devices"): export
- * every child's data as one JSON file; "Send to other device" via the share sheet (falls back to a
- * download); pick a file to preview and merge it in — per incoming child, "Merge into ‹local
- * child›" (auto, silent, when its id already matches one) or a choice between that and "Add as new
- * child". Nothing already on this device is ever lost or replaced.
- */
+/** Parent area "Backup" (app-structure.md §11, §13): export every child's data, send to another
+ * device, or pick a file to preview and merge in. Nothing on this device is ever lost or replaced. */
 export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

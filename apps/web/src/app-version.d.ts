@@ -1,4 +1,3 @@
-// `vite.config.ts`'s `define` inlines this at build time from `package.json`'s own `version`
-// (`docs/release.md`): a compile-time string replacement, not `import.meta.env`, so it needs
-// no `script-src 'unsafe-inline'`/`eval` and is unaffected by the CSP.
+// Inlined at build time from `package.json`'s `version`; a compile-time replacement, not
+// `import.meta.env`, so it needs no `script-src 'unsafe-inline'`/`eval`.
 declare const __APP_VERSION__: string;

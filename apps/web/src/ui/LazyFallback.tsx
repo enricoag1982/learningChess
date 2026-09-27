@@ -2,15 +2,8 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Owl } from './ds/Owl.tsx';
 
-/**
- * `Suspense` fallback for a lazy-loaded screen (`App.tsx`, `non-functional.md` §4 "Lazy loading"):
- * a small spinning ring around the Owl avatar. Shown only for the moment that screen's own chunk
- * is still downloading — near-instant on a repeat visit, since the service worker precaches every
- * chunk right after first load (`non-functional.md` §1). `role="status"` + the translated label
- * announce it to screen readers the same way any other loading state would; the ring itself is
- * `aria-hidden` (decorative). `.lazy-spin` (`index.css`) is a plain CSS animation, zeroed globally
- * under reduced motion — same pattern every other animation in this codebase already uses.
- */
+/** `Suspense` fallback for a lazy-loaded screen: a spinning ring around the Owl avatar, shown only
+ * while that chunk downloads. `role="status"` for a11y; `.lazy-spin` zeroes under reduced motion. */
 export function LazyFallback(): JSX.Element {
   const { t } = useTranslation();
   return (

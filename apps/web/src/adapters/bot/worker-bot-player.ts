@@ -12,11 +12,8 @@ function chooseMoveInThread(state: game.GameState, level: number, seed: number):
   return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
 }
 
-/**
- * `BotPlayer` backed by a module Web Worker (`bot.worker.ts`), so a Bear-depth search never blocks
- * the UI thread (`docs/architecture.md` §2). Falls back to running the search in-thread when
- * `Worker` is unavailable (jsdom / Vitest): same result, no background thread.
- */
+/** `BotPlayer` backed by a module Web Worker, so a Bear-depth search never blocks the UI thread.
+ * Falls back to running the search in-thread when `Worker` is unavailable (jsdom/Vitest). */
 export function createWorkerBotPlayer(): BotPlayer {
   if (typeof Worker === 'undefined') {
     return {

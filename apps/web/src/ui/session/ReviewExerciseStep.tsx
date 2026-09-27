@@ -31,19 +31,13 @@ export interface ReviewExerciseStepProps {
   readonly onNext: () => void;
   /** Hides the Hint control (domain-model.md §3.2: an assessment task offers no hints). Default `true`. */
   readonly showHint?: boolean;
-  /**
-   * Overrides the default `recordReviewResult` save (assessment tasks, M4.5: scoring is per-run, not
-   * a per-task Leitner box move). Receives the solved core exercise state and whether it was solved
-   * first-try with no hint/error; must resolve before the Next button appears.
-   */
+  /** Overrides the default `recordReviewResult` save (assessment tasks: scoring is per-run, not a
+   * per-task Leitner box move); must resolve before Next appears. */
   readonly onRecord?: (state: ExerciseState, correct: boolean) => Promise<void>;
 }
 
-/**
- * One warm-up / Practice review task (domain-model.md §3.1): the same board + input controls a
- * lesson's scored exercise uses, minus the easier-variant machinery (never offered on a review
- * task) and never touching the task's own lesson's `bestStars` — see `recordReviewResult`.
- */
+/** One warm-up/Practice review task (domain-model.md §3.1): the same board + controls a lesson's
+ * scored exercise uses, minus the easier-variant machinery. */
 export function ReviewExerciseStep({
   task,
   reviewSource,

@@ -25,8 +25,8 @@ import { AvatarBadge } from './ds/AvatarBadge.tsx';
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const FULL_GAME_MOVE_LIMIT = 100;
 
-/** Sizes `children` to the largest square that fits this wrapper's available space (docs/screens.md
- * §1 "Board >= 75% of screen height"), measured via `ResizeObserver`; no-op (unsized) in jsdom. */
+/** Sizes `children` to the largest square that fits this wrapper's space (docs/screens.md §1),
+ * measured via `ResizeObserver`; no-op in jsdom. */
 function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);
@@ -101,9 +101,8 @@ interface FriendGameDef {
   readonly position: Position;
 }
 
-/** The rules/position for `gameId`: the full game (built the same way as `FullGameScreen`'s vs
- * computer one), or an unlocked `versus` mini-game's own content — `null` for an unknown id
- * (defensive only: the setup sheet only ever offers ids `friendGameOptions` already unlocked). */
+/** The rules/position for `gameId`: the full game, or an unlocked `versus` mini-game's own
+ * content; `null` for an unknown id (defensive only). */
 function gameDefFor(gameId: string, content: ContentSource): FriendGameDef | null {
   if (gameId === 'full') {
     return {
@@ -156,9 +155,8 @@ interface PlayerStripProps {
   readonly rotate?: boolean;
 }
 
-/** One player's own turn indicator + Take back / Stop (ongoing) or result + Play again / Back to
- * Play (ended) — `docs/screens.md` #8 "take back + exit per player". Reused for face-to-face's two
- * mirrored strips and pass-and-play's single one. */
+/** One player's turn indicator + Take back/Stop (ongoing) or result + Play again/Back to Play
+ * (ended), reused for face-to-face's two strips and pass-and-play's single one. */
 function PlayerStrip({
   player,
   isTurn,
@@ -233,7 +231,7 @@ interface FriendMatchProps {
 }
 
 /** The live match + result, once a valid game/def/players are resolved (a separate component so
- * every hook here runs unconditionally, same split as `FullGameScreen` / `VersusStep`). */
+ * every hook here runs unconditionally). */
 function FriendMatch({
   gameId,
   def,
@@ -288,8 +286,7 @@ function FriendMatch({
     }).then(() => {
       setSaved(true);
     });
-    // Only the match itself should re-trigger this (mirrors `VersusStep`'s own save effect):
-    // `services.deps`/players are stable for the life of this screen.
+    // Only `match` should re-trigger this; `services.deps`/players are stable for this screen.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [match]);
 
@@ -397,10 +394,8 @@ function FriendMatch({
           <PlayerStrip player={whitePlayer} isTurn={position.toMove === 'w'} {...stripCommon} />
         </div>
       ) : (
-        // Pass-and-play: a single strip (the board itself flips to face whoever moves next), laid
-        // out the same board-fills-the-height way as face-to-face — `GameLayout`'s side-by-side /
-        // capped-height shape is tuned for a richer panel (speech bubble, replay, …) than this
-        // screen has, and would otherwise leave the board small with dead space beneath it.
+        // Pass-and-play: a single strip; board fills the height (not `GameLayout`, tuned for a
+        // richer panel than this screen has).
         <div className="flex min-h-0 flex-1 flex-col gap-3">
           <SquareArea>
             <Board
@@ -450,12 +445,8 @@ function FriendMatch({
   );
 }
 
-/**
- * Play's vs Friend game screen (`docs/app-structure.md` §6 / `docs/screens.md` #8):
- * pass-and-play (board flips to the mover each move) or face-to-face (fixed orientation, the top
- * side's pieces + strip rotated 180°); per-player Take back (with the other player's Yes/No) and
- * Stop; result names the winner by nickname ("Guest" for a guest).
- */
+/** Play's vs Friend game screen (`docs/app-structure.md` §6): pass-and-play (board flips to the
+ * mover) or face-to-face (fixed orientation, top side rotated 180°); per-player Take back + Stop. */
 export function FriendGameScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

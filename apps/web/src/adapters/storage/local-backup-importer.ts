@@ -24,8 +24,7 @@ import { MAX_GAME_RECORDS } from './local-game-record-repository.ts';
 import { MAX_ATTEMPTS } from './local-progress-repository.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
-/** Every record name a backup import replaces — the same `STORAGE_KEYS` every repository reads and
- * writes, deliberately never `parentLock` (see `BackupImporter`'s own doc: a restored backup never
+/** Every record a backup import replaces; deliberately never `parentLock` (a restored backup never
  * touches the parent password). */
 const RECORD_NAMES = [
   STORAGE_KEYS.profiles,
@@ -54,9 +53,8 @@ function capped<T extends { readonly createdAt: string }>(items: readonly T[], m
   return sorted.length > max ? sorted.slice(sorted.length - max) : sorted;
 }
 
-/** This device's own current `AppSettings` fields a merge import must carry through unchanged
- * (device sharing) instead of the blank slate a plain "replace" writes — see `writeMerged`'s
- * own doc on `BackupImporter` (`app/ports.ts`). */
+/** This device's own current `AppSettings` fields a merge import must carry through unchanged,
+ * instead of the blank slate a plain "replace" writes. */
 type DeviceOnlySettings = Pick<
   AppSettings,
   'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
@@ -69,12 +67,8 @@ interface MergeWriteOptions {
   readonly deviceSettings?: DeviceOnlySettings;
 }
 
-/** `${profileId}:${date}` for this device's own row (`log.deviceId` absent, or equal to
- * `localDeviceId`) — the exact key `LocalStorageRewardsRepository`'s `getSessionLog`/
- * `saveSessionLog` already read/write, so this device's live minute-by-minute tracking keeps
- * finding the same row after a merge import. Any other `deviceId` is a foreign device's own row:
- * suffixed so it is stored *alongside* this device's row for the same date,
- * never overwriting it — `RewardsRepository.listSessionLogs`/`totalMinutesForDate` then sum both. */
+/** `${profileId}:${date}` for this device's own row (`log.deviceId` absent or equal to
+ * `localDeviceId`); a foreign device's row is suffixed so it is stored alongside, never overwriting. */
 function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined): string {
   const isLocal = log.deviceId === undefined || log.deviceId === localDeviceId;
   return isLocal ? `${log.profileId}:${log.date}` : `${log.profileId}:${log.date}:${log.deviceId}`;
@@ -157,15 +151,9 @@ function toRawRecords(
 
 const STAGING_PREFIX = 'backup-staging:';
 
-/**
- * `BackupImporter` for the web (`docs/architecture.md` §11): writes every replaced record to
- * a staging key set first (`backup-staging:<name>`), and only once every one of them has written
- * successfully copies them over the real keys and clears the staging ones — so a failure partway
- * (e.g. a quota error) leaves every real key untouched instead of a mix of old and new data.
- * `localStorage` has no real transactions, so this is a best-effort, not a database-grade guarantee
- * — but the window where a real key could be left half-written shrinks to the final copy loop,
- * after every byte of the new data is already known to fit and parse.
- */
+/** `BackupImporter` for the web (`docs/architecture.md` §11): stages every replaced record under
+ * `backup-staging:<name>` first, then copies all to the real keys — a quota error partway leaves
+ * every real key untouched instead of a mix of old and new data. */
 export class LocalStorageBackupImporter implements BackupImporter {
   private readonly store: LocalStore;
 
@@ -206,9 +194,7 @@ export class LocalStorageBackupImporter implements BackupImporter {
     }
   }
 
-  /** Writes every `raw` record to its staging key first, and only once every one of them has
-   * written successfully copies them over the real keys and clears the staging ones — shared by
-   * `replaceAll` and `writeMerged` (this class's own module doc). */
+  /** Stages every `raw` record, then copies all to the real keys; shared by `replaceAll`/`writeMerged`. */
   private stageThenSwap(raw: Readonly<Record<(typeof RECORD_NAMES)[number], unknown>>): void {
     const staged: (typeof RECORD_NAMES)[number][] = [];
     try {

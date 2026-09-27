@@ -4,10 +4,8 @@ import { useAppStore, useRoute } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { BlankScreen } from './ds/Screen.tsx';
 
-/**
- * Practice's task run (domain-model.md §3.3 "Practice screen"): either the daily warm-up (tapped
- * from Practice's own card, `practiceConceptId: null`) or one topic's 5 review tasks.
- */
+/** Practice's task run (domain-model.md §3.3 "Practice screen"): either the daily warm-up (tapped
+ * from Practice's own card, `practiceConceptId: null`) or one topic's 5 review tasks. */
 export function PracticeRunScreen(): JSX.Element {
   const { t } = useTranslation();
   const route = useRoute('practice-run');

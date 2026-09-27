@@ -7,21 +7,16 @@ import type { BossPlaySession } from './lesson/BossStep.tsx';
 import { BossStep } from './lesson/BossStep.tsx';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
-/**
- * A mini-game played standalone from the Play screen (app-structure.md §4 Play): the same boss
- * step components a lesson uses (`BossStep`, any of the 3 modes), inside a simple top bar (close +
- * title) instead of the lesson chrome, saved via `recordMiniGameResult` rather than a lesson's own
- * boss slot — see `BossPlaySession`.
- */
+/** A mini-game played standalone from the Play screen: the same `BossStep` a lesson uses, in a
+ * simple top bar instead of the lesson chrome, saved via `recordMiniGameResult`. */
 export function MiniGameSessionScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const route = useRoute('minigame');
   const miniGameId = route?.miniGameId ?? null;
-  // Its own exit's target and label read straight off the stack (no more `miniGameOrigin`): a
-  // standalone session sits directly on whatever opened it (Play, Journey, or Home for a Today
-  // activity — the `today` flag above takes over from there instead).
+  // Exit target/label read straight off the stack: a standalone session sits directly on whatever
+  // opened it.
   const below = useAppStore((state) => state.stack[state.stack.length - 2]);
   const exitMiniGame = useAppStore((state) => state.exitMiniGame);
   const advanceToday = useAppStore((state) => state.advanceToday);

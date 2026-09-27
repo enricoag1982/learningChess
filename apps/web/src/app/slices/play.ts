@@ -40,47 +40,32 @@ const DEFAULT_FRIEND_SETUP: FriendSetupState = {
 };
 
 export interface PlaySlice {
-  /** Owl's "Ready for the Fox?" line (`docs/computer-opponent.md` §5 "Automatic level"), set once
-   * a just-finished full game moves the profile's suggested level up; `null` otherwise. Play reads
-   * it once (`ROUTE_ENTER` on `full-game`, and `goToHome`, clear it so it never lingers past the
-   * game it is about). */
+  /** Owl's "Ready for the Fox?" line, set once a full game moves the suggested level up; cleared
+   * on next read (`full-game` entry, `goToHome`) so it never lingers. */
   readonly levelUpSuggestion: { readonly level: number } | null;
-  /** The vs Friend setup sheet's current choices (screen `friend-setup`), read by the friend game
-   * screen (`friend-game`) once "Start" is tapped. */
+  /** The vs Friend setup sheet's current choices, read by `friend-game` once "Start" is tapped. */
   readonly friendSetup: FriendSetupState;
 
-  /**
-   * Opens a mini-game's standalone session: from the Play screen (unlocked tiles only) or the
-   * Journey map's world boss node — pushed on top of whichever, so `exitMiniGame`'s plain `back()`
-   * returns to it unaided. A Today session's world-boss / mini-game activity opens the same screen
-   * via `enterTodayActivity` instead, with the route's own `today` flag.
-   */
+  /** Opens a mini-game session from Play or a Journey world-boss node, pushed on top so
+   * `exitMiniGame`'s `back()` returns there unaided. */
   readonly startMiniGame: (miniGameId: string) => void;
-  /**
-   * Leaves the standalone mini-game session for wherever it was opened from; a Today-session
-   * mini-game (the current route's `today` flag) abandons the whole session instead (`leaveToday`).
-   */
+  /** Leaves the mini-game session for wherever it opened from; a Today one abandons the whole
+   * session instead (`leaveToday`). */
   readonly exitMiniGame: () => void;
   /** Play's vs Computer "Full game" button: opens a full game vs `level` (1 Mouse .. 5 Bear). */
   readonly startFullGame: (level: number) => void;
   /** Leaves the full-game screen back to Play, refreshing progress (game records included). */
   readonly exitFullGame: () => void;
-  /**
-   * Recomputes and persists the "Automatic level" suggestion (`docs/computer-opponent.md` §5)
-   * after one full game vs computer at `level` is recorded (finished or left — an abandoned game
-   * never counts toward the last-5 tally itself, so this is a no-op either way for those). Sets
-   * `levelUpSuggestion` when it moves the suggestion up a level. Called by `FullGameScreen` right
-   * after its own `recordGame`.
-   */
+  /** Recomputes the "Automatic level" suggestion (`docs/computer-opponent.md` §5) after a full
+   * game at `level`; sets `levelUpSuggestion` when it moves up. */
   readonly updateAutomaticLevel: (level: number) => Promise<void>;
   /** Play's "vs Friend" card: opens the setup sheet, resetting its choices (board mode defaults
    * to face-to-face on a tablet-width screen, pass-and-play otherwise). */
   readonly goToFriendSetup: () => void;
   /** Merges `patch` into the setup sheet's current choices. */
   readonly updateFriendSetup: (patch: Partial<FriendSetupState>) => void;
-  /** The setup sheet's "Start" button: opens the friend game screen with the sheet's current
-   * choices (a no-op without both a second player and a game picked — the button is disabled by
-   * then, this guards a stale click). */
+  /** The setup sheet's "Start" button: opens the friend game screen (a no-op without both a
+   * second player and a game picked, guarding a stale click). */
   readonly startFriendGame: () => void;
   /** Leaves the friend game screen back to Play, refreshing progress (game records included). */
   readonly exitFriendGame: () => void;

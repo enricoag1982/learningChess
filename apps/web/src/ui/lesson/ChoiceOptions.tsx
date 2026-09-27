@@ -11,11 +11,8 @@ export interface ChoiceOptionsProps {
   readonly onPick: (optionId: string) => void;
 }
 
-/**
- * Choice exercise's pickable options: big tiles (icon over text) in a responsive grid — 2 per row
- * on a phone, up to 4 once there's room. Each tile is ≥ 64 px tall (min-h-24 ≈ 96 px) with a
- * ≥ 56 px icon, easily tappable and clearly readable for an 8-year-old.
- */
+/** Choice exercise's pickable options: big tiles (icon over text) in a responsive grid, 2 per row
+ * on a phone up to 4. Each tile is ≥64px tall with a ≥56px icon. */
 export function ChoiceOptions({
   options,
   wrongOptionIds,

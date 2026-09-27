@@ -156,9 +156,8 @@ function SavedStep({
   );
 }
 
-/** First run: Welcome (kid) → parent password (parent) → Saved (parent), then the store decides
- * whether to open the new-player wizard, go straight to Home, or show the picker
- * (`finishFirstRun`, see the "Existing installs" note). */
+/** First run: Welcome (kid) → parent password → Saved, then `finishFirstRun` decides whether to
+ * open the new-player wizard, go straight to Home, or show the picker. */
 export function FirstRunScreen(): JSX.Element {
   const finishFirstRun = useAppStore((state) => state.finishFirstRun);
   const [step, setStep] = useState<Step>('welcome');

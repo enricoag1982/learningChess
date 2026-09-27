@@ -1,9 +1,7 @@
 import type { AppDeps } from '@chess-kids/core';
 
-/** localStorage key (`chess-kids:<name>`, `architecture.md` §11) guarding "have we ever asked" —
- * a plain device-level flag, not part of `AppSettings` (same pattern `install-banner.ts`'s own
- * dismiss flag uses). `AppSettings.storagePersisted` is written too, for the parent area to read,
- * but this key alone gates the ask so it never depends on a settings round trip. */
+/** "Have we ever asked" flag, a plain device-level key, not part of `AppSettings`; gates the ask
+ * without depending on a settings round trip. */
 const REQUESTED_KEY = 'chess-kids:storage-persist-requested';
 
 function alreadyRequested(): boolean {
@@ -22,14 +20,9 @@ function markRequested(): void {
   }
 }
 
-/**
- * Requests persistent storage once, the first time any profile is created on this device
- * (`non-functional.md` §1 "Storage eviction"): browsers may otherwise evict `localStorage` under
- * pressure — Safari's "may clear website data after 7 days without use" is the sharpest case.
- * Feature-detects `navigator.storage.persist` (absent in jsdom/older browsers, a no-op there);
- * `REQUESTED_KEY` guards it to exactly once ever. Best-effort only: never throws or blocks
- * profile creation on its own result.
- */
+/** Requests persistent storage once, the first profile created on this device
+ * (`non-functional.md` §1): browsers may otherwise evict `localStorage` under pressure. Feature-
+ * detects `navigator.storage.persist`; best-effort, never blocks profile creation. */
 export async function requestPersistentStorageIfNeeded(deps: AppDeps): Promise<void> {
   try {
     if (alreadyRequested()) {

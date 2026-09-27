@@ -21,12 +21,8 @@ export interface UnlockPanelProps {
   readonly profileId: string;
 }
 
-/**
- * Parent area "Unlock lessons & worlds" (app-structure.md §11, domain-model.md §3.2 "Parent
- * unlock"): a small list of this child's locked worlds and locked lessons, each with an unlock
- * toggle (`masteredVia: 'parent'`). Loads this profile's own `Journey` directly (bypassing the
- * store's `journey`, which only ever holds the *active kid session's* profile).
- */
+/** Parent area "Unlock lessons & worlds" (domain-model.md §3.2): locked worlds/lessons, each with
+ * an unlock button. Loads this profile's own `Journey` directly, bypassing the store's. */
 export function UnlockPanel({ profileId }: UnlockPanelProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

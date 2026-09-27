@@ -4,20 +4,14 @@ import type { Screen } from '../app/store.ts';
 import { useAppStore } from '../app/store.ts';
 import { ROUTE_META } from '../app/routes.ts';
 
-/** Screens an update is safe to apply at (`ROUTE_META`'s `safeUpdate` flag) — never
- * mid-lesson/game/assessment/time-limit/parent (playtest 2, `docs/non-functional.md` §1 "App update"). */
+/** Screens an update is safe to apply at (`ROUTE_META`'s `safeUpdate`) — never mid-lesson/game/
+ * parent (`docs/non-functional.md` §1). */
 function isSafeUpdateScreen(screen: Screen): boolean {
   return ROUTE_META[screen].safeUpdate === true;
 }
 
-/**
- * Applies a waiting app update once it is safe to (M-after-MVP, `docs/non-functional.md` §1):
- * `appUpdate.isUpdateReady()` turns true whenever the service worker found a new version
- * (`adapters/app-update.ts`'s own `onNeedRefresh`) — this only ever calls `appUpdate.apply()` at Home
- * or the profile picker: at once if the kid is already there, else on the next arrival there, so an
- * update discovered mid-lesson just waits. Renders nothing; mounted once in `App.tsx`
- * alongside `TimeTracker`/`Celebration`.
- */
+/** Applies a waiting app update once safe (`docs/non-functional.md` §1): at Home/picker right
+ * away, else on the next arrival there — an update found mid-lesson just waits. */
 export function AppUpdater({ appUpdate }: { readonly appUpdate: AppUpdate }): null {
   const screen = useAppStore((state) => state.screen);
   const screenRef = useRef(screen);
@@ -29,8 +23,7 @@ export function AppUpdater({ appUpdate }: { readonly appUpdate: AppUpdate }): nu
     }
   }, [screen, appUpdate]);
 
-  // An update found while the kid is already on Home / the picker (e.g. the app reopened there)
-  // applies right away instead of waiting for the next screen change.
+  // Already on Home/the picker: applies right away instead of waiting for a screen change.
   useEffect(
     () =>
       appUpdate.onUpdateReady(() => {

@@ -1,9 +1,5 @@
-// Microsoft Fluent Emoji 3D (MIT) artwork, copied from `@lobehub/fluent-emoji-3d` (MIT) into
-// `apps/web/src/assets/art/` with readable names (docs/roadmap.md §7 "Illustrations") — never imported from
-// the npm package itself (not a dependency). Imported as TS so Vite hashes/precaches each file and
-// `vite.config.ts`'s `assetsInlineLimit` keeps them as real files, never inlined base64 in JS.
-// `lioness.webp` has no source emoji: derived from `lion.webp` by `tools/art/make-lioness.py`
-// (mane removed) — see that script for the method.
+// Microsoft Fluent Emoji 3D (MIT) artwork, copied into `assets/art/` with readable names; imported
+// as TS so Vite hashes/precaches each file instead of inlining base64.
 import rhino from '../../assets/art/rhino.webp';
 import elephant from '../../assets/art/elephant.webp';
 import lion from '../../assets/art/lion.webp';
@@ -21,9 +17,8 @@ import frog from '../../assets/art/frog.webp';
 import mouse from '../../assets/art/mouse.webp';
 import wolf from '../../assets/art/wolf.webp';
 
-/** Every animal image this app ships, keyed by id: lesson characters (`character-meta.ts`),
- * profile avatars (`avatar-meta.ts`), and bot levels (`domain/bot/levels.ts`'s `BotLevel.name`).
- * `animal-images.test.ts` checks every id each of those modules actually uses resolves here. */
+/** Every animal image this app ships, keyed by id: lesson characters, profile avatars, and bot
+ * levels. `animal-images.test.ts` checks every id each module uses resolves here. */
 export const ANIMAL_IMAGES = {
   rhino,
   elephant,

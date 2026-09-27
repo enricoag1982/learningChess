@@ -9,11 +9,8 @@ import { StarsRow } from './StarsRow.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen } from './ds/Screen.tsx';
 
-/**
- * Today session's closing screen (domain-model.md §3.3 "session summary"): stars earned this
- * session (against the snapshot `startToday` took), any newly-earned animal friend, a rank-up, and
- * Owl's "see you tomorrow" line — then back to Home (`finishToday`).
- */
+/** Today session's closing screen (domain-model.md §3.3): stars earned, any new animal friend, a
+ * rank-up, and Owl's line — then back to Home. */
 export function SessionSummaryScreen(): JSX.Element {
   const { t } = useTranslation();
   const journey = useAppStore((state) => state.journey);

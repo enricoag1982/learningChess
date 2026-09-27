@@ -54,10 +54,8 @@ export interface ExerciseUIState {
   readonly feedback: ExerciseFeedback;
   /** Squares wrongly selected/placed in the last try; orange, never red. */
   readonly wrongSquares: readonly Square[];
-  /**
-   * select-squares, after a wrong check: answer squares the kid had not selected (dashed orange
-   * until tapped). Kept across toggles; the play area hides the ones since selected.
-   */
+  /** select-squares, after a wrong check: answer squares the kid had not selected (dashed orange
+   * until tapped). Kept across toggles; the play area hides the ones since selected. */
   readonly missedSquares: readonly Square[];
   /** The last played kid move, for the board's slide animation (collect-stars / capture / best-move). */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
@@ -65,11 +63,8 @@ export interface ExerciseUIState {
   readonly wrongMove?: { readonly from: Square; readonly to: Square };
   /** yes-no: the value last picked wrong, if any — that button turns orange and disables. */
   readonly wrongAnswer?: boolean;
-  /**
-   * mate-in-n only: the kid's move was accepted and its scripted opponent reply already applied
-   * in `core`, but not shown yet — `position` is the board right after the kid's own move (before
-   * the reply), for the board to render while the reply's short delay plays out.
-   */
+  /** mate-in-n: the kid's move was accepted and its scripted reply already applied in `core` but
+   * not shown yet; `position` is the board right after the kid's own move. */
   readonly pendingReply?: {
     readonly move: Move;
     readonly reply: Move;
@@ -92,11 +87,8 @@ export type ExerciseAction =
   /** mate-in-n: reveals the scripted opponent reply once its short delay has elapsed. */
   | { readonly type: 'reveal-reply' };
 
-/**
- * Fresh reducer state for a newly-started exercise (guided or scored). `def.lastMove` (M4.1: the
- * opponent's last move, e.g. the double step before an en passant capture) seeds the board's
- * last-move highlight from the very start, before the kid's own first move replaces it.
- */
+/** Fresh reducer state for a newly-started exercise. `def.lastMove` (the opponent's last move,
+ * e.g. the double step before en passant) seeds the last-move highlight from the start. */
 export function initExerciseState(def: ExerciseDef): ExerciseUIState {
   return {
     core: startExercise(def),
@@ -155,9 +147,8 @@ export function createExerciseReducer(
               pendingReply: undefined,
             };
           }
-          // 'moved': the scripted reply is already applied in `core`; stage it for its delayed
-          // reveal. `core.history`'s last entry is the position right after the kid's own move
-          // (before the reply), pushed by `playMateInN` alongside the pre-move one.
+          // 'moved': stage the already-applied reply for its delayed reveal; the pre-reply
+          // position is `core.history`'s last entry (pushed by `playMateInN`).
           const positionAfterMove = core.history[core.history.length - 1];
           if (positionAfterMove === undefined) {
             throw new Error(

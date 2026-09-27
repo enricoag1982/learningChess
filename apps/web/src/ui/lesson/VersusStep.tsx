@@ -39,9 +39,8 @@ export interface VersusStepProps {
   readonly game: VersusMiniGame;
   readonly nextStepIndex: number;
   readonly session?: BossPlaySession;
-  /** Fired after every ply (kid, bot, take back, play again) with the latest state — a caller that
-   * needs the in-progress game outside `session.save`'s terminal-only call (the Play screen's full
-   * game, to record an abandoned `GameRecord` on Leave) reads it from here. */
+  /** Fired after every ply with the latest state — for a caller that needs the in-progress game
+   * outside `session.save`'s terminal-only call (recording an abandoned game on Leave). */
   readonly onStateChange?: (state: VersusState) => void;
 }
 
@@ -78,10 +77,8 @@ function botThinkDelayMs(): number {
   return readTestSeed() !== null || prefersReducedMotion() ? 300 : 800 + Math.random() * 700;
 }
 
-/** Aids per bot level (`docs/computer-opponent.md` §4), from `BotLevel.aids` itself
- * (`domain/bot/levels.ts`) — Mouse/Rabbit unlimited take-back + danger on, Fox 3 take-backs/game
- * + danger off by default, Wolf/Bear no take-back + danger off. Falls back to Mouse's aids for an
- * unknown level number, which should never actually happen (`opponentLevel` is always 1-5). */
+/** Aids per bot level (`docs/computer-opponent.md` §4, `domain/bot/levels.ts`); falls back to
+ * Mouse's for an unknown level (never happens — `opponentLevel` is always 1-5). */
 function aidsForLevel(level: number): bot.BotAids {
   return (
     bot.BOT_LEVELS.find((entry) => entry.level === level)?.aids ??
@@ -108,11 +105,8 @@ function dangerSquares(state: VersusState): readonly Square[] {
     );
 }
 
-/**
- * A `versus` boss mini-game (Pawn Wars, …): the kid plays their colour against the computer
- * opponent (`BotPlayer`, running in a worker), with Mouse-level aids (take back, danger ring,
- * legal-move dots) and Owl narrating the bot's moves and the result.
- */
+/** A `versus` boss mini-game: the kid plays their colour against the computer opponent (in a
+ * worker), with level-based aids and Owl narrating moves and the result. */
 export function VersusStep({
   lesson,
   game: minigame,
@@ -144,9 +138,7 @@ export function VersusStep({
 
   useEffect(() => {
     onStateChange?.(versus);
-    // Only the state itself should re-trigger this; `onStateChange` is an optional callback the
-    // caller may not memoize (e.g. a `useState` setter, always stable, but not guaranteed for every
-    // caller), and re-running on identity churn alone would be surprising.
+    // Only `versus` should re-trigger this; `onStateChange` may not be memoized by every caller.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [versus]);
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref
@@ -346,10 +338,8 @@ export function VersusStep({
               <span>{t('boss.versus.moves', { count: moves })}</span>
             </div>
             {versus.status === 'playing' && (
-              // `SECONDARY_BUTTON` bakes in `flex-1` for its usual row-of-buttons context (e.g.
-              // Hint + Undo sharing a row's width); wrapped here in its own row so that `flex-1`
-              // governs width, not this column's main axis, which would otherwise let the
-              // button's height shrink to share space with everything above it.
+              // `SECONDARY_BUTTON` bakes in `flex-1`: wrapped in its own row so it governs width,
+              // not this column's main axis (which would shrink the button's height instead).
               <div className="flex gap-3">
                 <button
                   type="button"
@@ -439,11 +429,8 @@ function resultText(t: TFunction, status: 'won' | 'lost' | 'draw'): string {
   return t('boss.versus.lost');
 }
 
-/**
- * A second, explaining line for a draw result (docs/computer-opponent.md §6 "which draw"): a
- * `GameResult.reason` (`domain/game/rules.ts`) that has a kid-friendly explanation, or `undefined`
- * for a reason with none (e.g. a kingless mini-game's `move-limit`/`no-moves`) or no draw at all.
- */
+/** A second, explaining line for a draw result (docs/computer-opponent.md §6): `undefined` for a
+ * reason with no kid-friendly explanation, or no draw at all. */
 function drawReasonI18nKey(
   reason: string | undefined,
 ):

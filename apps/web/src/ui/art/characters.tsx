@@ -1,18 +1,16 @@
 import type { JSX } from 'react';
 import { animalImage } from './animal-images.ts';
 
-/** Decorative animal artwork (Microsoft Fluent Emoji 3D, `animal-images.ts`): every caller already
- * gives the image its accessible name (an `aria-label`/`role="img"` wrapper, or a visible text
- * label next to it), so the `<img>` itself is `alt=""` and never draggable. */
+/** Decorative animal artwork: every caller already gives the image its accessible name, so the
+ * `<img>` itself is `alt=""` and never draggable. */
 function AnimalImg({ id }: { readonly id: string }): JSX.Element {
   return (
     <img src={animalImage(id)} alt="" draggable={false} className="h-full w-full object-contain" />
   );
 }
 
-/** Character portrait, keyed by lesson-character id (`docs/app-structure.md` §8: rhino, elephant,
- * lioness, lion, horse, caterpillar, owl) or the kid's own profile-avatar fox — falls back to the
- * fox image for an unknown id (`animal-images.test.ts` checks every real id resolves). */
+/** Character portrait, keyed by lesson-character id (`docs/app-structure.md` §8); falls back to
+ * the fox image for an unknown id. */
 export function CharacterIcon({ character }: { readonly character: string }): JSX.Element {
   return <AnimalImg id={character} />;
 }

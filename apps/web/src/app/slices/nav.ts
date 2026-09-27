@@ -9,26 +9,23 @@ export interface NavSlice {
   readonly stack: readonly Route[];
   /** The current screen's name; always `stack[stack.length - 1].name`. */
   readonly screen: RouteName;
-  /** Pushes `route`. Gated routes (`ROUTE_META`) check the daily-limit/allowed-hours gate first —
-   * over the limit, pushes `time-limit` instead, remembering this push to replay once granted. */
+  /** Pushes `route`; a gated route (`ROUTE_META`) over the limit pushes `time-limit` instead. */
   readonly navigate: (route: Route) => Promise<void>;
-  /** Same as `navigate`, but replaces the current top instead of pushing (Today session activities
-   * advancing in place, a placement world moving on). */
+  /** Same as `navigate`, but replaces the current top instead of pushing. */
   readonly replace: (route: Route) => Promise<void>;
-  /** Pops back to the nearest `to` frame (or one level, without `to`). `gate: true` runs the
-   * activity gate on the way (`goToHome`'s "back to Home" checkpoint) even though the landing
-   * route itself is not one of `ROUTE_META`'s gated ones. */
+  /** Pops back to the nearest `to` frame (or one level). `gate: true` runs the activity gate on
+   * the way even though the landing route is not itself gated. */
   readonly back: (to?: RouteName, opts?: { readonly gate?: boolean }) => Promise<void>;
-  /** Replaces the whole stack, ungated (first run, the picker, picking a profile). */
+  /** Replaces the whole stack, ungated. */
   readonly reset: (...routes: readonly Route[]) => void;
-  /** Applies a `time-limit` route's `resume` without re-gating — the parent just granted more
-   * time. Shared with `grantMoreTimeAndResume` (`app/slices/time.ts`). */
+  /** Applies a `time-limit` route's `resume` without re-gating. Shared with `time.ts`'s
+   * `grantMoreTimeAndResume`. */
   readonly applyResume: (resume: NavOp) => Promise<void>;
 
-  /** Decides the first screen: first run, or the picker (app-structure.md §3). Call once at startup. */
+  /** Decides the first screen: first run, or the picker (app-structure.md §3). */
   readonly init: () => Promise<void>;
-  /** Opens the new-player wizard, pushed on whatever it was opened from (picker or parent area) —
-   * `finishNewPlayer` reads that back off the stack to decide where it returns to. */
+  /** Opens the new-player wizard, pushed on whatever opened it; `finishNewPlayer` reads that
+   * back off the stack. */
   readonly startNewPlayer: () => void;
   /** Refreshes the profiles list and shows the picker, last-used first. */
   readonly goToPicker: () => Promise<void>;
@@ -44,9 +41,8 @@ export interface NavSlice {
   readonly goToPractice: () => void;
 }
 
-/** `lesson` resumes at its own `startStep`; a fresh `full-game` (or one resumed after "Parent:
- * more time") never opens still showing the previous game's level-up banner. Runs once per landed
- * route, on every `navigate`/`replace`/`back`/`reset`/gate-resume alike. */
+/** `lesson` resumes at its own `startStep`; `full-game` clears any stale level-up banner. Runs
+ * once per landed route, on every navigation. */
 function runRouteEnter(set: AppSet, route: Route): void {
   if (route.name === 'lesson') set({ stepIndex: route.startStep });
   if (route.name === 'full-game') set({ levelUpSuggestion: null });
@@ -75,10 +71,8 @@ async function overLimitStatus(get: AppGet): Promise<TimeLimitStatus | null> {
   return status.overLimit ? status : null;
 }
 
-/**
- * Runs one stack change. `skipGate` is set only when replaying a `time-limit` route's `resume`
- * (`grantMoreTimeAndResume`) — the parent already granted more time, so this is never re-checked.
- */
+/** Runs one stack change. `skipGate` is set only when replaying a `time-limit` route's `resume`
+ * — the parent already granted more time, so this is never re-checked. */
 async function runOp(set: AppSet, get: AppGet, op: NavOp, skipGate: boolean): Promise<void> {
   const needsGate =
     !skipGate &&

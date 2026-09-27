@@ -1,19 +1,12 @@
-/**
- * Class-string builder behind every raised tappable (docs/screens.md §1, roadmap F3) — replaces 61
- * `tap-raised` literals across 27 files plus the `parent`/lesson style constants (refactor-v4.md §2
- * finding 6). `look` is the shape/sizing family, `tone` the fill (colour role); `extra` appends any
- * classes a specific caller still needs of its own (never a colour already covered by `tone`).
- */
+/** Class-string builder behind every raised tappable (docs/screens.md §1). `look` is the
+ * shape/sizing family, `tone` the fill; `extra` appends any classes a caller still needs. */
 
-/** Fill: `neutral` = card/ink (the default look of a raised tappable), a colour role, or `none` for
- * a caller that puts its own (often conditional) fill classes straight into `extra`. `danger` and
- * `locked` live in `ds/parent-styles-lazy.ts` instead (grown-ups-only fills, never reached before
- * the parent gate — refactor-v4.md §4 "Initial JS must not grow"). */
+/** Fill: `neutral` = card/ink (default), a colour role, or `none` for a caller's own `extra`.
+ * `danger`/`locked` live in `ds/parent-styles-lazy.ts` (kept out of the initial bundle). */
 export type TapTone = 'neutral' | 'go' | 'today' | 'info' | 'none';
 
-/** Shape/sizing family. `custom` contributes no base classes: `extra` carries the whole shape, for
- * a one-off literal that shares no base with another caller. `parent-chip`/`parent-row` live in
- * `ds/parent-styles-lazy.ts` instead (grown-ups-only looks, same reason as `TapTone` above). */
+/** Shape/sizing family. `custom` contributes no base classes: `extra` carries the whole shape.
+ * `parent-chip`/`parent-row` live in `ds/parent-styles-lazy.ts`, same reason as `TapTone`. */
 export type TapLook =
   | 'round'
   | 'round-sm'

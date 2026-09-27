@@ -20,10 +20,8 @@ function isGameRecordShape(value: unknown): value is GameRecord {
   );
 }
 
-/**
- * `GameRecordRepository` over one `LocalStore`: a single capped, append-only list (newest last),
- * the same shape `LocalStorageProgressRepository` uses for `Attempt`.
- */
+/** `GameRecordRepository` over one `LocalStore`: a single capped, append-only list (newest last),
+ * the same shape `LocalStorageProgressRepository` uses for `Attempt`. */
 export class LocalStorageGameRecordRepository implements GameRecordRepository {
   private readonly records: CappedList<GameRecord>;
 

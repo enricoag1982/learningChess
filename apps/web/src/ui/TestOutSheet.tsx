@@ -11,12 +11,8 @@ export interface TestOutSheetProps {
   readonly onNo: () => void;
 }
 
-/**
- * "Show you know it?" sheet (domain-model.md §3.2, app-structure.md §6 "Skip (kid)"): shown after
- * tapping a locked lesson or locked world on the Journey. A dialog, so the Owl row is always
- * stacked (docs/screens.md §1), unlike the side-by-side layout an in-flow speech bubble gets from
- * `sm` up.
- */
+/** "Show you know it?" sheet (domain-model.md §3.2): shown after tapping a locked lesson or world
+ * on the Journey. A dialog, so the Owl row is always stacked (docs/screens.md §1). */
 export function TestOutSheet({ bodyText, onYes, onNo }: TestOutSheetProps): JSX.Element {
   const { t } = useTranslation();
 

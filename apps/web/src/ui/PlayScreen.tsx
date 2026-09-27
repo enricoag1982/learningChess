@@ -87,11 +87,8 @@ export function PlayScreen(): JSX.Element {
   const friendUnlocked = friendOptions.length > 0;
 
   const levelStatuses = computerLevelStatus(gameRecords, journey);
-  // Settings effect now (app-structure.md §11): a fixed "computer level" setting preselects that
-  // level (when it is currently unlocked — the parent-area picker only offers unlocked ones, but a
-  // level can regress from unlocked to not-yet-reached only in theory, never in practice) and
-  // disables the automatic suggestion below it; a manual chip tap this session (`selectedLevel`)
-  // still wins over either, same as before this setting existed.
+  // A fixed "computer level" setting preselects that level (when unlocked) and disables the
+  // automatic suggestion; a manual chip tap this session still wins over either.
   const fixedLevel =
     computerLevelSetting !== 'auto'
       ? levelStatuses.find((status) => status.level === computerLevelSetting && !status.locked)
@@ -100,9 +97,7 @@ export function PlayScreen(): JSX.Element {
   const effectiveLevel =
     selectedLevel ?? fixedLevel ?? suggestedLevel(storedSuggestion, levelStatuses);
   // The only level `effectiveLevel` can ever resolve to locked is Mouse (`suggestedLevel`'s own
-  // fallback, when nothing at all is unlocked yet) — `selectLevel` below never lets a manual pick
-  // land on a locked chip, `fixedLevel` is filtered to unlocked levels above, and `suggestedLevel`'s
-  // other branches only ever return an unlocked one.
+  // fallback with nothing unlocked yet).
   const selectedStatus = levelStatuses.find((status) => status.level === effectiveLevel);
   const fullGameUnlocked = selectedStatus !== undefined && !selectedStatus.locked;
   const levelUpStatus = levelUpSuggestion

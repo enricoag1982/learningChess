@@ -37,9 +37,7 @@ export function PasswordScreen(): JSX.Element {
     [services],
   );
 
-  // Ticks every 500ms while locked, clearing the lock once its time is up (from the interval
-  // callback, not the effect body itself, so this is an external-system subscription, not a
-  // synchronous setState-in-effect).
+  // Ticks every 500ms while locked, clearing it from the interval callback once time is up.
   useEffect(() => {
     if (lockedUntil === null) return;
     const id = setInterval(() => {

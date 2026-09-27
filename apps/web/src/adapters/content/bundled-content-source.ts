@@ -3,11 +3,8 @@ import bundled from '@chess-kids/content/content.json';
 import bundledTracks from '@chess-kids/content/tracks.json';
 import bundledBadges from '@chess-kids/content/badges.json';
 
-/**
- * The only place the raw JSON import is treated as `CompiledContent`: the content build
- * validates the data against that shape (invalid content fails `pnpm build`), so this is a type
- * conversion, not a runtime check.
- */
+/** The content build validates this shape (invalid content fails `pnpm build`), so this is a type
+ * conversion, not a runtime check. */
 const content = bundled as unknown as CompiledContent;
 
 /** Same conversion as `content` above, for `packages/content/tracks.yaml`'s compiled output. */

@@ -2,12 +2,8 @@ import type { JSX, ReactNode } from 'react';
 import { BackIcon, CloseIcon } from './icons.tsx';
 import { tapClass } from './tap.ts';
 
-/**
- * Screen shells (refactor-v4.md §2 finding 6): every screen's own top-level `<main>` was one of a
- * handful of repeated shapes (17 blank, page x5, game x4, centred/form x7), and every header row
- * repeated the same back/close round button (round 64px x10, round 44px x4). Consolidated here so
- * a screen states its kind/header once instead of the raw classes.
- */
+/** Screen shells: every screen's top-level `<main>` states its kind/header once instead of the
+ * raw classes each used to repeat. */
 
 export type ScreenKind = 'page' | 'game' | 'center' | 'form';
 
@@ -75,9 +71,8 @@ export interface ScreenHeaderProps {
   readonly action: 'back' | 'close';
   readonly actionLabel: string;
   readonly onAction: () => void;
-  /** Overrides the default action icon (`BackIcon`/`CloseIcon`, both eager) — the parent area's own
-   * `ChevronLeftIcon` (lazy-only, `icons-lazy.tsx`) is passed this way, so this shared module never
-   * imports it itself and never pulls it into the initial bundle. */
+  /** Overrides the default action icon — the parent area's lazy-only `ChevronLeftIcon` is passed
+   * this way, so this shared module never imports it itself. */
   readonly icon?: ReactNode;
   /** A simple truncating title (kid: `<h1>`, parent: `<h2>`) — a screen with a richer header
    * (avatar, trailing pill, a custom two-line block) passes it all via `children` instead. */

@@ -10,10 +10,8 @@ import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
 import { useAsync } from './ds/useAsync.ts';
 
-/** `TimeLimitStatus.reason` -> the title/body text this screen shows ("limit";
- * "late"/"early", app-structure.md §13 "Allowed hours"). Falls back to the daily-limit text for
- * `null` (should not normally happen — this screen only ever shows once the gate found a reason —
- * but keeps the component total). `playFrom` fills the "early" body's `{{time}}`. */
+/** `TimeLimitStatus.reason` -> title/body text ("limit"; "late"/"early", app-structure.md §13);
+ * falls back to the daily-limit text for `null` (should not normally happen). */
 function timeLimitText(
   t: TFunction,
   reason: TimeLimitReason | null,
@@ -33,15 +31,8 @@ function timeLimitText(
   }
 }
 
-/**
- * "See you tomorrow" screen (app-structure.md's time controls table, widened to
- * allowed hours): shown instead of the activity/Home the kid was headed to once the activity gate
- * finds them blocked (`store.ts`'s `gated`) — over the daily limit, or outside allowed hours.
- * Owl, spoken, today's stars; **Switch player** (back to the picker) or **Parent: more time** (the
- * existing password screen, `purpose: 'more-time'`) — a correct password grants more time
- * (`EXTRA_TIME_GRANT_MINUTES` for a daily-limit gate, an hours override for a late/early one,
- * `store.ts`'s `grantMoreTimeAndResume`) and resumes `pendingActivity` right where the kid left off.
- */
+/** "See you tomorrow" screen, shown once the gate finds the kid blocked. **Switch player** or
+ * **Parent: more time**, which resumes the blocked navigation. */
 export function TimeLimitScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

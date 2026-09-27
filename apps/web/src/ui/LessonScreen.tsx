@@ -82,9 +82,7 @@ export function LessonScreen(): JSX.Element {
   );
   const step = steps[stepIndex];
 
-  // rewards.md §4 "lesson complete" celebration moment: the exercise/boss use cases already wrote
-  // any newly earned badge (`checkRewards`, app layer) by the time this step renders — this just
-  // picks it up and queues it (`checkForCelebrations`), capped and deduped by the store itself.
+  // rewards.md §4 "lesson complete": picks up any badge the use cases already wrote and queues it.
   useEffect(() => {
     if (step?.kind === 'complete') {
       void checkForCelebrations();
@@ -121,9 +119,8 @@ export function LessonScreen(): JSX.Element {
     });
   }
 
-  // "Skip" (playtest 2, teaching-process.md §2): Story/Demo/Try only. Narration stops immediately;
-  // the mark is saved and `progress` refreshed *before* the step jumps, so `StepPills` never shows
-  // the old step as "done" for a frame on its way to "skipped".
+  // "Skip" (teaching-process.md §2): narration stops immediately; the mark is saved and `progress`
+  // refreshed before the step jumps, so `StepPills` never flashes "done" en route to "skipped".
   function skipPhase(): void {
     const currentStep = steps[stepIndex];
     if (!lesson || !profile || !currentStep) return;
@@ -142,9 +139,8 @@ export function LessonScreen(): JSX.Element {
   const stars = totalStars(progress);
   const lessonProgress = progress.find((entry) => entry.lessonId === lessonId);
   const skippedPhases = lessonProgress?.skippedPhases;
-  // Try's last guided step (its own `nextStepIndex` leaves the `try` phase): unmarks a previous
-  // "Skip" on replay (`recordExerciseResult`'s `completesPhase`), same "phase later completed
-  // normally" rule `advanceFromCurrent` applies to Story/Demo above.
+  // Try's last guided step: unmarks a previous "Skip" on replay (`completesPhase`), same rule
+  // `advanceFromCurrent` applies to Story/Demo above.
   const nextStep = steps[stepIndex + 1];
   const completesTry =
     step.kind === 'guided' && nextStep !== undefined && stepPhase(nextStep) !== 'try';

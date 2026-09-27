@@ -36,11 +36,8 @@ function ChoiceChip({
   );
 }
 
-/**
- * Play's vs Friend setup sheet (`docs/app-structure.md` §6): second player (another profile or a
- * guest), game (only what is already unlocked for the active profile), board mode, legal-move
- * dots and swap-colours, then "Start" opens the friend game screen (`FriendGameScreen`).
- */
+/** Play's vs Friend setup sheet (`docs/app-structure.md` §6): second player, game (unlocked
+ * only), board mode, legal-move dots, swap-colours; "Start" opens `FriendGameScreen`. */
 export function FriendSetupScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

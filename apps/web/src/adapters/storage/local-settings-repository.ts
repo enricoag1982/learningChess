@@ -12,9 +12,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 /** Loosely-typed stored shape, before `normalize` fills in a field a pre-`suggestedLevels`/
- * pre-`profileSettings` record does not have — same "old data reads
- * back as the empty default" approach `migrations.ts` already uses for `concept-stats`/
- * `game-records`, so this needs no version bump. */
+ * pre-`profileSettings` record does not have; needs no version bump. */
 function isAppSettingsShape(value: unknown): value is {
   lastProfileId: string | null;
   suggestedLevels?: unknown;

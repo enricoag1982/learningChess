@@ -24,12 +24,8 @@ function pieceTypeName(t: TFunction, type: PieceType): string {
   }
 }
 
-/**
- * Character portrait + name, and (except for Owl, who doesn't stand for one piece — World 1 is
- * about the board itself) a piece-icon badge naming the chess piece it stands for. A compact row
- * on phone width (< 640px), a big portrait over a column from `sm` up (docs/screens.md §1, fix:
- * phone Story as a compact row).
- */
+/** Character portrait + name, and (except Owl) a piece-icon badge naming the chess piece it
+ * stands for. A compact row on phone width, a big portrait over a column from `sm` up. */
 export function CharacterCard({ character }: { readonly character: string }): JSX.Element {
   const { t } = useTranslation();
   const piece = characterPieceOrNull(character);

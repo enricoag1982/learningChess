@@ -17,33 +17,23 @@ export interface TimeSlice {
   /** The 5-minute warning banner (`ui/AppNotice.tsx`): visible only on a calm screen, at
    * most once per child per day (`SessionLog.warnedAt`). */
   readonly timeNoticeVisible: boolean;
-  /**
-   * Re-evaluates the 5-minute warning (app-structure.md §13 "5-min warning"):
-   * `trigger: 'screen'` (every screen change, incl. the lesson-complete step) first hides it —
-   * "gone on the next screen change" — then, same as `trigger: 'tick'` (`TimeTracker`'s own
-   * minute tick), shows it when the current screen is calm and {@link shouldWarn} says so,
-   * persisting `SessionLog.warnedAt` so it never shows twice the same day. A no-op without an
-   * active profile.
-   */
+  /** Re-evaluates the 5-minute warning (app-structure.md §13): `'screen'` first hides it, then
+   * both triggers show it when the screen is calm and due, once per day. */
   readonly checkTimeNotice: (trigger: 'screen' | 'tick') => Promise<void>;
-  /** Picker's "Grown-ups" button, and the "See you tomorrow" screen's "Parent: more time" button
-   * (`purpose: 'more-time'`) — decides what a correct password does next. Defaults to the
-   * ordinary parent-area gate. */
+  /** Picker's "Grown-ups", or "See you tomorrow"'s "Parent: more time" — decides what a correct
+   * password does next; defaults to the ordinary parent-area gate. */
   readonly goToPasswordScreen: (purpose?: 'parent-area' | 'more-time') => void;
-  /** Password screen, once the password is verified (`purpose === 'parent-area'`). */
+  /** Password screen, once verified (`purpose === 'parent-area'`). */
   readonly goToParentArea: () => Promise<void>;
-  /** Password screen, once the password is verified with `purpose === 'more-time'`: grants
-   * more time for today, then replays the `time-limit` route's `resume` (or lands on Home, if for
-   * some reason there is none) — unchecked, no re-gating. */
+  /** Password screen, once verified with `purpose === 'more-time'`: grants more time, then
+   * replays the `time-limit` route's `resume` (or Home), unchecked. */
   readonly grantMoreTimeAndResume: () => Promise<void>;
-  /** "See you tomorrow" screen's "Switch player": abandons whatever was gated and opens the
-   * picker. */
+  /** "See you tomorrow"'s "Switch player": abandons whatever was gated, opens the picker. */
   readonly switchPlayerFromTimeLimit: () => Promise<void>;
 }
 
-/** `true` while `screen` is one the 5-minute warning may show on right now — see
- * `ROUTE_META`'s `calm` flag; for `screen: 'lesson'`, only once `lessonId`/`stepIndex` land on that
- * lesson's own `'complete'` step (`lessonSteps`, same step `LessonScreen` renders as `CompleteStep`). */
+/** `true` while `screen` is calm (`ROUTE_META`) — for `'lesson'`, only once `stepIndex` lands on
+ * that lesson's own `'complete'` step. */
 function isCalmScreen(
   screen: Screen,
   lessonId: string | null,
@@ -95,9 +85,8 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
       if (!profile) return;
       const timeLimitRoute = stack[stack.length - 2];
       if (!timeLimitRoute || timeLimitRoute.name !== 'time-limit') return;
-      // A late/early gate grants a 15-minute hours override instead of extending the
-      // daily limit — `checkActivityGate` never over-reports "limit" once hours are also
-      // blocking (`app/time-limit.ts`'s own priority), so `reason` alone decides which to grant.
+      // A late/early gate grants an hours override instead of extending the daily limit;
+      // `reason` alone decides which (never both at once, `app/time-limit.ts`'s own priority).
       if (timeLimitRoute.status?.reason === 'late' || timeLimitRoute.status?.reason === 'early') {
         await grantHoursOverride(services.deps, profile.id);
       } else {

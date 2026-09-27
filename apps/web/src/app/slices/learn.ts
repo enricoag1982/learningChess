@@ -18,36 +18,23 @@ import type { AppGet, AppSet } from '../store.ts';
 export interface LearnSlice {
   readonly stepIndex: number;
 
-  /**
-   * Journey tap: opens `lessonId` (available / complete / mastered only — a no-op for a locked
-   * one, which the Journey screen intercepts with a spoken "Finish … first" line instead). A
-   * complete/mastered lesson restarts at the story; otherwise resumes at its saved step.
-   */
+  /** Journey tap: opens an available/complete/mastered `lessonId` at its story (if done) or saved
+   * step; a locked one is a no-op (Journey intercepts with "Finish … first"). */
   readonly startLesson: (lessonId: string) => Promise<void>;
   readonly goToStep: (index: number) => void;
-  /**
-   * Leaves the lesson screen (top-bar Close) for Home or the Journey, whichever it was opened
-   * from (read off the stack, one level below); a Today-session lesson (`route.today`) abandons
-   * the whole session instead (`leaveToday` — "the kid can leave any time", domain-model.md §3.3).
-   */
+  /** Lesson Close: back to Home/Journey (one level below on the stack); a Today lesson abandons
+   * the session instead (`leaveToday`, domain-model.md §3.3 "leave any time"). */
   readonly exitLesson: () => void;
-  /**
-   * The lesson-complete screen's "Continue": a Today-session lesson advances to the session's next
-   * activity (`advanceToday`); otherwise identical to `exitLesson`.
-   */
+  /** The lesson-complete screen's "Continue": a Today-session lesson advances to the session's next
+   * activity (`advanceToday`); otherwise identical to `exitLesson`. */
   readonly completeLessonActivity: () => Promise<void>;
-  /**
-   * Journey locked-tap sheet "Yes, test me!" for a locked lesson (domain-model.md §3.2): plans a
-   * lesson test-out run (`planTestOutLesson`) and opens the runner (screen `assessment`).
-   */
+  /** Journey locked-tap sheet "Yes, test me!" for a locked lesson (domain-model.md §3.2): plans a
+   * lesson test-out run (`planTestOutLesson`) and opens the runner (screen `assessment`). */
   readonly startTestOutLesson: (lessonId: string, worldId: string) => void;
   /** Same, for a locked world (`planTestOutWorld`): all its lessons at once. */
   readonly startTestOutWorld: (worldId: string) => void;
-  /**
-   * The assessment runner's `onDone`: scores the run (`scoreTestOut`) and applies a pass
-   * (`submitAssessment`) — masters every lesson in scope, unlocks it. Does not change screen; the
-   * runner shows the pass/fail result itself, then calls `exitAssessment`.
-   */
+  /** Assessment runner's `onDone`: scores + records the pass, unlocking the scope; the runner
+   * shows the result itself, then calls `exitAssessment`. */
   readonly submitAssessmentRun: (results: readonly boolean[]) => Promise<AssessmentScore>;
   /** Leaves the assessment screen (Close, or the result screen's Continue) back to the Journey. */
   readonly exitAssessment: () => void;
@@ -56,12 +43,8 @@ export interface LearnSlice {
   /** Placement offer screen "Yes": plans the whole placement test (`planPlacement`) and opens the
    * first Basics world's run (screen `placement`); straight to Home if there is nothing to test. */
   readonly acceptPlacement: () => void;
-  /**
-   * One placement world's `onDone`: scores it (`scorePlacementWorld`) and applies a pass
-   * (`submitAssessment`) — same effect as a world test-out, `masteredVia: 'placement'`. Does not
-   * advance the placement route's `index` itself; the screen reads the outcome and calls
-   * `advancePlacementWorld` (pass, more worlds left) or `finishPlacement` (fail, or nothing left).
-   */
+  /** One placement world's `onDone`: scores + records the pass; the screen then calls
+   * `advancePlacementWorld` (more worlds left) or `finishPlacement`. */
   readonly submitPlacementWorldRun: (
     worldId: string,
     results: readonly boolean[],

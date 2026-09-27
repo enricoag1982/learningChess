@@ -28,9 +28,8 @@ import type { LocalStore } from '../adapters/storage/local-store.ts';
 import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
 import { MIGRATIONS } from '../adapters/storage/migrations.ts';
 
-/** `AppDeps.backupFileWriter`/`backupImporter`: read only from the lazy-loaded Parent area
- * (`app/backup.ts`, `app/merge.ts`), so their implementations are fetched on first use instead of
- * shipping in the initial bundle. */
+/** `AppDeps.backupFileWriter`/`backupImporter`: read only from the lazy-loaded Parent area, so
+ * their implementations are fetched on first use, not shipped in the initial bundle. */
 function createLazyBackupFileWriter(): BackupFileWriter {
   return {
     async write(filename, contents) {

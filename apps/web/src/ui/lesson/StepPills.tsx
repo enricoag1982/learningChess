@@ -10,13 +10,8 @@ export interface StepPillsProps {
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 
-/**
- * Story · Demo · Try · Exercises · Boss as a flat progress track (info, not tappable — F3,
- * docs/screens.md §1): label over a thin bar; current = orange bar, done = green bar + check,
- * skipped = skip icon + muted label over a dashed/striped bar (playtest 2 — never solid green or
- * orange, so it never reads as either "done" or "current"), rest muted. No pill box, so no step
- * reads as a button.
- */
+/** Story · Demo · Try · Exercises · Boss as a flat progress track (docs/screens.md §1, info not
+ * tappable): current = orange bar, done = green + check, skipped = skip icon over a dashed bar. */
 export function StepPills({ current, skippedPhases = [] }: StepPillsProps): JSX.Element {
   const { t } = useTranslation();
 

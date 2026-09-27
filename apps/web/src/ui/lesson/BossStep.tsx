@@ -4,12 +4,8 @@ import { SeriesBossStep } from './SeriesBossStep.tsx';
 import { StaticBossStep } from './StaticBossStep.tsx';
 import { VersusStep } from './VersusStep.tsx';
 
-/**
- * Overrides a boss step's own end-of-play save + "continue" action, for reuse outside a lesson
- * (the Play screen's standalone mini-game session, `MiniGameSessionScreen`). Left `undefined`,
- * each step keeps its lesson behaviour unchanged: `recordBossResult` and advancing to
- * `nextStepIndex`, with "Play again" offered only once the play did not win outright.
- */
+/** Overrides a boss step's end-of-play save + "continue" action, for reuse outside a lesson
+ * (`MiniGameSessionScreen`). Left `undefined`, each step keeps its lesson behaviour. */
 export interface BossPlaySession {
   /** Persists this play; replaces the lesson's own boss-result save. */
   readonly save: (

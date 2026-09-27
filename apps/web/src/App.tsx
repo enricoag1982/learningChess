@@ -27,12 +27,9 @@ import { TimeLimitScreen } from './ui/TimeLimitScreen.tsx';
 import { TimeTracker } from './ui/TimeTracker.tsx';
 import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
-// Lazy-loaded screens (non-functional.md §4 "Initial JS ≤ 300 KB gzipped"
-// "Lazy loading"): each split into its own chunk, only fetched the first time its screen actually
-// shows — precached by the service worker (`vite.config.ts`) right after, so a repeat visit is no
-// slower than a static import would have been. Picked for size (Parent area, `ui/parent/**`) or
-// for being off the every-session path (Friend play, placement / test-out) — every other screen
-// stays a static import, on the path most kids take most days.
+// Lazy-loaded screens (non-functional.md §4): each split into its own chunk, precached by the
+// service worker right after first fetch. Picked for size (Parent area) or for being off the
+// every-session path (Friend play, placement/test-out); every other screen stays static.
 const ParentAreaScreen = lazy(() =>
   import('./ui/ParentAreaScreen.tsx').then((module) => ({ default: module.ParentAreaScreen })),
 );
@@ -59,7 +56,7 @@ function LoadingScreen(): JSX.Element {
   return <main className="min-h-dvh bg-cream" />;
 }
 
-/** Route → component table (v4 R2 PR C), replacing the old `screen` switch. */
+/** Route → component table. */
 const ROUTE_SCREENS: Readonly<Record<RouteName, ComponentType>> = {
   loading: LoadingScreen,
   'first-run': FirstRunScreen,
@@ -92,8 +89,7 @@ function Screens(): JSX.Element {
   return <ScreenComponent />;
 }
 
-/** Never applies an update on its own: the default for tests and any render that does not pass
- * `appUpdate` (`main.tsx`, the real composition root, always does). */
+/** Never applies an update on its own: the default for tests and any render without `appUpdate`. */
 const NOOP_APP_UPDATE: AppUpdate = {
   isUpdateReady: () => false,
   apply: () => Promise.resolve(),
@@ -103,8 +99,7 @@ const NOOP_APP_UPDATE: AppUpdate = {
 export interface AppProps {
   /** Injected in tests (fake narrator + in-memory storage); defaults to the real web adapters. */
   readonly services?: Services;
-  /** Injected from `main.tsx` (the real `virtual:pwa-register`-backed one, `adapters/app-update.ts`)
-   * or a fake in tests; defaults to a no-op so nothing here ever touches PWA update logic. */
+  /** Injected from `main.tsx` or a fake in tests; defaults to a no-op. */
   readonly appUpdate?: AppUpdate;
 }
 

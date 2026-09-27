@@ -16,14 +16,12 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 
-// Registers the service worker once, here — the app's own composition root, kept out of
-// `App.tsx` so `App.test.tsx` (which imports `App.tsx` directly) never touches the
-// `virtual:pwa-register` module (unavailable outside a Vite/PWA build).
+// Registered here, the composition root, so `App.test.tsx` never touches `virtual:pwa-register`
+// (unavailable outside a Vite/PWA build).
 const appUpdate = createAppUpdate(registerSW);
 
-// Dev-only board / exercise / lesson playgrounds at /#board, /#exercises and /#lesson=<id>;
-// dynamically imported so none reaches the production bundle (see src/dev/BoardPlayground.tsx,
-// ExercisePlayground.tsx, LessonPreview.tsx).
+// Dev-only board/exercise/lesson playgrounds at /#board, /#exercises, /#lesson=<id>; dynamically
+// imported so none reaches the production bundle.
 if (import.meta.env.DEV && location.hash === '#board') {
   void import('./dev/BoardPlayground.tsx').then(({ BoardPlayground }) => {
     root.render(
