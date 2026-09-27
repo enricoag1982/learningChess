@@ -108,7 +108,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | F2 | Easier variants content | `variants` for the hardest exercise of every lesson (Worlds 1–2, `domain-model.md` §3.4) | Done (`m5.5`): one per remaining lesson |
 | F3 | Tappable vs not tappable (owner, playtest) | Info boxes looked like buttons | Done (`m5.3`): `.tap-raised`/`.info-flat` tokens, shared primitives (`ui/primitives.tsx`), `screens.md` §1 |
 | F4 | Bear stronger than Wolf | `computer-opponent.md` §6.6: null-move pruning + LMR + history heuristic; bear vs wolf 13.3% → 20.0% (N = 30), still short of ≥ 70% | Open. Next: richer `staticEval` for Bear, isolating each technique's own share, wider opening-book coverage |
-| F5 | Mate-in-2+ outside a lesson step | The scripted-reply timer lives only in `ExerciseStep.tsx`; a mate-in-2+ in a boss series round or a review task would freeze. Unreachable today (all 27 mate-in-n are n = 1) | Open. Planned fix: v4 R3 (`useExerciseSession`); fix directly first if any mate-in-2+ content is authored sooner |
+| F5 | Mate-in-2+ outside a lesson step | Scripted-reply timer lived only in `ExerciseStep.tsx`; a mate-in-2+ in a series boss round or review task froze | Done (`m8.13`): the reply timer is part of the shared `useExerciseSession`; regression tests for a series round and a review task |
 | F6 | Check ring in series boss rounds | "Escape the Check" series rounds show no check ring (lessons do); the ring is part of each square's accessible name, so changing it is a visible + a11y change | Found in the v4 R3b design (2026-09-27); kept as is in v4 (same behaviour); owner decision |
 
 ## 4. After MVP

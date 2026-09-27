@@ -104,7 +104,7 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 |---|---|---|
 | Files to add an exercise type | ≈ 15 in 4 packages | 1 folder + 1 registry line |
 | Type / mode dispatch sites | ≈ 45 | registries only (≤ 4) |
-| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction) → `m8.11` 32.0 k → `m8.12` 31.3 k (web compaction); next: R3b (≈ −0.9 k). Initial JS 187.7 KB at `m8.12` vs 186.2 at `v2.0.0`: bundle analysis before `v4.0.0`) |
+| Production TS lines | ≈ 29 k | −3.5 k (≈ −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction) → `m8.11` 32.0 k → `m8.12` 31.3 k (web compaction) → `m8.13` 31.6 k (web kinds: per-kind files outweigh the deleted switches). Initial JS 187.7 KB at `m8.12` vs 186.2 at `v2.0.0`: bundle analysis before `v4.0.0`) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
 | Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |
@@ -142,7 +142,7 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | Core layout | `domain/chess/facts/` (SAN, pieces, goals, special moves, line replay: one helper per fact) · `domain/exercise/kinds/<type>/` (def, engine, solution, kind, tests) · `domain/exercise/modes/<mode>/`; `engine.ts` = legacy facade (735 → 73 lines) until R3b |
 | Content layout (`m8.7`) | `src/kinds/<type>/` schema · compile · verify; `src/modes/<mode>/`; loader generic. File names match core so R4 merges both halves into `subject-chess/kinds/<type>/` by move |
 | Context | `VariantRules` + `chess: ChessRules` (additive) |
-| Open for R3b | Kind functions still take the general `ExerciseState` (public API used by the web) → `kinds/adapt.ts` narrows; removed when the web moves to kinds |
+| Web kinds (`m8.13`) | `apps/web/src/kinds/<type>/` (`ui.ts` = core outcome → UI patch, `PlayArea.tsx`) behind `EXERCISE_KIND_UI`; `useExerciseSession` shared by lesson step, series round and review task (reply timer → F5 fixed); note texts as data in core (`EXERCISE_NOTES`, also feeds the voice inventory); legacy `engine.ts`, `adapt.ts`, `minigame.ts`, `versus.ts`, `boss-result.ts` deleted. Next (`m8.14`): mode UI registry, e2e driven by core solutions, playground samples |
 
 ## 10. R2 web design (2026-09-27)
 
