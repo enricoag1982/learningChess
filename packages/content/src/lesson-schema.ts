@@ -20,7 +20,8 @@ export type { ChoiceOptionYaml, ExerciseYaml, MiniGameYaml, WinConditionYaml };
 export const demoSchema = z
   .object({
     ...positionFields,
-    text: textRefSchema,
+    /** Locale key for the demo's spoken text; defaults to `<lesson-id>.demo` when absent. */
+    text: textRefSchema.optional(),
     highlight: z.string().regex(/^legal-moves [a-h][1-8]$|^squares(?: [a-h][1-8])*$/),
   })
   .strict()
@@ -30,12 +31,15 @@ export const demoSchema = z
 export const lessonSchema = z
   .object({
     id: keySchema,
-    world: keySchema,
+    /** Defaults to the lesson's own folder name when absent. */
+    world: keySchema.optional(),
     order: z.number().int().positive(),
     concept: keySchema,
     character: keySchema,
-    title: textRefSchema,
-    story: textRefSchema,
+    /** Defaults to `<id>.title` when absent. */
+    title: textRefSchema.optional(),
+    /** Defaults to `<id>.story` when absent. */
+    story: textRefSchema.optional(),
     demo: demoSchema,
     guided: z.array(exerciseSchema),
     exercises: z.array(exerciseSchema).min(1),

@@ -35,7 +35,12 @@ function compileDemoHighlight(raw: string): DemoHighlight {
   return { squares: rest === '' ? [] : (rest.split(' ') as Square[]) };
 }
 
-function compileLessonFile(filePath: string, relPath: string, issues: string[]): Lesson | null {
+function compileLessonFile(
+  filePath: string,
+  relPath: string,
+  worldName: string,
+  issues: string[],
+): Lesson | null {
   let raw: string;
   try {
     raw = readFileSync(filePath, 'utf8');
@@ -69,15 +74,15 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
 
   return {
     id: data.id,
-    world: data.world,
+    world: data.world ?? worldName,
     order: data.order,
     concept: data.concept,
     character: data.character,
-    titleKey: `lessons:${data.title}`,
-    storyKey: `lessons:${data.story}`,
+    titleKey: `lessons:${data.title ?? `${data.id}.title`}`,
+    storyKey: `lessons:${data.story ?? `${data.id}.story`}`,
     demo: {
       position: demoPosition,
-      textKey: `lessons:${data.demo.text}`,
+      textKey: `lessons:${data.demo.text ?? `${data.id}.demo`}`,
       // `demoSchema` already validated the "legal-moves <square>" / "squares [<sq> …]" shape.
       highlight: compileDemoHighlight(data.demo.highlight),
     },
@@ -332,7 +337,7 @@ export function loadContent(
         issues.push(`${relPath}: invalid file name (expected <lesson-id>.yaml)`);
         continue;
       }
-      const lesson = compileLessonFile(join(worldPath, fileName), relPath, issues);
+      const lesson = compileLessonFile(join(worldPath, fileName), relPath, worldName, issues);
       if (lesson !== null) {
         lessons.push(lesson);
       }

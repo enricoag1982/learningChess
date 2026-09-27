@@ -1,6 +1,10 @@
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { loadLocales } from '../../load.ts';
+import { loadContent } from '../../lesson-load.ts';
 import {
   diagram,
+  dir,
   fixturesAfterEach,
   fixturesBeforeEach,
   issuesOf,
@@ -14,6 +18,26 @@ beforeEach(fixturesBeforeEach);
 afterEach(fixturesAfterEach);
 
 describe('capture', () => {
+  it('defaults stars2 to stars3 + 1 when absent', () => {
+    writeLesson({
+      exercises: [
+        validExercise({
+          type: 'capture',
+          board: diagram({ d1: 'R', d5: 'p' }),
+          stars3: 1,
+          stars2: undefined,
+        }),
+      ],
+    });
+    writeMiniGame();
+    writeDefaultLocales();
+
+    expect(issuesOf()).toEqual([]);
+    const locales = loadLocales(join(dir, 'locales'));
+    const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+    const exercise = content.lessons[0]?.exercises[0];
+    expect(exercise?.type === 'capture' && exercise.stars2).toBe(2);
+  });
   it('reports a capture exercise with no opponent piece', () => {
     writeLesson({
       exercises: [

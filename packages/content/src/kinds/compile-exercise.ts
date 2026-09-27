@@ -56,7 +56,7 @@ export function compileExercise(
     relPath,
     fieldPath,
     issues,
-    { id: raw.id, concept, textKey: `lessons:${raw.text}`, position },
+    { id: raw.id, concept, textKey: `lessons:${raw.text ?? raw.id}`, position },
     { easier: raw.easier, lastMove },
   );
   return contentKindOf(raw.type).compile(raw, ctx);

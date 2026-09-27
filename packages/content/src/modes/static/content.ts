@@ -38,8 +38,8 @@ function compile(raw: z.output<typeof schema>, ctx: MiniGameCompileContext): Sta
     goal: raw.type ?? 'capture-all',
     par: raw.par,
     moveLimit: raw.moveLimit,
-    titleKey: `lessons:${raw.title}`,
-    goalKey: `lessons:${raw.goal}`,
+    titleKey: `lessons:${raw.title ?? `${raw.id}.title`}`,
+    goalKey: `lessons:${raw.goal ?? `${raw.id}.goal`}`,
     unlockAfter: raw.unlockAfter,
   };
 }

@@ -57,8 +57,8 @@ export function compile(
     opponentLevel: raw.opponent.bot as 1 | 2 | 3 | 4 | 5,
     kidColor,
     ...(raw.par === undefined ? {} : { par: raw.par }),
-    titleKey: `lessons:${raw.title}`,
-    goalKey: `lessons:${raw.goal}`,
+    titleKey: `lessons:${raw.title ?? `${raw.id}.title`}`,
+    goalKey: `lessons:${raw.goal ?? `${raw.id}.goal`}`,
     unlockAfter: raw.unlockAfter,
   };
 }

@@ -44,7 +44,8 @@ export function checkExactlyOnePosition(
 /** Fields every exercise type shares (`lesson-schema.ts`'s exercise union member). */
 export const exerciseCommonFields = {
   id: keySchema,
-  text: textRefSchema,
+  /** Locale key for the instruction text; defaults to `id` when absent. */
+  text: textRefSchema.optional(),
   easier: keySchema.optional(),
   /** The opponent's last move, `<from><to>` (e.g. `d7d5`), display only: the loader checks a piece
    * sits on `to`, and, with an en passant square, that this is the double step that produced it. */

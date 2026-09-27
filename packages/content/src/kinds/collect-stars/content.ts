@@ -10,12 +10,17 @@ export const schema = z
     ...exerciseCommonFields,
     type: z.literal('collect-stars'),
     stars3: z.number().int().positive(),
-    stars2: z.number().int().positive(),
+    /** Defaults to `stars3 + 1` when absent. */
+    stars2: z.number().int().positive().optional(),
   })
   .strict();
 
 function compile(raw: z.output<typeof schema>, ctx: CompileContext): CollectStarsDef {
-  return ctx.build({ type: 'collect-stars', stars3: raw.stars3, stars2: raw.stars2 });
+  return ctx.build({
+    type: 'collect-stars',
+    stars3: raw.stars3,
+    stars2: raw.stars2 ?? raw.stars3 + 1,
+  });
 }
 
 /** A star must exist, and `stars3`/`stars2` must match the solver (`checkOptimalMoves`). */
