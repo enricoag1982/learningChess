@@ -51,6 +51,18 @@ export interface ExerciseKind<
   hint(state: State, level: 1 | 2 | 3, ctx: Ctx): { readonly state: State; readonly hint: Hint };
   /** Stars earned; only ever called once `state.solved` (the engine keeps the pre-solved `0`). */
   stars(state: State): 1 | 2 | 3;
+}
+
+/**
+ * A kind's content-test-only action sequences — kept out of `ExerciseKind`/`EXERCISE_KINDS` (the
+ * registry `engine.ts`'s real dispatchers reach) so this code, and whatever each type's `solution`
+ * pulls in (e.g. the solver), is reachable only from `/testing` and content, never the app bundle.
+ */
+export interface ExerciseSolution<
+  Def extends { readonly type: string; readonly id: string; readonly textKey: string },
+  Action extends { readonly type: string },
+  Ctx,
+> {
   /** The action sequence that solves `def` from `init(def)` with 0 errors (content tests, `/testing`). */
   solution(def: Def, ctx: Ctx): readonly Action[];
   /** An action sequence producing exactly 1 error from `init(def)`, otherwise unchanged (content tests). */

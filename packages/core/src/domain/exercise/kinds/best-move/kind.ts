@@ -1,18 +1,17 @@
-import { startExercise } from '../../engine.ts';
 import { errorHintStars } from '../../stars.ts';
-import { narrowState, narrowStep, widen } from '../adapt.ts';
+import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { playMove } from '../static-move.ts';
+import { initState } from '../../state.ts';
 import type { BestMoveDef, MoveAction, MoveOutcome } from './def.ts';
 import { bestMoveHint } from './engine.ts';
-import { bestMoveSolution, bestMoveWrongAction } from './solution.ts';
 
 export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
   type: 'best-move',
   input: 'static-move',
 
   init(def) {
-    return narrowState(startExercise(def));
+    return initState(def);
   },
 
   act(state, action, ctx) {
@@ -26,13 +25,5 @@ export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
 
   stars(state) {
     return errorHintStars(state.hintLevel, state.errors);
-  },
-
-  solution(def) {
-    return bestMoveSolution(def);
-  },
-
-  wrongAction(def) {
-    return bestMoveWrongAction(def);
   },
 };

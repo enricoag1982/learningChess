@@ -1,18 +1,17 @@
-import { startExercise } from '../../engine.ts';
 import { errorHintStars } from '../../stars.ts';
 import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
+import { initState } from '../../state.ts';
 import type { AnswerOutcome, AnswerYesNoAction, YesNoDef } from './def.ts';
 import { answerYesNo, yesNoHint } from './engine.ts';
-import { yesNoSolution, yesNoWrongAction } from './solution.ts';
 
 export const yesNoKind: ChessKind<YesNoDef, AnswerYesNoAction, AnswerOutcome> = {
   type: 'yes-no',
   input: 'answer',
 
   init(def) {
-    return narrowState(startExercise(def));
+    return initState(def);
   },
 
   act(state, action) {
@@ -27,13 +26,5 @@ export const yesNoKind: ChessKind<YesNoDef, AnswerYesNoAction, AnswerOutcome> = 
 
   stars(state) {
     return errorHintStars(state.hintLevel, state.errors);
-  },
-
-  solution(def) {
-    return yesNoSolution(def);
-  },
-
-  wrongAction(def) {
-    return yesNoWrongAction(def);
   },
 };

@@ -7,6 +7,7 @@
 import { chessJsRules } from '../domain/chess/chessjs-rules.ts';
 import type { ExerciseState } from '../domain/exercise/engine.ts';
 import { kindOf } from '../domain/exercise/kinds/index.ts';
+import { solutionOf } from '../domain/exercise/kinds/solutions.ts';
 import type { ExerciseDef } from '../domain/exercise/types.ts';
 import { createVariantRules } from '../domain/variant/rules.ts';
 import type { VariantRules } from '../domain/variant/rules.ts';
@@ -16,7 +17,7 @@ const defaultRules = createVariantRules(chessJsRules);
 /** Plays `def`'s own kind's `solution()` from a fresh state to a solved end. */
 export function playSolution(def: ExerciseDef, rules: VariantRules = defaultRules): ExerciseState {
   const kind = kindOf(def);
-  return kind
+  return solutionOf(def)
     .solution(def, rules)
     .reduce((state, action) => kind.act(state, action, rules).state, kind.init(def));
 }
@@ -30,12 +31,13 @@ export function playWrongThenSolve(
   rules: VariantRules = defaultRules,
 ): ExerciseState {
   const kind = kindOf(def);
-  const wrong = kind.wrongAction?.(def, rules) ?? [];
+  const solution = solutionOf(def);
+  const wrong = solution.wrongAction?.(def, rules) ?? [];
   const afterWrong = wrong.reduce(
     (state, action) => kind.act(state, action, rules).state,
     kind.init(def),
   );
-  return kind
+  return solution
     .solution(def, rules)
     .reduce((state, action) => kind.act(state, action, rules).state, afterWrong);
 }

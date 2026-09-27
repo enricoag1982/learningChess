@@ -18,3 +18,22 @@ export interface ExerciseStateOf<D> extends ExerciseProgress {
    */
   readonly wrongOptions?: readonly string[];
 }
+
+/**
+ * Builds a fresh `ExerciseStateOf<D>` at `def`'s own authored position. Every kind's `init` calls
+ * this directly (not `engine.ts`'s `startExercise`, which dispatches back through the kind — this
+ * is the one non-dispatching implementation that dispatch bottoms out at).
+ */
+export function initState<D extends { readonly position: Position }>(def: D): ExerciseStateOf<D> {
+  return {
+    def,
+    position: def.position,
+    history: [],
+    moves: 0,
+    selected: [],
+    errors: 0,
+    hintLevel: 0,
+    solved: false,
+    wrongOptions: [],
+  };
+}

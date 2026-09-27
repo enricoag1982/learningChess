@@ -1,16 +1,15 @@
-import { startExercise } from '../../engine.ts';
-import { narrowState, narrowStep, widen } from '../adapt.ts';
+import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
 import { moveCountStars, moveHint, playMove } from '../static-move.ts';
+import { initState } from '../../state.ts';
 import type { CollectStarsDef, MoveAction, MoveOutcome } from './def.ts';
-import { collectStarsSolution, collectStarsWrongAction } from './solution.ts';
 
 export const collectStarsKind: ChessKind<CollectStarsDef, MoveAction, MoveOutcome> = {
   type: 'collect-stars',
   input: 'static-move',
 
   init(def) {
-    return narrowState(startExercise(def));
+    return initState(def);
   },
 
   act(state, action, ctx) {
@@ -24,13 +23,5 @@ export const collectStarsKind: ChessKind<CollectStarsDef, MoveAction, MoveOutcom
 
   stars(state) {
     return moveCountStars(state.moves, state.def.stars3, state.def.stars2, state.hintLevel);
-  },
-
-  solution(def, ctx) {
-    return collectStarsSolution(def, ctx);
-  },
-
-  wrongAction(def) {
-    return collectStarsWrongAction(def);
   },
 };

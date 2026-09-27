@@ -40,10 +40,6 @@ describe.each(allExercises())('$where ($exercise.type)', ({ exercise }) => {
   });
 
   it('wrongAction() costs exactly 1 error and does not block solving', () => {
-    const kind = kindOf(exercise);
-    if (kind.wrongAction === undefined) {
-      return;
-    }
     const result = playWrongThenSolve(exercise);
     expect(result.errors).toBe(1);
     expect(result.solved).toBe(true);

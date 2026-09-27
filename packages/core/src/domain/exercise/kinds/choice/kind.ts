@@ -1,18 +1,17 @@
-import { startExercise } from '../../engine.ts';
 import { errorHintStars } from '../../stars.ts';
 import { narrowState, widen } from '../adapt.ts';
 import { deriveAnswerOutcome } from '../base.ts';
 import type { ChessKind } from '../index.ts';
+import { initState } from '../../state.ts';
 import type { AnswerChoiceAction, AnswerOutcome, ChoiceDef } from './def.ts';
 import { answerChoice, choiceHint } from './engine.ts';
-import { choiceSolution, choiceWrongAction } from './solution.ts';
 
 export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome> = {
   type: 'choice',
   input: 'answer',
 
   init(def) {
-    return narrowState(startExercise(def));
+    return initState(def);
   },
 
   act(state, action) {
@@ -28,13 +27,5 @@ export const choiceKind: ChessKind<ChoiceDef, AnswerChoiceAction, AnswerOutcome>
 
   stars(state) {
     return errorHintStars(state.hintLevel, state.errors);
-  },
-
-  solution(def) {
-    return choiceSolution(def);
-  },
-
-  wrongAction(def) {
-    return choiceWrongAction(def);
   },
 };

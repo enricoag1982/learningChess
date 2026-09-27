@@ -144,9 +144,14 @@ export function solve(
   return null;
 }
 
+/** True for the two exercise types that are also a static-opponent `Goal` (`staticGoalExercise`'s domain). */
+function isGoalType(type: ExerciseDef['type']): type is Goal {
+  return type === 'collect-stars' || type === 'capture';
+}
+
 /** Shortest solve length for `def` (collect-stars / capture only); `null` when unsolvable. Used by content tests. */
 export function optimalMoves(def: ExerciseDef, rules: VariantRules): number | null {
-  if (def.type !== 'collect-stars' && def.type !== 'capture') {
+  if (!isGoalType(def.type)) {
     return null;
   }
   const line = solve(def.position, rules, def.type);

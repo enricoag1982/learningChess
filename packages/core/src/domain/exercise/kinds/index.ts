@@ -5,7 +5,7 @@
  */
 import type { VariantRules } from '../../variant/rules.ts';
 import type { Hint } from '../hint.ts';
-import type { ExerciseKind } from '../kind.ts';
+import type { ExerciseKind, KindInput } from '../kind.ts';
 import type { ExerciseStateOf } from '../state.ts';
 import type { ExerciseDef } from '../types.ts';
 import type { MoveAction } from './base.ts';
@@ -63,4 +63,15 @@ export type AnyExerciseKind = ChessKind<ExerciseDef, ExerciseAction, OutcomeOf<E
 /** The kind implementing `def`'s exercise type. */
 export function kindOf(def: ExerciseDef): AnyExerciseKind {
   return EXERCISE_KINDS[def.type];
+}
+
+/**
+ * Throws (`${fnName}: ${def.type} exercises use a different action`) unless `def`'s kind takes
+ * `input`. The one guard every legacy multi-type facade in `engine.ts` needs (e.g. `playMove`,
+ * open to every type except its own `'static-move'` kinds).
+ */
+export function assertKind(def: ExerciseDef, input: KindInput, fnName: string): void {
+  if (kindOf(def).input !== input) {
+    throw new Error(`${fnName}: ${def.type} exercises use a different action`);
+  }
 }

@@ -1,17 +1,16 @@
-import { startExercise } from '../../engine.ts';
 import { errorHintStars } from '../../stars.ts';
-import { narrowState, narrowStep, widen } from '../adapt.ts';
+import { narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
+import { initState } from '../../state.ts';
 import type { MateInNDef, MateInNOutcome, MoveAction } from './def.ts';
 import { mateInNHint, playMateInN } from './engine.ts';
-import { mateInNSolution, mateInNWrongAction } from './solution.ts';
 
 export const mateInNKind: ChessKind<MateInNDef, MoveAction, MateInNOutcome> = {
   type: 'mate-in-n',
   input: 'real-move',
 
   init(def) {
-    return narrowState(startExercise(def));
+    return initState(def);
   },
 
   act(state, action, ctx) {
@@ -25,13 +24,5 @@ export const mateInNKind: ChessKind<MateInNDef, MoveAction, MateInNOutcome> = {
 
   stars(state) {
     return errorHintStars(state.hintLevel, state.errors);
-  },
-
-  solution(def, ctx) {
-    return mateInNSolution(def, ctx);
-  },
-
-  wrongAction(def) {
-    return mateInNWrongAction(def);
   },
 };
