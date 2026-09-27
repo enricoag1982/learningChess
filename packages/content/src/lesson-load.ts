@@ -54,6 +54,7 @@ import {
   pieceValue,
   replaySanLine,
   selectSquaresAnswer,
+  staticGoalExercise,
 } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
@@ -1186,18 +1187,14 @@ function checkMiniGame(miniGame: MiniGame, where: string, issues: string[]): voi
     checkVersusMiniGame(miniGame, where, issues);
     return;
   }
-  const shared = {
+  const asExercise = staticGoalExercise({
     id: miniGame.id,
     concept: miniGame.concept,
     textKey: miniGame.titleKey,
     position: miniGame.position,
-    stars3: miniGame.par,
-    stars2: miniGame.par,
-  } as const;
-  const asExercise: CaptureDef | CollectStarsDef =
-    (miniGame.goal ?? 'capture-all') === 'collect-stars'
-      ? { ...shared, type: 'collect-stars' }
-      : { ...shared, type: 'capture' };
+    goal: miniGame.goal,
+    par: miniGame.par,
+  });
   if (asExercise.type === 'collect-stars' && miniGame.position.markers.stars.length === 0) {
     issues.push(`${where}: collect-stars mini-game has no star`);
     return;

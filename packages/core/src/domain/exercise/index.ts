@@ -55,6 +55,9 @@ export {
   canEnPassant,
 } from '../chess/facts/position.ts';
 
+export type { StaticGoalSource } from './modes/static/def.ts';
+export { staticGoalExercise } from './modes/static/def.ts';
+
 export type { StaticCaptureGameDef, MiniGameGoal, GameState, GameOutcome } from './minigame.ts';
 export { startStaticCaptureGame, playGameMove, gameResult, gameStars } from './minigame.ts';
 

@@ -248,8 +248,10 @@ export type {
   GameState,
   SeriesGameState,
   VersusState,
+  StaticGoalSource,
 } from './domain/exercise/index.ts';
 export {
+  staticGoalExercise,
   startExercise,
   exerciseMoves,
   playMove,

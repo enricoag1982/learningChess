@@ -1,7 +1,11 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CaptureDef, CollectStarsDef } from '@chess-kids/core';
-import { chessJsRules, createVariantRules, optimalMoves } from '@chess-kids/core';
+import {
+  chessJsRules,
+  createVariantRules,
+  optimalMoves,
+  staticGoalExercise,
+} from '@chess-kids/core';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
@@ -84,15 +88,13 @@ describe('real content', () => {
     expect(hungryRook.unlockAfter).toBe('rook');
     expect(hungryRook.moveLimit).toBeGreaterThan(hungryRook.par);
 
-    const asCapture: CaptureDef = {
+    const asCapture = staticGoalExercise({
       id: hungryRook.id,
       concept: hungryRook.concept,
       textKey: hungryRook.titleKey,
       position: hungryRook.position,
-      type: 'capture',
-      stars3: hungryRook.par,
-      stars2: hungryRook.par,
-    };
+      par: hungryRook.par,
+    });
     expect(optimalMoves(asCapture, rules)).toBe(hungryRook.par);
   });
 
@@ -209,26 +211,14 @@ describe('real content', () => {
       expect(minigame.moveLimit).toBeGreaterThan(minigame.par);
       expect(minigame.goal ?? 'capture-all').toBe(goal ?? 'capture-all');
 
-      const asExercise: CaptureDef | CollectStarsDef =
-        (minigame.goal ?? 'capture-all') === 'collect-stars'
-          ? {
-              id: minigame.id,
-              concept: minigame.concept,
-              textKey: minigame.titleKey,
-              position: minigame.position,
-              type: 'collect-stars',
-              stars3: minigame.par,
-              stars2: minigame.par,
-            }
-          : {
-              id: minigame.id,
-              concept: minigame.concept,
-              textKey: minigame.titleKey,
-              position: minigame.position,
-              type: 'capture',
-              stars3: minigame.par,
-              stars2: minigame.par,
-            };
+      const asExercise = staticGoalExercise({
+        id: minigame.id,
+        concept: minigame.concept,
+        textKey: minigame.titleKey,
+        position: minigame.position,
+        goal: minigame.goal,
+        par: minigame.par,
+      });
       expect(optimalMoves(asExercise, rules)).toBe(minigame.par);
     },
   );

@@ -3,6 +3,7 @@ import type { PieceType, Position } from '../chess/types.ts';
 import type { VariantRules } from '../variant/rules.ts';
 import { playMove, startExercise } from './engine.ts';
 import type { ExerciseState } from './engine.ts';
+import { staticGoalExercise } from './modes/static/def.ts';
 import type { CaptureDef, CollectStarsDef, ExerciseDef } from './types.ts';
 
 /**
@@ -41,18 +42,14 @@ export type GameOutcome =
   | { readonly kind: 'ended'; readonly move: Move; readonly captured?: PieceType };
 
 function toGoalDef(def: StaticCaptureGameDef): CaptureDef | CollectStarsDef {
-  const shared = {
+  return staticGoalExercise({
     id: def.id,
     concept: def.concept,
     textKey: def.id,
     position: def.position,
-    stars3: def.par,
-    stars2: def.par,
-  } as const;
-  if ((def.goal ?? 'capture-all') === 'collect-stars') {
-    return { ...shared, type: 'collect-stars' };
-  }
-  return { ...shared, type: 'capture' };
+    goal: def.goal,
+    par: def.par,
+  });
 }
 
 /** Starts a fresh mini-game at its authored position. */
