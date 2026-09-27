@@ -2,7 +2,7 @@ import type { PieceStyleSetting, Position } from '@chess-kids/core';
 import { toFen } from '@chess-kids/core';
 
 /** World 5's id (`packages/content/tracks.yaml`, order 5, "Full Rules"): its lessons always show
- * classic pieces, no animal badge (docs/app-structure.md "Piece look on board", M5.3). */
+ * classic pieces, no animal badge (docs/app-structure.md "Piece look on board"). */
 const WORLD_FIVE_ID = 'rules';
 
 /** Standard chess start position's board part of its FEN — the same shape `app/minigames.ts`'s
@@ -37,8 +37,8 @@ export function isClassicOnlyContext(input: {
 }
 
 /**
- * Effective board piece look (docs/app-structure.md "Piece look on board"; M5.1's `pieceStyle`
- * parent setting, applied here from M5.3): `'classic'` forces classic pieces everywhere, even in
+ * Effective board piece look (docs/app-structure.md "Piece look on board"; the parent `pieceStyle`
+ * setting): `'classic'` forces classic pieces everywhere, even in
  * Worlds 1-4 — an explicit parent override always wins. `'animal'` (the default) shows the animal
  * badge wherever content allows it, i.e. everywhere except a classic-only context (World 5, a full
  * game) — it does not force badges into those, since the "transfer to a real board" moment they

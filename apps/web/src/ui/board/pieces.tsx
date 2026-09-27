@@ -227,16 +227,10 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
   );
 }
 
-/**
- * Small animal-face badge overlaid on a piece's corner (docs/app-structure.md "Piece look on
- * board": classic + animal badge in Worlds 1-4). Purely decorative — a square's own accessible
- * name already names the piece by type and colour (`Board`'s `role="grid"` labels) — so it is
- * `aria-hidden`. The Fluent Emoji 3D artwork is drawn as an SVG `<image>` (not `<img>`, unlike the
- * other animal spots in the app) so it composes with the badge's own ring/background in one
- * element at this very small size (≤ ~16 px at a 40 px board square) instead of layering an `img`
- * inside an HTML circle. White vs Black stays readable from the piece shape/fill under the badge
- * (unchanged in this file) — the badge itself never varies by colour.
- */
+/** Small animal-face badge overlaid on a piece's corner (docs/app-structure.md "Piece look on
+ * board"). Purely decorative — a square's accessible name already names the piece — so `aria-hidden`;
+ * drawn as an SVG `<image>` (not `<img>`) so it composes with the badge's ring/background in one
+ * element at this very small size. */
 export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
   const character = characterForPiece(type);
   return (

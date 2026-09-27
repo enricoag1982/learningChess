@@ -19,13 +19,10 @@ function isTrackedScreen(screen: Screen): boolean {
 }
 
 /**
- * Foreground time tracker (M5.2, domain-model.md §3.3 "what counts"): while a kid profile is on a
+ * Foreground time tracker (domain-model.md §3.3 "what counts"): while a kid profile is on a
  * tracked screen, adds one minute to today's `SessionLog` every real minute the tab is visible
- * (`document.hidden`) and the kid has touched/typed something within the last
- * {@link IDLE_LIMIT_MS} — paused otherwise, so a phone left open in a pocket or a background tab
- * never racks up play time. Renders nothing; mounted once in `App.tsx` alongside `Celebration`.
- * Replaces the earlier Today-session-only lump-sum recording (M4.4): every kid-mode screen counts
- * now, not only a Today session, matching the decision table's own "Home / Journey / Den browsing".
+ * and the kid has touched/typed something within the last {@link IDLE_LIMIT_MS} — paused
+ * otherwise, so a phone left in a pocket never racks up play time. Renders nothing.
  */
 export function TimeTracker(): null {
   const services = useServices();
@@ -68,8 +65,8 @@ export function TimeTracker(): null {
       if (!isTrackedScreen(screenRef.current) || document.hidden) return;
       if (Date.now() - lastInputRef.current > IDLE_LIMIT_MS) return;
       void recordSessionMinutes(services.deps, profileId, 1, services.deps.clock.now());
-      // M7.1 5-minute warning: the other trigger (`AppNotice.tsx` runs the "screen change" one) —
-      // catches the threshold being crossed while sitting still on an already-calm screen.
+      // The other 5-minute-warning trigger (`AppNotice.tsx` runs "screen change"): catches the
+      // threshold being crossed while sitting still on an already-calm screen.
       void checkTimeNotice('tick');
     }, TICK_MS);
     return () => {

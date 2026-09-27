@@ -79,7 +79,7 @@ function parseHash(): { readonly lessonId: string; readonly view: string } {
 /**
  * Dev-only visual harness for a lesson's demo, exercises and boss, at `/#lesson=<id>&view=<view>`
  * (`view` = `demo`, `boss`, or an exercise id). Renders the real bundled content, not a fixture, so
- * it doubles as a manual check that new content displays correctly (see `docs/roadmap.md` M2.3).
+ * it doubles as a manual check that new content displays correctly (see `docs/roadmap.md`).
  */
 export function LessonPreview(): JSX.Element {
   const initial = parseHash();

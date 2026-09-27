@@ -2,11 +2,9 @@ import type { Migration } from './local-store.ts';
 
 /**
  * Every schema migration this build knows, applied in order by `openLocalStore` (`local-store.ts`).
- * v2 (M3.4): adds the `concept-stats` record. v3 (M3.5): adds the `game-records` record. v4 (M4.4):
- * adds the `earned-badges`/`streaks`/`session-logs` records. v5 (M4.5): adds the
- * `assessment-results`/`unlocks` records. None need existing data transformed — a profile with none
- * yet simply reads back an empty list/undefined, same as the empty-array/Map defaults each
- * repository already returns for a missing key — so every step only bumps the stored version.
+ * v2 adds `concept-stats`; v3 adds `game-records`; v4 adds `earned-badges`/`streaks`/
+ * `session-logs`; v5 adds `assessment-results`/`unlocks`. None need existing data transformed — a
+ * profile with none yet reads back an empty list/undefined, so every step only bumps the version.
  */
 export const MIGRATIONS: readonly Migration[] = [
   {

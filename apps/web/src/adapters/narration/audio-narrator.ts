@@ -28,14 +28,11 @@ export type AudioNarratorOutcome =
   | { readonly kind: 'fallback'; readonly reason: AudioNarratorFallbackReason };
 
 export interface AudioNarrator extends Narrator {
-  /** The active profile's nickname (or `null` for none) — stripped from text before the
-   * generated-audio lookup, same as `packages/content`'s inventory strips it from templates
-   * (`voice-text.ts`'s `stripNickname`). Wired wherever the active profile is set, alongside
-   * `Services.setVoiceEnabled` (`app/services.ts` / `store.ts`). */
+  /** The active profile's nickname (or `null`), stripped from text before the generated-audio
+   * lookup, same as the content inventory strips it from templates (`stripNickname`). */
   setNickname(nickname: string | null): void;
-  /** The outcome of the most recently *completed* `speak()` call, or `null` before any call has
-   * finished. Read by the parent area's "Test voice" check (M6.3 item 2, `ChildSettings.tsx`) right
-   * after awaiting its own `speak()` — nothing else in the app needs this. */
+  /** The outcome of the most recently *completed* `speak()` call, or `null` before any has
+   * finished — read by the parent area's "Test voice" check right after its own `speak()`. */
   lastOutcome(): AudioNarratorOutcome | null;
 }
 
@@ -52,8 +49,7 @@ function hasAudioContextSupport(): boolean {
   return typeof w.AudioContext === 'function' || typeof w.webkitAudioContext === 'function';
 }
 
-/** `localStorage` key for the missed-text report (M6.3 item 4, `docs/voice.md`): off by default
- * (a plain read, no other cost), so this never runs in a real kid's session. */
+/** `localStorage` key for the missed-text report (`docs/voice.md`): off by default, a plain read. */
 const VOICE_REPORT_STORAGE_KEY = 'chess-kids:voice-report';
 
 function voiceReportEnabled(): boolean {
@@ -64,13 +60,8 @@ function voiceReportEnabled(): boolean {
   }
 }
 
-/**
- * Records a text that fell back for a content reason (a manifest miss, or its mp3 not decoding) —
- * not an environmental one (no `AudioContext`, still suspended, manifest itself unreachable) — into
- * `window.__chessKidsVoiceMisses`, only while `voiceReportEnabled()`. The e2e a11y curriculum walk
- * (`e2e/a11y.spec.ts`) sets the flag and asserts this list is empty at the end: every narrated text
- * the walk reaches should have had generated audio.
- */
+/** Records a text that fell back for a content reason (manifest miss, decode failure — not an
+ * environmental one) while `voiceReportEnabled()`; the e2e a11y walk asserts this list stays empty. */
 function recordVoiceMiss(text: string): void {
   if (!voiceReportEnabled()) return;
   const w = window as unknown as { __chessKidsVoiceMisses?: string[] };
@@ -90,12 +81,8 @@ function defaultAudioContextFactory(): AudioContext {
   return new Ctor();
 }
 
-/**
- * `Narrator` over pre-generated Kokoro audio (`docs/voice.md`), with `fallback` (Web Speech) for
- * any text without generated audio, or when audio playback itself cannot go ahead (manifest
- * missing/unreachable, no `AudioContext`, fetch/decode error, or a still-locked `AudioContext` on
- * iOS — see the module doc comment above `speak` for the exact fallback triggers).
- */
+/** `Narrator` over pre-generated Kokoro audio (`docs/voice.md`), falling back to `fallback` (Web
+ * Speech) for any text without generated audio or when playback itself cannot go ahead. */
 export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioNarrator {
   const { baseUrl, fallback } = options;
   const fetchFn = options.fetch ?? fetch;
@@ -105,11 +92,8 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
   let audioContext: AudioContext | undefined;
   let unlockListenersAdded = false;
   let currentSource: AudioBufferSourceNode | undefined;
-  /** Resolves the in-flight `playBuffer` promise for `currentSource` — `stopCurrentSource` calls
-   * this itself (after nulling `onended`, so the real `ended` event never double-resolves it),
-   * since stopping a node does not otherwise fire `onended`. Without this, `cancel()` mid-playback
-   * would stop the audio but leave that `speak()` call's promise pending forever, breaking the
-   * "resolves when playback ends or is cancelled" contract. */
+  /** Resolves the in-flight `playBuffer` promise for `currentSource`; stopping a node fires no
+   * `onended`, so `stopCurrentSource` calls this itself or `cancel()` mid-playback would hang. */
   let currentResolve: (() => void) | undefined;
   /** Bumped by every `speak`/`cancel`; an in-flight async step whose captured token no longer
    * matches this one was superseded and must not play audio or resolve on its own. */
@@ -152,18 +136,12 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     resolve?.();
   }
 
-  /** Every gesture type an unlock is attempted on. iOS Safari only actually unlocks Web Audio
-   * inside a `touchend`/`click` handler — never `touchstart`/`pointerdown` — so all four are
-   * listened on and the listeners stay registered (not `{ once: true }`) until `ctx.state` really
-   * is `'running'`: a `pointerdown` (or an unlucky `touchend`) can fire the handler without
-   * actually unlocking anything, and the next gesture (e.g. the `touchend` that follows the very
-   * same tap's `pointerdown`) needs its own chance. */
+  /** iOS Safari only unlocks Web Audio inside a `touchend`/`click` handler, never
+   * `touchstart`/`pointerdown` — all four stay registered until `ctx.state` is really `'running'`. */
   const UNLOCK_EVENTS = ['pointerdown', 'touchend', 'click', 'keydown'] as const;
 
-  /** iOS Safari (and some other mobile browsers) start every `AudioContext` `suspended` until a
-   * user gesture resumes it. A document listener on the next several gesture types resumes it and
-   * plays a 1-sample silent buffer — the standard "unlock" trick — so by the time a lesson actually
-   * wants to narrate, playback is already allowed. */
+  /** iOS starts every `AudioContext` `suspended` until a gesture resumes it; this plays a 1-sample
+   * silent buffer on the next one (the standard "unlock" trick) so a later `speak` is already allowed. */
   function ensureUnlockListener(ctx: AudioContext): void {
     if (unlockListenersAdded) return;
     unlockListenersAdded = true;
@@ -212,10 +190,8 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     return audioContext;
   }
 
-  /** How long `ensureRunning` waits on `ctx.resume()` before giving up on it for *this* `speak()`
-   * call only — a `resume()` that never settles (seen on some iOS versions before the unlock
-   * gesture has actually landed) must not hang narration indefinitely; the first-tap unlock
-   * listener above stays registered regardless, so a later call still gets a running context. */
+  /** `ensureRunning`'s own cap on `ctx.resume()`: some iOS versions never settle it before the
+   * unlock gesture lands, and this must not hang narration — the unlock listener stays registered. */
   const RESUME_TIMEOUT_MS = 300;
 
   function timeout<T>(ms: number, value: T): Promise<T> {
@@ -226,10 +202,8 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     });
   }
 
-  /** `speak` runs this when the context is still `suspended` (unlock listener above hasn't fired
-   * yet, e.g. this is the very first narrated line and it plays before any tap/key). Races
-   * `ctx.resume()` against `RESUME_TIMEOUT_MS`: still suspended once that timer wins means this one
-   * call falls back, without waiting on a `resume()` that may never settle. */
+  /** Races `ctx.resume()` against `RESUME_TIMEOUT_MS` for a still-`suspended` context (e.g. the
+   * very first narrated line, before any tap unlocked it); still suspended means this call falls back. */
   async function ensureRunning(ctx: AudioContext): Promise<boolean> {
     if (ctx.state !== 'suspended') return true;
     const resumed = await Promise.race([
@@ -243,11 +217,8 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     return (ctx.state as AudioContextState) !== 'suspended';
   }
 
-  /** `packages/content/dist/voice-texts.json` → `tools/voice/generate.py` → the manifest at
-   * `<baseUrl>manifest.json` (`{ config, entries: { <key>: { text, ms } } }`). Only `entries`' keys
-   * matter at runtime — a lookup table of which texts have generated audio; `text`/`ms`/`config`
-   * are for `docs/voice.md`'s own tooling. `null` (missing/unreachable/malformed) means every
-   * `speak` falls back to Web Speech, same as an individual miss. */
+  /** Fetches `<baseUrl>manifest.json`'s `entries` keys (which texts have generated audio); `null`
+   * (missing/unreachable/malformed) falls every `speak` back to Web Speech, same as one miss. */
   function loadManifestKeys(): Promise<ReadonlySet<string> | null> {
     return fetchFn(`${baseUrl}manifest.json`)
       .then((response) => (response.ok ? (response.json() as Promise<unknown>) : null))
@@ -265,8 +236,7 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     return manifestKeysPromise;
   }
 
-  /** Fetching the mp3 and decoding it are kept as two separate failure cases (`'file-missing'` vs
-   * `'decode-failed'`) so `lastOutcome()` (M6.3 item 2) can tell a parent which one happened. */
+  /** Fetch and decode are two separate failure cases so `lastOutcome()` can say which happened. */
   type BufferResult =
     { readonly buffer: AudioBuffer } | { readonly reason: 'file-missing' | 'decode-failed' };
 
@@ -328,15 +298,13 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     });
   }
 
-  /** The outcome of the most recently *completed* `doSpeak` — read by `lastOutcome()` (M6.3 item
-   * 2). Only ever written right before a branch a still-current call is about to take, so a
-   * superseded call never overwrites a newer one's outcome with its own stale result. */
+  /** The most recently *completed* `doSpeak`'s outcome, read by `lastOutcome()`; only ever written
+   * right before a still-current call's own branch, so a superseded call can't overwrite it. */
   let lastOutcomeValue: AudioNarratorOutcome | null = null;
 
   async function doSpeak(text: string, myToken: number): Promise<void> {
-    // The lookup key is computed from the nickname-stripped text (never-in-audio rule), but a
-    // fallback to Web Speech gets the *original* text — Web Speech has no such limitation, and
-    // saying the child's name is the pre-M6 behaviour subtitles already promise it matches.
+    // Nickname-stripped for the lookup key; a Web Speech fallback gets the original text instead,
+    // since it has no such limitation and should still say the child's name.
     const key = voiceKey(stripNickname(text, nickname));
 
     const ctx = getAudioContext();

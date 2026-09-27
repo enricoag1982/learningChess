@@ -17,7 +17,7 @@ function canShareFile(file: File): boolean {
 }
 
 /**
- * Parent area "Send to other device" (M7.2 device sharing, decision table "Send to other device"):
+ * Parent area "Send to other device" (decision table "Send to other device"):
  * builds the same backup JSON the Export button writes, under a `chess-for-kids-<nickname or
  * all>-<date>.json` name (`buildShareFile`), and offers it through the Web Share API
  * (`navigator.share({ files: [file], title })`) when this browser can share files — the OS share

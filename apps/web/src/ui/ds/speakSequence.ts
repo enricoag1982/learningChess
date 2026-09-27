@@ -20,7 +20,7 @@ function nextToken(narrator: Narrator): number {
 /**
  * Speaks each of `texts` through `narrator`, one after another, each waiting for the previous to
  * finish — so every text gets its own generated-audio lookup, instead of one concatenated string
- * that could never be in the manifest (`docs/voice.md` "Sequence"; M6.3 item 1: the exercise
+ * that could never be in the manifest (`docs/voice.md` "Sequence"): the exercise
  * instruction, then its feedback note). A newer call for the same `narrator` (another
  * `speakSequence`, including an empty `texts` used only to cancel) stops this run before its next
  * text starts: `narrator.speak()` already resolves a superseded call's own promise on its own (the

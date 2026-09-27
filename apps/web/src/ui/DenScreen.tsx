@@ -81,7 +81,7 @@ function rankNote(t: TFunction, catalog: TracksCatalog, entry: RankLadderEntry):
   return t('den.rank-after-track', { track: track ? tContent(t, track.titleKey) : '' });
 }
 
-/** My Den: rank ladder and animal-friend collection (rewards.md §2; badges are M4, omitted here). */
+/** My Den: rank ladder, animal-friend collection, and the badge grid (rewards.md §2–3). */
 export function DenScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -244,7 +244,7 @@ export function DenScreen(): JSX.Element {
         </div>
       </div>
 
-      {/* M4.4: badges + streak, its own section (kept apart from the rank/friends row above so a
+      {/* Badges + streak, its own section (kept apart from the rank/friends row above so a
           "Games with friends" count added elsewhere in My Den merges cleanly). */}
       {/* Flat, no border (docs/screens.md §1 "Cards that contain buttons", v1.1.0 part B): this
           panel's own content is a grid of raised badge tiles, so a bordered outer card would read

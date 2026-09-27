@@ -65,7 +65,7 @@ export interface BackupScreenProps {
 }
 
 /**
- * Parent area "Backup" (M7.2 device sharing, app-structure.md §11, §13 "Across devices"): export
+ * Parent area "Backup" (app-structure.md §11, §13 "Across devices"): export
  * every child's data as one JSON file; "Send to other device" via the share sheet (falls back to a
  * download); pick a file to preview and merge it in — per incoming child, "Merge into ‹local
  * child›" (auto, silent, when its id already matches one) or a choice between that and "Add as new

@@ -32,7 +32,7 @@ function levelConditionText(t: TFunction, condition: ComputerLevelCondition): st
   });
 }
 
-/** Play: vs Computer, vs Friend (M4.3: unlocked once the profile has any game unlocked — the
+/** Play: vs Computer, vs Friend (unlocked once the profile has any game unlocked — the
  * setup sheet, `FriendSetupScreen`), and the unlocked mini-games grid. */
 export function PlayScreen(): JSX.Element {
   const { t } = useTranslation();

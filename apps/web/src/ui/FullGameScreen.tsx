@@ -45,7 +45,7 @@ const FULL_GAME_LESSON: Lesson = {
 };
 
 /** A full game vs `level` (1 Mouse .. 5 Bear): the same rules/position as World 4's `first-game`
- * boss, built at runtime instead of from content so any unlocked level can play it (M3.5). */
+ * boss, built at runtime instead of from content so any unlocked level can play it. */
 function fullGameDef(level: number): VersusMiniGame {
   return {
     mode: 'versus',
@@ -69,7 +69,7 @@ function fullGameDef(level: number): VersusMiniGame {
 }
 
 /**
- * Play's "Full game" button (M3.5): the same versus UI World 4's `first-game` boss uses
+ * Play's "Full game" button: the same versus UI World 4's `first-game` boss uses
  * (`VersusStep`, reused as-is), at a level the kid picked on the Play screen. Unlike a lesson's
  * boss or a standalone mini-game session, a full game keeps no `MiniGameProgress`/`Attempt` — only
  * a `GameRecord` (`domain-model.md` §2), whether finished normally or left mid-game.

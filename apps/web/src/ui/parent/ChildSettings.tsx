@@ -159,7 +159,7 @@ function DeleteConfirmDialog({
   );
 }
 
-/** One {@link DAILY_LIMIT_OPTIONS} chip row (M7.1: reused for "Every day" / "Mon–Fri" / "Sat–Sun"). */
+/** One {@link DAILY_LIMIT_OPTIONS} chip row (reused for "Every day" / "Mon–Fri" / "Sat–Sun"). */
 function LimitChipRow({
   label,
   value,
@@ -194,7 +194,7 @@ function LimitChipRow({
   );
 }
 
-/** One allowed-hours chip row (M7.1: "Play until" / "Not before") — `options` are `'HH:MM'`
+/** One allowed-hours chip row ("Play until" / "Not before") — `options` are `'HH:MM'`
  * strings shown as-is, plus `null` for "off" (`parent.daily-limit-off`, same wording as the daily
  * limit's own "Off" chip). */
 function HoursChipRow({
@@ -233,13 +233,8 @@ function HoursChipRow({
 
 type VoiceOutcome = Awaited<ReturnType<Services['testVoice']>>;
 
-/**
- * Parent area "Test voice" check (M6.3 item 2): speaks one fixed, inventoried sentence
- * (`voice-check.sentence`) through the real narrator and reports whether generated audio actually
- * played, or a short reason why it fell back to the device voice (`docs/voice.md` "Fallback
- * rules") — the owner-reported "voice sounds mechanical" symptom is that fallback, most often on
- * iPad Safari before the audio context is truly unlocked.
- */
+/** Parent area "Test voice" check: speaks one fixed sentence through the real narrator and reports
+ * whether generated audio played, or a short reason why it fell back (`docs/voice.md`). */
 function VoiceTestRow(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -321,13 +316,10 @@ export interface ChildSettingsScreenProps {
 }
 
 /**
- * Parent area "child settings" (app-structure.md §11): rename / avatar / delete (moved here from
- * the old flat overview row), daily limit / voice / sound / hints / computer level / piece style,
- * unlock lessons & worlds (M4.5's `UnlockPanel`, integrated here rather than duplicated), export
- * this child's data, and reset. Settings effects (`docs/app-structure.md` §11 "Settings effect
- * now"): voice/sound/hints/computer level take effect the next time this profile is selected
- * (`selectProfileAndHome` re-reads them); daily limit is enforced live, from the very next activity
- * gate check (M5.2, `store.ts`'s `gated`); piece style only stored until M5.3.
+ * Parent area "child settings" (app-structure.md §11): rename / avatar / delete, daily limit /
+ * voice / sound / hints / computer level / piece style, unlock lessons & worlds (`UnlockPanel`),
+ * export this child's data, and reset. Voice/sound/hints/computer level take effect next profile
+ * select; daily limit is enforced live, from the next activity gate check.
  */
 export function ChildSettingsScreen({
   profile,
@@ -390,7 +382,7 @@ export function ChildSettingsScreen({
     await refreshProfiles();
   }
 
-  // Queues patches one after another (M7.1: the daily-limit block now has up to four chip rows a
+  // Queues patches one after another (the daily-limit block can have up to four chip rows a
   // parent could tap in quick succession — weekday, weekend, "Play until", "Not before"): each
   // `updateProfileSettings` call reads-merges-saves the *stored* settings, so two overlapping
   // calls would race and the slower one's read misses the faster one's not-yet-saved field,

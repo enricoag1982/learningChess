@@ -29,7 +29,7 @@ export interface ProfileSlice {
   readonly profiles: readonly Profile[];
   /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
-  /** `profile`'s own parent-set settings (M5.1, app-structure.md §11), loaded alongside it —
+  /** `profile`'s own parent-set settings (app-structure.md §11), loaded alongside it —
    * `ExerciseStep`'s Hint button and `PlayScreen`'s computer-level default both read this;
    * `DEFAULT_PROFILE_SETTINGS` outside a selected profile. Voice is applied as a side effect at
    * load time (`services.setVoiceEnabled`), not read from here (`gated-narrator.ts` owns it). */
@@ -39,7 +39,7 @@ export interface ProfileSlice {
   readonly miniGameProgress: readonly MiniGameProgress[];
   /** This profile's full-game / versus mini-game records (Play's vs Computer tally, My Den). */
   readonly gameRecords: readonly GameRecord[];
-  /** This profile's concept mastery + review state (M3.4 Leitner scheduler): Home's "Start today"
+  /** This profile's concept mastery + review state (Leitner scheduler): Home's "Start today"
    * button and the Practice screen's due count / weak tags both read this. */
   readonly conceptStats: readonly ConceptStats[];
   /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
@@ -144,7 +144,7 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
       const [only] = profiles;
       if (profiles.length === 1 && only) {
         // M1-upgrade path: an existing single profile with no parent lock yet skips profile
-        // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
+        // creation and goes straight to Home.
         await selectProfile(services.deps, only.id);
         const settings = await getProfileSettings(services.deps, only.id);
         await activateProfile(set, get, only, settings);
@@ -158,7 +158,7 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
     async finishNewPlayer(nickname: string, avatar: string) {
       const { services } = get();
       const profile = await createProfile(services.deps, nickname, avatar);
-      // Storage eviction (non-functional.md §1, M5.4 decision table): asks once, on whichever
+      // Storage eviction (non-functional.md §1): asks once, on whichever
       // profile creation happens first on this device — a no-op every time after (see
       // `requestPersistentStorageIfNeeded`'s own doc comment).
       await requestPersistentStorageIfNeeded(services.deps);

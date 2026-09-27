@@ -135,7 +135,7 @@ export function HomeScreen(): JSX.Element {
     nextStep?.kind === 'world-boss' && nextStep.world.boss !== undefined
       ? services.deps.content.minigame(nextStep.world.boss)
       : undefined;
-  // Today's warm-up (M3.4, domain-model.md §3.1): shown even once every lesson is done, so the
+  // Today's warm-up (domain-model.md §3.1): shown even once every lesson is done, so the
   // "Start today" button still has something to offer (review-only sessions).
   const hasWarmUp = conceptStats.some((entry) => isDue(entry, services.deps.clock.now()));
 

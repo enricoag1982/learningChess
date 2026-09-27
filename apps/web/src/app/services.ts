@@ -28,16 +28,14 @@ export interface Services {
   readonly rules: VariantRules;
   readonly narrator: Narrator;
   readonly botPlayer: BotPlayer;
-  /** Gates `narrator` on the active profile's "voice" setting (M5.1, app-structure.md §11
-   * "Settings effect now") — set at every profile select (`selectProfileAndHome`, `store.ts`). */
+  /** Gates `narrator` on the active profile's "voice" setting (app-structure.md §11 "Settings
+   * effect now") — set at every profile select. */
   setVoiceEnabled(enabled: boolean): void;
   /** The active profile's nickname, stripped from narrated text before the generated-audio lookup
-   * (M6.2, `docs/voice.md`) — set at every profile select, alongside `setVoiceEnabled`. */
+   * (`docs/voice.md`) — set at every profile select, alongside `setVoiceEnabled`. */
   setNickname(nickname: string | null): void;
-  /** M6.3 item 2: the parent area "Test voice" check (`ChildSettings.tsx`) — speaks `text` (the
-   * app's one fixed, inventoried test sentence) through the real audio narrator, bypassing the
-   * voice on/off setting so it works even while that toggle is off, and reports whether generated
-   * audio actually played or why it fell back to the device voice. */
+  /** The parent area "Test voice" check (`ChildSettings.tsx`): speaks `text` through the real audio
+   * narrator, bypassing the voice on/off setting, and reports whether generated audio played. */
   testVoice(text: string): Promise<AudioNarratorOutcome>;
 }
 
@@ -62,9 +60,8 @@ export function createServices(storage: Storage = window.localStorage): Services
     storageSchemaVersion: SCHEMA_VERSION,
   };
 
-  // M6.2 (docs/voice.md): pre-generated Kokoro audio per narrated text, Web Speech (device voice)
-  // as the fallback for any text without generated audio — `createGatedNarrator` wraps the
-  // combined pair, same as it wrapped Web Speech alone before this milestone.
+  // Pre-generated Kokoro audio per narrated text (docs/voice.md), Web Speech as the fallback for
+  // any text without generated audio — `createGatedNarrator` wraps the combined pair.
   const audioNarrator = createAudioNarrator({
     baseUrl: `${import.meta.env.BASE_URL}audio/en/`,
     fallback: createWebSpeechNarrator(),

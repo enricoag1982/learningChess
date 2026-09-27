@@ -25,16 +25,8 @@ import { AvatarBadge } from './ds/AvatarBadge.tsx';
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const FULL_GAME_MOVE_LIMIT = 100;
 
-/**
- * Sizes `children` to the largest square that fits this wrapper's own available space —
- * `size = min(available width, available height)`, centred (docs/screens.md §1 "Board >= 75% of
- * screen height"). Same idea as `GameLayout`'s own `FitSquare` (lesson / versus screens), minus its
- * shrink-only rule: a vs Friend match's per-player strips never change height mid-game. This
- * measures the real box via `ResizeObserver` and sets an explicit pixel size — exact regardless of
- * strip height or viewport. No-op (renders
- * unsized, `flex-1`, `aspect-square`) where `ResizeObserver` is unavailable (jsdom in RTL tests,
- * which never exercises real layout/geometry, only DOM structure and interaction).
- */
+/** Sizes `children` to the largest square that fits this wrapper's available space (docs/screens.md
+ * §1 "Board >= 75% of screen height"), measured via `ResizeObserver`; no-op (unsized) in jsdom. */
 function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);
@@ -459,7 +451,7 @@ function FriendMatch({
 }
 
 /**
- * Play's vs Friend game screen (M4.3, `docs/app-structure.md` §6 / `docs/screens.md` #8):
+ * Play's vs Friend game screen (`docs/app-structure.md` §6 / `docs/screens.md` #8):
  * pass-and-play (board flips to the mover each move) or face-to-face (fixed orientation, the top
  * side's pieces + strip rotated 180°); per-player Take back (with the other player's Yes/No) and
  * Stop; result names the winner by nickname ("Guest" for a guest).

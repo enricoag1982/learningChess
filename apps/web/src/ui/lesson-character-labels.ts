@@ -42,7 +42,7 @@ export function unlockLabel(
  * Journey map node label for a lesson: the character's name for the first lesson of that piece
  * character ("Caterpillar"), else the lesson's own title, so a repeated character's later lesson
  * ("Promotion") reads as "Caterpillar Transforms!" instead of a second, indistinguishable
- * "Caterpillar" node (M3.5 polish). Owl-taught lessons (no piece character, World 1) always use
+ * "Caterpillar" node. Owl-taught lessons (no piece character, World 1) always use
  * their own title, unchanged.
  */
 export function journeyNodeLabel(

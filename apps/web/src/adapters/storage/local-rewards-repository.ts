@@ -44,7 +44,7 @@ function isSessionLogShape(value: unknown): value is SessionLog {
 }
 
 /**
- * `RewardsRepository` over one `LocalStore` (M4.4): earned badges as a single append-only list, no
+ * `RewardsRepository` over one `LocalStore`: earned badges as a single append-only list, no
  * cap (unlike `Attempt`/`GameRecord`); one streak per profile; one session log row per
  * `"<profileId>:<date>"`, same keying pattern `LocalStorageProgressRepository` uses.
  */

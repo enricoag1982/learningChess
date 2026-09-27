@@ -6,12 +6,8 @@ export interface IconProps {
   readonly className?: string;
 }
 
-/**
- * Shared stroke-icon base (viewBox 24, round caps/joins, `aria-hidden`) behind every icon below —
- * replaces 44 one-off inline icon functions (refactor-v4.md §2 finding 6). `fill`/`stroke` default
- * to the plain two-tone look (`none`/`currentColor`); a few icons override one to carry their own
- * fixed colour instead (docs/screens.md colour roles).
- */
+/** Shared stroke-icon base (viewBox 24, round caps/joins, `aria-hidden`) behind every icon below;
+ * `fill`/`stroke` default to the plain two-tone look, a few icons override one for a fixed colour. */
 export function Svg({
   size = 24,
   strokeWidth = 2,

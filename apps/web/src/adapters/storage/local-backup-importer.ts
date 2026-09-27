@@ -55,7 +55,7 @@ function capped<T extends { readonly createdAt: string }>(items: readonly T[], m
 }
 
 /** This device's own current `AppSettings` fields a merge import must carry through unchanged
- * (M7.2 device sharing) instead of the blank slate a plain "replace" writes — see `writeMerged`'s
+ * (device sharing) instead of the blank slate a plain "replace" writes — see `writeMerged`'s
  * own doc on `BackupImporter` (`app/ports.ts`). */
 type DeviceOnlySettings = Pick<
   AppSettings,
@@ -63,7 +63,7 @@ type DeviceOnlySettings = Pick<
 >;
 
 /** Options only `writeMerged` passes (`toRawRecords`' plain `replaceAll` call omits both, matching
- * its pre-M7.2 behaviour exactly: every session-log row keyed bare, `AppSettings` blanked). */
+ * its pre-merge behaviour exactly: every session-log row keyed bare, `AppSettings` blanked). */
 interface MergeWriteOptions {
   readonly localDeviceId?: string;
   readonly deviceSettings?: DeviceOnlySettings;
@@ -72,8 +72,8 @@ interface MergeWriteOptions {
 /** `${profileId}:${date}` for this device's own row (`log.deviceId` absent, or equal to
  * `localDeviceId`) — the exact key `LocalStorageRewardsRepository`'s `getSessionLog`/
  * `saveSessionLog` already read/write, so this device's live minute-by-minute tracking keeps
- * finding the same row after a merge import. Any other `deviceId` is a foreign device's own row
- * (M7.2 device sharing): suffixed so it is stored *alongside* this device's row for the same date,
+ * finding the same row after a merge import. Any other `deviceId` is a foreign device's own row:
+ * suffixed so it is stored *alongside* this device's row for the same date,
  * never overwriting it — `RewardsRepository.listSessionLogs`/`totalMinutesForDate` then sum both. */
 function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined): string {
   const isLocal = log.deviceId === undefined || log.deviceId === localDeviceId;
@@ -158,7 +158,7 @@ function toRawRecords(
 const STAGING_PREFIX = 'backup-staging:';
 
 /**
- * `BackupImporter` for the web (M5.1, `docs/architecture.md` §11): writes every replaced record to
+ * `BackupImporter` for the web (`docs/architecture.md` §11): writes every replaced record to
  * a staging key set first (`backup-staging:<name>`), and only once every one of them has written
  * successfully copies them over the real keys and clears the staging ones — so a failure partway
  * (e.g. a quota error) leaves every real key untouched instead of a mix of old and new data.

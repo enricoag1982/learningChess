@@ -33,7 +33,7 @@ function isUnlockShape(value: unknown): value is Unlock {
 }
 
 /**
- * `AssessmentRepository` over one `LocalStore` (M4.5): assessment results as a single capped,
+ * `AssessmentRepository` over one `LocalStore`: assessment results as a single capped,
  * append-only list (newest last); unlocked lesson/world ids as a single append-only list, no cap
  * (no natural single-key-per-profile shape, unlike `Streak` — a profile can unlock more than one id).
  */

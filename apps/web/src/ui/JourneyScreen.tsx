@@ -61,11 +61,8 @@ interface NodePoint {
   readonly y: number;
 }
 
-/**
- * A gentle winding "snake" of `count` points across the 0–100 normalized map: left-to-right and
- * oscillating vertically when `wide` (tablet landscape), bottom-to-top and oscillating
- * horizontally otherwise (phone / tablet portrait — same `lg` cut as `GameLayout`).
- */
+/** A gentle winding "snake" of `count` points across the 0–100 normalized map: left-to-right when
+ * `wide` (tablet landscape), bottom-to-top otherwise (phone / tablet portrait). */
 function layoutNodes(count: number, wide: boolean): readonly NodePoint[] {
   if (count <= 0) return [];
   if (count === 1) return [{ x: 50, y: 50 }];
@@ -106,10 +103,7 @@ function smoothPath(points: readonly NodePoint[]): string {
   return d;
 }
 
-/**
- * Default world to show: the one holding `journey.nextStep` (a lesson or a world boss), else the
- * first open one, else the first.
- */
+/** Default world to show: the one holding `journey.nextStep`, else the first open one, else the first. */
 function defaultWorldId(journey: Journey): string | undefined {
   if (journey.nextStep?.kind === 'lesson') return journey.nextStep.lesson.world;
   if (journey.nextStep?.kind === 'world-boss') return journey.nextStep.world.id;
@@ -562,7 +556,7 @@ function LessonNode({
 
   // Owl-taught lessons (World 1: no piece character) are labelled by their title, e.g. "Squares";
   // a piece character's first lesson by the character's name ("Rhino"), a later lesson of the same
-  // character (M3.5: "Promotion") by its own title ("Caterpillar Transforms!"), so two nodes never
+  // character ("Promotion") by its own title ("Caterpillar Transforms!"), so two nodes never
   // show the same label (`journeyNodeLabel`, like Play's `unlockLabel`).
   const piece = characterPieceOrNull(lesson.character);
   const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
@@ -631,13 +625,8 @@ function LessonNode({
   );
 }
 
-/**
- * A world boss's node, shown after its world's last lesson node (crown badge). Status style
- * mirrors `LessonNode`: `locked` (grey, lock icon), `available` (pulsing "current" style — this is
- * always the Journey's next step while unwon, since a world's lessons gate its boss), `won`
- * (solid, filled gold crown). Tapping a locked boss does nothing; `available`/`won` calls
- * `onActivate` (starts the mini-game session, same as the Play screen).
- */
+/** A world boss's node, shown after its world's last lesson node (crown badge). Status style
+ * mirrors `LessonNode`; tapping a locked boss does nothing, `available`/`won` calls `onActivate`. */
 function BossNode({
   miniGame,
   status,

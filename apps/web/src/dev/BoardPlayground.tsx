@@ -57,7 +57,7 @@ function InteractiveBoardDemo(): JSX.Element {
   function handleMove({ from, to }: { from: Square; to: Square }): void {
     const result = chessJsRules.play(position, { from, to });
     if (!result) return;
-    // The variant layer (star collection, blocked squares) arrives in M1.2; for this playground,
+    // The variant layer (star collection, blocked squares) is out of scope; for this playground,
     // simulate "collecting" a star so the Board's star-pop animation has something to show.
     const collectedStar = position.markers.stars.includes(to);
     const nextPosition: Position = collectedStar

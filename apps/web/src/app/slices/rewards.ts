@@ -8,11 +8,11 @@ import type { AppGet, AppSet } from '../store.ts';
 const MAX_CELEBRATIONS_PER_SESSION = 2;
 
 export interface RewardsSlice {
-  /** This profile's earned badges (M4.4, My Den's grid + celebrations' "new" dot). */
+  /** This profile's earned badges (My Den's grid + celebrations' "new" dot). */
   readonly earnedBadges: readonly EarnedBadge[];
-  /** This profile's daily-play streak (M4.4); `null` before it has any counted day yet. */
+  /** This profile's daily-play streak; `null` before it has any counted day yet. */
   readonly streak: Streak | null;
-  /** The badge celebration currently showing full-screen (M4.4, rewards.md §1); `null` when none is. */
+  /** The badge celebration currently showing full-screen (rewards.md §1); `null` when none is. */
   readonly activeCelebration: EarnedBadge | null;
   /** Celebrations already shown this app sitting (reset on profile select); caps at {@link MAX_CELEBRATIONS_PER_SESSION}. */
   readonly celebrationsShownThisSession: number;
@@ -32,7 +32,7 @@ export interface RewardsSlice {
   readonly markBadgeSeen: (earnedBadgeId: string) => Promise<void>;
 }
 
-/** This profile's earned badges + streak (M4.4), `[]`/`undefined` when `rewards` is not wired. */
+/** This profile's earned badges + streak, `[]`/`undefined` when `rewards` is not wired. */
 export async function loadRewards(
   get: AppGet,
   profileId: string,

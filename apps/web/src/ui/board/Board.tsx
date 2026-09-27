@@ -58,25 +58,16 @@ export interface BoardProps {
   readonly highlights?: BoardHighlights;
   /** Show file/rank labels on the edge squares. Default `false` (kids: no notation). */
   readonly showCoordinates?: boolean;
-  /**
-   * Face-to-face vs Friend (docs/app-structure.md §6): draws the side opposite `orientation`'s
-   * pieces rotated 180°, so the player sitting at that edge of a flat tablet reads their own
-   * pieces upright. Default `false` (pass-and-play, every other board). Purely visual — square
-   * a11y labels (`describeSquare`) are unaffected either way.
-   */
+  /** Face-to-face vs Friend (docs/app-structure.md §6): draws the side opposite `orientation`
+   * rotated 180° so that player reads their own pieces upright. Purely visual, a11y unaffected. */
   readonly rotateTopPieces?: boolean;
-  /**
-   * vs Friend's "legal-move dots" setting (default on): when `false`, hides the possible-move
-   * dot/ring but leaves every square exactly as draggable/tappable as `legalMoves` allows — a
-   * difficulty toggle, not an interactivity one. Screen-reader square names still say "possible
-   * move" either way. Default `true`.
-   */
+  /** vs Friend's "legal-move dots" setting: `false` hides the possible-move dot/ring but leaves
+   * every square exactly as draggable/tappable — a difficulty toggle, not an interactivity one. */
   readonly showLegalMoveDots?: boolean;
   /** Accessible name of the board, e.g. "Chess board". */
   readonly label: string;
-  /** Animal-badge piece look (docs/app-structure.md "Piece look on board", M5.3): a small corner
-   * badge naming each piece's taught animal, on top of the classic drawing. Default `false`
-   * (classic only) — callers compute this from `board/piece-style.ts`'s `showPieceBadges`. */
+  /** Animal-badge piece look (docs/app-structure.md "Piece look on board"): a small corner badge
+   * naming each piece's taught animal — callers compute this from `showPieceBadges`. */
   readonly pieceBadges?: boolean;
 }
 
@@ -124,8 +115,7 @@ function describeSquare(
   if (selected) return t('board.square.selected', { base });
   if (target) return t('board.square.possible-move', { base });
   if (focus) return t('board.square.focus', { base });
-  // Check outranks danger: a versus boss with real check rules (M3.3) can flag the kid's own
-  // king as both (attacked, undefended) at once, and "in check" is the more urgent, specific one.
+  // Check outranks danger: a checked, undefended king is flagged as both; check is more urgent.
   if (check) return t('board.square.check', { base });
   if (danger) return t('board.square.danger', { base });
   return base;
@@ -206,10 +196,8 @@ export function Board({
   );
   const draggableFroms = new Set<Square>(squareMode ? [] : legalMoves.map((move) => move.from));
 
-  // Adjusting state during render (React's documented pattern for "reset state when a prop
-  // changes"): a new `position` reference is the signal that the game state advanced (move, undo,
-  // new lesson). We drop any stale tap-tap selection and, from `highlights.lastMove`, work out
-  // the slide / capture-fade / star-pop animation for the move that just happened.
+  // React's "reset state when a prop changes" pattern: a new `position` reference means the game
+  // advanced, so drop any stale selection and derive the slide/capture-fade/star-pop animation.
   const [prevPosition, setPrevPosition] = useState(position);
   if (position !== prevPosition) {
     setPrevPosition(position);
@@ -246,9 +234,8 @@ export function Board({
     }
   }
 
-  // Same render-time-adjustment pattern, keyed on `highlights.wrongMove` instead of `position`:
-  // a best-move exercise's wrong-but-legal attempt never changes the position, so a new object
-  // reference here (set by the caller for each attempt) is the only signal a bounce should play.
+  // Same pattern keyed on `highlights.wrongMove`: a wrong-but-legal attempt never changes the
+  // position, so a new object reference here is the only signal a bounce should play.
   const [prevWrongMove, setPrevWrongMove] = useState(highlights?.wrongMove);
   if (highlights?.wrongMove !== prevWrongMove) {
     setPrevWrongMove(highlights?.wrongMove);
@@ -308,12 +295,8 @@ export function Board({
     handleActivate(square);
   }
 
-  // Real pointer/touch interactions (handled below) resolve to a tap or a drag themselves; a
-  // browser then often follows up with a synthetic `click` on the same element, which would
-  // otherwise reach `handleClick` and re-run the same activation a second time. This suppresses
-  // exactly that follow-up click. It self-expires on a timer rather than waiting for that click,
-  // because a genuine drag gesture does not reliably produce one — leaving the flag stuck `true`
-  // would silently swallow the *next*, unrelated click instead.
+  // A pointer/touch interaction often gets a synthetic follow-up `click`, which would otherwise
+  // re-run the same activation; self-expires on a timer since a drag may never produce one.
   function suppressNextClick(): void {
     justInteractedRef.current = true;
     setTimeout(() => {
@@ -360,10 +343,8 @@ export function Board({
   function handlePointerDown(event: ReactPointerEvent<HTMLButtonElement>, square: Square): void {
     if (squareMode || !draggableFroms.has(square)) return;
     event.currentTarget.setPointerCapture(event.pointerId);
-    // Selecting only happens once this turns into an actual drag (see handlePointerMove) — not
-    // here — so a plain tap still goes through the ordinary tap-tap state machine in
-    // `handleActivate` exactly once, from pointerup, instead of this pre-selecting the square and
-    // then immediately reading that as "tap the already-selected piece" (deselect).
+    // Selecting only happens once this becomes an actual drag (handlePointerMove): a plain tap
+    // still goes through the ordinary tap-tap state machine once, from pointerup.
     const rect = boardRef.current?.getBoundingClientRect();
     setDrag({
       pointerId: event.pointerId,

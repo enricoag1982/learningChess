@@ -18,7 +18,7 @@ function initiallyVisible(): boolean {
 
 /**
  * One-time Home banner for iOS Safari, not already installed (`non-functional.md` §1/§4 "iPad
- * install prompt", M5.4 decision table): Safari may clear website data after 7 days without use, so
+ * install prompt"): Safari may clear website data after 7 days without use, so
  * this nudges a grown-up to add the app to the Home Screen, which keeps it around. `install-banner.ts`
  * has the actual UA/standalone logic and the dismiss flag. Flat, tinted "info" panel (`docs/screens.md`
  * §1 colour roles — blue = info; the roadmap's own F3 "tappable vs info" rule, not yet formalised

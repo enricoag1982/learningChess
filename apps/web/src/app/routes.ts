@@ -83,9 +83,9 @@ export type NavOp =
   | { readonly op: 'reset'; readonly routes: readonly Route[] };
 
 interface RouteMeta {
-  /** Counted by `TimeTracker` (M5.2) while a profile is active. */
+  /** Counted by `TimeTracker` while a profile is active. */
   readonly tracked: boolean;
-  /** The 5-minute warning (M7.1) may show here (`AppNotice`); `lesson` is calm only on its own
+  /** The 5-minute warning may show here (`AppNotice`); `lesson` is calm only on its own
    * lesson-complete step, checked separately, not via this flag. */
   readonly calm?: true;
   /** A waiting app update may apply here (`AppUpdater`, non-functional.md §1). */

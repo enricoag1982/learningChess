@@ -5,7 +5,7 @@ import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { Owl } from './ds/Owl.tsx';
 
 /**
- * 5-minute warning banner (M7.1, app-structure.md §13 "5-min warning"): the store's
+ * 5-minute warning banner (app-structure.md §13 "5-min warning"): the store's
  * `timeNoticeVisible` (`checkTimeNotice`) decides whether it shows — this component only re-runs
  * that check on every screen change (mounted once in `App.tsx` alongside `TimeTracker`/
  * `AppUpdater`; `TimeTracker`'s own minute tick runs the other trigger). "Screen change" includes

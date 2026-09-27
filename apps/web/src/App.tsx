@@ -27,7 +27,7 @@ import { TimeLimitScreen } from './ui/TimeLimitScreen.tsx';
 import { TimeTracker } from './ui/TimeTracker.tsx';
 import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
-// Lazy-loaded screens (non-functional.md §4 "Initial JS ≤ 300 KB gzipped", M5.4 decision table
+// Lazy-loaded screens (non-functional.md §4 "Initial JS ≤ 300 KB gzipped"
 // "Lazy loading"): each split into its own chunk, only fetched the first time its screen actually
 // shows — precached by the service worker (`vite.config.ts`) right after, so a repeat visit is no
 // slower than a static import would have been. Picked for size (Parent area, `ui/parent/**`) or

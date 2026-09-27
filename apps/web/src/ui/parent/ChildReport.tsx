@@ -69,7 +69,7 @@ function limitLabel(t: TFunction, minutes: number | null): string {
 }
 
 /**
- * One-line summary of the active time-control rules (M7.1, app-structure.md §13), e.g. "Mon–Fri
+ * One-line summary of the active time-control rules (app-structure.md §13), e.g. "Mon–Fri
  * 30 min · Sat–Sun 60 min · until 20:00" — shown under the minutes-per-day chart, alongside (not
  * replacing) its own existing "Daily limit: N min" line. `null` when nothing is set (no limit, no
  * allowed-hours window) — nothing to show.

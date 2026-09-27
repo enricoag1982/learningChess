@@ -1,6 +1,6 @@
 /** localStorage key (`chess-kids:<name>`, `architecture.md` §11): remembers the iPad install
  * banner was dismissed, so it never comes back once a grown-up has seen it once
- * (`non-functional.md` §1/§4 "iPad install prompt", M5.4 decision table). A plain top-level key,
+ * (`non-functional.md` §1/§4 "iPad install prompt"). A plain top-level key,
  * not part of the versioned app-data schema — a device-only UI preference, same pattern
  * `ui/lesson/VersusStep.tsx`'s own `chess-kids:test-seed` already uses. */
 const DISMISSED_KEY = 'chess-kids:install-banner-dismissed';

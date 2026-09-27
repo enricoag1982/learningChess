@@ -3,7 +3,7 @@ import { tapClass } from '../ds/tap.ts';
 /**
  * Shared button/input styling for parent-area screens: adult style, denser, ≥44px targets. Built
  * on the same `tapClass`/`info-flat` tokens every other screen uses (docs/screens.md §1,
- * roadmap F3) — the parent area's own M5.1 "raised row / flat panel" pair is this system's first
+ * roadmap F3) — the parent area's own "raised row / flat panel" pair is this system's first
  * instance, not a second one; `index.css`'s `.tap-raised`/`.info-flat` and the `--color-ledge-*`
  * tokens are the single source of truth for both.
  */

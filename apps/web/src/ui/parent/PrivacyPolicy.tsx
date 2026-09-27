@@ -7,7 +7,7 @@ import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 const ISSUES_URL = 'https://github.com/enricoag1982/learningChess/issues';
 
 /**
- * Privacy policy body (M5.5, non-functional.md §3, `docs/privacy-policy.md` — same text, kept in
+ * Privacy policy body (non-functional.md §3, `docs/privacy-policy.md` — same text, kept in
  * sync by hand since one lives in i18n and the other in plain Markdown for the repo root): plain
  * English, fits one tablet screen. Shared by `PrivacyScreen` (parent area, `PrivacyScreen.tsx`) and
  * `PrivacyDialog` (first-run overlay, right below) so the wording only ever lives in one place —
@@ -56,7 +56,7 @@ export interface PrivacyDialogProps {
 }
 
 /** First-run password step's "Read our privacy policy" link: an in-screen overlay, not a new
- * store screen (M5.5 lead note — the parent hasn't set the password yet, so the parent area
+ * store screen (the parent hasn't set the password yet, so the parent area
  * itself is not reachable here). */
 export function PrivacyDialog({ onClose }: PrivacyDialogProps): JSX.Element {
   const { t } = useTranslation();

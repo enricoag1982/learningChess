@@ -28,11 +28,9 @@ export interface OpenLocalStoreOptions {
 }
 
 /**
- * Current schema version for `chess-kids:*` storage, used when `options.version` is omitted.
- * v2 (M3.4) adds the `concept-stats` record; v3 (M3.5) adds the `game-records` record; v4 (M4.4)
- * adds `earned-badges`/`streaks`/`session-logs`; v5 (M4.5) adds `assessment-results`/`unlocks` (see
- * `migrations.ts`) — existing older data has none yet, so every migration only bumps the version:
- * the relevant repository reads a missing key as "none yet", same as a fresh profile.
+ * Current schema version for `chess-kids:*` storage, used when `options.version` is omitted (see
+ * `migrations.ts` for what each version adds) — a migration only bumps the version, since the
+ * relevant repository reads a missing key as "none yet", same as a fresh profile.
  */
 export const SCHEMA_VERSION = 5;
 

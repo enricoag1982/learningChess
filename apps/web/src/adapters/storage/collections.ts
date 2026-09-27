@@ -151,7 +151,7 @@ export interface SingletonRecord<T> {
 
 /**
  * A `LocalStore` record holding one `T` (or nothing yet). No shape guard here: a singleton's value
- * is either used as-is or needs field-by-field defaulting (`AppSettings`'s pre-M4.2/pre-M5.1
+ * is either used as-is or needs field-by-field defaulting (`AppSettings`'s older
  * records), which stays behaviour-specific in the repository, on top of the raw value this returns.
  * `defaults`, if given, is returned in place of `undefined` when nothing has been stored yet.
  */

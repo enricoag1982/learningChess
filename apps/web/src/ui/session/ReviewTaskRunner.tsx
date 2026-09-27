@@ -45,16 +45,16 @@ export interface ReviewTaskRunnerProps {
   readonly onDone: () => void;
   /** Top-bar Close: leaves the run early (kid can leave any time). */
   readonly onClose: () => void;
-  /** Hides every task's Hint control (assessment runs, M4.5: domain-model.md §3.2). Default `true`. */
+  /** Hides every task's Hint control (assessment runs, domain-model.md §3.2). Default `true`. */
   readonly showHint?: boolean;
-  /** Overrides the default per-task `recordReviewResult` save (assessment runs, M4.5); see
+  /** Overrides the default per-task `recordReviewResult` save (assessment runs); see
    * `ReviewExerciseStepProps.onRecord`. Receives the task alongside its solved state/correctness. */
   readonly onRecord?: (task: ConceptTask, state: ExerciseState, correct: boolean) => Promise<void>;
 }
 
 /**
  * Steps through a fixed list of review tasks (warm-up or a Practice topic run), one at a time,
- * each played with `ReviewExerciseStep` and recorded via `recordReviewResult` (M3.4). Shares the
+ * each played with `ReviewExerciseStep` and recorded via `recordReviewResult`. Shares the
  * lesson screen's chrome shape (close + progress + board/panel) without the lesson's own state.
  */
 export function ReviewTaskRunner({

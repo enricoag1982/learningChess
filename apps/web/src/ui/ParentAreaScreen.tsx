@@ -140,7 +140,7 @@ type ParentView =
   | { readonly kind: 'privacy' };
 
 /** Parent area (parent style, ≥ 44px targets, WCAG 2.2 AA): overview → child report → child
- * settings; backup export / import — behind the parent gate (app-structure.md §11, M5.1). */
+ * settings; backup export / import — behind the parent gate (app-structure.md §11). */
 export function ParentAreaScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

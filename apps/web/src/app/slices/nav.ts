@@ -66,7 +66,7 @@ function lastIndexOfName(stack: readonly Route[], name: RouteName): number {
   return -1;
 }
 
-/** The activity gate's current read (M5.2, domain-model.md §3.3), or `null` under the limit / with
+/** The activity gate's current read (domain-model.md §3.3), or `null` under the limit / with
  * no active profile — never blocks first-run/picker/parent-area navigation. */
 async function overLimitStatus(get: AppGet): Promise<TimeLimitStatus | null> {
   const { profile, services } = get();
