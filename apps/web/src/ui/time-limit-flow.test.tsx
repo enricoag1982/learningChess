@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { lessonSteps, localDayString, updateProfileSettings } from '@chess-kids/core';
-import App from '../App.tsx';
 import type { FakeNarrator } from '../testing/fake-narrator.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { AppNotice } from './AppNotice.tsx';
@@ -43,8 +43,7 @@ describe('Daily time limit — activity gate (M5.2)', () => {
     await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 15 });
     await seedMinutesToday(services, profile.id, 15);
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // Home first
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
@@ -61,8 +60,7 @@ describe('Daily time limit — activity gate (M5.2)', () => {
     // Under the limit right now: the lesson opens normally.
     await seedMinutesToday(services, profile.id, 10);
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
     await screen.findByRole('button', { name: /Let me try/ }); // in the lesson's Story step
 
@@ -83,8 +81,7 @@ describe('Daily time limit — activity gate (M5.2)', () => {
     await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 15 });
     await seedMinutesToday(services, profile.id, 15);
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
     await screen.findByRole('heading', { name: 'See you tomorrow!' });
 
@@ -110,8 +107,7 @@ describe('Daily time limit — activity gate (M5.2)', () => {
     await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 15 });
     await seedMinutesToday(services, profile.id, 15);
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
     await screen.findByRole('heading', { name: 'See you tomorrow!' });
 
@@ -124,8 +120,7 @@ describe('Daily time limit — activity gate (M5.2)', () => {
     const profile = await seedReturningProfile(services, 'Mia');
     await seedMinutesToday(services, profile.id, 999); // a lot of minutes, limit stays off
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
 
     await screen.findByRole('button', { name: /Let me try/ });
@@ -139,8 +134,7 @@ describe('Allowed hours gate (M7.1)', () => {
     const profile = await seedReturningProfile(services, 'Mia');
     await updateProfileSettings(services.deps, profile.id, { playUntil: '20:00' });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // Home first
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
 
@@ -170,8 +164,7 @@ describe('Allowed hours gate (M7.1)', () => {
     const profile = await seedReturningProfile(services, 'Mia');
     await updateProfileSettings(services.deps, profile.id, { playFrom: '07:00' });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // Home first
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
 
@@ -187,8 +180,7 @@ describe('Allowed hours gate (M7.1)', () => {
     services.deps.clock.now = () => new Date(2026, 0, 5, 6, 0, 0); // 06:00 local
     const profile = await seedReturningProfile(services, 'Mia');
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia'); // activeProfileSettings loaded now, playFrom absent
+    await renderApp(services, { at: 'home' }); // activeProfileSettings loaded now, playFrom absent
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
 
     // Changed only now — after selection, so `activeProfileSettings` in the store stays stale.
@@ -206,8 +198,7 @@ describe('5-minute warning notice (M7.1)', () => {
     const profile = await seedReturningProfile(services, 'Mia');
     await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 15 });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' }); // Home
 
     // Nowhere near the limit yet: no banner.

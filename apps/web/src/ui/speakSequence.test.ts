@@ -1,34 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { Narrator } from '@chess-kids/core';
+import { createFakeNarrator } from '../testing/fake-narrator.ts';
 import { speakSequence } from './speakSequence.ts';
-
-/** Records every `speak`/`cancel` call; `speak` stays pending until the test calls `resolve()`
- * (mirrors the real narrators' own "resolves when playback ends or is cancelled" contract). */
-class FakeNarrator implements Narrator {
-  available = true;
-  spoken: string[] = [];
-  cancelCount = 0;
-  private pending: (() => void) | undefined;
-
-  speak(text: string): Promise<void> {
-    this.spoken.push(text);
-    return new Promise((resolve) => {
-      this.pending = resolve;
-    });
-  }
-
-  cancel(): void {
-    this.cancelCount += 1;
-    this.pending?.();
-    this.pending = undefined;
-  }
-
-  /** Resolves the current `speak()` as if playback finished on its own (not a cancel). */
-  finish(): void {
-    this.pending?.();
-    this.pending = undefined;
-  }
-}
 
 /** Lets every already-queued microtask (the loop's own `await`s) run before continuing. */
 function flush(): Promise<void> {
@@ -39,7 +11,7 @@ function flush(): Promise<void> {
 
 describe('speakSequence', () => {
   it('speaks every text in order, each only after the previous one finished', async () => {
-    const narrator = new FakeNarrator();
+    const narrator = createFakeNarrator({ manual: true });
     const done = speakSequence(narrator, ['one', 'two', 'three']);
 
     expect(narrator.spoken).toEqual(['one']); // only the first: the second waits for it
@@ -55,7 +27,7 @@ describe('speakSequence', () => {
   });
 
   it('an empty texts array cancels the narrator without speaking anything', async () => {
-    const narrator = new FakeNarrator();
+    const narrator = createFakeNarrator({ manual: true });
     void speakSequence(narrator, ['one']);
     expect(narrator.spoken).toEqual(['one']);
 
@@ -65,7 +37,7 @@ describe('speakSequence', () => {
   });
 
   it('a newer speakSequence() call stops the previous run before its next text starts', async () => {
-    const narrator = new FakeNarrator();
+    const narrator = createFakeNarrator({ manual: true });
     const first = speakSequence(narrator, ['a1', 'a2', 'a3']);
     expect(narrator.spoken).toEqual(['a1']);
 
@@ -84,7 +56,7 @@ describe('speakSequence', () => {
   });
 
   it('cancelling mid-run (an empty texts array) stops it before its next text starts', async () => {
-    const narrator = new FakeNarrator();
+    const narrator = createFakeNarrator({ manual: true });
     const run = speakSequence(narrator, ['x1', 'x2']);
     expect(narrator.spoken).toEqual(['x1']);
 

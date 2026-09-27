@@ -12,6 +12,7 @@ import { parseDiagram } from '@chess-kids/core';
 import App from '../App.tsx';
 import { fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 
 // Two worlds, three lessons: w1 (no boss) = l1 (Rhino, collect-stars) -> l2 (Elephant, yes-no);
@@ -117,8 +118,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l1, l2 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
@@ -156,8 +156,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l2 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
@@ -182,8 +181,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l3 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /2.*w2/ }));

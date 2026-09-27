@@ -1,21 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
-import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
-
-function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
-  return createTestServices(createBundledContentSource());
-}
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 
 describe('DenScreen', () => {
   it('shows every friend unearned and the Pawn rank current, with nothing played', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
@@ -28,7 +22,7 @@ describe('DenScreen', () => {
   });
 
   it('marks Rhino a friend once the Rook lesson is complete', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const rook = services.deps.content.lesson('rook');
     if (!rook) throw new Error('bundled content: "rook" lesson not found');
@@ -38,8 +32,7 @@ describe('DenScreen', () => {
     );
     await services.deps.progress.saveLesson({ ...saved, bestStars });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
 
@@ -51,10 +44,9 @@ describe('DenScreen', () => {
   });
 
   it('shows every badge locked with its condition, and no streak yet, on a fresh profile', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
@@ -71,7 +63,7 @@ describe('DenScreen', () => {
   });
 
   it('shows an earned badge in colour, with its tier, and a "new" dot until tapped', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const now = new Date().toISOString();
     await services.deps.rewards?.addEarnedBadge({
@@ -85,8 +77,7 @@ describe('DenScreen', () => {
       updatedAt: now,
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
 
@@ -101,7 +92,7 @@ describe('DenScreen', () => {
   });
 
   it('shows the streak pill with current + best once a streak exists', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const now = new Date().toISOString();
     await services.deps.rewards?.saveStreak({
@@ -115,8 +106,7 @@ describe('DenScreen', () => {
       updatedAt: now,
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
 

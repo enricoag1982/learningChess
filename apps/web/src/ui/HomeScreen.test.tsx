@@ -1,28 +1,16 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
-import type {
-  ContentSource,
-  Lesson,
-  MiniGame,
-  Track,
-  TracksCatalog,
-  World,
-} from '@chess-kids/core';
+import type { MiniGame, Track, TracksCatalog, World } from '@chess-kids/core';
+import { makeContentSource } from '@chess-kids/core/testing';
 import i18n from '../i18n.ts';
-import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { tContent } from '../content-text.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { HomeScreen } from './HomeScreen.tsx';
-
-/** The real (bundled) content, with test adapters otherwise (fake password writer). */
-function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
-  return createTestServices(createBundledContentSource());
-}
 
 describe('HomeScreen', () => {
   it('new lesson, Owl-taught (no piece character yet): Owl greets by lesson topic, primary button says Start today', async () => {
@@ -31,8 +19,7 @@ describe('HomeScreen', () => {
     const lesson = fixtureLesson({ character: 'owl', titleKey: 'lessons:squares.title' });
     const services = createTestServices(fixtureContentSource(lesson));
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     const topic = tContent(i18n.t, lesson.titleKey);
     await screen.findByText(i18n.t('home.owl-next-topic', { topic }));
@@ -45,8 +32,7 @@ describe('HomeScreen', () => {
     const lesson = fixtureLesson({ character: 'rhino' });
     const services = createTestServices(fixtureContentSource(lesson));
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     const character = i18n.t('characters:rhino.name');
     await screen.findByText(i18n.t('home.owl-next', { character }));
@@ -55,7 +41,7 @@ describe('HomeScreen', () => {
   });
 
   it('in-progress lesson: Owl invites to keep going, primary button says Continue', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     // Whichever lesson the Journey currently offers first (see `journey.spec.ts`), not a
     // hardcoded id: content order changes as worlds are added.
@@ -66,15 +52,14 @@ describe('HomeScreen', () => {
     const saved = await getLessonProgress(services.deps, profile.id, firstLesson.id);
     await services.deps.progress.saveLesson(withResumeStep(saved, 2, services.deps.clock.now()));
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     await screen.findByText("Let's keep going!");
     expect(screen.getByRole('button', { name: /Continue/ })).toBeTruthy();
   });
 
   it('every lesson done: Owl says so, no primary button', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     for (const lesson of services.deps.content.lessons()) {
       const saved = await getLessonProgress(services.deps, profile.id, lesson.id);
@@ -84,8 +69,7 @@ describe('HomeScreen', () => {
       await services.deps.progress.saveLesson({ ...saved, bestStars });
     }
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     await screen.findByText('You finished everything for now. Come back soon for more!');
     expect(screen.queryByRole('button', { name: /Start today/ })).toBeNull();
@@ -93,10 +77,9 @@ describe('HomeScreen', () => {
   });
 
   it('switch-player button returns to the picker', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Switch player' }));
 
@@ -104,19 +87,17 @@ describe('HomeScreen', () => {
   });
 
   it('shows the app version at the bottom (also in the parent area)', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     await screen.findByText(`Version ${__APP_VERSION__}`);
   });
 
   it('Journey tile opens the Journey screen', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
 
@@ -124,10 +105,9 @@ describe('HomeScreen', () => {
   });
 
   it('Play tile opens the Play screen', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
 
@@ -135,10 +115,9 @@ describe('HomeScreen', () => {
   });
 
   it("My Den tile opens Mia's Den", async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
 
@@ -146,7 +125,7 @@ describe('HomeScreen', () => {
   });
 
   it('shows the streak pill once the streak reaches 2 days, not for 0 or 1', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const now = new Date().toISOString();
     await services.deps.rewards?.saveStreak({
@@ -160,13 +139,12 @@ describe('HomeScreen', () => {
       updatedAt: now,
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     expect(screen.queryByRole('img', { name: '1 day streak' })).toBeNull();
   });
 
   it('shows the streak pill at 2+ days', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const now = new Date().toISOString();
     await services.deps.rewards?.saveStreak({
@@ -180,8 +158,7 @@ describe('HomeScreen', () => {
       updatedAt: now,
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     expect(await screen.findByRole('img', { name: '3 day streak' })).toBeTruthy();
   });
 });
@@ -222,20 +199,12 @@ const BOSS_MINIGAME: MiniGame = {
   par: 5,
 };
 
-function contentSourceWithBoss(lesson: Lesson): ContentSource {
-  return {
-    lessons: () => [lesson],
-    lesson: (id) => (id === lesson.id ? lesson : undefined),
-    minigames: () => [BOSS_MINIGAME],
-    minigame: (id) => (id === BOSS_MINIGAME.id ? BOSS_MINIGAME : undefined),
-    catalog: () => CATALOG_BOSS,
-  };
-}
-
 describe('HomeScreen next step is a world boss', () => {
   it('Owl announces the world boss and "Start today" starts its mini-game session', async () => {
     const lesson = fixtureLesson({ id: 'bl', character: 'rhino' });
-    const services = createTestServices(contentSourceWithBoss(lesson));
+    const services = createTestServices(
+      makeContentSource({ lessons: [lesson], minigames: [BOSS_MINIGAME], catalog: CATALOG_BOSS }),
+    );
     const { store } = await renderWithStore(<HomeScreen />, services);
     const profileId = store.getState().profile?.id ?? '';
 

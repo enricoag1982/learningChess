@@ -5,15 +5,13 @@ import type { AppUpdate } from './adapters/app-update.ts';
 import { fixtureContentSource, fixtureLesson } from './testing/fixtures.ts';
 import { createTestServices } from './testing/test-services.ts';
 import { pickProfileFromPicker, seedReturningProfile } from './testing/app-test-helpers.ts';
+import { renderApp } from './testing/render-app.tsx';
 
 describe('App', () => {
   it('picker → Home: title visible, offline status hidden until a service worker is ready', async () => {
     const services = createTestServices(fixtureContentSource(fixtureLesson()));
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-
-    await screen.findByRole('heading', { name: "Who's playing today?" });
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     await screen.findByRole('heading', { level: 1, name: 'Chess for Kids' });
     // jsdom (unit tests) has no `serviceWorker`: the status line never appears there (see e2e).
@@ -24,9 +22,7 @@ describe('App', () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
     await seedReturningProfile(services, 'Mia');
-    const { container } = render(<App services={services} />);
-
-    await pickProfileFromPicker('Mia');
+    const { container } = await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Start/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Let me try/ })); // Story -> Demo

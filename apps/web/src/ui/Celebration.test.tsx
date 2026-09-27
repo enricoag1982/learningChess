@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { EarnedBadge } from '@chess-kids/core';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { StoreProvider } from '../app/store.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { Celebration } from './Celebration.tsx';
-
-function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
-  return createTestServices(createBundledContentSource());
-}
 
 function makeEarnedBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
   const now = new Date().toISOString();
@@ -27,13 +22,13 @@ function makeEarnedBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
 
 describe('Celebration', () => {
   it('shows nothing when there is no active celebration', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await renderWithStore(<Celebration />, services);
     expect(screen.queryByRole('alertdialog')).toBeNull();
   });
 
   it('shows the oldest unseen badge and clears it on Continue', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { store } = await renderWithStore(<Celebration />, services);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
@@ -55,7 +50,7 @@ describe('Celebration', () => {
   });
 
   it('shows a tiered badge with its tier label', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { store } = await renderWithStore(<Celebration />, services);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
@@ -71,7 +66,7 @@ describe('Celebration', () => {
   });
 
   it('caps celebrations at 2 per session: a 3rd unseen badge does not auto-show', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { store } = await renderWithStore(<Celebration />, services);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
@@ -105,7 +100,7 @@ describe('Celebration', () => {
 
 describe('Celebration (no active celebration in a plain StoreProvider render)', () => {
   it('renders null without throwing when used outside renderWithStore helpers', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { createAppStore } = await import('../app/store.ts');
     const store = createAppStore(services);
     render(

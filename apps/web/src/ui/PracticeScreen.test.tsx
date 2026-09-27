@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { recordExerciseResult, startExercise } from '@chess-kids/core';
-import App from '../App.tsx';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { PracticeScreen } from './PracticeScreen.tsx';
@@ -91,8 +91,7 @@ describe('PracticeScreen', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Practice' }));
     await screen.findByText('1 due today');

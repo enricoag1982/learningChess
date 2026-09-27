@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
-import App from '../App.tsx';
+import { fireEvent, screen } from '@testing-library/react';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 
 describe('Today session (M3.4)', () => {
@@ -22,8 +22,7 @@ describe('Today session (M3.4)', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
 
@@ -60,8 +59,7 @@ describe('Today session (M3.4)', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
     await screen.findByText('Warm-up 1/1');
