@@ -1,11 +1,13 @@
 import type {
   ConceptStats,
+  EarnedBadge,
   GameRecord,
   Journey,
   LessonProgress,
   MiniGameProgress,
   Profile,
   ProfileSettings,
+  Streak,
 } from '@chess-kids/core';
 import {
   createProfile,
@@ -61,6 +63,67 @@ export interface ProfileSlice {
   readonly refreshProgress: () => Promise<void>;
 }
 
+/** The per-profile data `activateProfile`/`refreshProgress` load and apply together. */
+interface ProfileData {
+  readonly progress: readonly LessonProgress[];
+  readonly miniGameProgress: readonly MiniGameProgress[];
+  readonly gameRecords: readonly GameRecord[];
+  readonly conceptStats: readonly ConceptStats[];
+  readonly journey: Journey | null;
+  readonly earnedBadges: readonly EarnedBadge[];
+  readonly streak: Streak | null;
+}
+
+/** One profile's progress/journey/rewards, loaded in parallel — the shared read behind
+ * `activateProfile` and `refreshProgress`. */
+async function loadProfileData(get: AppGet, profileId: string): Promise<ProfileData> {
+  const { services } = get();
+  const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
+    await Promise.all([
+      loadProgress(services.deps, profileId),
+      loadMiniGameProgress(services.deps, profileId),
+      loadGameRecords(services.deps, profileId),
+      services.deps.progress.listConceptStats(profileId),
+      loadJourney(services.deps, profileId),
+      loadRewards(get, profileId),
+    ]);
+  return {
+    progress,
+    miniGameProgress,
+    gameRecords,
+    conceptStats,
+    journey,
+    earnedBadges: rewards.earnedBadges,
+    streak: rewards.streak ?? null,
+  };
+}
+
+/**
+ * Makes `profile` the one playing — the one profile-load path shared by the M1-upgrade path
+ * (`finishFirstRun`), `finishNewPlayer`, and `selectProfileAndHome` (previously 4 near-identical
+ * copies): applies `settings`'s voice/nickname side effects (app-structure.md §11 "Settings effect
+ * now"), loads its progress data (`loadProfileData`), and resets the celebration queue for this
+ * sitting. Leaves `screen`/`profiles` to the caller — they differ per entry point.
+ */
+async function activateProfile(
+  set: AppSet,
+  get: AppGet,
+  profile: Profile,
+  settings: ProfileSettings,
+): Promise<void> {
+  const { services } = get();
+  const data = await loadProfileData(get, profile.id);
+  services.setVoiceEnabled(settings.voice);
+  services.setNickname(profile.nickname);
+  set({
+    profile,
+    activeProfileSettings: settings,
+    ...data,
+    activeCelebration: null,
+    celebrationsShownThisSession: 0,
+  });
+}
+
 export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
   return {
     profiles: [],
@@ -85,33 +148,9 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
         // M1-upgrade path: an existing single profile with no parent lock yet skips profile
         // creation and goes straight to Home (see the M2.1 spec's "Existing installs" note).
         await selectProfile(services.deps, only.id);
-        const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards, settings] =
-          await Promise.all([
-            loadProgress(services.deps, only.id),
-            loadMiniGameProgress(services.deps, only.id),
-            loadGameRecords(services.deps, only.id),
-            services.deps.progress.listConceptStats(only.id),
-            loadJourney(services.deps, only.id),
-            loadRewards(get, only.id),
-            getProfileSettings(services.deps, only.id),
-          ]);
-        services.setVoiceEnabled(settings.voice);
-        services.setNickname(only.nickname);
-        set({
-          profile: only,
-          activeProfileSettings: settings,
-          progress,
-          miniGameProgress,
-          gameRecords,
-          conceptStats,
-          journey,
-          profiles,
-          earnedBadges: rewards.earnedBadges,
-          streak: rewards.streak ?? null,
-          activeCelebration: null,
-          celebrationsShownThisSession: 0,
-          screen: 'home',
-        });
+        const settings = await getProfileSettings(services.deps, only.id);
+        await activateProfile(set, get, only, settings);
+        set({ profiles, screen: 'home' });
         return;
       }
       await get().goToPicker();
@@ -130,33 +169,12 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
         return;
       }
       await selectProfile(services.deps, profile.id);
-      const [profiles, progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
-        await Promise.all([
-          listProfiles(services.deps),
-          loadProgress(services.deps, profile.id),
-          loadMiniGameProgress(services.deps, profile.id),
-          loadGameRecords(services.deps, profile.id),
-          services.deps.progress.listConceptStats(profile.id),
-          loadJourney(services.deps, profile.id),
-          loadRewards(get, profile.id),
-        ]);
       // A brand-new profile has no stored settings yet: DEFAULT_PROFILE_SETTINGS applies as-is
       // (voice on), no need to round-trip `getProfileSettings` for a row that cannot exist yet.
-      services.setVoiceEnabled(DEFAULT_PROFILE_SETTINGS.voice);
-      services.setNickname(profile.nickname);
+      await activateProfile(set, get, profile, DEFAULT_PROFILE_SETTINGS);
+      const profiles = await listProfiles(services.deps);
       set({
-        profile,
-        activeProfileSettings: DEFAULT_PROFILE_SETTINGS,
-        progress,
-        miniGameProgress,
-        gameRecords,
-        conceptStats,
-        journey,
         profiles,
-        earnedBadges: rewards.earnedBadges,
-        streak: rewards.streak ?? null,
-        activeCelebration: null,
-        celebrationsShownThisSession: 0,
         // app-structure.md §3 / domain-model.md §3.2: offered once, right after creating a new
         // player (not when a parent added a child from the parent area — that path stays on
         // `finishNewPlayer`'s own early return above, straight back to 'parent').
@@ -169,36 +187,9 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
       const profile = await services.deps.profiles.get(profileId);
       if (!profile) return;
       await selectProfile(services.deps, profileId);
-      const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards, settings] =
-        await Promise.all([
-          loadProgress(services.deps, profileId),
-          loadMiniGameProgress(services.deps, profileId),
-          loadGameRecords(services.deps, profileId),
-          services.deps.progress.listConceptStats(profileId),
-          loadJourney(services.deps, profileId),
-          loadRewards(get, profileId),
-          getProfileSettings(services.deps, profileId),
-        ]);
-      // Settings effect now (app-structure.md §11): voice/hints/computer level take effect the
-      // next time this profile is selected — voice is applied here as a side effect (gates the
-      // shared narrator), the rest is read straight off `activeProfileSettings` by the screens
-      // that need it (`ExerciseStep`'s Hint button, `PlayScreen`'s computer-level default).
-      services.setVoiceEnabled(settings.voice);
-      services.setNickname(profile.nickname);
-      set({
-        profile,
-        activeProfileSettings: settings,
-        progress,
-        miniGameProgress,
-        gameRecords,
-        conceptStats,
-        journey,
-        earnedBadges: rewards.earnedBadges,
-        streak: rewards.streak ?? null,
-        activeCelebration: null,
-        celebrationsShownThisSession: 0,
-        screen: 'home',
-      });
+      const settings = await getProfileSettings(services.deps, profileId);
+      await activateProfile(set, get, profile, settings);
+      set({ screen: 'home' });
     },
 
     async refreshProfiles() {
@@ -208,26 +199,9 @@ export function createProfileSlice(set: AppSet, get: AppGet): ProfileSlice {
     },
 
     async refreshProgress() {
-      const { profile, services } = get();
+      const { profile } = get();
       if (!profile) return;
-      const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
-        await Promise.all([
-          loadProgress(services.deps, profile.id),
-          loadMiniGameProgress(services.deps, profile.id),
-          loadGameRecords(services.deps, profile.id),
-          services.deps.progress.listConceptStats(profile.id),
-          loadJourney(services.deps, profile.id),
-          loadRewards(get, profile.id),
-        ]);
-      set({
-        progress,
-        miniGameProgress,
-        gameRecords,
-        conceptStats,
-        journey,
-        earnedBadges: rewards.earnedBadges,
-        streak: rewards.streak ?? null,
-      });
+      set(await loadProfileData(get, profile.id));
     },
   };
 }
