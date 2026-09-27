@@ -1,6 +1,7 @@
 // Chess's `SubjectCore` + `AppConfig` (design-r4.md §2, C4): the concrete values every platform
 // seam (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound —
 // m8.17 moves this file into `subject-chess` unchanged.
+import { chessGameRecordOf } from './app/games.ts';
 import { chessJsRules } from './domain/chess/chessjs-rules.ts';
 import {
   chessRewardFacts,
@@ -14,14 +15,15 @@ import type { AppConfig, SubjectCore } from './domain/subject.ts';
 import { createVariantRules, type VariantRules } from './domain/variant/index.ts';
 
 /** Chess's `SubjectCore`: today's 8 exercise kinds, the `static`/`versus` modes (`series` is added
- * by `createSubjectRuntime`, subject-free), and its own badge facts (`game-win`/`game-event`/
- * `game-played`, design-r4.md §2 leak #4). */
+ * by `createSubjectRuntime`, subject-free), its own badge facts (`game-win`/`game-event`/
+ * `game-played`, leak #4) and its versus→GameRecord translation (leak #7). */
 export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   id: 'chess',
   context: createVariantRules(chessJsRules),
   kinds: EXERCISE_KINDS,
   modes: { static: staticMode, versus: versusMode },
   rewards: { facts: chessRewardFacts, conditionValue: chessConditionValue },
+  gameRecordOf: chessGameRecordOf,
 };
 
 /** Chess app's storage / backup / parent-code identifiers — unchanged from today's hardcoded

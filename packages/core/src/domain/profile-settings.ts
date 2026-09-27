@@ -1,8 +1,8 @@
-import type { BotLevel } from './bot/levels.ts';
-
-/** `'auto'` = "Automatic level"; a number fixes it to that `BotLevel.level`, preselected and no
- * longer auto-suggested. */
-export type ComputerLevelSetting = 'auto' | BotLevel['level'];
+/** `'auto'` = "Automatic level"; a number fixes it to that bot level (chess: 1 Mouse .. 5 Bear,
+ * `BotLevel['level']` — spelled out here, not imported, so this subject-bound field stays the only
+ * thing keeping this otherwise-generic file from being subject-free), preselected and no longer
+ * auto-suggested. */
+export type ComputerLevelSetting = 'auto' | 1 | 2 | 3 | 4 | 5;
 
 /** Board piece look. */
 export type PieceStyleSetting = 'animal' | 'classic';

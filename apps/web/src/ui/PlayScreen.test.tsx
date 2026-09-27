@@ -154,7 +154,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
       await recordGame(services.deps, {
         profileId: profile.id,
         game: 'full',
-        opponentLevel: 1,
+        opponent: 'computer:1',
         result: 'win',
         reason: 'checkmate',
         moves: [],
@@ -194,7 +194,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
       await recordGame(services.deps, {
         profileId: profile.id,
         game: 'full',
-        opponentLevel: 1,
+        opponent: 'computer:1',
         result: 'win',
         reason: 'checkmate',
         moves: [],

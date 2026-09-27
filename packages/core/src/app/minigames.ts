@@ -1,21 +1,8 @@
-import type { GameState } from '../domain/exercise/modes/static/def.ts';
-import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
-import { versusGameState } from '../domain/exercise/modes/versus/engine.ts';
-import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
-import type { MiniGame } from '../domain/lesson.ts';
+import type { MiniGameBase, MiniGameStateBase } from '../domain/subject.ts';
 import type { MiniGameProgress } from '../domain/progress.ts';
 import { recordMiniGamePlay } from '../domain/progress.ts';
-import { isStandardStart } from '../domain/chess/facts/start.ts';
-import { recordGame, versusGameRecordResult } from './games.ts';
 import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
-
-/** `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings,
- * standard start position), the same id the Play screen's "Full game" flow records; else its own id. */
-function gameRecordId(state: VersusState): string {
-  const { def } = state;
-  return def.rules.kings && isStandardStart(def.position) ? 'full' : def.id;
-}
 
 /** All saved mini-game progress for a profile (Play screen's best-stars tiles). */
 export async function loadMiniGameProgress(
@@ -28,8 +15,8 @@ export async function loadMiniGameProgress(
 /** Result of playing one mini-game, from the Play screen or as a lesson's boss. */
 export interface RecordMiniGameResultInput {
   readonly profileId: string;
-  readonly game: MiniGame;
-  readonly state: GameState | SeriesGameState | VersusState;
+  readonly game: MiniGameBase;
+  readonly state: MiniGameStateBase;
   readonly durationMs: number;
 }
 
@@ -58,21 +45,23 @@ export async function saveMiniGamePlay(
   );
   await deps.progress.saveMiniGame(updated);
 
-  // A `versus` play also gets its own `GameRecord`; `static`/`series` mini-games have no computer
-  // opponent to record one against.
-  if (state.mode === 'versus') {
-    const { result, reason } = versusGameRecordResult(state);
-    await recordGame(deps, {
-      profileId,
-      game: gameRecordId(state),
-      opponentLevel: state.def.opponentLevel,
-      result,
-      reason,
-      moves: versusGameState(state).history.map((move) => move.san),
-    });
-  } else {
-    // static/series finishes have no GameRecord, so this is their only "game finished" check.
+  // The subject's own GameRecord for this mode/state (chess: versus only — static/series have no
+  // computer opponent to log against); `null` just needs the generic "finished" reward check.
+  const gameRecordInput = deps.subject.gameRecordOf?.(game, state);
+  if (gameRecordInput === undefined || gameRecordInput === null) {
     await checkRewards(deps, profileId);
+  } else {
+    const nowIso = now.toISOString();
+    await deps.gameRecords.add({
+      id: deps.ids.next(),
+      profileId,
+      ...gameRecordInput,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+    });
+    if (gameRecordInput.result !== 'abandoned') {
+      await checkRewards(deps, profileId);
+    }
   }
 
   return updated;

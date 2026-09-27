@@ -104,7 +104,7 @@ export function FullGameScreen(): JSX.Element {
       void recordGame(services.deps, {
         profileId: profile.id,
         game: 'full',
-        opponentLevel: level,
+        opponent: `computer:${String(level)}`,
         result: 'abandoned',
         reason: 'left',
         moves: versusGameState(current).history.map((move) => move.san),
@@ -126,7 +126,7 @@ export function FullGameScreen(): JSX.Element {
         recordGame(services.deps, {
           profileId: profile.id,
           game: 'full',
-          opponentLevel: level,
+          opponent: `computer:${String(level)}`,
           result,
           reason,
           moves: versusGameState(state).history.map((move) => move.san),

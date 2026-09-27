@@ -1,7 +1,5 @@
 import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
-import type { Move } from '../domain/chess/rules.ts';
-import type { GameState } from '../domain/game/types.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
@@ -144,12 +142,6 @@ export interface Clock {
 /** Randomness in [0, 1); seeded in tests. */
 export interface Random {
   next(): number;
-}
-
-/** The computer opponent for `versus` mini-games. Runs in a Web Worker so search never blocks the
- * UI thread; same position + level + seed always replies with the same move (deterministic `Random`). */
-export interface BotPlayer {
-  chooseMove(state: GameState, level: number, seed: number): Promise<Move | null>;
 }
 
 /** Writes a backup file somewhere the parent can find again — web downloads it, a Capacitor adapter

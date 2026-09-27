@@ -4,6 +4,7 @@
 import type { SubjectRewards } from './badges.ts';
 import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
 import type { MiniGameMode } from './exercise/mode.ts';
+import type { GameRecordResult } from './progress.ts';
 
 /** Fields shared by every exercise definition, regardless of subject. */
 export interface ExerciseDefBase {
@@ -93,6 +94,19 @@ export type AnyKind<Ctx> = ExerciseKind<
  * (`startStaticCaptureGame`, `startSeries`, `startVersus`). */
 export type AnyMode = MiniGameMode<unknown, MiniGameStateBase>;
 
+/** One `GameRecord` to save (`app/games.ts`'s `recordGame`, the Play/boss "versus finished" path):
+ * `opponent` is the already-formatted string (chess: `'computer:<level>'`) — the platform never
+ * knows how a subject names its opponents. */
+export interface RecordGameInput {
+  readonly profileId: string;
+  /** `'full'` for a full standard game, else a `versus` mini-game's content id. */
+  readonly game: string;
+  readonly opponent: string;
+  readonly result: GameRecordResult;
+  readonly reason: string;
+  readonly moves: readonly string[];
+}
+
 /** One subject's whole behaviour behind the platform's uniform interfaces (design-r4.md §2).
  * `rewards`/`gameRecordOf` are optional: a subject without badge facts or its own game log simply
  * omits them (R5's math demo). */
@@ -107,6 +121,12 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
   /** The subject's own facts for badge condition types the engine's 7 generic ones don't cover
    * (chess: `game-win`/`game-event`/`game-played`). */
   readonly rewards?: SubjectRewards<F>;
+  /** `game`/`state`'s own `GameRecord`, or `null` for a mode/state with no game log (chess:
+   * `static`/`series`) — the versus→GameRecord translation `app/minigames.ts` used to hardcode. */
+  gameRecordOf?(
+    game: MiniGameBase,
+    state: MiniGameStateBase,
+  ): Omit<RecordGameInput, 'profileId'> | null;
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping
