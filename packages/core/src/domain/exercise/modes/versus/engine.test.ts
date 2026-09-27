@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { chessJsRules as rules } from '../chess/chessjs-rules.ts';
-import type { Color, Piece, Position, Square } from '../chess/types.ts';
-import type { GameRulesDef } from '../game/types.ts';
+import { chessJsRules as rules } from '../../../chess/chessjs-rules.ts';
+import type { Color, Piece, Position, Square } from '../../../chess/types.ts';
+import type { GameRulesDef } from '../../../game/types.ts';
+import type { VersusGameDef } from './def.ts';
 import {
   canTakeBack,
   isKidTurn,
@@ -12,8 +13,7 @@ import {
   takeBackVersusMove,
   versusPosition,
   versusStars,
-} from './versus.ts';
-import type { VersusGameDef } from './versus.ts';
+} from './engine.ts';
 
 function pos(pieces: Partial<Record<Square, Piece>>, toMove: Color = 'w'): Position {
   return { pieces, markers: { stars: [], blocked: [] }, toMove, castling: '-', enPassant: null };
