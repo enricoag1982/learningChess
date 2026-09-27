@@ -2,7 +2,7 @@
  * The exercise-kind content registry — the only place exercise-type dispatch happens in
  * `packages/content` for schemas, compiling and semantic verification.
  */
-import type { DefOf, ExerciseDef, ExerciseType } from '@chess-kids/core';
+import type { DefOf, ExerciseDef, ExerciseType } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { bestMove } from './best-move/content.ts';
 import { capture } from './capture/content.ts';

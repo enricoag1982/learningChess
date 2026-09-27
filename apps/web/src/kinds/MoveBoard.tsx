@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Hint, Move, Position, Square } from '@chess-kids/core';
+import type { Hint, Move, Position, Square } from '@chess-kids/core/chess';
 import { Board } from '../ui/board/Board.tsx';
 import type { FromTo } from './kind-ui.ts';
 import { hintSquares } from './kind-ui.ts';

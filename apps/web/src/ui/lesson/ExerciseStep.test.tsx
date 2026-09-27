@@ -9,8 +9,8 @@ import type {
   SelectSquaresDef,
   SetupDef,
   YesNoDef,
-} from '@chess-kids/core';
-import { parseDiagram } from '@chess-kids/core';
+} from '@chess-kids/core/chess';
+import { parseDiagram } from '@chess-kids/core/chess';
 import '../../i18n.ts';
 import {
   fixtureContentSource,

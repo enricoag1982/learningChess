@@ -1,6 +1,12 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { CaptureDef, CollectStarsDef, MoveAction, Square, UndoAction } from '@chess-kids/core';
+import type {
+  CaptureDef,
+  CollectStarsDef,
+  MoveAction,
+  Square,
+  UndoAction,
+} from '@chess-kids/core/chess';
 import { useServices } from '../app/store.ts';
 import { InfoPanel } from '../ui/ds/primitives.tsx';
 import { StarsRow } from '../ui/StarsRow.tsx';

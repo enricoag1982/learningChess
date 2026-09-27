@@ -1,12 +1,6 @@
-import type {
-  AppDeps,
-  BackupFileWriter,
-  BackupImporter,
-  BotPlayer,
-  Narrator,
-  VariantRules,
-} from '@chess-kids/core';
-import { chessJsRules, createVariantRules } from '@chess-kids/core';
+import type { AppDeps, BackupFileWriter, BackupImporter, Narrator } from '@chess-kids/core';
+import type { BotPlayer, VariantRules } from '@chess-kids/core/chess';
+import { chessJsRules, createVariantRules } from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';

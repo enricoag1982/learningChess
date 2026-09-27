@@ -9,7 +9,7 @@ import type {
   ExerciseType,
   OutcomeOf,
   VariantRules,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { bestMoveE2E } from './best-move/e2e.ts';
 import { captureE2E } from './capture/e2e.ts';
 import { choiceE2E } from './choice/e2e.ts';

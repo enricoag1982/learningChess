@@ -1,4 +1,12 @@
 import {
+  createProfile,
+  DEFAULT_PROFILE_SETTINGS,
+  getProfileSettings,
+  listProfiles,
+  loadJourney,
+  loadMiniGameProgress,
+  loadProgress,
+  selectProfile,
   type ConceptStats,
   type GameRecord,
   type Journey,
@@ -6,16 +14,8 @@ import {
   type MiniGameProgress,
   type Profile,
   type ProfileSettings,
-  createProfile,
-  DEFAULT_PROFILE_SETTINGS,
-  getProfileSettings,
-  listProfiles,
-  loadGameRecords,
-  loadJourney,
-  loadMiniGameProgress,
-  loadProgress,
-  selectProfile,
 } from '@chess-kids/core';
+import { loadGameRecords } from '@chess-kids/core/chess';
 import { requestPersistentStorageIfNeeded } from '../../adapters/persistent-storage.ts';
 import type { AppGet, AppSet, SliceCreator } from '../store.ts';
 import { loadRewards, type RewardsSlice } from './rewards.ts';

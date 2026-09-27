@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Color, ContentSource, LocalPlayer, Position, Square } from '@chess-kids/core';
+import type { ContentSource } from '@chess-kids/core';
+import type { Color, LocalPlayer, Position, Square } from '@chess-kids/core/chess';
 import {
   chessJsRules,
   game,
@@ -9,7 +10,7 @@ import {
   kingSquare,
   parseFen,
   recordLocalMatch,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/slices/play.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { Board } from './board/Board.tsx';

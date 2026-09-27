@@ -2,7 +2,7 @@
 // `Page` is a type-only import: this file (and every mode's own `e2e.ts`) is never reachable from
 // app code, only from Playwright specs (`e2e/kit/exercises.ts`), enforced by eslint.config.js.
 import type { Page } from '@playwright/test';
-import type { ExerciseDef, ModeType } from '@chess-kids/core';
+import type { ExerciseDef, ModeType } from '@chess-kids/core/chess';
 import { seriesE2E } from './series/e2e.ts';
 import { staticE2E } from './static/e2e.ts';
 import { versusE2E } from './versus/e2e.ts';

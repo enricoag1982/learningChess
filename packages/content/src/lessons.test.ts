@@ -5,7 +5,7 @@ import {
   createVariantRules,
   optimalMoves,
   staticGoalExercise,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';

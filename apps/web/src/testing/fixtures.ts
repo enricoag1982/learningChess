@@ -1,5 +1,6 @@
-import type { ExerciseDef, Lesson, MiniGame, Track, TracksCatalog, World } from '@chess-kids/core';
-import { parseDiagram } from '@chess-kids/core';
+import type { Lesson, MiniGame, Track, TracksCatalog, World } from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core/chess';
+import { parseDiagram } from '@chess-kids/core/chess';
 import { makeContentSource } from '@chess-kids/core/testing';
 
 /** A tiny static boss mini-game (rook a1, pawn h1, one move to capture it). */

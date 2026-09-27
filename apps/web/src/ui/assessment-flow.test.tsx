@@ -1,14 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import type {
-  ContentSource,
-  Lesson,
-  Track,
-  TracksCatalog,
-  World,
-  YesNoDef,
-} from '@chess-kids/core';
-import { parseDiagram } from '@chess-kids/core';
+import type { ContentSource, Lesson, Track, TracksCatalog, World } from '@chess-kids/core';
+import type { YesNoDef } from '@chess-kids/core/chess';
+import { parseDiagram } from '@chess-kids/core/chess';
 import App from '../App.tsx';
 import { fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';

@@ -1,4 +1,4 @@
-import type { PieceType } from '@chess-kids/core';
+import type { PieceType } from '@chess-kids/core/chess';
 
 /** Maps a lesson's `character` id (docs/app-structure.md §8) to the piece it stands for. */
 const CHARACTER_PIECE: Readonly<Record<string, PieceType>> = {

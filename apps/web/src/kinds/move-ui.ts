@@ -1,4 +1,4 @@
-import type { MoveOutcome } from '@chess-kids/core';
+import type { MoveOutcome } from '@chess-kids/core/chess';
 import type { UiPatch } from './kind-ui.ts';
 
 /** Shared by every move kind's `toUi` (collect-stars, capture, best-move, mate-in-n's own kinds

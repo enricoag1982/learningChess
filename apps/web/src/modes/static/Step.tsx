@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Square } from '@chess-kids/core';
-import { enemyCount, gameResult, playGameMove, startStaticCaptureGame } from '@chess-kids/core';
-import type { GameState } from '@chess-kids/core';
+import type { Square } from '@chess-kids/core/chess';
+import {
+  enemyCount,
+  gameResult,
+  playGameMove,
+  startStaticCaptureGame,
+} from '@chess-kids/core/chess';
+import type { GameState } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { Board } from '../../ui/board/Board.tsx';

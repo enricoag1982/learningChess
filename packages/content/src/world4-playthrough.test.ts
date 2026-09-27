@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef } from '@chess-kids/core';
+import type { ExerciseDef } from '@chess-kids/core/chess';
 import {
   completeRound,
   currentRound,

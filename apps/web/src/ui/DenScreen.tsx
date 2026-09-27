@@ -9,7 +9,8 @@ import type {
   RankLadderEntry,
   TracksCatalog,
 } from '@chess-kids/core';
-import { animalFriends, friendGamesPlayed, rankLadder, totalStars } from '@chess-kids/core';
+import { animalFriends, rankLadder, totalStars } from '@chess-kids/core';
+import { friendGamesPlayed } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';

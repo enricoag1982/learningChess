@@ -12,7 +12,7 @@ import type {
   Position,
   Square,
   VariantRules,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import type { JSX, ReactNode } from 'react';
 
 /** A move's endpoints, for the board's slide / bounce-back highlight. */

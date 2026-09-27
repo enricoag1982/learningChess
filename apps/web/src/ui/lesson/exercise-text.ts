@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
-import type { ExerciseDef, ExerciseFeedback, Resolve, Stars } from '@chess-kids/core';
-import { exerciseNote as coreExerciseNote } from '@chess-kids/core';
+import type { Stars } from '@chess-kids/core';
+import type { ExerciseDef, ExerciseFeedback, Resolve } from '@chess-kids/core/chess';
+import { exerciseNote as coreExerciseNote } from '@chess-kids/core/chess';
 import { characterName, tContent } from '../../content-text.ts';
 import { characterPiece } from '../art/character-meta.ts';
 import type { SpeechBubbleNote } from '../ds/SpeechBubble.tsx';

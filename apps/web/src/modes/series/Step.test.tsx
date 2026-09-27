@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { MateInNDef, MiniGame, SelectSquaresDef } from '@chess-kids/core';
-import { parseDiagram } from '@chess-kids/core';
+import type { MiniGame } from '@chess-kids/core';
+import type { MateInNDef, SelectSquaresDef } from '@chess-kids/core/chess';
+import { parseDiagram } from '@chess-kids/core/chess';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import type { FakeNarrator } from '../../testing/fake-narrator.ts';

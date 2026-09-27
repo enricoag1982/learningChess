@@ -1,7 +1,7 @@
 // Dev-only playground fixture (`dev/ExercisePlayground.tsx`, loaded via `import.meta.glob`) — never
 // imported by app code (see eslint.config.js).
-import type { ChoiceDef } from '@chess-kids/core';
-import { parseDiagram } from '@chess-kids/core';
+import type { ChoiceDef } from '@chess-kids/core/chess';
+import { parseDiagram } from '@chess-kids/core/chess';
 
 const EXERCISE: ChoiceDef = {
   id: 'dev-ch',

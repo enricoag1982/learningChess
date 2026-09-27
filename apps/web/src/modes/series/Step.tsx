@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDef, ExerciseState, SeriesGameState } from '@chess-kids/core';
+import type { SeriesGameState } from '@chess-kids/core';
+import type { ExerciseDef, ExerciseState } from '@chess-kids/core/chess';
 import { completeRound, currentRound, startSeries } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';

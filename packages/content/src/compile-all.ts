@@ -1,5 +1,6 @@
 import { join } from 'node:path';
-import type { BadgeDef, bot, CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { bot } from '@chess-kids/core/chess';
 import { loadBadges } from './badges-load.ts';
 import { loadBotBook } from './bot-book-load.ts';
 import { ContentError, compareToReference, loadLocales, type Locales } from './load.ts';

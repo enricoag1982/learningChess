@@ -116,7 +116,6 @@ export type {
   ContentSource,
   Clock,
   Random,
-  BotPlayer,
 } from './app/ports.ts';
 
 export type { AppDeps } from './app/use-cases.ts';
@@ -132,19 +131,6 @@ export {
 } from './app/use-cases.ts';
 
 export { loadMiniGameProgress, recordMiniGameResult } from './app/minigames.ts';
-
-export type { ComputerLevelCondition, ComputerLevelStatus } from './app/games.ts';
-export {
-  recordGame,
-  loadGameRecords,
-  computerLevelStatus,
-  suggestedLevel,
-  updateSuggestedLevel,
-  versusGameRecordResult,
-} from './app/games.ts';
-
-export type { LocalPlayer } from './app/friend-play.ts';
-export { friendGameOptions, friendGamesPlayed, recordLocalMatch } from './app/friend-play.ts';
 
 export type { Journey } from './app/journey.ts';
 export { loadJourney } from './app/journey.ts';
@@ -190,155 +176,22 @@ export {
   selectProfile,
 } from './app/profiles.ts';
 
-export type {
-  Color,
-  PieceType,
-  File,
-  Rank,
-  Square,
-  Piece,
-  Position,
-  Move,
-  MoveInput,
-} from './domain/chess/index.ts';
-export {
-  SQUARES,
-  parseDiagram,
-  DiagramError,
-  parseFen,
-  toFen,
-  FenError,
-  chessJsRules,
-  PIECE_BY_LETTER,
-} from './domain/chess/index.ts';
-
-// Chess facts: pure predicates/derivations shared by the exercise engine, solver and content build.
-export type { Goal, ReplayedLine, FailedReplay, ReplayResult } from './domain/chess/index.ts';
-export {
-  enemyCount,
-  piecesEqual,
-  hasKing,
-  hasPieceOf,
-  normalizeSan,
-  sameSan,
-  findMoveBySan,
-  givesCheck,
-  castlingMoves,
-  enPassantMoves,
-  doubleStepBefore,
-  replaySanLine,
-} from './domain/chess/index.ts';
-
-export type { VariantRules } from './domain/variant/index.ts';
-export { createVariantRules } from './domain/variant/index.ts';
-
-export type {
-  CollectStarsDef,
-  CaptureDef,
-  SelectSquaresDef,
-  YesNoDef,
-  ChoiceOption,
-  ChoiceDef,
-  BestMoveDef,
-  SetupDef,
-  MateInNDef,
-  ExerciseDef,
-  ExerciseState,
-  PalettePiece,
-  Hint,
-  GameState,
-  SeriesGameState,
-  VersusState,
-  StaticGoalSource,
-  ExerciseFeedback,
-  ExerciseNoteKind,
-  ExerciseNoteCtx,
-  ExerciseNote,
-  Resolve,
-  ModeType,
-  MiniGameState,
-  MoveOutcome,
-  UndoAction,
-  UndoOutcome,
-} from './domain/exercise/index.ts';
-export {
-  EXERCISE_NOTES,
-  exerciseNote,
-  isEasierOfferNote,
-  MINI_GAME_MODES,
-  modeOf,
-} from './domain/exercise/index.ts';
-
-// Exercise-kind registry: the only exercise-type dispatch (`domain/exercise/kinds/index.ts`).
+// Exercise-kind base abstraction (subject-free): every subject's kind registry is built on this;
+// the chess kinds and their registry live behind `./chess` (`@chess-kids/core/chess`).
 export type {
   ExerciseProgress,
   ExerciseKind,
   Step,
   TextKeyRef,
   KindInput,
-  ExerciseStateOf,
-  ExerciseType,
-  DefOf,
-  ExerciseAction,
-  ChessKind,
-  ActionOf,
-  OutcomeOf,
-  AnyExerciseKind,
-  MoveAction,
-  AnswerOutcome,
-  ToggleAction,
-  SubmitAction,
-  SelectSquaresAction,
-  SelectOutcome,
-  AnswerYesNoAction,
-  AnswerChoiceAction,
-  PlaceAction,
-} from './domain/exercise/index.ts';
-export { EXERCISE_KINDS, kindOf } from './domain/exercise/index.ts';
+} from './domain/exercise/kind.ts';
 
+// The `series` mini-game mode: subject-free, rounds of any exercise type.
+export type { SeriesGameState } from './domain/exercise/modes/series/def.ts';
 export {
-  staticGoalExercise,
-  startExercise,
-  selectSquaresAnswer,
-  setupPalette,
-  requestHint,
-  starsFor,
-  solve,
-  optimalMoves,
-  kingSquare,
-  isAttacked,
-  isDefended,
-  isHanging,
-  isSafe,
-  pieceValue,
-  isInCheck,
-  isCheckmate,
-  isStalemate,
-  isInsufficientMaterial,
-  canCastle,
-  canEnPassant,
-  startStaticCaptureGame,
-  playGameMove,
-  gameResult,
-  gameStars,
   startSeries,
   currentRound,
   completeRound,
   seriesResult,
   seriesStars,
-  startVersus,
-  versusPosition,
-  versusEndReason,
-  versusGameState,
-  isKidTurn,
-  kidMoveCount,
-  playVersusMove,
-  canTakeBack,
-  takeBackVersusMove,
-  versusStars,
-} from './domain/exercise/index.ts';
-
-// Variant game rules and the computer opponent. Namespaced: both reuse names already taken by the
-// static-capture mini-game API above (`GameState`, `playGameMove`, `gameResult`).
-export * as game from './domain/game/index.ts';
-export * as bot from './domain/bot/index.ts';
+} from './domain/exercise/modes/series/engine.ts';

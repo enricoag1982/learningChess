@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ConceptTask, ExerciseState } from '@chess-kids/core';
+import type { ConceptTask } from '@chess-kids/core';
+import type { ExerciseState } from '@chess-kids/core/chess';
 import { recordReviewResult } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';

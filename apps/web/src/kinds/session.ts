@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDef, ExerciseState, Square, Stars, VariantRules } from '@chess-kids/core';
+import type { Stars } from '@chess-kids/core';
+import type { ExerciseDef, ExerciseState, Square, VariantRules } from '@chess-kids/core/chess';
+import { shouldOfferEasier } from '@chess-kids/core';
 import {
   isInCheck,
   kindOf,
   kingSquare,
   requestHint,
-  shouldOfferEasier,
   starsFor,
   startExercise,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { useServices } from '../app/store.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';
 import { useInstructionNarration } from '../ui/ds/useNarratedText.ts';

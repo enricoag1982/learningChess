@@ -1,5 +1,5 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
-import { bot, chessJsRules, createVariantRules } from '@chess-kids/core';
+import { bot, chessJsRules, createVariantRules } from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
