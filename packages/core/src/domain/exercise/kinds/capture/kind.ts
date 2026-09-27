@@ -1,6 +1,7 @@
-import { playMove, startExercise } from '../../engine.ts';
-import { delegateHint, delegateStars, narrowState, narrowStep, widen } from '../adapt.ts';
+import { startExercise } from '../../engine.ts';
+import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
+import { moveCountStars, moveHint, playMove } from '../static-move.ts';
 import type { CaptureDef, MoveAction, MoveOutcome } from './def.ts';
 import { captureSolution, captureWrongAction } from './solution.ts';
 
@@ -17,11 +18,12 @@ export const captureKind: ChessKind<CaptureDef, MoveAction, MoveOutcome> = {
   },
 
   hint(state, level, ctx) {
-    return delegateHint(state, ctx);
+    const bumped = { ...state, hintLevel: level };
+    return { state: bumped, hint: moveHint(widen(bumped), ctx, level) };
   },
 
   stars(state) {
-    return delegateStars(state);
+    return moveCountStars(state.moves, state.def.stars3, state.def.stars2, state.hintLevel);
   },
 
   solution(def, ctx) {

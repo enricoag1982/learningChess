@@ -1,7 +1,8 @@
-import { playMove, startExercise } from '../../engine.ts';
+import { startExercise } from '../../engine.ts';
 import { errorHintStars } from '../../stars.ts';
 import { narrowState, narrowStep, widen } from '../adapt.ts';
 import type { ChessKind } from '../index.ts';
+import { playMove } from '../static-move.ts';
 import type { BestMoveDef, MoveAction, MoveOutcome } from './def.ts';
 import { bestMoveHint } from './engine.ts';
 import { bestMoveSolution, bestMoveWrongAction } from './solution.ts';
