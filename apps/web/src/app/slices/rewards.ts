@@ -1,6 +1,5 @@
-import type { EarnedBadge, Streak } from '@chess-kids/core';
-import { markSeen } from '@chess-kids/core';
-import type { AppGet, AppSet } from '../store.ts';
+import { type EarnedBadge, type Streak, markSeen } from '@chess-kids/core';
+import type { AppGet, SliceCreator } from '../store.ts';
 
 /** Rare celebrations (rewards.md §1): at most this many full-screen ones per app sitting; every
  * other badge still shows as a "new" dot in My Den. */
@@ -39,7 +38,7 @@ export async function loadRewards(
   return { earnedBadges, streak };
 }
 
-export function createRewardsSlice(set: AppSet, get: AppGet): RewardsSlice {
+export const createRewardsSlice: SliceCreator<RewardsSlice> = (set, get) => {
   /** Queues the oldest unseen badge as `activeCelebration`, under cap; assumes the reward fields
    * are already current. */
   function queueNextCelebration(): void {
@@ -86,4 +85,4 @@ export function createRewardsSlice(set: AppSet, get: AppGet): RewardsSlice {
       set({ earnedBadges: earnedBadges.map((entry) => (entry.id === seen.id ? seen : entry)) });
     },
   };
-}
+};

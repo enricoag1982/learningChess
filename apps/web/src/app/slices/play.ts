@@ -1,5 +1,5 @@
 import { computerLevelStatus, loadGameRecords, updateSuggestedLevel } from '@chess-kids/core';
-import type { AppGet, AppSet } from '../store.ts';
+import { backAndRefresh, type SliceCreator } from '../store.ts';
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */
 export type FriendOpponentChoice =
@@ -71,14 +71,12 @@ export interface PlaySlice {
   readonly exitFriendGame: () => void;
 }
 
-export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
+export const createPlaySlice: SliceCreator<PlaySlice> = (set, get) => {
   return {
     levelUpSuggestion: null,
     friendSetup: DEFAULT_FRIEND_SETUP,
 
-    startMiniGame(miniGameId: string) {
-      void get().navigate({ name: 'minigame', miniGameId });
-    },
+    startMiniGame: (miniGameId) => void get().navigate({ name: 'minigame', miniGameId }),
 
     exitMiniGame() {
       const top = get().stack[get().stack.length - 1];
@@ -90,14 +88,10 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
       void get().refreshProgress();
     },
 
-    startFullGame(level: number) {
-      void get().navigate({ name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 });
-    },
+    startFullGame: (level) =>
+      void get().navigate({ name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 }),
 
-    exitFullGame() {
-      void get().back();
-      void get().refreshProgress();
-    },
+    exitFullGame: backAndRefresh(get),
 
     async updateAutomaticLevel(level: number) {
       const { profile, journey, services } = get();
@@ -121,7 +115,7 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
       void get().navigate({ name: 'friend-setup' });
     },
 
-    updateFriendSetup(patch: Partial<FriendSetupState>) {
+    updateFriendSetup: (patch) => {
       set((state) => ({ friendSetup: { ...state.friendSetup, ...patch } }));
     },
 
@@ -131,9 +125,6 @@ export function createPlaySlice(set: AppSet, get: AppGet): PlaySlice {
       void get().navigate({ name: 'friend-game' });
     },
 
-    exitFriendGame() {
-      void get().back('play');
-      void get().refreshProgress();
-    },
+    exitFriendGame: backAndRefresh(get, 'play'),
   };
-}
+};

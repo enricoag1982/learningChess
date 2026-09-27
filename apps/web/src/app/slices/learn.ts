@@ -1,5 +1,9 @@
-import type { AssessmentScore, ConceptTask, Lesson, ParentUnlockTarget } from '@chess-kids/core';
 import {
+  type AssessmentScope,
+  type AssessmentScore,
+  type ConceptTask,
+  type Lesson,
+  type ParentUnlockTarget,
   getLessonProgress,
   lessonStatus,
   loadPracticeTasks,
@@ -13,7 +17,7 @@ import {
   submitAssessment,
 } from '@chess-kids/core';
 import type { Route } from '../routes.ts';
-import type { AppGet, AppSet } from '../store.ts';
+import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 
 export interface LearnSlice {
   readonly stepIndex: number;
@@ -85,15 +89,26 @@ export async function enterLesson(
   await enter({ name: 'lesson', lessonId, startStep, ...(options?.today ? { today: true } : {}) });
 }
 
-export function createLearnSlice(set: AppSet, get: AppGet): LearnSlice {
+/** Records a test-out/placement pass for the active profile; a no-op without one. Shared by
+ * `submitAssessmentRun` and `submitPlacementWorldRun`. */
+async function recordScore(
+  get: AppGet,
+  kind: 'test-out' | 'placement',
+  scope: AssessmentScope,
+  results: readonly boolean[],
+  score: AssessmentScore,
+): Promise<void> {
+  const { profile, services } = get();
+  if (!profile) return;
+  await submitAssessment(services.deps, { profileId: profile.id, kind, scope, results, score });
+}
+
+export const createLearnSlice: SliceCreator<LearnSlice> = (set, get) => {
   return {
     stepIndex: 0,
 
-    async startLesson(lessonId: string) {
-      await enterLesson(get, lessonId);
-    },
-
-    goToStep(index: number) {
+    startLesson: (lessonId) => enterLesson(get, lessonId),
+    goToStep: (index) => {
       set({ stepIndex: index });
     },
 
@@ -148,28 +163,17 @@ export function createLearnSlice(set: AppSet, get: AppGet): LearnSlice {
     },
 
     async submitAssessmentRun(results: readonly boolean[]) {
-      const { profile, stack, services } = get();
       const score = scoreTestOut(results);
-      const top = stack[stack.length - 1];
-      if (!profile || top?.name !== 'assessment') return score;
-      await submitAssessment(services.deps, {
-        profileId: profile.id,
-        kind: 'test-out',
-        scope: top.scope,
-        results,
-        score,
-      });
+      const top = get().stack[get().stack.length - 1];
+      if (top?.name === 'assessment') {
+        await recordScore(get, 'test-out', top.scope, results, score);
+      }
       return score;
     },
 
-    exitAssessment() {
-      void get().back();
-      void get().refreshProgress();
-    },
+    exitAssessment: backAndRefresh(get),
 
-    declinePlacement() {
-      void get().back('home', { gate: true });
-    },
+    declinePlacement: () => void get().back('home', { gate: true }),
 
     acceptPlacement() {
       const { journey, services } = get();
@@ -186,16 +190,8 @@ export function createLearnSlice(set: AppSet, get: AppGet): LearnSlice {
     },
 
     async submitPlacementWorldRun(worldId: string, results: readonly boolean[]) {
-      const { profile, services } = get();
       const score = scorePlacementWorld(results);
-      if (!profile) return score;
-      await submitAssessment(services.deps, {
-        profileId: profile.id,
-        kind: 'placement',
-        scope: { type: 'world', worldId },
-        results,
-        score,
-      });
+      await recordScore(get, 'placement', { type: 'world', worldId }, results, score);
       return score;
     },
 
@@ -205,10 +201,7 @@ export function createLearnSlice(set: AppSet, get: AppGet): LearnSlice {
       void get().replace({ name: 'placement', plan: top.plan, index: top.index + 1 });
     },
 
-    finishPlacement() {
-      void get().back('home', { gate: true });
-      void get().refreshProgress();
-    },
+    finishPlacement: backAndRefresh(get, 'home', { gate: true }),
 
     async parentUnlockTarget(profileId: string, target) {
       const { services } = get();
@@ -230,9 +223,6 @@ export function createLearnSlice(set: AppSet, get: AppGet): LearnSlice {
       await get().navigate({ name: 'practice-run', conceptId, tasks });
     },
 
-    exitPracticeRun() {
-      void get().back();
-      void get().refreshProgress();
-    },
+    exitPracticeRun: backAndRefresh(get),
   };
-}
+};

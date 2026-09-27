@@ -70,13 +70,12 @@ export type Route =
       readonly resume: NavOp | null;
     };
 
-/** One requested stack change (`app/slices/nav.ts`): `navigate`/`replace`/`back`/`reset` each build
- * one of these, and it is what a gate remembers as `time-limit`'s `resume`. */
+/** One requested stack change (`app/slices/nav.ts`): `navigate`/`replace`/`back` each build one of
+ * these, and it is what a gate remembers as `time-limit`'s `resume`. */
 export type NavOp =
   | { readonly op: 'push'; readonly route: Route }
   | { readonly op: 'replace'; readonly route: Route }
-  | { readonly op: 'back'; readonly to?: RouteName; readonly gate?: boolean }
-  | { readonly op: 'reset'; readonly routes: readonly Route[] };
+  | { readonly op: 'back'; readonly to?: RouteName; readonly gate?: boolean };
 
 interface RouteMeta {
   /** Counted by `TimeTracker` while a profile is active. */

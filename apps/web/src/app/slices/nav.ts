@@ -1,8 +1,7 @@
 import { checkActivityGate, isFirstRun, listProfiles } from '@chess-kids/core';
 import type { Profile, TimeLimitStatus } from '@chess-kids/core';
-import type { AppGet, AppSet } from '../store.ts';
-import type { NavOp, Route, RouteName } from '../routes.ts';
-import { ROUTE_META } from '../routes.ts';
+import type { AppGet, AppSet, SliceCreator } from '../store.ts';
+import { ROUTE_META, type NavOp, type Route, type RouteName } from '../routes.ts';
 
 export interface NavSlice {
   /** The navigation stack, root first, current screen last. */
@@ -78,7 +77,7 @@ async function runOp(set: AppSet, get: AppGet, op: NavOp, skipGate: boolean): Pr
     !skipGate &&
     (op.op === 'push' || op.op === 'replace'
       ? ROUTE_META[op.route.name].gated === true
-      : op.op === 'back' && op.gate === true);
+      : op.gate === true);
   if (needsGate) {
     const status = await overLimitStatus(get);
     if (status) {
@@ -100,9 +99,6 @@ async function runOp(set: AppSet, get: AppGet, op: NavOp, skipGate: boolean): Pr
       setStack(set, stack.slice(0, safeIndex + 1));
       return;
     }
-    case 'reset':
-      setStack(set, op.routes);
-      return;
   }
 }
 
@@ -123,30 +119,23 @@ export function setRoute(store: { readonly setState: AppSet }, route: Route): vo
   store.setState({ stack: [route], screen: route.name });
 }
 
-export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
+/** A plain-route action that just navigates there, no other logic. */
+function navigateTo(get: AppGet, name: 'new-player' | 'journey' | 'play' | 'den' | 'practice') {
+  return (): void => void get().navigate({ name });
+}
+
+export const createNavSlice: SliceCreator<NavSlice> = (set, get) => {
   return {
     stack: [{ name: 'loading' }],
     screen: 'loading',
 
-    async navigate(route: Route) {
-      await runOp(set, get, { op: 'push', route }, false);
-    },
-
-    async replace(route: Route) {
-      await runOp(set, get, { op: 'replace', route }, false);
-    },
-
-    async back(to, opts) {
-      await runOp(set, get, { op: 'back', to, gate: opts?.gate }, false);
-    },
-
-    reset(...routes: readonly Route[]) {
+    navigate: (route) => runOp(set, get, { op: 'push', route }, false),
+    replace: (route) => runOp(set, get, { op: 'replace', route }, false),
+    back: (to, opts) => runOp(set, get, { op: 'back', to, gate: opts?.gate }, false),
+    reset: (...routes) => {
       setStack(set, routes);
     },
-
-    async applyResume(resume: NavOp) {
-      await runOp(set, get, resume, true);
-    },
+    applyResume: (resume) => runOp(set, get, resume, true),
 
     async init() {
       const { services } = get();
@@ -157,9 +146,7 @@ export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
       await get().goToPicker();
     },
 
-    startNewPlayer() {
-      void get().navigate({ name: 'new-player' });
-    },
+    startNewPlayer: navigateTo(get, 'new-player'),
 
     async goToPicker() {
       const { services } = get();
@@ -171,25 +158,15 @@ export function createNavSlice(set: AppSet, get: AppGet): NavSlice {
       get().reset({ name: 'picker' });
     },
 
-    goToJourney() {
-      void get().navigate({ name: 'journey' });
-    },
+    goToJourney: navigateTo(get, 'journey'),
 
     goToHome() {
       set({ levelUpSuggestion: null });
       void get().back('home', { gate: true });
     },
 
-    goToPlay() {
-      void get().navigate({ name: 'play' });
-    },
-
-    goToDen() {
-      void get().navigate({ name: 'den' });
-    },
-
-    goToPractice() {
-      void get().navigate({ name: 'practice' });
-    },
+    goToPlay: navigateTo(get, 'play'),
+    goToDen: navigateTo(get, 'den'),
+    goToPractice: navigateTo(get, 'practice'),
   };
-}
+};

@@ -5,13 +5,13 @@ import {
   grantExtraTime,
   grantHoursOverride,
   lessonSteps,
-  listProfiles,
   markTimeWarning,
   minutesUntilEnd,
   shouldWarn,
 } from '@chess-kids/core';
 import { ROUTE_META } from '../routes.ts';
-import type { AppGet, AppSet, Screen } from '../store.ts';
+import type { Screen, SliceCreator } from '../store.ts';
+import { reloadProfiles } from './profile.ts';
 
 export interface TimeSlice {
   /** The 5-minute warning banner (`ui/AppNotice.tsx`): visible only on a calm screen, at
@@ -47,7 +47,7 @@ function isCalmScreen(
   return lessonSteps(lesson, content.minigames())[stepIndex]?.kind === 'complete';
 }
 
-export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
+export const createTimeSlice: SliceCreator<TimeSlice> = (set, get) => {
   return {
     timeNoticeVisible: false,
 
@@ -69,14 +69,11 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
       }
     },
 
-    goToPasswordScreen(purpose = 'parent-area') {
-      void get().navigate({ name: 'password', purpose });
-    },
+    goToPasswordScreen: (purpose = 'parent-area') =>
+      void get().navigate({ name: 'password', purpose }),
 
     async goToParentArea() {
-      const { services } = get();
-      const profiles = await listProfiles(services.deps);
-      set({ profiles });
+      await reloadProfiles(set, get);
       await get().replace({ name: 'parent' });
     },
 
@@ -105,4 +102,4 @@ export function createTimeSlice(set: AppSet, get: AppGet): TimeSlice {
       await get().goToPicker();
     },
   };
-}
+};

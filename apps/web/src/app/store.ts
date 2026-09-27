@@ -1,22 +1,14 @@
 import { createContext, useContext } from 'react';
-import { create } from 'zustand';
-import type { StoreApi } from 'zustand';
+import { create, type StoreApi } from 'zustand';
 import type { Route, RouteName } from './routes.ts';
 import type { Services } from './services.ts';
-import type { LearnSlice } from './slices/learn.ts';
-import { createLearnSlice } from './slices/learn.ts';
-import type { NavSlice } from './slices/nav.ts';
-import { createNavSlice } from './slices/nav.ts';
-import type { PlaySlice } from './slices/play.ts';
-import { createPlaySlice } from './slices/play.ts';
-import type { ProfileSlice } from './slices/profile.ts';
-import { createProfileSlice } from './slices/profile.ts';
-import type { RewardsSlice } from './slices/rewards.ts';
-import { createRewardsSlice } from './slices/rewards.ts';
-import type { TimeSlice } from './slices/time.ts';
-import { createTimeSlice } from './slices/time.ts';
-import type { TodaySlice } from './slices/today.ts';
-import { createTodaySlice } from './slices/today.ts';
+import { createLearnSlice, type LearnSlice } from './slices/learn.ts';
+import { createNavSlice, type NavSlice } from './slices/nav.ts';
+import { createPlaySlice, type PlaySlice } from './slices/play.ts';
+import { createProfileSlice, type ProfileSlice } from './slices/profile.ts';
+import { createRewardsSlice, type RewardsSlice } from './slices/rewards.ts';
+import { createTimeSlice, type TimeSlice } from './slices/time.ts';
+import { createTodaySlice, type TodaySlice } from './slices/today.ts';
 
 /** Test-only stack override — see `slices/nav.ts`'s own doc comment. Re-exported here so ui tests
  * only need one import path for the store. */
@@ -35,6 +27,22 @@ export interface AppState
  * {@link AppState} (not just its own slice) so any action can read or write any field. */
 export type AppSet = StoreApi<AppState>['setState'];
 export type AppGet = StoreApi<AppState>['getState'];
+
+/** One slice's `create*Slice(set, get)` factory. */
+export type SliceCreator<T> = (set: AppSet, get: AppGet) => T;
+
+/** Pops back (optionally to a named, gated frame) and refreshes progress — the shared shape of
+ * several slices' "leave a session" exit actions. */
+export function backAndRefresh(
+  get: AppGet,
+  to?: RouteName,
+  opts?: { readonly gate?: boolean },
+): () => void {
+  return () => {
+    void get().back(to, opts);
+    void get().refreshProgress();
+  };
+}
 
 /** A created store instance, as returned by `createAppStore` (one per `App`, for test isolation). */
 export type AppStore = ReturnType<typeof createAppStore>;

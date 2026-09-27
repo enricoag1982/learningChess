@@ -1,6 +1,6 @@
 import type { AnimalFriend, TodaySessionPlan } from '@chess-kids/core';
 import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@chess-kids/core';
-import type { AppGet, AppSet } from '../store.ts';
+import { backAndRefresh, type SliceCreator } from '../store.ts';
 import { enterLesson } from './learn.ts';
 
 export interface TodaySlice {
@@ -26,7 +26,7 @@ export interface TodaySlice {
   readonly finishToday: () => void;
 }
 
-export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
+export const createTodaySlice: SliceCreator<TodaySlice> = (set, get) => {
   /** Opens the Today activity at `index`, or the summary past the end. `index === 0` pushes; every
    * later activity replaces, so "back" never unwinds the whole session. */
   async function enterTodayActivity(index: number): Promise<void> {
@@ -65,6 +65,11 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
     await enter({ name: 'minigame', miniGameId, today: true });
   }
 
+  function exitToday(): void {
+    set({ todayPlan: null, todayActivityIndex: 0 });
+    backAndRefresh(get, 'home', { gate: true })();
+  }
+
   return {
     todayPlan: null,
     todayActivityIndex: 0,
@@ -99,16 +104,7 @@ export function createTodaySlice(set: AppSet, get: AppGet): TodaySlice {
       await enterTodayActivity(get().todayActivityIndex + 1);
     },
 
-    leaveToday() {
-      set({ todayPlan: null, todayActivityIndex: 0 });
-      void get().back('home', { gate: true });
-      void get().refreshProgress();
-    },
-
-    finishToday() {
-      set({ todayPlan: null, todayActivityIndex: 0 });
-      void get().back('home', { gate: true });
-      void get().refreshProgress();
-    },
+    leaveToday: exitToday,
+    finishToday: exitToday,
   };
-}
+};
