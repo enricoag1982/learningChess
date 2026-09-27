@@ -8,13 +8,8 @@ import {
 } from '@chess-kids/core';
 import { rules } from '../common.ts';
 
-/**
- * A `mate-in-n` exercise's optional `trap: stalemate` (M3.3 "don't stalemate"): requires at least
- * one legal kid move, at the exercise's own start position, that stalemates the opponent instead
- * of the scripted mating line — a mistake the exercise is meant to teach avoiding. Real rules (both
- * kings, real turn alternation), like every other mate-in-n check; never compiled into the runtime
- * `MateInNDef`.
- */
+/** A `mate-in-n` exercise's optional `trap: stalemate`: requires at least one legal kid move, at
+ * the start position, that stalemates the opponent instead of the scripted mating line. */
 export function checkMateInNTrap(
   exercise: MateInNDef,
   trap: 'stalemate' | undefined,
@@ -40,11 +35,8 @@ export function checkMateInNTrap(
   }
 }
 
-/**
- * `mate-in-n`: both kings on the board, every line entry a legal move played in sequence under real
- * chess rules (turns alternate normally, never a static opponent), and the final (`n`th) kid move
- * delivers checkmate. `n` matching `line.length` is already schema-enforced.
- */
+/** `mate-in-n`: both kings on the board, every line entry a legal move played in sequence under
+ * real chess rules, and the final kid move delivers checkmate. */
 export function verify(exercise: MateInNDef, where: string, issues: string[]): void {
   if (!hasKing(exercise.position, 'w') || !hasKing(exercise.position, 'b')) {
     issues.push(`${where}: mate-in-n requires both kings on the board`);

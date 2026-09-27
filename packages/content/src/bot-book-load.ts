@@ -13,13 +13,9 @@ function errorMessage(error: unknown): string {
   return message.split('\n')[0] ?? message;
 }
 
-/**
- * Checks one line's moves are all legal, in order, from the standard start position, and within
- * the book's own ply cap — the build-time half of "build validates every line is legal"
- * (`docs/computer-opponent.md` §3). Also rejects a move whose authored SAN does not match
- * chess.js's own SAN for it (e.g. a missing disambiguator): `bookCandidates` (`domain/bot/book.ts`)
- * matches by exact SAN string, so a line like that would silently never match at runtime.
- */
+/** Checks one line's moves are all legal, in order, from the standard start position, and within
+ * the book's ply cap. Also rejects a move whose authored SAN does not match chess.js's own —
+ * `bookCandidates` matches by exact SAN string, so a mismatch would never match at runtime. */
 function validateLine(line: BookLineYaml, issues: string[]): void {
   const where = `bot-book.yaml: lines.${line.name}`;
   if (line.moves.length > bot.MAX_BOOK_PLIES) {
@@ -47,11 +43,8 @@ function validateLine(line: BookLineYaml, issues: string[]): void {
   }
 }
 
-/**
- * Loads and validates `bot-book.yaml` (`docs/computer-opponent.md` §3: Fox/Wolf/Bear's small
- * opening book), compiling it to `bot.BotBook`. Deliberately its own module, not part of
- * `lesson-load.ts` — this file's own content, own validation, own build step (see `build.ts`).
- */
+/** Loads and validates `bot-book.yaml` (Fox/Wolf/Bear's small opening book), compiling it to
+ * `bot.BotBook`. Deliberately its own module, not part of `lesson-load.ts`. */
 export function loadBotBook(filePath: string): bot.BotBook {
   let raw: string;
   try {

@@ -29,15 +29,8 @@ export const schema = z
     answer: z.string(),
     /** Hides the board (default: shown). Named apart from `board`, the position diagram field. */
     showBoard: z.boolean().optional(),
-    /**
-     * Load-time-only check (M3.1 `higher-value`; M3.2b `worth <n>` / `trade <SAN>`): `higher-value`
-     * requires every option to be a piece and `answer` to be the (unique) higher-value one;
-     * `worth <n>` requires every option to be a piece and `answer` to be the (unique) option worth
-     * exactly `<n>`; `trade <SAN>` requires options ids `good`/`equal`/`bad` and `answer` to match
-     * the loader's classification of the kid capture `<SAN>` in the position; `draw-kind` (M4.1)
-     * requires options ids `stalemate`/`insufficient-material`/`not-a-draw` and `answer` to match
-     * the loader's classification of the position. Never compiled into the runtime `ExerciseDef`.
-     */
+    /** Load-time-only check; see `verify.ts` for each rule's meaning. Never compiled into the
+     * runtime `ExerciseDef`. */
     verify: z
       .string()
       .regex(/^higher-value$|^worth [0-9]+$|^trade \S+$|^draw-kind$/)

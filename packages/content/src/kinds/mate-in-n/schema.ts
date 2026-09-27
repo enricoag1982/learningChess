@@ -11,11 +11,8 @@ export const schema = z
     type: z.literal('mate-in-n'),
     n: z.number().int().positive(),
     line: z.array(z.string()).min(1),
-    /**
-     * M3.3 "don't stalemate" exercises: the loader requires at least one legal kid move (other than
-     * the scripted mating line) that would stalemate the opponent instead — a trap the exercise is
-     * meant to teach avoiding. Load-time only, never compiled into the runtime `MateInNDef`.
-     */
+    /** "Don't stalemate" exercises: the loader requires >= 1 legal kid move besides the scripted
+     * line that would stalemate the opponent. Load-time only. */
     trap: z.literal('stalemate').optional(),
   })
   .strict()

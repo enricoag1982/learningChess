@@ -1,9 +1,5 @@
-/**
- * Compiles one exercise, or an array of them — a lesson's `guided`/`exercises`/`variants`, or a
- * `series` mini-game's `rounds` — through the exercise-kind registry. The one place either kind of
- * exercise list turns into `ExerciseDef[]`, so a mode's own compile (`modes/series/compile.ts`)
- * never repeats this.
- */
+// Compiles one exercise, or an array of them — a lesson's `guided`/`exercises`/`variants`, or a
+// `series` mini-game's `rounds` — through the exercise-kind registry.
 import { doubleStepBefore, type ExerciseDef, type Position, type Square } from '@chess-kids/core';
 import { compilePosition } from './common.ts';
 import { contentKindOf, type ExerciseYaml } from './index.ts';
@@ -14,12 +10,8 @@ function parseLastMove(raw: string): { readonly from: Square; readonly to: Squar
   return { from: raw.slice(0, 2) as Square, to: raw.slice(2, 4) as Square };
 }
 
-/**
- * Exercise field `lastMove` (M4.1, display only): checks it against `position` — a piece must sit
- * on `to` (something must have just moved there), and, when the position has an en passant square,
- * `lastMove` must be exactly the double step that produced it, so the board never shows the kid a
- * "last move" that could not have just happened.
- */
+/** Exercise field `lastMove`, display only: checks it against `position` — a piece must sit on
+ * `to`, and, with an en passant square, `lastMove` must be exactly the double step that produced it. */
 function checkLastMove(
   position: Position,
   lastMove: { readonly from: Square; readonly to: Square },
@@ -42,12 +34,8 @@ function checkLastMove(
   }
 }
 
-/**
- * Compiles one exercise: parses its position and `lastMove` (shared by every kind), then hands the
- * rest to its own kind's `compile` (`kinds/<type>/compile.ts`, via `EXERCISE_KIND_CONTENT`) through
- * a `CompileContext` that supplies the head (`id`/`concept`/`textKey`/`position`) and tail
- * (`easier`/`lastMove`) every exercise shares.
- */
+/** Compiles one exercise: parses its position and `lastMove`, then hands the rest to its own kind's
+ * `compile` through a `CompileContext` that supplies the shared head and tail. */
 export function compileExercise(
   relPath: string,
   fieldPath: string,

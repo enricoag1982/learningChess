@@ -56,12 +56,8 @@ function computeVerifyFact(fact: VerifyFact, position: Position): boolean {
   return canEnPassant(position, chessJsRules);
 }
 
-/**
- * A `yes-no` exercise's optional `verify` (`schema.ts`): computes the named rule fact on the
- * exercise's own position and fails the build if it contradicts `answer`, so a "safe?" / "in
- * check?" answer authored by hand can never be wrong. Load-time only: never affects the compiled
- * `YesNoDef`.
- */
+/** A `yes-no` exercise's optional `verify`: computes the named rule fact on the position and fails
+ * the build if it contradicts `answer`. Load-time only. */
 export function checkYesNoVerify(
   exercise: YesNoDef,
   verify: string | undefined,

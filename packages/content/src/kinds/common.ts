@@ -1,7 +1,5 @@
-/**
- * Fields, cross-field checks and small helpers shared by every exercise kind's schema
- * (`kinds/<type>/schema.ts`) and compile/verify logic.
- */
+// Fields, cross-field checks and small helpers shared by every exercise kind's schema and
+// compile/verify logic.
 import {
   chessJsRules,
   createVariantRules,
@@ -21,10 +19,8 @@ import { keySchema } from '../schema.ts';
 const SQUARE_PATTERN = /^[a-h][1-8]$/;
 export const squareSchema = z.string().regex(SQUARE_PATTERN);
 
-/**
- * Locale key reference: one or more kebab-case segments joined by dots, e.g. `rook-01` or
- * `rook.story`. Compiles to `lessons:<value>` (or `characters:<value>` for character names).
- */
+/** Locale key reference: one or more kebab-case segments joined by dots, e.g. `rook-01` or
+ * `rook.story`. Compiles to `lessons:<value>` (or `characters:<value>` for character names). */
 const TEXT_REF_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$/;
 export const textRefSchema = z.string().regex(TEXT_REF_PATTERN);
 
@@ -50,11 +46,8 @@ export const exerciseCommonFields = {
   id: keySchema,
   text: textRefSchema,
   easier: keySchema.optional(),
-  /**
-   * The opponent's last move, `<from><to>` (e.g. `d7d5`), display only (M4.1): the loader checks a
-   * piece sits on `to`, and — when the position has an en passant square — that this is exactly the
-   * double step that produced it. See `ExerciseBase.lastMove` (`@chess-kids/core`).
-   */
+  /** The opponent's last move, `<from><to>` (e.g. `d7d5`), display only: the loader checks a piece
+   * sits on `to`, and, with an en passant square, that this is the double step that produced it. */
   lastMove: z
     .string()
     .regex(/^[a-h][1-8][a-h][1-8]$/)
@@ -93,13 +86,8 @@ export function compilePosition(
   }
 }
 
-/**
- * Classifies a kid capture (M3.2b `docs/curriculum.md` World 3 "Trades"): `good` when the captured
- * piece is worth more than the capturer or is undefended (a free or winning capture either way),
- * `equal` when same value and defended, `bad` when worth less than the capturer and defended (a
- * losing trade even though it looks like "getting" a piece). Shared by `choice`'s `trade <SAN>`
- * verify and `best-move`'s `good-trade` verify.
- */
+/** Classifies a kid capture: `good` when the captured piece is worth more or is undefended, `equal`
+ * when same value and defended, `bad` when worth less and defended. */
 export function classifyTrade(
   capturedValue: number,
   capturerValue: number,
@@ -110,10 +98,8 @@ export function classifyTrade(
   return 'bad';
 }
 
-/**
- * `collect-stars` / `capture` shared semantic check: `stars3` must equal the solver's optimal move
- * count, and `stars2` must be at least `stars3`.
- */
+/** `collect-stars` / `capture` shared semantic check: `stars3` must equal the solver's optimal move
+ * count, and `stars2` must be at least `stars3`. */
 export function checkOptimalMoves(
   exercise: CaptureDef | CollectStarsDef,
   where: string,

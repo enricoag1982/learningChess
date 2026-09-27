@@ -24,11 +24,8 @@ function allConceptIds(lessons: readonly Lesson[]): ReadonlySet<string> {
   return ids;
 }
 
-/**
- * Checks one badge's `condition` matches its `type`'s own required params (rewards.md §4) and that
- * every id it references (a world/track scope, a concept, an opponent level/mini-game) exists in
- * the compiled tracks catalog / lesson content.
- */
+/** Checks one badge's `condition` matches its `type`'s own required params and that every id it
+ * references exists in the compiled tracks catalog / lesson content. */
 function validateCondition(
   id: string,
   condition: BadgeConditionYaml,
@@ -140,12 +137,8 @@ function compileBadge(raw: BadgeYaml): BadgeDef {
   };
 }
 
-/**
- * Loads and validates `badges.yaml` (rewards.md §3-4), compiling it to `BadgeDef[]`. Cross-checks
- * every id a condition references against the compiled tracks/lesson/mini-game content, and that
- * both `rewards:badges.<id>.name` and `.condition` resolve in the `en` locale (derived from `id`,
- * not authored per-badge — same convention `characters.yaml` uses for its own name keys).
- */
+/** Loads and validates `badges.yaml`, compiling it to `BadgeDef[]`. Cross-checks every id a
+ * condition references, and that its name/condition text keys (derived from `id`) resolve. */
 export function loadBadges(
   filePath: string,
   locales: Locales,

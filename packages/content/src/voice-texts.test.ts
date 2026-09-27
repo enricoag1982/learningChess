@@ -35,8 +35,7 @@ for (const entry of inventory.entries) {
 }
 
 /** Looks up a dot-separated `namespace:path` key directly against `locales.en`, mirroring
- * `voice-texts.ts`'s own private resolver — used only to independently recompute the expected text
- * for the "every lesson story/demo is present" assertions below. */
+ * `voice-texts.ts`'s own private resolver. */
 function lookupLocale(loc: Locales, fullKey: string): string {
   const separatorIndex = fullKey.indexOf(':');
   const namespace = separatorIndex < 0 ? 'common' : fullKey.slice(0, separatorIndex);
@@ -54,9 +53,8 @@ function lookupLocale(loc: Locales, fullKey: string): string {
 
 describe('voice text inventory (real content)', () => {
   it('has every lesson story and demo text (one per lesson; every story is unique already)', () => {
-    // Story keys resolve 1:1 to a unique English sentence per lesson (checked directly, not via
-    // the inventory, since two lessons happening to share one exercise wording — unlike story —
-    // would otherwise mask a real miss through dedup); demo text is compared the same way.
+    // Story keys resolve 1:1 to a unique English sentence per lesson, checked directly (not via
+    // the inventory, since dedup could otherwise mask a real miss); demo text the same way.
     expect(textsBySource.get('lesson-story')).toHaveLength(content.lessons.length);
     expect(textsBySource.get('lesson-demo')).toHaveLength(content.lessons.length);
     for (const lesson of content.lessons) {
@@ -74,10 +72,8 @@ describe('voice text inventory (real content)', () => {
         wordings.add(lookupLocale(locales, def.textKey));
       }
     }
-    // Every wording is present *somewhere* in the inventory — usually under lesson-guided/
-    // lesson-exercise, but a wording a mini-game round happens to share verbatim (e.g. "Tap every
-    // square in your king's row.") dedupes to one audio file and keeps whichever source label
-    // last touched that key; the label is report-only, so that reassignment is not a loss.
+    // Every wording is present somewhere in the inventory; a shared wording dedupes to one audio
+    // file and keeps whichever source label last touched that key (report-only, not a real loss).
     const allTexts = new Set(inventory.entries.map((entry) => entry.text));
     for (const wording of wordings) {
       expect(allTexts.has(wording)).toBe(true);
@@ -95,8 +91,8 @@ describe('voice text inventory (real content)', () => {
         expect(entry.source.startsWith(prefix)).toBe(false);
       }
     }
-    // Confirms the guard is meaningful: real parent-area content does exist in the locale (it is
-    // simply never resolved into the inventory), not vacuously true because the namespace is empty.
+    // Confirms the guard is meaningful: real parent-area content exists in the locale, just never
+    // resolved into the inventory.
     expect(locales.en?.common?.['parent']).toBeDefined();
   });
 

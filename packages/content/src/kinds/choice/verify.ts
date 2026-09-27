@@ -103,12 +103,8 @@ function checkChoiceTrade(exercise: ChoiceDef, san: string, where: string, issue
   }
 }
 
-/**
- * `draw-kind` (M4.1): a single static position classified from real chess rules only — checkmate
- * and stalemate both leave no legal move, but only stalemate (no check) is a draw; repetition and
- * the 50-move rule need move history, not just a position, so they are never "not-a-draw" here —
- * lesson text covers them separately (`docs/curriculum.md` World 5 "Draws").
- */
+/** `draw-kind`: a single static position classified from real chess rules only — checkmate and
+ * stalemate both leave no legal move, but only stalemate (no check) is a draw. */
 function classifyDrawKind(
   position: Position,
 ): 'stalemate' | 'insufficient-material' | 'not-a-draw' {
@@ -144,11 +140,8 @@ function checkChoiceDrawKind(exercise: ChoiceDef, where: string, issues: string[
   }
 }
 
-/**
- * A `choice` exercise's optional `verify` (`schema.ts`): `higher-value` / `worth <n>` need every
- * option to be a piece; `trade <SAN>` classifies a kid capture; `draw-kind` (M4.1) classifies the
- * position itself. Load-time only: never affects the compiled `ChoiceDef`.
- */
+/** A `choice` exercise's optional `verify`: `higher-value`/`worth <n>` need every option to be a
+ * piece; `trade <SAN>` classifies a kid capture; `draw-kind` classifies the position. Load-time only. */
 export function checkChoiceVerify(
   exercise: ChoiceDef,
   verify: string | undefined,

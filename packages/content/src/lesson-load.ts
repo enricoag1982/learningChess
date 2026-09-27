@@ -88,11 +88,8 @@ function compileLessonFile(filePath: string, relPath: string, issues: string[]):
   };
 }
 
-/**
- * Compiles one mini-game file: schema-validates it, then hands it to its own mode's `compile`
- * (`modes/<mode>/compile.ts`, via the `MINI_GAME_MODE_CONTENT` registry) through a
- * `MiniGameCompileContext` (board/FEN parsing, `series`' own exercise-array compiling).
- */
+/** Compiles one mini-game file: schema-validates it, then hands it to its own mode's `compile`
+ * through a `MiniGameCompileContext` (board/FEN parsing, `series`' own exercise-array compiling). */
 function compileMiniGameFile(filePath: string, relPath: string, issues: string[]): MiniGame | null {
   let raw: string;
   try {
@@ -153,14 +150,10 @@ function checkTextKey(fullKey: string, locales: Locales, where: string, issues: 
   }
 }
 
-/**
- * Per-exercise semantic checks, shared by a lesson's own guided/exercises/variants and a series
- * mini-game's rounds (via `ModeVerifyContext.checkExercise`): the instruction text key resolves, a
- * kid piece sits on the position unless this kind says otherwise (`needsKidPiece`, default `true`),
- * every extra text key the kind's `solution` reports (e.g. `choice`'s option texts, via core's
- * `textKeys`) resolves too, and the kind's own semantic/shape check (`verify`, e.g. "collect-stars
- * exercise has no star").
- */
+/** Per-exercise semantic checks, shared by a lesson's guided/exercises/variants and a series
+ * mini-game's rounds: the instruction text key resolves, a kid piece sits on the position unless
+ * this kind says otherwise, every extra text key the kind reports resolves too, and the kind's own
+ * `verify`. */
 function checkExerciseSemantics(
   exercise: ExerciseDef,
   where: string,
@@ -178,11 +171,8 @@ function checkExerciseSemantics(
   kind.verify?.(exercise, where, issues);
 }
 
-/**
- * Per-lesson `easier` / `variants` rules (teaching-process.md §3.3): `easier` only on a scored
- * exercise, referencing a variant id of the same lesson; a variant has no `easier` of its own; and
- * every variant is referenced by at least one exercise.
- */
+/** Per-lesson `easier`/`variants` rules: `easier` only on a scored exercise, referencing a variant
+ * id of the same lesson; a variant has no `easier` of its own; every variant is referenced. */
 function checkEasierVariants(lesson: Lesson, where: string, issues: string[]): void {
   const variants = lesson.variants ?? [];
   const variantIds = new Set(variants.map((variant) => variant.id));
@@ -287,11 +277,8 @@ function validateSemantics(
   }
 }
 
-/**
- * One issue, formatted `<file>: <path>: <message>`. A mini-game's `mode` makes its schema a union
- * (static / series): an invalid document fails both branches, so `invalid_union` is flattened into
- * every branch's own issues instead of one generic "invalid input" line.
- */
+/** One issue, formatted `<file>: <path>: <message>`. A mini-game's `mode` makes its schema a union:
+ * `invalid_union` is flattened into every branch's own issues instead of one generic line. */
 function formatZodIssue(relPath: string, issue: z.core.$ZodIssue): string[] {
   if (issue.code === 'invalid_union') {
     return issue.errors.flatMap((branchIssues) =>
@@ -320,10 +307,8 @@ function errorMessage(error: unknown): string {
   return message.split('\n')[0] ?? message;
 }
 
-/**
- * Loads and validates every lesson and mini-game file, compiling them to `CompiledContent`.
- * Collects every issue (parse, compile and semantic) before throwing a single `ContentError`.
- */
+/** Loads and validates every lesson and mini-game file, compiling them to `CompiledContent`.
+ * Collects every issue before throwing a single `ContentError`. */
 export function loadContent(
   lessonsDir: string,
   minigamesDir: string,

@@ -57,11 +57,8 @@ function claimId(claimed: Map<string, string>, id: string, where: string, issues
   claimed.set(id, where);
 }
 
-/**
- * Checks one world's `boss` (if set) references an existing mini-game, and that mini-game's
- * `unlockAfter` names a lesson of this same world (build-time check, domain-model.md §3: a world
- * boss's Play tile must unlock alongside the world it belongs to).
- */
+/** Checks one world's `boss` (if set) references an existing mini-game, and that mini-game's
+ * `unlockAfter` names a lesson of this same world. */
 function checkWorldBoss(
   world: World,
   worldWhere: string,
@@ -86,12 +83,8 @@ function checkWorldBoss(
   }
 }
 
-/**
- * Cross-record checks the schema cannot express alone: ids unique (per kind), orders unique
- * within a track, exactly one main track, rank `after` references an existing world/track, every
- * title/habitat/rank text key resolves in the `en` locale, and every world boss references a real
- * mini-game unlocked by one of that world's own lessons.
- */
+/** Cross-record checks the schema cannot express alone: ids unique, orders unique within a track,
+ * exactly one main track, rank `after` references an existing world/track, text keys resolve. */
 function validateSemantics(
   catalog: TracksCatalog,
   locales: Locales,
@@ -160,12 +153,8 @@ function validateSemantics(
   }
 }
 
-/**
- * Loads and validates `tracks.yaml`, compiling it to `TracksCatalog`. Collects every issue
- * (parse, schema and semantic) before throwing a single `ContentError`. `minigames`/`lessons`
- * (the compiled content, from `loadContent`) validate world bosses' cross-references; omit them
- * only where that check does not matter (e.g. a fixture with no `boss:` set).
- */
+/** Loads and validates `tracks.yaml`, compiling it to `TracksCatalog`. `minigames`/`lessons`
+ * validate world bosses' cross-references; omit where that check does not matter. */
 export function loadTracks(
   filePath: string,
   locales: Locales,

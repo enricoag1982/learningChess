@@ -1,7 +1,5 @@
-/**
- * The mini-game-mode content registry — the only place mini-game-mode dispatch happens in
- * `packages/content` for schemas, compiling and semantic verification.
- */
+// The mini-game-mode content registry — the only place mode dispatch happens in `packages/content`
+// for schemas, compiling and semantic verification.
 import type { MiniGame } from '@chess-kids/core';
 import { z } from 'zod';
 import { makeMiniGameCompileContext } from './mode-content.ts';
@@ -21,9 +19,8 @@ export { makeMiniGameCompileContext };
 /** Any mini-game mode's content, widened from its own precise type. */
 export type AnyMiniGameModeContent = MiniGameModeContent<MiniGame, z.ZodType>;
 
-/** Every mode's content, by `mode`. Only 3 modes exist (no per-mode action union to key off,
- * unlike exercise kinds), so this is spelled out rather than derived through a generic helper —
- * same call core's `MINI_GAME_MODES` makes. */
+/** Every mode's content, by `mode`. Only 3 modes exist, so this is spelled out rather than derived
+ * through a generic helper. */
 export const MINI_GAME_MODE_CONTENT = {
   static: staticMode,
   series: seriesMode,
