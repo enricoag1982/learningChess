@@ -7,7 +7,7 @@ import type { VariantRules } from '../../variant/rules.ts';
 import type { ExerciseSolution } from '../kind.ts';
 import { bestMoveSolution, bestMoveWrongAction } from './best-move/solution.ts';
 import { captureSolution, captureWrongAction } from './capture/solution.ts';
-import { choiceSolution, choiceWrongAction } from './choice/solution.ts';
+import { choiceSolution, choiceTextKeys, choiceWrongAction } from './choice/solution.ts';
 import { collectStarsSolution, collectStarsWrongAction } from './collect-stars/solution.ts';
 import type { DefOf, ExerciseAction, ExerciseType } from './index.ts';
 import { mateInNSolution, mateInNWrongAction } from './mate-in-n/solution.ts';
@@ -27,7 +27,7 @@ export const EXERCISE_SOLUTIONS = {
   capture: { solution: captureSolution, wrongAction: captureWrongAction },
   'select-squares': { solution: selectSquaresSolution, wrongAction: selectSquaresWrongAction },
   'yes-no': { solution: yesNoSolution, wrongAction: yesNoWrongAction },
-  choice: { solution: choiceSolution, wrongAction: choiceWrongAction },
+  choice: { solution: choiceSolution, wrongAction: choiceWrongAction, textKeys: choiceTextKeys },
   'best-move': { solution: bestMoveSolution, wrongAction: bestMoveWrongAction },
   setup: { solution: setupSolution, wrongAction: setupWrongAction },
   'mate-in-n': { solution: mateInNSolution, wrongAction: mateInNWrongAction },

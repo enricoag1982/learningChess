@@ -2,7 +2,18 @@
  * Fields, cross-field checks and small helpers shared by every exercise kind's schema
  * (`kinds/<type>/schema.ts`) and compile/verify logic.
  */
-import { chessJsRules, createVariantRules } from '@chess-kids/core';
+import {
+  chessJsRules,
+  createVariantRules,
+  DiagramError,
+  FenError,
+  optimalMoves,
+  parseDiagram,
+  parseFen,
+  type CaptureDef,
+  type CollectStarsDef,
+  type Position,
+} from '@chess-kids/core';
 import { z } from 'zod';
 import { keySchema } from '../schema.ts';
 
@@ -54,6 +65,34 @@ export const exerciseCommonFields = {
 /** Shared standard-rules instance for load-time legality / solvability checks (no fakes needed). */
 export const rules = createVariantRules(chessJsRules);
 
+/** Fields shared by anything authored as a board diagram or FEN (see `parseDiagram` / `parseFen`). */
+export interface PositionYaml {
+  readonly board?: string;
+  readonly fen?: string;
+  readonly toMove?: 'w' | 'b';
+}
+
+/** Parses a board diagram or FEN into a `Position`, reporting `DiagramError` / `FenError` as an issue. */
+export function compilePosition(
+  relPath: string,
+  fieldPath: string,
+  raw: PositionYaml,
+  issues: string[],
+): Position | null {
+  try {
+    if (raw.board !== undefined) {
+      return parseDiagram(raw.board, { toMove: raw.toMove });
+    }
+    return parseFen(raw.fen ?? '');
+  } catch (error) {
+    if (error instanceof DiagramError || error instanceof FenError) {
+      issues.push(`${relPath}: ${fieldPath}: ${error.message}`);
+      return null;
+    }
+    throw error;
+  }
+}
+
 /**
  * Classifies a kid capture (M3.2b `docs/curriculum.md` World 3 "Trades"): `good` when the captured
  * piece is worth more than the capturer or is undefended (a free or winning capture either way),
@@ -69,4 +108,30 @@ export function classifyTrade(
   if (!defended || capturedValue > capturerValue) return 'good';
   if (capturedValue === capturerValue) return 'equal';
   return 'bad';
+}
+
+/**
+ * `collect-stars` / `capture` shared semantic check: `stars3` must equal the solver's optimal move
+ * count, and `stars2` must be at least `stars3`.
+ */
+export function checkOptimalMoves(
+  exercise: CaptureDef | CollectStarsDef,
+  where: string,
+  issues: string[],
+): void {
+  const optimal = optimalMoves(exercise, rules);
+  if (optimal === null) {
+    issues.push(`${where}: no solution found (not solvable within the search depth)`);
+    return;
+  }
+  if (optimal !== exercise.stars3) {
+    issues.push(
+      `${where}: stars3 is ${String(exercise.stars3)} but the optimal solve is ${String(optimal)} move(s)`,
+    );
+  }
+  if (exercise.stars2 < exercise.stars3) {
+    issues.push(
+      `${where}: stars2 (${String(exercise.stars2)}) is below stars3 (${String(exercise.stars3)})`,
+    );
+  }
 }
