@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
@@ -15,22 +15,20 @@ import {
   recordBossResult,
   seriesResult,
   seriesStars,
-  starsFor,
   startSeries,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
+import { useExerciseSession } from '../../kinds/session.ts';
 import { Board } from '../board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useInstructionNarration, useNarratedText } from '../ds/useNarratedText.ts';
+import { useNarratedText } from '../ds/useNarratedText.ts';
 import type { BossPlaySession } from './BossStep.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
-import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
-import { exerciseInstructionText, exerciseNote } from './exercise-text.ts';
 import { buildExercisePlayArea } from './exercise-play-area.tsx';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
@@ -89,15 +87,18 @@ function SeriesRound({
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const isStacked = useIsStackedLayout();
-  const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
-  const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
   const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
 
-  const solved = state.core.solved;
-  const stars = starsFor(state.core);
-  const instructionText = exerciseInstructionText(t, exercise);
-  const note = exerciseNote(t, state.feedback, character, stars);
-  const replay = useInstructionNarration(services.narrator, instructionText, note?.text);
+  // No save (a series round scores only as part of the series' total mistakes) and the check ring
+  // stays off, as today (`showCheck: false` — refactor-v4.md follow-up F6).
+  const {
+    state,
+    dispatch,
+    solved,
+    instruction: instructionText,
+    note,
+    replay,
+  } = useExerciseSession(exercise, { character, showCheck: false });
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
     t,

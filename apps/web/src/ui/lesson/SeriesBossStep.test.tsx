@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { MiniGame, SelectSquaresDef } from '@chess-kids/core';
+import type { MateInNDef, MiniGame, SelectSquaresDef } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import type { FakeNarrator } from '../../testing/fake-narrator.ts';
+import { stubMatchMedia } from '../../testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
 import { BossStep } from './BossStep.tsx';
@@ -125,5 +126,62 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
       const saved = await services.deps.progress.getLesson(profile?.id ?? '', lesson.id);
       expect(saved?.bossStars).toBe(2);
     });
+  });
+
+  it('F5: a mate-in-2 round reveals the scripted reply instead of freezing', async () => {
+    const restoreMatchMedia = stubMatchMedia('(prefers-reduced-motion: reduce)');
+    try {
+      // Same fool's-mate-shaped mate-in-2 as core's mate-in-n kind test: 1.Ne7+ Kh8 2.Qa8#.
+      const position = parseDiagram(
+        [
+          '. . . . . . k .',
+          '. . . . . p p p',
+          '. . N . . . . .',
+          '. . . . . . . .',
+          '. . . . . . . .',
+          '. . . . . . . .',
+          '. . . . . . . .',
+          'Q K . . . . . .',
+        ].join('\n'),
+      );
+      const mateRound: MateInNDef = {
+        id: 'sb-mate2',
+        concept: 'mate-in-2',
+        textKey: 'fixtures:sb-mate2',
+        position,
+        type: 'mate-in-n',
+        n: 2,
+        line: ['Ne7+', 'Kh8', 'Qa8#'],
+      };
+      const boss: MiniGame = {
+        mode: 'series',
+        id: 'fixture-mate-series',
+        concept: 'mate-in-2',
+        rounds: [mateRound],
+        errors3: 0,
+        errors2: 2,
+        titleKey: 'fixtures:boss-title',
+        goalKey: 'fixtures:boss-goal',
+        unlockAfter: 'fixture',
+      };
+      const lesson = fixtureLesson({ boss: boss.id });
+      const services = createTestServices(fixtureContentSource(lesson, [boss]));
+      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+
+      fireEvent.click(screen.getByRole('button', { name: /^c6,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^e7,/ })); // Ne7+, the scripted move
+
+      // Before the F5 fix this never appears: a series round has no reply timer of its own, so the
+      // board stays frozen on the kid's own move forever.
+      await screen.findByRole('button', { name: /^h8, black king/ });
+
+      fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+      fireEvent.click(screen.getByRole('button', { name: /^a8,/ })); // Qa8#
+      fireEvent.click(await screen.findByRole('button', { name: /^Next/ }));
+
+      expect(screen.getByTestId('stars-row')).toBeTruthy();
+    } finally {
+      restoreMatchMedia();
+    }
   });
 });

@@ -1,28 +1,21 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ExerciseDef, Lesson, Piece, SkippablePhase } from '@chess-kids/core';
 import {
   EASIER_VARIANT_STARS,
-  chessJsRules,
   easierVariant,
-  isInCheck,
-  kingSquare,
   recordAttempt,
   recordExerciseResult,
-  shouldOfferEasier,
-  starsFor,
 } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { useExerciseSession } from '../../kinds/session.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { useIsStackedLayout } from '../useMediaQuery.ts';
-import { useInstructionNarration } from '../ds/useNarratedText.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
-import { createExerciseReducer, initExerciseState } from './exercise-reducer.ts';
-import { exerciseInstructionText, exerciseNote, withEasierOffer } from './exercise-text.ts';
 import { buildExercisePlayArea } from './exercise-play-area.tsx';
 import { GameLayout } from './GameLayout.tsx';
 import { NextButton } from './NextButton.tsx';
@@ -40,18 +33,6 @@ export interface ExerciseStepProps {
    * `RecordExerciseResultInput.completesPhase`. */
   readonly completesPhase?: SkippablePhase;
 }
-
-function prefersReducedMotion(): boolean {
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  } catch {
-    return false;
-  }
-}
-
-/** mate-in-n: how long the scripted opponent reply stays hidden before it is shown and narrated. */
-const REPLY_DELAY_MS = 600;
-const REPLY_DELAY_REDUCED_MS = 150;
 
 interface ExerciseAttemptProps extends ExerciseStepProps {
   /** The scored exercise's easier variant, if it has one — offered once errors pile up. */
@@ -83,78 +64,44 @@ function ExerciseAttempt({
   const refreshProgress = useAppStore((state) => state.refreshProgress);
   const isStacked = useIsStackedLayout();
 
-  const reducer = useMemo(() => createExerciseReducer(services.rules), [services.rules]);
-  const [state, dispatch] = useReducer(reducer, exercise, initExerciseState);
   /** setup only: the palette piece currently selected, waiting for a square tap. */
   const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
 
-  // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
-  const [startedAt] = useState(() => Date.now());
-  const savedRef = useRef(false);
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    if (guided) dispatch({ type: 'auto-hint' });
-    // Runs once for this mounted exercise; the parent remounts a fresh instance per exercise id.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // mate-in-n: reveals the scripted opponent reply — held back in `state.pendingReply` — after a
-  // short delay, so the kid sees their own move complete first (teaching-process.md §3.3).
-  useEffect(() => {
-    if (!state.pendingReply) return;
-    const delay = prefersReducedMotion() ? REPLY_DELAY_REDUCED_MS : REPLY_DELAY_MS;
-    const timer = setTimeout(() => {
-      dispatch({ type: 'reveal-reply' });
-    }, delay);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [state.pendingReply, dispatch]);
-
-  const solved = state.core.solved;
-  const stars = starsFor(state.core);
-  const shownStars = standsInFor === undefined ? stars : EASIER_VARIANT_STARS;
-  const offerEasier = easier !== undefined && shouldOfferEasier(state.core);
-
-  // The board's own displayed position (mate-in-n stages the reply behind `pendingReply`; every
-  // other type always shows `state.core.position`), for the check ring — "all exercise types".
-  const displayedPosition = state.pendingReply ? state.pendingReply.position : state.core.position;
-  const checkSquare = isInCheck(displayedPosition, chessJsRules)
-    ? kingSquare(displayedPosition, displayedPosition.toMove)
-    : undefined;
-
-  useEffect(() => {
-    if (!solved || savedRef.current || !profile) return;
-    savedRef.current = true;
-    void recordExerciseResult(services.deps, {
-      profileId: profile.id,
-      lesson,
-      state: state.core,
-      scored: !guided && standsInFor === undefined,
-      durationMs: Date.now() - startedAt,
-      nextStep: nextStepIndex,
-      ...(standsInFor === undefined ? {} : { standsInFor }),
-      ...(completesPhase === undefined ? {} : { completesPhase }),
-    }).then(() => {
-      setSaved(true);
-      // Keeps the store's `progress` current through the lesson, not just when it's re-read on
-      // exit: the Complete step reads it straight from the store to show stars earned.
-      void refreshProgress();
-    });
-  }, [
-    solved,
-    profile,
-    services.deps,
-    lesson,
+  const session = useExerciseSession(exercise, {
+    character: lesson.character,
     guided,
-    standsInFor,
-    completesPhase,
-    nextStepIndex,
-    state.core,
-    startedAt,
-    refreshProgress,
-  ]);
+    easier: easier !== undefined,
+    shownStars: standsInFor === undefined ? undefined : EASIER_VARIANT_STARS,
+    save: (core, ms) =>
+      profile
+        ? recordExerciseResult(services.deps, {
+            profileId: profile.id,
+            lesson,
+            state: core,
+            scored: !guided && standsInFor === undefined,
+            durationMs: ms,
+            nextStep: nextStepIndex,
+            ...(standsInFor === undefined ? {} : { standsInFor }),
+            ...(completesPhase === undefined ? {} : { completesPhase }),
+          }).then(() => {
+            // Keeps the store's `progress` current through the lesson, not just when it's re-read
+            // on exit: the Complete step reads it straight from the store to show stars earned.
+            void refreshProgress();
+          })
+        : undefined,
+  });
+  const {
+    state,
+    dispatch,
+    solved,
+    stars: shownStars,
+    saved,
+    offerEasier,
+    instruction: instructionText,
+    note,
+    replay,
+    checkSquare,
+  } = session;
 
   function handleTakeEasier(): void {
     if (profile) {
@@ -163,16 +110,11 @@ function ExerciseAttempt({
         lesson,
         state: state.core,
         scored: true,
-        durationMs: Date.now() - startedAt,
+        durationMs: session.elapsedMs(),
       });
     }
     onTakeEasier?.();
   }
-
-  const instructionText = exerciseInstructionText(t, exercise);
-  const baseNote = exerciseNote(t, state.feedback, lesson.character, shownStars);
-  const note = offerEasier ? withEasierOffer(t, baseNote, state.feedback) : baseNote;
-  const replay = useInstructionNarration(services.narrator, instructionText, note?.text);
 
   const { board, belowBoard, controls } = buildExercisePlayArea({
     t,
@@ -185,7 +127,7 @@ function ExerciseAttempt({
     isStacked,
     checkSquare,
     // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
-    // auto-hint (the `dispatch({ type: 'auto-hint' })` effect above, unaffected by this setting).
+    // auto-hint (`useExerciseSession`'s mount effect, unaffected by this setting).
     showHint: hintsEnabled,
     pieceBadges: showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world })),
   });
