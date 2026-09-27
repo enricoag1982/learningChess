@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
@@ -12,6 +11,7 @@ import { RankPill } from '../RankPill.tsx';
 import { ChevronRightIcon } from '../ds/icons.tsx';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { ScreenHeader } from '../ds/Screen.tsx';
+import { useAsync } from '../ds/useAsync.ts';
 import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
@@ -128,20 +128,13 @@ export function ChildReportScreen({
 }: ChildReportScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const [report, setReport] = useState<ChildReport | null>(null);
-
   // The caller remounts this component with `key={profileId}` (`ParentAreaScreen.tsx`) when the
-  // report opens for a different child, so `report` always starts fresh at `null` — no need for a
-  // synchronous `setReport(null)` reset inside the effect body for a `profileId` change.
-  useEffect(() => {
-    let cancelled = false;
-    void buildChildReport(services.deps, profileId).then((loaded) => {
-      if (!cancelled) setReport(loaded);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [services, profileId]);
+  // report opens for a different child, so `report` always starts fresh (no stale previous child's
+  // data) for a `profileId` change.
+  const { value: report } = useAsync(
+    () => buildChildReport(services.deps, profileId),
+    [services, profileId],
+  );
 
   const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
   const lessons = services.deps.content.lessons();

@@ -73,5 +73,9 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      // `useAsync` (ui/ds/useAsync.ts) takes its own `deps` array, same shape as useEffect's.
+      'react-hooks/exhaustive-deps': ['warn', { additionalHooks: '(useAsync)' }],
+    },
   },
 ]);

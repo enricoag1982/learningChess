@@ -12,6 +12,7 @@ import {
 } from './parent/parent-styles.ts';
 import { LockIcon } from './ds/icons.tsx';
 import { Screen } from './ds/Screen.tsx';
+import { useAsync } from './ds/useAsync.ts';
 
 const MAX_ATTEMPTS = 5;
 /** How often the countdown re-reads the clock while locked. */
@@ -27,16 +28,14 @@ export function PasswordScreen(): JSX.Element {
   const passwordPurpose = useAppStore((state) => state.passwordPurpose);
 
   const [input, setInput] = useState('');
-  const [fileLocation, setFileLocation] = useState<string | null>(null);
   const [wrongAttempts, setWrongAttempts] = useState<number | null>(null);
   const [lockedUntil, setLockedUntil] = useState<string | null>(null);
   const [, tick] = useState(0);
 
-  useEffect(() => {
-    void services.deps.parentLock.get().then((lock) => {
-      setFileLocation(lock?.fileLocation ?? null);
-    });
-  }, [services]);
+  const { value: fileLocation } = useAsync(
+    () => services.deps.parentLock.get().then((lock) => lock?.fileLocation ?? null),
+    [services],
+  );
 
   // Ticks every 500ms while locked, clearing the lock once its time is up (from the interval
   // callback, not the effect body itself, so this is an external-system subscription, not a

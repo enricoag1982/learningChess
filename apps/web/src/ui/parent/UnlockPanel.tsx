@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { Journey, Lesson } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core';
 import { loadJourney } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { characterName, tContent } from '../../content-text.ts';
 import { characterPieceOrNull } from '../art/character-meta.ts';
 import { PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
+import { useAsync } from '../ds/useAsync.ts';
 
 /** Locked-lesson name: title for an Owl-taught lesson (no piece character), else its character's name. */
 function lessonName(t: TFunction, lesson: Lesson): string {
@@ -30,23 +31,11 @@ export function UnlockPanel({ profileId }: UnlockPanelProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const parentUnlockTarget = useAppStore((state) => state.parentUnlockTarget);
-  const [journey, setJourney] = useState<Journey | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-
-  async function refresh(): Promise<void> {
-    const loaded = await loadJourney(services.deps, profileId);
-    setJourney(loaded);
-  }
-
-  useEffect(() => {
-    let cancelled = false;
-    void loadJourney(services.deps, profileId).then((loaded) => {
-      if (!cancelled) setJourney(loaded);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [services, profileId]);
+  const { value: journey, reload: refresh } = useAsync(
+    () => loadJourney(services.deps, profileId),
+    [services, profileId],
+  );
 
   async function unlockWorld(worldId: string): Promise<void> {
     setBusyId(worldId);

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import type { CSSProperties, JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
@@ -17,6 +16,7 @@ import { useNarratedText } from './ds/useNarratedText.ts';
 import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, RoundIconButton } from './ds/Screen.tsx';
+import { useAsync } from './ds/useAsync.ts';
 
 // Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
 // base") — one-off shapes only Home uses, built on the shared `Svg` icon base.
@@ -117,19 +117,12 @@ export function HomeScreen(): JSX.Element {
   const goToPractice = useAppStore((state) => state.goToPractice);
   const goToPlay = useAppStore((state) => state.goToPlay);
   const goToDen = useAppStore((state) => state.goToDen);
-  const [offlineReady, setOfflineReady] = useState(false);
-
-  useEffect(() => {
-    // jsdom (unit tests) and some browsers have no `serviceWorker`; skip the status line there.
-    if (!('serviceWorker' in navigator)) return;
-    let cancelled = false;
-    void navigator.serviceWorker.ready.then(() => {
-      if (!cancelled) setOfflineReady(true);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // jsdom (unit tests) and some browsers have no `serviceWorker`; skip the status line there.
+  const { value: offlineReady = false } = useAsync(
+    () => navigator.serviceWorker.ready.then(() => true),
+    [],
+    'serviceWorker' in navigator,
+  );
 
   const next = journey?.next ?? null;
   const nextProgress = next ? progress.find((entry) => entry.lessonId === next.id) : undefined;

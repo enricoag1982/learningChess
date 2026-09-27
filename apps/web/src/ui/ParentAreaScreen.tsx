@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ChildOverview } from '@chess-kids/core';
@@ -24,6 +24,7 @@ import {
   PARENT_TAPPABLE_ROW,
 } from './parent/parent-styles.ts';
 import { ChevronRightIcon, LockIcon } from './ds/icons.tsx';
+import { useAsync } from './ds/useAsync.ts';
 
 function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.Element {
   const { t } = useTranslation();
@@ -150,7 +151,6 @@ export function ParentAreaScreen(): JSX.Element {
   const goToPicker = useAppStore((state) => state.goToPicker);
   const refreshProfiles = useAppStore((state) => state.refreshProfiles);
   const startNewPlayer = useAppStore((state) => state.startNewPlayer);
-  const [overviews, setOverviews] = useState<Readonly<Record<string, ChildOverview>>>({});
   const [changingPassword, setChangingPassword] = useState(false);
   const [codeFileLocation, setCodeFileLocation] = useState<string | null>(null);
   const [view, setView] = useState<ParentView>({ kind: 'overview' });
@@ -159,21 +159,17 @@ export function ParentAreaScreen(): JSX.Element {
   // child's stats can change on the Report/Settings screens (reset, an import) without the
   // `profiles` array reference changing at all, and the Overview must show fresh numbers each time
   // it is shown again, not just the ones from when it first mounted.
-  useEffect(() => {
-    if (view.kind !== 'overview') return;
-    let cancelled = false;
-    void Promise.all(
-      profiles.map(
-        async (profile) =>
-          [profile.id, await buildChildOverview(services.deps, profile.id)] as const,
-      ),
-    ).then((entries) => {
-      if (!cancelled) setOverviews(Object.fromEntries(entries));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [profiles, services, view.kind]);
+  const { value: overviews = {} } = useAsync(
+    () =>
+      Promise.all(
+        profiles.map(
+          async (profile) =>
+            [profile.id, await buildChildOverview(services.deps, profile.id)] as const,
+        ),
+      ).then((entries) => Object.fromEntries(entries)),
+    [profiles, services],
+    view.kind === 'overview',
+  );
 
   const settingsProfile =
     view.kind === 'settings'

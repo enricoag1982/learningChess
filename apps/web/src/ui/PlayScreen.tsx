@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { useAsync } from './ds/useAsync.ts';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
@@ -53,22 +54,13 @@ export function PlayScreen(): JSX.Element {
   // `null` = no manual pick yet this session: the level chips default to the profile's stored
   // "Automatic level" suggestion (`docs/computer-opponent.md` §5), loaded once below.
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
-  const [storedSuggestion, setStoredSuggestion] = useState<number | undefined>(undefined);
   const bubbleText = t('play.owl-line');
-
-  useEffect(() => {
-    if (!profile) return;
-    let cancelled = false;
-    void services.deps.settings.get().then((settings) => {
-      if (!cancelled) {
-        setStoredSuggestion(settings.suggestedLevels[profile.id]);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.id]);
+  const { value: storedSuggestion } = useAsync(
+    () =>
+      services.deps.settings.get().then((settings) => settings.suggestedLevels[profile?.id ?? '']),
+    [services, profile?.id],
+    !!profile,
+  );
 
   if (!profile || !journey) {
     return <BlankScreen />;

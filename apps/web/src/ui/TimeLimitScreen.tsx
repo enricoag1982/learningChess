@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +8,7 @@ import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
+import { useAsync } from './ds/useAsync.ts';
 
 /** `TimeLimitStatus.reason` -> the title/body text this screen shows (M5.2 "limit"; M7.1
  * "late"/"early", app-structure.md §13 "Allowed hours"). Falls back to the daily-limit text for
@@ -49,18 +49,11 @@ export function TimeLimitScreen(): JSX.Element {
   const timeLimitStatus = useAppStore((state) => state.timeLimitStatus);
   const goToPasswordScreen = useAppStore((state) => state.goToPasswordScreen);
   const switchPlayerFromTimeLimit = useAppStore((state) => state.switchPlayerFromTimeLimit);
-  const [stars, setStars] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!profile) return;
-    let cancelled = false;
-    void starsToday(services.deps, profile.id, services.deps.clock.now()).then((count) => {
-      if (!cancelled) setStars(count);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [services, profile]);
+  const { value: stars } = useAsync(
+    () => starsToday(services.deps, profile?.id ?? '', services.deps.clock.now()),
+    [services, profile],
+    !!profile,
+  );
 
   const { title: titleText, body: bubbleText } = timeLimitText(
     t,
@@ -71,7 +64,7 @@ export function TimeLimitScreen(): JSX.Element {
     <Screen kind="center" className="gap-8 px-4 py-8 sm:px-10">
       <h1 className="font-display text-4xl text-ink sm:text-5xl">{titleText}</h1>
 
-      {stars !== null && stars > 0 && (
+      {stars !== undefined && stars > 0 && (
         <div className="flex items-center gap-2">
           <StarsPill count={stars} />
           <span className="text-sm font-bold text-muted">{t('time-limit.stars-today')}</span>
