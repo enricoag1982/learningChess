@@ -1,8 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
 import type {
-  ContentSource,
   Lesson,
   MiniGame,
   MiniGameProgress,
@@ -10,13 +9,11 @@ import type {
   TracksCatalog,
   World,
 } from '@chess-kids/core';
-import '../i18n.ts';
+import { makeContentSource } from '@chess-kids/core/testing';
 import { fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { JourneyScreen } from './JourneyScreen.tsx';
-
-afterEach(cleanup);
 
 // World order 2 (not 1): JourneyScreen shows the Owl instead of a character icon for a main
 // track's very first world (matched by `world.order === 1`), which this fixture is not testing.
@@ -37,20 +34,10 @@ function twoLessons(): readonly [Lesson, Lesson] {
   return [l1, l2];
 }
 
-function contentSource(lessons: readonly Lesson[]): ContentSource {
-  return {
-    lessons: () => lessons,
-    lesson: (id) => lessons.find((lesson) => lesson.id === id),
-    minigames: () => [],
-    minigame: () => undefined,
-    catalog: () => CATALOG,
-  };
-}
-
 describe('JourneyScreen', () => {
   it('shows the first lesson current and the next one locked', async () => {
     const [l1, l2] = twoLessons();
-    const services = createTestServices(contentSource([l1, l2]));
+    const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
     await renderWithStore(<JourneyScreen />, services);
 
     await screen.findByRole('button', { name: /Rhino the Rook, current/ });
@@ -59,7 +46,7 @@ describe('JourneyScreen', () => {
 
   it('tapping the locked lesson explains what to finish first', async () => {
     const [l1, l2] = twoLessons();
-    const services = createTestServices(contentSource([l1, l2]));
+    const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
     await renderWithStore(<JourneyScreen />, services);
 
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
@@ -69,7 +56,7 @@ describe('JourneyScreen', () => {
 
   it('tapping the current lesson opens it', async () => {
     const [l1, l2] = twoLessons();
-    const services = createTestServices(contentSource([l1, l2]));
+    const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
     const { store } = await renderWithStore(<JourneyScreen />, services);
 
     await act(async () => {
@@ -82,7 +69,7 @@ describe('JourneyScreen', () => {
 
   it('back button returns to Home', async () => {
     const [l1, l2] = twoLessons();
-    const services = createTestServices(contentSource([l1, l2]));
+    const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
     const { store } = await renderWithStore(<JourneyScreen />, services);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Back to Home' }));
@@ -121,14 +108,12 @@ const BOSS_MINIGAME: MiniGame = {
   par: 5,
 };
 
-function contentSourceWithBoss(lesson: Lesson): ContentSource {
-  return {
-    lessons: () => [lesson],
-    lesson: (id) => (id === lesson.id ? lesson : undefined),
-    minigames: () => [BOSS_MINIGAME],
-    minigame: (id) => (id === BOSS_MINIGAME.id ? BOSS_MINIGAME : undefined),
-    catalog: () => CATALOG_BOSS,
-  };
+function contentSourceWithBoss(lesson: Lesson): ReturnType<typeof makeContentSource> {
+  return makeContentSource({
+    lessons: [lesson],
+    minigames: [BOSS_MINIGAME],
+    catalog: CATALOG_BOSS,
+  });
 }
 
 /** Marks `lesson` complete (every exercise at 1+ star) for the just-selected test profile. */

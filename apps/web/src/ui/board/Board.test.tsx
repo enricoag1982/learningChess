@@ -1,11 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { chessJsRules, parseDiagram } from '@chess-kids/core';
-import type { Move, Square } from '@chess-kids/core';
-import '../../i18n.ts';
+import type { Move } from '@chess-kids/core';
+import { boardCell as cell } from '../../testing/board.ts';
 import { Board } from './Board.tsx';
-
-afterEach(cleanup);
 
 // White rook d5 (movable), white knight b1 (movable), star on e8, blocked square on e3.
 // No kings: chessJsRules accepts this (lessons/mini-games routinely omit them).
@@ -21,10 +19,6 @@ const DIAGRAM = `
 `;
 const POSITION = parseDiagram(DIAGRAM);
 const LEGAL_MOVES: readonly Move[] = chessJsRules.legalMoves(POSITION);
-
-function cell(square: Square): HTMLElement {
-  return screen.getByRole('button', { name: new RegExp(`^${square},`) });
-}
 
 describe('Board — rendering', () => {
   it('renders a role=grid of 64 gridcells', () => {

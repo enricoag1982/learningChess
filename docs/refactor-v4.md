@@ -143,3 +143,12 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | Content layout (`m8.7`) | `src/kinds/<type>/` schema · compile · verify; `src/modes/<mode>/`; loader generic. File names match core so R4 merges both halves into `subject-chess/kinds/<type>/` by move |
 | Context | `VariantRules` + `chess: ChessRules` (additive) |
 | Open for R3b | Kind functions still take the general `ExerciseState` (public API used by the web) → `kinds/adapt.ts` narrows; removed when the web moves to kinds |
+
+## 10. R2 web design (2026-09-27)
+
+| PR | Scope | Key decisions |
+|---|---|---|
+| A test kits (`m8.8`) | vitest `setupFiles`; `src/testing/` (`renderApp`, `createTestServices`, fixtures, board, bot, fake narrator, seeds); `e2e/kit/` (content + journey via core `mainTrackLessons` / `findWorld`, i18n via the app's own options, `withAppStorage` over the real repositories, page flows); `e2e/helpers.ts` = barrel | e2e reuses app / core code instead of re-implementing i18n, journey order, storage shapes |
+| B design system | `ui/ds/`: icon set (44 inline icons → one base), `TapButton` looks + `tone` (was `role`, clashed with ARIA), `Screen`, `ScreenHeader`, `RoundIconButton`, `ConfirmDialog`, `NarratedBubble`, `useSpeak`, `useAsync`, `AvatarBadge`; parent-only pieces lazy | Same DOM, roles, labels, class sets; built CSS byte-identical |
+| C navigation | Typed `Route` union + stack (`navigate`, `replace`, `back`, `reset`), `ROUTE_META` (tracked / calm / gated), gate resume as data (`NavOp`, no closure); store slices (nav, profile, rewards, time, learn, today, play); one profile-load path; comment trim (≈ −820 lines) | Removes the 5 origin fields; screens read params via `useRoute` |
+| R3b web kinds | `ExerciseKindUI` per kind, `useExerciseSession` (fixes F5), mode UI registry, e2e solving via core `solution()` | After C |

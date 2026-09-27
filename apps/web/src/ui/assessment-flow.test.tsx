@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type {
   ContentSource,
   Lesson,
@@ -9,13 +9,11 @@ import type {
   YesNoDef,
 } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { createTestServices } from '../testing/test-services.ts';
-
-afterEach(cleanup);
 
 // Two worlds, three lessons: w1 (no boss) = l1 (Rhino, collect-stars) -> l2 (Elephant, yes-no);
 // w2 (no boss) = l3 (Lioness, yes-no). Distinct characters keep every Journey node's accessible
@@ -120,8 +118,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l1, l2 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
@@ -159,8 +156,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l2 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
@@ -185,8 +181,7 @@ describe('Test-out (M4.5)', () => {
     const { contentSource, l3 } = buildFixture();
     const services = createTestServices(contentSource);
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Journey/ }));
     fireEvent.click(await screen.findByRole('button', { name: /2.*w2/ }));

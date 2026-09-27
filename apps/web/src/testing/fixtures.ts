@@ -1,13 +1,30 @@
-import type {
-  ContentSource,
-  ExerciseDef,
-  Lesson,
-  MiniGame,
-  Track,
-  TracksCatalog,
-  World,
-} from '@chess-kids/core';
+import type { ExerciseDef, Lesson, MiniGame, Track, TracksCatalog, World } from '@chess-kids/core';
 import { parseDiagram } from '@chess-kids/core';
+import { makeContentSource } from '@chess-kids/core/testing';
+
+/** A tiny static boss mini-game (rook a1, pawn h1, one move to capture it). */
+export function fixtureBoss(): MiniGame {
+  return {
+    mode: 'static',
+    id: 'fixture-boss',
+    concept: 'fixture-move',
+    position: parseDiagram(`
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      . . . . . . . .
+      R . . . . . . p
+    `),
+    par: 1,
+    moveLimit: 5,
+    titleKey: 'fixtures:boss-title',
+    goalKey: 'fixtures:boss-goal',
+    unlockAfter: 'fixture',
+  };
+}
 
 /** A tiny collect-stars exercise: rook at a1, one star at h1 (solved in exactly one move). */
 export function fixtureExercise(id = 'fixture-ex'): ExerciseDef {
@@ -110,13 +127,6 @@ export const fixtureCatalog: TracksCatalog = {
 export function fixtureContentSource(
   lesson: Lesson,
   minigames: readonly MiniGame[] = [],
-): ContentSource {
-  return {
-    lessons: () => [lesson],
-    lesson: (id) => (id === lesson.id ? lesson : undefined),
-    minigames: () => minigames,
-    minigame: (id) => minigames.find((game) => game.id === id),
-    catalog: () => fixtureCatalog,
-    badges: () => [],
-  };
+): ReturnType<typeof makeContentSource> {
+  return makeContentSource({ lessons: [lesson], minigames, catalog: fixtureCatalog, badges: [] });
 }

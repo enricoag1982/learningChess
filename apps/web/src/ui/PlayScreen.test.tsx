@@ -1,36 +1,18 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress, recordGame, solve } from '@chess-kids/core';
-import '../i18n.ts';
-import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
-import {
-  pickProfileFromPicker,
-  seedReturningProfile,
-  seedWorldFourMastered,
-} from '../testing/app-test-helpers.ts';
+import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
+import { clickSquare } from '../testing/board.ts';
 import { PlayScreen } from './PlayScreen.tsx';
-
-afterEach(cleanup);
-
-/** The real (bundled) content, with test adapters otherwise (fake password writer). */
-function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
-  return createTestServices(createBundledContentSource());
-}
-
-/** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
-function clickSquare(square: string): void {
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${square},`) }));
-}
 
 describe('PlayScreen', () => {
   it('shows a locked mini-game greyed with its unlock condition, an unlocked one with best stars', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
@@ -42,7 +24,7 @@ describe('PlayScreen', () => {
   });
 
   it('unlocks a mini-game once its lesson is complete, showing 0 stars until played', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const rook = services.deps.content.lesson('rook');
     if (!rook) throw new Error('bundled content: "rook" lesson not found');
@@ -52,8 +34,7 @@ describe('PlayScreen', () => {
     );
     await services.deps.progress.saveLesson({ ...saved, bestStars });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
 
@@ -65,7 +46,7 @@ describe('PlayScreen', () => {
   });
 
   it('playing an unlocked static mini-game standalone saves best stars, shown back on the Play tile', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const rook = services.deps.content.lesson('rook');
     const hungryRook = services.deps.content.minigame('hungry-rook');
@@ -78,8 +59,7 @@ describe('PlayScreen', () => {
     );
     await services.deps.progress.saveLesson({ ...saved, bestStars });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
 
@@ -112,10 +92,9 @@ describe('PlayScreen', () => {
 
 describe('PlayScreen: vs Computer (M3.5)', () => {
   it('shows every level locked, Mouse with its own condition, before World 4 is mastered', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
@@ -133,11 +112,10 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
   });
 
   it('unlocks Mouse once World 4 is mastered; Rabbit stays locked until 3 full-game wins', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
@@ -151,11 +129,10 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
   });
 
   it('the Full game button starts a full game vs the selected (unlocked) level', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
@@ -167,7 +144,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
   });
 
   it('preselects the vs Computer chip at the profile’s stored suggested level', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
     // 3 full-game wins vs Mouse unlock Rabbit; seeding the stored suggestion directly is the same
@@ -188,8 +165,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
       suggestedLevels: { [profile.id]: 2 },
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
 
@@ -207,7 +183,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
   });
 
   it('shows Owl’s suggestion line once a finished full game moves the suggestion up a level', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { store } = await renderWithStore(<PlayScreen />, services);
     const profile = store.getState().profile;
     if (!profile) throw new Error('renderWithStore: no profile');

@@ -1,12 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import '../i18n.ts';
-import App from '../App.tsx';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { createTestServices } from '../testing/test-services.ts';
-
-afterEach(cleanup);
 
 describe('Today session (M3.4)', () => {
   it('Start today runs the due warm-up first ("Warm-up 1/1"), then lands in the next lesson', async () => {
@@ -25,8 +22,7 @@ describe('Today session (M3.4)', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
 
@@ -63,8 +59,7 @@ describe('Today session (M3.4)', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Start today/ }));
     await screen.findByText('Warm-up 1/1');

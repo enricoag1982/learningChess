@@ -1,10 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { InfoPanel, InfoPill, TapButton } from './primitives.tsx';
-
-afterEach(cleanup);
 
 describe('TapButton', () => {
   it('renders the raised marker class, plus a role class for a colour role', () => {

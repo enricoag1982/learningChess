@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createProfile, DEFAULT_PROFILE_SETTINGS, updateProfileSettings } from '@chess-kids/core';
 import type { BackupFile } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import type { FakeBackupFileWriter } from '../testing/fake-backup-file-writer.ts';
@@ -14,10 +13,10 @@ import {
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
 
 afterEach(() => {
-  cleanup();
   vi.unstubAllGlobals();
 });
 
@@ -235,8 +234,7 @@ describe('Parent area settings effects (M5.1)', () => {
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id); // unlocks Mouse
     await updateProfileSettings(services.deps, profile.id, { computerLevel: 1 });
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: /Play/ }));
     await screen.findByRole('heading', { name: 'Play' });

@@ -1,16 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { BotPlayer, Move, Square } from '@chess-kids/core';
-import { chessJsRules } from '@chess-kids/core';
-import '../i18n.ts';
-import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { createTestServices } from '../testing/test-services.ts';
-import {
-  pickProfileFromPicker,
-  seedReturningProfile,
-  seedWorldFourMastered,
-} from '../testing/app-test-helpers.ts';
+import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
+import { scriptedBotPlayer } from '../testing/bot.ts';
+import { clickSquare } from '../testing/board.ts';
 
 // A fixed test seed shortens the bot's "thinking" pause to 300ms (VersusStep.tsx's pattern).
 beforeEach(() => {
@@ -18,37 +12,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  cleanup();
   window.localStorage.removeItem('chess-kids:test-seed');
 });
-
-function createServicesWithRealContent(): ReturnType<typeof createTestServices> {
-  return createTestServices(createBundledContentSource());
-}
-
-/** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
-function clickSquare(square: string): void {
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${square},`) }));
-}
-
-/** A scripted `BotPlayer`: replies with the queued `from`/`to` moves in order. */
-function scriptedBotPlayer(
-  moves: readonly { readonly from: Square; readonly to: Square }[],
-): BotPlayer {
-  let index = 0;
-  return {
-    chooseMove(state) {
-      const queued = moves[index];
-      index += 1;
-      if (queued === undefined) return Promise.resolve(null);
-      const legal = chessJsRules.legalMoves(state.position);
-      const move: Move | undefined = legal.find(
-        (candidate) => candidate.from === queued.from && candidate.to === queued.to,
-      );
-      return Promise.resolve(move ?? null);
-    },
-  };
-}
 
 async function openFullGame(): Promise<void> {
   fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
@@ -60,7 +25,7 @@ async function openFullGame(): Promise<void> {
 describe('FullGameScreen (M3.5)', () => {
   it('a Scholar\'s-mate win is saved as a "full" GameRecord and shown back on Play', async () => {
     const services = {
-      ...createServicesWithRealContent(),
+      ...createTestServices('bundled'),
       botPlayer: scriptedBotPlayer([
         { from: 'e7', to: 'e5' },
         { from: 'b8', to: 'c6' },
@@ -69,8 +34,7 @@ describe('FullGameScreen (M3.5)', () => {
     };
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFullGame();
 
     // 1.e4 e5 2.Qh5 Nc6 3.Bc4 Nf6?? 4.Qxf7# (Scholar's mate) — the bot's replies are scripted above.
@@ -104,13 +68,12 @@ describe('FullGameScreen (M3.5)', () => {
 
   it('leaving mid-game asks to confirm; confirming records it as abandoned, not a loss', async () => {
     const services = {
-      ...createServicesWithRealContent(),
+      ...createTestServices('bundled'),
       botPlayer: scriptedBotPlayer([{ from: 'e7', to: 'e5' }]),
     };
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFullGame();
 
     clickSquare('e2');

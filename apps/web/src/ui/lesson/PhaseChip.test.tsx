@@ -1,9 +1,6 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
-import '../../i18n.ts';
+import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
 import { PhaseChip } from './PhaseChip.tsx';
-
-afterEach(cleanup);
 
 describe('PhaseChip (phone)', () => {
   it('names skipped phases for screen readers and stripes them in the mini track', () => {

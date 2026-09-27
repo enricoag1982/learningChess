@@ -1,27 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { createProfile } from '@chess-kids/core';
-import '../i18n.ts';
-import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
-import {
-  pickProfileFromPicker,
-  seedReturningProfile,
-  seedWorldFourMastered,
-} from '../testing/app-test-helpers.ts';
+import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
+import { clickSquare } from '../testing/board.ts';
 import type { Services } from '../app/services.ts';
-
-afterEach(cleanup);
-
-function createServicesWithRealContent(): Services {
-  return createTestServices(createBundledContentSource());
-}
-
-/** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
-function clickSquare(square: string): void {
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${square},`) }));
-}
 
 /** Seeds Mia (active, World 4 mastered — unlocks every vs Friend game) and Ben (second player,
  * no progress needed: only the active profile's own unlocks decide what the setup sheet offers). */
@@ -53,10 +37,9 @@ async function startFriendGame(boardMode: 'Pass and play' | 'Face to face'): Pro
 
 describe('FriendSetupScreen (M4.3)', () => {
   it('offers the second-player and game choices, and enables Start once both are picked', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
 
     expect(screen.getByRole('button', { name: 'Ben' })).toBeTruthy();
@@ -80,11 +63,10 @@ describe('FriendSetupScreen (M4.3)', () => {
   });
 
   it('vs Friend is locked until the active profile has any game unlocked', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     // Mia has no progress at all: no full game, no versus mini-game unlocked yet.
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     fireEvent.click(await screen.findByRole('button', { name: 'Play' }));
     await screen.findByRole('heading', { name: 'Play' });
 
@@ -96,10 +78,9 @@ describe('FriendSetupScreen (M4.3)', () => {
 
 describe('FriendGameScreen — board modes (M4.3)', () => {
   it("face-to-face rotates the top (black) side's pieces and strip", async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
     await startFriendGame('Face to face');
 
@@ -114,10 +95,9 @@ describe('FriendGameScreen — board modes (M4.3)', () => {
   });
 
   it('pass-and-play flips the board to face the player to move', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
     await startFriendGame('Pass and play');
 
@@ -145,10 +125,9 @@ describe('FriendGameScreen — board modes (M4.3)', () => {
 
 describe('FriendGameScreen — take back (M4.3)', () => {
   it('asks the player to move; declining keeps the move, accepting undoes it', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
     await startFriendGame('Pass and play');
 
@@ -177,10 +156,9 @@ describe('FriendGameScreen — take back (M4.3)', () => {
 
 describe('FriendGameScreen — stop (M4.3)', () => {
   it('confirms before stopping; confirming records "abandoned" for both profiles', async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { miaId, benId } = await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
     await startFriendGame('Pass and play');
 
@@ -220,10 +198,9 @@ describe('FriendGameScreen — stop (M4.3)', () => {
 
 describe('FriendGameScreen — result (M4.3)', () => {
   it("Scholar's mate names the winner by nickname and saves both profiles' records", async () => {
-    const services = createServicesWithRealContent();
+    const services = createTestServices('bundled');
     const { miaId, benId } = await seedTwoProfiles(services);
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
     await openFriendSetup();
     await startFriendGame('Pass and play');
 

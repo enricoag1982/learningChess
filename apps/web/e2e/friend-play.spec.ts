@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent, GameRecord, TracksCatalog } from '@chess-kids/core';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {
@@ -10,26 +10,15 @@ import {
   getSoleProfileId,
   pickProfileFromPicker,
   seedWorldFourMastered,
+  withAppStorage,
 } from './helpers.ts';
 
 const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
-interface StoredGameRecord {
-  readonly profileId: string;
-  readonly game: string;
-  readonly opponent: string;
-  readonly result: string;
-  readonly reason: string;
-}
-
-/** Every `GameRecord` in real storage for `profileId` (same shape `LocalStorageGameRecordRepository` writes). */
-async function gameRecordsFor(page: Page, profileId: string): Promise<StoredGameRecord[]> {
-  return page.evaluate((pid) => {
-    const raw = localStorage.getItem('chess-kids:game-records');
-    const all = raw ? (JSON.parse(raw) as StoredGameRecord[]) : [];
-    return all.filter((record) => record.profileId === pid);
-  }, profileId);
+/** Every `GameRecord` for `profileId`, via the real `LocalStorageGameRecordRepository`. */
+async function gameRecordsFor(page: Page, profileId: string): Promise<GameRecord[]> {
+  return withAppStorage(page, (repos) => repos.gameRecords.listByProfile(profileId));
 }
 
 /** Adds a second profile ("Ben") from the parent area, without leaving Mia as the active player. */

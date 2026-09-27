@@ -1,14 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createProfile } from '@chess-kids/core';
-import '../i18n.ts';
 import App from '../App.tsx';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-
-afterEach(cleanup);
 
 function makeServices(): ReturnType<typeof createTestServices> {
   return createTestServices(fixtureContentSource(fixtureLesson()));

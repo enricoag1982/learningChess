@@ -1,15 +1,12 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { recordExerciseResult, startExercise } from '@chess-kids/core';
-import '../i18n.ts';
-import App from '../App.tsx';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { seedReturningProfile } from '../testing/app-test-helpers.ts';
+import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { PracticeScreen } from './PracticeScreen.tsx';
-
-afterEach(cleanup);
 
 describe('PracticeScreen', () => {
   it('nothing complete yet: no topics, warm-up disabled ("All done for today!")', async () => {
@@ -94,8 +91,7 @@ describe('PracticeScreen', () => {
       updatedAt: services.deps.clock.now().toISOString(),
     });
 
-    render(<App services={services} />);
-    await pickProfileFromPicker('Mia');
+    await renderApp(services, { at: 'home' });
 
     fireEvent.click(await screen.findByRole('button', { name: 'Practice' }));
     await screen.findByText('1 due today');

@@ -1,6 +1,7 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
 import { bot, chessJsRules, createVariantRules } from '@chess-kids/core';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
+import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
 import { LocalStorageAssessmentRepository } from '../adapters/storage/local-assessment-repository.ts';
@@ -21,13 +22,14 @@ import { createMemoryStorage } from './memory-storage.ts';
 
 /**
  * Same wiring as `createServices`, but with an injectable `ContentSource` so tests can use a
- * small fixture lesson instead of the real bundled content, and a `FakeNarrator` (`narrator`, cast
+ * small fixture lesson instead of the real bundled content — or `'bundled'`, for a test that wants
+ * the real (bundled) content itself, same as production — and a `FakeNarrator` (`narrator`, cast
  * back to `FakeNarrator` where a test needs its `spoken`/`cancelCount`) gated the same way the real
  * `createServices` gates `createWebSpeechNarrator()`, so a "voice off" setting's effect is testable
  * without touching Web Speech.
  */
 export function createTestServices(
-  content: ContentSource,
+  content: ContentSource | 'bundled',
   storage: Storage = createMemoryStorage(),
 ): Services {
   const store = openLocalStore(storage, { migrations: MIGRATIONS });
@@ -39,7 +41,7 @@ export function createTestServices(
     assessment: new LocalStorageAssessmentRepository(store),
     clock: createSystemClock(),
     ids: createCryptoIds(),
-    content,
+    content: content === 'bundled' ? createBundledContentSource() : content,
     parentLock: new LocalStorageParentLockRepository(store),
     passwordFile: createFakePasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),

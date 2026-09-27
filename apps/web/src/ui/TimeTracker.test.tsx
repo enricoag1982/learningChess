@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
 import { localDayString } from '@chess-kids/core';
-import '../i18n.ts';
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
@@ -9,7 +8,6 @@ import { createTestServices } from '../testing/test-services.ts';
 import { TimeTracker } from './TimeTracker.tsx';
 
 afterEach(() => {
-  cleanup();
   vi.useRealTimers();
   Object.defineProperty(document, 'hidden', { value: false, configurable: true });
 });
