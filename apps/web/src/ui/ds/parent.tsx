@@ -1,9 +1,12 @@
 import type { JSX, ReactNode, SubmitEvent } from 'react';
-import { PARENT_DANGER_BUTTON, PARENT_SECONDARY_BUTTON } from '../parent/parent-styles.ts';
+import { PARENT_SECONDARY_BUTTON } from '../parent/parent-styles.ts';
+import { PARENT_DANGER_BUTTON } from './parent-styles-lazy.ts';
 
 /**
  * Parent-only pieces (lazy chunks only, refactor-v4.md §4 "Initial JS must not grow"): imported
- * only from the parent area's own screens, never eagerly.
+ * only from the parent area's own screens, never eagerly. The lazy-only style constants themselves
+ * (`PARENT_DANGER_BUTTON` and friends) live in `parent-styles-lazy.ts`, a plain `.ts` module, so
+ * this file can stay component-exports-only for react-refresh.
  */
 
 const SECTION_GAP: Readonly<Record<3 | 4, string>> = { 3: 'gap-3', 4: 'gap-4' };

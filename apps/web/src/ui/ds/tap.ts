@@ -6,11 +6,14 @@
  */
 
 /** Fill: `neutral` = card/ink (the default look of a raised tappable), a colour role, or `none` for
- * a caller that puts its own (often conditional) fill classes straight into `extra`. */
-export type TapTone = 'neutral' | 'go' | 'today' | 'info' | 'danger' | 'locked' | 'none';
+ * a caller that puts its own (often conditional) fill classes straight into `extra`. `danger` and
+ * `locked` live in `ds/parent-styles-lazy.ts` instead (grown-ups-only fills, never reached before
+ * the parent gate — refactor-v4.md §4 "Initial JS must not grow"). */
+export type TapTone = 'neutral' | 'go' | 'today' | 'info' | 'none';
 
 /** Shape/sizing family. `custom` contributes no base classes: `extra` carries the whole shape, for
- * a one-off literal that shares no base with another caller. */
+ * a one-off literal that shares no base with another caller. `parent-chip`/`parent-row` live in
+ * `ds/parent-styles-lazy.ts` instead (grown-ups-only looks, same reason as `TapTone` above). */
 export type TapLook =
   | 'round'
   | 'round-sm'
@@ -23,8 +26,6 @@ export type TapLook =
   | 'primary'
   | 'secondary'
   | 'parent'
-  | 'parent-chip'
-  | 'parent-row'
   | 'custom';
 
 const LOOK_BASE: Readonly<Record<TapLook, string>> = {
@@ -49,10 +50,6 @@ const LOOK_BASE: Readonly<Record<TapLook, string>> = {
   secondary:
     'flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold',
   parent: 'flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold',
-  'parent-chip': 'flex h-11 items-center justify-center rounded-xl px-4 text-sm font-bold',
-  // `bg-card` is fixed for this look (never another tone), so it lives in the base, not a tone fill.
-  'parent-row':
-    'flex min-h-[44px] w-full items-center gap-3 rounded-2xl bg-card px-4 py-3 text-left',
   custom: '',
 };
 
@@ -61,8 +58,6 @@ const TONE_FILL: Readonly<Record<TapTone, string>> = {
   go: 'tap-go bg-go text-white',
   today: 'tap-today bg-today text-white',
   info: 'tap-info bg-info text-white',
-  danger: 'tap-border-today bg-card text-[#8C4012]',
-  locked: 'bg-[#F3EDE0] text-muted',
   none: '',
 };
 

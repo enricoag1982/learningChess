@@ -13,17 +13,17 @@ import { RankPill } from './RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';
 import { ChildReportScreen } from './parent/ChildReport.tsx';
 import { ChildSettingsScreen } from './parent/ChildSettings.tsx';
-import { PrivacyScreen } from './parent/PrivacyPolicy.tsx';
+import { PrivacyScreen } from './parent/PrivacyScreen.tsx';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
-  PARENT_TAPPABLE_ROW,
 } from './parent/parent-styles.ts';
 import { ChevronRightIcon, LockIcon } from './ds/icons.tsx';
 import { useAsync } from './ds/useAsync.ts';
 import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { PARENT_TAPPABLE_ROW } from './ds/parent-styles-lazy.ts';
 
 function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.Element {
   const { t } = useTranslation();

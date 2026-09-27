@@ -1,7 +1,5 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { ScreenHeader } from '../ds/Screen.tsx';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
 /** Repository issues page (non-functional.md §3 "contact"): the same repo the live app deploys
@@ -11,10 +9,15 @@ const ISSUES_URL = 'https://github.com/enricoag1982/learningChess/issues';
 /**
  * Privacy policy body (M5.5, non-functional.md §3, `docs/privacy-policy.md` — same text, kept in
  * sync by hand since one lives in i18n and the other in plain Markdown for the repo root): plain
- * English, fits one tablet screen. Shared by `PrivacyScreen` (parent area) and `PrivacyDialog`
- * (first-run overlay) so the wording only ever lives in one place.
+ * English, fits one tablet screen. Shared by `PrivacyScreen` (parent area, `PrivacyScreen.tsx`) and
+ * `PrivacyDialog` (first-run overlay, right below) so the wording only ever lives in one place —
+ * exported (not just this file's own use) so `PrivacyScreen.tsx` can stay a separate, lazy-only
+ * module: this one is reached before the parent gate too (`FirstRunScreen.tsx`), so it must stay in
+ * the eager bundle, while `PrivacyScreen`'s own `ScreenHeader`/`ChevronLeftIcon` need not (lead
+ * review 2026-09-27: `ChevronLeftIcon` in particular, since `icons-lazy.tsx`'s other export,
+ * `GuestIcon`, was being pulled into the eager bundle right along with it).
  */
-function PrivacyPolicyBody(): JSX.Element {
+export function PrivacyPolicyBody(): JSX.Element {
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-3">
@@ -44,28 +47,6 @@ function PrivacyPolicyBody(): JSX.Element {
           {t('parent.privacy.contact-body', { url: ISSUES_URL })}
         </p>
       </section>
-    </div>
-  );
-}
-
-export interface PrivacyScreenProps {
-  readonly onBack: () => void;
-}
-
-/** Parent area "Privacy" row's own screen (`ParentAreaScreen.tsx`'s local view router). */
-export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
-  const { t } = useTranslation();
-  return (
-    <div className="flex flex-col gap-4">
-      <ScreenHeader
-        look="parent"
-        action="back"
-        actionLabel={t('parent.back')}
-        onAction={onBack}
-        icon={<ChevronLeftIcon />}
-        title={t('parent.privacy.title')}
-      />
-      <PrivacyPolicyBody />
     </div>
   );
 }

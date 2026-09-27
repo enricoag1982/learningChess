@@ -34,12 +34,14 @@ import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
 import { tapClass } from '../ds/tap.ts';
 import { ScreenHeader } from '../ds/Screen.tsx';
 import { ParentConfirmDialog, ParentSection } from '../ds/parent.tsx';
-import { AvatarBadge } from '../ds/AvatarBadge.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
   PARENT_CHIP_SELECTED,
   PARENT_DANGER_BUTTON,
+} from '../ds/parent-styles-lazy.ts';
+import { AvatarBadge } from '../ds/AvatarBadge.tsx';
+import {
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
