@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SeriesGameState } from '@chess-kids/core';
 import type { ExerciseDef, ExerciseState } from '@chess-kids/core/chess';
+import { EXERCISE_KINDS } from '@chess-kids/core/chess';
 import { completeRound, currentRound, startSeries } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
@@ -125,18 +126,20 @@ export function Step({
   const goToStep = useAppStore((state) => state.goToStep);
   const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
 
-  const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame));
+  const [series, setSeries] = useState<SeriesGameState<ExerciseDef>>(() =>
+    startSeries(minigame, EXERCISE_KINDS),
+  );
   const run = useBossRun(series, { lesson, nextStepIndex, session });
   const goalText = tContent(t, minigame.goalKey);
   const replay = useNarratedText(services.narrator, goalText);
 
   function handleRoundNext(roundState: ExerciseState): void {
-    setSeries((current) => completeRound(current, roundState));
+    setSeries((current) => completeRound(current, roundState, EXERCISE_KINDS));
   }
 
   /** Standalone-only: restarts the series at its first round (a lesson boss never restarts inline). */
   function handlePlayAgain(): void {
-    setSeries(startSeries(minigame));
+    setSeries(startSeries(minigame, EXERCISE_KINDS));
     run.restart();
   }
 
@@ -160,7 +163,7 @@ export function Step({
         <GameLayout
           board={
             <Board
-              position={series.round.position}
+              position={(series.round as ExerciseState).position}
               legalMoves={[]}
               label={t('lesson.board-label')}
               pieceBadges={pieceBadges}

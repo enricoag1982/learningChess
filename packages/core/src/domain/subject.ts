@@ -1,7 +1,8 @@
 // Platform base types (design-r4.md §2 `SubjectCore`): the subject-free shapes every exercise def /
 // state / mini-game / lesson is built on. Pure TS, no chess import — a subject (chess, R5's math
 // demo) supplies its own concrete types on top of these.
-import type { ExerciseProgress } from './exercise/kind.ts';
+import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
+import type { MiniGameMode } from './exercise/mode.ts';
 
 /** Fields shared by every exercise definition, regardless of subject. */
 export interface ExerciseDefBase {
@@ -40,10 +41,13 @@ export interface MiniGameBase {
   readonly unlockAfter: string;
 }
 
-/** Fields shared by every mini-game's runtime state, regardless of subject or mode. */
+/** Fields shared by every mini-game's runtime state, regardless of subject or mode. `def` is only
+ * `{id}` here (not the full `MiniGameBase`): a mode's own play-time def (`StaticCaptureGameDef`,
+ * `VersusGameDef`, …) deliberately omits the catalog fields (title/goal/unlockAfter), which the
+ * boss/Play screen already has from the content lesson/mini-game, not the running state. */
 export interface MiniGameStateBase {
   readonly mode: string;
-  readonly def: MiniGameBase;
+  readonly def: { readonly id: string };
 }
 
 /** One lesson: story, demo, guided tries, scored exercises, optional boss mini-game — generic over
@@ -70,4 +74,47 @@ export interface Lesson<
   /** Easier variants, reachable only via a scored exercise's `easier`; never stepped through,
    * scored or counted in completion / mastery. Absent = none. */
   readonly variants?: readonly E[];
+}
+
+/** Any exercise kind, widened to the base def/state/hint shapes plus the subject's own kind context. */
+export type AnyKind<Ctx> = ExerciseKind<
+  ExerciseDefBase,
+  ExerciseStateBase,
+  { readonly type: string },
+  unknown,
+  HintBase,
+  Ctx
+>;
+
+/** Any mini-game mode, widened to the base state shape. `Def` (a mode's own `start(def)` input) is
+ * `unknown`: platform code never starts a mini-game generically, only reads its running state
+ * (`isOver`/`isWin`/`stars`/`summarise`) — starting stays each mode's own concrete function
+ * (`startStaticCaptureGame`, `startSeries`, `startVersus`). */
+export type AnyMode = MiniGameMode<unknown, MiniGameStateBase>;
+
+/** One subject's whole behaviour behind the platform's uniform interfaces (design-r4.md §2).
+ * `rewards`/`gameRecordOf` are optional: a subject without badge facts or its own game log simply
+ * omits them (R5's math demo). */
+export interface SubjectCore<Ctx = unknown> {
+  /** e.g. `'chess'`. */
+  readonly id: string;
+  /** The kind context every `ExerciseKind.act`/`hint` call receives (chess: `VariantRules`). */
+  readonly context: Ctx;
+  readonly kinds: Readonly<Record<string, AnyKind<Ctx>>>;
+  /** `static`/`versus`-shaped modes; `createSubjectRuntime` adds the platform `series` mode. */
+  readonly modes: Readonly<Record<string, AnyMode>>;
+}
+
+/** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping
+ * subjects never collides on disk (design-r4.md §2; values unchanged from today's chess app). */
+export interface AppConfig {
+  /** localStorage key prefix, e.g. `'chess-kids:'`. */
+  readonly storagePrefix: string;
+  /** Backup file's `app` field, e.g. `'chess-kids'`. */
+  readonly backupAppId: string;
+  /** Downloaded backup file name prefix. */
+  readonly backupFilePrefix: string;
+  /** Downloaded parent-code file name prefix. */
+  readonly parentCodeFilePrefix: string;
+  readonly version: string;
 }

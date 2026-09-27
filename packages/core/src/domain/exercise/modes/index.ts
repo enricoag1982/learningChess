@@ -1,26 +1,29 @@
 // The mini-game-mode registry — the only place mode-type dispatch happens. `boss-result.ts`'s
 // legacy functions go through `modeOf`/`MINI_GAME_MODES` instead of their own `if` chain.
 import type { MiniGameMode } from '../mode.ts';
+import type { ExerciseDef } from '../types.ts';
 import type { GameState, StaticCaptureGameDef } from './static/def.ts';
 import { staticMode } from './static/mode.ts';
 import type { SeriesGameDef, SeriesGameState } from './series/def.ts';
-import { seriesMode } from './series/mode.ts';
+import { createSeriesMode } from './series/mode.ts';
+import { EXERCISE_KINDS } from '../kinds/index.ts';
 import type { VersusGameDef, VersusState } from './versus/def.ts';
 import { versusMode } from './versus/mode.ts';
 
 /** Every boss/mini-game state, whichever mode played it. */
-export type MiniGameState = GameState | SeriesGameState | VersusState;
+export type MiniGameState = GameState | SeriesGameState<ExerciseDef> | VersusState;
 export type ModeType = MiniGameState['mode'];
 
 /** Every mode's implementation, by `mode`. Only 3 exist, so this is spelled out rather than derived
- * through a generic helper. */
+ * through a generic helper. `series` is `createSeriesMode` over this package's own chess kinds —
+ * the same factory `createSubjectRuntime` uses for any other subject (design-r4.md §2). */
 export const MINI_GAME_MODES = {
   static: staticMode,
-  series: seriesMode,
+  series: createSeriesMode<ExerciseDef>(EXERCISE_KINDS),
   versus: versusMode,
 } as const satisfies {
   readonly static: MiniGameMode<StaticCaptureGameDef, GameState>;
-  readonly series: MiniGameMode<SeriesGameDef, SeriesGameState>;
+  readonly series: MiniGameMode<SeriesGameDef<ExerciseDef>, SeriesGameState<ExerciseDef>>;
   readonly versus: MiniGameMode<VersusGameDef, VersusState>;
 };
 

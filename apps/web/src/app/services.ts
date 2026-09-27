@@ -1,6 +1,12 @@
 import type { AppDeps, BackupFileWriter, BackupImporter, Narrator } from '@chess-kids/core';
+import { createSubjectRuntime } from '@chess-kids/core';
 import type { BotPlayer, VariantRules } from '@chess-kids/core/chess';
-import { chessJsRules, createVariantRules } from '@chess-kids/core/chess';
+import {
+  CHESS_APP_CONFIG,
+  chessCore,
+  chessJsRules,
+  createVariantRules,
+} from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
@@ -86,6 +92,8 @@ export function createServices(storage: Storage = window.localStorage): Services
     backupFileWriter: createLazyBackupFileWriter(),
     backupImporter: createLazyBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
+    subject: createSubjectRuntime(chessCore),
+    app: CHESS_APP_CONFIG,
   };
 
   // Pre-generated Kokoro audio per narrated text (docs/voice.md), Web Speech as the fallback for

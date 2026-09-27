@@ -12,6 +12,8 @@ import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import { seededRandom } from '../domain/random.ts';
+import { createSubjectRuntime } from '../domain/runtime.ts';
+import { chessCore, CHESS_APP_CONFIG } from '../chess-core.ts';
 import type { ConceptStats } from '../domain/review.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
@@ -368,7 +370,8 @@ export function makeBackupImporter(): BackupImporter & { readonly calls: readonl
 
 /* -------------------------------------------------------------------- AppDeps -------------- */
 
-/** Every required `AppDeps` port, wired to the in-memory fakes above. */
+/** Every required `AppDeps` port, wired to the in-memory fakes above. `subject`/`app` default to
+ * chess (`createSubjectRuntime(chessCore)`, `CHESS_APP_CONFIG`) — the only subject today. */
 export function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     profiles: makeProfileRepo(),
@@ -381,6 +384,8 @@ export function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     passwordFile: makePasswordFileWriter(),
     settings: makeSettingsRepo(),
     random: seededRandom(1),
+    subject: createSubjectRuntime(chessCore),
+    app: CHESS_APP_CONFIG,
     ...overrides,
   };
 }

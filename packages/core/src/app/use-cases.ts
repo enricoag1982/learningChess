@@ -1,6 +1,4 @@
 import type { ExerciseState } from '../domain/exercise/state.ts';
-import { starsFor } from '../domain/exercise/kinds/index.ts';
-import { modeOf } from '../domain/exercise/modes/index.ts';
 import type { GameState } from '../domain/exercise/modes/static/def.ts';
 import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
 import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
@@ -8,6 +6,8 @@ import type { Lesson } from '../domain/lesson.ts';
 import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { SkippablePhase } from '../domain/lesson-session.ts';
 import type { LessonProgress } from '../domain/progress.ts';
+import type { AppConfig } from '../domain/subject.ts';
+import type { SubjectRuntime } from '../domain/runtime.ts';
 import {
   newLessonProgress,
   recordBossStars,
@@ -63,6 +63,20 @@ export interface AppDeps {
   /** Current local storage schema version, injected so `app/backup.ts` can stamp/validate a backup
    * file without `packages/core` importing a web adapter constant. Optional, same reason as above. */
   readonly storageSchemaVersion?: number;
+  /** This profile's subject (chess): kind + mode registries, via `createSubjectRuntime` — the only
+   * way platform code reaches an exercise kind or mini-game mode (design-r4.md §2). */
+  readonly subject: SubjectRuntime;
+  /** App identifiers (storage prefix, backup id, file name prefixes, version) — chess's today's
+   * hardcoded values, unchanged (design-r4.md §2 `AppConfig`). */
+  readonly app: AppConfig;
+}
+
+/** Stars earned so far for `state`, via its subject's own kind; `0` until solved. */
+function starsFor(subject: SubjectRuntime, state: ExerciseState): 0 | 1 | 2 | 3 {
+  if (!state.solved) {
+    return 0;
+  }
+  return subject.kinds[state.def.type]?.stars(state) ?? 0;
 }
 
 /** Existing concept stats, or fresh (unsaved) ones if this profile has no attempt for it yet. */
@@ -130,7 +144,7 @@ export interface RecordAttemptInput {
 export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): Promise<void> {
   const { profileId, lesson, state, scored, durationMs } = input;
   const now = deps.clock.now();
-  const stars = starsFor(state);
+  const stars = starsFor(deps.subject, state);
   const correct = state.solved && state.errors === 0 && state.hintLevel === 0;
 
   await deps.progress.addAttempt({
@@ -183,7 +197,7 @@ export async function recordExerciseResult(
   const { profileId, lesson, state, scored, durationMs, nextStep, standsInFor, completesPhase } =
     input;
   const now = deps.clock.now();
-  const stars = starsFor(state);
+  const stars = starsFor(deps.subject, state);
 
   await recordAttempt(deps, { profileId, lesson, state, scored, durationMs });
 
@@ -235,7 +249,11 @@ export async function recordBossResult(
 ): Promise<LessonProgress> {
   const { profileId, lesson, state, durationMs, nextStep } = input;
   const now = deps.clock.now();
-  const summary = modeOf(state).summarise(state);
+  const mode = deps.subject.modes[state.mode];
+  if (mode === undefined) {
+    throw new Error(`recordBossResult: no mode registered for "${state.mode}"`);
+  }
+  const summary = mode.summarise(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),
@@ -288,7 +306,7 @@ export async function recordReviewResult(
 ): Promise<ConceptStats> {
   const { profileId, task, state, durationMs, reviewSource } = input;
   const now = deps.clock.now();
-  const stars = starsFor(state);
+  const stars = starsFor(deps.subject, state);
   const correct = state.solved && state.errors === 0 && state.hintLevel === 0;
 
   await deps.progress.addAttempt({

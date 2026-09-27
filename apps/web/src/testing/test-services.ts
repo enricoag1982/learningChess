@@ -1,5 +1,12 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
-import { bot, chessJsRules, createVariantRules } from '@chess-kids/core/chess';
+import { createSubjectRuntime } from '@chess-kids/core';
+import {
+  CHESS_APP_CONFIG,
+  bot,
+  chessCore,
+  chessJsRules,
+  createVariantRules,
+} from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
@@ -50,6 +57,8 @@ export function createTestServices(
     backupFileWriter: createFakeBackupFileWriter(),
     backupImporter: new LocalStorageBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
+    subject: createSubjectRuntime(chessCore),
+    app: CHESS_APP_CONFIG,
   };
 
   const narrator = createFakeNarrator();

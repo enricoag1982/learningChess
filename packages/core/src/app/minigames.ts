@@ -1,4 +1,3 @@
-import { modeOf } from '../domain/exercise/modes/index.ts';
 import type { GameState } from '../domain/exercise/modes/static/def.ts';
 import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
 import { versusGameState } from '../domain/exercise/modes/versus/engine.ts';
@@ -46,7 +45,11 @@ export async function saveMiniGamePlay(
 ): Promise<MiniGameProgress> {
   const { profileId, game, state } = input;
   const now = deps.clock.now();
-  const summary = modeOf(state).summarise(state);
+  const mode = deps.subject.modes[state.mode];
+  if (mode === undefined) {
+    throw new Error(`saveMiniGamePlay: no mode registered for "${state.mode}"`);
+  }
+  const summary = mode.summarise(state);
   const existing = await deps.progress.getMiniGame(profileId, game.id);
   const updated = recordMiniGamePlay(
     existing,
@@ -54,7 +57,7 @@ export async function saveMiniGamePlay(
     profileId,
     game.id,
     summary.stars,
-    modeOf(state).isWin(state),
+    mode.isWin(state),
     now,
   );
   await deps.progress.saveMiniGame(updated);
@@ -87,7 +90,11 @@ export async function recordMiniGameResult(
 ): Promise<MiniGameProgress> {
   const { profileId, game, state, durationMs } = input;
   const now = deps.clock.now();
-  const summary = modeOf(state).summarise(state);
+  const mode = deps.subject.modes[state.mode];
+  if (mode === undefined) {
+    throw new Error(`recordMiniGameResult: no mode registered for "${state.mode}"`);
+  }
+  const summary = mode.summarise(state);
 
   await deps.progress.addAttempt({
     id: deps.ids.next(),

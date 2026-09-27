@@ -12,6 +12,7 @@ import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
+import { EXERCISE_KINDS } from '@chess-kids/core/chess';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locales = loadLocales(join(packageDir, 'locales'));
@@ -54,13 +55,13 @@ describe('escape-the-check and mate-hunt (series) play every round for 3 stars',
       throw new Error(`${id} mini-game is not a series`);
     }
 
-    let series = startSeries(minigame);
+    let series = startSeries(minigame, EXERCISE_KINDS);
     for (const round of minigame.rounds) {
       expect(currentRound(series)).toBe(round);
       const solved = playExerciseToCompletion(round);
       expect(solved.solved, `${minigame.id}/${round.id}: not solved`).toBe(true);
       expect(solved.errors, `${minigame.id}/${round.id}: unexpected error`).toBe(0);
-      series = completeRound(series, solved);
+      series = completeRound(series, solved, EXERCISE_KINDS);
     }
 
     expect(seriesResult(series)).toBe('won');
