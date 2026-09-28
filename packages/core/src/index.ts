@@ -113,6 +113,7 @@ export type {
 export type { AppDeps } from './app/use-cases.ts';
 export {
   loadProgress,
+  loadGameRecords,
   getLessonProgress,
   recordAttempt,
   recordExerciseResult,

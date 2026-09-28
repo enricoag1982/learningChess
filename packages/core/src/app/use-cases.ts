@@ -1,7 +1,7 @@
 import type { Lesson } from '../domain/lesson.ts';
 import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { SkippablePhase } from '../domain/lesson-session.ts';
-import type { LessonProgress } from '../domain/progress.ts';
+import type { GameRecord, LessonProgress } from '../domain/progress.ts';
 import type { AppConfig, ExerciseStateBase, MiniGameStateBase } from '../domain/subject.ts';
 import type { SubjectRuntime } from '../domain/runtime.ts';
 import {
@@ -109,6 +109,11 @@ async function recordConceptOutcome(
 /** All saved lesson progress for a profile. */
 export async function loadProgress(deps: AppDeps, profileId: string): Promise<LessonProgress[]> {
   return deps.progress.listLessons(profileId);
+}
+
+/** Full games and versus mini-games recorded for a profile (Play's vs Computer tally, My Den). */
+export function loadGameRecords(deps: AppDeps, profileId: string): Promise<GameRecord[]> {
+  return deps.gameRecords.listByProfile(profileId);
 }
 
 /** Saved progress for one lesson, or fresh (unsaved) progress if the kid has not started it. */

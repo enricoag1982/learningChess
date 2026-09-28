@@ -5,13 +5,13 @@ import { makeDeps as buildDeps, makeGameRecordRepo } from '../testing/index.ts';
 import type { Journey } from './journey.ts';
 import {
   computerLevelStatus,
-  loadGameRecords,
   nextSuggestedLevel,
   recordGame,
   suggestedLevel,
   updateSuggestedLevel,
 } from './games.ts';
 import type { AppDeps } from './use-cases.ts';
+import { loadGameRecords } from './use-cases.ts';
 
 function makeDeps(records: readonly GameRecord[] = []): AppDeps {
   return buildDeps({ gameRecords: makeGameRecordRepo(records) });

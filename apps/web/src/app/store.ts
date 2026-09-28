@@ -55,7 +55,7 @@ export function createAppStore(services: Services, pack: SubjectWeb) {
     services,
     pack,
     ...createNavSlice(set, get),
-    ...createProfileSlice(set, get),
+    ...createProfileSlice(set, get, pack),
     ...createRewardsSlice(set, get),
     ...createTimeSlice(set, get),
     ...createLearnSlice(set, get),

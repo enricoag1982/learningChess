@@ -76,11 +76,6 @@ export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise
   return record;
 }
 
-/** This profile's saved game records (newest and oldest alike; callers filter/sort as needed). */
-export function loadGameRecords(deps: AppDeps, profileId: string): Promise<GameRecord[]> {
-  return deps.gameRecords.listByProfile(profileId);
-}
-
 /** A locked computer level's unlock condition, for the Play screen's vs Computer card. */
 export type ComputerLevelCondition =
   | { readonly kind: 'world-mastered'; readonly worldId: string }

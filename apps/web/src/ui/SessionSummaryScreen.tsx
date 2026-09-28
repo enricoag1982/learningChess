@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { animalFriends, totalStars } from '@chess-kids/core';
-import { CHESS_CHARACTERS } from '@chess-kids/core/chess';
 import { useAppStore } from '../app/store.ts';
+import { usePack } from '../app/subject.ts';
 import { characterName, tContent } from '../content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
@@ -14,6 +14,7 @@ import { BlankScreen } from './ds/Screen.tsx';
  * rank-up, and Owl's line — then back to Home. */
 export function SessionSummaryScreen(): JSX.Element {
   const { t } = useTranslation();
+  const characters = usePack().core.characters;
   const journey = useAppStore((state) => state.journey);
   const progress = useAppStore((state) => state.progress);
   const startTotalStars = useAppStore((state) => state.todaySessionStartTotalStars);
@@ -31,7 +32,7 @@ export function SessionSummaryScreen(): JSX.Element {
   const startFriendChars = new Set(
     startFriends.filter((friend) => friend.earned).map((friend) => friend.character),
   );
-  const newFriends = animalFriends(journey.lessons, progress, CHESS_CHARACTERS).filter(
+  const newFriends = animalFriends(journey.lessons, progress, characters).filter(
     (friend) => friend.earned && !startFriendChars.has(friend.character),
   );
   const newRank = journey.rank && journey.rank.id !== startRankId ? journey.rank : undefined;

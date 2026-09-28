@@ -1,4 +1,5 @@
-import { computerLevelStatus, loadGameRecords, updateSuggestedLevel } from '@chess-kids/core/chess';
+import { loadGameRecords } from '@chess-kids/core';
+import { computerLevelStatus, updateSuggestedLevel } from '@chess-kids/core/chess';
 import { backAndRefresh, type SliceCreator } from '../store.ts';
 
 /** vs Friend's second player (`docs/app-structure.md` §6): another profile, or a guest (no password, no record). */

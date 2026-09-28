@@ -6,7 +6,6 @@ export { friendGameOptions, friendGamesPlayed, recordLocalMatch } from './app/fr
 export type { ComputerLevelCondition, ComputerLevelStatus } from './app/games.ts';
 export {
   recordGame,
-  loadGameRecords,
   computerLevelStatus,
   suggestedLevel,
   updateSuggestedLevel,

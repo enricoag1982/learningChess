@@ -1,7 +1,9 @@
 import {
+  composeDefaultSettings,
   createProfile,
   getProfileSettings,
   listProfiles,
+  loadGameRecords,
   loadJourney,
   loadMiniGameProgress,
   loadProgress,
@@ -14,9 +16,9 @@ import {
   type Profile,
   type ProfileSettings,
 } from '@chess-kids/core';
-import { DEFAULT_PROFILE_SETTINGS, loadGameRecords } from '@chess-kids/core/chess';
 import { requestPersistentStorageIfNeeded } from '../../adapters/persistent-storage.ts';
-import type { AppGet, AppSet, SliceCreator } from '../store.ts';
+import type { AppGet, AppSet } from '../store.ts';
+import type { SubjectWeb } from '../subject.ts';
 import { loadRewards, type RewardsSlice } from './rewards.ts';
 
 export interface ProfileSlice {
@@ -24,8 +26,8 @@ export interface ProfileSlice {
   readonly profiles: readonly Profile[];
   /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
-  /** `profile`'s own parent-set settings (app-structure.md §11); `DEFAULT_PROFILE_SETTINGS`
-   * outside a selected profile. Voice is applied at load time, not read from here. */
+  /** `profile`'s own parent-set settings (app-structure.md §11); the composed defaults outside a
+   * selected profile. Voice is applied at load time, not read from here. */
   readonly activeProfileSettings: ProfileSettings;
   readonly progress: readonly LessonProgress[];
   /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
@@ -122,11 +124,12 @@ async function selectAndGoHome(set: AppSet, get: AppGet, profile: Profile): Prom
   get().reset({ name: 'home' });
 }
 
-export const createProfileSlice: SliceCreator<ProfileSlice> = (set, get) => {
+export function createProfileSlice(set: AppSet, get: AppGet, pack: SubjectWeb): ProfileSlice {
+  const defaultSettings = composeDefaultSettings(pack.core.settings);
   return {
     profiles: [],
     profile: null,
-    activeProfileSettings: DEFAULT_PROFILE_SETTINGS,
+    activeProfileSettings: defaultSettings,
     progress: [],
     miniGameProgress: [],
     gameRecords: [],
@@ -163,7 +166,7 @@ export const createProfileSlice: SliceCreator<ProfileSlice> = (set, get) => {
       }
       await selectProfile(services.deps, profile.id);
       // A brand-new profile has no stored settings yet; defaults apply as-is (voice on).
-      await activateProfile(set, get, profile, DEFAULT_PROFILE_SETTINGS);
+      await activateProfile(set, get, profile, defaultSettings);
       await reloadProfiles(set, get);
       // domain-model.md §3.2: placement offered once, right after creating a new player.
       get().reset({ name: 'home' }, { name: 'placement-offer' });
@@ -185,4 +188,4 @@ export const createProfileSlice: SliceCreator<ProfileSlice> = (set, get) => {
       set(await loadProfileData(get, profile.id));
     },
   };
-};
+}
