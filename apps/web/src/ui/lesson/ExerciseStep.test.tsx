@@ -11,6 +11,7 @@ import type {
   YesNoDef,
 } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
+import { chessWeb } from '../../chess-pack.ts';
 import '../../i18n.ts';
 import {
   fixtureContentSource,
@@ -250,7 +251,7 @@ describe('ExerciseStep', () => {
       services,
     );
 
-    const answer = services.rules
+    const answer = chessWeb.core.context
       .legalMoves(position, { staticOpponent: true }, 'd4')
       .map((move) => move.to);
 

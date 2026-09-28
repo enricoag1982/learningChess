@@ -12,6 +12,7 @@ import {
   startExercise,
 } from '@chess-kids/core/chess';
 import { useServices } from '../app/store.ts';
+import { chessWeb } from '../chess-pack.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';
 import { useInstructionNarration } from '../ui/ds/useNarratedText.ts';
 import { exerciseInstructionText, exerciseNote } from '../ui/lesson/exercise-text.ts';
@@ -110,7 +111,7 @@ export function useExerciseSession(
   const services = useServices();
   const { character, guided = false, showCheck = true, shownStars, easier = false, save } = options;
 
-  const reducer = useMemo(() => sessionReducer(services.rules), [services.rules]);
+  const reducer = useMemo(() => sessionReducer(chessWeb.core.context), []);
   const [state, dispatch] = useReducer(reducer, def, initSessionState);
 
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
@@ -164,7 +165,7 @@ export function useExerciseSession(
   // `ExerciseStep`/`ReviewExerciseStep`, now shared.
   const displayedPosition = state.pending ? state.pending.position : state.core.position;
   const checkSquare =
-    showCheck && isInCheck(displayedPosition, services.rules.chess)
+    showCheck && isInCheck(displayedPosition, chessWeb.core.context.chess)
       ? kingSquare(displayedPosition, displayedPosition.toMove)
       : undefined;
 

@@ -2,6 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Lesson } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { chessWeb } from '../../chess-pack.ts';
 import { tContent } from '../../content-text.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
@@ -29,7 +30,7 @@ export function StoryStep({ lesson, onNext, onSkip }: StoryStepProps): JSX.Eleme
   const { demo } = lesson;
   const dots =
     'legalMovesFrom' in demo.highlight
-      ? services.rules
+      ? chessWeb.core.context
           .legalMoves(demo.position, { staticOpponent: true }, demo.highlight.legalMovesFrom)
           .map((move) => move.to)
       : demo.highlight.squares;

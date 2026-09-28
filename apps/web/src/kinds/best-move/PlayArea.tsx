@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useServices } from '../../app/store.ts';
+import { chessWeb } from '../../chess-pack.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
 import { panelBody } from '../panel-body.tsx';
@@ -16,13 +16,12 @@ export function PlayArea({
   top,
   done,
 }: PlayAreaProps<'best-move'>): JSX.Element {
-  const services = useServices();
   const solved = state.core.solved;
 
   const board = (
     <MoveBoard
       position={state.core.position}
-      legalMoves={moveKindLegalMoves(state.core, services.rules)}
+      legalMoves={moveKindLegalMoves(state.core, chessWeb.core.context)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}

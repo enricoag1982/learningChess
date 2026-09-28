@@ -26,11 +26,13 @@ describe('FullGameScreen (M3.5)', () => {
   it('a Scholar\'s-mate win is saved as a "full" GameRecord and shown back on Play', async () => {
     const services = {
       ...createTestServices('bundled'),
-      botPlayer: scriptedBotPlayer([
-        { from: 'e7', to: 'e5' },
-        { from: 'b8', to: 'c6' },
-        { from: 'g8', to: 'f6' },
-      ]),
+      subject: {
+        botPlayer: scriptedBotPlayer([
+          { from: 'e7', to: 'e5' },
+          { from: 'b8', to: 'c6' },
+          { from: 'g8', to: 'f6' },
+        ]),
+      },
     };
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);
@@ -69,7 +71,7 @@ describe('FullGameScreen (M3.5)', () => {
   it('leaving mid-game asks to confirm; confirming records it as abandoned, not a loss', async () => {
     const services = {
       ...createTestServices('bundled'),
-      botPlayer: scriptedBotPlayer([{ from: 'e7', to: 'e5' }]),
+      subject: { botPlayer: scriptedBotPlayer([{ from: 'e7', to: 'e5' }]) },
     };
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);

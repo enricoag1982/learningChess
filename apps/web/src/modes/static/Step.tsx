@@ -10,6 +10,7 @@ import {
 } from '@chess-kids/core/chess';
 import type { GameState } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { chessWeb } from '../../chess-pack.ts';
 import { tContent } from '../../content-text.ts';
 import { Board } from '../../ui/board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
@@ -49,7 +50,7 @@ export function Step({
   const starsCollected = totalStars - game.exercise.position.markers.stars.length;
 
   function handleMove(move: { from: Square; to: Square }): void {
-    const { state: next, outcome } = playGameMove(game, services.rules, move);
+    const { state: next, outcome } = playGameMove(game, chessWeb.core.context, move);
     setGame(next);
     if (outcome.kind !== 'illegal') setLastMove(move);
   }
@@ -71,7 +72,7 @@ export function Step({
             position={game.exercise.position}
             legalMoves={
               result === 'playing'
-                ? services.rules.legalMoves(game.exercise.position, { staticOpponent: true })
+                ? chessWeb.core.context.legalMoves(game.exercise.position, { staticOpponent: true })
                 : []
             }
             onMove={handleMove}

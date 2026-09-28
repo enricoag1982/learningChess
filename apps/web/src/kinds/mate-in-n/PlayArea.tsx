@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { useServices } from '../../app/store.ts';
+import { chessWeb } from '../../chess-pack.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
 import { panelBody } from '../panel-body.tsx';
@@ -16,7 +16,6 @@ export function PlayArea({
   top,
   done,
 }: PlayAreaProps<'mate-in-n'>): JSX.Element {
-  const services = useServices();
   const solved = state.core.solved;
   // While the reply is pending, the board shows the position right after the kid's own move (not
   // the reply, already applied in `state.core`) until `reveal` fires; `state.lastMove` already
@@ -26,7 +25,7 @@ export function PlayArea({
   const board = (
     <MoveBoard
       position={displayPosition}
-      legalMoves={state.pending ? [] : moveKindLegalMoves(state.core, services.rules)}
+      legalMoves={state.pending ? [] : moveKindLegalMoves(state.core, chessWeb.core.context)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}

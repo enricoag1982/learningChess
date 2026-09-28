@@ -124,7 +124,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     const lesson = fixtureLesson({ boss: boss.id });
     const services = {
       ...createTestServices(fixtureContentSource(lesson, [boss])),
-      botPlayer: scriptedBotPlayer([{ from: 'h7', to: 'h6' }]),
+      subject: { botPlayer: scriptedBotPlayer([{ from: 'h7', to: 'h6' }]) },
     };
     const { store } = await renderWithStore(
       <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
@@ -156,7 +156,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     const lesson = fixtureLesson({ boss: boss.id });
     const services = {
       ...createTestServices(fixtureContentSource(lesson, [boss])),
-      botPlayer: scriptedBotPlayer([{ from: 'h7', to: 'h6' }]),
+      subject: { botPlayer: scriptedBotPlayer([{ from: 'h7', to: 'h6' }]) },
     };
     await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -191,7 +191,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     const lesson = fixtureLesson({ boss: boss.id });
     const services = {
       ...createTestServices(fixtureContentSource(lesson, [boss])),
-      botPlayer: scriptedBotPlayer([]),
+      subject: { botPlayer: scriptedBotPlayer([]) },
     };
     await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -222,7 +222,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -238,12 +238,14 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         // Each round's take-back resets the position to the same start, so the black king is on
         // g8 again every time — the bot's correct reply is g8-h8 every round, not alternating.
-        botPlayer: scriptedBotPlayer([
-          { from: 'g8', to: 'h8' },
-          { from: 'g8', to: 'h8' },
-          { from: 'g8', to: 'h8' },
-          { from: 'g8', to: 'h8' },
-        ]),
+        subject: {
+          botPlayer: scriptedBotPlayer([
+            { from: 'g8', to: 'h8' },
+            { from: 'g8', to: 'h8' },
+            { from: 'g8', to: 'h8' },
+            { from: 'g8', to: 'h8' },
+          ]),
+        },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -276,7 +278,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([{ from: 'g8', to: 'h8' }]),
+        subject: { botPlayer: scriptedBotPlayer([{ from: 'g8', to: 'h8' }]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -312,7 +314,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -324,7 +326,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -354,7 +356,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -376,7 +378,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -395,7 +397,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -415,7 +417,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 
@@ -435,7 +437,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       const lesson = fixtureLesson({ boss: boss.id });
       const services = {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
-        botPlayer: scriptedBotPlayer([]),
+        subject: { botPlayer: scriptedBotPlayer([]) },
       };
       await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
 

@@ -7,7 +7,7 @@ import type {
   Square,
   UndoAction,
 } from '@chess-kids/core/chess';
-import { useServices } from '../app/store.ts';
+import { chessWeb } from '../chess-pack.ts';
 import { InfoPanel } from '../ui/ds/primitives.tsx';
 import { StarsRow } from '../ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';
@@ -88,13 +88,12 @@ export function MoveCountedPlayArea({
   done,
 }: MoveCountedPlayAreaProps): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
   const solved = state.core.solved;
 
   const board = (
     <MoveBoard
       position={state.core.position}
-      legalMoves={moveKindLegalMoves(state.core, services.rules)}
+      legalMoves={moveKindLegalMoves(state.core, chessWeb.core.context)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}

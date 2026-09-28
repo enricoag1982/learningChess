@@ -249,7 +249,6 @@ export default defineConfig([
       'apps/web/src/adapters/storage/local-store.ts',
       'apps/web/src/adapters/storage/migrations.test.ts',
       'apps/web/src/adapters/storage/migrations.ts',
-      'apps/web/src/adapters/storage/storage-compat.test.ts',
       'apps/web/src/adapters/storage/storage-keys.ts',
       'apps/web/src/app-version.d.ts',
       'apps/web/src/app/nav.test.ts',

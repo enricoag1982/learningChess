@@ -1,13 +1,11 @@
-import type { AppDeps, BackupFileWriter, BackupImporter, Narrator } from '@chess-kids/core';
+import type {
+  AppConfig,
+  AppDeps,
+  BackupFileWriter,
+  BackupImporter,
+  Narrator,
+} from '@chess-kids/core';
 import { createSubjectRuntime } from '@chess-kids/core';
-import type { BotPlayer, VariantRules } from '@chess-kids/core/chess';
-import {
-  CHESS_APP_CONFIG,
-  chessCore,
-  chessJsRules,
-  createVariantRules,
-} from '@chess-kids/core/chess';
-import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';
@@ -27,6 +25,7 @@ import { LocalStorageSettingsRepository } from '../adapters/storage/local-settin
 import type { LocalStore } from '../adapters/storage/local-store.ts';
 import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
 import { MIGRATIONS } from '../adapters/storage/migrations.ts';
+import type { SubjectServices, SubjectWeb } from './subject.ts';
 
 /** `AppDeps.backupFileWriter`/`backupImporter`: read only from the lazy-loaded Parent area, so
  * their implementations are fetched on first use, not shipped in the initial bundle. */
@@ -59,9 +58,9 @@ function createLazyBackupImporter(store: LocalStore): BackupImporter {
 /** The app's wired-up use-case dependencies, plus the pieces the UI reaches for directly. */
 export interface Services {
   readonly deps: AppDeps;
-  readonly rules: VariantRules;
   readonly narrator: Narrator;
-  readonly botPlayer: BotPlayer;
+  /** The active subject pack's own services (chess: `{ botPlayer }`), built once here. */
+  readonly subject: SubjectServices;
   /** Gates `narrator` on the active profile's "voice" setting (app-structure.md §11 "Settings
    * effect now") — set at every profile select. */
   setVoiceEnabled(enabled: boolean): void;
@@ -73,11 +72,16 @@ export interface Services {
   testVoice(text: string): Promise<AudioNarratorOutcome>;
 }
 
-/** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters. */
-export function createServices(storage: Storage = window.localStorage): Services {
+/** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters,
+ * over `pack`'s own subject (kind/mode registries, services). */
+export function createServices(
+  pack: SubjectWeb,
+  appConfig: Omit<AppConfig, 'version'>,
+  storage: Storage = window.localStorage,
+): Services {
   const store = openLocalStore(storage, {
     migrations: MIGRATIONS,
-    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+    keyPrefix: appConfig.storagePrefix,
   });
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
@@ -89,14 +93,14 @@ export function createServices(storage: Storage = window.localStorage): Services
     ids: createCryptoIds(),
     content: createBundledContentSource(),
     parentLock: new LocalStorageParentLockRepository(store),
-    passwordFile: createDownloadPasswordFileWriter(CHESS_APP_CONFIG.parentCodeFilePrefix),
+    passwordFile: createDownloadPasswordFileWriter(appConfig.parentCodeFilePrefix),
     settings: new LocalStorageSettingsRepository(store),
     random: createMathRandom(),
     backupFileWriter: createLazyBackupFileWriter(),
     backupImporter: createLazyBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
-    subject: createSubjectRuntime(chessCore),
-    app: { ...CHESS_APP_CONFIG, version: __APP_VERSION__ },
+    subject: createSubjectRuntime(pack.core),
+    app: { ...appConfig, version: __APP_VERSION__ },
   };
 
   // Pre-generated Kokoro audio per narrated text (docs/voice.md), Web Speech as the fallback for
@@ -109,9 +113,8 @@ export function createServices(storage: Storage = window.localStorage): Services
 
   return {
     deps,
-    rules: createVariantRules(chessJsRules),
     narrator,
-    botPlayer: createWorkerBotPlayer(),
+    subject: pack.createServices(),
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },

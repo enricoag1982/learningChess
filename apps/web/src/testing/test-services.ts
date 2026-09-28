@@ -1,12 +1,6 @@
 import type { AppDeps, ContentSource } from '@chess-kids/core';
 import { createSubjectRuntime } from '@chess-kids/core';
-import {
-  CHESS_APP_CONFIG,
-  bot,
-  chessCore,
-  chessJsRules,
-  createVariantRules,
-} from '@chess-kids/core/chess';
+import { CHESS_APP_CONFIG, bot, chessCore } from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
@@ -68,9 +62,8 @@ export function createTestServices(
 
   return {
     deps,
-    rules: createVariantRules(chessJsRules),
     narrator,
-    botPlayer: createWorkerBotPlayer(),
+    subject: { botPlayer: createWorkerBotPlayer() },
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },
