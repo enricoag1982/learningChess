@@ -54,6 +54,9 @@ export interface SubjectWeb {
   /** The piece-icon pill under a character's portrait, naming the piece it stands for
    * (`CharacterCard`); absent for a subject with no such badge. */
   CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
+  /** This subject's own art (chess: lesson characters, bot levels), keyed by id; falls back to the
+   * platform's own (avatars, Owl) for an id it doesn't have. */
+  readonly art: Readonly<Record<string, string>>;
   /** Extra Home tiles this subject contributes (chess: Play), merged with the platform's own
    * (Journey/Practice/My Den) and sorted by `order`; absent for a subject with none. */
   readonly homeTiles?: readonly HomeTile[];

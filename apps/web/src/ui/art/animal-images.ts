@@ -38,10 +38,13 @@ export const ANIMAL_IMAGES = {
   wolf,
 } as const;
 
-/** Image URL for `id`, falling back to the fox image for an id this module doesn't know (should
- * never happen for a real character/avatar/bot-level id — defensive only). */
-export function animalImage(id: string): string {
-  return (ANIMAL_IMAGES as Record<string, string | undefined>)[id] ?? ANIMAL_IMAGES.fox;
+/** Image URL for `id`: `subjectArt` (a subject's own `pack.art`) first, else the platform's own;
+ * falls back to the fox image for an id neither knows (should never happen for a real
+ * character/avatar/bot-level id — defensive only). */
+export function animalImage(id: string, subjectArt: Readonly<Record<string, string>> = {}): string {
+  return (
+    subjectArt[id] ?? (ANIMAL_IMAGES as Record<string, string | undefined>)[id] ?? ANIMAL_IMAGES.fox
+  );
 }
 
 /** Pastel badge colour per character, echoing its habitat in the sketches (animal theme, not

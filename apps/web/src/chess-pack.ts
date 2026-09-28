@@ -15,6 +15,7 @@ import { createPlaySlice, type PlaySlice } from './app/slices/play.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
 import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
+import { ANIMAL_IMAGES } from './ui/art/animal-images.ts';
 import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
@@ -82,6 +83,7 @@ export const chessWeb = {
   kinds: EXERCISE_KIND_UI,
   surface: { Story: SurfaceStory, Demo: SurfaceDemo },
   CharacterBadge,
+  art: ANIMAL_IMAGES,
   homeTiles: HOME_TILES,
   den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },
   loadParent: () => import('./parent-panels.tsx'),
