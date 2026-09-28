@@ -16,7 +16,7 @@ export {
 export type { BotPlayer } from './app/bot-player.ts';
 
 // Chess's `SubjectCore` + `AppConfig`.
-export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS } from './chess-core.ts';
+export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS, CHARACTER_PIECES } from './chess-core.ts';
 
 // Chess's concrete lesson/mini-game content shapes — the platform's own `Lesson`/`MiniGame`
 // (`./index.ts`) at chess's exercise def / demo instantiation.

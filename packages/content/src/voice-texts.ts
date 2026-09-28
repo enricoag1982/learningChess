@@ -12,7 +12,7 @@ import type {
   Resolve,
 } from '@chess-kids/core/chess';
 import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
-import { exerciseNote, isEasierOfferNote } from '@chess-kids/core/chess';
+import { bot, CHARACTER_PIECES, exerciseNote, isEasierOfferNote } from '@chess-kids/core/chess';
 import type { Locales } from './load.ts';
 import { modeContentOf } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
@@ -93,22 +93,11 @@ function resolve(
 
 // Domains derived from content, never guessed.
 
-/** Mirrors `apps/web/src/ui/art/character-meta.ts`'s `CHARACTER_PIECE` — kept in sync by
- * `lessons.test.ts` covering every lesson character. */
-const CHARACTER_PIECE: Readonly<Record<string, PieceType>> = {
-  rhino: 'r',
-  elephant: 'b',
-  lioness: 'q',
-  lion: 'k',
-  horse: 'n',
-  caterpillar: 'p',
-};
-
 function characterPieceOf(character: string): PieceType | null {
-  return CHARACTER_PIECE[character] ?? null;
+  return CHARACTER_PIECES[character] ?? null;
 }
 
-const PIECE_CHARACTERS = new Set(Object.keys(CHARACTER_PIECE));
+const PIECE_CHARACTERS = new Set(Object.keys(CHARACTER_PIECES));
 
 /** An Owl-taught lesson is named by its own title; a piece character's first lesson is named by
  * the character; every later lesson of that character by its own title. */
@@ -121,8 +110,8 @@ function lessonDisplayName(
     : resolve(locales, lesson.titleKey);
 }
 
-/** Fixed Mouse → Bear ladder, mirrored here (not re-exported from `@chess-kids/core`). */
-const BOT_LEVEL_NAMES = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'] as const;
+/** Mouse → Bear ladder, from the one source (`domain/bot/levels.ts`'s `BOT_LEVELS`). */
+const BOT_LEVEL_NAMES = bot.BOT_LEVELS.map((level) => level.name);
 
 const PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
 

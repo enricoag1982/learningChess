@@ -4,9 +4,10 @@ import type { BadgeCondition } from '../../badges.ts';
 import type { GameRecord } from '../../progress.ts';
 import { chessJsRules } from '../chessjs-rules.ts';
 import { parseFen } from '../fen.ts';
+import { STANDARD_START_BOARD } from './start.ts';
 
 /** Standard chess start position, castling rights included (same board `isStandardStart` checks). */
-const STANDARD_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const STANDARD_START_FEN = `${STANDARD_START_BOARD} w KQkq - 0 1`;
 
 /** True if the opponent ever captured this profile's queen while replaying `moves` from the
  * standard start. Only meaningful for a full game. An unreplayable move stops the scan. */

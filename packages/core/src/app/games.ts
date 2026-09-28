@@ -1,3 +1,4 @@
+import { BOT_LEVELS } from '../domain/bot/levels.ts';
 import type { BotLevel } from '../domain/bot/levels.ts';
 import { isStandardStart } from '../domain/chess/facts/start.ts';
 import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
@@ -96,7 +97,7 @@ export interface ComputerLevelStatus {
   readonly games: number;
 }
 
-const LEVEL_NAMES: readonly BotLevel['name'][] = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'];
+const LEVEL_NAMES: readonly BotLevel['name'][] = BOT_LEVELS.map((level) => level.name);
 
 /** Full games ("game: 'full'", not mini-games) played vs `level`, excluding abandoned ones. */
 function fullGameTally(
