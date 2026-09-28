@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePack } from '../../app/subject.ts';
-import { characterName } from '../../content-text.ts';
-import { characterColor } from '../art/animal-images.ts';
+import { characterName } from '@learn/platform-web/content-text.ts';
+import { characterColor } from '@learn/platform-web/ui/art/animal-images.ts';
 import { CharacterIcon } from '../art/characters.tsx';
 
 /** Character portrait + name, and (except Owl) a subject-supplied badge (chess: a piece-icon

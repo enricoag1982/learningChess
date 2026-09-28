@@ -11,7 +11,7 @@ import { CHESS_APP_CONFIG } from '@learn/subject-chess';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createServices } from '../../app/services.ts';
 import { chessWeb } from '../../chess-pack.ts';
-import { SCHEMA_VERSION } from './local-store.ts';
+import { SCHEMA_VERSION } from '@learn/platform-web/adapters/storage/local-store.ts';
 
 const FIXTURES_DIR = join(import.meta.dirname, '..', '..', '..', 'test-fixtures', 'storage');
 const TAGS = ['v1.0.0', 'v1.1.0', 'v2.0.0'] as const;

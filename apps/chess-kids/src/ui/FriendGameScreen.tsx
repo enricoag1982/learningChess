@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Color, LocalPlayer, Position, Square } from '@learn/subject-chess';
-import type { ChessContentSource } from '../adapters/content/bundled-content-source.ts';
+import type { ChessContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import {
   chessJsRules,
   game,
@@ -13,14 +13,17 @@ import {
 } from '@learn/subject-chess';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/slices/play.ts';
 import { useAppStore, useServices } from '../app/store.ts';
-import { Board } from './board/Board.tsx';
-import type { BoardHighlights } from './board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
-import { GuestIcon } from './ds/icons-lazy.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen } from './ds/Screen.tsx';
-import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import type { BoardHighlights } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import {
+  isClassicOnlyContext,
+  showPieceBadges,
+} from '@learn/subject-chess/web/ui/board/piece-style.ts';
+import { GuestIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { ConfirmDialog } from '@learn/platform-web/ui/ds/ConfirmDialog.tsx';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
 /** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

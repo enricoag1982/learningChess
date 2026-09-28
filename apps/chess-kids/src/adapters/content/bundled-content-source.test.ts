@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createBundledContentSource } from './bundled-content-source.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 
 describe('createBundledContentSource', () => {
   it('exposes the rook lesson from the compiled content bundle', () => {

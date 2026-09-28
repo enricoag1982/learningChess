@@ -11,7 +11,7 @@ export * from './kit/content.ts';
 export * from './kit/storage.ts';
 export * from './kit/pages.ts';
 export * from './kit/exercises.ts';
-export { clickSquare } from '../src/kinds/e2e-actions.ts';
+export { clickSquare } from '@learn/subject-chess/web/kinds/e2e-actions.ts';
 export {
   playOneKidVersusMove,
   playVersusBoss,

@@ -2,7 +2,7 @@ import { Component } from 'react';
 import type { ErrorInfo, JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Owl } from './ds/Owl.tsx';
-import { TapButton } from './ds/primitives.tsx';
+import { TapButton } from '@learn/platform-web/ui/ds/primitives.tsx';
 
 /** What a child (or the parent helping) sees instead of a blank page when the app cannot start or
  * a screen crashes: Owl, a short message, the error text, and "Try again". */

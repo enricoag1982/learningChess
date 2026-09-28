@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { PhaseChip } from './PhaseChip.tsx';
+import { PhaseChip } from '@learn/platform-web/ui/lesson/PhaseChip.tsx';
 
 describe('PhaseChip (phone)', () => {
   it('names skipped phases for screen readers and stripes them in the mini track', () => {

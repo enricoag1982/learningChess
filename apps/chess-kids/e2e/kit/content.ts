@@ -10,7 +10,7 @@ import {
 // shape (see `bundled-content-source.ts`), so the cast below is a type conversion, not a check.
 import rawContent from '@learn/subject-chess/dist/content.json' with { type: 'json' };
 import rawTracks from '@learn/subject-chess/dist/tracks.json' with { type: 'json' };
-import { characterPieceOrNull } from '../../src/ui/art/character-meta.ts';
+import { characterPieceOrNull } from '@learn/subject-chess/web/ui/art/character-meta.ts';
 import { contentText, interpolate } from './i18n.ts';
 
 export const content: CompiledContent = rawContent as unknown as CompiledContent;

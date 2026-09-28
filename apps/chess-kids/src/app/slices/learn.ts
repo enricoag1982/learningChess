@@ -16,7 +16,7 @@ import {
   type Lesson,
   type ParentUnlockTarget,
 } from '@learn/platform-core';
-import type { Route } from '../routes.ts';
+import type { Route } from '@learn/platform-web/app/routes.ts';
 import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 
 export interface LearnSlice {

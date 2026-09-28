@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import App from './App.tsx';
-import type { AppUpdate } from './adapters/app-update.ts';
-import { fixtureContentSource, fixtureLesson } from './testing/fixtures.ts';
+import type { AppUpdate } from '@learn/platform-web/adapters/app-update.ts';
+import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { createTestServices } from './testing/test-services.ts';
 import { pickProfileFromPicker, seedReturningProfile } from './testing/app-test-helpers.ts';
 import { renderApp } from './testing/render-app.tsx';

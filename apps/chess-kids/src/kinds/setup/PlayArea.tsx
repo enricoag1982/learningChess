@@ -4,14 +4,14 @@ import { useTranslation } from 'react-i18next';
 import type { ActionOf, DefOf, ExerciseStateOf, Hint, Piece, Square } from '@learn/subject-chess';
 import { setupPalette } from '@learn/subject-chess';
 import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
-import { Board } from '../../ui/board/Board.tsx';
-import { useIsStackedLayout } from '../../ui/useMediaQuery.ts';
-import { ExerciseControls } from '../ExerciseControls.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import { useIsStackedLayout } from '@learn/platform-web/ui/useMediaQuery.ts';
+import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
-import { panelBody } from '../panel-body.tsx';
+import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import type { PlayAreaProps } from '../kind-ui.ts';
 import type { WrongSquaresExtra } from '../move-ui.ts';
-import { SetupPalette } from './SetupPalette.tsx';
+import { SetupPalette } from '@learn/subject-chess/kinds/setup/SetupPalette.tsx';
 
 export function PlayArea({
   state,

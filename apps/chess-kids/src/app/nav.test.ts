@@ -7,7 +7,7 @@ import {
   fixtureCatalog,
   fixtureContentSource,
   fixtureLesson,
-} from '../testing/fixtures.ts';
+} from '@learn/subject-chess/web/testing/fixtures.ts';
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { chessWeb } from '../chess-pack.ts';

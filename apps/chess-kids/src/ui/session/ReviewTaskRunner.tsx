@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { ConceptTask, ExerciseStateBase } from '@learn/platform-core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
-import { BlankScreen, Screen, ScreenHeader } from '../ds/Screen.tsx';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Dots mirroring the lesson's `StageDots`, sized for a short (3–5 task) review run. */
 function TaskDots({

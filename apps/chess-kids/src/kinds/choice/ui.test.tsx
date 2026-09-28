@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import type { ChoiceOption } from '@learn/subject-chess';
 import '../../app-i18n.ts';
-import { ChoiceOptions } from './ChoiceOptions.tsx';
+import { ChoiceOptions } from '@learn/subject-chess/kinds/choice/ChoiceOptions.tsx';
 
 afterEach(cleanup);
 

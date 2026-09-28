@@ -5,9 +5,9 @@ import {
   fixtureContentSource,
   fixtureExercise,
   fixtureLesson,
-} from '../testing/fixtures.ts';
+} from '@learn/subject-chess/web/testing/fixtures.ts';
 import { chessWeb } from '../chess-pack.ts';
-import { stubMatchMedia } from '../testing/mock-media-query.ts';
+import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { LessonScreen } from './LessonScreen.tsx';

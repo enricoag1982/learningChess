@@ -6,10 +6,10 @@ import type { AssessmentScope, AssessmentScore, SubjectCore } from '@learn/platf
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { Services } from '../app/services.ts';
 import { usePack } from '../app/subject.ts';
-import { characterName, tContent } from '../content-text.ts';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { BlankScreen, Screen } from './ds/Screen.tsx';
+import { BlankScreen, Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Scope's display name, for the result screen's headline. */
 function scopeName(

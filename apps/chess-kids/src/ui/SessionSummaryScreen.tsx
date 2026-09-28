@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { animalFriends, totalStars } from '@learn/platform-core';
 import { useAppStore } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
-import { characterName, tContent } from '../content-text.ts';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
 import { CharacterIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsRow } from './StarsRow.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen } from './ds/Screen.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Today session's closing screen (domain-model.md §3.3): stars earned, any new animal friend, a
  * rank-up, and Owl's line — then back to Home. */

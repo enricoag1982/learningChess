@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { PieceType } from '@learn/subject-chess';
 import { AVATARS } from '@learn/platform-core';
 import { bot } from '@learn/subject-chess';
-import { characterForPiece } from './character-meta.ts';
-import { ANIMAL_IMAGES } from './animal-images.ts';
+import { characterForPiece } from '@learn/subject-chess/web/ui/art/character-meta.ts';
+import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 
 const PIECE_TYPES: readonly PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
 

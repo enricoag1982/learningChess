@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import type { Lesson } from '@learn/platform-core';
 import { lessonStars } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
-import { tContent } from '../../content-text.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
 import { StarsRow } from '../StarsRow.tsx';
-import { NewGameIcon } from '../ds/icons.tsx';
-import { tapClass } from '../ds/tap.ts';
+import { NewGameIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
 
 export interface CompleteStepProps {
   readonly lesson: Lesson;

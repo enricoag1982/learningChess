@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { recordMiniGameResult } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { BossStep } from '../chess-pack.ts';
-import { tContent } from '../content-text.ts';
-import type { BossPlaySession } from '../modes/mode-ui.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import type { BossPlaySession } from '@learn/platform-web/modes/mode-ui.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** A mini-game played standalone from the Play screen: the same `BossStep` a lesson uses, in a
  * simple top bar instead of the lesson chrome, saved via `recordMiniGameResult`. */

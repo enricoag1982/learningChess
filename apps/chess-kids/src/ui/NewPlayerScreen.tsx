@@ -3,12 +3,12 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { validateNickname } from '@learn/platform-core';
 import { useAppStore } from '../app/store.ts';
-import { avatarName } from '../content-text.ts';
-import type { Avatar } from './art/avatar-meta.ts';
-import { AVATARS, avatarBackground } from './art/avatar-meta.ts';
-import { AvatarIcon } from './art/avatars.tsx';
-import { tapClass } from './ds/tap.ts';
-import { Screen } from './ds/Screen.tsx';
+import { avatarName } from '@learn/platform-web/content-text.ts';
+import type { Avatar } from '@learn/platform-web/ui/art/avatar-meta.ts';
+import { AVATARS, avatarBackground } from '@learn/platform-web/ui/art/avatar-meta.ts';
+import { AvatarIcon } from '@learn/platform-web/ui/art/avatars.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 type Step = 'nickname' | 'avatar';
 

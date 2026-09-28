@@ -3,14 +3,17 @@ import type { AppSettings, ProfileSettings, TracksCatalog } from '@learn/platfor
 import type { Lesson } from '@learn/subject-chess';
 import { localDayString } from '@learn/platform-core';
 import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
-import { LocalStorageGameRecordRepository } from '../../src/adapters/storage/local-game-record-repository.ts';
-import { LocalStorageProfileRepository } from '../../src/adapters/storage/local-profile-repository.ts';
-import { LocalStorageProgressRepository } from '../../src/adapters/storage/local-progress-repository.ts';
-import { LocalStorageRewardsRepository } from '../../src/adapters/storage/local-rewards-repository.ts';
-import { LocalStorageSettingsRepository } from '../../src/adapters/storage/local-settings-repository.ts';
-import { openLocalStore, SCHEMA_VERSION } from '../../src/adapters/storage/local-store.ts';
-import { MIGRATIONS } from '../../src/adapters/storage/migrations.ts';
-import { createMemoryStorage } from '../../src/testing/memory-storage.ts';
+import { LocalStorageGameRecordRepository } from '@learn/platform-web/adapters/storage/local-game-record-repository.ts';
+import { LocalStorageProfileRepository } from '@learn/platform-web/adapters/storage/local-profile-repository.ts';
+import { LocalStorageProgressRepository } from '@learn/platform-web/adapters/storage/local-progress-repository.ts';
+import { LocalStorageRewardsRepository } from '@learn/platform-web/adapters/storage/local-rewards-repository.ts';
+import { LocalStorageSettingsRepository } from '@learn/platform-web/adapters/storage/local-settings-repository.ts';
+import {
+  openLocalStore,
+  SCHEMA_VERSION,
+} from '@learn/platform-web/adapters/storage/local-store.ts';
+import { MIGRATIONS } from '@learn/platform-web/adapters/storage/migrations.ts';
+import { createMemoryStorage } from '@learn/platform-web/testing/memory-storage.ts';
 
 /** The real repositories a spec can drive directly, over the page's own storage (`withAppStorage`). */
 export interface AppStorageRepos {

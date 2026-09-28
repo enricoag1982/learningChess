@@ -19,18 +19,21 @@ import {
   versusPosition,
 } from '@learn/subject-chess';
 import { useAppStore, useServices } from '../../app/store.ts';
-import { tContent } from '../../content-text.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
 import { UndoIcon } from '../../kinds/MoveCountedPlayArea.tsx';
-import { Board } from '../../ui/board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
-import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import {
+  isClassicOnlyContext,
+  showPieceBadges,
+} from '@learn/subject-chess/web/ui/board/piece-style.ts';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
-import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
-import { SECONDARY_BUTTON } from '../../ui/lesson/button-styles.ts';
-import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
-import { prefersReducedMotion } from '../../ui/useMediaQuery.ts';
+import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
+import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
+import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
+import { prefersReducedMotion } from '@learn/platform-web/ui/useMediaQuery.ts';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
-import type { BossStepProps } from '../mode-ui.ts';
+import type { BossStepProps } from '@learn/platform-web/modes/mode-ui.ts';
 
 export interface VersusStepProps extends BossStepProps<VersusMiniGame> {
   /** Fired after every ply with the latest state — for a caller that needs the in-progress game

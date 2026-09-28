@@ -10,12 +10,12 @@ import type {
 } from '@learn/subject-chess';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
 import type { SurfaceContext } from '../app/subject.ts';
-import { InfoPanel } from '../ui/ds/primitives.tsx';
+import { InfoPanel } from '@learn/platform-web/ui/ds/primitives.tsx';
 import { StarsRow } from '../ui/StarsRow.tsx';
-import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';
-import { ExerciseControls } from './ExerciseControls.tsx';
+import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
+import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from './ExercisePlay.tsx';
-import { panelBody } from './panel-body.tsx';
+import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import type { ExerciseUIState, SessionAction } from './kind-ui.ts';
 import type { MoveExtra } from './move-ui.ts';
 import { moveKindLegalMoves } from './move-ui.ts';

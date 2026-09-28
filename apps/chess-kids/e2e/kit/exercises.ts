@@ -21,7 +21,7 @@ import {
   toFen,
 } from '@learn/subject-chess';
 import { solutionOf } from '@learn/subject-chess/testing';
-import { kindE2EOf } from '../../src/kinds/e2e-registry.ts';
+import { kindE2EOf } from '@learn/subject-chess/web/kinds/e2e-registry.ts';
 import { modeE2EOf } from '../../src/modes/e2e-registry.ts';
 import { contentText } from './i18n.ts';
 

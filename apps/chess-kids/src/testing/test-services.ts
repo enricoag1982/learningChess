@@ -1,25 +1,28 @@
 import type { AppDeps, ContentSource } from '@learn/platform-core';
 import { createSubjectRuntime } from '@learn/platform-core';
 import { CHESS_APP_CONFIG, bot, chessCore } from '@learn/subject-chess';
-import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
-import { createCryptoIds } from '../adapters/ids.ts';
-import { createSystemClock } from '../adapters/clock.ts';
-import { LocalStorageAssessmentRepository } from '../adapters/storage/local-assessment-repository.ts';
-import { LocalStorageBackupImporter } from '../adapters/storage/local-backup-importer.ts';
-import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game-record-repository.ts';
-import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
-import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
-import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
-import { LocalStorageRewardsRepository } from '../adapters/storage/local-rewards-repository.ts';
-import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
-import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
-import { MIGRATIONS } from '../adapters/storage/migrations.ts';
+import { createWorkerBotPlayer } from '@learn/subject-chess/web/adapters/bot/worker-bot-player.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
+import { createCryptoIds } from '@learn/platform-web/adapters/ids.ts';
+import { createSystemClock } from '@learn/platform-web/adapters/clock.ts';
+import { LocalStorageAssessmentRepository } from '@learn/platform-web/adapters/storage/local-assessment-repository.ts';
+import { LocalStorageBackupImporter } from '@learn/platform-web/adapters/storage/local-backup-importer.ts';
+import { LocalStorageGameRecordRepository } from '@learn/platform-web/adapters/storage/local-game-record-repository.ts';
+import { LocalStorageParentLockRepository } from '@learn/platform-web/adapters/storage/local-parent-lock-repository.ts';
+import { LocalStorageProfileRepository } from '@learn/platform-web/adapters/storage/local-profile-repository.ts';
+import { LocalStorageProgressRepository } from '@learn/platform-web/adapters/storage/local-progress-repository.ts';
+import { LocalStorageRewardsRepository } from '@learn/platform-web/adapters/storage/local-rewards-repository.ts';
+import { LocalStorageSettingsRepository } from '@learn/platform-web/adapters/storage/local-settings-repository.ts';
+import {
+  openLocalStore,
+  SCHEMA_VERSION,
+} from '@learn/platform-web/adapters/storage/local-store.ts';
+import { MIGRATIONS } from '@learn/platform-web/adapters/storage/migrations.ts';
 import type { Services } from '../app/services.ts';
-import { createFakeBackupFileWriter } from './fake-backup-file-writer.ts';
-import { createFakeNarrator } from './fake-narrator.ts';
-import { createFakePasswordFileWriter } from './fake-password-file-writer.ts';
-import { createMemoryStorage } from './memory-storage.ts';
+import { createFakeBackupFileWriter } from '@learn/platform-web/testing/fake-backup-file-writer.ts';
+import { createFakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
+import { createFakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
+import { createMemoryStorage } from '@learn/platform-web/testing/memory-storage.ts';
 
 /**
  * Same wiring as `createServices`, but with an injectable `ContentSource` so tests can use a

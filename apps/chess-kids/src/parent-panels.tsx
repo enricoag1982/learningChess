@@ -14,8 +14,8 @@ import {
   PARENT_CHIP,
   PARENT_CHIP_LOCKED,
   PARENT_CHIP_SELECTED,
-} from './ui/ds/parent-styles-lazy.ts';
-import { PARENT_INFO_PANEL } from './ui/parent/parent-styles.ts';
+} from '@learn/platform-web/ui/ds/parent-styles-lazy.ts';
+import { PARENT_INFO_PANEL } from '@learn/platform-web/ui/parent/parent-styles.ts';
 import { formatDate, opponentLabel, resultLabel, Section } from './ui/parent/ChildReport.tsx';
 
 /** The computer-level + piece-style chips (`ChildSettings`'s generic settings section). */

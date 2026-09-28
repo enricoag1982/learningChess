@@ -11,16 +11,19 @@ import {
   suggestedLevel,
 } from '@learn/subject-chess';
 import { useAppStore, useServices } from '../app/store.ts';
-import { avatarName, tContent } from '../content-text.ts';
-import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
-import { animalImage } from './art/animal-images.ts';
+import { avatarName, tContent } from '@learn/platform-web/content-text.ts';
+import {
+  firstLessonsByCharacter,
+  unlockLabel,
+} from '@learn/platform-web/ui/lesson-character-labels.ts';
+import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
 import { OwlIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { ComputerIcon, FriendIcon, LockIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
-import { useAsync } from './ds/useAsync.ts';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { ComputerIcon, FriendIcon, LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
 /** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {

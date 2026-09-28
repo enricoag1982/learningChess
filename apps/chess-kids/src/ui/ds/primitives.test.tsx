@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { InfoPanel, InfoPill, TapButton } from './primitives.tsx';
+import { InfoPanel, InfoPill, TapButton } from '@learn/platform-web/ui/ds/primitives.tsx';
 
 describe('TapButton', () => {
   it('renders the raised marker class, plus a tone class for a colour tone', () => {

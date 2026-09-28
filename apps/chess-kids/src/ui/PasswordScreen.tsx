@@ -3,16 +3,16 @@ import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verifyParentPassword } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
-import { formatCountdown } from './parent/countdown.ts';
+import { formatCountdown } from '@learn/platform-web/ui/parent/countdown.ts';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
-} from './parent/parent-styles.ts';
-import { LockIcon } from './ds/icons.tsx';
-import { Screen } from './ds/Screen.tsx';
-import { useAsync } from './ds/useAsync.ts';
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
+import { LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 
 const MAX_ATTEMPTS = 5;
 /** How often the countdown re-reads the clock while locked. */

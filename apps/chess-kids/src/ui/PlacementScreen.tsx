@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore, useRoute } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { Screen } from './ds/Screen.tsx';
+import { Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Placement's own closing summary (domain-model.md §3.2): how many Basics worlds were passed. */
 function PlacementSummary({

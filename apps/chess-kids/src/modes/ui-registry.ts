@@ -5,7 +5,7 @@ import type { MiniGame, ModeType } from '@learn/subject-chess';
 import { Step as SeriesStep } from './series/Step.tsx';
 import { Step as StaticStep } from './static/Step.tsx';
 import { Step as VersusStep } from './versus/Step.tsx';
-import type { BossStepProps, MiniGameModeUI } from './mode-ui.ts';
+import type { BossStepProps, MiniGameModeUI } from '@learn/platform-web/modes/mode-ui.ts';
 
 /** `M`'s own mini-game type — `kinds/e2e-registry.ts`'s sibling for the mode e2e drivers. */
 export type GameOf<M extends ModeType> = Extract<MiniGame, { readonly mode: M }>;

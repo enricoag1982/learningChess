@@ -7,7 +7,7 @@ import type {
   Stars,
 } from '@learn/platform-core';
 import { exerciseNote as coreExerciseNote } from '@learn/platform-core';
-import { characterName, tContent } from '../../content-text.ts';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
 import type { SpeechBubbleNote } from '../ds/SpeechBubble.tsx';
 
 /** The exercise's instruction: always shown, never replaced by a hint / error / praise note. */

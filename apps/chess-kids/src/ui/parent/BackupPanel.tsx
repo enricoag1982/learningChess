@@ -10,17 +10,17 @@ import type {
 } from '@learn/platform-core/merge';
 import { importMerged, planImport, previewChildChange } from '@learn/platform-core/merge';
 import { useServices } from '../../app/store.ts';
-import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
-import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { ScreenHeader } from '../ds/Screen.tsx';
-import { ParentSection } from '../ds/parent.tsx';
+import { sendBackupToOtherDevice } from '@learn/platform-web/adapters/share-backup.ts';
+import { ChevronLeftIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
+import { ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { ParentSection } from '@learn/platform-web/ui/ds/parent.tsx';
 import {
   PARENT_INFO_PANEL,
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
-} from './parent-styles.ts';
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
 
 /** Reads a browser `File` as text (`FileReader`, wrapped as a promise). */
 function readFileText(file: File): Promise<string> {

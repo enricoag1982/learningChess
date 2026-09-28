@@ -6,7 +6,7 @@ import { createAppStore, StoreProvider } from '../app/store.ts';
 import { PackProvider } from '../app/subject.ts';
 import { chessWeb } from '../chess-pack.ts';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
-import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
+import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { createTestServices } from '../testing/test-services.ts';
 
 interface ExerciseSample {
@@ -16,7 +16,7 @@ interface ExerciseSample {
 
 /** Every exercise kind's own `sample.ts` (dev-only fixtures), one glob per type folder. */
 const SAMPLE_MODULES = import.meta.glob<{ readonly samples: readonly ExerciseSample[] }>(
-  '../kinds/*/sample.ts',
+  '../../../../packages/subject-chess/src/kinds/*/sample.ts',
   { eager: true },
 );
 const EXERCISES: readonly ExerciseSample[] = Object.values(SAMPLE_MODULES)

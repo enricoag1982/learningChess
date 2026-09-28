@@ -11,11 +11,11 @@ import {
   versusGameState,
 } from '@learn/subject-chess';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
-import type { BossPlaySession } from '../modes/mode-ui.ts';
+import type { BossPlaySession } from '@learn/platform-web/modes/mode-ui.ts';
 import { Step as VersusStep } from '../modes/versus/Step.tsx';
-import { animalImage } from './art/animal-images.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
-import { ConfirmDialog } from './ds/ConfirmDialog.tsx';
+import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { ConfirmDialog } from '@learn/platform-web/ui/ds/ConfirmDialog.tsx';
 
 /** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

@@ -1,6 +1,6 @@
 import type { JSX, ReactNode } from 'react';
 import { usePack } from '../app/subject.ts';
-import { GameLayout } from '../ui/lesson/GameLayout.tsx';
+import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
 import type { PlayAreaProps } from './kind-ui.ts';
 
 export interface ExerciseFrameProps {

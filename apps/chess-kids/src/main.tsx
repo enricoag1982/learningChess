@@ -7,7 +7,7 @@ import './index.css';
 import './app-i18n.ts';
 import App from './App.tsx';
 import { AppErrorBoundary } from './ui/AppErrorBoundary.tsx';
-import { createAppUpdate } from './adapters/app-update.ts';
+import { createAppUpdate } from '@learn/platform-web/adapters/app-update.ts';
 import { chessWeb } from './chess-pack.ts';
 import type { SubjectWeb } from './app/subject.ts';
 

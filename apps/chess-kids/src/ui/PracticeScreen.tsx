@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import type { ConceptStats, Lesson } from '@learn/platform-core';
 import { isDue, isWeak, lessonStatus } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { avatarName, tContent } from '../content-text.ts';
+import { avatarName, tContent } from '@learn/platform-web/content-text.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { WarmUpIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { WarmUpIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
 /** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {

@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
-import { scriptedBotPlayer } from '../testing/bot.ts';
-import { clickSquare } from '../testing/board.ts';
+import { scriptedBotPlayer } from '@learn/subject-chess/web/testing/bot.ts';
+import { clickSquare } from '@learn/subject-chess/web/testing/board.ts';
 
 // A fixed test seed shortens the bot's "thinking" pause to 300ms (VersusStep.tsx's pattern).
 beforeEach(() => {

@@ -9,7 +9,7 @@ brownish rim goes soft instead of jagged.
 
 Run once, offline, from the repo root (any Python 3 + Pillow):
     python3 tools/art/make-lioness.py
-Commit the output `apps/chess-kids/src/assets/art/lioness.webp`; not part of the build.
+Commit the output `packages/platform-web/src/assets/art/lioness.webp`; not part of the build.
 """
 
 from collections import deque
@@ -18,8 +18,8 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SOURCE = REPO_ROOT / "apps/chess-kids/src/assets/art/lion.webp"
-DEST = REPO_ROOT / "apps/chess-kids/src/assets/art/lioness.webp"
+SOURCE = REPO_ROOT / "packages/platform-web/src/assets/art/lion.webp"
+DEST = REPO_ROOT / "packages/platform-web/src/assets/art/lioness.webp"
 
 FACE_MIN_RED = 200  # face / ears / muzzle are at least this red; mane and background are not
 RIM_FULL_RED = 235  # rim pixels at least this red stay fully opaque

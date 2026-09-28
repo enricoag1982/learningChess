@@ -3,19 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { isDue, lessonStatus, totalStars } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
-import { avatarName, characterName, tContent } from '../content-text.ts';
+import { avatarName, characterName, tContent } from '@learn/platform-web/content-text.ts';
 import { InstallBanner } from './InstallBanner.tsx';
-import { RankPill } from './RankPill.tsx';
-import { ReplayButton } from './ds/ReplayButton.tsx';
+import { RankPill } from '@learn/platform-web/ui/RankPill.tsx';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from './ds/SpeechBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { StreakPill } from './StreakPill.tsx';
-import { useNarratedText } from './ds/useNarratedText.ts';
-import { PlayIcon, Svg, SwitchPlayerIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, RoundIconButton } from './ds/Screen.tsx';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
-import { useAsync } from './ds/useAsync.ts';
+import { StreakPill } from '@learn/platform-web/ui/StreakPill.tsx';
+import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
+import { PlayIcon, Svg, SwitchPlayerIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, RoundIconButton } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 
 // Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
 // base") — one-off shapes only Home uses, built on the shared `Svg` icon base.

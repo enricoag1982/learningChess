@@ -2,13 +2,13 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ActionOf, DefOf, ExerciseStateOf } from '@learn/subject-chess';
 import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
-import { Board } from '../../ui/board/Board.tsx';
-import { ExerciseControls } from '../ExerciseControls.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
-import { panelBody } from '../panel-body.tsx';
+import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import type { PlayAreaProps } from '../kind-ui.ts';
 import type { WrongSquaresExtra } from '../move-ui.ts';
-import { ChoiceOptions } from './ChoiceOptions.tsx';
+import { ChoiceOptions } from '@learn/subject-chess/kinds/choice/ChoiceOptions.tsx';
 
 export function PlayArea({
   def,

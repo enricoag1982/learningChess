@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@source '../../../packages/platform-web/src';
+@source '../../../packages/subject-chess/src';
 
 /* Design tokens: see docs/screens.md §1.1 (kept in sync by the lead). */
 @theme {

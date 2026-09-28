@@ -1,13 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
-import type { RouteName } from './app/routes.ts';
+import type { RouteName } from '@learn/platform-web/app/routes.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import { PackProvider } from './app/subject.ts';
 import type { SubjectWeb } from './app/subject.ts';
 import { chessWeb, CHESS_APP_CONFIG } from './chess-pack.ts';
-import type { AppUpdate } from './adapters/app-update.ts';
+import type { AppUpdate } from '@learn/platform-web/adapters/app-update.ts';
 import { AppNotice } from './ui/AppNotice.tsx';
 import { AppUpdater } from './ui/AppUpdater.tsx';
 import { Celebration } from './ui/Celebration.tsx';

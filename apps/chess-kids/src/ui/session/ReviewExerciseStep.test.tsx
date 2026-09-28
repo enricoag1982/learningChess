@@ -5,9 +5,13 @@ import type { MateInNDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
 import { chessWeb } from '../../chess-pack.ts';
 import '../../app-i18n.ts';
-import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';
-import type { FakeNarrator } from '../../testing/fake-narrator.ts';
-import { stubMatchMedia } from '../../testing/mock-media-query.ts';
+import {
+  fixtureContentSource,
+  fixtureExercise,
+  fixtureLesson,
+} from '@learn/subject-chess/web/testing/fixtures.ts';
+import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
+import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';

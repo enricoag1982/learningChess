@@ -5,16 +5,19 @@ import { buildBackupFile } from '@learn/platform-core/backup';
 import { CHESS_APP_CONFIG, chessCore, DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
 import { makeClock, makeIds, makePasswordFileWriter } from '@learn/platform-core/testing';
 import { stubContent } from '@learn/subject-chess/testing';
-import { LocalStorageBackupImporter } from './local-backup-importer.ts';
-import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
-import { LocalStorageGameRecordRepository } from './local-game-record-repository.ts';
-import { LocalStorageParentLockRepository } from './local-parent-lock-repository.ts';
-import { LocalStorageProfileRepository } from './local-profile-repository.ts';
-import { LocalStorageProgressRepository } from './local-progress-repository.ts';
-import { LocalStorageRewardsRepository } from './local-rewards-repository.ts';
-import { LocalStorageSettingsRepository } from './local-settings-repository.ts';
-import { openLocalStore, SCHEMA_VERSION } from './local-store.ts';
-import { MIGRATIONS } from './migrations.ts';
+import { LocalStorageBackupImporter } from '@learn/platform-web/adapters/storage/local-backup-importer.ts';
+import { LocalStorageAssessmentRepository } from '@learn/platform-web/adapters/storage/local-assessment-repository.ts';
+import { LocalStorageGameRecordRepository } from '@learn/platform-web/adapters/storage/local-game-record-repository.ts';
+import { LocalStorageParentLockRepository } from '@learn/platform-web/adapters/storage/local-parent-lock-repository.ts';
+import { LocalStorageProfileRepository } from '@learn/platform-web/adapters/storage/local-profile-repository.ts';
+import { LocalStorageProgressRepository } from '@learn/platform-web/adapters/storage/local-progress-repository.ts';
+import { LocalStorageRewardsRepository } from '@learn/platform-web/adapters/storage/local-rewards-repository.ts';
+import { LocalStorageSettingsRepository } from '@learn/platform-web/adapters/storage/local-settings-repository.ts';
+import {
+  openLocalStore,
+  SCHEMA_VERSION,
+} from '@learn/platform-web/adapters/storage/local-store.ts';
+import { MIGRATIONS } from '@learn/platform-web/adapters/storage/migrations.ts';
 
 beforeEach(() => {
   localStorage.clear();

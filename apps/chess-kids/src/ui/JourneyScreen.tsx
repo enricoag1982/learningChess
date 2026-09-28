@@ -15,15 +15,18 @@ import type {
 import { lessonStars, worldLessons } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
-import { characterName, tContent } from '../content-text.ts';
-import { firstLessonsByCharacter, journeyNodeLabel } from './lesson-character-labels.ts';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
+import {
+  firstLessonsByCharacter,
+  journeyNodeLabel,
+} from '@learn/platform-web/ui/lesson-character-labels.ts';
 import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
 import { TestOutSheet } from './TestOutSheet.tsx';
-import { useMediaQuery } from './useMediaQuery.ts';
-import { CheckIcon, CrownIcon, FlagIcon, LockIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { useMediaQuery } from '@learn/platform-web/ui/useMediaQuery.ts';
+import { CheckIcon, CrownIcon, FlagIcon, LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Pastel tint per habitat (app-structure.md §8: one habitat per world), for the map panel. */
 const HABITAT_COLOR: Readonly<Record<Habitat, string>> = {

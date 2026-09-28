@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useRoute } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
-import { BlankScreen } from './ds/Screen.tsx';
+import { BlankScreen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Practice's task run (domain-model.md §3.3 "Practice screen"): either the daily warm-up (tapped
  * from Practice's own card, `practiceConceptId: null`) or one topic's 5 review tasks. */

@@ -5,9 +5,9 @@ import type { Lesson, MiniGameStateBase, Stars } from '@learn/platform-core';
 import { recordBossResult } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { StarsRow } from '../ui/StarsRow.tsx';
-import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';
-import { NextButton } from '../ui/lesson/NextButton.tsx';
-import type { BossPlaySession } from './mode-ui.ts';
+import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
+import { NextButton } from '@learn/platform-web/ui/lesson/NextButton.tsx';
+import type { BossPlaySession } from '@learn/platform-web/modes/mode-ui.ts';
 
 export interface UseBossRunOptions {
   readonly lesson: Lesson;

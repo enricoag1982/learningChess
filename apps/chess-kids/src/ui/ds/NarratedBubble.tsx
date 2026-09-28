@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useServices } from '../../app/store.ts';
 import { SpeechBubble } from './SpeechBubble.tsx';
-import { ReplayButton } from './ReplayButton.tsx';
-import { useSpeak } from './useNarratedText.ts';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
+import { useSpeak } from '@learn/platform-web/ui/ds/useNarratedText.ts';
 
 export type NarratedBubbleLayout = 'row' | 'center-row' | 'stack' | 'column';
 

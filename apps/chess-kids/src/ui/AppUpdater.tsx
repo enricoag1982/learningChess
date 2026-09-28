@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { AppUpdate } from '../adapters/app-update.ts';
+import type { AppUpdate } from '@learn/platform-web/adapters/app-update.ts';
 import type { Screen } from '../app/store.ts';
 import { useAppStore } from '../app/store.ts';
 import { routeMetaFor } from '../app/subject.ts';

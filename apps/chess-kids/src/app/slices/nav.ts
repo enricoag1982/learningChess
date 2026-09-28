@@ -2,7 +2,7 @@ import { checkActivityGate, isFirstRun, listProfiles } from '@learn/platform-cor
 import type { Profile, TimeLimitStatus } from '@learn/platform-core';
 import type { AppGet, AppSet, SliceCreator } from '../store.ts';
 import { routeMetaFor } from '../subject.ts';
-import type { NavOp, Route, RouteName } from '../routes.ts';
+import type { NavOp, Route, RouteName } from '@learn/platform-web/app/routes.ts';
 
 export interface NavSlice {
   /** The navigation stack, root first, current screen last. */

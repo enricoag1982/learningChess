@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { lessonSteps, localDayString, updateProfileSettings } from '@learn/platform-core';
-import type { FakeNarrator } from '../testing/fake-narrator.ts';
-import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
+import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
+import {
+  fixtureContentSource,
+  fixtureExercise,
+  fixtureLesson,
+} from '@learn/subject-chess/web/testing/fixtures.ts';
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';

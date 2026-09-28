@@ -6,9 +6,9 @@ import type { TimeLimitReason } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { tapClass } from './ds/tap.ts';
-import { Screen } from './ds/Screen.tsx';
-import { useAsync } from './ds/useAsync.ts';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 
 /** `TimeLimitStatus.reason` -> title/body text ("limit"; "late"/"early", app-structure.md §13);
  * falls back to the daily-limit text for `null` (should not normally happen). */

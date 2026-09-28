@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { usePack } from '../../app/subject.ts';
-import { animalImage } from './animal-images.ts';
+import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
 
 /** Decorative animal artwork: every caller already gives the image its accessible name, so the
  * `<img>` itself is `alt=""` and never draggable. */

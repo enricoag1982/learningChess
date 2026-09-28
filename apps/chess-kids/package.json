@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@learn/platform-core": "workspace:*",
+    "@learn/platform-web": "workspace:*",
     "@learn/subject-chess": "workspace:*",
     "@fontsource-variable/fredoka": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",

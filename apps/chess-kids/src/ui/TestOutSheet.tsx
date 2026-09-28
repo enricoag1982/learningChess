@@ -1,8 +1,8 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { tContent } from '../content-text.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { tapClass } from './ds/tap.ts';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
 
 export interface TestOutSheetProps {
   /** The offer question, already resolved (e.g. "Want to show me you already know Rhino?"). */

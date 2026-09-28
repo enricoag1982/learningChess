@@ -2,14 +2,14 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@learn/subject-chess';
 import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
-import { Board } from '../../ui/board/Board.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
-import { panelBody } from '../panel-body.tsx';
-import { ExerciseControls } from '../ExerciseControls.tsx';
+import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
+import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { hintSquares } from '../move-ui.ts';
 import type { PlayAreaProps } from '../kind-ui.ts';
 import type { YesNoExtra } from './ui.ts';
-import { YesNoButtons } from './YesNoButtons.tsx';
+import { YesNoButtons } from '@learn/subject-chess/kinds/yes-no/YesNoButtons.tsx';
 
 export function PlayArea({
   def,

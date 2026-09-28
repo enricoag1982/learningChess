@@ -6,25 +6,28 @@ import type {
   Narrator,
 } from '@learn/platform-core';
 import { createSubjectRuntime } from '@learn/platform-core';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
-import { createCryptoIds } from '../adapters/ids.ts';
-import { createSystemClock } from '../adapters/clock.ts';
-import { createDownloadPasswordFileWriter } from '../adapters/download-password-file-writer.ts';
-import type { AudioNarratorOutcome } from '../adapters/narration/audio-narrator.ts';
-import { createAudioNarrator } from '../adapters/narration/audio-narrator.ts';
-import { createGatedNarrator } from '../adapters/narration/gated-narrator.ts';
-import { createWebSpeechNarrator } from '../adapters/narration/web-speech-narrator.ts';
-import { createMathRandom } from '../adapters/random.ts';
-import { LocalStorageAssessmentRepository } from '../adapters/storage/local-assessment-repository.ts';
-import { LocalStorageGameRecordRepository } from '../adapters/storage/local-game-record-repository.ts';
-import { LocalStorageParentLockRepository } from '../adapters/storage/local-parent-lock-repository.ts';
-import { LocalStorageProfileRepository } from '../adapters/storage/local-profile-repository.ts';
-import { LocalStorageProgressRepository } from '../adapters/storage/local-progress-repository.ts';
-import { LocalStorageRewardsRepository } from '../adapters/storage/local-rewards-repository.ts';
-import { LocalStorageSettingsRepository } from '../adapters/storage/local-settings-repository.ts';
-import type { LocalStore } from '../adapters/storage/local-store.ts';
-import { openLocalStore, SCHEMA_VERSION } from '../adapters/storage/local-store.ts';
-import { MIGRATIONS } from '../adapters/storage/migrations.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
+import { createCryptoIds } from '@learn/platform-web/adapters/ids.ts';
+import { createSystemClock } from '@learn/platform-web/adapters/clock.ts';
+import { createDownloadPasswordFileWriter } from '@learn/platform-web/adapters/download-password-file-writer.ts';
+import type { AudioNarratorOutcome } from '@learn/platform-web/adapters/narration/audio-narrator.ts';
+import { createAudioNarrator } from '@learn/platform-web/adapters/narration/audio-narrator.ts';
+import { createGatedNarrator } from '@learn/platform-web/adapters/narration/gated-narrator.ts';
+import { createWebSpeechNarrator } from '@learn/platform-web/adapters/narration/web-speech-narrator.ts';
+import { createMathRandom } from '@learn/platform-web/adapters/random.ts';
+import { LocalStorageAssessmentRepository } from '@learn/platform-web/adapters/storage/local-assessment-repository.ts';
+import { LocalStorageGameRecordRepository } from '@learn/platform-web/adapters/storage/local-game-record-repository.ts';
+import { LocalStorageParentLockRepository } from '@learn/platform-web/adapters/storage/local-parent-lock-repository.ts';
+import { LocalStorageProfileRepository } from '@learn/platform-web/adapters/storage/local-profile-repository.ts';
+import { LocalStorageProgressRepository } from '@learn/platform-web/adapters/storage/local-progress-repository.ts';
+import { LocalStorageRewardsRepository } from '@learn/platform-web/adapters/storage/local-rewards-repository.ts';
+import { LocalStorageSettingsRepository } from '@learn/platform-web/adapters/storage/local-settings-repository.ts';
+import type { LocalStore } from '@learn/platform-web/adapters/storage/local-store.ts';
+import {
+  openLocalStore,
+  SCHEMA_VERSION,
+} from '@learn/platform-web/adapters/storage/local-store.ts';
+import { MIGRATIONS } from '@learn/platform-web/adapters/storage/migrations.ts';
 import type { SubjectServices, SubjectWeb } from './subject.ts';
 
 /** `AppDeps.backupFileWriter`/`backupImporter`: read only from the lazy-loaded Parent area, so
@@ -33,7 +36,7 @@ function createLazyBackupFileWriter(): BackupFileWriter {
   return {
     async write(filename, contents) {
       const { createDownloadBackupFileWriter } =
-        await import('../adapters/download-backup-file-writer.ts');
+        await import('@learn/platform-web/adapters/download-backup-file-writer.ts');
       return createDownloadBackupFileWriter().write(filename, contents);
     },
   };
@@ -44,12 +47,12 @@ function createLazyBackupImporter(store: LocalStore): BackupImporter {
   return {
     async replaceAll(file) {
       const { LocalStorageBackupImporter } =
-        await import('../adapters/storage/local-backup-importer.ts');
+        await import('@learn/platform-web/adapters/storage/local-backup-importer.ts');
       return new LocalStorageBackupImporter(store).replaceAll(file);
     },
     async writeMerged(file, options) {
       const { LocalStorageBackupImporter } =
-        await import('../adapters/storage/local-backup-importer.ts');
+        await import('@learn/platform-web/adapters/storage/local-backup-importer.ts');
       return new LocalStorageBackupImporter(store).writeMerged(file, options);
     },
   };

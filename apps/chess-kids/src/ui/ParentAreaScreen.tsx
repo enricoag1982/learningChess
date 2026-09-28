@@ -9,21 +9,21 @@ import {
   isValidPassword,
 } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { RankPill } from './RankPill.tsx';
+import { RankPill } from '@learn/platform-web/ui/RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';
 import { ChildReportScreen } from './parent/ChildReport.tsx';
 import { ChildSettingsScreen } from './parent/ChildSettings.tsx';
-import { PrivacyScreen } from './parent/PrivacyScreen.tsx';
+import { PrivacyScreen } from '@learn/platform-web/ui/parent/PrivacyScreen.tsx';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
-} from './parent/parent-styles.ts';
-import { ChevronRightIcon, LockIcon } from './ds/icons.tsx';
-import { useAsync } from './ds/useAsync.ts';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
-import { PARENT_TAPPABLE_ROW } from './ds/parent-styles-lazy.ts';
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
+import { ChevronRightIcon, LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
+import { PARENT_TAPPABLE_ROW } from '@learn/platform-web/ui/ds/parent-styles-lazy.ts';
 
 function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.Element {
   const { t } = useTranslation();

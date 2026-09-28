@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../app/store.ts';
-import { LockIcon, PlusIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { LockIcon, PlusIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
 /** Profile picker (kid style): app start whenever a parent lock exists (app-structure.md §3). */
 export function ProfilePickerScreen(): JSX.Element {

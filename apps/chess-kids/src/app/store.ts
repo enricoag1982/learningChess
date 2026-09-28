@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import { create, type StoreApi } from 'zustand';
-import type { Route, RouteName } from './routes.ts';
+import type { Route, RouteName } from '@learn/platform-web/app/routes.ts';
 import type { Services } from './services.ts';
 import type { SubjectState, SubjectWeb } from './subject.ts';
 import { createLearnSlice, type LearnSlice } from './slices/learn.ts';

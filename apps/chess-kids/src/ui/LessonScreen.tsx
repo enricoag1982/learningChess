@@ -15,12 +15,12 @@ import { BossStep } from '../chess-pack.ts';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
 import { DemoStep } from './lesson/DemoStep.tsx';
 import { ExerciseStep } from './lesson/ExerciseStep.tsx';
-import { PhaseChip } from './lesson/PhaseChip.tsx';
-import { StepPills } from './lesson/StepPills.tsx';
+import { PhaseChip } from '@learn/platform-web/ui/lesson/PhaseChip.tsx';
+import { StepPills } from '@learn/platform-web/ui/lesson/StepPills.tsx';
 import { StoryStep } from './lesson/StoryStep.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { useIsCompact } from './useMediaQuery.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { useIsCompact } from '@learn/platform-web/ui/useMediaQuery.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Exercise stage dots + "N of M", shown only while working through the scored exercises. */
 function StageDots({

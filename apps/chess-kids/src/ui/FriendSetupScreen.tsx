@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { friendGameOptions } from '@learn/subject-chess';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/slices/play.ts';
 import { useAppStore, useServices } from '../app/store.ts';
-import { tContent } from '../content-text.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { GuestIcon } from './ds/icons-lazy.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
-import { AvatarBadge } from './ds/AvatarBadge.tsx';
+import { GuestIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
 /** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({

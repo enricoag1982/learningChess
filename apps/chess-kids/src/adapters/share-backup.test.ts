@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createProfile } from '@learn/platform-core';
 import { createTestServices } from '../testing/test-services.ts';
-import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
-import { sendBackupToOtherDevice } from './share-backup.ts';
+import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
+import { sendBackupToOtherDevice } from '@learn/platform-web/adapters/share-backup.ts';
 
 // jsdom does not implement Blob URLs; stub them so the download fallback can run under vitest
 // (same pattern `download-password-file-writer.test.ts` uses).

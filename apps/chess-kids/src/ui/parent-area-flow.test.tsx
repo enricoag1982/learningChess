@@ -4,10 +4,14 @@ import { createProfile, updateProfileSettings } from '@learn/platform-core';
 import type { BackupFile } from '@learn/platform-core';
 import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
 import App from '../App.tsx';
-import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
-import type { FakeBackupFileWriter } from '../testing/fake-backup-file-writer.ts';
-import type { FakeNarrator } from '../testing/fake-narrator.ts';
-import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
+import type { FakeBackupFileWriter } from '@learn/platform-web/testing/fake-backup-file-writer.ts';
+import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
+import {
+  fixtureContentSource,
+  fixtureExercise,
+  fixtureLesson,
+} from '@learn/subject-chess/web/testing/fixtures.ts';
 import {
   pickProfileFromPicker,
   seedReturningProfile,
@@ -15,7 +19,7 @@ import {
 } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderApp } from '../testing/render-app.tsx';
-import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
+import type { FakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
 
 afterEach(() => {
   vi.unstubAllGlobals();

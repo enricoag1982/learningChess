@@ -3,13 +3,13 @@ import { useTranslation } from 'react-i18next';
 import type { Lesson } from '@learn/platform-core';
 import { useServices } from '../../app/store.ts';
 import { usePack } from '../../app/subject.ts';
-import { tContent } from '../../content-text.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
-import { useNarratedText } from '../ds/useNarratedText.ts';
-import { GameLayout } from './GameLayout.tsx';
-import { NextButton } from './NextButton.tsx';
-import { SkipButton } from './SkipButton.tsx';
+import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
+import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
+import { NextButton } from '@learn/platform-web/ui/lesson/NextButton.tsx';
+import { SkipButton } from '@learn/platform-web/ui/lesson/SkipButton.tsx';
 
 export interface DemoStepProps {
   readonly lesson: Lesson;

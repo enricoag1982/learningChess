@@ -5,9 +5,9 @@ import { shouldOfferEasier } from '@learn/platform-core';
 import { usePack } from '../app/subject.ts';
 import { useServices } from '../app/store.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';
-import { useInstructionNarration } from '../ui/ds/useNarratedText.ts';
+import { useInstructionNarration } from '@learn/platform-web/ui/ds/useNarratedText.ts';
 import { exerciseInstructionText, exerciseNote } from '../ui/lesson/exercise-text.ts';
-import { prefersReducedMotion } from '../ui/useMediaQuery.ts';
+import { prefersReducedMotion } from '@learn/platform-web/ui/useMediaQuery.ts';
 import type { AnyExerciseKindUI, ExerciseUIState, SessionAction } from './kind-ui.ts';
 
 /** mate-in-n: how long the scripted opponent reply stays hidden before it is shown and narrated. */

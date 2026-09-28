@@ -4,8 +4,8 @@ import { createElement, lazy } from 'react';
 import { CHESS_APP_CONFIG, chessCore, isInCheck, kingSquare } from '@learn/subject-chess';
 import type { BotPlayer, ExerciseState, Position, Square } from '@learn/subject-chess';
 import type { ExerciseStateBase } from '@learn/platform-core';
-import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
-import { createBundledContentSource } from './adapters/content/bundled-content-source.ts';
+import { createWorkerBotPlayer } from '@learn/subject-chess/web/adapters/bot/worker-bot-player.ts';
+import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import { useAppStore } from './app/store.ts';
 import type {
   SubjectRouteEntry,
@@ -18,9 +18,12 @@ import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
 import { BossStep } from './modes/ui-registry.ts';
 import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
-import { ANIMAL_IMAGES } from './ui/art/animal-images.ts';
-import { Board } from './ui/board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
+import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import {
+  isClassicOnlyContext,
+  showPieceBadges,
+} from '@learn/subject-chess/web/ui/board/piece-style.ts';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
 
@@ -54,7 +57,7 @@ declare module './app/subject.ts' {
   interface SubjectState extends PlaySlice {}
 }
 
-declare module './app/routes.ts' {
+declare module '@learn/platform-web/app/routes.ts' {
   interface SubjectRoutes {
     // eslint-disable-next-line @typescript-eslint/no-generated-empty-object-type -- deliberately empty: no extra route params
     play: Record<never, never>;
@@ -102,7 +105,8 @@ export const chessWeb = {
   // its two `import()` calls as live split points and grows the initial bundle.
   dev: import.meta.env.DEV
     ? {
-        '#board': () => import('./dev/BoardPlayground.tsx').then((m) => m.BoardPlayground),
+        '#board': () =>
+          import('@learn/subject-chess/web/dev/BoardPlayground.tsx').then((m) => m.BoardPlayground),
         '#exercises': () =>
           import('./dev/ExercisePlayground.tsx').then((m) => m.ExercisePlayground),
       }

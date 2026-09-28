@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '../../app-i18n.ts';
-import { YesNoButtons } from './YesNoButtons.tsx';
+import { YesNoButtons } from '@learn/subject-chess/kinds/yes-no/YesNoButtons.tsx';
 
 afterEach(cleanup);
 

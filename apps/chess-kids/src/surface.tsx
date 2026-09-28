@@ -7,12 +7,15 @@ import type { GameRecord } from '@learn/platform-core';
 import { CHARACTER_PIECES, chessCore, friendGamesPlayed } from '@learn/subject-chess';
 import type { Lesson, Position, Square } from '@learn/subject-chess';
 import { useAppStore } from './app/store.ts';
-import { characterName, tContent } from './content-text.ts';
-import { Board } from './ui/board/Board.tsx';
-import { MiniBoard } from './ui/board/MiniBoard.tsx';
-import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
-import { PieceIcon } from './ui/board/pieces.tsx';
-import { InfoPill } from './ui/ds/primitives.tsx';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import { MiniBoard } from '@learn/subject-chess/web/ui/board/MiniBoard.tsx';
+import {
+  isClassicOnlyContext,
+  showPieceBadges,
+} from '@learn/subject-chess/web/ui/board/piece-style.ts';
+import { PieceIcon } from '@learn/subject-chess/web/ui/board/pieces.tsx';
+import { InfoPill } from '@learn/platform-web/ui/ds/primitives.tsx';
 
 /** The piece-icon pill under a character's portrait, naming the piece it stands for; nothing for
  * a narrator-taught character (Owl — no `core.characters` entry). */

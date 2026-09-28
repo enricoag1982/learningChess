@@ -9,8 +9,8 @@ import type {
 } from '@learn/platform-core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
 import type { AppSet, SliceCreator } from './store.ts';
-import { DEFAULT_ROUTE_META, PLATFORM_ROUTE_META } from './routes.ts';
-import type { Route, RouteMeta, RouteName } from './routes.ts';
+import { DEFAULT_ROUTE_META, PLATFORM_ROUTE_META } from '@learn/platform-web/app/routes.ts';
+import type { Route, RouteMeta, RouteName } from '@learn/platform-web/app/routes.ts';
 
 /** A subject's own store state, augmented by module declaration (chess: `PlaySlice`'s
  * `levelUpSuggestion`/`friendSetup` and their actions). */

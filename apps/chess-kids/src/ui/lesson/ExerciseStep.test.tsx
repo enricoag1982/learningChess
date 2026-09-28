@@ -18,9 +18,9 @@ import {
   fixtureExercise,
   fixtureLesson,
   fixtureVariantExercise,
-} from '../../testing/fixtures.ts';
-import type { FakeNarrator } from '../../testing/fake-narrator.ts';
-import { stubMatchMedia } from '../../testing/mock-media-query.ts';
+} from '@learn/subject-chess/web/testing/fixtures.ts';
+import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
+import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
 import { ExerciseStep } from './ExerciseStep.tsx';

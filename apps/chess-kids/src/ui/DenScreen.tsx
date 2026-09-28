@@ -12,14 +12,14 @@ import type {
 import { animalFriends, rankLadder, totalStars } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
-import { tContent } from '../content-text.ts';
-import { BadgeIcon } from './BadgeIcon.tsx';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import { BadgeIcon } from '@learn/platform-web/ui/BadgeIcon.tsx';
 import { CharacterIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
-import { StreakPill } from './StreakPill.tsx';
-import { tapClass } from './ds/tap.ts';
-import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
+import { StreakPill } from '@learn/platform-web/ui/StreakPill.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 /** Badge categories, in rewards.md §3 catalogue order. */
 const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play', 'habit'];

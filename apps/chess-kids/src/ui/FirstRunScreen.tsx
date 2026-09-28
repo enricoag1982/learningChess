@@ -3,13 +3,17 @@ import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isValidPassword, setupParentPassword } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
-import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
-import { PARENT_INPUT, PARENT_NOTE, PARENT_PRIMARY_BUTTON } from './parent/parent-styles.ts';
+import { PrivacyDialog, PrivacyLink } from '@learn/platform-web/ui/parent/PrivacyPolicy.tsx';
+import {
+  PARENT_INPUT,
+  PARENT_NOTE,
+  PARENT_PRIMARY_BUTTON,
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
 import { Owl } from './ds/Owl.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { LockIcon } from './ds/icons.tsx';
-import { tapClass } from './ds/tap.ts';
-import { Screen } from './ds/Screen.tsx';
+import { LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { Screen } from '@learn/platform-web/ui/ds/Screen.tsx';
 
 type Step = 'welcome' | 'password' | 'saved';
 

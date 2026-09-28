@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Hint, Move, Position, Square } from '@learn/subject-chess';
-import { Board } from '../ui/board/Board.tsx';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
 import type { FromTo } from './move-ui.ts';
 import { hintSquares } from './move-ui.ts';
 

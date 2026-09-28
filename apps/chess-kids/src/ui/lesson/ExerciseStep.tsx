@@ -11,12 +11,12 @@ import {
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
-import { SECONDARY_BUTTON } from './button-styles.ts';
-import { NextButton } from './NextButton.tsx';
-import { SkipButton } from './SkipButton.tsx';
+import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
+import { NextButton } from '@learn/platform-web/ui/lesson/NextButton.tsx';
+import { SkipButton } from '@learn/platform-web/ui/lesson/SkipButton.tsx';
 
 export interface ExerciseStepProps {
   readonly lesson: Lesson;

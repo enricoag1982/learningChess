@@ -6,14 +6,18 @@ import { buildChildReport } from '@learn/platform-core';
 import { usePack } from '../../app/subject.ts';
 import type { ParentPanels } from '../../app/subject.ts';
 import { useServices } from '../../app/store.ts';
-import { tContent } from '../../content-text.ts';
-import { RankPill } from '../RankPill.tsx';
-import { ChevronRightIcon } from '../ds/icons.tsx';
-import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { ScreenHeader } from '../ds/Screen.tsx';
-import { useAsync } from '../ds/useAsync.ts';
-import { AvatarBadge } from '../ds/AvatarBadge.tsx';
-import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import { RankPill } from '@learn/platform-web/ui/RankPill.tsx';
+import { ChevronRightIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { ChevronLeftIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
+import { ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
+import {
+  PARENT_INFO_PANEL,
+  PARENT_NOTE,
+  PARENT_SECONDARY_BUTTON,
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
 

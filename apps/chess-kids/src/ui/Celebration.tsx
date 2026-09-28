@@ -1,10 +1,10 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore, useServices } from '../app/store.ts';
-import { tContent } from '../content-text.ts';
-import { BadgeIcon } from './BadgeIcon.tsx';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import { BadgeIcon } from '@learn/platform-web/ui/BadgeIcon.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
-import { tapClass } from './ds/tap.ts';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
 
 /** Full-screen badge celebration (rewards.md §1), shown over the current screen whenever
  * `activeCelebration` is set, capped per app sitting; other badges show as a My Den "new" dot. */

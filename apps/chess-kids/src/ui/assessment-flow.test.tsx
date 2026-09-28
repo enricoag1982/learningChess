@@ -5,7 +5,7 @@ import type { Lesson } from '@learn/subject-chess';
 import type { YesNoDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
 import App from '../App.tsx';
-import { fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
+import { fixtureExercise, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
 import { createTestServices } from '../testing/test-services.ts';

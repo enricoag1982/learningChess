@@ -20,26 +20,26 @@ import { exportBackup } from '@learn/platform-core/backup';
 import { usePack } from '../../app/subject.ts';
 import type { ParentPanels } from '../../app/subject.ts';
 import { useAppStore, useServices } from '../../app/store.ts';
-import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
-import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
-import { AvatarIcon } from '../art/avatars.tsx';
-import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';
-import { tapClass } from '../ds/tap.ts';
-import { ScreenHeader } from '../ds/Screen.tsx';
-import { ParentConfirmDialog, ParentSection } from '../ds/parent.tsx';
+import { sendBackupToOtherDevice } from '@learn/platform-web/adapters/share-backup.ts';
+import { AVATARS, avatarBackground } from '@learn/platform-web/ui/art/avatar-meta.ts';
+import { AvatarIcon } from '@learn/platform-web/ui/art/avatars.tsx';
+import { ChevronLeftIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
+import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
+import { ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
+import { ParentConfirmDialog, ParentSection } from '@learn/platform-web/ui/ds/parent.tsx';
 import {
   PARENT_CHIP,
   PARENT_CHIP_SELECTED,
   PARENT_DANGER_BUTTON,
-} from '../ds/parent-styles-lazy.ts';
-import { AvatarBadge } from '../ds/AvatarBadge.tsx';
-import { useAsync } from '../ds/useAsync.ts';
+} from '@learn/platform-web/ui/ds/parent-styles-lazy.ts';
+import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
   PARENT_PRIMARY_BUTTON,
   PARENT_SECONDARY_BUTTON,
-} from './parent-styles.ts';
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
 import { UnlockPanel } from './UnlockPanel.tsx';
 
 /** Small inline avatar picker (parent style, ≥ 44px targets). */

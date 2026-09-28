@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { createProfile } from '@learn/platform-core';
 import App from '../App.tsx';
-import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
+import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { createTestServices } from '../testing/test-services.ts';
-import type { FakePasswordFileWriter } from '../testing/fake-password-file-writer.ts';
+import type { FakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 
 function makeServices(): ReturnType<typeof createTestServices> {

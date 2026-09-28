@@ -7,7 +7,7 @@ import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
-import { clickSquare } from '../testing/board.ts';
+import { clickSquare } from '@learn/subject-chess/web/testing/board.ts';
 import { PlayScreen } from './PlayScreen.tsx';
 
 describe('PlayScreen', () => {

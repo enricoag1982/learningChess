@@ -6,9 +6,12 @@ import type { Lesson, SubjectCore } from '@learn/platform-core';
 import { loadJourney } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { usePack } from '../../app/subject.ts';
-import { characterName, tContent } from '../../content-text.ts';
-import { PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
-import { useAsync } from '../ds/useAsync.ts';
+import { characterName, tContent } from '@learn/platform-web/content-text.ts';
+import {
+  PARENT_NOTE,
+  PARENT_SECONDARY_BUTTON,
+} from '@learn/platform-web/ui/parent/parent-styles.ts';
+import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 
 /** Locked-lesson name: title for an Owl-taught lesson (no piece character), else its character's name. */
 function lessonName(t: TFunction, characters: SubjectCore['characters'], lesson: Lesson): string {

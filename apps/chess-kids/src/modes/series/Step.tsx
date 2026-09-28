@@ -11,16 +11,16 @@ import type {
 import { completeRound, currentRound, startSeries } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { SeriesClosingBoard, useSurfacePieceBadges } from '../../chess-pack.ts';
-import { tContent } from '../../content-text.ts';
+import { tContent } from '@learn/platform-web/content-text.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
-import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
-import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
-import { NextButton } from '../../ui/lesson/NextButton.tsx';
+import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
+import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
+import { NextButton } from '@learn/platform-web/ui/lesson/NextButton.tsx';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
-import type { BossStepProps } from '../mode-ui.ts';
+import type { BossStepProps } from '@learn/platform-web/modes/mode-ui.ts';
 
 /** A `series` mini-game's content, at the platform's own base round def. */
 type SeriesGame = MiniGameBase & SeriesGameDef;

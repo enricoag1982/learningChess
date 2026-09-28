@@ -2,7 +2,7 @@ import i18next from 'i18next';
 // Node's ESM loader (this file runs straight under Playwright, outside Vite) requires this
 // attribute for a JSON import.
 import en from '@learn/subject-chess/dist/locales/en.json' with { type: 'json' };
-import { i18nOptions } from '../../src/i18n-options.ts';
+import { i18nOptions } from '@learn/platform-web/i18n-options.ts';
 
 /**
  * A standalone i18next instance for Playwright specs (outside the browser/React tree), built from

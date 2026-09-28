@@ -1,9 +1,9 @@
 import type { JSX } from 'react';
 import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@learn/subject-chess';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
-import { ExerciseControls } from '../ExerciseControls.tsx';
+import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
-import { panelBody } from '../panel-body.tsx';
+import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import type { PlayAreaProps } from '../kind-ui.ts';
 import type { MoveExtra } from '../move-ui.ts';
 import { moveKindLegalMoves } from '../move-ui.ts';

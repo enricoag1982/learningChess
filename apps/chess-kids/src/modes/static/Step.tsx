@@ -6,15 +6,18 @@ import { enemyCount, gameResult, playGameMove, startStaticCaptureGame } from '@l
 import type { GameState, StaticMiniGame } from '@learn/subject-chess';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { chessWeb } from '../../chess-pack.ts';
-import { tContent } from '../../content-text.ts';
-import { Board } from '../../ui/board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
-import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
+import { tContent } from '@learn/platform-web/content-text.ts';
+import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
+import {
+  isClassicOnlyContext,
+  showPieceBadges,
+} from '@learn/subject-chess/web/ui/board/piece-style.ts';
+import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
-import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
-import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
+import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
+import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
-import type { BossStepProps } from '../mode-ui.ts';
+import type { BossStepProps } from '@learn/platform-web/modes/mode-ui.ts';
 
 /** A `static` boss mini-game: capture every enemy piece (or collect every star) before the move
  * limit, no hints (`MINI_GAME_MODE_UI.static`). */

@@ -16,7 +16,7 @@ import {
   type Profile,
   type ProfileSettings,
 } from '@learn/platform-core';
-import { requestPersistentStorageIfNeeded } from '../../adapters/persistent-storage.ts';
+import { requestPersistentStorageIfNeeded } from '@learn/platform-web/adapters/persistent-storage.ts';
 import type { AppGet, AppSet } from '../store.ts';
 import type { SubjectWeb } from '../subject.ts';
 import { loadRewards, type RewardsSlice } from './rewards.ts';

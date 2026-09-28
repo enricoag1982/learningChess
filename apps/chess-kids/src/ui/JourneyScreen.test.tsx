@@ -5,7 +5,7 @@ import type { MiniGameProgress, Track, TracksCatalog, World } from '@learn/platf
 import type { Lesson, MiniGame } from '@learn/subject-chess';
 import { makeContentSource } from '@learn/subject-chess/testing';
 import { chessWeb } from '../chess-pack.ts';
-import { fixtureLesson } from '../testing/fixtures.ts';
+import { fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
 import { JourneyScreen } from './JourneyScreen.tsx';

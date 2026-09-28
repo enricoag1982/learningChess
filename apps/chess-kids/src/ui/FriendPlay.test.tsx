@@ -4,7 +4,7 @@ import { createProfile } from '@learn/platform-core';
 import { createTestServices } from '../testing/test-services.ts';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
-import { clickSquare } from '../testing/board.ts';
+import { clickSquare } from '@learn/subject-chess/web/testing/board.ts';
 import type { Services } from '../app/services.ts';
 
 /** Seeds Mia (active, World 4 mastered — unlocks every vs Friend game) and Ben (second player,
