@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
 import type { ConceptTask, MateInNDef } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
+import { chessWeb } from '../../chess-pack.ts';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';
 import type { FakeNarrator } from '../../testing/fake-narrator.ts';
@@ -23,6 +24,7 @@ describe('ReviewExerciseStep', () => {
     await renderWithStore(
       <ReviewExerciseStep task={task} reviewSource="warmup" onNext={() => {}} />,
       services,
+      chessWeb,
     );
 
     // `fixtureExercise`'s textKey ("fixtures:hint-me") has no real "fixtures" namespace, so i18next
@@ -71,6 +73,7 @@ describe('ReviewExerciseStep', () => {
       await renderWithStore(
         <ReviewExerciseStep task={task} reviewSource="warmup" onNext={() => {}} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /^c6,/ }));

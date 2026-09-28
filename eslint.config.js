@@ -422,7 +422,13 @@ export default defineConfig([
     ];
     // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
     const WEB_RATCHET_IGNORES = [
+      'apps/web/src/App.test.tsx',
       'apps/web/src/App.tsx',
+      'apps/web/src/adapters/content/bundled-content-source.ts',
+      'apps/web/src/adapters/persistent-storage.test.ts',
+      'apps/web/src/adapters/share-backup.test.ts',
+      'apps/web/src/adapters/storage/local-backup-importer.test.ts',
+      'apps/web/src/app/nav.test.ts',
       'apps/web/src/app/routes.ts',
       'apps/web/src/app/services.ts',
       'apps/web/src/app/slices/learn.ts',
@@ -439,16 +445,21 @@ export default defineConfig([
       'apps/web/src/modes/series/Step.test.tsx',
       'apps/web/src/modes/series/Step.tsx',
       'apps/web/src/ui/AssessmentScreen.tsx',
+      'apps/web/src/ui/Celebration.test.tsx',
+      'apps/web/src/ui/DenScreen.test.tsx',
       'apps/web/src/ui/DenScreen.tsx',
       'apps/web/src/ui/HomeScreen.test.tsx',
       'apps/web/src/ui/JourneyScreen.test.tsx',
       'apps/web/src/ui/JourneyScreen.tsx',
+      'apps/web/src/ui/LessonScreen.test.tsx',
       'apps/web/src/ui/LessonScreen.tsx',
       'apps/web/src/ui/MiniGameSessionScreen.tsx',
       'apps/web/src/ui/ParentAreaScreen.tsx',
       'apps/web/src/ui/PracticeScreen.test.tsx',
       'apps/web/src/ui/PracticeScreen.tsx',
       'apps/web/src/ui/SessionSummaryScreen.tsx',
+      'apps/web/src/ui/TimeTracker.test.tsx',
+      'apps/web/src/ui/TodaySession.test.tsx',
       'apps/web/src/ui/art/animal-images.test.ts',
       'apps/web/src/ui/assessment-flow.test.tsx',
       'apps/web/src/ui/lesson-character-labels.ts',
@@ -458,19 +469,23 @@ export default defineConfig([
       'apps/web/src/ui/lesson/ExerciseStep.test.tsx',
       'apps/web/src/ui/lesson/ExerciseStep.tsx',
       'apps/web/src/ui/lesson/StoryStep.tsx',
-      'apps/web/src/ui/lesson/exercise-text.ts',
       'apps/web/src/ui/parent-area-flow.test.tsx',
       'apps/web/src/ui/parent/UnlockPanel.tsx',
+      'apps/web/src/ui/profiles-flow.test.tsx',
       'apps/web/src/ui/session/ReviewExerciseStep.test.tsx',
       'apps/web/src/ui/session/ReviewExerciseStep.tsx',
       'apps/web/src/ui/session/ReviewTaskRunner.tsx',
+      'apps/web/src/ui/time-limit-flow.test.tsx',
     ];
     return [
       {
         files: PLATFORM_BOUND_WEB_PATHS,
         ignores: WEB_RATCHET_IGNORES,
         rules: {
-          'no-restricted-imports': [
+          // Separate rule instance (typescript-eslint's) so the later e2e-import-restriction
+          // block below (plain `no-restricted-imports`, same `apps/web/src/**` files) does not
+          // overwrite this one — flat config replaces same-named rules per matching file.
+          '@typescript-eslint/no-restricted-imports': [
             'error',
             {
               paths: [

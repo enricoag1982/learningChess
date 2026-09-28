@@ -1,9 +1,21 @@
+import type { ActionOf, DefOf, ExerciseStateOf, OutcomeOf } from '@chess-kids/core/chess';
 import type { ExerciseKindUI } from '../kind-ui.ts';
-import { moveToUi } from '../move-ui.ts';
+import type { MoveExtra } from '../move-ui.ts';
+import { baseInitUi, moveToUi } from '../move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
-export const collectStarsUi: ExerciseKindUI<'collect-stars'> = {
+export const collectStarsUi: ExerciseKindUI<
+  DefOf<'collect-stars'>,
+  ExerciseStateOf<DefOf<'collect-stars'>>,
+  ActionOf<'collect-stars'>,
+  OutcomeOf<'collect-stars'>,
+  MoveExtra
+> = {
   type: 'collect-stars',
+
+  initUi: baseInitUi,
+
+  clearWrongUi: () => ({ wrongSquares: [] }),
 
   toUi(outcome) {
     if (outcome.kind === 'undone') {

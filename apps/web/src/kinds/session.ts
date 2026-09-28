@@ -1,58 +1,60 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Stars } from '@chess-kids/core';
-import type { ExerciseDef, ExerciseState, Square, VariantRules } from '@chess-kids/core/chess';
+import type { AnyKind, ExerciseDefBase, ExerciseStateBase, Stars } from '@chess-kids/core';
 import { shouldOfferEasier } from '@chess-kids/core';
-import {
-  isInCheck,
-  kindOf,
-  kingSquare,
-  requestHint,
-  starsFor,
-  startExercise,
-} from '@chess-kids/core/chess';
+import { usePack } from '../app/subject.ts';
 import { useServices } from '../app/store.ts';
-import { chessWeb } from '../chess-pack.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';
 import { useInstructionNarration } from '../ui/ds/useNarratedText.ts';
 import { exerciseInstructionText, exerciseNote } from '../ui/lesson/exercise-text.ts';
 import { prefersReducedMotion } from '../ui/useMediaQuery.ts';
-import type { ExerciseUIState, SessionAction } from './kind-ui.ts';
-import { kindUiOf } from './ui-registry.ts';
+import type { AnyExerciseKindUI, ExerciseUIState, SessionAction } from './kind-ui.ts';
 
 /** mate-in-n: how long the scripted opponent reply stays hidden before it is shown and narrated. */
 const REPLY_DELAY_MS = 600;
 const REPLY_DELAY_REDUCED_MS = 150;
 
-/** Fresh reducer state for a newly-started exercise. `def.lastMove` (the opponent's last move,
- * e.g. the double step before en passant) seeds the last-move highlight from the start. */
-function initSessionState(def: ExerciseDef): ExerciseUIState {
+/** Fresh reducer state for a newly-started exercise; `kindUi.initUi(def)` seeds a kind's own extras
+ * (a move kind: `def.lastMove`, if any). */
+function initSessionState(
+  def: ExerciseDefBase,
+  kind: AnyKind<unknown>,
+  kindUi: AnyExerciseKindUI,
+): ExerciseUIState {
   return {
-    core: startExercise(def),
+    core: kind.init(def),
     hint: null,
     feedback: { kind: 'instruction' },
-    wrongSquares: [],
-    missedSquares: [],
-    ...(def.lastMove ? { lastMove: def.lastMove } : {}),
+    ...kindUi.initUi(def),
   };
 }
 
 /** The generic reducer every exercise kind shares: a `UiAction` is handled directly; any other
- * action goes through `kindOf(def).act` + `kindUiOf(def).toUi` — the one exercise-type dispatch
- * left in session plumbing, and it is the registries', not a local `switch`. */
+ * action goes through `kind.act` + `kindUi.toUi` — the one exercise-type dispatch left in session
+ * plumbing, and it is the active pack's, not a local `switch`. */
 function sessionReducer(
-  rules: VariantRules,
+  ctx: unknown,
+  kind: AnyKind<unknown>,
+  kindUi: AnyExerciseKindUI,
 ): (state: ExerciseUIState, action: SessionAction) => ExerciseUIState {
   return function reduce(state, action) {
     if (action.type === 'tap-first') {
       return { ...state, feedback: { kind: 'tap-first' } };
     }
     if (action.type === 'hint') {
-      const { state: core, hint } = requestHint(state.core, rules);
-      return { ...state, core, hint, feedback: { kind: 'hint', hint }, wrongSquares: [] };
+      const level = (state.core.hintLevel < 3 ? state.core.hintLevel + 1 : 3) as 1 | 2 | 3;
+      const { state: core, hint } = kind.hint(state.core, level, ctx);
+      return {
+        ...state,
+        core,
+        hint,
+        feedback: { kind: 'hint', hint },
+        ...kindUi.clearWrongUi(),
+      };
     }
     if (action.type === 'auto-hint') {
-      const { state: core, hint } = requestHint(state.core, rules);
+      const level = (state.core.hintLevel < 3 ? state.core.hintLevel + 1 : 3) as 1 | 2 | 3;
+      const { state: core, hint } = kind.hint(state.core, level, ctx);
       return { ...state, core, hint };
     }
     if (action.type === 'reveal') {
@@ -63,9 +65,8 @@ function sessionReducer(
     // The scripted reply has not been shown yet: ignore kid input until it is (F5 fix — generic,
     // not only inside `ExerciseStep` any more).
     if (state.pending) return state;
-    const kind = kindOf(state.core.def);
-    const { state: core, outcome } = kind.act(state.core, action, rules);
-    const patch = kindUiOf(state.core.def).toUi(outcome, action, core);
+    const { state: core, outcome } = kind.act(state.core, action, ctx);
+    const patch = kindUi.toUi(outcome, action, core);
     return { ...state, core, ...patch };
   };
 }
@@ -74,15 +75,12 @@ export interface ExerciseSessionOptions {
   readonly character: string;
   /** Guided tries: hint level 1 auto-shown, never scored. */
   readonly guided?: boolean;
-  /** Board's check ring (all exercise types); default `true`. Series rounds pass `false` to keep
-   * today's behaviour (no ring there — `docs/refactor-v4.md` follow-up F6). */
-  readonly showCheck?: boolean;
   /** Overrides the stars shown (an easier-variant attempt credits the original's fixed stars). */
   readonly shownStars?: Stars;
   /** Whether an easier variant exists, offered once errors pile up. */
   readonly easier?: boolean;
   /** Persists a solved attempt; a falsy result (e.g. no active profile) leaves `saved` false. */
-  readonly save?: (core: ExerciseState, ms: number) => Promise<void> | undefined | null;
+  readonly save?: (core: ExerciseStateBase, ms: number) => Promise<void> | undefined | null;
 }
 
 export interface ExerciseSession {
@@ -95,24 +93,33 @@ export interface ExerciseSession {
   readonly instruction: string;
   readonly note: SpeechBubbleNote | undefined;
   readonly replay: () => void;
-  readonly checkSquare: Square | undefined;
   readonly elapsedMs: () => number;
 }
 
 /** One exercise attempt's whole session: the generic reducer, guided auto-hint, the mate-in-n
  * reply timer (generic here — F5 fix: a series round or review task no longer freezes on
- * mate-in-2+), the solved-save flow, and the instruction/note/narration/check-ring the Owl bubble
- * and board need. Shared by `ExerciseStep`, a `series` boss's round and `ReviewExerciseStep`. */
+ * mate-in-2+), the solved-save flow, and the instruction/note/narration the Owl bubble needs.
+ * Shared by `ExerciseStep`, a `series` boss's round and `ReviewExerciseStep`. */
 export function useExerciseSession(
-  def: ExerciseDef,
+  def: ExerciseDefBase,
   options: ExerciseSessionOptions,
 ): ExerciseSession {
   const { t } = useTranslation();
   const services = useServices();
-  const { character, guided = false, showCheck = true, shownStars, easier = false, save } = options;
+  const pack = usePack();
+  const { character, guided = false, shownStars, easier = false, save } = options;
 
-  const reducer = useMemo(() => sessionReducer(chessWeb.core.context), []);
-  const [state, dispatch] = useReducer(reducer, def, initSessionState);
+  const kind = pack.core.kinds[def.type];
+  const kindUi = pack.kinds[def.type];
+  if (!kind || !kindUi) {
+    throw new Error(`useExerciseSession: no kind registered for type "${def.type}"`);
+  }
+
+  const reducer = useMemo(
+    () => sessionReducer(pack.core.context, kind, kindUi),
+    [pack, kind, kindUi],
+  );
+  const [state, dispatch] = useReducer(reducer, def, (d) => initSessionState(d, kind, kindUi));
 
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure.
   const [startedAt] = useState(() => Date.now());
@@ -140,7 +147,7 @@ export function useExerciseSession(
   }, [state.pending, dispatch]);
 
   const solved = state.core.solved;
-  const stars = shownStars ?? starsFor(state.core);
+  const stars = shownStars ?? (solved ? kind.stars(state.core) : 0);
   const offerEasier = easier && shouldOfferEasier(state.core);
 
   function elapsedMs(): number {
@@ -160,17 +167,16 @@ export function useExerciseSession(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solved, state.core, save]);
 
-  // The board's own displayed position (mate-in-n stages the reply behind `pending`; every other
-  // type always shows `state.core.position`) — same rule the check ring used to apply only inside
-  // `ExerciseStep`/`ReviewExerciseStep`, now shared.
-  const displayedPosition = state.pending ? state.pending.position : state.core.position;
-  const checkSquare =
-    showCheck && isInCheck(displayedPosition, chessWeb.core.context.chess)
-      ? kingSquare(displayedPosition, displayedPosition.toMove)
-      : undefined;
-
   const instruction = exerciseInstructionText(t, def);
-  const note = exerciseNote(t, state.feedback, character, stars, offerEasier);
+  const note = exerciseNote(
+    t,
+    state.feedback,
+    character,
+    stars,
+    offerEasier,
+    pack.core.notes,
+    pack.core.noteVars(character),
+  );
   // Instruction spoken once; each note spoken alone, never with the instruction re-read.
   const replay = useInstructionNarration(services.narrator, instruction, note?.text);
 
@@ -184,7 +190,6 @@ export function useExerciseSession(
     instruction,
     note,
     replay,
-    checkSquare,
     elapsedMs,
   };
 }

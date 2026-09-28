@@ -1,8 +1,21 @@
+import type { ActionOf, DefOf, ExerciseStateOf, OutcomeOf } from '@chess-kids/core/chess';
 import type { ExerciseKindUI } from '../kind-ui.ts';
+import type { WrongSquaresExtra } from '../move-ui.ts';
+import { baseInitUi } from '../move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
-export const choiceUi: ExerciseKindUI<'choice'> = {
+export const choiceUi: ExerciseKindUI<
+  DefOf<'choice'>,
+  ExerciseStateOf<DefOf<'choice'>>,
+  ActionOf<'choice'>,
+  OutcomeOf<'choice'>,
+  WrongSquaresExtra
+> = {
   type: 'choice',
+
+  initUi: baseInitUi,
+
+  clearWrongUi: () => ({ wrongSquares: [] }),
 
   toUi(outcome) {
     if (outcome.kind === 'wrong') {

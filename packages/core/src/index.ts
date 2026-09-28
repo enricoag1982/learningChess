@@ -37,6 +37,7 @@ export {
   DAILY_LIMIT_OPTIONS,
   PLAY_UNTIL_OPTIONS,
   PLAY_FROM_OPTIONS,
+  composeDefaultSettings,
 } from './domain/profile-settings.ts';
 
 export type { ConceptStats, ConceptTask } from './domain/review.ts';
@@ -195,7 +196,18 @@ export type {
   SubjectCore,
   AppConfig,
   ExerciseDefBase,
+  ExerciseStateBase,
+  HintBase,
   MiniGameBase,
 } from './domain/subject.ts';
 export type { SubjectRuntime } from './domain/runtime.ts';
 export { createSubjectRuntime } from './domain/runtime.ts';
+
+export type {
+  Resolve,
+  ExerciseFeedbackBase,
+  ExerciseNoteCtx,
+  ExerciseNote,
+  AnyNoteEntry,
+} from './domain/notes.ts';
+export { exerciseNote, isEasierOfferNote } from './domain/notes.ts';

@@ -4,6 +4,7 @@ import type { ZodType } from 'zod';
 import type { SubjectRewards } from './badges.ts';
 import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
 import type { MiniGameMode } from './exercise/mode.ts';
+import type { AnyNoteEntry } from './notes.ts';
 import type { GameRecordResult } from './progress.ts';
 
 /** Fields shared by every exercise definition, regardless of subject. */
@@ -139,6 +140,12 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
     isValid(s: Readonly<Record<string, unknown>>): boolean;
     loadBackupShape(): Promise<SettingsBackupShape>;
   };
+  /** Every feedback kind's note, keyed by `ExerciseFeedbackBase['kind']` (`domain/notes.ts`'s
+   * `exerciseNote` dispatch) — the subject's own kinds plus the platform-shaped ones
+   * (tap-first, wrong-answer, hint, solved). */
+  readonly notes: Readonly<Record<string, AnyNoteEntry>>;
+  /** Extra note vars for `character` beyond `{name, stars}` (chess: `{ piece }`). */
+  noteVars(character: string): Readonly<Record<string, string>>;
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping

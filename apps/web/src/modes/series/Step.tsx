@@ -63,10 +63,8 @@ function SeriesRound({
 }: SeriesRoundProps): JSX.Element {
   const { t } = useTranslation();
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
 
-  // No save (a series round scores only as part of the series' total mistakes) and the check ring
-  // stays off, as today (`showCheck: false` — refactor-v4.md follow-up F6).
+  // No save: a series round scores only as part of the series' total mistakes.
   const {
     state,
     dispatch,
@@ -74,7 +72,7 @@ function SeriesRound({
     instruction: instructionText,
     note,
     replay,
-  } = useExerciseSession(exercise, { character, showCheck: false });
+  } = useExerciseSession(exercise, { character });
 
   // Live running total: mistakes already folded in from earlier rounds, plus this round's own
   // errors and hint level so far (folded in for real once it is solved — see `completeRound`).
@@ -92,7 +90,9 @@ function SeriesRound({
     <div className="mt-auto flex flex-col items-center gap-4">
       <NextButton
         onClick={() => {
-          onNext(state.core);
+          // `useExerciseSession` (generic) types `state.core` by its base shape; the pack's own
+          // registry narrows `def.type` to a chess kind at runtime, so this always is one.
+          onNext(state.core as ExerciseState);
         }}
         className="w-full"
       />
@@ -105,7 +105,9 @@ function SeriesRound({
       state={state}
       dispatch={dispatch}
       showHint={hintsEnabled}
-      pieceBadges={showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId }))}
+      // The check ring stays off in a series round, as today (`docs/refactor-v4.md` follow-up F6).
+      showCheck={false}
+      surface={{ worldId }}
       top={top}
       done={done}
     />

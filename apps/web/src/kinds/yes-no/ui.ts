@@ -1,8 +1,26 @@
+import type { ActionOf, DefOf, ExerciseStateOf, OutcomeOf } from '@chess-kids/core/chess';
 import type { ExerciseKindUI } from '../kind-ui.ts';
+import type { WrongSquaresExtra } from '../move-ui.ts';
+import { baseInitUi } from '../move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
-export const yesNoUi: ExerciseKindUI<'yes-no'> = {
+export interface YesNoExtra extends WrongSquaresExtra {
+  /** The value last picked wrong, if any — that button turns orange and disables. */
+  readonly wrongAnswer?: boolean;
+}
+
+export const yesNoUi: ExerciseKindUI<
+  DefOf<'yes-no'>,
+  ExerciseStateOf<DefOf<'yes-no'>>,
+  ActionOf<'yes-no'>,
+  OutcomeOf<'yes-no'>,
+  YesNoExtra
+> = {
   type: 'yes-no',
+
+  initUi: baseInitUi,
+
+  clearWrongUi: () => ({ wrongSquares: [] }),
 
   toUi(outcome, action) {
     if (outcome.kind === 'wrong') {
