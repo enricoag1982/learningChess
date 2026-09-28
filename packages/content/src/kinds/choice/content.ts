@@ -1,3 +1,4 @@
+import type { TextKeyRef } from '@chess-kids/core';
 import {
   PIECE_BY_LETTER,
   type ChoiceDef,
@@ -94,6 +95,17 @@ function compile(raw: z.output<typeof schema>, ctx: CompileContext): ChoiceDef {
   return exercise;
 }
 
+/** Every option's own text key (besides the exercise's own `textKey`), for `lesson-load.ts`'s
+ * locale check. */
+function textKeys(def: ChoiceDef): readonly TextKeyRef[] {
+  return def.options
+    .filter(
+      (option): option is ChoiceOption & { readonly textKey: string } =>
+        option.textKey !== undefined,
+    )
+    .map((option) => ({ key: option.textKey, label: `option "${option.id}"` }));
+}
+
 // No semantic `verify`: option-id uniqueness, answer membership and "text or piece" are all
 // schema-level; the authored `verify` field itself is checked at compile time (`checkChoiceVerify`).
 export const choice: ExerciseKindContent<ChoiceDef, typeof schema> = {
@@ -101,4 +113,5 @@ export const choice: ExerciseKindContent<ChoiceDef, typeof schema> = {
   schema,
   refine,
   compile,
+  textKeys,
 };

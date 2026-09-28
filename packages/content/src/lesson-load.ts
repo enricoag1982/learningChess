@@ -3,7 +3,6 @@ import { join } from 'node:path';
 import type { CompiledContent, Lesson, MiniGame } from '@chess-kids/core/chess';
 import type { ExerciseDef, Position } from '@chess-kids/core/chess';
 import { hasPieceOf } from '@chess-kids/core/chess';
-import { solutionOf } from '@chess-kids/core/testing';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
 import { chessDemo } from './chess-content.ts';
@@ -154,7 +153,7 @@ function checkExerciseSemantics(
   if ((kind.needsKidPiece?.(exercise) ?? true) && !hasKidPiece(exercise.position)) {
     issues.push(`${where}: side to move has no piece`);
   }
-  for (const ref of solutionOf(exercise).textKeys?.(exercise) ?? []) {
+  for (const ref of contentKindOf(exercise.type).textKeys?.(exercise) ?? []) {
     checkTextKey(ref.key, locales, `${where}: ${ref.label}`, issues);
   }
   kind.verify?.(exercise, where, issues);

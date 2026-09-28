@@ -241,6 +241,30 @@ describe('loadContent', () => {
     expect(issuesOf()).toEqual([]);
   });
 
+  it('reports a choice option referencing a missing text key (kind content textKeys)', () => {
+    writeLesson({
+      exercises: [
+        validChoiceExercise({
+          options: [
+            { id: 'rook', text: 'no-such-option-key' },
+            { id: 'pawn', piece: 'P' },
+          ],
+        }),
+      ],
+    });
+    writeMiniGame();
+    writeDefaultLocales();
+
+    const issues = issuesOf();
+    expect(
+      issues.some(
+        (issue) =>
+          issue.includes('missing text key "lessons:no-such-option-key"') &&
+          issue.includes('option "rook"'),
+      ),
+    ).toBe(true);
+  });
+
   describe('YAML defaults', () => {
     it('defaults exercise text to id', () => {
       writeLesson({ exercises: [validExercise({ text: undefined })] });

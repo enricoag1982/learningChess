@@ -1,6 +1,7 @@
 // The exercise-kind content abstraction (schema + compile + verify): a uniform interface so
 // `lesson-load.ts` dispatches through a registry (`kinds/index.ts`) — the content counterpart of
 // core's `ExerciseKind`.
+import type { TextKeyRef } from '@chess-kids/core';
 import type { ExerciseDef } from '@chess-kids/core/chess';
 import type { z } from 'zod';
 
@@ -64,4 +65,6 @@ export interface ExerciseKindContent<D extends ExerciseDef, S extends z.ZodType>
   compile(raw: z.output<S>, ctx: CompileContext): D | null;
   verify?(def: D, where: string, issues: string[]): void;
   needsKidPiece?(def: D): boolean;
+  /** Text keys `def` references besides its own `textKey` (e.g. a `choice` option's). */
+  textKeys?(def: D): readonly TextKeyRef[];
 }
