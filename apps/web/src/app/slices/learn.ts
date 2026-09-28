@@ -67,6 +67,12 @@ export interface LearnSlice {
   readonly startPracticeTopic: (conceptId: string) => Promise<void>;
   /** Leaves the Practice task run back to the topic list, refreshing progress. */
   readonly exitPracticeRun: () => void;
+  /** Opens a mini-game session from Play or a Journey world-boss node, pushed on top so
+   * `exitMiniGame`'s `back()` returns there unaided. Subject-free: any mini-game mode. */
+  readonly startMiniGame: (miniGameId: string) => void;
+  /** Leaves the mini-game session for wherever it opened from; a Today one abandons the whole
+   * session instead (`leaveToday`). */
+  readonly exitMiniGame: () => void;
 }
 
 /** Enters `lessonId` via `enter` (`navigate` to open fresh, `replace` for a Today session moving
@@ -223,5 +229,17 @@ export const createLearnSlice: SliceCreator<LearnSlice> = (set, get) => {
     },
 
     exitPracticeRun: backAndRefresh(get),
+
+    startMiniGame: (miniGameId) => void get().navigate({ name: 'minigame', miniGameId }),
+
+    exitMiniGame() {
+      const top = get().stack[get().stack.length - 1];
+      if (top?.name === 'minigame' && top.today) {
+        get().leaveToday();
+      } else {
+        void get().back();
+      }
+      void get().refreshProgress();
+    },
   };
 };

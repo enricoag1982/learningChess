@@ -46,12 +46,6 @@ export interface PlaySlice {
   /** The vs Friend setup sheet's current choices, read by `friend-game` once "Start" is tapped. */
   readonly friendSetup: FriendSetupState;
 
-  /** Opens a mini-game session from Play or a Journey world-boss node, pushed on top so
-   * `exitMiniGame`'s `back()` returns there unaided. */
-  readonly startMiniGame: (miniGameId: string) => void;
-  /** Leaves the mini-game session for wherever it opened from; a Today one abandons the whole
-   * session instead (`leaveToday`). */
-  readonly exitMiniGame: () => void;
   /** Play's vs Computer "Full game" button: opens a full game vs `level` (1 Mouse .. 5 Bear). */
   readonly startFullGame: (level: number) => void;
   /** Leaves the full-game screen back to Play, refreshing progress (game records included). */
@@ -75,18 +69,6 @@ export const createPlaySlice: SliceCreator<PlaySlice> = (set, get) => {
   return {
     levelUpSuggestion: null,
     friendSetup: DEFAULT_FRIEND_SETUP,
-
-    startMiniGame: (miniGameId) => void get().navigate({ name: 'minigame', miniGameId }),
-
-    exitMiniGame() {
-      const top = get().stack[get().stack.length - 1];
-      if (top?.name === 'minigame' && top.today) {
-        get().leaveToday();
-      } else {
-        void get().back();
-      }
-      void get().refreshProgress();
-    },
 
     startFullGame: (level) =>
       void get().navigate({ name: 'full-game', level: level as 1 | 2 | 3 | 4 | 5 }),

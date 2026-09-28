@@ -5,6 +5,7 @@ import type { BotPlayer, Position, Square } from '@chess-kids/core/chess';
 import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
 import { useAppStore } from './app/store.ts';
 import type { SubjectServices, SubjectWeb, SurfaceContext } from './app/subject.ts';
+import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
 import { CharacterBadge, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
@@ -25,6 +26,7 @@ export const chessWeb = {
   kinds: EXERCISE_KIND_UI,
   surface: { Story: SurfaceStory, Demo: SurfaceDemo },
   CharacterBadge,
+  homeTiles: HOME_TILES,
 } satisfies SubjectWeb;
 
 /** The checked king's square right now, if any (Board's check ring, every exercise kind). */

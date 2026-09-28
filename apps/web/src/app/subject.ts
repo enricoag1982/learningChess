@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import type { JSX } from 'react';
 import type { Lesson, SubjectCore } from '@chess-kids/core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
+import type { PlainRouteName } from './routes.ts';
 
 /** A subject's own runtime services, augmented by module declaration (chess: `{ botPlayer }`). */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
@@ -31,6 +32,28 @@ export interface SubjectWeb {
   /** The piece-icon pill under a character's portrait, naming the piece it stands for
    * (`CharacterCard`); absent for a subject with no such badge. */
   CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
+  /** Extra Home tiles this subject contributes (chess: Play), merged with the platform's own
+   * (Journey/Practice/My Den) and sorted by `order`; absent for a subject with none. */
+  readonly homeTiles?: readonly HomeTile[];
+}
+
+/** One Home tile's own colours (`docs/screens.md` §1: border = `fg`, ledge a still-darker shade). */
+export interface HomeTileColors {
+  readonly bg: string;
+  readonly fg: string;
+  readonly ledge: string;
+}
+
+/** A subject-contributed Home tile (`SubjectWeb.homeTiles`), rendered the same as a platform one. */
+export interface HomeTile {
+  readonly id: string;
+  /** Placement among the platform's own tiles, lowest first. */
+  readonly order: number;
+  readonly labelKey: string;
+  readonly Icon: () => JSX.Element;
+  readonly colors: HomeTileColors;
+  /** Tapping the tile navigates here — a plain, param-less screen (chess: `play`). */
+  readonly route: PlainRouteName;
 }
 
 const PackContext = createContext<SubjectWeb | null>(null);
