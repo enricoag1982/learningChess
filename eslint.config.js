@@ -5,9 +5,10 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-// Package boundaries (docs/refactor-v4.md §R4): platform packages never reach a subject,
-// platform-core / platform-content stay React-free, and subject-chess's core, content and kind
-// engines stay UI-free. `chess.js` is only allowed in the rules adapter.
+// Package boundaries (docs/refactor-v4.md §R4): platform packages (core, content, web) never reach
+// a subject, platform-core / platform-content stay React-free, subject-chess's core, content and
+// kind engines stay UI-free, and apps reach a package only through its `exports`. `chess.js` is
+// only allowed in the rules adapter.
 const CHESSJS_RULES = 'packages/subject-chess/src/core/chess/chessjs-rules*.ts';
 const CHESS_JS = {
   name: 'chess.js',
@@ -16,6 +17,10 @@ const CHESS_JS = {
 const NO_SUBJECT = {
   group: ['@learn/subject-*', '**/subject-*/**'],
   message: 'platform packages never import a subject package',
+};
+const NO_DEEP_PATH = {
+  group: ['@learn/*/src', '@learn/*/src/**', '**/packages/*/src/**'],
+  message: 'apps reach a package only through its `exports`, never a deep `src` path',
 };
 const NO_REACT = { group: ['react*'], message: 'this package is React-free' };
 const NO_WEB = {
@@ -78,6 +83,8 @@ export default defineConfig([
       { group: ['@learn/platform-web'], message: 'platform-content sits below platform-web' },
     ]),
   },
+  { files: ['packages/platform-web/**'], rules: restrict([NO_SUBJECT]) },
+  { files: ['apps/**'], rules: restrict([NO_DEEP_PATH]) },
   {
     files: [
       'packages/subject-chess/src/core/**',
@@ -138,15 +145,21 @@ export default defineConfig([
     },
   },
   {
-    // App code never drives e2e or Playwright directly — only the registries' own `e2e.ts`
-    // siblings and `e2e-actions.ts`/`e2e-registry.ts` do (`kinds/`, `modes/`), for `e2e/kit/*.ts`.
-    files: ['apps/chess-kids/src/**/*.{ts,tsx}'],
+    // Neither app nor web code drives e2e or Playwright directly — only the registries' own `e2e.ts`
+    // siblings and `e2e-actions.ts`/`e2e-registry.ts` do (`kinds/`, `modes/`), for the app's
+    // `e2e/kit/*.ts`.
+    files: [
+      'apps/chess-kids/src/**/*.{ts,tsx}',
+      'packages/platform-web/src/**/*.{ts,tsx}',
+      'packages/subject-chess/src/web/**/*.{ts,tsx}',
+      'packages/subject-chess/src/{kinds,modes}/**/*.tsx',
+    ],
     ignores: [
-      'apps/chess-kids/src/kinds/e2e-actions.ts',
-      'apps/chess-kids/src/kinds/e2e-registry.ts',
-      'apps/chess-kids/src/kinds/*/e2e.ts',
       'apps/chess-kids/src/modes/e2e-registry.ts',
       'apps/chess-kids/src/modes/*/e2e.ts',
+      'packages/subject-chess/src/web/kinds/e2e-actions.ts',
+      'packages/subject-chess/src/web/kinds/e2e-registry.ts',
+      'packages/subject-chess/src/web/modes/e2e-registry.ts',
     ],
     rules: {
       'no-restricted-imports': [
