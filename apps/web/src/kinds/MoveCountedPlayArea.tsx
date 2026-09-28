@@ -7,7 +7,7 @@ import type {
   Hint,
   MoveAction,
   UndoAction,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
 import type { SurfaceContext } from '../app/subject.ts';
 import { InfoPanel } from '../ui/ds/primitives.tsx';

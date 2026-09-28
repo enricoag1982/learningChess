@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@chess-kids/core';
+import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@learn/platform-core';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
 import { compileExercises } from './kinds/compile-exercise.ts';

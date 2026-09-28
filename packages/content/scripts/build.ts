@@ -1,7 +1,7 @@
 import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { bot } from '@chess-kids/core/chess';
+import type { bot } from '@learn/subject-chess';
 import { loadBotBook } from '../src/bot-book-load.ts';
 import { chessContent } from '../src/chess-content.ts';
 import { compileAll } from '../src/compile-all.ts';

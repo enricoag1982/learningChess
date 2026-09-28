@@ -1,4 +1,4 @@
-import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
+import { CHESS_APP_CONFIG } from '@learn/subject-chess';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { chessWeb } from '../chess-pack.ts';
 import { createServices } from './services.ts';

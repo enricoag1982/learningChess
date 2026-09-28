@@ -11,7 +11,7 @@ import {
   type CaptureDef,
   type CollectStarsDef,
   type Position,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { z } from 'zod';
 import { keySchema, textRefSchema } from '../schema.ts';
 import type { Where } from '../subject.ts';

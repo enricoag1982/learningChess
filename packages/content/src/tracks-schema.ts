@@ -1,4 +1,4 @@
-import { HABITATS } from '@chess-kids/core';
+import { HABITATS } from '@learn/platform-core';
 import { z } from 'zod';
 import { textRefSchema } from './lesson-schema.ts';
 import { KEY_PATTERN, keySchema } from './schema.ts';

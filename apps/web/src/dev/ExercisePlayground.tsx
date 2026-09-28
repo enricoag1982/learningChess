@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import type { Lesson } from '@chess-kids/core/chess';
-import type { ExerciseDef } from '@chess-kids/core/chess';
+import type { Lesson } from '@learn/subject-chess';
+import type { ExerciseDef } from '@learn/subject-chess';
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import { PackProvider } from '../app/subject.ts';
 import { chessWeb } from '../chess-pack.ts';

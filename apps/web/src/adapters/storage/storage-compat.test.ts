@@ -4,10 +4,10 @@
 // never the fixture (`apps/web/test-fixtures/storage/README.md`).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { AppDeps, AppSettings, BackupFile, ParentLock } from '@chess-kids/core';
-import { buildBackupFile, parseBackupFile } from '@chess-kids/core/backup';
-import { importMerged, planImport } from '@chess-kids/core/merge';
-import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
+import type { AppDeps, AppSettings, BackupFile, ParentLock } from '@learn/platform-core';
+import { buildBackupFile, parseBackupFile } from '@learn/platform-core/backup';
+import { importMerged, planImport } from '@learn/platform-core/merge';
+import { CHESS_APP_CONFIG } from '@learn/subject-chess';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createServices } from '../../app/services.ts';
 import { chessWeb } from '../../chess-pack.ts';

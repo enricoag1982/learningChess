@@ -1,5 +1,5 @@
-import type { Narrator } from '@chess-kids/core';
-import { voiceKey } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
+import { voiceKey } from '@learn/platform-core';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createAudioNarrator } from './audio-narrator.ts';
 

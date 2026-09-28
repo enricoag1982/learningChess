@@ -4,7 +4,7 @@ import {
   selectSquaresAnswer,
   type SelectSquaresDef,
   type Square,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { z } from 'zod';
 import { exerciseCommonFields, rules, squareSchema } from '../common.ts';
 import type { ExerciseKindContent } from '../kind-content.ts';

@@ -1,5 +1,5 @@
-import type { StaticMiniGame } from '@chess-kids/core/chess';
-import { hasPieceOf, optimalMoves, staticGoalExercise } from '@chess-kids/core/chess';
+import type { StaticMiniGame } from '@learn/subject-chess';
+import { hasPieceOf, optimalMoves, staticGoalExercise } from '@learn/subject-chess';
 import { z } from 'zod';
 import {
   checkExactlyOnePosition,

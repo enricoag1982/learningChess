@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseFen } from '@chess-kids/core/chess';
+import { parseFen } from '@learn/subject-chess';
 import { isClassicOnlyContext, isWorldFive, showPieceBadges } from './piece-style.ts';
 
 const STANDARD_START = parseFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');

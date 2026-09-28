@@ -1,7 +1,7 @@
 // Dev-only playground fixture (`dev/ExercisePlayground.tsx`, loaded via `import.meta.glob`) — never
 // imported by app code (see eslint.config.js).
-import type { MateInNDef } from '@chess-kids/core/chess';
-import { parseDiagram } from '@chess-kids/core/chess';
+import type { MateInNDef } from '@learn/subject-chess';
+import { parseDiagram } from '@learn/subject-chess';
 
 // 1.Ne7+ Kh8 2.Qa8# — mate in 2, kid = White; Kf8 is also legal but the line scripts Kh8, so the
 // reply's reveal delay and narration show up here too.

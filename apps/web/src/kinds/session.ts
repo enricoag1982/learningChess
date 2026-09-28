@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AnyKind, ExerciseDefBase, ExerciseStateBase, Stars } from '@chess-kids/core';
-import { shouldOfferEasier } from '@chess-kids/core';
+import type { AnyKind, ExerciseDefBase, ExerciseStateBase, Stars } from '@learn/platform-core';
+import { shouldOfferEasier } from '@learn/platform-core';
 import { usePack } from '../app/subject.ts';
 import { useServices } from '../app/store.ts';
 import type { SpeechBubbleNote } from '../ui/ds/SpeechBubble.tsx';

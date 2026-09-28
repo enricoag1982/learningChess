@@ -19,7 +19,8 @@
     "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests"
   },
   "dependencies": {
-    "@chess-kids/core": "workspace:*",
+    "@learn/platform-core": "workspace:*",
+    "@learn/subject-chess": "workspace:*",
     "zod": "^4.6.5",
     "yaml": "^2.9.1"
   }

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
-import { localDayString } from '@chess-kids/core';
+import { localDayString } from '@learn/platform-core';
 import { createAppStore, setRoute, StoreProvider } from '../app/store.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';

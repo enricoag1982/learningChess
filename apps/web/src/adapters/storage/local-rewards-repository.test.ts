@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { EarnedBadge, SessionLog, Streak } from '@chess-kids/core';
+import type { EarnedBadge, SessionLog, Streak } from '@learn/platform-core';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageRewardsRepository } from './local-rewards-repository.ts';
 

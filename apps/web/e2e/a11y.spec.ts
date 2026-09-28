@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import type { TracksCatalog } from '@chess-kids/core';
-import type { CompiledContent, Lesson, MiniGame } from '@chess-kids/core/chess';
-import type { ExerciseDef } from '@chess-kids/core/chess';
-import { SQUARES } from '@chess-kids/core/chess';
+import type { TracksCatalog } from '@learn/platform-core';
+import type { CompiledContent, Lesson, MiniGame } from '@learn/subject-chess';
+import type { ExerciseDef } from '@learn/subject-chess';
+import { SQUARES } from '@learn/subject-chess';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import { modeE2EOf } from '../src/modes/e2e-registry.ts';

@@ -13,7 +13,7 @@ import {
   type Color,
   type Position,
   type Square,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { classifyTrade, rules } from '../common.ts';
 
 /** A `best-move` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */

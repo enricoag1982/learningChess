@@ -1,6 +1,6 @@
-import type { Hint, Move, MoveOutcome, Square, VariantRules } from '@chess-kids/core/chess';
-import type { ExerciseDefBase, ExerciseStateBase } from '@chess-kids/core';
-import type { ExerciseState } from '@chess-kids/core/chess';
+import type { Hint, Move, MoveOutcome, Square, VariantRules } from '@learn/subject-chess';
+import type { ExerciseDefBase, ExerciseStateBase } from '@learn/platform-core';
+import type { ExerciseState } from '@learn/subject-chess';
 import type { UiPatch } from './kind-ui.ts';
 
 /** A move's endpoints, for the board's slide / bounce-back highlight. */

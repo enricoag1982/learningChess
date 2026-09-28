@@ -6,7 +6,7 @@ import {
   optimalMoves,
   staticGoalExercise,
   type CompiledContent,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from './load.ts';

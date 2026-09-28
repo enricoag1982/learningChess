@@ -1,4 +1,4 @@
-import type { VersusMiniGame } from '@chess-kids/core/chess';
+import type { VersusMiniGame } from '@learn/subject-chess';
 import type { MiniGameModeContent } from '../mode-content.ts';
 import { compile } from './compile.ts';
 import { schema } from './schema.ts';

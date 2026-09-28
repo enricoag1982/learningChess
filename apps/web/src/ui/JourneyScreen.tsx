@@ -11,8 +11,8 @@ import type {
   World,
   WorldBossStatus,
   WorldStatus,
-} from '@chess-kids/core';
-import { lessonStars, worldLessons } from '@chess-kids/core';
+} from '@learn/platform-core';
+import { lessonStars, worldLessons } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
 import { characterName, tContent } from '../content-text.ts';

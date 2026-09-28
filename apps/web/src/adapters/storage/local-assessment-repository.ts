@@ -1,4 +1,4 @@
-import type { AssessmentRepository, AssessmentResult, Unlock } from '@chess-kids/core';
+import type { AssessmentRepository, AssessmentResult, Unlock } from '@learn/platform-core';
 import type { CappedList } from './collections.ts';
 import { cappedList } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

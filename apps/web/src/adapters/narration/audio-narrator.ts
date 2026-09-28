@@ -1,5 +1,5 @@
-import type { Narrator } from '@chess-kids/core';
-import { stripNickname, voiceKey } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
+import { stripNickname, voiceKey } from '@learn/platform-core';
 
 export interface CreateAudioNarratorOptions {
   /** e.g. `import.meta.env.BASE_URL + 'audio/en/'` — every file this adapter fetches is `<baseUrl><key>.mp3`/`<baseUrl>manifest.json`. */

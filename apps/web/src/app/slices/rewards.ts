@@ -1,4 +1,4 @@
-import { markSeen, type EarnedBadge, type Streak } from '@chess-kids/core';
+import { markSeen, type EarnedBadge, type Streak } from '@learn/platform-core';
 import type { AppGet, SliceCreator } from '../store.ts';
 
 /** Rare celebrations (rewards.md §1): at most this many full-screen ones per app sitting; every

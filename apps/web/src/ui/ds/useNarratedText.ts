@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { Narrator } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
 import { speakSequence } from './speakSequence.ts';
 
 /** Speaks `text` through `narrator` on every change (incl. mount); returns a `replay` callback.

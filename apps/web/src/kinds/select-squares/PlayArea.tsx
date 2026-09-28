@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@chess-kids/core/chess';
+import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@learn/subject-chess';
 import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { Board } from '../../ui/board/Board.tsx';
 import { PRIMARY_BUTTON } from '../../ui/lesson/button-styles.ts';

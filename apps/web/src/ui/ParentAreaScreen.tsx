@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ChildOverview } from '@chess-kids/core';
+import type { ChildOverview } from '@learn/platform-core';
 import {
   buildChildOverview,
   changeParentPassword,
   downloadParentCodeFile,
   isValidPassword,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { RankPill } from './RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';

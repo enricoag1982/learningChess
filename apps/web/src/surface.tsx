@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { GameRecord } from '@chess-kids/core';
-import { CHARACTER_PIECES, chessCore, friendGamesPlayed } from '@chess-kids/core/chess';
-import type { Lesson, Position, Square } from '@chess-kids/core/chess';
+import type { GameRecord } from '@learn/platform-core';
+import { CHARACTER_PIECES, chessCore, friendGamesPlayed } from '@learn/subject-chess';
+import type { Lesson, Position, Square } from '@learn/subject-chess';
 import { useAppStore } from './app/store.ts';
 import { characterName, tContent } from './content-text.ts';
 import { Board } from './ui/board/Board.tsx';

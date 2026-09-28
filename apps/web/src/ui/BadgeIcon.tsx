@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { BadgeTier } from '@chess-kids/core';
+import type { BadgeTier } from '@learn/platform-core';
 
 /** Fill colour per tier (`docs/screens.md` §1.1 tokens where they fit; gold reuses the star token). */
 const TIER_COLOR: Readonly<Record<BadgeTier | 'none', string>> = {

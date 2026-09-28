@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createProfile } from '@chess-kids/core';
+import { createProfile } from '@learn/platform-core';
 import { createTestServices } from '../testing/test-services.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { sendBackupToOtherDevice } from './share-backup.ts';

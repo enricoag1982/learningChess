@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { VersusMiniGame } from '@chess-kids/core/chess';
-import type { BotPlayer, Move, PieceType, Square } from '@chess-kids/core/chess';
-import { chessJsRules, parseDiagram, parseFen } from '@chess-kids/core/chess';
+import type { VersusMiniGame } from '@learn/subject-chess';
+import type { BotPlayer, Move, PieceType, Square } from '@learn/subject-chess';
+import { chessJsRules, parseDiagram, parseFen } from '@learn/subject-chess';
 import '../../app-i18n.ts';
 import { createBundledContentSource } from '../../adapters/content/bundled-content-source.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';

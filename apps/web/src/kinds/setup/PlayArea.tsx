@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf, ExerciseStateOf, Hint, Piece, Square } from '@chess-kids/core/chess';
-import { setupPalette } from '@chess-kids/core/chess';
+import type { ActionOf, DefOf, ExerciseStateOf, Hint, Piece, Square } from '@learn/subject-chess';
+import { setupPalette } from '@learn/subject-chess';
 import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { Board } from '../../ui/board/Board.tsx';
 import { useIsStackedLayout } from '../../ui/useMediaQuery.ts';

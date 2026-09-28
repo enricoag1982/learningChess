@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { AppDeps, BackupFile, ProfileSettings } from '@chess-kids/core';
-import { createProfile, createSubjectRuntime } from '@chess-kids/core';
-import { buildBackupFile } from '@chess-kids/core/backup';
-import { CHESS_APP_CONFIG, chessCore, DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core/chess';
-import { stubContent, makeClock, makeIds, makePasswordFileWriter } from '@chess-kids/core/testing';
+import type { AppDeps, BackupFile, ProfileSettings } from '@learn/platform-core';
+import { createProfile, createSubjectRuntime } from '@learn/platform-core';
+import { buildBackupFile } from '@learn/platform-core/backup';
+import { CHESS_APP_CONFIG, chessCore, DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
+import { makeClock, makeIds, makePasswordFileWriter } from '@learn/platform-core/testing';
+import { stubContent } from '@learn/subject-chess/testing';
 import { LocalStorageBackupImporter } from './local-backup-importer.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
 import { LocalStorageGameRecordRepository } from './local-game-record-repository.ts';

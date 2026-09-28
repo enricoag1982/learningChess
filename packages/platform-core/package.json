@@ -1,0 +1,21 @@
+{
+  "name": "@learn/platform-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./backup": "./src/app/backup.ts",
+    "./merge": "./src/app/merge.ts",
+    "./testing": "./src/testing/index.ts",
+    "./domain/*": "./src/domain/*.ts",
+    "./app/*": "./src/app/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}

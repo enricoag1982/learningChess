@@ -7,8 +7,8 @@ import type {
   ExerciseDefBase,
   TracksCatalog,
   World,
-} from '@chess-kids/core';
-import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
+} from '@learn/platform-core';
+import { PLAY_FROM_OPTIONS, voiceKey } from '@learn/platform-core';
 import type { Locales } from './load.ts';
 import type { LocaleTree } from './schema.ts';
 import type { SubjectContent } from './subject.ts';

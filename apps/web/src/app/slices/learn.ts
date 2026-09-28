@@ -15,7 +15,7 @@ import {
   type ConceptTask,
   type Lesson,
   type ParentUnlockTarget,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import type { Route } from '../routes.ts';
 import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 

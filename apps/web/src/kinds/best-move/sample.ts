@@ -1,7 +1,7 @@
 // Dev-only playground fixture (`dev/ExercisePlayground.tsx`, loaded via `import.meta.glob`) — never
 // imported by app code (see eslint.config.js).
-import type { BestMoveDef } from '@chess-kids/core/chess';
-import { parseDiagram } from '@chess-kids/core/chess';
+import type { BestMoveDef } from '@learn/subject-chess';
+import { parseDiagram } from '@learn/subject-chess';
 
 const EXERCISE: BestMoveDef = {
   id: 'dev-bm',

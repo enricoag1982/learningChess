@@ -13,7 +13,7 @@ import {
   type Position,
   type Square,
   type YesNoDef,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 
 /** A `yes-no` exercise's parsed `verify` field (`schema.ts`'s regex already restricts the shape). */
 type VerifyFact =

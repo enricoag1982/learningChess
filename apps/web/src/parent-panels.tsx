@@ -4,10 +4,10 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { GameRecord } from '@chess-kids/core';
-import { loadGameRecords, loadJourney } from '@chess-kids/core';
-import { computerLevelStatus, bot } from '@chess-kids/core/chess';
-import type { ComputerLevelStatus, PieceStyleSetting } from '@chess-kids/core/chess';
+import type { GameRecord } from '@learn/platform-core';
+import { loadGameRecords, loadJourney } from '@learn/platform-core';
+import { computerLevelStatus, bot } from '@learn/subject-chess';
+import type { ComputerLevelStatus, PieceStyleSetting } from '@learn/subject-chess';
 import { useServices } from './app/store.ts';
 import type { ParentSettingsProps, ReportSectionProps } from './app/subject.ts';
 import {

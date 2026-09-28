@@ -4,7 +4,7 @@
 // replacing each type's own hand-rolled solver + the versus board's fixed waits/aria-label reads.
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { Lesson, MiniGame } from '@chess-kids/core/chess';
+import type { Lesson, MiniGame } from '@learn/subject-chess';
 import type {
   ExerciseAction,
   ExerciseDef,
@@ -12,15 +12,15 @@ import type {
   SelectSquaresDef,
   Square,
   VariantRules,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import {
   chessJsRules,
   createVariantRules,
   kindOf,
   selectSquaresAnswer as coreSelectSquaresAnswer,
   toFen,
-} from '@chess-kids/core/chess';
-import { solutionOf } from '@chess-kids/core/testing';
+} from '@learn/subject-chess';
+import { solutionOf } from '@learn/subject-chess/testing';
 import { kindE2EOf } from '../../src/kinds/e2e-registry.ts';
 import { modeE2EOf } from '../../src/modes/e2e-registry.ts';
 import { contentText } from './i18n.ts';

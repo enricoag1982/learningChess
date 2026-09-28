@@ -1,8 +1,8 @@
-import type { Track, TracksCatalog, World } from '@chess-kids/core';
-import type { Lesson, MiniGame } from '@chess-kids/core/chess';
-import type { ExerciseDef } from '@chess-kids/core/chess';
-import { parseDiagram } from '@chess-kids/core/chess';
-import { makeContentSource } from '@chess-kids/core/testing';
+import type { Track, TracksCatalog, World } from '@learn/platform-core';
+import type { Lesson, MiniGame } from '@learn/subject-chess';
+import type { ExerciseDef } from '@learn/subject-chess';
+import { parseDiagram } from '@learn/subject-chess';
+import { makeContentSource } from '@learn/subject-chess/testing';
 
 /** A tiny static boss mini-game (rook a1, pawn h1, one move to capture it). */
 export function fixtureBoss(): MiniGame {

@@ -1,7 +1,11 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { ExerciseDef } from '@chess-kids/core/chess';
-import { PLACEMENT_TASKS_PER_WORLD, TEST_OUT_LESSON_TASKS, worldLessons } from '@chess-kids/core';
+import type { ExerciseDef } from '@learn/subject-chess';
+import {
+  PLACEMENT_TASKS_PER_WORLD,
+  TEST_OUT_LESSON_TASKS,
+  worldLessons,
+} from '@learn/platform-core';
 import {
   answerExerciseWrongThenSolve,
   catalog,

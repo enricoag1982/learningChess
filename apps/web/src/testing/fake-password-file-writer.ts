@@ -1,4 +1,4 @@
-import type { PasswordFileWriter } from '@chess-kids/core';
+import type { PasswordFileWriter } from '@learn/platform-core';
 
 const LOCATION = 'Downloads/chess-for-kids-parent-code.txt';
 

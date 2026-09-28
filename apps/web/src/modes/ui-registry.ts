@@ -1,7 +1,7 @@
 // The mini-game-mode UI registry — the only place mode dispatch happens for the boss UI (`BossStep`,
 // never a local `if`/`switch`).
 import type { JSX } from 'react';
-import type { MiniGame, ModeType } from '@chess-kids/core/chess';
+import type { MiniGame, ModeType } from '@learn/subject-chess';
 import { Step as SeriesStep } from './series/Step.tsx';
 import { Step as StaticStep } from './static/Step.tsx';
 import { Step as VersusStep } from './versus/Step.tsx';

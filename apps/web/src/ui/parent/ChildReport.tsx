@@ -1,8 +1,8 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { ChildReport, GameRecord, Lesson, Profile } from '@chess-kids/core';
-import { buildChildReport } from '@chess-kids/core';
+import type { ChildReport, GameRecord, Lesson, Profile } from '@learn/platform-core';
+import { buildChildReport } from '@learn/platform-core';
 import { usePack } from '../../app/subject.ts';
 import type { ParentPanels } from '../../app/subject.ts';
 import { useServices } from '../../app/store.ts';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { createProfile } from '@chess-kids/core';
+import { createProfile } from '@learn/platform-core';
 import { createTestServices } from '../testing/test-services.ts';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';

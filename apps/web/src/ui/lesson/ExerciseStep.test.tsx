@@ -9,8 +9,8 @@ import type {
   SelectSquaresDef,
   SetupDef,
   YesNoDef,
-} from '@chess-kids/core/chess';
-import { parseDiagram } from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
+import { parseDiagram } from '@learn/subject-chess';
 import { chessWeb } from '../../chess-pack.ts';
 import '../../app-i18n.ts';
 import {

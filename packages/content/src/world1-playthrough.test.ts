@@ -1,18 +1,18 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { playExerciseToCompletion } from '@chess-kids/core/testing';
+import { playExerciseToCompletion } from '@learn/subject-chess/testing';
 import {
   completeRound,
   currentRound,
   seriesResult,
   seriesStars,
   startSeries,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
-import { EXERCISE_KINDS, type CompiledContent } from '@chess-kids/core/chess';
+import { EXERCISE_KINDS, type CompiledContent } from '@learn/subject-chess';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
 const locales = mergeLocales(

@@ -1,4 +1,4 @@
-import type { LessonPhase, SkippablePhase } from '@chess-kids/core';
+import type { LessonPhase, SkippablePhase } from '@learn/platform-core';
 
 /** Lesson phases in track order (`StepPills` on tablets, `PhaseChip`'s mini track on phones). */
 export const PHASES: readonly LessonPhase[] = ['story', 'demo', 'try', 'exercises', 'boss'];

@@ -1,4 +1,4 @@
-import type { Narrator } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
 
 /** Tracks, per `Narrator` instance, which `speakSequence` run is current; a fresh call (even an
  * empty one, to stop without starting a new run) always supersedes the last. A `WeakMap` keeps

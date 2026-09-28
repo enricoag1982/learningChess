@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { ParentLock } from '@chess-kids/core';
+import type { ParentLock } from '@learn/platform-core';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageParentLockRepository } from './local-parent-lock-repository.ts';
 

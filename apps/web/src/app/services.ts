@@ -4,8 +4,8 @@ import type {
   BackupFileWriter,
   BackupImporter,
   Narrator,
-} from '@chess-kids/core';
-import { createSubjectRuntime } from '@chess-kids/core';
+} from '@learn/platform-core';
+import { createSubjectRuntime } from '@learn/platform-core';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '../adapters/ids.ts';
 import { createSystemClock } from '../adapters/clock.ts';

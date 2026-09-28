@@ -1,4 +1,4 @@
-import type { EarnedBadge, RewardsRepository, SessionLog, Streak } from '@chess-kids/core';
+import type { EarnedBadge, RewardsRepository, SessionLog, Streak } from '@learn/platform-core';
 import type { CappedList, KeyedCollection } from './collections.ts';
 import { cappedList, keyedCollection } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

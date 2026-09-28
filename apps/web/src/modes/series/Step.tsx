@@ -7,8 +7,8 @@ import type {
   MiniGameBase,
   SeriesGameDef,
   SeriesGameState,
-} from '@chess-kids/core';
-import { completeRound, currentRound, startSeries } from '@chess-kids/core';
+} from '@learn/platform-core';
+import { completeRound, currentRound, startSeries } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { SeriesClosingBoard, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { tContent } from '../../content-text.ts';

@@ -1,4 +1,4 @@
-import type { BackupFileWriter } from '@chess-kids/core';
+import type { BackupFileWriter } from '@learn/platform-core';
 
 /** Triggers a same-origin download of `filename` holding `text`, then releases the object URL.
  * Exported so `share-backup.ts`'s fallback can reuse it directly. */

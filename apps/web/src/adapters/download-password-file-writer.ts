@@ -1,4 +1,4 @@
-import type { PasswordFileWriter } from '@chess-kids/core';
+import type { PasswordFileWriter } from '@learn/platform-core';
 
 function fileText(password: string): string {
   return `Chess for Kids — parent code: ${password}\nKeep this file. The app asks for this code before the grown-ups area.\n`;

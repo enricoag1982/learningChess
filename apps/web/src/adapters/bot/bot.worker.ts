@@ -1,5 +1,5 @@
-import type { Move, game } from '@chess-kids/core/chess';
-import { bot, chessJsRules } from '@chess-kids/core/bot-worker';
+import type { Move, game } from '@learn/subject-chess';
+import { bot, chessJsRules } from '@learn/subject-chess/bot-worker';
 import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 

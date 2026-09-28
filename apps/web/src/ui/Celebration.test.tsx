@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { EarnedBadge } from '@chess-kids/core';
+import type { EarnedBadge } from '@learn/platform-core';
 import { StoreProvider } from '../app/store.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';

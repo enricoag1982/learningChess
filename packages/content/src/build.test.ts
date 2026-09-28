@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CompiledContent } from '@chess-kids/core/chess';
+import type { CompiledContent } from '@learn/subject-chess';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { mergeLocales } from './load.ts';
 import type { LocaleTree } from './schema.ts';

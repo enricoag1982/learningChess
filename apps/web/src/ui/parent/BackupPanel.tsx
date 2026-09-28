@@ -1,10 +1,14 @@
 import { useRef, useState } from 'react';
 import type { ChangeEvent, JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { BackupFile } from '@chess-kids/core';
-import { BackupValidationError, exportBackup, parseBackupFile } from '@chess-kids/core/backup';
-import type { ChildImportChoice, ImportChangeSummary, ImportPlan } from '@chess-kids/core/merge';
-import { importMerged, planImport, previewChildChange } from '@chess-kids/core/merge';
+import type { BackupFile } from '@learn/platform-core';
+import { BackupValidationError, exportBackup, parseBackupFile } from '@learn/platform-core/backup';
+import type {
+  ChildImportChoice,
+  ImportChangeSummary,
+  ImportPlan,
+} from '@learn/platform-core/merge';
+import { importMerged, planImport, previewChildChange } from '@learn/platform-core/merge';
 import { useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { ChevronLeftIcon } from '../ds/icons-lazy.tsx';

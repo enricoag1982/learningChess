@@ -1,11 +1,11 @@
 import { screen, fireEvent } from '@testing-library/react';
-import type { Profile } from '@chess-kids/core';
+import type { Profile } from '@learn/platform-core';
 import {
   createProfile,
   getLessonProgress,
   selectProfile,
   setupParentPassword,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import type { Services } from '../app/services.ts';
 
 /**

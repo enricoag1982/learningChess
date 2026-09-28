@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react';
 import { render } from '@testing-library/react';
-import { createProfile } from '@chess-kids/core';
+import { createProfile } from '@learn/platform-core';
 import type { AppStore } from '../app/store.ts';
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import type { Services } from '../app/services.ts';

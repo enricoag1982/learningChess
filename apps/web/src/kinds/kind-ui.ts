@@ -3,7 +3,7 @@ import type {
   ExerciseFeedbackBase,
   ExerciseStateBase,
   HintBase,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import type { JSX, ReactNode } from 'react';
 import type { SurfaceContext } from '../app/subject.ts';
 

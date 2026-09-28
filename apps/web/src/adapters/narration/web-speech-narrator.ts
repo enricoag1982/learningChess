@@ -1,4 +1,4 @@
-import type { Narrator } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
 
 /** Speaking rate and pitch tuned for a slow, friendly read-aloud voice. */
 const RATE = 0.95;

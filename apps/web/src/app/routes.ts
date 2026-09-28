@@ -3,7 +3,7 @@ import type {
   ConceptTask,
   PlacementWorldPlan,
   TimeLimitStatus,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 
 /** A subject-contributed route's own param fields, keyed by route name — augmented per subject
  * (chess: `play`, `'full-game'` `{level}`, `'friend-setup'`, `'friend-game'`). Each subject's own

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { recordSessionMinutes } from '@chess-kids/core';
+import { recordSessionMinutes } from '@learn/platform-core';
 import type { Screen } from '../app/store.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { routeMetaFor } from '../app/subject.ts';

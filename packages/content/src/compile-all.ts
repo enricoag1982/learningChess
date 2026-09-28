@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { BadgeDef, CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, CompiledContent, TracksCatalog } from '@learn/platform-core';
 import { loadBadges } from './badges-load.ts';
 import {
   ContentError,

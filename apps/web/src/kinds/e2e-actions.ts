@@ -1,8 +1,8 @@
 // Shared e2e drive primitives for the move kinds (collect-stars, capture, best-move, mate-in-n);
 // `Page` is a type-only import — this file is never reachable from app code (see eslint.config.js).
 import type { Page } from '@playwright/test';
-import type { MoveInput, Position, VariantRules } from '@chess-kids/core/chess';
-import { SQUARES, findMoveBySan } from '@chess-kids/core/chess';
+import type { MoveInput, Position, VariantRules } from '@learn/subject-chess';
+import { SQUARES, findMoveBySan } from '@learn/subject-chess';
 
 /** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
 export async function clickSquare(page: Page, square: string): Promise<void> {

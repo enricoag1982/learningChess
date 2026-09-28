@@ -1,4 +1,4 @@
-import type { Move, game } from '@chess-kids/core/chess';
+import type { Move, game } from '@learn/subject-chess';
 
 /** Main thread → worker: choose a move for `state` at `level` (`BotLevel.level`), seeded. */
 export interface BotRequest {

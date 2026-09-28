@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, MiniGameStateBase, Stars } from '@chess-kids/core';
-import { recordBossResult } from '@chess-kids/core';
+import type { Lesson, MiniGameStateBase, Stars } from '@learn/platform-core';
+import { recordBossResult } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { StarsRow } from '../ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';

@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { createProfile, updateProfileSettings } from '@chess-kids/core';
-import type { BackupFile } from '@chess-kids/core';
-import { DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core/chess';
+import { createProfile, updateProfileSettings } from '@learn/platform-core';
+import type { BackupFile } from '@learn/platform-core';
+import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
 import App from '../App.tsx';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import type { FakeBackupFileWriter } from '../testing/fake-backup-file-writer.ts';

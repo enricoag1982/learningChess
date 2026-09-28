@@ -1,7 +1,10 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { makeLesson as buildLesson, makeMiniGame as buildMiniGame } from '@chess-kids/core/testing';
+import {
+  makeLesson as buildLesson,
+  makeMiniGame as buildMiniGame,
+} from '@learn/subject-chess/testing';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ContentError, loadLocales } from './load.ts';
 import { loadTracks } from './tracks-load.ts';

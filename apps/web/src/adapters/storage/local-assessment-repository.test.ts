@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { AssessmentResult, Unlock } from '@chess-kids/core';
+import type { AssessmentResult, Unlock } from '@learn/platform-core';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
 

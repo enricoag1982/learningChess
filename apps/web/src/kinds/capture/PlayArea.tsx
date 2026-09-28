@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { ActionOf, DefOf, ExerciseStateOf } from '@chess-kids/core/chess';
+import type { ActionOf, DefOf, ExerciseStateOf } from '@learn/subject-chess';
 import type { PlayAreaProps } from '../kind-ui.ts';
 import type { MoveExtra } from '../move-ui.ts';
 import { MoveCountedPlayArea } from '../MoveCountedPlayArea.tsx';

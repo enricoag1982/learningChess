@@ -1,6 +1,6 @@
 // Platform content abstraction: the subject-free shapes the YAML → JSON pipeline compiles through.
 // Pure TS; zod type-only — a subject supplies its own concrete schema/compile logic on top.
-import type { CompiledContent } from '@chess-kids/core';
+import type { CompiledContent } from '@learn/platform-core';
 import type { z } from 'zod';
 import type { AnyExerciseKindContent } from './kinds/kind-content.ts';
 import type { AnyMiniGameModeContent } from './modes/mode-content.ts';

@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Attempt, ConceptStats, LessonProgress, MiniGameProgress } from '@chess-kids/core';
+import type { Attempt, ConceptStats, LessonProgress, MiniGameProgress } from '@learn/platform-core';
 import {
   makeProgress as buildProgress,
   makeMiniGameProgress as buildMiniGameProgress,
   makeConceptStats as buildConceptStats,
   makeAttempt as buildAttempt,
-} from '@chess-kids/core/testing';
+} from '@learn/platform-core/testing';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 

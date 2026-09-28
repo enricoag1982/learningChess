@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
-import type { ConceptTask, ExerciseStateBase } from '@chess-kids/core';
+import type { ConceptTask, ExerciseStateBase } from '@learn/platform-core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
 import { BlankScreen, Screen, ScreenHeader } from '../ds/Screen.tsx';
 

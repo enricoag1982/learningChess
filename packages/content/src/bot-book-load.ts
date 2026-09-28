@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { bot, chessJsRules, parseFen } from '@chess-kids/core/chess';
+import { bot, chessJsRules, parseFen } from '@learn/subject-chess';
 import { parse as parseYaml } from 'yaml';
 import { ContentError } from './load.ts';
 import { botBookFileSchema, type BookLineYaml } from './bot-book-schema.ts';

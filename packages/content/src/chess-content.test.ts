@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { TracksCatalog } from '@chess-kids/core';
+import type { TracksCatalog } from '@learn/platform-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
 import { chessBadges } from './chess-content.ts';

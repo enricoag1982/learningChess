@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import type { BadgeDef, Lesson, MiniGame, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, Lesson, MiniGame, TracksCatalog } from '@learn/platform-core';
 import { parse as parseYaml } from 'yaml';
 import { checkTextKey, ContentError, type Locales } from './load.ts';
 import { type BadgeConditionYaml, type BadgeYaml, badgesFileSchema } from './badges-schema.ts';

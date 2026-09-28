@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import type { Profile } from '@chess-kids/core';
-import { makeProfile } from '@chess-kids/core/testing';
+import type { Profile } from '@learn/platform-core';
+import { makeProfile } from '@learn/platform-core/testing';
 import { openLocalStore, StorageError } from './local-store.ts';
 import { LocalStorageProfileRepository } from './local-profile-repository.ts';
 

@@ -1,4 +1,4 @@
-import type { BackupFileWriter } from '@chess-kids/core';
+import type { BackupFileWriter } from '@learn/platform-core';
 
 export interface FakeBackupFileWriter extends BackupFileWriter {
   /** Every file written so far, oldest first. */

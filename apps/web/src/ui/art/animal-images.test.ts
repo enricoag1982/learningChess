@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { PieceType } from '@chess-kids/core/chess';
-import { AVATARS } from '@chess-kids/core';
-import { bot } from '@chess-kids/core/chess';
+import type { PieceType } from '@learn/subject-chess';
+import { AVATARS } from '@learn/platform-core';
+import { bot } from '@learn/subject-chess';
 import { characterForPiece } from './character-meta.ts';
 import { ANIMAL_IMAGES } from './animal-images.ts';
 

@@ -1,4 +1,4 @@
-import type { AppSettings, SettingsRepository } from '@chess-kids/core';
+import type { AppSettings, SettingsRepository } from '@learn/platform-core';
 import type { SingletonRecord } from './collections.ts';
 import { singleton } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

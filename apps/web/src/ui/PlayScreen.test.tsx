@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { getLessonProgress } from '@chess-kids/core';
-import { recordGame, solve } from '@chess-kids/core/chess';
+import { getLessonProgress } from '@learn/platform-core';
+import { recordGame, solve } from '@learn/subject-chess';
 import { chessWeb } from '../chess-pack.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';

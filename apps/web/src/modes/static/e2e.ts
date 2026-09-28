@@ -1,4 +1,4 @@
-import { staticGoalExercise } from '@chess-kids/core/chess';
+import { staticGoalExercise } from '@learn/subject-chess';
 import type { ModeE2E } from '../e2e-registry.ts';
 
 /** A `static` boss solves like the `capture`/`collect-stars` exercise its goal reduces to

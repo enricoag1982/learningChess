@@ -1,5 +1,5 @@
-import type { BotPlayer, Move, Square } from '@chess-kids/core/chess';
-import { chessJsRules } from '@chess-kids/core/chess';
+import type { BotPlayer, Move, Square } from '@learn/subject-chess';
+import { chessJsRules } from '@learn/subject-chess';
 
 /** A scripted `BotPlayer`: replies with the queued `from`/`to` moves in order. */
 export function scriptedBotPlayer(

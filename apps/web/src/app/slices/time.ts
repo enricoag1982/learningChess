@@ -1,4 +1,4 @@
-import type { ContentSource } from '@chess-kids/core';
+import type { ContentSource } from '@learn/platform-core';
 import {
   combinedSessionLog,
   getProfileSettings,
@@ -8,7 +8,7 @@ import {
   markTimeWarning,
   minutesUntilEnd,
   shouldWarn,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { routeMetaFor } from '../subject.ts';
 import type { SubjectWeb } from '../subject.ts';
 import type { Screen, SliceCreator } from '../store.ts';

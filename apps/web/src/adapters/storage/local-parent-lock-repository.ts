@@ -1,4 +1,4 @@
-import type { ParentLock, ParentLockRepository } from '@chess-kids/core';
+import type { ParentLock, ParentLockRepository } from '@learn/platform-core';
 import type { SingletonRecord } from './collections.ts';
 import { singleton } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

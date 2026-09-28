@@ -1,4 +1,4 @@
-import type { Narrator } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
 
 /** A `Narrator` a parent-set "voice" setting (app-structure.md §11) can silence without every call
  * site checking it itself; `setEnabled(false)` also cancels whatever is mid-speaking. */

@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { RankDef } from '@chess-kids/core';
+import type { RankDef } from '@learn/platform-core';
 import { tContent } from '../content-text.ts';
 import { InfoPill } from './ds/primitives.tsx';
 import { RankCrownIcon } from './ds/icons.tsx';

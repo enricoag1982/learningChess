@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { createProfile, localDayString, updateProfileSettings } from '@chess-kids/core';
-import { makeContentSource } from '@chess-kids/core/testing';
+import { createProfile, localDayString, updateProfileSettings } from '@learn/platform-core';
+import { makeContentSource } from '@learn/subject-chess/testing';
 import {
   fixtureBoss,
   fixtureCatalog,

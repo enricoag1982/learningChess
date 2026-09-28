@@ -4,7 +4,7 @@ import type {
   LessonProgress,
   MiniGameProgress,
   ProgressRepository,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import type { CappedList, KeyedCollection } from './collections.ts';
 import { cappedList, keyedCollection } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

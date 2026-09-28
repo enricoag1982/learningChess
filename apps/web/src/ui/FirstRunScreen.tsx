@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isValidPassword, setupParentPassword } from '@chess-kids/core';
+import { isValidPassword, setupParentPassword } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { PrivacyDialog, PrivacyLink } from './parent/PrivacyPolicy.tsx';
 import { PARENT_INPUT, PARENT_NOTE, PARENT_PRIMARY_BUTTON } from './parent/parent-styles.ts';

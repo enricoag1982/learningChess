@@ -1,6 +1,12 @@
 import { createContext, useContext } from 'react';
 import type { ComponentType, JSX } from 'react';
-import type { GameRecord, Lesson, Profile, ProfileSettings, SubjectCore } from '@chess-kids/core';
+import type {
+  GameRecord,
+  Lesson,
+  Profile,
+  ProfileSettings,
+  SubjectCore,
+} from '@learn/platform-core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
 import type { AppSet, SliceCreator } from './store.ts';
 import { DEFAULT_ROUTE_META, PLATFORM_ROUTE_META } from './routes.ts';

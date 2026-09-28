@@ -14,7 +14,7 @@ import type {
   SessionLog,
   Streak,
   Unlock,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { toPromise } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { SCHEMA_VERSION } from './local-store.ts';

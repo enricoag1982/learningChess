@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { MiniGameProgress } from '@chess-kids/core';
+import type { MiniGameProgress } from '@learn/platform-core';
 import {
   completeFirstRun,
   findLesson,

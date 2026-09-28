@@ -5,8 +5,8 @@ import type {
   ExerciseFeedbackBase,
   Resolve,
   Stars,
-} from '@chess-kids/core';
-import { exerciseNote as coreExerciseNote } from '@chess-kids/core';
+} from '@learn/platform-core';
+import { exerciseNote as coreExerciseNote } from '@learn/platform-core';
 import { characterName, tContent } from '../../content-text.ts';
 import type { SpeechBubbleNote } from '../ds/SpeechBubble.tsx';
 

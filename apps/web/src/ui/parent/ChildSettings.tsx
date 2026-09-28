@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Profile, ProfileSettings } from '@chess-kids/core';
+import type { Profile, ProfileSettings } from '@learn/platform-core';
 import type { Services } from '../../app/services.ts';
 import {
   changeAvatar,
@@ -15,8 +15,8 @@ import {
   updateProfileSettings,
   validateNickname,
   verifyParentPassword,
-} from '@chess-kids/core';
-import { exportBackup } from '@chess-kids/core/backup';
+} from '@learn/platform-core';
+import { exportBackup } from '@learn/platform-core/backup';
 import { usePack } from '../../app/subject.ts';
 import type { ParentPanels } from '../../app/subject.ts';
 import { useAppStore, useServices } from '../../app/store.ts';

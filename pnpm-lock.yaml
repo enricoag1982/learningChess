@@ -44,15 +44,18 @@ importers:
       '@chess-kids/content':
         specifier: workspace:*
         version: link:../../packages/content
-      '@chess-kids/core':
-        specifier: workspace:*
-        version: link:../../packages/core
       '@fontsource-variable/fredoka':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/nunito':
         specifier: ^5.3.0
         version: 5.3.0
+      '@learn/platform-core':
+        specifier: workspace:*
+        version: link:../../packages/platform-core
+      '@learn/subject-chess':
+        specifier: workspace:*
+        version: link:../../packages/subject-chess
       i18next:
         specifier: ^26.4.2
         version: 26.4.2(typescript@6.0.3)
@@ -114,9 +117,12 @@ importers:
 
   packages/content:
     dependencies:
-      '@chess-kids/core':
+      '@learn/platform-core':
         specifier: workspace:*
-        version: link:../core
+        version: link:../platform-core
+      '@learn/subject-chess':
+        specifier: workspace:*
+        version: link:../subject-chess
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -124,8 +130,17 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
 
-  packages/core:
+  packages/platform-core:
     dependencies:
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+
+  packages/subject-chess:
+    dependencies:
+      '@learn/platform-core':
+        specifier: workspace:*
+        version: link:../platform-core
       chess.js:
         specifier: 1.4.0
         version: 1.4.0

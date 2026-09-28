@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { AssessmentScope, AssessmentScore, SubjectCore } from '@chess-kids/core';
+import type { AssessmentScope, AssessmentScore, SubjectCore } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { Services } from '../app/services.ts';
 import { usePack } from '../app/subject.ts';

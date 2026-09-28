@@ -1,6 +1,6 @@
 // Chess's `stimulus`/`demo` content: the concrete values the platform's compile pipeline plugs in
 // for this app. Chess-bound.
-import type { Stars } from '@chess-kids/core';
+import type { Stars } from '@learn/platform-core';
 import {
   bot,
   doubleStepBefore,
@@ -16,9 +16,9 @@ import {
   type Position,
   type Resolve,
   type Square,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { z } from 'zod';
-import { chessCore } from '@chess-kids/core/chess';
+import { chessCore } from '@learn/subject-chess';
 import {
   checkExactlyOnePosition,
   compilePosition,

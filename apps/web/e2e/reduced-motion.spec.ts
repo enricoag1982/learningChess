@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import type { TracksCatalog } from '@chess-kids/core';
-import type { CompiledContent, Lesson } from '@chess-kids/core/chess';
-import type { ExerciseDef, Square } from '@chess-kids/core/chess';
-import { createVariantRules, chessJsRules, findMoveBySan } from '@chess-kids/core/chess';
-import { solutionOf } from '@chess-kids/core/testing';
+import type { TracksCatalog } from '@learn/platform-core';
+import type { CompiledContent, Lesson } from '@learn/subject-chess';
+import type { ExerciseDef, Square } from '@learn/subject-chess';
+import { createVariantRules, chessJsRules, findMoveBySan } from '@learn/subject-chess';
+import { solutionOf } from '@learn/subject-chess/testing';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
 import {

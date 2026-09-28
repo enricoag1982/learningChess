@@ -1,5 +1,5 @@
-import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
-import type { CompiledContent } from '@chess-kids/core/chess';
+import type { BadgeDef, TracksCatalog } from '@learn/platform-core';
+import type { CompiledContent } from '@learn/subject-chess';
 import bundled from '@chess-kids/content/content.json';
 import bundledTracks from '@chess-kids/content/tracks.json';
 import bundledBadges from '@chess-kids/content/badges.json';

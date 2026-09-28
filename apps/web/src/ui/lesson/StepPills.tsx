@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { LessonPhase, SkippablePhase } from '@chess-kids/core';
+import type { LessonPhase, SkippablePhase } from '@learn/platform-core';
 import { PHASE_BAR, PHASES, phaseState } from './phase-track.ts';
 import { CheckIcon, SkipIcon } from '../ds/icons.tsx';
 

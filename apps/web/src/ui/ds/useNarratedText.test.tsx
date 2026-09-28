@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import type { Narrator } from '@chess-kids/core';
+import type { Narrator } from '@learn/platform-core';
 import { createFakeNarrator } from '../../testing/fake-narrator.ts';
 import { useInstructionNarration } from './useNarratedText.ts';
 

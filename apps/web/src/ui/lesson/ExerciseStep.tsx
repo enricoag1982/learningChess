@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ExerciseDefBase, Lesson, SkippablePhase } from '@chess-kids/core';
+import type { ExerciseDefBase, Lesson, SkippablePhase } from '@learn/platform-core';
 import {
   EASIER_VARIANT_STARS,
   easierVariant,
   recordAttempt,
   recordExerciseResult,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';

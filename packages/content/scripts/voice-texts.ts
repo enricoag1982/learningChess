@@ -7,8 +7,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
-import type { CompiledContent } from '@chess-kids/core/chess';
+import type { BadgeDef, TracksCatalog } from '@learn/platform-core';
+import type { CompiledContent } from '@learn/subject-chess';
 import { loadBadges } from '../src/badges-load.ts';
 import { chessContent } from '../src/chess-content.ts';
 import { ContentError, loadLocales, mergeLocales, type Locales } from '../src/load.ts';

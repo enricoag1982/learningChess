@@ -1,6 +1,6 @@
 // Compiles one exercise, or an array of them — a lesson's `guided`/`exercises`/`variants`, or a
 // `series` mini-game's `rounds` — through the exercise-kind registry.
-import type { ExerciseDefBase } from '@chess-kids/core';
+import type { ExerciseDefBase } from '@learn/platform-core';
 import type { ExerciseYamlBase, StimulusContent } from '../subject.ts';
 import type { AnyExerciseKindContent } from './kind-content.ts';
 import { makeCompileContext } from './kind-content.ts';

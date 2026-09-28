@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { Lesson, MiniGameBase, MiniGameStateBase } from '@chess-kids/core';
+import type { Lesson, MiniGameBase, MiniGameStateBase } from '@learn/platform-core';
 
 /** Overrides a boss step's end-of-play save + "continue" action, for reuse outside a lesson
  * (`MiniGameSessionScreen`). Left `undefined`, each step keeps its lesson behaviour. */

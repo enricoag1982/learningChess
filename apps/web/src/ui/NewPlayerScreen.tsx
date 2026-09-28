@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { validateNickname } from '@chess-kids/core';
+import { validateNickname } from '@learn/platform-core';
 import { useAppStore } from '../app/store.ts';
 import { avatarName } from '../content-text.ts';
 import type { Avatar } from './art/avatar-meta.ts';

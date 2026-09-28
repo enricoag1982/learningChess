@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@chess-kids/core/chess';
+import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '@learn/subject-chess';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';

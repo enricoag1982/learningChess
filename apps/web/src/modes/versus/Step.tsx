@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { PieceType, Square, VersusMiniGame, VersusState } from '@chess-kids/core/chess';
+import type { PieceType, Square, VersusMiniGame, VersusState } from '@learn/subject-chess';
 import {
   bot,
   canTakeBack,
@@ -17,7 +17,7 @@ import {
   versusEndReason,
   versusGameState,
   versusPosition,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { UndoIcon } from '../../kinds/MoveCountedPlayArea.tsx';

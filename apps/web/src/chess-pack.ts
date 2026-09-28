@@ -1,9 +1,9 @@
 // The chess `SubjectWeb` pack (docs/refactor-v4.md §11) — temporary home until m8.18 moves it to
 // `subject-chess/src/web`. Every platform-bound module reaches chess only through this file.
 import { createElement, lazy } from 'react';
-import { CHESS_APP_CONFIG, chessCore, isInCheck, kingSquare } from '@chess-kids/core/chess';
-import type { BotPlayer, ExerciseState, Position, Square } from '@chess-kids/core/chess';
-import type { ExerciseStateBase } from '@chess-kids/core';
+import { CHESS_APP_CONFIG, chessCore, isInCheck, kingSquare } from '@learn/subject-chess';
+import type { BotPlayer, ExerciseState, Position, Square } from '@learn/subject-chess';
+import type { ExerciseStateBase } from '@learn/platform-core';
 import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from './adapters/content/bundled-content-source.ts';
 import { useAppStore } from './app/store.ts';

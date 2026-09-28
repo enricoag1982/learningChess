@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ConceptStats, Lesson } from '@chess-kids/core';
-import { isDue, isWeak, lessonStatus } from '@chess-kids/core';
+import type { ConceptStats, Lesson } from '@learn/platform-core';
+import { isDue, isWeak, lessonStatus } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';

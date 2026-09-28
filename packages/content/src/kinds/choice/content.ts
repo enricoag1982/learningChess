@@ -1,10 +1,10 @@
-import type { TextKeyRef } from '@chess-kids/core';
+import type { TextKeyRef } from '@learn/platform-core';
 import {
   PIECE_BY_LETTER,
   type ChoiceDef,
   type ChoiceOption,
   type Piece,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { z } from 'zod';
 import { keySchema } from '../../schema.ts';
 import { exerciseCommonFields, textRefSchema } from '../common.ts';

@@ -32,10 +32,6 @@ const APP_INTEGRATION_TESTS = [
   'apps/web/src/ui/profiles-flow.test.tsx',
   'apps/web/src/ui/session/ReviewExerciseStep.test.tsx',
   'apps/web/src/ui/time-limit-flow.test.tsx',
-  // subject-chess
-  'packages/core/src/app/use-cases.test.ts',
-  'packages/core/src/app/minigames.test.ts',
-  'packages/core/src/domain/exercise/modes/series/engine.test.ts',
 ];
 
 export default defineConfig([
@@ -69,7 +65,7 @@ export default defineConfig([
   {
     // Separate rule instance (typescript-eslint's) so it does not override the domain rule below.
     files: ['packages/**', 'apps/**'],
-    ignores: ['packages/core/src/domain/chess/chessjs-rules*.ts'],
+    ignores: ['packages/subject-chess/src/core/chess/chessjs-rules*.ts'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
@@ -77,7 +73,8 @@ export default defineConfig([
           paths: [
             {
               name: 'chess.js',
-              message: 'use ChessRules from @chess-kids/core; chess.js stays behind the adapter',
+              message:
+                'use ChessRules from @learn/subject-chess; chess.js stays behind the adapter',
             },
           ],
         },
@@ -85,7 +82,18 @@ export default defineConfig([
     },
   },
   {
-    files: ['packages/core/src/domain/**'],
+    // The cast is needed where subject-chess's `ProfileSettings` augmentation is in the program and
+    // unnecessary in platform-core's own program, where this file is linted.
+    files: ['packages/platform-core/src/domain/profile-settings.ts'],
+    rules: { '@typescript-eslint/no-unnecessary-type-assertion': 'off' },
+  },
+  {
+    files: [
+      'packages/platform-core/src/domain/**',
+      'packages/subject-chess/src/core/{chess,bot,game,variant,exercise}/**',
+      'packages/subject-chess/src/kinds/**',
+      'packages/subject-chess/src/modes/**',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',

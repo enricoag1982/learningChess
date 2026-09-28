@@ -1,5 +1,5 @@
-import type { AnimalFriend, TodaySessionPlan } from '@chess-kids/core';
-import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@chess-kids/core';
+import type { AnimalFriend, TodaySessionPlan } from '@learn/platform-core';
+import { animalFriends, checkRewards, loadTodaySession, totalStars } from '@learn/platform-core';
 import { backAndRefresh, type SliceCreator } from '../store.ts';
 import { enterLesson } from './learn.ts';
 

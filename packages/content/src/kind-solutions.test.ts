@@ -5,9 +5,9 @@
  */
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CompiledContent, ExerciseDef } from '@chess-kids/core/chess';
-import { kindOf } from '@chess-kids/core/chess';
-import { playSolution, playWrongThenSolve } from '@chess-kids/core/testing';
+import type { CompiledContent, ExerciseDef } from '@learn/subject-chess';
+import { kindOf } from '@learn/subject-chess';
+import { playSolution, playWrongThenSolve } from '@learn/subject-chess/testing';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from './load.ts';

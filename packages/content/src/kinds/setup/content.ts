@@ -1,4 +1,4 @@
-import { piecesEqual, type SetupDef, type Square } from '@chess-kids/core/chess';
+import { piecesEqual, type SetupDef, type Square } from '@learn/subject-chess';
 import { z } from 'zod';
 import { checkExactlyOnePosition, compilePosition, exerciseCommonFields } from '../common.ts';
 import type { ExerciseKindContent } from '../kind-content.ts';

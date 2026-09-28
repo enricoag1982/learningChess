@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { recordMiniGameResult } from '@chess-kids/core';
+import { recordMiniGameResult } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { BossStep } from '../chess-pack.ts';
 import { tContent } from '../content-text.ts';

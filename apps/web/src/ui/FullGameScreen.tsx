@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { MiniGameStateBase } from '@chess-kids/core';
-import type { Lesson, VersusMiniGame, VersusState } from '@chess-kids/core/chess';
+import type { MiniGameStateBase } from '@learn/platform-core';
+import type { Lesson, VersusMiniGame, VersusState } from '@learn/subject-chess';
 import {
   bot,
   parseFen,
   recordGame,
   versusGameRecordResult,
   versusGameState,
-} from '@chess-kids/core/chess';
+} from '@learn/subject-chess';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { BossPlaySession } from '../modes/mode-ui.ts';
 import { Step as VersusStep } from '../modes/versus/Step.tsx';

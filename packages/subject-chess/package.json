@@ -1,0 +1,22 @@
+{
+  "name": "@learn/subject-chess",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/chess.ts",
+    "./bot-worker": "./src/bot-worker.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests",
+    "calibrate": "node scripts/calibrate.ts"
+  },
+  "dependencies": {
+    "@learn/platform-core": "workspace:*",
+    "chess.js": "1.4.0",
+    "zod": "^4.6.5"
+  }
+}

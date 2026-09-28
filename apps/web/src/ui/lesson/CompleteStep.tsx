@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson } from '@chess-kids/core';
-import { lessonStars } from '@chess-kids/core';
+import type { Lesson } from '@learn/platform-core';
+import { lessonStars } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { StarsRow } from '../StarsRow.tsx';

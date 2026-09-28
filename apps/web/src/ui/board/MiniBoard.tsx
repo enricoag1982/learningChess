@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { Color, Position, Square } from '@chess-kids/core/chess';
+import type { Color, Position, Square } from '@learn/subject-chess';
 import { PieceBadge, PieceIcon } from './pieces.tsx';
 import { cellToSquare } from './geometry.ts';
 

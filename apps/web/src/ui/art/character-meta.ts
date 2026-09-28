@@ -1,4 +1,4 @@
-import { CHARACTER_PIECES, type PieceType } from '@chess-kids/core/chess';
+import { CHARACTER_PIECES, type PieceType } from '@learn/subject-chess';
 
 /** Piece type for a lesson character, or `null` for one that doesn't stand for a single piece (Owl: World 1 is about the board itself, not one piece). */
 export function characterPieceOrNull(character: string): PieceType | null {

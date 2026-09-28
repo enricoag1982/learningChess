@@ -1,7 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bot, chessJsRules, game } from '@chess-kids/core/chess';
-import type { CompiledContent, VersusMiniGame } from '@chess-kids/core/chess';
+import { bot, chessJsRules, game } from '@learn/subject-chess';
+import type { CompiledContent, VersusMiniGame } from '@learn/subject-chess';
 
 /** One `domain/bot` difficulty profile (Mouse .. Bear); re-exported as a namespace, not a named type. */
 type BotLevel = (typeof bot.BOT_LEVELS)[number];

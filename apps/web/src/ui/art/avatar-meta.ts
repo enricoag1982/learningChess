@@ -1,5 +1,5 @@
-import type { Avatar } from '@chess-kids/core';
-import { AVATARS } from '@chess-kids/core';
+import type { Avatar } from '@learn/platform-core';
+import { AVATARS } from '@learn/platform-core';
 
 export { AVATARS };
 export type { Avatar };

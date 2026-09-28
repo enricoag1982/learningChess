@@ -12,7 +12,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
-import { PLACEMENT_TASKS_PER_WORLD, worldLessons } from '@chess-kids/core';
+import { PLACEMENT_TASKS_PER_WORLD, worldLessons } from '@learn/platform-core';
 import {
   answerExerciseWrongThenSolve,
   completeExercise,

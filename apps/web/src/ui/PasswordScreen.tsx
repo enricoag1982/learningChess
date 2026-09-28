@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { verifyParentPassword } from '@chess-kids/core';
+import { verifyParentPassword } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { formatCountdown } from './parent/countdown.ts';
 import {

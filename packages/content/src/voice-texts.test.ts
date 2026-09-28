@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { voiceKey } from '@chess-kids/core';
+import { voiceKey } from '@learn/platform-core';
 import { describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
 import { chessContent } from './chess-content.ts';

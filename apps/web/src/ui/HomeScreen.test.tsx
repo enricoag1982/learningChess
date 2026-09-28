@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
-import { getLessonProgress, nextLesson, withResumeStep } from '@chess-kids/core';
-import type { Track, TracksCatalog, World } from '@chess-kids/core';
-import type { MiniGame } from '@chess-kids/core/chess';
-import { makeContentSource } from '@chess-kids/core/testing';
+import { getLessonProgress, nextLesson, withResumeStep } from '@learn/platform-core';
+import type { Track, TracksCatalog, World } from '@learn/platform-core';
+import type { MiniGame } from '@learn/subject-chess';
+import { makeContentSource } from '@learn/subject-chess/testing';
 import { chessWeb } from '../chess-pack.ts';
 import i18n from 'i18next';
 import { tContent } from '../content-text.ts';

@@ -1,4 +1,4 @@
-import type { Profile, ProfileRepository } from '@chess-kids/core';
+import type { Profile, ProfileRepository } from '@learn/platform-core';
 import type { KeyedCollection } from './collections.ts';
 import { keyedCollection } from './collections.ts';
 import type { LocalStore } from './local-store.ts';

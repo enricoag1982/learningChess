@@ -15,7 +15,7 @@ import {
   type MiniGameProgress,
   type Profile,
   type ProfileSettings,
-} from '@chess-kids/core';
+} from '@learn/platform-core';
 import { requestPersistentStorageIfNeeded } from '../../adapters/persistent-storage.ts';
 import type { AppGet, AppSet } from '../store.ts';
 import type { SubjectWeb } from '../subject.ts';

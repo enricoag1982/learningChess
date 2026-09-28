@@ -1,6 +1,6 @@
 import type { CSSProperties, JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
+import { isDue, lessonStatus, totalStars } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
 import { avatarName, characterName, tContent } from '../content-text.ts';

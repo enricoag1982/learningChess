@@ -1,4 +1,4 @@
-import type { Color, File, Rank, Square } from '@chess-kids/core/chess';
+import type { Color, File, Rank, Square } from '@learn/subject-chess';
 
 const FILES: readonly File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const RANKS: readonly Rank[] = ['1', '2', '3', '4', '5', '6', '7', '8'];

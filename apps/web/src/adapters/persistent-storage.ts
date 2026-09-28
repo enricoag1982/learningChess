@@ -1,4 +1,4 @@
-import type { AppDeps } from '@chess-kids/core';
+import type { AppDeps } from '@learn/platform-core';
 
 /** "Have we ever asked" flag, a plain device-level key, not part of `AppSettings`; gates the ask
  * without depending on a settings round trip. */
