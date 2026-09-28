@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
 Generates pre-recorded Kokoro audio (docs/voice.md) for every text in
-packages/subject-chess/dist/voice-texts.json, writing apps/web/public/audio/en/<key>.mp3 plus
-apps/web/public/audio/en/manifest.json (`{ config, entries: { <key>: { text, ms } } }`).
+packages/subject-chess/dist/voice-texts.json, writing apps/chess-kids/public/audio/en/<key>.mp3 plus
+apps/chess-kids/public/audio/en/manifest.json (`{ config, entries: { <key>: { text, ms } } }`).
 
 Incremental: reuses an existing mp3 when its key is already in the manifest, the manifest's
 `config` still matches tools/voice/config.json exactly, and the file exists on disk. A config
 change regenerates every file (one shared config for the whole manifest, not per entry). Removes
-any apps/web/public/audio/en/*.mp3 whose key is no longer in voice-texts.json, or that was left
+any apps/chess-kids/public/audio/en/*.mp3 whose key is no longer in voice-texts.json, or that was left
 over from a different config.
 
 Usage:
@@ -39,7 +39,7 @@ TOOLS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_DIR.parent.parent
 DEFAULT_MODEL_DIR = TOOLS_DIR / ".cache"
 DEFAULT_VOICE_TEXTS = REPO_ROOT / "packages" / "subject-chess" / "dist" / "voice-texts.json"
-DEFAULT_OUT_DIR = REPO_ROOT / "apps" / "web" / "public" / "audio" / "en"
+DEFAULT_OUT_DIR = REPO_ROOT / "apps" / "chess-kids" / "public" / "audio" / "en"
 CONFIG_PATH = TOOLS_DIR / "config.json"
 
 MODEL_RELEASE_BASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0"

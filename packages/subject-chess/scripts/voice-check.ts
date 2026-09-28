@@ -1,7 +1,7 @@
 /**
  * `pnpm voice:check` (`docs/voice.md`): rebuilds the voice inventory in memory — same content, same
  * `buildVoiceInventory` as `scripts/voice-texts.ts`, without writing `dist/voice-texts.json` — and
- * compares its keys against `apps/web/public/audio/en/manifest.json`'s own `entries`. CI's own guard
+ * compares its keys against `apps/chess-kids/public/audio/en/manifest.json`'s own `entries`. CI's own guard
  * against a content/UI change that added narrated text but forgot to regenerate its audio.
  *
  * Fails (exit 1) on any inventory key with no manifest entry: exactly the case
@@ -35,7 +35,7 @@ const lessonsDir = join(contentDir, 'lessons');
 const minigamesDir = join(contentDir, 'minigames');
 const tracksPath = join(contentDir, 'tracks.yaml');
 const badgesPath = join(contentDir, 'badges.yaml');
-const manifestPath = join(repoRoot, 'apps', 'web', 'public', 'audio', 'en', 'manifest.json');
+const manifestPath = join(repoRoot, 'apps', 'chess-kids', 'public', 'audio', 'en', 'manifest.json');
 
 function fail(issues: readonly string[]): never {
   for (const issue of issues) console.error(issue);

@@ -109,10 +109,10 @@ jobs:
         run: pnpm run --if-present build
 
       - name: Install Playwright browser
-        run: pnpm --filter @chess-kids/web exec playwright install --with-deps chromium
+        run: pnpm --filter @learn/chess-kids exec playwright install --with-deps chromium
 
       - name: E2E (shard ${{ matrix.shard }}/3)
-        run: pnpm --filter @chess-kids/web exec playwright test --shard=${{ matrix.shard }}/3
+        run: pnpm --filter @learn/chess-kids exec playwright test --shard=${{ matrix.shard }}/3
         env:
           CI: true
 
@@ -121,7 +121,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-shard-${{ matrix.shard }}
-          path: apps/web/playwright-report
+          path: apps/chess-kids/playwright-report
           retention-days: 7
 
   # Single required check for the master ruleset. Keep the job name stable; it only aggregates the
