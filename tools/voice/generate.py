@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generates pre-recorded Kokoro audio (docs/voice.md) for every text in
-packages/content/dist/voice-texts.json, writing apps/web/public/audio/en/<key>.mp3 plus
+packages/subject-chess/dist/voice-texts.json, writing apps/web/public/audio/en/<key>.mp3 plus
 apps/web/public/audio/en/manifest.json (`{ config, entries: { <key>: { text, ms } } }`).
 
 Incremental: reuses an existing mp3 when its key is already in the manifest, the manifest's
@@ -38,7 +38,7 @@ os.environ.setdefault("OMP_NUM_THREADS", "2")
 TOOLS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TOOLS_DIR.parent.parent
 DEFAULT_MODEL_DIR = TOOLS_DIR / ".cache"
-DEFAULT_VOICE_TEXTS = REPO_ROOT / "packages" / "content" / "dist" / "voice-texts.json"
+DEFAULT_VOICE_TEXTS = REPO_ROOT / "packages" / "subject-chess" / "dist" / "voice-texts.json"
 DEFAULT_OUT_DIR = REPO_ROOT / "apps" / "web" / "public" / "audio" / "en"
 CONFIG_PATH = TOOLS_DIR / "config.json"
 
@@ -154,7 +154,7 @@ def main() -> None:
     if not args.voice_texts.exists():
         raise SystemExit(
             f"generate: {args.voice_texts} not found — run "
-            "`pnpm --filter @chess-kids/content voice-texts` first."
+            "`pnpm --filter @learn/subject-chess voice-texts` first."
         )
     with open(args.voice_texts, encoding="utf8") as f:
         inventory = json.load(f)

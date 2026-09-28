@@ -4,8 +4,8 @@ import type { CompiledContent, Lesson } from '@learn/subject-chess';
 import type { ExerciseDef, Square } from '@learn/subject-chess';
 import { createVariantRules, chessJsRules, findMoveBySan } from '@learn/subject-chess';
 import { solutionOf } from '@learn/subject-chess/testing';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import rawContent from '@learn/subject-chess/dist/content.json' with { type: 'json' };
+import rawTracks from '@learn/subject-chess/dist/tracks.json' with { type: 'json' };
 import {
   clickSquare,
   completeFirstRun,

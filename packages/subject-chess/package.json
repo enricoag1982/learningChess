@@ -6,17 +6,24 @@
   "exports": {
     ".": "./src/chess.ts",
     "./bot-worker": "./src/bot-worker.ts",
-    "./testing": "./src/testing/index.ts"
+    "./testing": "./src/testing/index.ts",
+    "./content": "./src/content/chess-content.ts",
+    "./dist/*": "./dist/*"
   },
   "scripts": {
+    "build": "node scripts/build-content.ts",
+    "voice-texts": "node scripts/voice-texts.ts",
+    "voice-check": "node scripts/voice-check.ts",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:slow": "vitest run --config vitest.slow.config.ts --passWithNoTests",
     "calibrate": "node scripts/calibrate.ts"
   },
   "dependencies": {
+    "@learn/platform-content": "workspace:*",
     "@learn/platform-core": "workspace:*",
     "chess.js": "1.4.0",
+    "yaml": "^2.9.1",
     "zod": "^4.6.5"
   }
 }

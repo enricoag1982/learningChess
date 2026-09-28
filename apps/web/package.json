@@ -15,7 +15,6 @@
     "compat": "node scripts/check-compat.ts"
   },
   "dependencies": {
-    "@chess-kids/content": "workspace:*",
     "@learn/platform-core": "workspace:*",
     "@learn/subject-chess": "workspace:*",
     "@fontsource-variable/fredoka": "^5.3.0",

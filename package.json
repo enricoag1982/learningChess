@@ -7,7 +7,7 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "prepare": "pnpm --filter @chess-kids/content build",
+    "prepare": "pnpm --filter @learn/subject-chess build",
     "dev": "pnpm --filter @chess-kids/web dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -19,8 +19,8 @@
     "test:e2e": "pnpm --filter @chess-kids/web test:e2e",
     "size": "pnpm --filter @chess-kids/web size",
     "compat": "pnpm --filter @chess-kids/web compat",
-    "voice:check": "pnpm --filter @chess-kids/content voice-check",
-    "voice:generate": "pnpm --filter @chess-kids/content voice-texts && python3 tools/voice/generate.py"
+    "voice:check": "pnpm --filter @learn/subject-chess voice-check",
+    "voice:generate": "pnpm --filter @learn/subject-chess voice-texts && python3 tools/voice/generate.py"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

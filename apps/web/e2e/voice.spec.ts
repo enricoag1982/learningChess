@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import type { TracksCatalog } from '@learn/platform-core';
 import type { CompiledContent } from '@learn/subject-chess';
 import { nextLesson, voiceKey } from '@learn/platform-core';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import rawContent from '@learn/subject-chess/dist/content.json' with { type: 'json' };
+import rawTracks from '@learn/subject-chess/dist/tracks.json' with { type: 'json' };
 import { completeFirstRun, contentText, pickProfileFromPicker } from './helpers.ts';
 
 const content = rawContent as unknown as CompiledContent;

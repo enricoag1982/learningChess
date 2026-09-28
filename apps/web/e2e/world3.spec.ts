@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import type { TracksCatalog } from '@learn/platform-core';
 import type { CompiledContent } from '@learn/subject-chess';
-import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
-import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };
+import rawContent from '@learn/subject-chess/dist/content.json' with { type: 'json' };
+import rawTracks from '@learn/subject-chess/dist/tracks.json' with { type: 'json' };
 import {
   completeExercise,
   completeFirstRun,

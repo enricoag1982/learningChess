@@ -41,9 +41,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@chess-kids/content':
-        specifier: workspace:*
-        version: link:../../packages/content
       '@fontsource-variable/fredoka':
         specifier: ^5.3.0
         version: 5.3.0
@@ -115,14 +112,11 @@ importers:
         specifier: ^7.4.1
         version: 7.4.1
 
-  packages/content:
+  packages/platform-content:
     dependencies:
       '@learn/platform-core':
         specifier: workspace:*
         version: link:../platform-core
-      '@learn/subject-chess':
-        specifier: workspace:*
-        version: link:../subject-chess
       yaml:
         specifier: ^2.9.1
         version: 2.9.1
@@ -138,12 +132,18 @@ importers:
 
   packages/subject-chess:
     dependencies:
+      '@learn/platform-content':
+        specifier: workspace:*
+        version: link:../platform-content
       '@learn/platform-core':
         specifier: workspace:*
         version: link:../platform-core
       chess.js:
         specifier: 1.4.0
         version: 1.4.0
+      yaml:
+        specifier: ^2.9.1
+        version: 2.9.1
       zod:
         specifier: ^4.6.5
         version: 4.6.5

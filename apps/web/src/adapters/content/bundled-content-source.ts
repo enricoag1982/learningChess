@@ -1,8 +1,8 @@
 import type { BadgeDef, TracksCatalog } from '@learn/platform-core';
 import type { CompiledContent } from '@learn/subject-chess';
-import bundled from '@chess-kids/content/content.json';
-import bundledTracks from '@chess-kids/content/tracks.json';
-import bundledBadges from '@chess-kids/content/badges.json';
+import bundled from '@learn/subject-chess/dist/content.json';
+import bundledTracks from '@learn/subject-chess/dist/tracks.json';
+import bundledBadges from '@learn/subject-chess/dist/badges.json';
 
 /** The content build validates this shape (invalid content fails `pnpm build`), so this is a type
  * conversion, not a runtime check. */
