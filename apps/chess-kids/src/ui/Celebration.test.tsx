@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { EarnedBadge } from '@learn/platform-core';
-import { StoreProvider } from '../app/store.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { chessWeb } from '../chess-pack.ts';
-import { Celebration } from './Celebration.tsx';
+import { StoreProvider } from '@learn/platform-web/app/store.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
+import { Celebration } from '@learn/platform-web/ui/Celebration.tsx';
 
 function makeEarnedBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
   const now = new Date().toISOString();
@@ -102,7 +102,7 @@ describe('Celebration', () => {
 describe('Celebration (no active celebration in a plain StoreProvider render)', () => {
   it('renders null without throwing when used outside renderWithStore helpers', async () => {
     const services = createTestServices('bundled');
-    const { createAppStore } = await import('../app/store.ts');
+    const { createAppStore } = await import('@learn/platform-web/app/store.ts');
     const store = createAppStore(services, chessWeb);
     render(
       <StoreProvider value={store}>

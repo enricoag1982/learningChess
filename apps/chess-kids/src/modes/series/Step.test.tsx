@@ -3,14 +3,14 @@ import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { MiniGame } from '@learn/subject-chess';
 import type { MateInNDef, SelectSquaresDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
-import { chessWeb } from '../../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import '../../app-i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
 import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
-import { renderWithStore } from '../../testing/render-with-store.tsx';
-import { createTestServices } from '../../testing/test-services.ts';
-import { BossStep } from '../BossStep.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { BossStep } from '@learn/platform-web/modes/BossStep.tsx';
 
 const EMPTY_POSITION = parseDiagram(
   [

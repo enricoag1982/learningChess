@@ -6,11 +6,11 @@ import {
   fixtureExercise,
   fixtureLesson,
 } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { chessWeb } from '../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { createTestServices } from '../testing/test-services.ts';
-import { LessonScreen } from './LessonScreen.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { LessonScreen } from '@learn/platform-web/ui/LessonScreen.tsx';
 
 describe('LessonScreen', () => {
   it('Story: "Let me try" advances to the Demo step', async () => {

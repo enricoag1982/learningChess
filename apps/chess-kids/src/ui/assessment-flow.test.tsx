@@ -5,9 +5,12 @@ import type { Lesson } from '@learn/subject-chess';
 import type { YesNoDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
 import { fixtureExercise, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { pickProfileFromPicker, seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp, renderAppRaw } from '../testing/render-app.tsx';
-import { createTestServices } from '../testing/test-services.ts';
+import {
+  pickProfileFromPicker,
+  seedReturningProfile,
+} from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp, renderAppRaw } from '@learn/subject-chess/web/testing/render-app.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
 
 // Two worlds, three lessons: w1 (no boss) = l1 (Rhino, collect-stars) -> l2 (Elephant, yes-no);
 // w2 (no boss) = l3 (Lioness, yes-no). Distinct characters keep every Journey node's accessible

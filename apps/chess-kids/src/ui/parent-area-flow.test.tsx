@@ -15,9 +15,9 @@ import {
   pickProfileFromPicker,
   seedReturningProfile,
   seedWorldFourMastered,
-} from '../testing/app-test-helpers.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { renderApp, renderAppRaw } from '../testing/render-app.tsx';
+} from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { renderApp, renderAppRaw } from '@learn/subject-chess/web/testing/render-app.tsx';
 import type { FakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
 
 afterEach(() => {

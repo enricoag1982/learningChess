@@ -7,12 +7,12 @@ import {
   fixtureExercise,
   fixtureLesson,
 } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp } from '../testing/render-app.tsx';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { chessWeb } from '../chess-pack.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { PracticeScreen } from './PracticeScreen.tsx';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { PracticeScreen } from '@learn/platform-web/ui/PracticeScreen.tsx';
 
 describe('PracticeScreen', () => {
   it('nothing complete yet: no topics, warm-up disabled ("All done for today!")', async () => {

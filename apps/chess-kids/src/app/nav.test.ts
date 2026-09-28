@@ -8,13 +8,13 @@ import {
   fixtureContentSource,
   fixtureLesson,
 } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { chessWeb } from '../chess-pack.ts';
-import type { Services } from './services.ts';
-import { createAppStore } from './store.ts';
-import type { AppStore } from './store.ts';
-import { setRoute } from './slices/nav.ts';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
+import type { Services } from '@learn/platform-web/app/services.ts';
+import { createAppStore } from '@learn/platform-web/app/store.ts';
+import type { AppStore } from '@learn/platform-web/app/store.ts';
+import { setRoute } from '@learn/platform-web/app/slices/nav.ts';
 
 /**
  * Store-level coverage of `design-r2-web.md` PR C's flow table (v4 R2 web C, C4b — HIGH RISK):

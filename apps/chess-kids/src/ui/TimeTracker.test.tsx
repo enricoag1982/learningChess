@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { localDayString } from '@learn/platform-core';
-import { createAppStore, setRoute, StoreProvider } from '../app/store.ts';
+import { createAppStore, setRoute, StoreProvider } from '@learn/platform-web/app/store.ts';
 import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { chessWeb } from '../chess-pack.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { TimeTracker } from './TimeTracker.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { TimeTracker } from '@learn/platform-web/ui/TimeTracker.tsx';
 
 afterEach(() => {
   vi.useRealTimers();

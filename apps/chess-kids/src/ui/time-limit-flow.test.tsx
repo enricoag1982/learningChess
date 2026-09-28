@@ -7,13 +7,13 @@ import {
   fixtureExercise,
   fixtureLesson,
 } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp } from '../testing/render-app.tsx';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { chessWeb } from '../chess-pack.ts';
-import { createTestServices } from '../testing/test-services.ts';
-import { setRoute } from '../app/store.ts';
-import { AppNotice } from './AppNotice.tsx';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { setRoute } from '@learn/platform-web/app/store.ts';
+import { AppNotice } from '@learn/platform-web/ui/AppNotice.tsx';
 
 /** Five-minute warning's own kid-facing text (`notice.five-minutes`), spoken and shown verbatim. */
 const FIVE_MINUTES_TEXT = '5 minutes left — pick something short!';

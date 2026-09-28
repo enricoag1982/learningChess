@@ -10,6 +10,7 @@
     "./content": "./src/content/chess-content.ts",
     "./web/*": "./src/web/*",
     "./kinds/*": "./src/kinds/*",
+    "./modes/*": "./src/modes/*",
     "./dist/*": "./dist/*"
   },
   "scripts": {

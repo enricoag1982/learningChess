@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress } from '@learn/platform-core';
-import { createTestServices } from '../testing/test-services.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp } from '../testing/render-app.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
 
 describe('DenScreen', () => {
   it('shows every friend unearned and the Pawn rank current, with nothing played', async () => {

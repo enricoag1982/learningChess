@@ -7,7 +7,7 @@ import type { ExerciseDef } from '@learn/subject-chess';
 import { SQUARES } from '@learn/subject-chess';
 import rawContent from '@learn/subject-chess/dist/content.json' with { type: 'json' };
 import rawTracks from '@learn/subject-chess/dist/tracks.json' with { type: 'json' };
-import { modeE2EOf } from '../src/modes/e2e-registry.ts';
+import { modeE2EOf } from '@learn/subject-chess/web/modes/e2e-registry.ts';
 import {
   answerExerciseWrongThenSolve,
   clickSquare,

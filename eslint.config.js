@@ -108,6 +108,16 @@ export default defineConfig([
     rules: { '@typescript-eslint/no-redundant-type-constituents': 'off' },
   },
   {
+    // The same reasoning for the typed-key `t()` (the app's `i18next.d.ts`) and `SubjectState` (chess
+    // augments it): platform-web's own program has neither.
+    files: ['packages/platform-web/src/ui/lesson/exercise-text.ts'],
+    rules: { '@typescript-eslint/no-unnecessary-type-assertion': 'off' },
+  },
+  {
+    files: ['packages/platform-web/src/app/subject.ts'],
+    rules: { '@typescript-eslint/no-generated-empty-object-type': 'off' },
+  },
+  {
     files: [
       'packages/platform-core/src/domain/**',
       'packages/subject-chess/src/core/{chess,bot,game,variant,exercise}/**',

@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { fireEvent, screen } from '@testing-library/react';
 import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp } from '../testing/render-app.tsx';
-import { createTestServices } from '../testing/test-services.ts';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
 
 describe('Today session (M3.4)', () => {
   it('Start today runs the due warm-up first ("Warm-up 1/1"), then lands in the next lesson', async () => {

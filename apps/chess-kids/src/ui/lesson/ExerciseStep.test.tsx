@@ -11,7 +11,7 @@ import type {
   YesNoDef,
 } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
-import { chessWeb } from '../../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import '../../app-i18n.ts';
 import {
   fixtureContentSource,
@@ -21,9 +21,9 @@ import {
 } from '@learn/subject-chess/web/testing/fixtures.ts';
 import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
 import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
-import { renderWithStore } from '../../testing/render-with-store.tsx';
-import { createTestServices } from '../../testing/test-services.ts';
-import { ExerciseStep } from './ExerciseStep.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { ExerciseStep } from '@learn/platform-web/ui/lesson/ExerciseStep.tsx';
 
 afterEach(cleanup);
 

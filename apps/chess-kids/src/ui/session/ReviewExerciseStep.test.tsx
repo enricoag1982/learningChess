@@ -3,7 +3,7 @@ import { cleanup, fireEvent, screen } from '@testing-library/react';
 import type { ConceptTask } from '@learn/platform-core';
 import type { MateInNDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
-import { chessWeb } from '../../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import '../../app-i18n.ts';
 import {
   fixtureContentSource,
@@ -12,9 +12,9 @@ import {
 } from '@learn/subject-chess/web/testing/fixtures.ts';
 import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
 import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
-import { renderWithStore } from '../../testing/render-with-store.tsx';
-import { createTestServices } from '../../testing/test-services.ts';
-import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { ReviewExerciseStep } from '@learn/platform-web/ui/session/ReviewExerciseStep.tsx';
 
 afterEach(cleanup);
 

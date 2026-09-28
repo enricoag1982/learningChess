@@ -16,4 +16,4 @@ export {
   playOneKidVersusMove,
   playVersusBoss,
   waitForVersusTurnOrEnd,
-} from '../src/modes/versus/e2e.ts';
+} from '@learn/subject-chess/modes/versus/e2e.ts';

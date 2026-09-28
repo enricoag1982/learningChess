@@ -22,7 +22,7 @@ import {
 } from '@learn/subject-chess';
 import { solutionOf } from '@learn/subject-chess/testing';
 import { kindE2EOf } from '@learn/subject-chess/web/kinds/e2e-registry.ts';
-import { modeE2EOf } from '../../src/modes/e2e-registry.ts';
+import { modeE2EOf } from '@learn/subject-chess/web/modes/e2e-registry.ts';
 import { contentText } from './i18n.ts';
 
 export const rules: VariantRules = createVariantRules(chessJsRules);

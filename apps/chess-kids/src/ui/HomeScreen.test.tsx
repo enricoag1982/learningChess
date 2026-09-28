@@ -4,15 +4,15 @@ import { getLessonProgress, nextLesson, withResumeStep } from '@learn/platform-c
 import type { Track, TracksCatalog, World } from '@learn/platform-core';
 import type { MiniGame } from '@learn/subject-chess';
 import { makeContentSource } from '@learn/subject-chess/testing';
-import { chessWeb } from '../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import i18n from 'i18next';
 import { tContent } from '@learn/platform-web/content-text.ts';
-import { createTestServices } from '../testing/test-services.ts';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
 import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { seedReturningProfile } from '../testing/app-test-helpers.ts';
-import { renderApp } from '../testing/render-app.tsx';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { HomeScreen } from './HomeScreen.tsx';
+import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-helpers.ts';
+import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { HomeScreen } from '@learn/platform-web/ui/HomeScreen.tsx';
 
 describe('HomeScreen', () => {
   it('new lesson, Owl-taught (no piece character yet): Owl greets by lesson topic, primary button says Start today', async () => {

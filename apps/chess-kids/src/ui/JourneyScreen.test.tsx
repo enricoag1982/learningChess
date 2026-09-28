@@ -4,11 +4,11 @@ import { getLessonProgress } from '@learn/platform-core';
 import type { MiniGameProgress, Track, TracksCatalog, World } from '@learn/platform-core';
 import type { Lesson, MiniGame } from '@learn/subject-chess';
 import { makeContentSource } from '@learn/subject-chess/testing';
-import { chessWeb } from '../chess-pack.ts';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import { fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
-import { renderWithStore } from '../testing/render-with-store.tsx';
-import { createTestServices } from '../testing/test-services.ts';
-import { JourneyScreen } from './JourneyScreen.tsx';
+import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
+import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
+import { JourneyScreen } from '@learn/platform-web/ui/JourneyScreen.tsx';
 
 // World order 2 (not 1): JourneyScreen shows the Owl instead of a character icon for a main
 // track's very first world (matched by `world.order === 1`), which this fixture is not testing.
