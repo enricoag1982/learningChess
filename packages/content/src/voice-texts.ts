@@ -12,7 +12,8 @@ import type {
   Resolve,
 } from '@chess-kids/core/chess';
 import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
-import { bot, CHARACTER_PIECES, exerciseNote, isEasierOfferNote } from '@chess-kids/core/chess';
+import { chessCore, exerciseNote, isEasierOfferNote } from '@chess-kids/core/chess';
+import { chessVoiceTemplates } from './chess-content.ts';
 import type { Locales } from './load.ts';
 import { modeContentOf } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
@@ -93,11 +94,14 @@ function resolve(
 
 // Domains derived from content, never guessed.
 
+/** The piece a lesson character stands for, from the one source (`core.characters`'s own
+ * `topicKey`, e.g. `piece.r`); `null` for a narrator-taught (Owl) character. */
 function characterPieceOf(character: string): PieceType | null {
-  return CHARACTER_PIECES[character] ?? null;
+  const topicKey = chessCore.characters[character]?.topicKey;
+  return topicKey?.startsWith('piece.') ? (topicKey.slice('piece.'.length) as PieceType) : null;
 }
 
-const PIECE_CHARACTERS = new Set(Object.keys(CHARACTER_PIECES));
+const PIECE_CHARACTERS = new Set(Object.keys(chessCore.characters));
 
 /** An Owl-taught lesson is named by its own title; a piece character's first lesson is named by
  * the character; every later lesson of that character by its own title. */
@@ -110,23 +114,7 @@ function lessonDisplayName(
     : resolve(locales, lesson.titleKey);
 }
 
-/** Mouse → Bear ladder, from the one source (`domain/bot/levels.ts`'s `BOT_LEVELS`). */
-const BOT_LEVEL_NAMES = bot.BOT_LEVELS.map((level) => level.name);
-
 const PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
-
-/** `PlayScreen.tsx`'s `levelConditionText`: either "full game locked" or "beat <name> 3 times". */
-function levelConditionTexts(locales: Locales): readonly string[] {
-  return [
-    resolve(locales, 'play.full-game-locked'),
-    ...BOT_LEVEL_NAMES.map((name) =>
-      resolve(locales, 'play.level-condition-beat', {
-        name: resolve(locales, `boss.versus.bot-name.${name}`),
-        times: 3,
-      }),
-    ),
-  ];
-}
 
 function addText(entries: Map<string, InventoryEntry>, text: string, source: string): void {
   if (text.trim() === '') return;
@@ -226,27 +214,15 @@ function collectUiTemplates(
     );
   }
 
-  // Play: locked computer level / locked mini-game / locked vs-friend messages.
-  const conditionTexts = levelConditionTexts(locales);
-  for (const name of BOT_LEVEL_NAMES) {
-    for (const condition of conditionTexts) {
-      addText(
-        entries,
-        resolve(locales, 'play.level-name-locked', {
-          name: resolve(locales, `boss.versus.bot-name.${name}`),
-          condition,
-        }),
-        'play',
-      );
-    }
-    addText(
-      entries,
-      resolve(locales, 'play.level-up-suggestion', {
-        name: resolve(locales, `boss.versus.bot-name.${name}`),
-      }),
-      'play',
-    );
-  }
+  // Play: locked computer level / locked mini-game / locked vs-friend messages, and the versus
+  // boss's own bot move / capture lines — the subject's own (chess: bot-level names, pieces).
+  chessVoiceTemplates(
+    (text, source) => {
+      addText(entries, text, source);
+    },
+    (key, vars) => resolve(locales, key, vars),
+  );
+
   // `unlockLabel`: the piece word for a piece character's first lesson, else the lesson's title.
   const firstLessonOfCharacter = new Map<string, string>();
   for (const lesson of content.lessons) {
@@ -272,27 +248,7 @@ function collectUiTemplates(
   }
   addText(entries, resolve(locales, 'play.vs-friend-locked'), 'play');
 
-  // Versus boss (Pawn Wars, …): bot move / capture / result lines.
-  for (const name of BOT_LEVEL_NAMES) {
-    for (const piece of PIECE_TYPES) {
-      addText(
-        entries,
-        resolve(locales, 'boss.versus.bot-captured', {
-          name: resolve(locales, `boss.versus.bot-name.${name}`),
-          piece: resolve(locales, `board.piece.${piece}`),
-        }),
-        'versus-boss',
-      );
-      addText(
-        entries,
-        resolve(locales, 'boss.versus.bot-moved', {
-          name: resolve(locales, `boss.versus.bot-name.${name}`),
-          piece: resolve(locales, `board.piece.${piece}`),
-        }),
-        'versus-boss',
-      );
-    }
-  }
+  // Versus boss (Pawn Wars, …): kid-captured / result lines (bot move/capture: chessVoiceTemplates above).
   for (const piece of PIECE_TYPES) {
     addText(
       entries,

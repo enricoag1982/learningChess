@@ -1,10 +1,12 @@
 // Chess's `stimulus`/`demo` content: the concrete values the platform's compile pipeline plugs in
 // for this app. Chess-bound.
 import {
+  bot,
   doubleStepBefore,
   hasPieceOf,
   type DemoHighlight,
   type Position,
+  type Resolve,
   type Square,
 } from '@chess-kids/core/chess';
 import { z } from 'zod';
@@ -184,3 +186,43 @@ export const chessBadges: BadgesContent = {
     }
   },
 };
+
+/** Mouse → Bear ladder, from the one source (`domain/bot/levels.ts`'s `BOT_LEVELS`). */
+const BOT_LEVEL_NAMES = bot.BOT_LEVELS.map((level) => level.name);
+
+/** Every board piece type, for the versus boss's move/capture lines. */
+const VERSUS_PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
+
+/** `PlayScreen.tsx`'s `levelConditionText`: either "full game locked" or "beat <name> 3 times". */
+function levelConditionTexts(r: Resolve): readonly string[] {
+  return [
+    r('play.full-game-locked'),
+    ...BOT_LEVEL_NAMES.map((name) =>
+      r('play.level-condition-beat', { name: r(`boss.versus.bot-name.${name}`), times: 3 }),
+    ),
+  ];
+}
+
+/** Chess's own Play / versus-boss voice templates: every bot level's name, combined with the Play
+ * screen's locked-level messages and the versus boss's own bot move/capture lines. */
+export function chessVoiceTemplates(add: (text: string, source: string) => void, r: Resolve): void {
+  const conditionTexts = levelConditionTexts(r);
+  for (const name of BOT_LEVEL_NAMES) {
+    const botName = r(`boss.versus.bot-name.${name}`);
+    for (const condition of conditionTexts) {
+      add(r('play.level-name-locked', { name: botName, condition }), 'play');
+    }
+    add(r('play.level-up-suggestion', { name: botName }), 'play');
+  }
+  for (const name of BOT_LEVEL_NAMES) {
+    const botName = r(`boss.versus.bot-name.${name}`);
+    for (const piece of VERSUS_PIECE_TYPES) {
+      const pieceName = r(`board.piece.${piece}`);
+      add(r('boss.versus.bot-captured', { name: botName, piece: pieceName }), 'versus-boss');
+      add(r('boss.versus.bot-moved', { name: botName, piece: pieceName }), 'versus-boss');
+    }
+  }
+  for (const piece of VERSUS_PIECE_TYPES) {
+    add(r('boss.versus.kid-captured', { piece: r(`board.piece.${piece}`) }), 'versus-boss');
+  }
+}
