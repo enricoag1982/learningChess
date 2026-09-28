@@ -2,21 +2,26 @@ import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { AssessmentScope, AssessmentScore } from '@chess-kids/core';
+import type { AssessmentScope, AssessmentScore, SubjectCore } from '@chess-kids/core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { Services } from '../app/services.ts';
+import { usePack } from '../app/subject.ts';
 import { characterName, tContent } from '../content-text.ts';
-import { characterPieceOrNull } from './art/character-meta.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { BlankScreen, Screen } from './ds/Screen.tsx';
 
 /** Scope's display name, for the result screen's headline. */
-function scopeName(t: TFunction, scope: AssessmentScope, services: Services): string {
+function scopeName(
+  t: TFunction,
+  scope: AssessmentScope,
+  services: Services,
+  characters: SubjectCore['characters'],
+): string {
   if (scope.type === 'lesson') {
     const lesson = services.deps.content.lesson(scope.lessonId);
     if (!lesson) return '';
-    return characterPieceOrNull(lesson.character) === null
+    return characters[lesson.character] === undefined
       ? tContent(t, lesson.titleKey)
       : characterName(t, lesson.character);
   }
@@ -40,7 +45,8 @@ function AssessmentResult({
 }): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const name = scopeName(t, scope, services);
+  const pack = usePack();
+  const name = scopeName(t, scope, services, pack.core.characters);
   const lessonCount =
     scope.type === 'lesson'
       ? 1

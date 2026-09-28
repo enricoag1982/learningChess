@@ -1,5 +1,6 @@
 import { createContext, useContext } from 'react';
-import type { SubjectCore } from '@chess-kids/core';
+import type { JSX } from 'react';
+import type { Lesson, SubjectCore } from '@chess-kids/core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
 
 /** A subject's own runtime services, augmented by module declaration (chess: `{ botPlayer }`). */
@@ -21,6 +22,15 @@ export interface SubjectWeb {
   createServices(): SubjectServices;
   /** Every exercise kind's UI, by `type` — `ExercisePlay`'s one dispatch point. */
   readonly kinds: Readonly<Record<string, AnyExerciseKindUI>>;
+  /** The lesson's board, Story and Demo steps: method syntax (bivariant), so a subject's own
+   * `Lesson` (concrete fields beyond `textKey`) widens here with no cast. */
+  readonly surface: {
+    Story(props: { readonly lesson: Lesson; readonly compact: boolean }): JSX.Element;
+    Demo(props: { readonly lesson: Lesson }): JSX.Element;
+  };
+  /** The piece-icon pill under a character's portrait, naming the piece it stands for
+   * (`CharacterCard`); absent for a subject with no such badge. */
+  CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
 }
 
 const PackContext = createContext<SubjectWeb | null>(null);

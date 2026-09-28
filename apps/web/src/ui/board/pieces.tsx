@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import type { Color, PieceType } from '@chess-kids/core/chess';
-import { characterColor, characterForPiece } from '../art/character-meta.ts';
-import { animalImage } from '../art/animal-images.ts';
+import { characterForPiece } from '../art/character-meta.ts';
+import { animalImage, characterColor } from '../art/animal-images.ts';
 
 /** A drawable piece: its type and colour. */
 export interface PieceIconProps {

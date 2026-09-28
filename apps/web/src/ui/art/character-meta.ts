@@ -25,18 +25,3 @@ const PIECE_CHARACTER: Readonly<Record<PieceType, string>> = {
 export function characterForPiece(type: PieceType): string {
   return PIECE_CHARACTER[type];
 }
-
-/** Pastel badge colour per character, echoing its habitat in the sketches. */
-const CHARACTER_COLOR: Readonly<Record<string, string>> = {
-  rhino: '#DCE3D9',
-  elephant: '#DCE3EA',
-  lioness: '#FBE3D2',
-  lion: '#FBEFD3',
-  horse: '#F1E4C8',
-  caterpillar: '#DCEFE3',
-};
-
-/** Background colour for a character's round badge/avatar. */
-export function characterColor(character: string): string {
-  return CHARACTER_COLOR[character] ?? '#E9DFF3';
-}

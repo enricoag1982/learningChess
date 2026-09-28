@@ -1,6 +1,8 @@
 import type { TFunction } from 'i18next';
 import { characterName, tContent } from '../content-text.ts';
-import { characterPieceOrNull } from './art/character-meta.ts';
+
+/** A subject's `SubjectCore.characters` map — narrowed here to the one field these labels use. */
+type Characters = Readonly<Record<string, { readonly topicKey: string }>>;
 
 /** First lesson id per character, in curriculum order (world order, then lesson order within it). */
 export function firstLessonsByCharacter(
@@ -22,16 +24,17 @@ export function firstLessonsByCharacter(
   return first;
 }
 
-/** The condition text for a locked mini-game: the piece word for a piece character's first
- * lesson ("Pawn"), else the lesson's title. */
+/** The condition text for a locked mini-game: the character's `topicKey` for a piece character's
+ * first lesson ("Pawn"), else the lesson's title. */
 export function unlockLabel(
   t: TFunction,
+  characters: Characters,
   lesson: { readonly id: string; readonly character: string; readonly titleKey: string },
   firstLessonOfCharacter: ReadonlyMap<string, string>,
 ): string {
-  const piece = characterPieceOrNull(lesson.character);
-  return piece !== null && firstLessonOfCharacter.get(lesson.character) === lesson.id
-    ? t(`piece.${piece}`)
+  const entry = characters[lesson.character];
+  return entry !== undefined && firstLessonOfCharacter.get(lesson.character) === lesson.id
+    ? tContent(t, entry.topicKey)
     : tContent(t, lesson.titleKey);
 }
 
@@ -39,11 +42,11 @@ export function unlockLabel(
  * — so a repeated character's later lesson never shows an indistinguishable second node. */
 export function journeyNodeLabel(
   t: TFunction,
+  characters: Characters,
   lesson: { readonly id: string; readonly character: string; readonly titleKey: string },
   firstLessonOfCharacter: ReadonlyMap<string, string>,
 ): string {
-  const piece = characterPieceOrNull(lesson.character);
-  if (piece === null) {
+  if (characters[lesson.character] === undefined) {
     return tContent(t, lesson.titleKey);
   }
   return firstLessonOfCharacter.get(lesson.character) === lesson.id
