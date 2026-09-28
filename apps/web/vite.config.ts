@@ -63,6 +63,8 @@ export default defineConfig({
   // Compile-time string replacement (not `import.meta.env`): fine under the M5.4 CSP's
   // `script-src 'self'` (no `unsafe-inline`/`eval`) since nothing is evaluated at runtime.
   define: { __APP_VERSION__: JSON.stringify(version) },
+  // One instance of each stateful library across the linked workspace packages.
+  resolve: { dedupe: ['react', 'react-dom', 'zustand', 'i18next', 'react-i18next', 'zod'] },
   build: {
     // Oldest supported: Safari 15.4 (iPad mini 4 on iOS 15.8, owner device; non-functional.md §4).
     // Vite's default target (Safari 16.4+) would let newer syntax through; `pnpm compat` checks

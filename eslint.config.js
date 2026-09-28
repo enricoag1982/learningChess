@@ -109,7 +109,7 @@ export default defineConfig([
     },
   },
   // Platform/chess boundary ratchet (docs/refactor-v4.md §R4): platform-bound paths (left) may not
-  // import chess-bound paths (right) or `@chess-kids/core/chess`.
+  // import chess-bound paths (right) or `@learn/subject-chess`.
   ...(() => {
     const PLATFORM_BOUND_PATHS = [
       'packages/core/src/index.ts',
@@ -212,7 +212,7 @@ export default defineConfig([
             {
               paths: [
                 {
-                  name: '@chess-kids/core/chess',
+                  name: '@learn/subject-chess',
                   message:
                     'platform-bound code cannot import chess-bound code (v4 pre-split ratchet)',
                 },
@@ -231,7 +231,7 @@ export default defineConfig([
     ];
   })(),
   // Web platform/chess boundary ratchet (docs/refactor-v4.md §R4 m8.17): platform-bound web
-  // modules (left) may not import chess-bound web modules (right) or `@chess-kids/core/chess` —
+  // modules (left) may not import chess-bound web modules (right) or `@learn/subject-chess` —
   // every platform-bound module reaches chess only through the `SubjectWeb` pack.
   ...(() => {
     const PLATFORM_BOUND_WEB_PATHS = [
@@ -463,7 +463,7 @@ export default defineConfig([
             {
               paths: [
                 {
-                  name: '@chess-kids/core/chess',
+                  name: '@learn/subject-chess',
                   message:
                     'platform-bound web code cannot import chess-bound code — reach chess only through the SubjectWeb pack',
                 },
