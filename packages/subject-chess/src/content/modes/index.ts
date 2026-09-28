@@ -2,16 +2,17 @@
 // for schemas, compiling and semantic verification.
 import type { MiniGame } from '../../chess.ts';
 import { z } from 'zod';
-import type { MiniGameModeContent } from '@learn/platform-content/modes/mode-content';
+import type {
+  MiniGameModeContent,
+  MiniGameSchema,
+} from '@learn/platform-content/modes/mode-content';
 import { seriesMode } from './series/content.ts';
 import { staticMode } from '../../modes/static/content.ts';
 import { versusMode } from '../../modes/versus/content.ts';
 
-export type { WinConditionYaml } from '../../modes/versus/schema.ts';
-
 type ChessSeriesMode = MiniGameModeContent<
   Extract<MiniGame, { readonly mode: 'series' }>,
-  z.ZodType
+  MiniGameSchema
 >;
 
 /** Every mode's content, by `mode`. Only 3 modes exist, so this is spelled out rather than derived
@@ -27,8 +28,3 @@ export const MINI_GAME_MODE_CONTENT = {
   readonly series: ChessSeriesMode;
   readonly versus: MiniGameModeContent<Extract<MiniGame, { readonly mode: 'versus' }>, z.ZodType>;
 };
-
-/** One mini-game file (`minigames/<id>.yaml`): `static`, `series`, or `versus` (`mode`, default `static`). */
-export const miniGameSchema = z.union([staticMode.schema, seriesMode.schema, versusMode.schema]);
-
-export type MiniGameYaml = z.infer<typeof miniGameSchema>;

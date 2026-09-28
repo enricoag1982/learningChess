@@ -57,6 +57,14 @@ export interface MiniGameModeContent<G extends MiniGameBase, S extends z.ZodType
   exercises?(game: G): readonly ExerciseDefBase[];
 }
 
+/** What every mode's file shares for the generic loader: `mode` picks the mode (absent = `static`). */
+export interface MiniGameYamlBase {
+  readonly mode?: string;
+}
+
+/** A mode's file schema, as far as the generic loader reads it. */
+export type MiniGameSchema = z.ZodType<MiniGameYamlBase>;
+
 /** Any mini-game mode's content, widened to the base state shape (`SubjectContent.modes`'s own
  * entries); each concrete mode (chess: `MiniGameModeContent<SeriesMiniGame, ...>`) widens to this. */
-export type AnyMiniGameModeContent = MiniGameModeContent<MiniGameBase, z.ZodType>;
+export type AnyMiniGameModeContent = MiniGameModeContent<MiniGameBase, MiniGameSchema>;

@@ -75,6 +75,8 @@ function checkLastMove(
 
 /** Chess's stimulus: a board position (the "head") plus an optional last move (the "tail"). */
 export const chessStimulus: StimulusContent = {
+  refine: checkExactlyOnePosition,
+
   compile(raw, at) {
     const r = raw as StimulusYaml;
     const position = compilePosition(r, { where: `${at.where}.board`, issues: at.issues });
@@ -110,10 +112,9 @@ function compileHighlight(raw: string): DemoHighlight {
 /**
  * A lesson's demo: position, spoken text, and its board highlight — either `legal-moves <square>`
  * (most lessons: every square that piece can reach) or `squares [<sq> …]` (World 1: an explicit
- * list, e.g. a row/diagonal or a corner; zero squares highlights nothing). Exported by its own
- * concrete type too, so `lesson-schema.ts` keeps `LessonYaml`'s fields precisely inferred.
+ * list, e.g. a row/diagonal or a corner; zero squares highlights nothing).
  */
-export const chessDemoSchema = z
+const chessDemoSchema = z
   .object({
     ...positionFields,
     /** Locale key for the demo's spoken text; defaults to `<lesson-id>.demo` when absent. */

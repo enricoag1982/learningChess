@@ -4,6 +4,7 @@ import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@learn/
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
 import { compileExercises } from '@learn/platform-content/kinds/compile-exercise';
+import { createLessonSchemas } from '@learn/platform-content/lesson-schema';
 import { ContentError, type Locales } from '@learn/platform-content/load';
 import {
   makeMiniGameCompileContext,
@@ -11,13 +12,15 @@ import {
 } from '@learn/platform-content/modes/mode-content';
 import type { LocaleTree } from '@learn/platform-content/schema';
 import type { SubjectContent } from '@learn/platform-content/subject';
-import { lessonSchema, miniGameSchema } from './lesson-schema.ts';
+
+type LessonSchemas = ReturnType<typeof createLessonSchemas>;
 
 function compileLessonFile(
   filePath: string,
   relPath: string,
   worldName: string,
   content: SubjectContent,
+  schemas: LessonSchemas,
   issues: string[],
 ): Lesson | null {
   let raw: string;
@@ -36,7 +39,7 @@ function compileLessonFile(
     return null;
   }
 
-  const result = lessonSchema.safeParse(parsed);
+  const result = schemas.lessonSchema.safeParse(parsed);
   if (!result.success) {
     issues.push(...formatZodIssues(relPath, result.error));
     return null;
@@ -100,6 +103,7 @@ function compileMiniGameFile(
   filePath: string,
   relPath: string,
   content: SubjectContent,
+  schemas: LessonSchemas,
   issues: string[],
 ): MiniGame | null {
   let raw: string;
@@ -118,7 +122,7 @@ function compileMiniGameFile(
     return null;
   }
 
-  const result = miniGameSchema.safeParse(parsed);
+  const result = schemas.miniGameSchema.safeParse(parsed);
   if (!result.success) {
     issues.push(...formatZodIssues(relPath, result.error));
     return null;
@@ -326,6 +330,7 @@ export function loadContent<C extends CompiledContent = CompiledContent>(
   const issues: string[] = [];
   const lessons: Lesson[] = [];
   const minigames: MiniGame[] = [];
+  const schemas = createLessonSchemas(content);
 
   for (const worldName of readEntries(lessonsDir, issues, 'lessons directory')) {
     const worldPath = join(lessonsDir, worldName);
@@ -346,6 +351,7 @@ export function loadContent<C extends CompiledContent = CompiledContent>(
         relPath,
         worldName,
         content,
+        schemas,
         issues,
       );
       if (lesson !== null) {
@@ -360,7 +366,13 @@ export function loadContent<C extends CompiledContent = CompiledContent>(
       issues.push(`${relPath}: invalid file name (expected <id>.yaml)`);
       continue;
     }
-    const minigame = compileMiniGameFile(join(minigamesDir, fileName), relPath, content, issues);
+    const minigame = compileMiniGameFile(
+      join(minigamesDir, fileName),
+      relPath,
+      content,
+      schemas,
+      issues,
+    );
     if (minigame !== null) {
       minigames.push(minigame);
     }

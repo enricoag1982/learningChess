@@ -13,7 +13,7 @@ import {
   type Position,
 } from '../../chess.ts';
 import { z } from 'zod';
-import { keySchema, textRefSchema } from '@learn/platform-content/schema';
+import { exerciseBaseFields, textRefSchema } from '@learn/platform-content/schema';
 import type { Where } from '@learn/platform-content/subject';
 
 // Re-exported for kind schema files that already import it from here.
@@ -40,12 +40,9 @@ export function checkExactlyOnePosition(
   }
 }
 
-/** Fields every exercise type shares (`lesson-schema.ts`'s exercise union member). */
+/** Fields every chess exercise type shares: the platform's, plus its last move and position. */
 export const exerciseCommonFields = {
-  id: keySchema,
-  /** Locale key for the instruction text; defaults to `id` when absent. */
-  text: textRefSchema.optional(),
-  easier: keySchema.optional(),
+  ...exerciseBaseFields,
   /** The opponent's last move, `<from><to>` (e.g. `d7d5`), display only: the loader checks a piece
    * sits on `to`, and, with an en passant square, that this is the double step that produced it. */
   lastMove: z

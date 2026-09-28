@@ -3,6 +3,7 @@
 // core's `ExerciseKind`.
 import type { ExerciseDefBase, TextKeyRef } from '@learn/platform-core';
 import type { z } from 'zod';
+import type { ExerciseYamlBase } from '../subject.ts';
 
 /** Fields every compiled exercise def shares, supplied by `CompileContext.build` ahead of the
  * subject's own stimulus head and the kind's own body. */
@@ -68,6 +69,9 @@ export interface ExerciseKindContent<D extends ExerciseDefBase, S extends z.ZodT
   textKeys?(def: D): readonly TextKeyRef[];
 }
 
+/** A kind's schema: an object schema whose `type` discriminates the exercise union. */
+export type KindSchema = z.ZodType<ExerciseYamlBase> & z.core.$ZodTypeDiscriminable;
+
 /** Any exercise kind's content, widened to the base def shape (`SubjectContent.kinds`'s own
  * entries); each concrete kind (chess: `ExerciseKindContent<CaptureDef, ...>`) widens to this. */
-export type AnyExerciseKindContent = ExerciseKindContent<ExerciseDefBase, z.ZodType>;
+export type AnyExerciseKindContent = ExerciseKindContent<ExerciseDefBase, KindSchema>;

@@ -26,6 +26,14 @@ export const keySchema = z.string().regex(KEY_PATTERN);
 const TEXT_REF_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*(\.[a-z0-9]+(-[a-z0-9]+)*)*$/;
 export const textRefSchema = z.string().regex(TEXT_REF_PATTERN);
 
+/** Fields every exercise's YAML shares, whatever the subject; a kind's schema spreads them first. */
+export const exerciseBaseFields = {
+  id: keySchema,
+  /** Locale key for the instruction text; defaults to `id` when absent. */
+  text: textRefSchema.optional(),
+  easier: keySchema.optional(),
+};
+
 /** Validates a translated leaf value: a non-empty string (i18next `{{var}}` interpolation allowed). */
 export const textLeafSchema = z.string().min(1);
 

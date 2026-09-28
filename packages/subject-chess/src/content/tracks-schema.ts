@@ -1,7 +1,6 @@
 import { HABITATS } from '@learn/platform-core';
 import { z } from 'zod';
-import { textRefSchema } from './lesson-schema.ts';
-import { KEY_PATTERN, keySchema } from '@learn/platform-content/schema';
+import { KEY_PATTERN, keySchema, textRefSchema } from '@learn/platform-content/schema';
 
 /** One of the fixed habitats a world can be set in (`@chess-kids/core` `HABITATS`). */
 export const habitatSchema = z.enum(HABITATS);
