@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CHARACTER_PIECES, chessCore } from '@chess-kids/core/chess';
+import type { GameRecord } from '@chess-kids/core';
+import { CHARACTER_PIECES, chessCore, friendGamesPlayed } from '@chess-kids/core/chess';
 import type { Lesson, Position, Square } from '@chess-kids/core/chess';
 import { useAppStore } from './app/store.ts';
 import { characterName, tContent } from './content-text.ts';
@@ -11,6 +12,7 @@ import { Board } from './ui/board/Board.tsx';
 import { MiniBoard } from './ui/board/MiniBoard.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
 import { PieceIcon } from './ui/board/pieces.tsx';
+import { InfoPill } from './ui/ds/primitives.tsx';
 
 /** The piece-icon pill under a character's portrait, naming the piece it stands for; nothing for
  * a narrator-taught character (Owl — no `core.characters` entry). */
@@ -90,5 +92,34 @@ export function SurfaceDemo({ lesson }: { readonly lesson: Lesson }): JSX.Elemen
       label={t('demo.board-label', { name: characterName(t, lesson.character) })}
       pieceBadges={pieceBadges}
     />
+  );
+}
+
+/** My Den's own stats row: games won, games played with a friend. */
+export function Stats({
+  gameRecords,
+}: {
+  readonly gameRecords: readonly GameRecord[];
+}): JSX.Element {
+  const { t } = useTranslation();
+  const gamesWon = gameRecords.filter((record) => record.result === 'win').length;
+  const friendGames = friendGamesPlayed(gameRecords);
+  return (
+    <div className="flex flex-wrap gap-2">
+      <InfoPill
+        role="img"
+        aria-label={t('den.games-won', { count: gamesWon })}
+        className="h-10 w-fit text-sm font-extrabold text-ink"
+      >
+        <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
+      </InfoPill>
+      <InfoPill
+        role="img"
+        aria-label={t('den.games-with-friends', { count: friendGames })}
+        className="h-10 w-fit text-sm font-extrabold text-ink"
+      >
+        <span aria-hidden="true">{t('den.games-with-friends', { count: friendGames })}</span>
+      </InfoPill>
+    </div>
   );
 }

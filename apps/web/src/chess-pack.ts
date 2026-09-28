@@ -7,8 +7,18 @@ import { useAppStore } from './app/store.ts';
 import type { SubjectServices, SubjectWeb, SurfaceContext } from './app/subject.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
-import { CharacterBadge, SurfaceDemo, SurfaceStory } from './surface.tsx';
+import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
+
+/** Unicode glyph per rank id (they are exactly the six piece words: pawn .. king). */
+const RANK_GLYPH: Readonly<Record<string, string>> = {
+  pawn: '♙',
+  knight: '♘',
+  bishop: '♗',
+  rook: '♖',
+  queen: '♕',
+  king: '♔',
+};
 
 declare module './app/subject.ts' {
   interface SubjectServices {
@@ -27,6 +37,7 @@ export const chessWeb = {
   surface: { Story: SurfaceStory, Demo: SurfaceDemo },
   CharacterBadge,
   homeTiles: HOME_TILES,
+  den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },
 } satisfies SubjectWeb;
 
 /** The checked king's square right now, if any (Board's check ring, every exercise kind). */

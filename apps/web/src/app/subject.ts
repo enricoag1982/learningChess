@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 import type { JSX } from 'react';
-import type { Lesson, SubjectCore } from '@chess-kids/core';
+import type { GameRecord, Lesson, SubjectCore } from '@chess-kids/core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
 import type { PlainRouteName } from './routes.ts';
 
@@ -35,6 +35,12 @@ export interface SubjectWeb {
   /** Extra Home tiles this subject contributes (chess: Play), merged with the platform's own
    * (Journey/Practice/My Den) and sorted by `order`; absent for a subject with none. */
   readonly homeTiles?: readonly HomeTile[];
+  /** My Den's own bits: the rank ladder's glyph per rank id, and an extra stats row (chess: games
+   * won / with friends) under the rank/friends panels; `Stats` absent for a subject with none. */
+  readonly den: {
+    rankGlyph(rankId: string): string;
+    Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
+  };
 }
 
 /** One Home tile's own colours (`docs/screens.md` §1: border = `fg`, ledge a still-darker shade). */

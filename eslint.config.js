@@ -446,7 +446,6 @@ export default defineConfig([
       'apps/web/src/modes/series/Step.tsx',
       'apps/web/src/ui/Celebration.test.tsx',
       'apps/web/src/ui/DenScreen.test.tsx',
-      'apps/web/src/ui/DenScreen.tsx',
       'apps/web/src/ui/HomeScreen.test.tsx',
       'apps/web/src/ui/JourneyScreen.test.tsx',
       'apps/web/src/ui/JourneyScreen.tsx',
