@@ -5,9 +5,9 @@ import { describe, expect, it } from 'vitest';
 import { loadBadges } from '@learn/platform-content/badges-load';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales, type Locales } from '@learn/platform-content/load';
-import { loadContent } from './lesson-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
 import type { LocaleTree } from '@learn/platform-content/schema';
-import { loadTracks } from './tracks-load.ts';
+import { loadTracks } from '@learn/platform-content/tracks-load';
 import { buildVoiceInventory } from '@learn/platform-content/voice-texts';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 

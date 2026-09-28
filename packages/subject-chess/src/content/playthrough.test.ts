@@ -15,7 +15,7 @@ import {
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from '@learn/platform-content/load';
-import { loadContent } from './lesson-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'content');

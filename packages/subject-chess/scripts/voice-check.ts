@@ -21,8 +21,8 @@ import {
   mergeLocales,
   type Locales,
 } from '@learn/platform-content/load';
-import { loadContent } from '../src/content/lesson-load.ts';
-import { loadTracks } from '../src/content/tracks-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
+import { loadTracks } from '@learn/platform-content/tracks-load';
 import { buildVoiceInventory } from '@learn/platform-content/voice-texts';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 

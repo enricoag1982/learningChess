@@ -6,7 +6,7 @@ import { dirname, join } from 'node:path';
 import { stringify } from 'yaml';
 import { chessContent } from '../content/chess-content.ts';
 import { ContentError, loadLocales } from '@learn/platform-content/load';
-import { loadContent } from '../content/lesson-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
 
 /** The current test's scratch content directory (live binding: set fresh by `fixturesBeforeEach`). */
 export let dir = '';

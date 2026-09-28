@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { bot } from '../src/chess.ts';
 import { loadBotBook } from '../src/content/bot-book-load.ts';
 import { chessContent } from '../src/content/chess-content.ts';
-import { compileAll } from '../src/content/compile-all.ts';
+import { compileAll } from '@learn/platform-content/compile-all';
 import { ContentError } from '@learn/platform-content/load';
 
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));

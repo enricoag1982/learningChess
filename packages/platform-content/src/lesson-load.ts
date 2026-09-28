@@ -3,15 +3,12 @@ import { join } from 'node:path';
 import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@learn/platform-core';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
-import { compileExercises } from '@learn/platform-content/kinds/compile-exercise';
-import { createLessonSchemas } from '@learn/platform-content/lesson-schema';
-import { ContentError, type Locales } from '@learn/platform-content/load';
-import {
-  makeMiniGameCompileContext,
-  type ModeVerifyContext,
-} from '@learn/platform-content/modes/mode-content';
-import type { LocaleTree } from '@learn/platform-content/schema';
-import type { SubjectContent } from '@learn/platform-content/subject';
+import { compileExercises } from './kinds/compile-exercise.ts';
+import { createLessonSchemas } from './lesson-schema.ts';
+import { ContentError, type Locales } from './load.ts';
+import { makeMiniGameCompileContext, type ModeVerifyContext } from './modes/mode-content.ts';
+import type { LocaleTree } from './schema.ts';
+import type { SubjectContent } from './subject.ts';
 
 type LessonSchemas = ReturnType<typeof createLessonSchemas>;
 

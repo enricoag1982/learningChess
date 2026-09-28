@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { loadBotBook } from './bot-book-load.ts';
 import { chessContent } from './chess-content.ts';
-import { compileAll } from './compile-all.ts';
+import { compileAll } from '@learn/platform-content/compile-all';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'content');
 const compiled = compileAll(

@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { makeLesson as buildLesson, makeMiniGame as buildMiniGame } from '../testing/index.ts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ContentError, loadLocales } from '@learn/platform-content/load';
-import { loadTracks } from './tracks-load.ts';
+import { loadTracks } from '@learn/platform-content/tracks-load';
 
 let dir: string;
 

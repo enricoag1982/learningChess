@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import type { Lesson, MiniGame, RankDef, Track, TracksCatalog, World } from '@learn/platform-core';
 import { parse as parseYaml } from 'yaml';
 import type { ZodError } from 'zod';
-import { checkTextKey, ContentError, type Locales } from '@learn/platform-content/load';
+import { checkTextKey, ContentError, type Locales } from './load.ts';
 import {
   type RankYaml,
   type TrackYaml,

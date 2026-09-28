@@ -2,9 +2,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
-import { loadContent } from './lesson-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
 import { loadLocales, mergeLocales } from '@learn/platform-content/load';
-import { loadTracks } from './tracks-load.ts';
+import { loadTracks } from '@learn/platform-content/tracks-load';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'content');

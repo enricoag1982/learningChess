@@ -1,18 +1,18 @@
 import { join } from 'node:path';
 import type { BadgeDef, CompiledContent, TracksCatalog } from '@learn/platform-core';
-import { loadBadges } from '@learn/platform-content/badges-load';
+import { loadBadges } from './badges-load.ts';
 import {
   ContentError,
   compareToReference,
   loadLocales,
   mergeLocales,
   type Locales,
-} from '@learn/platform-content/load';
+} from './load.ts';
 import { loadContent } from './lesson-load.ts';
-import type { SubjectContent } from '@learn/platform-content/subject';
+import type { SubjectContent } from './subject.ts';
 import { loadTracks } from './tracks-load.ts';
-import { buildVoiceInventory, type VoiceInventory } from '@learn/platform-content/voice-texts';
-import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
+import { buildVoiceInventory, type VoiceInventory } from './voice-texts.ts';
+import { PLATFORM_LOCALES_DIR } from './paths.ts';
 
 /** Every value `scripts/build.ts` and `scripts/voice-texts.ts` write to `dist/`, computed once. `C`
  * is the subject's own concrete content bundle (chess: exercises/demos with real board positions),

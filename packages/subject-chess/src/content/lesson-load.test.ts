@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { stringify } from 'yaml';
 import { chessContent } from './chess-content.ts';
 import { loadLocales } from '@learn/platform-content/load';
-import { loadContent } from './lesson-load.ts';
+import { loadContent } from '@learn/platform-content/lesson-load';
 import {
   diagram,
   dir,
