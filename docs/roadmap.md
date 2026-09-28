@@ -151,3 +151,4 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | Device sharing | Chosen over QR / parent's cloud drive / family-code sync: share a backup file, merge on import (`domain-model.md` §3.5) + "Send to other device" via the Web Share API, download fallback. Time limit is per device between shares |
 | Voice | Pre-generated audio: Kokoro-82M int8, `af_heart` voice, speed 0.92, MP3 mono 32 kbps (Apache-2.0, generated offline, no cloud TTS, no cost); one narrator voice (Owl, third-person); Web Speech API fallback for texts without audio |
 | v4 numbering | v4 refactor = M8 (`m8.x` tags); Store apps → M9, Paths → M10 |
+| v4 size target | Production TS: no growth vs `v2.0.0` (31.6 k), trim pass before `v4.0.0` (owner 2026-09-28) |
