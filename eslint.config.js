@@ -165,8 +165,6 @@ export default defineConfig([
       'packages/subject-chess/src/{kinds,modes}/**/*.tsx',
     ],
     ignores: [
-      'apps/chess-kids/src/modes/e2e-registry.ts',
-      'apps/chess-kids/src/modes/*/e2e.ts',
       'packages/subject-chess/src/web/kinds/e2e-actions.ts',
       'packages/subject-chess/src/web/kinds/e2e-registry.ts',
       'packages/subject-chess/src/web/modes/e2e-registry.ts',

@@ -1,7 +1,8 @@
 // CI guard (docs/refactor-v4.md §4): exercise-`type` / mini-game-`mode` dispatch stays inside the
 // chess pack's 4 registries (kinds/ui-registry.ts, kinds/e2e-registry.ts, modes/ui-registry.ts,
 // modes/e2e-registry.ts) — everything else reads through `kindOf`/`kindUiOf`/`modeOf`/… instead.
-// Scans `src/web`; platform-web has its own copy that allows 0 literals.
+// Scans `src/web` plus the UI files beside each kind / mode engine (`src/kinds/<type>/`,
+// `src/modes/<mode>/`); platform-web has its own copy that allows 0 literals.
 import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -58,7 +59,12 @@ function listSourceFiles(dir: string): readonly string[] {
 describe('subject-chess web: type / mode dispatch stays inside the 4 registries', () => {
   it('finds no dispatch on a type/mode literal outside them (or an allowed narrowing guard)', () => {
     const srcDir = import.meta.dirname;
-    const offenders = listSourceFiles(srcDir)
+    const uiBesideEngines = ['kinds', 'modes'].flatMap((dir) =>
+      listSourceFiles(path.join(srcDir, '..', dir)).filter((file) =>
+        /\.tsx$|[\\/]ui\.ts$/.test(file),
+      ),
+    );
+    const offenders = [...listSourceFiles(srcDir), ...uiBesideEngines]
       .map((file) => path.relative(srcDir, file).replaceAll('\\', '/'))
       .filter((rel) => !ALLOWED_REGISTRIES.has(rel) && !ALLOWED_MODE_GUARDS.has(rel))
       .filter((rel) => dispatchesOnTypeOrMode(fs.readFileSync(path.join(srcDir, rel), 'utf8')));
