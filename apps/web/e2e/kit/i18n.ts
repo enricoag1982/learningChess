@@ -1,5 +1,8 @@
 import i18next from 'i18next';
-import { chessWeb } from '../../src/chess-pack.ts';
+// Node's ESM loader (this file runs straight under Playwright, outside Vite) requires this
+// attribute for a JSON import; imports `en` directly rather than through `chess-pack.ts`, whose
+// own bot-player import chain has a nested JSON import Node's loader can't yet resolve this way.
+import en from '@chess-kids/content/locales/en.json' with { type: 'json' };
 import { i18nOptions } from '../../src/i18n-options.ts';
 
 /**
@@ -11,7 +14,7 @@ import { i18nOptions } from '../../src/i18n-options.ts';
 const e2eI18n = i18next.createInstance();
 // Resources are bundled at build time (same comment as `src/i18n.ts`): init completes
 // synchronously, so every export below can use `e2eI18n` right away.
-void e2eI18n.init(i18nOptions(chessWeb.resources));
+void e2eI18n.init(i18nOptions({ en }));
 
 /**
  * Resolves a content text key (e.g. `lessons:rook.title`, `characters:rhino.name`, or a
