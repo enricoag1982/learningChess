@@ -4,6 +4,8 @@ import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import type { ExerciseDef } from '@chess-kids/core/chess';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createAppStore, StoreProvider } from '../app/store.ts';
+import { PackProvider } from '../app/subject.ts';
+import { chessWeb } from '../chess-pack.ts';
 import { BossStep } from '../modes/ui-registry.ts';
 import { DemoStep } from '../ui/lesson/DemoStep.tsx';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
@@ -42,28 +44,30 @@ function StepPreview({
   if (!ready) return <p className="text-muted">Loading…</p>;
 
   return (
-    <StoreProvider value={store}>
-      <div className="flex min-h-0 max-h-[560px] flex-1 flex-col">
-        {view.kind === 'story' && (
-          <StoryStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
-        )}
-        {view.kind === 'demo' && (
-          <DemoStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
-        )}
-        {view.kind === 'exercise' && (
-          <ExerciseStep
-            key={view.exercise.id}
-            lesson={lesson}
-            exercise={view.exercise}
-            guided={false}
-            nextStepIndex={1}
-          />
-        )}
-        {view.kind === 'boss' && (
-          <BossStep key={view.game.id} lesson={lesson} game={view.game} nextStepIndex={1} />
-        )}
-      </div>
-    </StoreProvider>
+    <PackProvider value={chessWeb}>
+      <StoreProvider value={store}>
+        <div className="flex min-h-0 max-h-[560px] flex-1 flex-col">
+          {view.kind === 'story' && (
+            <StoryStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
+          )}
+          {view.kind === 'demo' && (
+            <DemoStep lesson={lesson} onNext={() => undefined} onSkip={() => undefined} />
+          )}
+          {view.kind === 'exercise' && (
+            <ExerciseStep
+              key={view.exercise.id}
+              lesson={lesson}
+              exercise={view.exercise}
+              guided={false}
+              nextStepIndex={1}
+            />
+          )}
+          {view.kind === 'boss' && (
+            <BossStep key={view.game.id} lesson={lesson} game={view.game} nextStepIndex={1} />
+          )}
+        </div>
+      </StoreProvider>
+    </PackProvider>
   );
 }
 

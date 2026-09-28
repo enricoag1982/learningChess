@@ -1,8 +1,7 @@
 import type { JSX, ReactNode } from 'react';
-import type { ExerciseType } from '@chess-kids/core/chess';
+import { usePack } from '../app/subject.ts';
 import { GameLayout } from '../ui/lesson/GameLayout.tsx';
 import type { PlayAreaProps } from './kind-ui.ts';
-import { kindUiOf } from './ui-registry.ts';
 
 export interface ExerciseFrameProps {
   readonly board: ReactNode | null;
@@ -19,10 +18,15 @@ export function ExerciseFrame({ board, panel, belowBoard }: ExerciseFrameProps):
   return <GameLayout board={board} panel={panel} belowBoard={belowBoard} />;
 }
 
-export type ExercisePlayProps = PlayAreaProps<ExerciseType>;
+export type ExercisePlayProps = PlayAreaProps;
 
 /** Renders `def`'s own kind's `PlayArea` — the one place exercise-type dispatch happens for the
- * exercise UI (`ui-registry.ts`'s `kindUiOf`, never a local `if`/`switch`). */
+ * exercise UI (the active pack's `kinds`, never a local `if`/`switch`). */
 export function ExercisePlay(props: ExercisePlayProps): JSX.Element {
-  return kindUiOf(props.def).PlayArea(props);
+  const pack = usePack();
+  const kindUi = pack.kinds[props.def.type];
+  if (!kindUi) {
+    throw new Error(`ExercisePlay: no kind UI registered for type "${props.def.type}"`);
+  }
+  return kindUi.PlayArea(props);
 }

@@ -3,6 +3,8 @@ import type { JSX } from 'react';
 import type { Lesson } from '@chess-kids/core/chess';
 import type { ExerciseDef } from '@chess-kids/core/chess';
 import { createAppStore, StoreProvider } from '../app/store.ts';
+import { PackProvider } from '../app/subject.ts';
+import { chessWeb } from '../chess-pack.ts';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';
 import { createTestServices } from '../testing/test-services.ts';
@@ -45,20 +47,22 @@ function ExercisePreview({
   if (!ready) return <p className="text-muted">Loading…</p>;
 
   return (
-    <StoreProvider value={store}>
-      {/* LessonScreen's real header (close button + phase pills + stage dots) leaves less height
-          for GameLayout than this playground's single tab row; cap it so the board doesn't grow
-          past what the panel column can match at 1024x768 (a dev-harness-only concern). */}
-      <div className="flex min-h-0 max-h-[560px] flex-1 flex-col">
-        <ExerciseStep
-          key={def.id}
-          lesson={lesson}
-          exercise={def}
-          guided={false}
-          nextStepIndex={1}
-        />
-      </div>
-    </StoreProvider>
+    <PackProvider value={chessWeb}>
+      <StoreProvider value={store}>
+        {/* LessonScreen's real header (close button + phase pills + stage dots) leaves less height
+            for GameLayout than this playground's single tab row; cap it so the board doesn't grow
+            past what the panel column can match at 1024x768 (a dev-harness-only concern). */}
+        <div className="flex min-h-0 max-h-[560px] flex-1 flex-col">
+          <ExerciseStep
+            key={def.id}
+            lesson={lesson}
+            exercise={def}
+            guided={false}
+            nextStepIndex={1}
+          />
+        </div>
+      </StoreProvider>
+    </PackProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
-import type { ConceptTask, ExerciseState } from '@chess-kids/core/chess';
+import type { ExerciseStateBase } from '@chess-kids/core';
+import type { ConceptTask } from '@chess-kids/core/chess';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
 import { BlankScreen, Screen, ScreenHeader } from '../ds/Screen.tsx';
 
@@ -49,7 +50,11 @@ export interface ReviewTaskRunnerProps {
   readonly showHint?: boolean;
   /** Overrides the default per-task `recordReviewResult` save; see
    * `ReviewExerciseStepProps.onRecord`. */
-  readonly onRecord?: (task: ConceptTask, state: ExerciseState, correct: boolean) => Promise<void>;
+  readonly onRecord?: (
+    task: ConceptTask,
+    state: ExerciseStateBase,
+    correct: boolean,
+  ) => Promise<void>;
 }
 
 /** Steps through a fixed list of review tasks, one at a time, each played with

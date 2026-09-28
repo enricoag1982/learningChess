@@ -1,8 +1,27 @@
+import type { ActionOf, DefOf, ExerciseStateOf, OutcomeOf, Square } from '@chess-kids/core/chess';
 import type { ExerciseKindUI } from '../kind-ui.ts';
+import type { WrongSquaresExtra } from '../move-ui.ts';
+import { baseInitUi } from '../move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
-export const selectSquaresUi: ExerciseKindUI<'select-squares'> = {
+export interface SelectSquaresExtra extends WrongSquaresExtra {
+  /** Answer squares the kid had not selected, after a wrong check: dashed orange until tapped.
+   * Kept across toggles; the play area hides the ones since selected. */
+  readonly missedSquares: readonly Square[];
+}
+
+export const selectSquaresUi: ExerciseKindUI<
+  DefOf<'select-squares'>,
+  ExerciseStateOf<DefOf<'select-squares'>>,
+  ActionOf<'select-squares'>,
+  OutcomeOf<'select-squares'>,
+  SelectSquaresExtra
+> = {
   type: 'select-squares',
+
+  initUi: (def) => ({ ...baseInitUi(def), missedSquares: [] }),
+
+  clearWrongUi: () => ({ wrongSquares: [] }),
 
   toUi(outcome) {
     if (outcome.kind === 'toggled') {

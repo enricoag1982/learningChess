@@ -2,8 +2,8 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Hint, Move, Position, Square } from '@chess-kids/core/chess';
 import { Board } from '../ui/board/Board.tsx';
-import type { FromTo } from './kind-ui.ts';
-import { hintSquares } from './kind-ui.ts';
+import type { FromTo } from './move-ui.ts';
+import { hintSquares } from './move-ui.ts';
 
 export interface MoveBoardProps {
   readonly position: Position;

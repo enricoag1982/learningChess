@@ -7,8 +7,10 @@ import { join } from 'node:path';
 import type { AppDeps, AppSettings, BackupFile, ParentLock } from '@chess-kids/core';
 import { buildBackupFile, parseBackupFile } from '@chess-kids/core/backup';
 import { importMerged, planImport } from '@chess-kids/core/merge';
+import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createServices } from '../../app/services.ts';
+import { chessWeb } from '../../chess-pack.ts';
 import { SCHEMA_VERSION } from './local-store.ts';
 
 const FIXTURES_DIR = join(import.meta.dirname, '..', '..', '..', 'test-fixtures', 'storage');
@@ -79,7 +81,7 @@ describe.each(TAGS)('storage compat: %s', (tag) => {
   it('loads local-storage.json cleanly (no StorageError, current schema version)', async () => {
     fillLocalStorage(JSON.parse(readFixture(tag, 'local-storage.json')) as Record<string, string>);
 
-    const { deps } = createServices(localStorage);
+    const { deps } = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
     const snapshot = await snapshotOf(deps);
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
@@ -87,7 +89,7 @@ describe.each(TAGS)('storage compat: %s', (tag) => {
   });
 
   it('merges backup-all.json into an empty device', async () => {
-    const { deps } = createServices(localStorage);
+    const { deps } = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
     const incoming = await parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
 
     const plan = await planImport(deps, incoming);
@@ -108,7 +110,7 @@ describe.each(TAGS)('storage compat: %s', (tag) => {
       JSON.parse(readFixture('v2.0.0', 'local-storage.json')) as Record<string, string>,
     );
 
-    const { deps } = createServices(localStorage);
+    const { deps } = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
     const incoming = await parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
 
     const plan = await planImport(deps, incoming);

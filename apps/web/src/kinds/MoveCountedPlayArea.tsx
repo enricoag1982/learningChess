@@ -3,19 +3,22 @@ import { useTranslation } from 'react-i18next';
 import type {
   CaptureDef,
   CollectStarsDef,
+  ExerciseStateOf,
+  Hint,
   MoveAction,
-  Square,
   UndoAction,
 } from '@chess-kids/core/chess';
-import { useServices } from '../app/store.ts';
+import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
+import type { SurfaceContext } from '../app/subject.ts';
 import { InfoPanel } from '../ui/ds/primitives.tsx';
 import { StarsRow } from '../ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';
 import { ExerciseControls } from './ExerciseControls.tsx';
 import { ExerciseFrame } from './ExercisePlay.tsx';
 import { panelBody } from './panel-body.tsx';
-import type { ExerciseUIState, UiAction } from './kind-ui.ts';
-import { moveKindLegalMoves } from './kind-ui.ts';
+import type { ExerciseUIState, SessionAction } from './kind-ui.ts';
+import type { MoveExtra } from './move-ui.ts';
+import { moveKindLegalMoves } from './move-ui.ts';
 import { MoveBoard } from './MoveBoard.tsx';
 
 /** Shared with `VersusStep`'s take-back button — the one place a move-counted "undo" icon lives. */
@@ -63,13 +66,15 @@ export function MovesCard({ current, target }: MovesCardProps): JSX.Element {
   );
 }
 
+type MoveCountedDef = CollectStarsDef | CaptureDef;
+
 export interface MoveCountedPlayAreaProps {
-  readonly def: CollectStarsDef | CaptureDef;
-  readonly state: ExerciseUIState<CollectStarsDef | CaptureDef>;
-  readonly dispatch: (action: MoveAction | UndoAction | UiAction) => void;
-  readonly checkSquare?: Square;
+  readonly def: MoveCountedDef;
+  readonly state: ExerciseUIState<MoveCountedDef, ExerciseStateOf<MoveCountedDef>, MoveExtra>;
+  readonly dispatch: (action: SessionAction<MoveAction | UndoAction>) => void;
   readonly showHint: boolean;
-  readonly pieceBadges: boolean;
+  readonly showCheck: boolean;
+  readonly surface: SurfaceContext;
   readonly top: ReactNode;
   readonly done: ReactNode | null;
 }
@@ -81,29 +86,31 @@ export function MoveCountedPlayArea({
   def,
   state,
   dispatch,
-  checkSquare,
   showHint,
-  pieceBadges,
+  showCheck,
+  surface,
   top,
   done,
 }: MoveCountedPlayAreaProps): JSX.Element {
   const { t } = useTranslation();
-  const services = useServices();
+  const pieceBadges = useSurfacePieceBadges(surface);
   const solved = state.core.solved;
 
   const board = (
     <MoveBoard
       position={state.core.position}
-      legalMoves={moveKindLegalMoves(state.core, services.rules)}
+      legalMoves={moveKindLegalMoves(state.core, chessWeb.core.context)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}
       onTapFirst={() => {
         dispatch({ type: 'tap-first' });
       }}
-      hint={state.hint}
+      // `useExerciseSession` (generic) types `state.hint` by its base shape; the pack's own
+      // registry narrows `def.type` to a chess kind at runtime, so this always is one.
+      hint={state.hint as Hint | null}
       lastMove={state.lastMove}
-      checkSquare={checkSquare}
+      checkSquare={showCheck ? checkSquareFor(state.core.position) : undefined}
       pieceBadges={pieceBadges}
     />
   );

@@ -3,6 +3,7 @@ import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { MiniGame } from '@chess-kids/core/chess';
 import type { MateInNDef, SelectSquaresDef } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
+import { chessWeb } from '../../chess-pack.ts';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import type { FakeNarrator } from '../../testing/fake-narrator.ts';
@@ -59,6 +60,7 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     const { store } = await renderWithStore(
       <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
       services,
+      chessWeb,
     );
 
     expect(screen.getByText('Round 1 of 2')).toBeTruthy();
@@ -94,6 +96,7 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     const { store } = await renderWithStore(
       <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
       services,
+      chessWeb,
     );
 
     // Round 1: solve cleanly (0 mistakes so far).
@@ -167,7 +170,11 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
       };
       const lesson = fixtureLesson({ boss: boss.id });
       const services = createTestServices(fixtureContentSource(lesson, [boss]));
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^c6,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^e7,/ })); // Ne7+, the scripted move

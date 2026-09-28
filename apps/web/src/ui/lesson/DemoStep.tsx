@@ -1,12 +1,9 @@
-import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson } from '@chess-kids/core/chess';
-import type { Position, Square } from '@chess-kids/core/chess';
-import { useAppStore, useServices } from '../../app/store.ts';
-import { characterName, tContent } from '../../content-text.ts';
-import { Board } from '../board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
+import type { Lesson } from '@chess-kids/core';
+import { useServices } from '../../app/store.ts';
+import { usePack } from '../../app/subject.ts';
+import { tContent } from '../../content-text.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { useNarratedText } from '../ds/useNarratedText.ts';
@@ -21,38 +18,18 @@ export interface DemoStepProps {
   readonly onSkip: () => void;
 }
 
-/** Free play with the lesson's piece: every legal move is open, nothing is scored. */
+/** Free play with the lesson's piece: every legal move is open, nothing is scored (the board
+ * itself is the subject's own `surface.Demo`). */
 export function DemoStep({ lesson, onNext, onSkip }: DemoStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
-  const [position, setPosition] = useState<Position>(lesson.demo.position);
-  const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | undefined>(undefined);
+  const pack = usePack();
   const text = tContent(t, lesson.demo.textKey);
   const replay = useNarratedText(services.narrator, text);
-  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
-
-  const legalMoves = services.rules.legalMoves(position, { staticOpponent: true });
-
-  function handleMove(move: { from: Square; to: Square }): void {
-    const played = services.rules.play(position, { staticOpponent: true }, move);
-    if (!played) return;
-    setPosition(played.position);
-    setLastMove(move);
-  }
 
   return (
     <GameLayout
-      board={
-        <Board
-          position={position}
-          legalMoves={legalMoves}
-          onMove={handleMove}
-          highlights={lastMove ? { lastMove } : undefined}
-          label={t('demo.board-label', { name: characterName(t, lesson.character) })}
-          pieceBadges={pieceBadges}
-        />
-      }
+      board={<pack.surface.Demo lesson={lesson} />}
       panel={
         <>
           <SpeechBubble text={text} />

@@ -154,7 +154,7 @@ export function Step({
     setThinking(true);
     timerRef.current = setTimeout(() => {
       timerRef.current = null;
-      void services.botPlayer
+      void services.subject.botPlayer
         .chooseMove(versusGameState(after), minigame.opponentLevel, nextBotSeed())
         .then((botMove) => {
           if (botMove === null) {

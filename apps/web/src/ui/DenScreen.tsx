@@ -10,15 +10,14 @@ import type {
   TracksCatalog,
 } from '@chess-kids/core';
 import { animalFriends, rankLadder, totalStars } from '@chess-kids/core';
-import { CHESS_CHARACTERS, friendGamesPlayed } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../app/store.ts';
+import { usePack } from '../app/subject.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
 import { CharacterIcon } from './art/characters.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { StreakPill } from './StreakPill.tsx';
-import { InfoPill } from './ds/primitives.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
@@ -56,16 +55,6 @@ function badgeDisplay(def: BadgeDef, earnedBadges: readonly EarnedBadge[]): Badg
   };
 }
 
-/** Unicode glyph per rank id (they are exactly the six piece words: pawn .. king). */
-const RANK_GLYPH: Readonly<Record<string, string>> = {
-  pawn: '♙',
-  knight: '♘',
-  bishop: '♗',
-  rook: '♖',
-  queen: '♕',
-  king: '♔',
-};
-
 /** The next rank's unlock condition, in words (own condition for `done`/`locked`, "You are here" for `current`). */
 function rankNote(t: TFunction, catalog: TracksCatalog, entry: RankLadderEntry): string {
   if (entry.state === 'current') return t('den.rank-current');
@@ -86,6 +75,7 @@ function rankNote(t: TFunction, catalog: TracksCatalog, entry: RankLadderEntry):
 export function DenScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pack = usePack();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const gameRecords = useAppStore((state) => state.gameRecords);
@@ -101,11 +91,9 @@ export function DenScreen(): JSX.Element {
     return <BlankScreen />;
   }
 
-  const friends = animalFriends(journey.lessons, progress, CHESS_CHARACTERS);
+  const friends = animalFriends(journey.lessons, progress, pack.core.characters);
   const ladder = rankLadder(journey.catalog, journey.lessons, progress);
   const stars = totalStars(progress);
-  const gamesWon = gameRecords.filter((record) => record.result === 'win').length;
-  const friendGames = friendGamesPlayed(gameRecords);
 
   const badgeDefs = services.deps.content.badges?.() ?? [];
 
@@ -145,22 +133,7 @@ export function DenScreen(): JSX.Element {
         bubbleClassName="text-lg"
       />
 
-      <div className="flex flex-wrap gap-2">
-        <InfoPill
-          role="img"
-          aria-label={t('den.games-won', { count: gamesWon })}
-          className="h-10 w-fit text-sm font-extrabold text-ink"
-        >
-          <span aria-hidden="true">{t('den.games-won', { count: gamesWon })}</span>
-        </InfoPill>
-        <InfoPill
-          role="img"
-          aria-label={t('den.games-with-friends', { count: friendGames })}
-          className="h-10 w-fit text-sm font-extrabold text-ink"
-        >
-          <span aria-hidden="true">{t('den.games-with-friends', { count: friendGames })}</span>
-        </InfoPill>
-      </div>
+      {pack.den.Stats && <pack.den.Stats gameRecords={gameRecords} />}
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="flex flex-col gap-3 rounded-[2rem] border-2 border-line bg-card p-5 lg:w-72 lg:flex-none">
@@ -185,7 +158,7 @@ export function DenScreen(): JSX.Element {
                       locked ? 'bg-[#F1E9D8] text-muted' : 'bg-go text-white'
                     }`}
                   >
-                    {RANK_GLYPH[entry.rank.id] ?? '?'}
+                    {pack.den.rankGlyph(entry.rank.id)}
                   </span>
                   <span className="flex min-w-0 flex-col">
                     <span

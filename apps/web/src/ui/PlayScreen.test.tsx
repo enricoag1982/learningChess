@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
 import { recordGame, solve } from '@chess-kids/core/chess';
+import { chessWeb } from '../chess-pack.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
@@ -67,7 +68,7 @@ describe('PlayScreen', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Hungry Rook, 0 stars' }));
     await screen.findByRole('heading', { name: 'Hungry Rook' });
 
-    const line = solve(hungryRook.position, services.rules, 'capture');
+    const line = solve(hungryRook.position, chessWeb.core.context, 'capture');
     if (!line) throw new Error('no solution found by the core solver for "hungry-rook"');
     for (const move of line) {
       clickSquare(move.from);

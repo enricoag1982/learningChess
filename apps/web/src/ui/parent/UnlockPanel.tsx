@@ -2,17 +2,17 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { Lesson } from '@chess-kids/core/chess';
+import type { Lesson, SubjectCore } from '@chess-kids/core';
 import { loadJourney } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { usePack } from '../../app/subject.ts';
 import { characterName, tContent } from '../../content-text.ts';
-import { characterPieceOrNull } from '../art/character-meta.ts';
 import { PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 import { useAsync } from '../ds/useAsync.ts';
 
 /** Locked-lesson name: title for an Owl-taught lesson (no piece character), else its character's name. */
-function lessonName(t: TFunction, lesson: Lesson): string {
-  return characterPieceOrNull(lesson.character) === null
+function lessonName(t: TFunction, characters: SubjectCore['characters'], lesson: Lesson): string {
+  return characters[lesson.character] === undefined
     ? tContent(t, lesson.titleKey)
     : characterName(t, lesson.character);
 }
@@ -26,6 +26,7 @@ export interface UnlockPanelProps {
 export function UnlockPanel({ profileId }: UnlockPanelProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const characters = usePack().core.characters;
   const parentUnlockTarget = useAppStore((state) => state.parentUnlockTarget);
   const [busyId, setBusyId] = useState<string | null>(null);
   const { value: journey, reload: refresh } = useAsync(
@@ -93,7 +94,7 @@ export function UnlockPanel({ profileId }: UnlockPanelProps): JSX.Element {
             className="flex items-center gap-2 rounded-lg border border-line bg-card px-3 py-2"
           >
             <span className="flex-1 text-sm text-ink">
-              {lessonName(t, lesson)}
+              {lessonName(t, characters, lesson)}
               {world && <span className="text-muted"> · {tContent(t, world.titleKey)}</span>}
             </span>
             <button

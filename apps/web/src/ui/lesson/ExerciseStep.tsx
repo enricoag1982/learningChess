@@ -16,7 +16,6 @@ import { useExerciseSession } from '../../kinds/session.ts';
 import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../board/piece-style.ts';
 import { SECONDARY_BUTTON } from './button-styles.ts';
 import { NextButton } from './NextButton.tsx';
 import { SkipButton } from './SkipButton.tsx';
@@ -59,7 +58,6 @@ function ExerciseAttempt({
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
   const refreshProgress = useAppStore((state) => state.refreshProgress);
 
@@ -96,7 +94,6 @@ function ExerciseAttempt({
     instruction: instructionText,
     note,
     replay,
-    checkSquare,
   } = session;
 
   function handleTakeEasier(): void {
@@ -151,11 +148,11 @@ function ExerciseAttempt({
       def={exercise}
       state={state}
       dispatch={dispatch}
-      checkSquare={checkSquare}
       // app-structure.md §11 "hints on/off": off hides the Hint button; guided tries keep their own
       // auto-hint (`useExerciseSession`'s mount effect, unaffected by this setting).
       showHint={hintsEnabled}
-      pieceBadges={showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }))}
+      showCheck
+      surface={{ worldId: lesson.world }}
       top={top}
       done={done}
     />

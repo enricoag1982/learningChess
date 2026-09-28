@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ConceptTask, ExerciseState } from '@chess-kids/core/chess';
+import type { ExerciseStateBase } from '@chess-kids/core';
+import type { ConceptTask } from '@chess-kids/core/chess';
 import { recordReviewResult } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
@@ -22,7 +23,7 @@ export interface ReviewExerciseStepProps {
   readonly showHint?: boolean;
   /** Overrides the default `recordReviewResult` save (assessment tasks: scoring is per-run, not a
    * per-task Leitner box move); must resolve before Next appears. */
-  readonly onRecord?: (state: ExerciseState, correct: boolean) => Promise<void>;
+  readonly onRecord?: (state: ExerciseStateBase, correct: boolean) => Promise<void>;
 }
 
 /** One warm-up/Practice review task (domain-model.md §3.1): the same board + controls a lesson's
@@ -50,7 +51,6 @@ export function ReviewExerciseStep({
     instruction: instructionText,
     note,
     replay,
-    checkSquare,
   } = useExerciseSession(exercise, {
     character,
     save: (core, ms) => {
@@ -87,9 +87,9 @@ export function ReviewExerciseStep({
       def={exercise}
       state={state}
       dispatch={dispatch}
-      checkSquare={checkSquare}
       showHint={showHint}
-      pieceBadges={false}
+      showCheck
+      surface={{ worldId: null }}
       top={top}
       done={done}
     />

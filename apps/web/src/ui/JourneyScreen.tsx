@@ -12,8 +12,8 @@ import type {
 import type { Journey, Lesson, MiniGame } from '@chess-kids/core/chess';
 import { lessonStars, worldLessons } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
+import { usePack } from '../app/subject.ts';
 import { characterName, tContent } from '../content-text.ts';
-import { characterPieceOrNull } from './art/character-meta.ts';
 import { firstLessonsByCharacter, journeyNodeLabel } from './lesson-character-labels.ts';
 import { CharacterIcon, OwlIcon } from './art/characters.tsx';
 import { StarsRow } from './StarsRow.tsx';
@@ -112,6 +112,7 @@ function defaultWorldId(journey: Journey): string | undefined {
 export function JourneyScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const characters = usePack().core.characters;
   const journey = useAppStore((state) => state.journey);
   const progress = useAppStore((state) => state.progress);
   const startLesson = useAppStore((state) => state.startLesson);
@@ -174,7 +175,7 @@ export function JourneyScreen(): JSX.Element {
       if (!previous) return;
       // Owl-taught lessons (no piece character) are named by their title.
       const name =
-        characterPieceOrNull(previous.character) === null
+        characters[previous.character] === undefined
           ? tContent(t, previous.titleKey)
           : characterName(t, previous.character);
       const message = tContent(t, 'journey:ui.finish-first', { name });
@@ -350,7 +351,7 @@ export function JourneyScreen(): JSX.Element {
                   );
                   if (!lesson) return;
                   const name =
-                    characterPieceOrNull(lesson.character) === null
+                    characters[lesson.character] === undefined
                       ? tContent(t, lesson.titleKey)
                       : characterName(t, lesson.character);
                   offerTestOutLesson(lockedMessage.lessonId, lockedMessage.worldId, name);
@@ -547,6 +548,7 @@ function LessonNode({
   readonly onActivate: () => void;
 }): JSX.Element {
   const { t } = useTranslation();
+  const characters = usePack().core.characters;
   const status = nodeStatus(statusValue);
   const { earned, max } = lessonStars(lesson, progress);
   const rating = status === 'complete' ? ratingStars(earned, max) : 0;
@@ -554,14 +556,14 @@ function LessonNode({
 
   // Owl-taught lessons labelled by title; a piece character's first lesson by its name, a later
   // one by its own title — so two nodes never show the same label (`journeyNodeLabel`).
-  const piece = characterPieceOrNull(lesson.character);
+  const characterEntry = characters[lesson.character];
   const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
-  const characterLabel = journeyNodeLabel(t, lesson, firstLessonOfCharacter);
+  const characterLabel = journeyNodeLabel(t, characters, lesson, firstLessonOfCharacter);
   const nameLabel =
-    piece !== null && isFirstOfCharacter
+    characterEntry !== undefined && isFirstOfCharacter
       ? tContent(t, 'journey:ui.character-piece', {
           character: characterLabel,
-          piece: tContent(t, `piece.${piece}`),
+          piece: tContent(t, characterEntry.topicKey),
         })
       : characterLabel;
   const statusWord = tContent(t, `journey:ui.status-${status}`);

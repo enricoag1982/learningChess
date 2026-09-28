@@ -1,0 +1,78 @@
+import { createContext, useContext } from 'react';
+import type { JSX } from 'react';
+import type { GameRecord, Lesson, SubjectCore } from '@chess-kids/core';
+import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
+import type { PlainRouteName } from './routes.ts';
+
+/** A subject's own runtime services, augmented by module declaration (chess: `{ botPlayer }`). */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
+export interface SubjectServices {}
+
+/** A board/story/demo surface's own lesson world, for the subject's piece look (chess: the animal
+ * badge, off in World 5 and for a review task, `worldId: null`). */
+export interface SurfaceContext {
+  readonly worldId: string | null;
+}
+
+/** One subject's whole web behaviour behind the platform's uniform interface (docs/refactor-v4.md
+ * §11). Grows a field per seam commit; a subject omits what it has no use for. */
+export interface SubjectWeb {
+  readonly core: SubjectCore;
+  /** Built once at composition-root time (`app/services.ts`), never per render — a subject's own
+   * services (chess: a worker-backed bot player) live on the result, not recreated on each call. */
+  createServices(): SubjectServices;
+  /** Every exercise kind's UI, by `type` — `ExercisePlay`'s one dispatch point. */
+  readonly kinds: Readonly<Record<string, AnyExerciseKindUI>>;
+  /** The lesson's board, Story and Demo steps: method syntax (bivariant), so a subject's own
+   * `Lesson` (concrete fields beyond `textKey`) widens here with no cast. */
+  readonly surface: {
+    Story(props: { readonly lesson: Lesson; readonly compact: boolean }): JSX.Element;
+    Demo(props: { readonly lesson: Lesson }): JSX.Element;
+  };
+  /** The piece-icon pill under a character's portrait, naming the piece it stands for
+   * (`CharacterCard`); absent for a subject with no such badge. */
+  CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
+  /** Extra Home tiles this subject contributes (chess: Play), merged with the platform's own
+   * (Journey/Practice/My Den) and sorted by `order`; absent for a subject with none. */
+  readonly homeTiles?: readonly HomeTile[];
+  /** My Den's own bits: the rank ladder's glyph per rank id, and an extra stats row (chess: games
+   * won / with friends) under the rank/friends panels; `Stats` absent for a subject with none. */
+  readonly den: {
+    rankGlyph(rankId: string): string;
+    Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
+  };
+  /** i18next `resources` for this subject's compiled locale bundle (`i18nOptions(resources)`). */
+  readonly resources: Readonly<Record<string, object>>;
+}
+
+/** One Home tile's own colours (`docs/screens.md` §1: border = `fg`, ledge a still-darker shade). */
+export interface HomeTileColors {
+  readonly bg: string;
+  readonly fg: string;
+  readonly ledge: string;
+}
+
+/** A subject-contributed Home tile (`SubjectWeb.homeTiles`), rendered the same as a platform one. */
+export interface HomeTile {
+  readonly id: string;
+  /** Placement among the platform's own tiles, lowest first. */
+  readonly order: number;
+  readonly labelKey: string;
+  readonly Icon: () => JSX.Element;
+  readonly colors: HomeTileColors;
+  /** Tapping the tile navigates here — a plain, param-less screen (chess: `play`). */
+  readonly route: PlainRouteName;
+}
+
+const PackContext = createContext<SubjectWeb | null>(null);
+
+export const PackProvider = PackContext.Provider;
+
+/** The active subject's whole web pack; must be used under `PackProvider` (`App.tsx`). */
+export function usePack(): SubjectWeb {
+  const pack = useContext(PackContext);
+  if (!pack) {
+    throw new Error('usePack must be used within a PackProvider');
+  }
+  return pack;
+}

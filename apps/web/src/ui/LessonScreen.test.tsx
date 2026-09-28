@@ -6,6 +6,7 @@ import {
   fixtureExercise,
   fixtureLesson,
 } from '../testing/fixtures.ts';
+import { chessWeb } from '../chess-pack.ts';
 import { stubMatchMedia } from '../testing/mock-media-query.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
@@ -15,7 +16,7 @@ describe('LessonScreen', () => {
   it('Story: "Let me try" advances to the Demo step', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
-    const { store } = await renderWithStore(<LessonScreen />, services);
+    const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
     await act(async () => {
       await store.getState().startLesson(lesson.id);
     });
@@ -33,7 +34,7 @@ describe('LessonScreen', () => {
       try {
         const lesson = fixtureLesson();
         const services = createTestServices(fixtureContentSource(lesson));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });
@@ -57,7 +58,7 @@ describe('LessonScreen', () => {
       try {
         const lesson = fixtureLesson({ guided: [fixtureExercise('guided-1')] });
         const services = createTestServices(fixtureContentSource(lesson));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });
@@ -80,7 +81,7 @@ describe('LessonScreen', () => {
           guided: [fixtureExercise('guided-1'), fixtureExercise('guided-2')],
         });
         const services = createTestServices(fixtureContentSource(lesson));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });
@@ -106,7 +107,7 @@ describe('LessonScreen', () => {
       try {
         const lesson = fixtureLesson(); // guided: []
         const services = createTestServices(fixtureContentSource(lesson));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });
@@ -127,7 +128,7 @@ describe('LessonScreen', () => {
         const boss = fixtureBoss();
         const lesson = fixtureLesson({ boss: boss.id });
         const services = createTestServices(fixtureContentSource(lesson, [boss]));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });
@@ -150,7 +151,7 @@ describe('LessonScreen', () => {
       try {
         const lesson = fixtureLesson();
         const services = createTestServices(fixtureContentSource(lesson));
-        const { store } = await renderWithStore(<LessonScreen />, services);
+        const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
         await act(async () => {
           await store.getState().startLesson(lesson.id);
         });

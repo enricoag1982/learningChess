@@ -14,6 +14,7 @@ import {
 } from './domain/chess/facts/rewards.ts';
 import type { PieceType } from './domain/chess/index.ts';
 import { EXERCISE_KINDS } from './domain/exercise/kinds/index.ts';
+import { EXERCISE_NOTES } from './domain/exercise/notes.ts';
 import { staticMode } from './domain/exercise/modes/static/mode.ts';
 import { versusMode } from './domain/exercise/modes/versus/mode.ts';
 import { composeDefaultSettings } from './domain/profile-settings.ts';
@@ -53,6 +54,8 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   rewards: { facts: chessRewardFacts, conditionValue: chessConditionValue },
   gameRecordOf: chessGameRecordOf,
   characters: CHESS_CHARACTERS,
+  notes: EXERCISE_NOTES,
+  noteVars: (character) => ({ piece: CHARACTER_PIECES[character] ?? 'r' }),
   settings: {
     defaults: CHESS_SETTINGS_DEFAULTS,
     isValid: (s) => isValidComputerLevel(s.computerLevel) && isValidPieceStyle(s.pieceStyle),

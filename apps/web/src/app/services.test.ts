@@ -1,4 +1,6 @@
+import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { chessWeb } from '../chess-pack.ts';
 import { createServices } from './services.ts';
 
 beforeEach(() => {
@@ -6,11 +8,11 @@ beforeEach(() => {
 });
 
 describe('createServices', () => {
-  it('wires deps, rules and narrator over the given storage', async () => {
-    const services = createServices(localStorage);
+  it('wires deps, subject services and narrator over the given storage', async () => {
+    const services = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
 
     expect(services.narrator).toBeDefined();
-    expect(typeof services.rules.legalMoves).toBe('function');
+    expect(services.subject).toBeDefined();
     expect(typeof services.deps.clock.now).toBe('function');
     expect(services.deps.ids.next()).not.toBe(services.deps.ids.next());
 
@@ -32,7 +34,7 @@ describe('createServices', () => {
   });
 
   it('persists profile data across separate createServices calls over the same storage', async () => {
-    const first = createServices(localStorage);
+    const first = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
     await first.deps.profiles.save({
       id: 'p1',
       accountId: 'local',
@@ -43,12 +45,12 @@ describe('createServices', () => {
       updatedAt: '2026-01-01T00:00:00.000Z',
     });
 
-    const second = createServices(localStorage);
+    const second = createServices(chessWeb, CHESS_APP_CONFIG, localStorage);
     expect(await second.deps.profiles.get('p1')).toMatchObject({ nickname: 'Rex' });
   });
 
   it('defaults to window.localStorage', () => {
-    const services = createServices();
+    const services = createServices(chessWeb, CHESS_APP_CONFIG);
     expect(services.deps).toBeDefined();
   });
 });

@@ -1,9 +1,13 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
+import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import type { RouteName } from './app/routes.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
+import { PackProvider } from './app/subject.ts';
+import type { SubjectWeb } from './app/subject.ts';
+import { chessWeb } from './chess-pack.ts';
 import type { AppUpdate } from './adapters/app-update.ts';
 import { AppNotice } from './ui/AppNotice.tsx';
 import { AppUpdater } from './ui/AppUpdater.tsx';
@@ -101,11 +105,19 @@ export interface AppProps {
   readonly services?: Services;
   /** Injected from `main.tsx` or a fake in tests; defaults to a no-op. */
   readonly appUpdate?: AppUpdate;
+  /** The active subject's whole web pack; defaults to chess (the app's only subject today). */
+  readonly pack?: SubjectWeb;
 }
 
 /** App root: wires one `Services` instance to a fresh store, then renders the current screen. */
-export default function App({ services, appUpdate = NOOP_APP_UPDATE }: AppProps): JSX.Element {
-  const [store] = useState(() => createAppStore(services ?? createServices()));
+export default function App({
+  services,
+  appUpdate = NOOP_APP_UPDATE,
+  pack = chessWeb,
+}: AppProps): JSX.Element {
+  const [store] = useState(() =>
+    createAppStore(services ?? createServices(pack, CHESS_APP_CONFIG)),
+  );
   const [initError, setInitError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -122,14 +134,16 @@ export default function App({ services, appUpdate = NOOP_APP_UPDATE }: AppProps)
   if (initError !== null) throw initError;
 
   return (
-    <StoreProvider value={store}>
-      <Suspense fallback={<LazyFallback />}>
-        <Screens />
-      </Suspense>
-      <Celebration />
-      <AppNotice />
-      <TimeTracker />
-      <AppUpdater appUpdate={appUpdate} />
-    </StoreProvider>
+    <PackProvider value={pack}>
+      <StoreProvider value={store}>
+        <Suspense fallback={<LazyFallback />}>
+          <Screens />
+        </Suspense>
+        <Celebration />
+        <AppNotice />
+        <TimeTracker />
+        <AppUpdater appUpdate={appUpdate} />
+      </StoreProvider>
+    </PackProvider>
   );
 }

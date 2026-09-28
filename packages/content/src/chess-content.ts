@@ -247,7 +247,7 @@ function exerciseNoteTemplates(
   all: CompiledContent,
 ): void {
   const characters = [...new Set(all.lessons.map((lesson) => lesson.character))];
-  const placeholderCtx: ExerciseNoteCtx = { name: '', piece: 'r', stars: 3 };
+  const placeholderCtx: ExerciseNoteCtx = { name: '', vars: { piece: 'r' }, stars: 3 };
 
   function addNote(feedback: ExerciseFeedback, ctx: ExerciseNoteCtx): void {
     if (feedback.kind === 'instruction') return;
@@ -268,8 +268,8 @@ function exerciseNoteTemplates(
 
   // tap-first (never gets the easier offer: not an error kind) and illegal move (its own piece).
   for (const { name, piece } of ctxByCharacter) {
-    addNote({ kind: 'tap-first' }, { name, piece, stars: 3 });
-    addNote({ kind: 'illegal' }, { name, piece, stars: 3 });
+    addNote({ kind: 'tap-first' }, { name, vars: { piece }, stars: 3 });
+    addNote({ kind: 'illegal' }, { name, vars: { piece }, stars: 3 });
   }
 
   // Plain error notes with no variables.
@@ -285,7 +285,7 @@ function exerciseNoteTemplates(
   for (const { name, piece } of ctxByCharacter) {
     addNote(
       { kind: 'hint', hint: { kind: 'squares', level: 1, squares: [] } },
-      { name, piece, stars: 3 },
+      { name, vars: { piece }, stars: 3 },
     );
   }
   const otherHints: readonly Hint[] = [

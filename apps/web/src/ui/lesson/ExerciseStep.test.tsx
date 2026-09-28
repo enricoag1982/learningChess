@@ -11,6 +11,7 @@ import type {
   YesNoDef,
 } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
+import { chessWeb } from '../../chess-pack.ts';
 import '../../i18n.ts';
 import {
   fixtureContentSource,
@@ -34,6 +35,7 @@ describe('ExerciseStep', () => {
     const { store } = await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
@@ -53,6 +55,7 @@ describe('ExerciseStep', () => {
     const { store } = await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     expect(screen.getByRole('button', { name: 'Hint' })).toBeTruthy();
@@ -73,6 +76,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
@@ -89,6 +93,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^d4,/ })); // empty, nothing selected yet
@@ -103,6 +108,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -138,6 +144,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
@@ -155,6 +162,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided nextStepIndex={1} />,
       services,
+      chessWeb,
     );
 
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
@@ -191,6 +199,7 @@ describe('ExerciseStep', () => {
     await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
     // The instruction (the exercise's textKey, un-translated in this fixture setup) stays on
@@ -248,9 +257,10 @@ describe('ExerciseStep', () => {
     const { store } = await renderWithStore(
       <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
       services,
+      chessWeb,
     );
 
-    const answer = services.rules
+    const answer = chessWeb.core.context
       .legalMoves(position, { staticOpponent: true }, 'd4')
       .map((move) => move.to);
 
@@ -310,6 +320,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: 'No' }));
@@ -329,6 +340,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -373,6 +385,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: 'opt-rook' }));
@@ -393,6 +406,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -441,6 +455,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
@@ -463,6 +478,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -481,6 +497,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={withLastMove} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const a1 = screen.getByRole('button', { name: /^a1,/ });
@@ -521,6 +538,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /black rook, \d+ left/ }));
@@ -546,6 +564,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -567,6 +586,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       const board = screen.getByLabelText('Chess board');
@@ -595,6 +615,7 @@ describe('ExerciseStep', () => {
         await renderWithStore(
           <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
           services,
+          chessWeb,
         );
 
         const hintButton = screen.getByRole('button', { name: /Hint/ });
@@ -653,6 +674,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(1);
@@ -668,6 +690,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -684,6 +707,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -710,6 +734,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -745,6 +770,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -778,6 +804,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={guidedOriginal} guided nextStepIndex={1} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -799,6 +826,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={noEasier} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -812,6 +840,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={original} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       makeIllegalMoves(2);
@@ -857,6 +886,7 @@ describe('ExerciseStep', () => {
       const { store } = await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={mateIn1} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /^d1,/ }));
@@ -874,6 +904,7 @@ describe('ExerciseStep', () => {
       await renderWithStore(
         <ExerciseStep lesson={lesson} exercise={mateIn1} guided={false} nextStepIndex={3} />,
         services,
+        chessWeb,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /^b1,/ }));
@@ -910,6 +941,7 @@ describe('ExerciseStep', () => {
         await renderWithStore(
           <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
           services,
+          chessWeb,
         );
 
         fireEvent.click(screen.getByRole('button', { name: /^c6,/ }));

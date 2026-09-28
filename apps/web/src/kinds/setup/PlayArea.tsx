@@ -1,31 +1,43 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Piece, Square } from '@chess-kids/core/chess';
+import type { ActionOf, DefOf, ExerciseStateOf, Hint, Piece, Square } from '@chess-kids/core/chess';
 import { setupPalette } from '@chess-kids/core/chess';
+import { checkSquareFor, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { Board } from '../../ui/board/Board.tsx';
 import { useIsStackedLayout } from '../../ui/useMediaQuery.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';
 import { ExerciseFrame } from '../ExercisePlay.tsx';
 import { panelBody } from '../panel-body.tsx';
 import type { PlayAreaProps } from '../kind-ui.ts';
+import type { WrongSquaresExtra } from '../move-ui.ts';
 import { SetupPalette } from './SetupPalette.tsx';
 
 export function PlayArea({
   state,
   dispatch,
-  checkSquare,
   showHint,
-  pieceBadges,
+  showCheck,
+  surface,
   top,
   done,
-}: PlayAreaProps<'setup'>): JSX.Element {
+}: PlayAreaProps<
+  DefOf<'setup'>,
+  ExerciseStateOf<DefOf<'setup'>>,
+  ActionOf<'setup'>,
+  WrongSquaresExtra
+>): JSX.Element {
   const { t } = useTranslation();
+  const pieceBadges = useSurfacePieceBadges(surface);
   const isStacked = useIsStackedLayout();
   // The palette piece currently selected, waiting for a square tap — setup's own UI-only state.
   const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
   const solved = state.core.solved;
-  const setupHint = state.hint?.kind === 'setup' ? state.hint : null;
+  // `useExerciseSession` (generic) types `state.hint` by its base shape; the pack's own registry
+  // narrows `def.type` to a chess kind at runtime, so this always is one.
+  const hint = state.hint as Hint | null;
+  const setupHint = hint?.kind === 'setup' ? hint : null;
+  const checkSquare = showCheck ? checkSquareFor(state.core.position) : undefined;
 
   function handlePlace(square: Square, piece: Piece): void {
     dispatch({ type: 'place', square, piece });
@@ -55,7 +67,7 @@ export function PlayArea({
     <SetupPalette
       palette={setupPalette(state.core)}
       selected={selectedPiece}
-      hint={state.hint}
+      hint={hint}
       onSelect={setSelectedPiece}
       compact={isStacked}
     />

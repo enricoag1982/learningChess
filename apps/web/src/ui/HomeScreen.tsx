@@ -2,8 +2,8 @@ import type { CSSProperties, JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isDue, lessonStatus, totalStars } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
+import { usePack } from '../app/subject.ts';
 import { avatarName, characterName, tContent } from '../content-text.ts';
-import { characterPieceOrNull } from './art/character-meta.ts';
 import { InstallBanner } from './InstallBanner.tsx';
 import { RankPill } from './RankPill.tsx';
 import { ReplayButton } from './ds/ReplayButton.tsx';
@@ -34,15 +34,6 @@ function PracticeTileIcon(): JSX.Element {
     <Svg size={32} stroke="#B8561A">
       <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
       <circle cx={12} cy={16} r={5} />
-    </Svg>
-  );
-}
-
-function PlayTileIcon(): JSX.Element {
-  return (
-    <Svg size={32} stroke="#B8561A">
-      <rect x={3} y={3} width={18} height={18} rx={3} />
-      <path d="M3 12h18M12 3v18" />
     </Svg>
   );
 }
@@ -104,6 +95,7 @@ function HomeTile({
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pack = usePack();
   const profile = useAppStore((state) => state.profile);
   const progress = useAppStore((state) => state.progress);
   const journey = useAppStore((state) => state.journey);
@@ -113,8 +105,8 @@ export function HomeScreen(): JSX.Element {
   const goToPicker = useAppStore((state) => state.goToPicker);
   const goToJourney = useAppStore((state) => state.goToJourney);
   const goToPractice = useAppStore((state) => state.goToPractice);
-  const goToPlay = useAppStore((state) => state.goToPlay);
   const goToDen = useAppStore((state) => state.goToDen);
+  const navigate = useAppStore((state) => state.navigate);
   // jsdom (unit tests) and some browsers have no `serviceWorker`; skip the status line there.
   const { value: offlineReady = false } = useAsync(
     () => navigator.serviceWorker.ready.then(() => true),
@@ -150,7 +142,7 @@ export function HomeScreen(): JSX.Element {
           })
         : isResuming
           ? t('home.owl-resume')
-          : characterPieceOrNull(nextStep.lesson.character) === null
+          : pack.core.characters[nextStep.lesson.character] === undefined
             ? t('home.owl-next-topic', { topic: tContent(t, nextStep.lesson.titleKey) })
             : t('home.owl-next', { character: characterName(t, nextStep.lesson.character) });
   const replay = useNarratedText(services.narrator, bubbleText);
@@ -228,38 +220,54 @@ export function HomeScreen(): JSX.Element {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-6">
-        <HomeTile
-          icon={<JourneyIcon />}
-          label={t('home.journey-tile')}
-          bg="#DCEFE3"
-          fg="#1F5A41"
-          ledge="#163F2E"
-          onClick={goToJourney}
-        />
-        <HomeTile
-          icon={<PracticeTileIcon />}
-          label={t('home.practice-tile')}
-          bg="#FBE3D2"
-          fg="#7A3A10"
-          ledge="#55290B"
-          onClick={goToPractice}
-        />
-        <HomeTile
-          icon={<PlayTileIcon />}
-          label={t('home.play-tile')}
-          bg="#FBE3D2"
-          fg="#7A3A10"
-          ledge="#55290B"
-          onClick={goToPlay}
-        />
-        <HomeTile
-          icon={<DenTileIcon />}
-          label={t('home.den-tile')}
-          bg="#EFE4F7"
-          fg="#4B3A63"
-          ledge="#352945"
-          onClick={goToDen}
-        />
+        {[
+          {
+            id: 'journey',
+            order: 1,
+            icon: <JourneyIcon />,
+            label: t('home.journey-tile'),
+            colors: { bg: '#DCEFE3', fg: '#1F5A41', ledge: '#163F2E' },
+            onClick: goToJourney,
+          },
+          {
+            id: 'practice',
+            order: 2,
+            icon: <PracticeTileIcon />,
+            label: t('home.practice-tile'),
+            colors: { bg: '#FBE3D2', fg: '#7A3A10', ledge: '#55290B' },
+            onClick: goToPractice,
+          },
+          ...(pack.homeTiles ?? []).map((tile) => ({
+            id: tile.id,
+            order: tile.order,
+            icon: <tile.Icon />,
+            label: tContent(t, tile.labelKey),
+            colors: tile.colors,
+            onClick: () => {
+              void navigate({ name: tile.route });
+            },
+          })),
+          {
+            id: 'den',
+            order: 4,
+            icon: <DenTileIcon />,
+            label: t('home.den-tile'),
+            colors: { bg: '#EFE4F7', fg: '#4B3A63', ledge: '#352945' },
+            onClick: goToDen,
+          },
+        ]
+          .sort((a, b) => a.order - b.order)
+          .map((tile) => (
+            <HomeTile
+              key={tile.id}
+              icon={tile.icon}
+              label={tile.label}
+              bg={tile.colors.bg}
+              fg={tile.colors.fg}
+              ledge={tile.colors.ledge}
+              onClick={tile.onClick}
+            />
+          ))}
       </div>
 
       <p className="min-h-[1.75rem] text-center text-base text-go">
