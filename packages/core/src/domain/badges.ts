@@ -1,4 +1,5 @@
 import type { StoredRecord } from './profile.ts';
+import type { GameRecord } from './progress.ts';
 
 /** Badge catalogue category. */
 export type BadgeCategory = 'milestone' | 'skill' | 'play' | 'habit';
@@ -65,8 +66,10 @@ export interface EarnedBadge extends StoredRecord {
   readonly seen: boolean;
 }
 
-/** Every fact the badge engine reads, derived from stored profile data + content (`app/rewards.ts`
- * builds this) — the engine itself never reads progress/attempts/game records directly. */
+/** Every fact the badge engine's own 7 generic condition types read, derived from stored profile
+ * data + content (`app/rewards.ts` builds this) — the engine itself never reads
+ * progress/attempts/game records directly. The other 3 types (`game-win`/`game-event`/
+ * `game-played`) read the subject's own facts instead (`SubjectCore.rewards`). */
 export interface BadgeFacts {
   /** Mastered worlds/tracks, as `'world:<id>'` / `'track:<id>'`. */
   readonly masteredScopes: ReadonlySet<string>;
@@ -79,14 +82,6 @@ export interface BadgeFacts {
   readonly conceptCorrectInARow: Readonly<Record<string, number>>;
   /** Current hint-free-in-a-row streak per concept id. */
   readonly conceptNoHintsInARow: Readonly<Record<string, number>>;
-  /** Win counts keyed like `BadgeCondition.opponent`: `'any'`, `'computer:<n>'`, a mini-game id. */
-  readonly gameWins: Readonly<Record<string, number>>;
-  /** Wins where the kid's queen was never captured. */
-  readonly queenKeptWins: number;
-  /** Promotion move count / games-with-a-castle count, across all non-abandoned games. */
-  readonly gameEvents: Readonly<{ promotion: number; castling: number }>;
-  /** Games played vs a friend (`opponent` starting `profile:`/`guest`). */
-  readonly localGamesPlayed: number;
   /** Today's streak, after folding in today's activity. */
   readonly streakCurrent: number;
   readonly warmupsCompleted: number;
@@ -94,11 +89,28 @@ export interface BadgeFacts {
   readonly comebackCount: number;
 }
 
+/** A subject's own badge-condition delegate (`SubjectCore.rewards.conditionValue`): the fact value
+ * for a condition type the engine's own 7 don't cover, or `undefined` for one of those 7. */
+/** Method syntax deliberate (bivariant parameter checking, same reason as `ExerciseKind`/
+ * `MiniGameMode`): lets a subject's precise `SubjectRewards<ChessRewardFacts>` widen to
+ * `SubjectRewards<unknown>` with no cast. */
+export interface SubjectRewards<F> {
+  facts(records: readonly GameRecord[]): F;
+  conditionValue(condition: BadgeCondition, facts: F): number | undefined;
+}
+
 /** Tier names in threshold order, sliced to how many thresholds a condition actually has. */
 const TIER_NAMES: readonly BadgeTier[] = ['bronze', 'silver', 'gold'];
 
-/** The single number `condition.type` is measured against, read off `facts`. */
-function factValue(condition: BadgeCondition, facts: BadgeFacts): number {
+/** The single number `condition.type` is measured against: one of the engine's own 7 generic types
+ * read off `facts`, or one of a subject's own 3 (`subject.conditionValue(condition, subjectFacts)`,
+ * `0` with no subject rewards wired up or no subject facts given). */
+function factValue<F>(
+  condition: BadgeCondition,
+  facts: BadgeFacts,
+  subject?: SubjectRewards<F>,
+  subjectFacts?: F,
+): number {
   switch (condition.type) {
     case 'mastered':
       return condition.scope !== undefined && facts.masteredScopes.has(condition.scope) ? 1 : 0;
@@ -112,20 +124,17 @@ function factValue(condition: BadgeCondition, facts: BadgeFacts): number {
       if (condition.noHints) return facts.conceptNoHintsInARow[concept] ?? 0;
       return facts.conceptCorrectTotal[concept] ?? 0;
     }
-    case 'game-win':
-      return condition.extra === 'queen-kept'
-        ? facts.queenKeptWins
-        : (facts.gameWins[condition.opponent ?? 'any'] ?? 0);
-    case 'game-event':
-      return facts.gameEvents[condition.event ?? 'promotion'];
-    case 'game-played':
-      return facts.localGamesPlayed;
     case 'streak-days':
       return facts.streakCurrent;
     case 'warmups':
       return facts.warmupsCompleted;
     case 'comeback':
       return facts.comebackCount;
+    case 'game-win':
+    case 'game-event':
+    case 'game-played':
+      if (subject === undefined || subjectFacts === undefined) return 0;
+      return subject.conditionValue(condition, subjectFacts) ?? 0;
   }
 }
 
@@ -142,17 +151,20 @@ function earnedKey(badgeId: string, tier: BadgeTier | undefined): string {
 
 /** Pure badge engine: for every `defs` entry, compares its current fact value against each of its
  * `thresholds` and returns every tier newly crossed not already in `earned`. Badges never lost:
- * this only ever adds. */
-export function evaluateBadges(
+ * this only ever adds. `subject`/`subjectFacts` are the subject's own `game-win`/`game-event`/
+ * `game-played` delegate (`SubjectCore.rewards`); omitted, those 3 types never earn. */
+export function evaluateBadges<F = unknown>(
   defs: readonly BadgeDef[],
   facts: BadgeFacts,
   earned: readonly EarnedBadge[],
+  subject?: SubjectRewards<F>,
+  subjectFacts?: F,
 ): readonly NewlyEarnedBadge[] {
   const alreadyEarned = new Set(earned.map((entry) => earnedKey(entry.badgeId, entry.tier)));
   const newlyEarned: NewlyEarnedBadge[] = [];
 
   for (const def of defs) {
-    const value = factValue(def.condition, facts);
+    const value = factValue(def.condition, facts, subject, subjectFacts);
     const thresholds = def.condition.thresholds;
     const tiered = thresholds.length > 1;
     thresholds.forEach((threshold, index) => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import type { ExerciseDef, Lesson } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core/chess';
+import type { ExerciseDef } from '@chess-kids/core/chess';
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';

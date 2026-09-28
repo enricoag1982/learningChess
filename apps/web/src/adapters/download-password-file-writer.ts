@@ -1,9 +1,5 @@
 import type { PasswordFileWriter } from '@chess-kids/core';
 
-const FILE_NAME = 'chess-for-kids-parent-code.txt';
-/** app-structure.md §2: web keeps the password in the app; this file is only the parent's copy. */
-const LOCATION = `Downloads/${FILE_NAME}`;
-
 function fileText(password: string): string {
   return `Chess for Kids — parent code: ${password}\nKeep this file. The app asks for this code before the grown-ups area.\n`;
 }
@@ -22,12 +18,15 @@ function triggerDownload(filename: string, text: string): void {
 }
 
 /** `PasswordFileWriter` for the web: browsers cannot write to a fixed path, so this downloads a
- * plain-text copy of the password to Downloads instead (app-structure.md §2). */
-export function createDownloadPasswordFileWriter(): PasswordFileWriter {
+ * plain-text copy of the password to Downloads instead (app-structure.md §2). `filePrefix` is
+ * `AppConfig.parentCodeFilePrefix`. */
+export function createDownloadPasswordFileWriter(filePrefix: string): PasswordFileWriter {
+  const fileName = `${filePrefix}.txt`;
+  const location = `Downloads/${fileName}`;
   return {
     write(password: string): Promise<{ location: string }> {
-      triggerDownload(FILE_NAME, fileText(password));
-      return Promise.resolve({ location: LOCATION });
+      triggerDownload(fileName, fileText(password));
+      return Promise.resolve({ location });
     },
   };
 }

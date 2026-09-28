@@ -1,5 +1,5 @@
 import type { JSX, ReactNode } from 'react';
-import type { ExerciseType } from '@chess-kids/core';
+import type { ExerciseType } from '@chess-kids/core/chess';
 import { GameLayout } from '../ui/lesson/GameLayout.tsx';
 import type { PlayAreaProps } from './kind-ui.ts';
 import { kindUiOf } from './ui-registry.ts';

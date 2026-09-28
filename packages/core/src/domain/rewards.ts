@@ -1,41 +1,31 @@
-import type { PieceType } from './chess/types.ts';
 import { currentRank } from './journey.ts';
 import type { RankDef, TracksCatalog } from './journey.ts';
 import type { Lesson } from './lesson.ts';
 import { lessonStatus } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
+import type { SubjectCore } from './subject.ts';
 
-/** The fixed World-2 piece-lesson characters, in catalogue order. */
-const ANIMAL_FRIEND_CHARACTERS: readonly {
-  readonly character: string;
-  readonly piece: PieceType;
-}[] = [
-  { character: 'rhino', piece: 'r' },
-  { character: 'elephant', piece: 'b' },
-  { character: 'lioness', piece: 'q' },
-  { character: 'lion', piece: 'k' },
-  { character: 'horse', piece: 'n' },
-  { character: 'caterpillar', piece: 'p' },
-];
-
-/** One animal friend, earned once its piece lesson is complete. */
+/** One animal friend, earned once its character's lesson is done. `topicKey` resolves through
+ * `t()` as-is (chess: `piece.r` etc. — `SubjectCore.characters`). */
 export interface AnimalFriend {
   readonly character: string;
-  readonly piece: PieceType;
+  readonly topicKey: string;
   readonly lessonId: string;
   readonly earned: boolean;
 }
 
-/** The fixed World-2 animal friends (Rhino .. Caterpillar), each tied to the earliest lesson that
- * teaches its character. A character with no authored lesson yet is left out. */
+/** The subject's animal friends (chess: Rhino .. Caterpillar), each tied to the earliest lesson
+ * that teaches its character, in `characters`' own key order. A character with no authored lesson
+ * yet is left out. */
 export function animalFriends(
   lessons: readonly Lesson[],
   progresses: readonly LessonProgress[],
+  characters: SubjectCore['characters'],
 ): readonly AnimalFriend[] {
   const progressByLesson = new Map(progresses.map((progress) => [progress.lessonId, progress]));
   const friends: AnimalFriend[] = [];
 
-  for (const { character, piece } of ANIMAL_FRIEND_CHARACTERS) {
+  for (const [character, { topicKey }] of Object.entries(characters)) {
     const lesson = lessons
       .filter((candidate) => candidate.character === character)
       .sort((a, b) => a.order - b.order)[0];
@@ -43,7 +33,7 @@ export function animalFriends(
     const status = lessonStatus(lesson, progressByLesson.get(lesson.id));
     friends.push({
       character,
-      piece,
+      topicKey,
       lessonId: lesson.id,
       earned: status === 'complete' || status === 'mastered',
     });

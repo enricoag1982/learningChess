@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./chess": "./src/chess.ts",
     "./backup": "./src/app/backup.ts",
     "./merge": "./src/app/merge.ts",
     "./testing": "./src/testing/index.ts"

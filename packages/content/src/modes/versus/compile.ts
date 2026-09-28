@@ -1,4 +1,5 @@
-import { game, type Color, type Piece, type Square, type VersusMiniGame } from '@chess-kids/core';
+import type { VersusMiniGame } from '@chess-kids/core/chess';
+import { game, type Color, type Piece, type Square } from '@chess-kids/core/chess';
 import type { z } from 'zod';
 import type { MiniGameCompileContext } from '../mode-content.ts';
 import type { schema, WinConditionYaml } from './schema.ts';

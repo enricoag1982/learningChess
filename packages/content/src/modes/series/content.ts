@@ -1,4 +1,4 @@
-import type { SeriesMiniGame } from '@chess-kids/core';
+import type { SeriesMiniGame } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { exerciseSchema } from '../../kinds/index.ts';
 import { miniGameCommonFields } from '../common.ts';

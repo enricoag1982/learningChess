@@ -1,4 +1,4 @@
-import type { bot } from '@chess-kids/core';
+import type { bot } from '@chess-kids/core/chess';
 import raw from '@chess-kids/content/bot-book.json';
 
 /** The compiled opening book, validated at content build time, typed as `domain/bot`'s `BotBook`

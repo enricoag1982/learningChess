@@ -5,9 +5,6 @@ import {
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
 } from '../testing/index.ts';
-import type { ExerciseState } from './exercise/state.ts';
-import type { ExerciseDef } from './exercise/types.ts';
-import type { Lesson, MiniGame } from './lesson.ts';
 import {
   easierVariant,
   isSkippablePhase,
@@ -17,11 +14,11 @@ import {
   stepPhase,
 } from './lesson-session.ts';
 
-function makeExercise(id: string): ExerciseDef {
+function makeExercise(id: string) {
   return buildExercise({ id });
 }
 
-function makeMiniGame(id: string): MiniGame {
+function makeMiniGame(id: string) {
   return buildMiniGame({
     id,
     par: 2,
@@ -30,7 +27,7 @@ function makeMiniGame(id: string): MiniGame {
   });
 }
 
-function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
+function makeLesson(overrides: Partial<ReturnType<typeof buildLesson>> = {}) {
   return buildLesson({
     guided: [makeExercise('rook-g1'), makeExercise('rook-g2')],
     exercises: [makeExercise('rook-01'), makeExercise('rook-02'), makeExercise('rook-03')],
@@ -134,13 +131,13 @@ describe('phaseEndIndex', () => {
   });
 });
 
-function exerciseState(def: ExerciseDef, overrides: Partial<ExerciseState> = {}): ExerciseState {
+function exerciseState(
+  def: ReturnType<typeof buildExercise>,
+  overrides: Partial<Parameters<typeof shouldOfferEasier>[0]> = {},
+): Parameters<typeof shouldOfferEasier>[0] {
   return {
     def,
-    position: def.position,
-    history: [],
     moves: 0,
-    selected: [],
     errors: 0,
     hintLevel: 0,
     solved: false,

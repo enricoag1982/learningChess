@@ -2,8 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
 import {
@@ -31,11 +29,15 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-05T12:00:00.000Z'); // a Monday
 
-function makeExercise(id: string, concept = 'rook-move'): ExerciseDef {
+function makeExercise(id: string, concept = 'rook-move') {
   return buildExercise({ id, concept });
 }
 
-function makeLesson(id: string, world: string, exercises: readonly ExerciseDef[]): Lesson {
+function makeLesson(
+  id: string,
+  world: string,
+  exercises: readonly ReturnType<typeof buildExercise>[],
+) {
   return buildLesson({ id, world, exercises: [...exercises] });
 }
 
@@ -54,7 +56,10 @@ function makeRewardsRepo(initialEarned: readonly EarnedBadge[] = []): RewardsRep
   return buildRewardsRepo({ badges: initialEarned });
 }
 
-function makeContent(lessons: readonly Lesson[], badges: readonly BadgeDef[] = []): ContentSource {
+function makeContent(
+  lessons: readonly ReturnType<typeof buildLesson>[],
+  badges: readonly BadgeDef[] = [],
+): ContentSource {
   return makeContentSource({ lessons, badges, catalog: CATALOG });
 }
 
@@ -250,146 +255,8 @@ describe('buildBadgeFacts', () => {
     expect(facts.conceptNoHintsInARow['hanging-piece']).toBe(1);
   });
 
-  it('splits game wins: "any"/opponent only from full games, mini-game wins under their own id', async () => {
-    const records: GameRecord[] = [
-      {
-        id: 'g1',
-        profileId: 'p1',
-        game: 'full',
-        opponent: 'computer:1',
-        result: 'win',
-        reason: 'checkmate',
-        moves: [],
-        createdAt: NOW.toISOString(),
-        updatedAt: NOW.toISOString(),
-      },
-      {
-        id: 'g2',
-        profileId: 'p1',
-        game: 'pawn-wars',
-        opponent: 'computer:1',
-        result: 'win',
-        reason: 'capture-all',
-        moves: [],
-        createdAt: NOW.toISOString(),
-        updatedAt: NOW.toISOString(),
-      },
-      {
-        id: 'g3',
-        profileId: 'p1',
-        game: 'full',
-        opponent: 'computer:2',
-        result: 'abandoned',
-        reason: 'left',
-        moves: [],
-        createdAt: NOW.toISOString(),
-        updatedAt: NOW.toISOString(),
-      },
-    ];
-    const deps = baseDeps({ gameRecords: makeGameRecordRepo(records) });
-    const { loadJourney } = await import('./journey.ts');
-    const journey = await loadJourney(deps, 'p1');
-    const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
-
-    expect(facts.gameWins.any).toBe(1);
-    expect(facts.gameWins['computer:1']).toBe(1);
-    expect(facts.gameWins['computer:2']).toBeUndefined();
-    expect(facts.gameWins['pawn-wars']).toBe(1);
-  });
-
-  it('counts promotion moves and castled games from SAN, ignoring abandoned games', async () => {
-    const records: GameRecord[] = [
-      {
-        id: 'g1',
-        profileId: 'p1',
-        game: 'full',
-        opponent: 'computer:1',
-        result: 'win',
-        reason: 'checkmate',
-        moves: ['e4', 'e5', 'O-O', 'a6', 'b8=Q'],
-        createdAt: NOW.toISOString(),
-        updatedAt: NOW.toISOString(),
-      },
-      {
-        id: 'g2',
-        profileId: 'p1',
-        game: 'full',
-        opponent: 'computer:1',
-        result: 'abandoned',
-        reason: 'left',
-        moves: ['O-O-O', 'a8=Q'],
-        createdAt: NOW.toISOString(),
-        updatedAt: NOW.toISOString(),
-      },
-    ];
-    const deps = baseDeps({ gameRecords: makeGameRecordRepo(records) });
-    const { loadJourney } = await import('./journey.ts');
-    const journey = await loadJourney(deps, 'p1');
-    const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
-
-    expect(facts.gameEvents.promotion).toBe(1);
-    expect(facts.gameEvents.castling).toBe(1);
-  });
-
-  it("detects the kid keeping the queen (Scholar's mate: Black never gets to capture it)", async () => {
-    const kept: GameRecord = {
-      id: 'g1',
-      profileId: 'p1',
-      game: 'full',
-      opponent: 'computer:1',
-      result: 'win',
-      reason: 'checkmate',
-      moves: ['e4', 'e5', 'Bc4', 'Nc6', 'Qh5', 'Nf6', 'Qxf7'],
-      createdAt: NOW.toISOString(),
-      updatedAt: NOW.toISOString(),
-    };
-    const deps = baseDeps({ gameRecords: makeGameRecordRepo([kept]) });
-    const { loadJourney } = await import('./journey.ts');
-    const journey = await loadJourney(deps, 'p1');
-    const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
-    expect(facts.queenKeptWins).toBe(1);
-  });
-
-  it('detects the kid losing the queen (Black captures it with Nxe5)', async () => {
-    const lost: GameRecord = {
-      id: 'g2',
-      profileId: 'p1',
-      game: 'full',
-      opponent: 'computer:1',
-      result: 'win',
-      reason: 'checkmate',
-      moves: ['e4', 'e5', 'Qh5', 'Nc6', 'Qxe5', 'Nxe5'],
-      createdAt: NOW.toISOString(),
-      updatedAt: NOW.toISOString(),
-    };
-    const deps = baseDeps({ gameRecords: makeGameRecordRepo([lost]) });
-    const { loadJourney } = await import('./journey.ts');
-    const journey = await loadJourney(deps, 'p1');
-    const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
-    expect(facts.queenKeptWins).toBe(0);
-  });
-
-  it("replays from the profile's own colour: Black keeps its queen when White loses one", async () => {
-    // Friend game (M4.3): the profile played Black and won; White's queen was captured (by Black),
-    // Black's never was.
-    const blackWin: GameRecord = {
-      id: 'g3',
-      profileId: 'p1',
-      game: 'full',
-      opponent: 'profile:p2',
-      result: 'win',
-      reason: 'checkmate',
-      moves: ['e4', 'e5', 'Qh5', 'Nc6', 'Qxe5+', 'Nxe5'],
-      color: 'b',
-      createdAt: NOW.toISOString(),
-      updatedAt: NOW.toISOString(),
-    };
-    const deps = baseDeps({ gameRecords: makeGameRecordRepo([blackWin]) });
-    const { loadJourney } = await import('./journey.ts');
-    const journey = await loadJourney(deps, 'p1');
-    const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
-    expect(facts.queenKeptWins).toBe(1);
-  });
+  // Game-record-derived facts (wins, promotion/castling, queen-kept) are covered in
+  // domain/chess/facts/rewards.test.ts; evaluateAndRecordBadges's own test below covers the wiring.
 
   it('counts warm-up-sourced review attempts, not practice-sourced ones', async () => {
     const attempts: Attempt[] = [
@@ -456,6 +323,35 @@ describe('evaluateAndRecordBadges', () => {
     const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     expect(await evaluateAndRecordBadges(deps, 'p1', journey, 0, NOW)).toEqual([]);
+  });
+
+  it('earns a game-win badge via deps.subject.rewards (chess facts, not the generic engine)', async () => {
+    const badge: BadgeDef = {
+      id: 'mouse-tamer',
+      category: 'play',
+      nameKey: 'rewards:badges.mouse-tamer.name',
+      conditionKey: 'rewards:badges.mouse-tamer.condition',
+      condition: { type: 'game-win', opponent: 'computer:1', thresholds: [1] },
+    };
+    const record: GameRecord = {
+      id: 'g1',
+      profileId: 'p1',
+      game: 'full',
+      opponent: 'computer:1',
+      result: 'win',
+      reason: 'checkmate',
+      moves: [],
+      createdAt: NOW.toISOString(),
+      updatedAt: NOW.toISOString(),
+    };
+    const deps = baseDeps({
+      content: makeContent([], [badge]),
+      gameRecords: makeGameRecordRepo([record]),
+    });
+    const { loadJourney } = await import('./journey.ts');
+    const journey = await loadJourney(deps, 'p1');
+    const earned = await evaluateAndRecordBadges(deps, 'p1', journey, 0, NOW);
+    expect(earned.map((b) => b.badgeId)).toEqual(['mouse-tamer']);
   });
 });
 

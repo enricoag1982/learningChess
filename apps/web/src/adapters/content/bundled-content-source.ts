@@ -1,4 +1,5 @@
-import type { BadgeDef, CompiledContent, ContentSource, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, ContentSource, TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import bundled from '@chess-kids/content/content.json';
 import bundledTracks from '@chess-kids/content/tracks.json';
 import bundledBadges from '@chess-kids/content/badges.json';

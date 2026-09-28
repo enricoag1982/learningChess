@@ -9,7 +9,8 @@ import type {
   RankLadderEntry,
   TracksCatalog,
 } from '@chess-kids/core';
-import { animalFriends, friendGamesPlayed, rankLadder, totalStars } from '@chess-kids/core';
+import { animalFriends, rankLadder, totalStars } from '@chess-kids/core';
+import { CHESS_CHARACTERS, friendGamesPlayed } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';
 import { BadgeIcon } from './BadgeIcon.tsx';
@@ -100,7 +101,7 @@ export function DenScreen(): JSX.Element {
     return <BlankScreen />;
   }
 
-  const friends = animalFriends(journey.lessons, progress);
+  const friends = animalFriends(journey.lessons, progress, CHESS_CHARACTERS);
   const ladder = rankLadder(journey.catalog, journey.lessons, progress);
   const stars = totalStars(progress);
   const gamesWon = gameRecords.filter((record) => record.result === 'win').length;
@@ -205,7 +206,7 @@ export function DenScreen(): JSX.Element {
           <ul className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
             {friends.map((friend) => {
               const characterLabel = tContent(t, `characters:${friend.character}.name`);
-              const pieceLabel = t(`piece.${friend.piece}`);
+              const pieceLabel = tContent(t, friend.topicKey);
               const name = friend.earned
                 ? t('den.friend-name', { character: characterLabel })
                 : t('den.friend-name-locked', { character: characterLabel, piece: pieceLabel });

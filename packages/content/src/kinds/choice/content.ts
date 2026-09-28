@@ -1,4 +1,9 @@
-import { PIECE_BY_LETTER, type ChoiceDef, type ChoiceOption, type Piece } from '@chess-kids/core';
+import {
+  PIECE_BY_LETTER,
+  type ChoiceDef,
+  type ChoiceOption,
+  type Piece,
+} from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { keySchema } from '../../schema.ts';
 import { exerciseCommonFields, textRefSchema } from '../common.ts';

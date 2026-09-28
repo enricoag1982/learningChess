@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import type { ExerciseDef } from './exercise/types.ts';
 import { makeExercise as buildExercise, makeLesson } from '../testing/index.ts';
 import { seededRandom } from './random.ts';
 import type { ConceptPoolEntry, ConceptStats } from './review.ts';
@@ -17,7 +16,7 @@ import {
   pickWarmUp,
 } from './review.ts';
 
-function makeExercise(id: string, concept: string): ExerciseDef {
+function makeExercise(id: string, concept: string) {
   return buildExercise({ id, concept });
 }
 

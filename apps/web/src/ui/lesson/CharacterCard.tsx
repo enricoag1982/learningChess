@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { PieceType } from '@chess-kids/core';
+import type { PieceType } from '@chess-kids/core/chess';
 import { characterName } from '../../content-text.ts';
 import { characterColor, characterPieceOrNull } from '../art/character-meta.ts';
 import { CharacterIcon } from '../art/characters.tsx';

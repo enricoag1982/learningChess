@@ -4,7 +4,7 @@ import {
   pieceValue,
   type ChoiceDef,
   type Position,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { classifyTrade } from '../common.ts';
 
 /** A `choice` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */

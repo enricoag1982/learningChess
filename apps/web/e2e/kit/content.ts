@@ -1,4 +1,5 @@
-import type { CompiledContent, Lesson, MiniGame, TracksCatalog, World } from '@chess-kids/core';
+import type { TracksCatalog, World } from '@chess-kids/core';
+import type { CompiledContent, Lesson, MiniGame } from '@chess-kids/core/chess';
 import {
   findWorld as coreFindWorld,
   mainTrackLessons,

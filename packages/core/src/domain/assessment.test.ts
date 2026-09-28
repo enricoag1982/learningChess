@@ -11,10 +11,9 @@ import {
   scoreTestOut,
 } from './assessment.ts';
 import type { TracksCatalog, Track, World } from './journey.ts';
-import type { Lesson } from './lesson.ts';
 import { seededRandom } from './random.ts';
 
-function makeLesson(id: string, world: string, order: number, exerciseCount: number): Lesson {
+function makeLesson(id: string, world: string, order: number, exerciseCount: number) {
   return buildLesson({
     id,
     world,

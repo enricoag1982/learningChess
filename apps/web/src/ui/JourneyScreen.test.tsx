@@ -1,14 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { act, fireEvent, screen } from '@testing-library/react';
 import { getLessonProgress } from '@chess-kids/core';
-import type {
-  Lesson,
-  MiniGame,
-  MiniGameProgress,
-  Track,
-  TracksCatalog,
-  World,
-} from '@chess-kids/core';
+import type { MiniGameProgress, Track, TracksCatalog, World } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import { makeContentSource } from '@chess-kids/core/testing';
 import { fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';

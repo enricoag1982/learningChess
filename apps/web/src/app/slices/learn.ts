@@ -1,9 +1,4 @@
 import {
-  type AssessmentScope,
-  type AssessmentScore,
-  type ConceptTask,
-  type Lesson,
-  type ParentUnlockTarget,
   getLessonProgress,
   lessonStatus,
   loadPracticeTasks,
@@ -15,7 +10,11 @@ import {
   scorePlacementWorld,
   scoreTestOut,
   submitAssessment,
+  type AssessmentScope,
+  type AssessmentScore,
+  type ParentUnlockTarget,
 } from '@chess-kids/core';
+import type { ConceptTask, Lesson } from '@chess-kids/core/chess';
 import type { Route } from '../routes.ts';
 import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 

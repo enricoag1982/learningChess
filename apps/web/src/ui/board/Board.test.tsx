@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { chessJsRules, parseDiagram, toFen } from '@chess-kids/core';
-import type { Move } from '@chess-kids/core';
+import { chessJsRules, parseDiagram, toFen } from '@chess-kids/core/chess';
+import type { Move } from '@chess-kids/core/chess';
 import { boardCell as cell } from '../../testing/board.ts';
 import { Board } from './Board.tsx';
 

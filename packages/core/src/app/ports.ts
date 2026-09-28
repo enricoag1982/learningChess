@@ -1,9 +1,7 @@
 import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
-import type { Move } from '../domain/chess/rules.ts';
-import type { GameState } from '../domain/game/types.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
-import type { Lesson, MiniGame } from '../domain/lesson.ts';
+import type { Lesson, MiniGame } from '../chess.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { ProfileSettings } from '../domain/profile-settings.ts';
@@ -123,7 +121,9 @@ export interface Narrator {
   cancel(): void;
 }
 
-/** Loads compiled lesson content (built from `packages/content`). */
+/** Loads compiled lesson content (built from `packages/content`). Concretely typed, not generic
+ * over the subject's exercise def: the UI reads real board/exercise fields straight off it (e.g.
+ * `LessonScreen`), so a base type here would only push a cast onto every one of those call sites. */
 export interface ContentSource {
   lessons(): readonly Lesson[];
   lesson(id: string): Lesson | undefined;
@@ -144,12 +144,6 @@ export interface Clock {
 /** Randomness in [0, 1); seeded in tests. */
 export interface Random {
   next(): number;
-}
-
-/** The computer opponent for `versus` mini-games. Runs in a Web Worker so search never blocks the
- * UI thread; same position + level + seed always replies with the same move (deterministic `Random`). */
-export interface BotPlayer {
-  chooseMove(state: GameState, level: number, seed: number): Promise<Move | null>;
 }
 
 /** Writes a backup file somewhere the parent can find again — web downloads it, a Capacitor adapter

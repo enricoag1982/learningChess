@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import type { ExerciseDef, Lesson, MiniGame } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core/chess';
+import type { ExerciseDef } from '@chess-kids/core/chess';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import { BossStep } from '../modes/ui-registry.ts';

@@ -1,7 +1,7 @@
 // The exercise-kind content abstraction (schema + compile + verify): a uniform interface so
 // `lesson-load.ts` dispatches through a registry (`kinds/index.ts`) — the content counterpart of
 // core's `ExerciseKind`.
-import type { ExerciseDef, Position, Square } from '@chess-kids/core';
+import type { ExerciseDef, Position, Square } from '@chess-kids/core/chess';
 import type { z } from 'zod';
 import { compilePosition, type PositionYaml } from './common.ts';
 

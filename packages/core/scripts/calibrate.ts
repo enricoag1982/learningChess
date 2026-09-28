@@ -1,4 +1,4 @@
-import { bot, chessJsRules, game } from '../src/index.ts';
+import { bot, chessJsRules, game } from '../src/chess.ts';
 import { parseFen } from '../src/domain/chess/fen.ts';
 import type { GameRulesDef } from '../src/domain/game/types.ts';
 import type { Color } from '../src/domain/chess/types.ts';

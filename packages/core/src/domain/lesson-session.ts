@@ -1,14 +1,18 @@
-import type { ExerciseState } from './exercise/state.ts';
-import type { ExerciseDef } from './exercise/types.ts';
-import type { Lesson, MiniGame } from './lesson.ts';
+import type { Lesson } from './lesson.ts';
+import type { ExerciseDefBase, ExerciseStateBase, MiniGameBase } from './subject.ts';
 
-/** One screen of a lesson session, in play order. */
-export type LessonStep =
+/** One screen of a lesson session, in play order — generic in the subject's own exercise def (`E`)
+ * and mini-game (`M`) so a caller with concrete types (chess: `ExerciseDef`, `MiniGame`) gets them
+ * back on `exercise`/`game`, inferred from `lessonSteps`'s own arguments. */
+export type LessonStep<
+  E extends ExerciseDefBase = ExerciseDefBase,
+  M extends MiniGameBase = MiniGameBase,
+> =
   | { readonly kind: 'story' }
   | { readonly kind: 'demo' }
-  | { readonly kind: 'guided'; readonly index: number; readonly exercise: ExerciseDef }
-  | { readonly kind: 'exercise'; readonly index: number; readonly exercise: ExerciseDef }
-  | { readonly kind: 'boss'; readonly game: MiniGame }
+  | { readonly kind: 'guided'; readonly index: number; readonly exercise: E }
+  | { readonly kind: 'exercise'; readonly index: number; readonly exercise: E }
+  | { readonly kind: 'boss'; readonly game: M }
   | { readonly kind: 'complete' };
 
 /** UI phase grouping for a step; guided tries and the demo are distinct from scored exercises. */
@@ -24,20 +28,23 @@ export function isSkippablePhase(phase: LessonPhase | null): phase is SkippableP
 
 /** Ordered steps for one lesson session: story, demo, guided tries, scored exercises, the boss
  * mini-game (only if `lesson.boss` resolves in `minigames`), then a final `complete` step. */
-export function lessonSteps(lesson: Lesson, minigames: readonly MiniGame[]): LessonStep[] {
-  const guidedSteps: LessonStep[] = lesson.guided.map((exercise, index) => ({
+export function lessonSteps<E extends ExerciseDefBase, M extends MiniGameBase>(
+  lesson: Lesson<E>,
+  minigames: readonly M[],
+): LessonStep<E, M>[] {
+  const guidedSteps: LessonStep<E, M>[] = lesson.guided.map((exercise, index) => ({
     kind: 'guided',
     index,
     exercise,
   }));
-  const exerciseSteps: LessonStep[] = lesson.exercises.map((exercise, index) => ({
+  const exerciseSteps: LessonStep<E, M>[] = lesson.exercises.map((exercise, index) => ({
     kind: 'exercise',
     index,
     exercise,
   }));
   const boss =
     lesson.boss === undefined ? undefined : minigames.find((game) => game.id === lesson.boss);
-  const bossSteps: LessonStep[] = boss === undefined ? [] : [{ kind: 'boss', game: boss }];
+  const bossSteps: LessonStep<E, M>[] = boss === undefined ? [] : [{ kind: 'boss', game: boss }];
 
   return [
     { kind: 'story' },
@@ -56,7 +63,10 @@ export const EASIER_AFTER_ERRORS = 2;
 export const EASIER_VARIANT_STARS = 1;
 
 /** `exercise`'s easier variant from `lesson.variants`, if it names one that exists. */
-export function easierVariant(lesson: Lesson, exercise: ExerciseDef): ExerciseDef | undefined {
+export function easierVariant<E extends ExerciseDefBase>(
+  lesson: Lesson<E>,
+  exercise: E,
+): E | undefined {
   if (exercise.easier === undefined) {
     return undefined;
   }
@@ -64,7 +74,7 @@ export function easierVariant(lesson: Lesson, exercise: ExerciseDef): ExerciseDe
 }
 
 /** True once an unsolved exercise has `EASIER_AFTER_ERRORS` or more errors. */
-export function shouldOfferEasier(state: ExerciseState): boolean {
+export function shouldOfferEasier(state: ExerciseStateBase): boolean {
   return !state.solved && state.errors >= EASIER_AFTER_ERRORS;
 }
 

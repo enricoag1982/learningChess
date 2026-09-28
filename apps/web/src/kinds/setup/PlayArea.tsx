@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Piece, Square } from '@chess-kids/core';
-import { setupPalette } from '@chess-kids/core';
+import type { Piece, Square } from '@chess-kids/core/chess';
+import { setupPalette } from '@chess-kids/core/chess';
 import { Board } from '../../ui/board/Board.tsx';
 import { useIsStackedLayout } from '../../ui/useMediaQuery.ts';
 import { ExerciseControls } from '../ExerciseControls.tsx';

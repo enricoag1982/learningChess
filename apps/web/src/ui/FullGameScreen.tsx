@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, VersusMiniGame, VersusState } from '@chess-kids/core';
+import type { Lesson, VersusMiniGame } from '@chess-kids/core/chess';
+import type { VersusState } from '@chess-kids/core/chess';
 import {
   bot,
   parseFen,
   recordGame,
   versusGameRecordResult,
   versusGameState,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import type { BossPlaySession } from '../modes/mode-ui.ts';
 import { Step as VersusStep } from '../modes/versus/Step.tsx';
@@ -103,7 +104,7 @@ export function FullGameScreen(): JSX.Element {
       void recordGame(services.deps, {
         profileId: profile.id,
         game: 'full',
-        opponentLevel: level,
+        opponent: `computer:${String(level)}`,
         result: 'abandoned',
         reason: 'left',
         moves: versusGameState(current).history.map((move) => move.san),
@@ -125,7 +126,7 @@ export function FullGameScreen(): JSX.Element {
         recordGame(services.deps, {
           profileId: profile.id,
           game: 'full',
-          opponentLevel: level,
+          opponent: `computer:${String(level)}`,
           result,
           reason,
           moves: versusGameState(state).history.map((move) => move.san),

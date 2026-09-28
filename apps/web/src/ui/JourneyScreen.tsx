@@ -3,15 +3,13 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   Habitat,
-  Journey,
   JourneyLessonStatus,
-  Lesson,
   LessonProgress,
-  MiniGame,
   World,
   WorldBossStatus,
   WorldStatus,
 } from '@chess-kids/core';
+import type { Journey, Lesson, MiniGame } from '@chess-kids/core/chess';
 import { lessonStars, worldLessons } from '@chess-kids/core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { characterName, tContent } from '../content-text.ts';

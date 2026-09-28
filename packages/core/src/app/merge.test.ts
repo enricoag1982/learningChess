@@ -7,7 +7,6 @@ import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { LessonProgress } from '../domain/progress.ts';
 import { newEarnedBadge } from '../domain/badges.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import type { BackupFile } from './backup.ts';
 import type { BackupImporter } from './ports.ts';
 import {
@@ -26,7 +25,7 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-const L1: Lesson = buildLesson({
+const L1 = buildLesson({
   id: 'l1',
   world: 'w1',
   concept: 'l1-concept',

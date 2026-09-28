@@ -1,4 +1,4 @@
-import type { CollectStarsDef } from '@chess-kids/core';
+import type { CollectStarsDef } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { checkOptimalMoves, exerciseCommonFields } from '../common.ts';
 import type { ExerciseKindContent } from '../kind-content.ts';

@@ -4,8 +4,7 @@ import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
-import type { Lesson } from '../domain/lesson.ts';
+import type { AppConfig } from '../domain/subject.ts';
 import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
@@ -34,11 +33,19 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-function makeExercise(id: string): ExerciseDef {
+const APP: AppConfig = {
+  storagePrefix: 'chess-kids:',
+  backupAppId: 'chess-kids',
+  backupFilePrefix: 'chess-for-kids',
+  parentCodeFilePrefix: 'chess-for-kids-parent-code',
+  version: '0.0.0-test',
+};
+
+function makeExercise(id: string) {
   return buildExercise({ id, concept: `${id}-concept` });
 }
 
-const L1: Lesson = buildLesson({
+const L1 = buildLesson({
   id: 'l1',
   world: 'w1',
   concept: 'l1-concept',
@@ -127,15 +134,17 @@ describe('buildBackupFile', () => {
 
 describe('backupFileName', () => {
   it('is chess-kids-backup-<date>.json with no nickname', () => {
-    expect(backupFileName(NOW)).toBe('chess-kids-backup-2026-01-10.json');
+    expect(backupFileName(APP, NOW)).toBe('chess-kids-backup-2026-01-10.json');
   });
 
   it('slugs the nickname in for a per-child export', () => {
-    expect(backupFileName(NOW, 'Mia')).toBe('chess-kids-backup-mia-2026-01-10.json');
+    expect(backupFileName(APP, NOW, 'Mia')).toBe('chess-kids-backup-mia-2026-01-10.json');
   });
 
   it('collapses punctuation/spaces in the nickname', () => {
-    expect(backupFileName(NOW, 'Léo Jr.')).toMatch(/^chess-kids-backup-l.*o-jr-2026-01-10\.json$/);
+    expect(backupFileName(APP, NOW, 'Léo Jr.')).toMatch(
+      /^chess-kids-backup-l.*o-jr-2026-01-10\.json$/,
+    );
   });
 });
 

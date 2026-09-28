@@ -217,7 +217,7 @@ export async function importMerged(
   }
 
   const mergedFile: BackupFile = {
-    app: 'chess-kids',
+    app: deps.app.backupAppId,
     schemaVersion: localFile.schemaVersion,
     exportedAt: now.toISOString(),
     profiles,

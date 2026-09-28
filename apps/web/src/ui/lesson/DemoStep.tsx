@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, Position, Square } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core/chess';
+import type { Position, Square } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { characterName, tContent } from '../../content-text.ts';
 import { Board } from '../board/Board.tsx';

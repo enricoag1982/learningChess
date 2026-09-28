@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseFen } from '../domain/chess/fen.ts';
-import type { VersusMiniGame } from '../domain/lesson.ts';
-import type { Lesson } from '../domain/lesson.ts';
+import type { Lesson, VersusMiniGame } from '../chess.ts';
 import { newLessonProgress } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
 import {

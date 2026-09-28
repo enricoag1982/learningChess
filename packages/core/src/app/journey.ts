@@ -15,6 +15,7 @@ import {
 } from '../domain/journey.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { totalStars } from '../domain/progress.ts';
+import type { ExerciseDefBase } from '../domain/subject.ts';
 import { loadUnlocked } from './assessment.ts';
 import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
@@ -26,17 +27,23 @@ export interface JourneyWorld {
   readonly bossStatus: WorldBossStatus;
 }
 
-/** Everything the Journey screen (map, next-lesson banner, rank badge) needs for one profile. */
-export interface Journey {
+/** Everything the Journey screen (map, next-lesson banner, rank badge) needs for one profile —
+ * generic in the subject's own exercise def / demo (`E`/`Demo`) so a caller with concrete types
+ * (chess: `ExerciseDef`/`LessonDemo`) gets them back on `lessons`/`next`/`nextStep`, inferred from
+ * `loadJourney`'s own `deps.content`. */
+export interface Journey<
+  E extends ExerciseDefBase = ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+> {
   readonly catalog: TracksCatalog;
-  readonly lessons: readonly Lesson[];
+  readonly lessons: readonly Lesson<E, Demo>[];
   readonly statuses: ReadonlyMap<string, JourneyLessonStatus>;
   /** Every world across every track, in track then world order. */
   readonly worlds: readonly JourneyWorld[];
   /** Next lesson to do, ignoring any world boss (see `nextStep` for the full next-thing-to-do). */
-  readonly next: Lesson | null;
+  readonly next: Lesson<E, Demo> | null;
   /** The next thing to do: a lesson, or a world boss once its world's lessons are all done. */
-  readonly nextStep: NextStep | null;
+  readonly nextStep: NextStep<E, Demo> | null;
   readonly rank: RankDef | undefined;
   readonly totalStars: number;
 }
@@ -53,9 +60,11 @@ function requireCatalog(content: ContentSource): TracksCatalog {
 /**
  * Loads a profile's Journey: the tracks/worlds/ranks catalog, every lesson's status, the world
  * map with its derived statuses, the next lesson to do, the current rank, and total stars —
- * everything derived (domain-model.md §2 "Derived"), nothing stored.
+ * everything derived (domain-model.md §2 "Derived"), nothing stored. Inferred (not annotated)
+ * return type: preserves the subject's own concrete types, from `deps.content`, through to the
+ * caller (chess: `Journey<ExerciseDef, LessonDemo>`).
  */
-export async function loadJourney(deps: AppDeps, profileId: string): Promise<Journey> {
+export async function loadJourney(deps: AppDeps, profileId: string) {
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();
   const [progresses, miniGames, unlocked] = await Promise.all([

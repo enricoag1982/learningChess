@@ -1,10 +1,15 @@
+import { BOT_LEVELS } from '../domain/bot/levels.ts';
 import type { BotLevel } from '../domain/bot/levels.ts';
+import { isStandardStart } from '../domain/chess/facts/start.ts';
 import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
-import { versusEndReason } from '../domain/exercise/modes/versus/engine.ts';
+import { versusEndReason, versusGameState } from '../domain/exercise/modes/versus/engine.ts';
 import type { GameRecord, GameRecordResult } from '../domain/progress.ts';
+import type { MiniGameBase, MiniGameStateBase, RecordGameInput } from '../domain/subject.ts';
 import type { Journey } from './journey.ts';
 import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
+
+export type { RecordGameInput } from '../domain/subject.ts';
 
 /** Result + reason for a `GameRecord`, from a `VersusState` that has already ended. */
 export function versusGameRecordResult(state: VersusState): {
@@ -18,25 +23,43 @@ export function versusGameRecordResult(state: VersusState): {
   throw new Error('versusGameRecordResult: game is still in progress');
 }
 
-export interface RecordGameInput {
-  readonly profileId: string;
-  /** `'full'` for a full standard game, else a `versus` mini-game's content id. */
-  readonly game: string;
-  readonly opponentLevel: number;
-  readonly result: GameRecordResult;
-  readonly reason: string;
-  readonly moves: readonly string[];
+/** `GameRecord.game` for a `versus` mini-game: `'full'` when it is a full standard game (kings,
+ * standard start position), the same id the Play screen's "Full game" flow records; else its own id. */
+function gameRecordId(state: VersusState): string {
+  const { def } = state;
+  return def.rules.kings && isStandardStart(def.position) ? 'full' : def.id;
+}
+
+/** `SubjectCore.gameRecordOf`: a `versus` mini-game's `GameRecord` (`null` for `static`/`series`,
+ * which have no computer opponent to log). `state` is narrowed from `MiniGameStateBase` once
+ * `mode` says `'versus'` — same cast pattern `kinds/` uses for its own subject state. */
+export function chessGameRecordOf(
+  game: MiniGameBase,
+  state: MiniGameStateBase,
+): Omit<RecordGameInput, 'profileId'> | null {
+  if (state.mode !== 'versus') {
+    return null;
+  }
+  const versusState = state as VersusState;
+  const { result, reason } = versusGameRecordResult(versusState);
+  return {
+    game: gameRecordId(versusState),
+    opponent: `computer:${String(versusState.def.opponentLevel)}`,
+    result,
+    reason,
+    moves: versusGameState(versusState).history.map((move) => move.san),
+  };
 }
 
 /** Saves one `GameRecord`: a finished full game / versus mini-game, or a left one. */
 export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise<GameRecord> {
-  const { profileId, game, opponentLevel, result, reason, moves } = input;
+  const { profileId, game, opponent, result, reason, moves } = input;
   const now = deps.clock.now().toISOString();
   const record: GameRecord = {
     id: deps.ids.next(),
     profileId,
     game,
-    opponent: `computer:${String(opponentLevel)}`,
+    opponent,
     result,
     reason,
     moves,
@@ -74,7 +97,7 @@ export interface ComputerLevelStatus {
   readonly games: number;
 }
 
-const LEVEL_NAMES: readonly BotLevel['name'][] = ['mouse', 'rabbit', 'fox', 'wolf', 'bear'];
+const LEVEL_NAMES: readonly BotLevel['name'][] = BOT_LEVELS.map((level) => level.name);
 
 /** Full games ("game: 'full'", not mini-games) played vs `level`, excluding abandoned ones. */
 function fullGameTally(

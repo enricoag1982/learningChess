@@ -5,8 +5,6 @@ import {
   makeLesson as buildLesson,
   makeProgress,
 } from '../testing/index.ts';
-import type { ExerciseDef } from './exercise/types.ts';
-import type { Lesson } from './lesson.ts';
 import {
   lessonStars,
   lessonStatus,
@@ -19,12 +17,12 @@ import {
   withSkippedPhase,
 } from './progress.ts';
 
-function makeExercise(id: string): ExerciseDef {
+function makeExercise(id: string) {
   return buildExercise({ id });
 }
 
 /** 3 exercises (max 9 stars; 80% of 9 = 7.2), like every other copy this replaces. */
-function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
+function makeLesson(overrides: Partial<ReturnType<typeof buildLesson>> = {}) {
   return buildLesson({
     exercises: [makeExercise('rook-01'), makeExercise('rook-02'), makeExercise('rook-03')],
     ...overrides,

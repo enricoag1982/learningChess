@@ -6,8 +6,20 @@ import type { Lesson } from './lesson.ts';
 import { newLessonProgress, recordExerciseStars } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 import { animalFriends, rankLadder } from './rewards.ts';
+import type { SubjectCore } from './subject.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
+
+/** Same shape/order as chess's own `CHESS_CHARACTERS` (`chess-core.ts`) — kept local so this
+ * platform-bound test never imports chess-bound code. */
+const CHARACTERS: SubjectCore['characters'] = {
+  rhino: { topicKey: 'piece.r' },
+  elephant: { topicKey: 'piece.b' },
+  lioness: { topicKey: 'piece.q' },
+  lion: { topicKey: 'piece.k' },
+  horse: { topicKey: 'piece.n' },
+  caterpillar: { topicKey: 'piece.p' },
+};
 
 function makeLesson(id: string, character: string, order: number): Lesson {
   return buildLesson({
@@ -41,7 +53,7 @@ const ALL_LESSONS = [ROOK, BISHOP, QUEEN, KING, KNIGHT, PAWN, PROMOTION];
 
 describe('animalFriends', () => {
   it('lists all six World-2 friends, unearned without any progress', () => {
-    const friends = animalFriends(ALL_LESSONS, []);
+    const friends = animalFriends(ALL_LESSONS, [], CHARACTERS);
     expect(friends.map((f) => f.character)).toEqual([
       'rhino',
       'elephant',
@@ -52,19 +64,19 @@ describe('animalFriends', () => {
     ]);
     expect(friends.every((f) => !f.earned)).toBe(true);
     expect(friends.find((f) => f.character === 'rhino')).toMatchObject({
-      piece: 'r',
+      topicKey: 'piece.r',
       lessonId: 'rook',
     });
   });
 
   it('marks a friend earned once its lesson is complete', () => {
-    const friends = animalFriends(ALL_LESSONS, [completeProgress(ROOK)]);
+    const friends = animalFriends(ALL_LESSONS, [completeProgress(ROOK)], CHARACTERS);
     expect(friends.find((f) => f.character === 'rhino')?.earned).toBe(true);
     expect(friends.find((f) => f.character === 'elephant')?.earned).toBe(false);
   });
 
   it("ties caterpillar's friend to the pawn lesson, not the later promotion lesson", () => {
-    const friends = animalFriends(ALL_LESSONS, [completeProgress(PROMOTION)]);
+    const friends = animalFriends(ALL_LESSONS, [completeProgress(PROMOTION)], CHARACTERS);
     const caterpillar = friends.find((f) => f.character === 'caterpillar');
     expect(caterpillar?.lessonId).toBe('pawn');
     // Completing only `promotion` (not `pawn`) does not earn the friend tied to `pawn`.
@@ -72,7 +84,7 @@ describe('animalFriends', () => {
   });
 
   it('skips a character with no authored lesson yet', () => {
-    const friends = animalFriends([ROOK], []);
+    const friends = animalFriends([ROOK], [], CHARACTERS);
     expect(friends).toHaveLength(1);
     expect(friends[0]?.character).toBe('rhino');
   });

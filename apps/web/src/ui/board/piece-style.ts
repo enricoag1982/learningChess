@@ -1,5 +1,6 @@
-import type { PieceStyleSetting, Position } from '@chess-kids/core';
-import { toFen } from '@chess-kids/core';
+import type { PieceStyleSetting } from '@chess-kids/core';
+import type { Position } from '@chess-kids/core/chess';
+import { toFen } from '@chess-kids/core/chess';
 
 /** World 5's id (`packages/content/tracks.yaml`, order 5, "Full Rules"): its lessons always show
  * classic pieces, no animal badge (docs/app-structure.md "Piece look on board"). */

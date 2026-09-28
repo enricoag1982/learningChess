@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CaptureDef, CollectStarsDef } from '@chess-kids/core';
+import type { CaptureDef, CollectStarsDef } from '@chess-kids/core/chess';
 import {
   chessJsRules,
   createVariantRules,
@@ -11,7 +11,7 @@ import {
   solve,
   startExercise,
   startStaticCaptureGame,
-} from '@chess-kids/core';
+} from '@chess-kids/core/chess';
 import { describe, expect, it } from 'vitest';
 import { loadLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';

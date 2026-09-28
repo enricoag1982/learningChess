@@ -1,6 +1,6 @@
 // The exercise-kind UI registry — the only place exercise-type dispatch happens for the UI
 // (`ExercisePlay.tsx`'s `kindUiOf`, never a local `if`/`switch`).
-import type { ExerciseDef, ExerciseType } from '@chess-kids/core';
+import type { ExerciseDef, ExerciseType } from '@chess-kids/core/chess';
 import { bestMoveUi } from './best-move/ui.ts';
 import { captureUi } from './capture/ui.ts';
 import { choiceUi } from './choice/ui.ts';

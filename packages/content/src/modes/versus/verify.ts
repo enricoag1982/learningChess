@@ -1,4 +1,5 @@
-import { chessJsRules, game, hasKing, type VersusMiniGame } from '@chess-kids/core';
+import type { VersusMiniGame } from '@chess-kids/core/chess';
+import { chessJsRules, game, hasKing } from '@chess-kids/core/chess';
 import type { ModeVerifyContext } from '../mode-content.ts';
 
 /**

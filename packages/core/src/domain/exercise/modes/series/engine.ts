@@ -1,10 +1,12 @@
-import { startExercise } from '../../kinds/index.ts';
-import type { ExerciseState } from '../../state.ts';
-import type { ExerciseDef } from '../../types.ts';
+import type { AnyKind, ExerciseDefBase, ExerciseStateBase } from '../../../subject.ts';
 import type { SeriesGameDef, SeriesGameState } from './def.ts';
 
-/** Starts a fresh series at its first round. */
-export function startSeries(def: SeriesGameDef): SeriesGameState {
+/** Starts a fresh series at its first round, via the given subject's kind registry — no hardcoded
+ * exercise kind here, any subject's kinds work. */
+export function startSeries<E extends ExerciseDefBase>(
+  def: SeriesGameDef<E>,
+  kinds: Readonly<Record<string, AnyKind<unknown>>>,
+): SeriesGameState<E> {
   const firstRound = def.rounds[0];
   if (firstRound === undefined) {
     throw new Error('startSeries: def.rounds is empty');
@@ -13,14 +15,14 @@ export function startSeries(def: SeriesGameDef): SeriesGameState {
     mode: 'series',
     def,
     roundIndex: 0,
-    round: startExercise(firstRound),
+    round: kinds[firstRound.type]?.init(firstRound) as ExerciseStateBase<E>,
     mistakes: 0,
     done: false,
   };
 }
 
 /** The exercise definition for the round currently (or, once `done`, last) in play. */
-export function currentRound(state: SeriesGameState): ExerciseDef {
+export function currentRound<E extends ExerciseDefBase>(state: SeriesGameState<E>): E {
   return state.def.rounds[state.roundIndex] ?? state.round.def;
 }
 
@@ -29,14 +31,24 @@ export function currentRound(state: SeriesGameState): ExerciseDef {
  * same as a wrong try) into the series total, then advances to the next round, or marks the series
  * `done` after the last one. `roundState` must be the current round's `solved` exercise state.
  */
-export function completeRound(state: SeriesGameState, roundState: ExerciseState): SeriesGameState {
+export function completeRound<E extends ExerciseDefBase>(
+  state: SeriesGameState<E>,
+  roundState: ExerciseStateBase<E>,
+  kinds: Readonly<Record<string, AnyKind<unknown>>>,
+): SeriesGameState<E> {
   const mistakes = state.mistakes + roundState.errors + roundState.hintLevel;
   const nextIndex = state.roundIndex + 1;
   const nextDef = state.def.rounds[nextIndex];
   if (nextDef === undefined) {
     return { ...state, round: roundState, mistakes, done: true };
   }
-  return { ...state, roundIndex: nextIndex, round: startExercise(nextDef), mistakes, done: false };
+  return {
+    ...state,
+    roundIndex: nextIndex,
+    round: kinds[nextDef.type]?.init(nextDef) as ExerciseStateBase<E>,
+    mistakes,
+    done: false,
+  };
 }
 
 /** Current series status: `playing` until every round is complete. */

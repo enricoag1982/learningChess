@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import type { AssessmentScope } from '../domain/assessment.ts';
 import { scorePlacementWorld, scoreTestOut } from '../domain/assessment.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
@@ -20,8 +19,8 @@ function makeLesson(
   id: string,
   world: string,
   order: number,
-  overrides: Partial<Lesson> = {},
-): Lesson {
+  overrides: Partial<ReturnType<typeof buildLesson>> = {},
+) {
   return buildLesson({
     id,
     world,

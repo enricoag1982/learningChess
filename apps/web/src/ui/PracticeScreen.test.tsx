@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { act, fireEvent, screen } from '@testing-library/react';
-import { recordExerciseResult, startExercise } from '@chess-kids/core';
+import { recordExerciseResult } from '@chess-kids/core';
+import { startExercise } from '@chess-kids/core/chess';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing/fixtures.ts';
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';

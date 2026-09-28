@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { friendGameOptions } from '@chess-kids/core';
+import { friendGameOptions } from '@chess-kids/core/chess';
 import type { FriendBoardMode, FriendOpponentChoice } from '../app/slices/play.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { tContent } from '../content-text.ts';

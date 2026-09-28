@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import type { AssessmentResult } from '../domain/assessment.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import { newProfile } from '../domain/profile.ts';
 import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
@@ -28,7 +27,7 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
-function makeLesson(id: string, world: string, order: number, concept = `${id}-concept`): Lesson {
+function makeLesson(id: string, world: string, order: number, concept = `${id}-concept`) {
   return buildLesson({
     id,
     world,

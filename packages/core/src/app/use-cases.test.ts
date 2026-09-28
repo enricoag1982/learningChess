@@ -15,7 +15,7 @@ import {
 } from '../domain/exercise/modes/versus/engine.ts';
 import type { VersusGameDef } from '../domain/exercise/modes/versus/def.ts';
 import type { GameRulesDef } from '../domain/game/types.ts';
-import type { Lesson, MiniGame } from '../domain/lesson.ts';
+import type { Lesson, MiniGame } from '../chess.ts';
 import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,

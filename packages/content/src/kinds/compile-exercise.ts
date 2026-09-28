@@ -1,6 +1,11 @@
 // Compiles one exercise, or an array of them — a lesson's `guided`/`exercises`/`variants`, or a
 // `series` mini-game's `rounds` — through the exercise-kind registry.
-import { doubleStepBefore, type ExerciseDef, type Position, type Square } from '@chess-kids/core';
+import {
+  doubleStepBefore,
+  type ExerciseDef,
+  type Position,
+  type Square,
+} from '@chess-kids/core/chess';
 import { compilePosition } from './common.ts';
 import { contentKindOf, type ExerciseYaml } from './index.ts';
 import { makeCompileContext } from './kind-content.ts';

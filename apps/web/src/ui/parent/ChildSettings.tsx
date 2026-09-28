@@ -1,21 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type {
-  GameRecord,
-  Journey,
-  PieceStyleSetting,
-  Profile,
-  ProfileSettings,
-} from '@chess-kids/core';
+import type { GameRecord, PieceStyleSetting, Profile, ProfileSettings } from '@chess-kids/core';
+import type { Journey } from '@chess-kids/core/chess';
 import type { Services } from '../../app/services.ts';
 import {
   changeAvatar,
-  computerLevelStatus,
   DAILY_LIMIT_OPTIONS,
   deleteProfile,
   getProfileSettings,
-  loadGameRecords,
   loadJourney,
   PLAY_FROM_OPTIONS,
   PLAY_UNTIL_OPTIONS,
@@ -25,6 +18,7 @@ import {
   validateNickname,
   verifyParentPassword,
 } from '@chess-kids/core';
+import { computerLevelStatus, loadGameRecords } from '@chess-kids/core/chess';
 import { exportBackup } from '@chess-kids/core/backup';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';

@@ -59,7 +59,7 @@ describe('recordGame / loadGameRecords', () => {
     const saved = await recordGame(deps, {
       profileId: 'profile-1',
       game: 'full',
-      opponentLevel: 1,
+      opponent: 'computer:1',
       result: 'win',
       reason: 'checkmate',
       moves: ['e4', 'e5', 'Qh5', 'Nc6', 'Bc4', 'Nf6', 'Qxf7#'],

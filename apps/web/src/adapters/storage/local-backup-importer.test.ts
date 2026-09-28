@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { AppDeps, BackupFile, ProfileSettings } from '@chess-kids/core';
-import { createProfile, DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core';
+import { createProfile, createSubjectRuntime, DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core';
 import { buildBackupFile } from '@chess-kids/core/backup';
+import { CHESS_APP_CONFIG, chessCore } from '@chess-kids/core/chess';
 import { stubContent, makeClock, makeIds, makePasswordFileWriter } from '@chess-kids/core/testing';
 import { LocalStorageBackupImporter } from './local-backup-importer.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
@@ -29,7 +30,10 @@ function requireData(file: BackupFile, profileId: string): BackupFile['data'][st
 /** Fresh `AppDeps` wired directly to `localStorage` (this file's own repos, no `test-services.ts`
  * indirection — keeps this test close to the real `chess-kids:*` storage shape). */
 function makeDeps(): AppDeps {
-  const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+  const store = openLocalStore(localStorage, {
+    migrations: MIGRATIONS,
+    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+  });
   return {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -45,6 +49,8 @@ function makeDeps(): AppDeps {
     random: { next: () => 0.5 },
     backupImporter: new LocalStorageBackupImporter(store),
     storageSchemaVersion: SCHEMA_VERSION,
+    subject: createSubjectRuntime(chessCore),
+    app: { ...CHESS_APP_CONFIG, version: '0.0.0-test' },
   };
 }
 
