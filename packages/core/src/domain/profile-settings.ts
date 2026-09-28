@@ -1,14 +1,6 @@
-/** `'auto'` = "Automatic level"; a number fixes it to that bot level (chess: 1 Mouse .. 5 Bear,
- * `BotLevel['level']` — spelled out here, not imported, so this subject-bound field stays the only
- * thing keeping this otherwise-generic file from being subject-free), preselected and no longer
- * auto-suggested. */
-export type ComputerLevelSetting = 'auto' | 1 | 2 | 3 | 4 | 5;
-
-/** Board piece look. */
-export type PieceStyleSetting = 'animal' | 'classic';
-
-/** Per-profile parent settings. `null` = daily limit off. */
-export interface ProfileSettings {
+/** Fields every profile's settings carry regardless of subject. `null` on `dailyLimitMinutes` =
+ * daily limit off. */
+export interface ProfileSettingsBase {
   /** "Every day" limit once the weekend toggle is off, else the school-days (Mon–Fri) limit. */
   readonly dailyLimitMinutes: number | null;
   /** Sat/Sun limit (device-local weekday). Absent = same as `dailyLimitMinutes`; `null` is a real
@@ -21,12 +13,16 @@ export interface ProfileSettings {
   readonly voice: boolean;
   readonly sound: boolean;
   readonly hints: boolean;
-  readonly computerLevel: ComputerLevelSetting;
-  readonly pieceStyle: PieceStyleSetting;
   /** ISO instant of the last change, set by `app/settings.ts`'s `updateProfileSettings`. Absent =
    * "missing = oldest" in `domain/merge.ts`'s settings merge; both absent keeps the local side. */
   readonly updatedAt?: string;
 }
+
+/** The full per-profile settings shape: `ProfileSettingsBase` plus whatever the subject's own
+ * settings slot adds (chess: `computerLevel`, `pieceStyle`), via module augmentation in the
+ * subject's own settings file. */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented by the subject.
+export interface ProfileSettings extends ProfileSettingsBase {}
 
 /** Daily limit choices: off, or 15/20/30/45/60 minutes. Reused for the weekend limit. */
 export const DAILY_LIMIT_OPTIONS: readonly (number | null)[] = [null, 15, 20, 30, 45, 60];
@@ -45,15 +41,13 @@ export const PLAY_UNTIL_OPTIONS: readonly (string | null)[] = [
 /** "Not before" choices: off, or a fixed morning start. */
 export const PLAY_FROM_OPTIONS: readonly (string | null)[] = [null, '07:00', '08:00', '09:00'];
 
-/** A brand-new profile's settings, and the fallback for one with none stored yet. No
- * `weekendLimitMinutes`/`playUntil`/`playFrom` — every optional field defaults to absent. */
-export const DEFAULT_PROFILE_SETTINGS: ProfileSettings = {
+/** A brand-new profile's platform-only defaults; a subject's own fields (chess: computer level,
+ * piece style) come from its settings slot — see {@link composeDefaultSettings}. */
+export const DEFAULT_PROFILE_SETTINGS_BASE: ProfileSettingsBase = {
   dailyLimitMinutes: null,
   voice: true,
   sound: true,
   hints: true,
-  computerLevel: 'auto',
-  pieceStyle: 'animal',
 };
 
 /** `true` for any of {@link DAILY_LIMIT_OPTIONS}. */
@@ -76,18 +70,20 @@ export function isValidPlayFrom(value: string | null | undefined): boolean {
   return value === undefined || PLAY_FROM_OPTIONS.includes(value);
 }
 
-/** `true` for `'auto'` or a real `BotLevel.level` (1–5). */
-export function isValidComputerLevel(value: unknown): value is ComputerLevelSetting {
-  return value === 'auto' || (typeof value === 'number' && value >= 1 && value <= 5);
+/** {@link DEFAULT_PROFILE_SETTINGS_BASE} plus `subject.defaults`, spread right after `hints` — the
+ * same key order `app/backup.ts`'s zod shape splices its own subject fields at. */
+export function composeDefaultSettings(subject: {
+  readonly defaults: Readonly<Record<string, unknown>>;
+}): ProfileSettings {
+  return { ...DEFAULT_PROFILE_SETTINGS_BASE, ...subject.defaults } as ProfileSettings;
 }
 
-/** `true` for `'animal'` or `'classic'`. */
-export function isValidPieceStyle(value: unknown): value is PieceStyleSetting {
-  return value === 'animal' || value === 'classic';
-}
-
-/** `true` when every field of `settings` is a valid, in-range value. */
-export function isValidProfileSettings(settings: ProfileSettings): boolean {
+/** `true` when every platform field of `settings` is valid and `subject.isValid` accepts the rest
+ * (chess: computer level, piece style). */
+export function isValidProfileSettings(
+  subject: { readonly isValid: (s: Readonly<Record<string, unknown>>) => boolean },
+  settings: ProfileSettings,
+): boolean {
   return (
     isValidDailyLimit(settings.dailyLimitMinutes) &&
     isValidWeekendLimit(settings.weekendLimitMinutes) &&
@@ -96,7 +92,7 @@ export function isValidProfileSettings(settings: ProfileSettings): boolean {
     typeof settings.voice === 'boolean' &&
     typeof settings.sound === 'boolean' &&
     typeof settings.hints === 'boolean' &&
-    isValidComputerLevel(settings.computerLevel) &&
-    isValidPieceStyle(settings.pieceStyle)
+    // Same bridge `kinds/` uses to hand a subject its own def back out of a base type.
+    subject.isValid(settings as unknown as Readonly<Record<string, unknown>>)
   );
 }

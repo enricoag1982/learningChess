@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import {
   makeDeps as buildDeps,
@@ -29,6 +29,8 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     ...overrides,
   });
 }
+
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings(buildDeps({}).subject.settings);
 
 function withSettings(profileSettings: AppSettings['profileSettings']): SettingsRepository {
   const stored: AppSettings = { lastProfileId: null, suggestedLevels: {}, profileSettings };

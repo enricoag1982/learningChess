@@ -18,8 +18,11 @@ import {
   totalMinutesToday,
 } from './merge.ts';
 import type { MergeableProfileData } from './merge.ts';
-import { DEFAULT_PROFILE_SETTINGS } from './profile-settings.ts';
+import { composeDefaultSettings } from './profile-settings.ts';
 import type { ProfileSettings } from './profile-settings.ts';
+
+/** This domain test has no real subject: enough of `ProfileSettings` to exercise merge logic. */
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings({ defaults: {} });
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from './progress.ts';
 import type { ConceptStats } from './review.ts';
 import type { SessionLog } from './session-log.ts';
@@ -622,7 +625,7 @@ describe('totalMinutesOverDays', () => {
 
 describe('emptyProfileData', () => {
   it('has DEFAULT_PROFILE_SETTINGS and every list empty', () => {
-    const data = emptyProfileData();
+    const data = emptyProfileData(DEFAULT_PROFILE_SETTINGS);
     expect(data.settings).toEqual(DEFAULT_PROFILE_SETTINGS);
     expect(data.lessonProgress).toEqual([]);
     expect(data.streak).toBeUndefined();

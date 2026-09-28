@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import { makeDeps as buildDeps, makeSettingsRepo } from '../testing/index.ts';
 import { getProfileSettings, updateProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
@@ -9,6 +9,8 @@ import type { AppSettings } from './ports.ts';
 function makeDeps(initialSettings: AppSettings): AppDeps {
   return buildDeps({ settings: makeSettingsRepo(initialSettings) });
 }
+
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings(buildDeps({}).subject.settings);
 
 const EMPTY_SETTINGS: AppSettings = {
   lastProfileId: null,

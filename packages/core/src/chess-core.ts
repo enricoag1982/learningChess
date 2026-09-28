@@ -1,6 +1,11 @@
 // Chess's `SubjectCore` + `AppConfig`: the concrete values every platform seam
 // (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound.
 import { chessGameRecordOf } from './app/games.ts';
+import {
+  CHESS_SETTINGS_DEFAULTS,
+  isValidComputerLevel,
+  isValidPieceStyle,
+} from './domain/chess/settings.ts';
 import { chessJsRules } from './domain/chess/chessjs-rules.ts';
 import {
   chessRewardFacts,
@@ -11,7 +16,9 @@ import type { PieceType } from './domain/chess/index.ts';
 import { EXERCISE_KINDS } from './domain/exercise/kinds/index.ts';
 import { staticMode } from './domain/exercise/modes/static/mode.ts';
 import { versusMode } from './domain/exercise/modes/versus/mode.ts';
+import { composeDefaultSettings } from './domain/profile-settings.ts';
 import type { AppConfig, SubjectCore } from './domain/subject.ts';
+import type { ProfileSettings } from './domain/profile-settings.ts';
 import { createVariantRules, type VariantRules } from './domain/variant/index.ts';
 
 /** The World-2 piece-lesson characters' own piece, Rhino .. Caterpillar — the one source both
@@ -46,7 +53,17 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   rewards: { facts: chessRewardFacts, conditionValue: chessConditionValue },
   gameRecordOf: chessGameRecordOf,
   characters: CHESS_CHARACTERS,
+  settings: {
+    defaults: CHESS_SETTINGS_DEFAULTS,
+    isValid: (s) => isValidComputerLevel(s.computerLevel) && isValidPieceStyle(s.pieceStyle),
+    loadBackupShape: async () =>
+      (await import('./domain/chess/settings-backup.ts')).chessSettingsBackupShape,
+  },
 };
+
+/** The chess app's own full default settings, for code that needs a plain constant (the web
+ * store's initial/new-profile state) rather than an `AppDeps` round trip. */
+export const DEFAULT_PROFILE_SETTINGS: ProfileSettings = composeDefaultSettings(chessCore.settings);
 
 /** Chess app's storage / backup / parent-code identifiers, read by `backup.ts`, `merge.ts`, web
  * `local-store.ts` and `download-password-file-writer.ts`. No `version`: that is the running

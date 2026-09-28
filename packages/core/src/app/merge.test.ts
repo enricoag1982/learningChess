@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import type { Profile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
@@ -60,6 +60,8 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     ...overrides,
   });
 }
+
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings(buildDeps({}).subject.settings);
 
 /** A minimal, valid `BackupFile` for one child, built straight from literal data (not via
  * `buildBackupFile`, so these tests do not depend on a *second* `AppDeps`'s own repositories). */

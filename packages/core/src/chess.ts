@@ -16,7 +16,17 @@ export {
 export type { BotPlayer } from './app/bot-player.ts';
 
 // Chess's `SubjectCore` + `AppConfig`.
-export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS, CHARACTER_PIECES } from './chess-core.ts';
+export {
+  chessCore,
+  CHESS_APP_CONFIG,
+  CHESS_CHARACTERS,
+  CHARACTER_PIECES,
+  DEFAULT_PROFILE_SETTINGS,
+} from './chess-core.ts';
+
+// Chess's own settings-slot fields (`domain/profile-settings.ts`'s `ProfileSettings` carries them
+// via module augmentation, loaded transitively through `chess-core.ts` above).
+export type { ComputerLevelSetting, PieceStyleSetting } from './domain/chess/settings.ts';
 
 // Chess's concrete lesson/mini-game content shapes — the platform's own `Lesson`/`MiniGame`
 // (`./index.ts`) at chess's exercise def / demo instantiation.

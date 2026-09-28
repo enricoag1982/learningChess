@@ -32,12 +32,11 @@ export type { SessionLog } from './domain/session-log.ts';
 
 export { minutesUntilEnd, shouldWarn } from './domain/time-policy.ts';
 
-export type { PieceStyleSetting, ProfileSettings } from './domain/profile-settings.ts';
+export type { ProfileSettings } from './domain/profile-settings.ts';
 export {
   DAILY_LIMIT_OPTIONS,
   PLAY_UNTIL_OPTIONS,
   PLAY_FROM_OPTIONS,
-  DEFAULT_PROFILE_SETTINGS,
 } from './domain/profile-settings.ts';
 
 export type { ConceptStats, ConceptTask } from './domain/review.ts';

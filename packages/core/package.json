@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./chess": "./src/chess.ts",
+    "./bot-worker": "./src/bot-worker.ts",
     "./backup": "./src/app/backup.ts",
     "./merge": "./src/app/merge.ts",
     "./testing": "./src/testing/index.ts"

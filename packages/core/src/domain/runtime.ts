@@ -10,6 +10,7 @@ export interface SubjectRuntime<Ctx = unknown, F = unknown> {
   readonly modes: Readonly<Record<string, AnyMode>>;
   readonly rewards?: SubjectCore<Ctx, F>['rewards'];
   readonly gameRecordOf?: SubjectCore<Ctx, F>['gameRecordOf'];
+  readonly settings: SubjectCore<Ctx, F>['settings'];
 }
 
 /** Builds `core`'s runtime: its own kinds, its own modes plus the platform `series` mode (built
@@ -22,5 +23,6 @@ export function createSubjectRuntime<Ctx, F = unknown>(
     modes: { ...core.modes, series: createSeriesMode(core.kinds) },
     rewards: core.rewards,
     gameRecordOf: core.gameRecordOf?.bind(core),
+    settings: core.settings,
   };
 }

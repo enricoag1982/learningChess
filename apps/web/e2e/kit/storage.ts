@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import type { AppSettings, ProfileSettings, TracksCatalog } from '@chess-kids/core';
 import type { Lesson } from '@chess-kids/core/chess';
-import { DEFAULT_PROFILE_SETTINGS, localDayString } from '@chess-kids/core';
+import { localDayString } from '@chess-kids/core';
+import { DEFAULT_PROFILE_SETTINGS } from '@chess-kids/core/chess';
 import { LocalStorageGameRecordRepository } from '../../src/adapters/storage/local-game-record-repository.ts';
 import { LocalStorageProfileRepository } from '../../src/adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '../../src/adapters/storage/local-progress-repository.ts';

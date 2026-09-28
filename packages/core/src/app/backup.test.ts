@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
@@ -72,6 +72,8 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     ...overrides,
   });
 }
+
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings(buildDeps({}).subject.settings);
 
 function makeGameRecord(overrides: Partial<GameRecord> = {}): GameRecord {
   return {
@@ -192,18 +194,18 @@ describe('parseBackupFile / backupSummary round trip', () => {
 
     const file = await buildBackupFile(deps);
     const raw = JSON.stringify(file);
-    const parsed = parseBackupFile(deps, raw);
+    const parsed = await parseBackupFile(deps, raw);
 
     expect(parsed).toEqual(file);
     expect(backupSummary(parsed)).toEqual({ profileCount: 1, totalStars: 5 });
   });
 
-  it('rejects invalid JSON', () => {
+  it('rejects invalid JSON', async () => {
     const deps = makeDeps();
-    expect(() => parseBackupFile(deps, '{not json')).toThrow(BackupValidationError);
+    await expect(parseBackupFile(deps, '{not json')).rejects.toThrow(BackupValidationError);
   });
 
-  it('rejects a valid-JSON file with the wrong app id', () => {
+  it('rejects a valid-JSON file with the wrong app id', async () => {
     const deps = makeDeps();
     const raw = JSON.stringify({
       app: 'someone-else',
@@ -212,27 +214,27 @@ describe('parseBackupFile / backupSummary round trip', () => {
       profiles: [],
       data: {},
     });
-    expect(() => parseBackupFile(deps, raw)).toThrow(BackupValidationError);
+    await expect(parseBackupFile(deps, raw)).rejects.toThrow(BackupValidationError);
   });
 
-  it('rejects a file missing required fields', () => {
+  it('rejects a file missing required fields', async () => {
     const deps = makeDeps();
     const raw = JSON.stringify({ app: 'chess-kids' });
-    expect(() => parseBackupFile(deps, raw)).toThrow(BackupValidationError);
+    await expect(parseBackupFile(deps, raw)).rejects.toThrow(BackupValidationError);
   });
 
   it('rejects a schemaVersion newer than deps.storageSchemaVersion', async () => {
     const deps = makeDeps({ storageSchemaVersion: 5 });
     const file = await buildBackupFile(deps);
     const raw = JSON.stringify({ ...file, schemaVersion: 6 });
-    expect(() => parseBackupFile(deps, raw)).toThrow(BackupValidationError);
+    await expect(parseBackupFile(deps, raw)).rejects.toThrow(BackupValidationError);
   });
 
   it('accepts a schemaVersion at or below the current one', async () => {
     const deps = makeDeps({ storageSchemaVersion: 5 });
     const file = await buildBackupFile(deps);
     const olderRaw = JSON.stringify({ ...file, schemaVersion: 3 });
-    expect(() => parseBackupFile(deps, olderRaw)).not.toThrow();
+    await expect(parseBackupFile(deps, olderRaw)).resolves.not.toThrow();
   });
 });
 

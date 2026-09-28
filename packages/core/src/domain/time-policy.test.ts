@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_PROFILE_SETTINGS } from './profile-settings.ts';
+import { composeDefaultSettings } from './profile-settings.ts';
+
+/** This domain test has no real subject: enough of `ProfileSettings` to exercise time-policy logic. */
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings({ defaults: {} });
 import { newSessionLog } from './session-log.ts';
 import type { SessionLog } from './session-log.ts';
 import {

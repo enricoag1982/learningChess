@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { DEFAULT_PROFILE_SETTINGS, isValidProfileSettings } from '../domain/profile-settings.ts';
+import { composeDefaultSettings, isValidProfileSettings } from '../domain/profile-settings.ts';
 import { localDayString } from '../domain/streak.ts';
 import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
@@ -9,7 +9,7 @@ import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../d
 import type { ConceptStats } from '../domain/review.ts';
 import type { SessionLog } from '../domain/session-log.ts';
 import type { Streak } from '../domain/streak.ts';
-import type { AppConfig } from '../domain/subject.ts';
+import type { AppConfig, SettingsBackupShape } from '../domain/subject.ts';
 import type { BackupFileWriter, BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
@@ -55,18 +55,22 @@ const profileSchema = z.object({
   locale: z.string(),
 });
 
-const profileSettingsSchema = z.object({
-  dailyLimitMinutes: z.number().nullable(),
-  voice: z.boolean(),
-  sound: z.boolean(),
-  hints: z.boolean(),
-  computerLevel: z.union([z.literal('auto'), z.number().int().min(1).max(5)]),
-  pieceStyle: z.union([z.literal('animal'), z.literal('classic')]),
-  weekendLimitMinutes: z.number().nullable().optional(),
-  playUntil: z.string().nullable().optional(),
-  playFrom: z.string().nullable().optional(),
-  updatedAt: z.string().optional(),
-});
+/** `dailyLimitMinutes` .. `hints` and `weekendLimitMinutes` .. `updatedAt`: the subject's own
+ * shape (`deps.subject.settings.loadBackupShape()`) splices in between, same key order as
+ * `composeDefaultSettings`. */
+function profileSettingsSchema(subjectShape: SettingsBackupShape) {
+  return z.object({
+    dailyLimitMinutes: z.number().nullable(),
+    voice: z.boolean(),
+    sound: z.boolean(),
+    hints: z.boolean(),
+    ...subjectShape,
+    weekendLimitMinutes: z.number().nullable().optional(),
+    playUntil: z.string().nullable().optional(),
+    playFrom: z.string().nullable().optional(),
+    updatedAt: z.string().optional(),
+  });
+}
 
 const starsSchema = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
 
@@ -178,29 +182,33 @@ const unlockSchema = z.object({
   via: z.enum(['test-out', 'placement', 'parent']),
 });
 
-const profileBackupDataSchema = z.object({
-  settings: profileSettingsSchema,
-  lessonProgress: z.array(lessonProgressSchema),
-  attempts: z.array(attemptSchema),
-  miniGameProgress: z.array(miniGameProgressSchema),
-  conceptStats: z.array(conceptStatsSchema),
-  gameRecords: z.array(gameRecordSchema),
-  earnedBadges: z.array(earnedBadgeSchema),
-  streak: streakSchema.optional(),
-  sessionLogs: z.array(sessionLogSchema),
-  assessmentResults: z.array(assessmentResultSchema),
-  unlocks: z.array(unlockSchema),
-});
+function profileBackupDataSchema(subjectShape: SettingsBackupShape) {
+  return z.object({
+    settings: profileSettingsSchema(subjectShape),
+    lessonProgress: z.array(lessonProgressSchema),
+    attempts: z.array(attemptSchema),
+    miniGameProgress: z.array(miniGameProgressSchema),
+    conceptStats: z.array(conceptStatsSchema),
+    gameRecords: z.array(gameRecordSchema),
+    earnedBadges: z.array(earnedBadgeSchema),
+    streak: streakSchema.optional(),
+    sessionLogs: z.array(sessionLogSchema),
+    assessmentResults: z.array(assessmentResultSchema),
+    unlocks: z.array(unlockSchema),
+  });
+}
 
 /** Shape-only validation: every field type here already matches the live domain interfaces, so a
  * successful parse is safe to treat as a real {@link BackupFile}. */
-const backupFileSchema = z.object({
-  app: z.string(),
-  schemaVersion: z.number().int().positive(),
-  exportedAt: z.string(),
-  profiles: z.array(profileSchema),
-  data: z.record(z.string(), profileBackupDataSchema),
-});
+function backupFileSchema(subjectShape: SettingsBackupShape) {
+  return z.object({
+    app: z.string(),
+    schemaVersion: z.number().int().positive(),
+    exportedAt: z.string(),
+    profiles: z.array(profileSchema),
+    data: z.record(z.string(), profileBackupDataSchema(subjectShape)),
+  });
+}
 
 /** Raised on a backup file that fails validation (corrupt JSON, wrong shape, or a newer schema
  * version than this build supports) — the parent-area Import UI shows `message` and changes nothing. */
@@ -248,7 +256,11 @@ async function profileBackupData(deps: AppDeps, profileId: string): Promise<Prof
     assessmentResults,
     unlocks,
   ] = await Promise.all([
-    deps.settings.get().then((all) => all.profileSettings[profileId] ?? DEFAULT_PROFILE_SETTINGS),
+    deps.settings
+      .get()
+      .then(
+        (all) => all.profileSettings[profileId] ?? composeDefaultSettings(deps.subject.settings),
+      ),
     deps.progress.listLessons(profileId),
     deps.progress.listAttempts(profileId),
     deps.progress.listMiniGames(profileId),
@@ -360,7 +372,7 @@ export async function exportBackup(deps: AppDeps, profileIds?: readonly string[]
 /** Validates `raw` into a {@link BackupFile} — corrupt JSON, a wrong `app` id, a bad shape, or a
  * newer `schemaVersion` all throw {@link BackupValidationError}, nothing else touched. No data
  * migration needed at or below the current version: every added field is optional with a default. */
-export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
+export async function parseBackupFile(deps: AppDeps, raw: string): Promise<BackupFile> {
   let json: unknown;
   try {
     json = JSON.parse(raw);
@@ -368,7 +380,8 @@ export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
     throw new BackupValidationError('Not a valid backup file (invalid JSON).');
   }
 
-  const result = backupFileSchema.safeParse(json);
+  const subjectShape = await deps.subject.settings.loadBackupShape();
+  const result = backupFileSchema(subjectShape).safeParse(json);
   if (!result.success || result.data.app !== deps.app.backupAppId) {
     throw new BackupValidationError('Not a valid backup file.');
   }
@@ -383,7 +396,7 @@ export function parseBackupFile(deps: AppDeps, raw: string): BackupFile {
     );
   }
   for (const data of Object.values(file.data)) {
-    if (!isValidProfileSettings(data.settings)) {
+    if (!isValidProfileSettings(deps.subject.settings, data.settings)) {
       throw new BackupValidationError('Not a valid backup file.');
     }
   }
@@ -416,7 +429,7 @@ export function backupSummary(file: BackupFile): BackupSummary {
 /** Parent area "Import": validates `raw`, then atomically replaces every stored record with `raw`'s
  * own. Returns the preview summary so the UI can show what was restored. */
 export async function importBackup(deps: AppDeps, raw: string): Promise<BackupSummary> {
-  const file = parseBackupFile(deps, raw);
+  const file = await parseBackupFile(deps, raw);
   await requireBackupImporter(deps).replaceAll(file);
   return backupSummary(file);
 }

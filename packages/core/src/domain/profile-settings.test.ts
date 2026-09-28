@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  composeDefaultSettings,
   DAILY_LIMIT_OPTIONS,
-  DEFAULT_PROFILE_SETTINGS,
-  isValidComputerLevel,
   isValidDailyLimit,
-  isValidPieceStyle,
   isValidProfileSettings,
 } from './profile-settings.ts';
 import type { ProfileSettings } from './profile-settings.ts';
+
+/** No settings-slot fields — enough to exercise the platform-only validation. */
+const NO_SUBJECT_FIELDS = { defaults: {}, isValid: () => true };
+
+const DEFAULTS = composeDefaultSettings(NO_SUBJECT_FIELDS);
 
 describe('isValidDailyLimit', () => {
   it('accepts every DAILY_LIMIT_OPTIONS value', () => {
@@ -23,63 +26,18 @@ describe('isValidDailyLimit', () => {
   });
 });
 
-describe('isValidComputerLevel', () => {
-  it('accepts "auto" and every level 1-5', () => {
-    expect(isValidComputerLevel('auto')).toBe(true);
-    for (let level = 1; level <= 5; level += 1) {
-      expect(isValidComputerLevel(level)).toBe(true);
-    }
-  });
-
-  it('rejects out-of-range numbers and other values', () => {
-    expect(isValidComputerLevel(0)).toBe(false);
-    expect(isValidComputerLevel(6)).toBe(false);
-    expect(isValidComputerLevel('manual')).toBe(false);
-    expect(isValidComputerLevel(null)).toBe(false);
-  });
-});
-
-describe('isValidPieceStyle', () => {
-  it('accepts "animal" and "classic"', () => {
-    expect(isValidPieceStyle('animal')).toBe(true);
-    expect(isValidPieceStyle('classic')).toBe(true);
-  });
-
-  it('rejects anything else', () => {
-    expect(isValidPieceStyle('wood')).toBe(false);
-    expect(isValidPieceStyle(undefined)).toBe(false);
-  });
-});
-
 describe('isValidProfileSettings', () => {
-  it('accepts DEFAULT_PROFILE_SETTINGS', () => {
-    expect(isValidProfileSettings(DEFAULT_PROFILE_SETTINGS)).toBe(true);
-  });
-
-  it('accepts every field customized to a valid value', () => {
-    const settings: ProfileSettings = {
-      dailyLimitMinutes: 30,
-      voice: false,
-      sound: false,
-      hints: false,
-      computerLevel: 3,
-      pieceStyle: 'classic',
-    };
-    expect(isValidProfileSettings(settings)).toBe(true);
+  it('accepts the composed defaults', () => {
+    expect(isValidProfileSettings(NO_SUBJECT_FIELDS, DEFAULTS)).toBe(true);
   });
 
   it('rejects an invalid dailyLimitMinutes', () => {
-    expect(isValidProfileSettings({ ...DEFAULT_PROFILE_SETTINGS, dailyLimitMinutes: 10 })).toBe(
-      false,
-    );
+    const settings: ProfileSettings = { ...DEFAULTS, dailyLimitMinutes: 10 };
+    expect(isValidProfileSettings(NO_SUBJECT_FIELDS, settings)).toBe(false);
   });
 
-  it('rejects an invalid computerLevel', () => {
-    expect(
-      isValidProfileSettings({
-        ...DEFAULT_PROFILE_SETTINGS,
-        computerLevel: 9 as unknown as ProfileSettings['computerLevel'],
-      }),
-    ).toBe(false);
+  it('defers to the subject for the rest of the bag', () => {
+    const rejecting = { defaults: {}, isValid: () => false };
+    expect(isValidProfileSettings(rejecting, DEFAULTS)).toBe(false);
   });
 });

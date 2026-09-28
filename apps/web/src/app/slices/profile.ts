@@ -1,6 +1,5 @@
 import {
   createProfile,
-  DEFAULT_PROFILE_SETTINGS,
   getProfileSettings,
   listProfiles,
   loadJourney,
@@ -14,7 +13,7 @@ import {
   type Profile,
   type ProfileSettings,
 } from '@chess-kids/core';
-import { loadGameRecords, type Journey } from '@chess-kids/core/chess';
+import { DEFAULT_PROFILE_SETTINGS, loadGameRecords, type Journey } from '@chess-kids/core/chess';
 import { requestPersistentStorageIfNeeded } from '../../adapters/persistent-storage.ts';
 import type { AppGet, AppSet, SliceCreator } from '../store.ts';
 import { loadRewards, type RewardsSlice } from './rewards.ts';

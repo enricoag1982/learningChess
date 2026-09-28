@@ -5,6 +5,7 @@ import {
   rekeyProfileData,
   totalMinutesOverDays,
 } from '../domain/merge.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import type { Profile } from '../domain/profile.ts';
 import { totalStars } from '../domain/progress.ts';
 import type { BackupFile, ProfileBackupData } from './backup.ts';
@@ -127,7 +128,8 @@ export async function previewChildChange(
   if (choice.localProfileId === undefined) return NO_CHANGE;
   const localFile = await buildBackupFile(deps, [choice.localProfileId]);
   const localData: MergeableProfileData =
-    localFile.data[choice.localProfileId] ?? emptyProfileData();
+    localFile.data[choice.localProfileId] ??
+    emptyProfileData(composeDefaultSettings(deps.subject.settings));
   const rekeyed =
     choice.localProfileId === choice.incomingProfileId
       ? incomingData
@@ -210,7 +212,8 @@ export async function importMerged(
       continue;
     }
 
-    const localData: MergeableProfileData = data[targetId] ?? emptyProfileData();
+    const localData: MergeableProfileData =
+      data[targetId] ?? emptyProfileData(composeDefaultSettings(deps.subject.settings));
     const rekeyed =
       targetId === incomingProfile.id ? incomingData : rekeyProfileData(incomingData, targetId);
     data[targetId] = mergeProfileData(localData, rekeyed, now);

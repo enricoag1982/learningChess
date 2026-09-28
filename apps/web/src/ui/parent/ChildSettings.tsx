@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { GameRecord, PieceStyleSetting, Profile, ProfileSettings } from '@chess-kids/core';
-import type { Journey } from '@chess-kids/core/chess';
+import type { GameRecord, Profile, ProfileSettings } from '@chess-kids/core';
+import type { Journey, PieceStyleSetting } from '@chess-kids/core/chess';
 import type { Services } from '../../app/services.ts';
 import {
   changeAvatar,

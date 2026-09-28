@@ -114,7 +114,7 @@ export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Ele
     setDone(false);
     try {
       const raw = await readFileText(file);
-      const incomingFile = parseBackupFile(services.deps, raw);
+      const incomingFile = await parseBackupFile(services.deps, raw);
       const plan = await planImport(services.deps, incomingFile);
       const choices: Record<string, ChildImportChoice> = {};
       for (const child of plan.children) {

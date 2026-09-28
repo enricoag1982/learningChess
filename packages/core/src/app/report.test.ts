@@ -4,7 +4,7 @@ import type { AssessmentResult } from '../domain/assessment.ts';
 import type { EarnedBadge } from '../domain/badges.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import { newProfile } from '../domain/profile.ts';
-import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
@@ -83,6 +83,8 @@ function makeDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     ...overrides,
   });
 }
+
+const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings(buildDeps({}).subject.settings);
 
 function makeConceptStats(
   profileId: string,

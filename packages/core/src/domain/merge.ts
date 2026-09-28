@@ -2,7 +2,6 @@ import type { AssessmentResult, Unlock } from './assessment.ts';
 import type { EarnedBadge } from './badges.ts';
 import type { ProfileSettings } from './profile-settings.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress, Stars } from './progress.ts';
-import { DEFAULT_PROFILE_SETTINGS } from './profile-settings.ts';
 import type { ConceptStats } from './review.ts';
 import type { SessionLog } from './session-log.ts';
 import { lastNDays, totalMinutesForDate } from './session-log.ts';
@@ -392,11 +391,12 @@ export function totalMinutesOverDays(data: MergeableProfileData, now: Date, days
   );
 }
 
-/** A brand-new local profile's data: default settings, every list empty. Safe fallback, not a real
- * code path (`buildBackupFile` always returns one entry per profile). */
-export function emptyProfileData(): MergeableProfileData {
+/** A brand-new local profile's data: `settings` (the caller's composed default) and every list
+ * empty. Safe fallback, not a real code path (`buildBackupFile` always returns one entry per
+ * profile). */
+export function emptyProfileData(settings: ProfileSettings): MergeableProfileData {
   return {
-    settings: DEFAULT_PROFILE_SETTINGS,
+    settings,
     lessonProgress: [],
     attempts: [],
     miniGameProgress: [],

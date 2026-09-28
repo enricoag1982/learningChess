@@ -1,5 +1,6 @@
 // Platform base types: the subject-free shapes every exercise def / state / mini-game / lesson is
 // built on. Pure TS, no chess import — a subject supplies its own concrete types on top of these.
+import type { ZodType } from 'zod';
 import type { SubjectRewards } from './badges.ts';
 import type { ExerciseKind, ExerciseProgress } from './exercise/kind.ts';
 import type { MiniGameMode } from './exercise/mode.ts';
@@ -130,10 +131,21 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
    * `rhino` → `piece.r`); key order is `animalFriends`' own friend order. Absent id = a
    * narrator-taught character (Owl), never a friend. */
   readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
+  /** The subject's own settings-slot fields (chess: computer level, piece style), as an opaque
+   * bag: `defaults` composes into `ProfileSettings`, `isValid` checks a stored one back, and
+   * `loadBackupShape` (dynamic import) supplies the matching zod fields to `app/backup.ts`. */
+  readonly settings: {
+    readonly defaults: Readonly<Record<string, unknown>>;
+    isValid(s: Readonly<Record<string, unknown>>): boolean;
+    loadBackupShape(): Promise<SettingsBackupShape>;
+  };
 }
 
 /** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping
  * subjects never collides on disk. */
+/** A subject's own backup zod fields, spliced into `app/backup.ts`'s settings shape. */
+export type SettingsBackupShape = Readonly<Record<string, ZodType>>;
+
 export interface AppConfig {
   /** localStorage key prefix, e.g. `'chess-kids:'`. */
   readonly storagePrefix: string;

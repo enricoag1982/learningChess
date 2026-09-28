@@ -88,7 +88,7 @@ describe.each(TAGS)('storage compat: %s', (tag) => {
 
   it('merges backup-all.json into an empty device', async () => {
     const { deps } = createServices(localStorage);
-    const incoming = parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
+    const incoming = await parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
 
     const plan = await planImport(deps, incoming);
     await importMerged(
@@ -109,7 +109,7 @@ describe.each(TAGS)('storage compat: %s', (tag) => {
     );
 
     const { deps } = createServices(localStorage);
-    const incoming = parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
+    const incoming = await parseBackupFile(deps, readFixture(tag, 'backup-all.json'));
 
     const plan = await planImport(deps, incoming);
     await importMerged(
