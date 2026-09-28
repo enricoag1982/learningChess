@@ -14,6 +14,7 @@ import {
 } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { keySchema, textRefSchema } from '../schema.ts';
+import type { Where } from '../subject.ts';
 
 // Re-exported for kind schema files that already import it from here.
 export { textRefSchema };
@@ -65,12 +66,7 @@ export interface PositionYaml {
 }
 
 /** Parses a board diagram or FEN into a `Position`, reporting `DiagramError` / `FenError` as an issue. */
-export function compilePosition(
-  relPath: string,
-  fieldPath: string,
-  raw: PositionYaml,
-  issues: string[],
-): Position | null {
+export function compilePosition(raw: PositionYaml, at: Where): Position | null {
   try {
     if (raw.board !== undefined) {
       return parseDiagram(raw.board, { toMove: raw.toMove });
@@ -78,7 +74,7 @@ export function compilePosition(
     return parseFen(raw.fen ?? '');
   } catch (error) {
     if (error instanceof DiagramError || error instanceof FenError) {
-      issues.push(`${relPath}: ${fieldPath}: ${error.message}`);
+      at.issues.push(`${at.where}: ${error.message}`);
       return null;
     }
     throw error;

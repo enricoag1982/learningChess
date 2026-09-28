@@ -1,55 +1,55 @@
 // The exercise-kind content abstraction (schema + compile + verify): a uniform interface so
 // `lesson-load.ts` dispatches through a registry (`kinds/index.ts`) — the content counterpart of
 // core's `ExerciseKind`.
-import type { ExerciseDef, Position, Square } from '@chess-kids/core/chess';
+import type { ExerciseDef } from '@chess-kids/core/chess';
 import type { z } from 'zod';
-import { compilePosition, type PositionYaml } from './common.ts';
 
-/** Fields every compiled `ExerciseDef` shares, supplied by `CompileContext.build` (the "head"). */
-interface CompiledHead {
+/** Fields every compiled exercise def shares, supplied by `CompileContext.build` ahead of the
+ * subject's own stimulus head and the kind's own body. */
+interface GenericHead {
   readonly id: string;
   readonly concept: string;
   readonly textKey: string;
-  readonly position: Position;
-}
-
-/** Fields every compiled `ExerciseDef` may carry, appended by `CompileContext.build` (the "tail"). */
-interface CompiledTail {
-  readonly easier?: string;
-  readonly lastMove?: { readonly from: Square; readonly to: Square };
 }
 
 /** Per-exercise compile helpers, threaded through a kind's `compile(raw, ctx)`: `ctx.where` is
- * `<relPath>: <fieldPath>`, `ctx.issues` collects them, `ctx.position` parses a further board/FEN
- * field, and `ctx.build` prepends the head and appends the tail every exercise shares. */
+ * `<relPath>: <fieldPath>`, `ctx.issues` collects them, and `ctx.build` prepends the generic and
+ * subject head fields and appends `easier` and the subject's tail fields every exercise shares.
+ * `D` (each kind's own concrete def) is inferred from the caller's own return type. */
 export interface CompileContext {
   readonly where: string;
   readonly issues: string[];
-  position(field: string, raw: PositionYaml): Position | null;
-  build<B extends { readonly type: string }>(body: B): CompiledHead & B & CompiledTail;
+  // D is inferred from each kind's own `compile`'s declared return type, not from `body`.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+  build<D extends { readonly type: string }>(body: object): D;
 }
 
-/** Builds the `CompileContext` for one exercise (`lesson-load.ts`'s generic exercise compiler). */
+/** Builds the `CompileContext` for one exercise (`kinds/compile-exercise.ts`'s generic compiler);
+ * `stimulus` is the subject's own `head`/`tail` for this exercise (`StimulusContent.compile`'s
+ * result), spliced in at the position `docs/refactor-v4.md` fixes: id, concept, textKey, [head],
+ * body, easier, [tail]. */
 export function makeCompileContext(
   relPath: string,
   fieldPath: string,
   issues: string[],
-  head: Omit<CompiledHead, 'position'> & { readonly position: Position },
-  tail: CompiledTail,
+  head: GenericHead,
+  easier: string | undefined,
+  stimulus: { readonly head: object; readonly tail: object },
 ): CompileContext {
   return {
     where: `${relPath}: ${fieldPath}`,
     issues,
-    position(field, raw) {
-      return compilePosition(relPath, `${fieldPath}.${field}.board`, raw, issues);
-    },
-    build(body) {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- see above.
+    build<D extends { readonly type: string }>(body: object): D {
+      // Single trust boundary from the generic bag to each kind's own concrete def — same idiom
+      // as every other platform/subject seam.
       return {
         ...head,
+        ...stimulus.head,
         ...body,
-        ...(tail.easier === undefined ? {} : { easier: tail.easier }),
-        ...(tail.lastMove === undefined ? {} : { lastMove: tail.lastMove }),
-      };
+        ...(easier === undefined ? {} : { easier }),
+        ...stimulus.tail,
+      } as unknown as D;
     },
   };
 }

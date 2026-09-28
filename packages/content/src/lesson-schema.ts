@@ -1,31 +1,15 @@
-import { z } from 'zod';
-import {
-  checkExactlyOnePosition,
-  positionFields,
-  squareSchema,
-  textRefSchema,
-} from './kinds/common.ts';
+import { chessDemoSchema } from './chess-content.ts';
+import { squareSchema, textRefSchema } from './kinds/common.ts';
 import { exerciseSchema, type ChoiceOptionYaml, type ExerciseYaml } from './kinds/index.ts';
 import { miniGameSchema, type MiniGameYaml, type WinConditionYaml } from './modes/index.ts';
 import { keySchema } from './schema.ts';
+import { z } from 'zod';
 
 export { exerciseSchema, miniGameSchema, squareSchema, textRefSchema };
 export type { ChoiceOptionYaml, ExerciseYaml, MiniGameYaml, WinConditionYaml };
 
-/**
- * A lesson's demo: position, spoken text, and its board highlight — either `legal-moves <square>`
- * (most lessons: every square that piece can reach) or `squares [<sq> …]` (World 1: an explicit
- * list, e.g. a row/diagonal or a corner; zero squares highlights nothing).
- */
-export const demoSchema = z
-  .object({
-    ...positionFields,
-    /** Locale key for the demo's spoken text; defaults to `<lesson-id>.demo` when absent. */
-    text: textRefSchema.optional(),
-    highlight: z.string().regex(/^legal-moves [a-h][1-8]$|^squares(?: [a-h][1-8])*$/),
-  })
-  .strict()
-  .superRefine(checkExactlyOnePosition);
+/** A lesson's demo: the subject's own schema (chess: position, spoken text, board highlight). */
+export const demoSchema = chessDemoSchema;
 
 /** One lesson file (`lessons/<world>/<lesson-id>.yaml`). */
 export const lessonSchema = z

@@ -1,13 +1,13 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CompiledContent, DemoHighlight, Lesson, MiniGame } from '@chess-kids/core/chess';
-import type { ExerciseDef, Position, Square } from '@chess-kids/core/chess';
+import type { CompiledContent, Lesson, MiniGame } from '@chess-kids/core/chess';
+import type { ExerciseDef, Position } from '@chess-kids/core/chess';
 import { hasPieceOf } from '@chess-kids/core/chess';
 import { solutionOf } from '@chess-kids/core/testing';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
+import { chessDemo } from './chess-content.ts';
 import { compileExercises } from './kinds/compile-exercise.ts';
-import { compilePosition } from './kinds/common.ts';
 import { contentKindOf } from './kinds/index.ts';
 import { ContentError, type Locales } from './load.ts';
 import {
@@ -18,15 +18,6 @@ import {
 } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
 import { lessonSchema, miniGameSchema } from './lesson-schema.ts';
-
-/** Parses a demo's `highlight` string (schema-validated) into a `DemoHighlight`. */
-function compileDemoHighlight(raw: string): DemoHighlight {
-  if (raw.startsWith('legal-moves ')) {
-    return { legalMovesFrom: raw.slice('legal-moves '.length) as Square };
-  }
-  const rest = raw.slice('squares'.length).trim();
-  return { squares: rest === '' ? [] : (rest.split(' ') as Square[]) };
-}
 
 function compileLessonFile(
   filePath: string,
@@ -57,11 +48,16 @@ function compileLessonFile(
   }
   const data = result.data;
 
-  const demoPosition = compilePosition(relPath, 'demo.board', data.demo, issues);
+  // The subject's own concrete shape (`Lesson['demo']`); `DemoContent.compile`'s declared return
+  // type is deliberately loose (the platform never names a subject's own demo fields).
+  const demo = chessDemo.compile(data.demo, `lessons:${data.demo.text ?? `${data.id}.demo`}`, {
+    where: `${relPath}: demo`,
+    issues,
+  }) as Lesson['demo'] | null;
   const guided = compileExercises(relPath, 'guided', data.guided, data.concept, issues);
   const exercises = compileExercises(relPath, 'exercises', data.exercises, data.concept, issues);
   const variants = compileExercises(relPath, 'variants', data.variants ?? [], data.concept, issues);
-  if (demoPosition === null || guided === null || exercises === null || variants === null) {
+  if (demo === null || guided === null || exercises === null || variants === null) {
     return null;
   }
 
@@ -73,12 +69,7 @@ function compileLessonFile(
     character: data.character,
     titleKey: `lessons:${data.title ?? `${data.id}.title`}`,
     storyKey: `lessons:${data.story ?? `${data.id}.story`}`,
-    demo: {
-      position: demoPosition,
-      textKey: `lessons:${data.demo.text ?? `${data.id}.demo`}`,
-      // `demoSchema` already validated the "legal-moves <square>" / "squares [<sq> …]" shape.
-      highlight: compileDemoHighlight(data.demo.highlight),
-    },
+    demo,
     guided,
     exercises,
     ...(variants.length > 0 ? { variants } : {}),
@@ -234,9 +225,7 @@ function validateSemantics(
       issues,
     );
     checkTextKey(lesson.demo.textKey, locales, `${lessonWhere}: demo.text`, issues);
-    if (!hasKidPiece(lesson.demo.position)) {
-      issues.push(`${lessonWhere}: demo: side to move has no piece`);
-    }
+    chessDemo.check?.(lesson.demo, { where: `${lessonWhere}: demo`, issues });
 
     for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
       const exerciseWhere = `${lessonWhere}: ${exercise.id}`;

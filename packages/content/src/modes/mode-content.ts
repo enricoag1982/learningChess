@@ -28,7 +28,7 @@ export function makeMiniGameCompileContext(
   return {
     issues,
     position(field, raw) {
-      return compilePosition(relPath, field, raw, issues);
+      return compilePosition(raw, { where: `${relPath}: ${field}`, issues });
     },
     exercises(field, raw, concept) {
       return compileExercises(relPath, field, raw, concept, issues);

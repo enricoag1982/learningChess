@@ -1,6 +1,6 @@
 import { piecesEqual, type SetupDef, type Square } from '@chess-kids/core/chess';
 import { z } from 'zod';
-import { checkExactlyOnePosition, exerciseCommonFields } from '../common.ts';
+import { checkExactlyOnePosition, compilePosition, exerciseCommonFields } from '../common.ts';
 import type { ExerciseKindContent } from '../kind-content.ts';
 import type { CompileContext } from '../kind-content.ts';
 
@@ -20,7 +20,10 @@ export const schema = z
   .strict();
 
 function compile(raw: z.output<typeof schema>, ctx: CompileContext): SetupDef | null {
-  const target = ctx.position('target', raw.target);
+  const target = compilePosition(raw.target, {
+    where: `${ctx.where}.target.board`,
+    issues: ctx.issues,
+  });
   if (target === null) {
     return null;
   }

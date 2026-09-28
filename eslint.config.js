@@ -144,6 +144,7 @@ export default defineConfig([
       '**/app/friend-play.ts',
       '**/app/bot-player.ts',
       '**/chess-core.ts',
+      '**/content/src/chess-content.ts',
       '**/content/src/bot-book-load.ts',
       '**/content/src/bot-book-schema.ts',
       '**/content/src/kinds/common.ts',
