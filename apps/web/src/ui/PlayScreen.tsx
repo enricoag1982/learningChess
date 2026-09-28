@@ -5,7 +5,12 @@ import { useTranslation } from 'react-i18next';
 import type { MiniGame } from '@chess-kids/core/chess';
 import type { ComputerLevelCondition, ComputerLevelStatus } from '@chess-kids/core/chess';
 import { unlockedMiniGames } from '@chess-kids/core';
-import { chessCore, computerLevelStatus, friendGameOptions, suggestedLevel } from '@chess-kids/core/chess';
+import {
+  chessCore,
+  computerLevelStatus,
+  friendGameOptions,
+  suggestedLevel,
+} from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { firstLessonsByCharacter, unlockLabel } from './lesson-character-labels.ts';
@@ -309,7 +314,9 @@ export function PlayScreen(): JSX.Element {
           const title = tContent(t, minigame.titleKey);
           const bestStars = Math.max(lessonBestStars, bestStarsById.get(minigame.id) ?? 0);
           const lesson = lessonById.get(minigame.unlockAfter);
-          const label = lesson ? unlockLabel(t, chessCore.characters, lesson, firstLessonOfCharacter) : title;
+          const label = lesson
+            ? unlockLabel(t, chessCore.characters, lesson, firstLessonOfCharacter)
+            : title;
           const condition = t('play.locked-condition', { label });
           const accessibleName = unlocked
             ? t('play.minigame-name-stars', {

@@ -4,6 +4,7 @@ import { getLessonProgress } from '@chess-kids/core';
 import type { MiniGameProgress, Track, TracksCatalog, World } from '@chess-kids/core';
 import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import { makeContentSource } from '@chess-kids/core/testing';
+import { chessWeb } from '../chess-pack.ts';
 import { fixtureLesson } from '../testing/fixtures.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
 import { createTestServices } from '../testing/test-services.ts';
@@ -32,7 +33,7 @@ describe('JourneyScreen', () => {
   it('shows the first lesson current and the next one locked', async () => {
     const [l1, l2] = twoLessons();
     const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
-    await renderWithStore(<JourneyScreen />, services);
+    await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     await screen.findByRole('button', { name: /Rhino the Rook, current/ });
     expect(screen.getByRole('button', { name: /Elephant the Bishop, locked/ })).toBeTruthy();
@@ -41,7 +42,7 @@ describe('JourneyScreen', () => {
   it('tapping the locked lesson explains what to finish first', async () => {
     const [l1, l2] = twoLessons();
     const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
-    await renderWithStore(<JourneyScreen />, services);
+    await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     fireEvent.click(await screen.findByRole('button', { name: /Elephant the Bishop, locked/ }));
 
@@ -51,7 +52,7 @@ describe('JourneyScreen', () => {
   it('tapping the current lesson opens it', async () => {
     const [l1, l2] = twoLessons();
     const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     await act(async () => {
       fireEvent.click(await screen.findByRole('button', { name: /Rhino the Rook, current/ }));
@@ -65,7 +66,7 @@ describe('JourneyScreen', () => {
   it('back button returns to Home', async () => {
     const [l1, l2] = twoLessons();
     const services = createTestServices(makeContentSource({ lessons: [l1, l2], catalog: CATALOG }));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Back to Home' }));
 
@@ -129,7 +130,7 @@ describe('JourneyScreen world boss node', () => {
   it('is locked while the world’s lessons are not all complete', async () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
-    await renderWithStore(<JourneyScreen />, services);
+    await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     await screen.findByRole('button', { name: /^World boss: .*, locked$/ });
   });
@@ -137,7 +138,7 @@ describe('JourneyScreen world boss node', () => {
   it('is available (highlighted as next) once every lesson of the world is complete', async () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     await completeLesson(services, bl);
     await act(async () => {
@@ -153,7 +154,7 @@ describe('JourneyScreen world boss node', () => {
   it('is won once its mini-game has a win, and no longer offers to start it again as "available"', async () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
     await completeLesson(services, bl);
 
     const nowIso = new Date().toISOString();
@@ -179,7 +180,7 @@ describe('JourneyScreen world boss node', () => {
   it('tapping the available boss starts its mini-game session, returning to the Journey on exit', async () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
     // `exitMiniGame` now reads its target off the stack (no more `miniGameOrigin`): put Journey
     // on top first, same as the app does before this screen ever shows.
     store.getState().goToJourney();
@@ -204,7 +205,7 @@ describe('JourneyScreen world boss node', () => {
   it('tapping the locked boss does nothing', async () => {
     const bl = fixtureLesson({ id: 'bl', order: 1, character: 'rhino' });
     const services = createTestServices(contentSourceWithBoss(bl));
-    const { store } = await renderWithStore(<JourneyScreen />, services);
+    const { store } = await renderWithStore(<JourneyScreen />, services, chessWeb);
 
     const screenBefore = store.getState().screen;
     fireEvent.click(await screen.findByRole('button', { name: /^World boss: .*, locked$/ }));
