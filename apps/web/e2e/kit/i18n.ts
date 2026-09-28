@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { chessWeb } from '../../src/chess-pack.ts';
 import { i18nOptions } from '../../src/i18n-options.ts';
 
 /**
@@ -10,7 +11,7 @@ import { i18nOptions } from '../../src/i18n-options.ts';
 const e2eI18n = i18next.createInstance();
 // Resources are bundled at build time (same comment as `src/i18n.ts`): init completes
 // synchronously, so every export below can use `e2eI18n` right away.
-void e2eI18n.init(i18nOptions);
+void e2eI18n.init(i18nOptions(chessWeb.resources));
 
 /**
  * Resolves a content text key (e.g. `lessons:rook.title`, `characters:rhino.name`, or a

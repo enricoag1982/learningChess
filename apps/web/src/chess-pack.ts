@@ -2,6 +2,9 @@
 // `subject-chess/src/web`. Every platform-bound module reaches chess only through this file.
 import { chessCore, isInCheck, kingSquare } from '@chess-kids/core/chess';
 import type { BotPlayer, Position, Square } from '@chess-kids/core/chess';
+// Node's ESM loader (this module is also imported straight from `e2e/kit/i18n.ts`, outside Vite)
+// requires this attribute for a JSON import.
+import en from '@chess-kids/content/locales/en.json' with { type: 'json' };
 import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
 import { useAppStore } from './app/store.ts';
 import type { SubjectServices, SubjectWeb, SurfaceContext } from './app/subject.ts';
@@ -38,6 +41,7 @@ export const chessWeb = {
   CharacterBadge,
   homeTiles: HOME_TILES,
   den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },
+  resources: { en },
 } satisfies SubjectWeb;
 
 /** The checked king's square right now, if any (Board's check ring, every exercise kind). */
