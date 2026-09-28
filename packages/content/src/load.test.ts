@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ContentError, compareToReference, loadLocales } from './load.ts';
+import { ContentError, compareToReference, loadLocales, mergeLocales } from './load.ts';
 
 let dir: string;
 
@@ -166,6 +166,39 @@ describe('loadLocales', () => {
     expect(issues).toHaveLength(2);
     expect(issues.some((issue) => issue.startsWith('en/common.yaml:'))).toBe(true);
     expect(issues.some((issue) => issue.startsWith('en/home.yaml:'))).toBe(true);
+  });
+});
+
+describe('mergeLocales', () => {
+  it('deep-merges two roots’ namespaces, key order canonical either way', () => {
+    const platform = { en: { common: { a: 'A', z: 'Z' } } };
+    const subject = { en: { common: { m: 'M' } } };
+
+    expect(mergeLocales(platform, subject)).toEqual({ en: { common: { a: 'A', m: 'M', z: 'Z' } } });
+  });
+
+  it('a namespace only one root defines passes through unchanged', () => {
+    const platform = { en: { common: { a: 'A' } } };
+    const subject = { en: { lessons: { rook: { title: 'Rook' } } } };
+
+    expect(mergeLocales(platform, subject)).toEqual({
+      en: { common: { a: 'A' }, lessons: { rook: { title: 'Rook' } } },
+    });
+  });
+
+  it('throws when both roots define the same leaf key', () => {
+    const platform = { en: { common: { parent: { a: 'A' } } } };
+    const subject = { en: { common: { parent: { a: 'B' } } } };
+
+    expect(() => mergeLocales(platform, subject)).toThrow(ContentError);
+    try {
+      mergeLocales(platform, subject);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ContentError);
+      expect((error as ContentError).issues).toEqual([
+        expect.stringContaining('"common.parent.a" is defined in both'),
+      ]);
+    }
   });
 });
 

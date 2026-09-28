@@ -53,6 +53,66 @@ export function loadLocales(localesDir: string): Locales {
   return locales;
 }
 
+/** Deep-merges one namespace's tree from the platform root with the subject's own (chess), a leaf
+ * key defined by both is a build error. Key order is canonical (`sortNamespaces` sorts both
+ * inputs already and the caller re-sorts the result), so which root a key lives in never affects
+ * the merged output. */
+function mergeTree(
+  platform: LocaleTree,
+  subject: LocaleTree,
+  path: string,
+  issues: string[],
+): LocaleTree {
+  const result: LocaleTree = { ...platform };
+  for (const [key, subjectValue] of Object.entries(subject)) {
+    const keyPath = path === '' ? key : `${path}.${key}`;
+    const platformValue = result[key];
+    if (platformValue === undefined) {
+      result[key] = subjectValue;
+    } else if (typeof platformValue === 'string' || typeof subjectValue === 'string') {
+      issues.push(`locales: "${keyPath}" is defined in both the platform and subject roots`);
+    } else {
+      result[key] = mergeTree(platformValue, subjectValue, keyPath, issues);
+    }
+  }
+  return result;
+}
+
+/** Deep-merges the subject's own locales (chess) into the platform's, namespace by namespace, per
+ * language; throws {@link ContentError} on any key both roots define. */
+export function mergeLocales(platform: Locales, subject: Locales): Locales {
+  const issues: string[] = [];
+  const languages = new Set([...Object.keys(platform), ...Object.keys(subject)]);
+  const merged: Locales = {};
+
+  for (const lang of languages) {
+    const platformNamespaces = platform[lang] ?? {};
+    const subjectNamespaces = subject[lang] ?? {};
+    const namespaceNames = new Set([
+      ...Object.keys(platformNamespaces),
+      ...Object.keys(subjectNamespaces),
+    ]);
+    const namespaces: Record<string, LocaleTree> = {};
+    for (const name of namespaceNames) {
+      namespaces[name] = mergeTree(
+        platformNamespaces[name] ?? {},
+        subjectNamespaces[name] ?? {},
+        name,
+        issues,
+      );
+    }
+    merged[lang] = namespaces;
+  }
+
+  if (issues.length > 0) {
+    throw new ContentError(issues);
+  }
+
+  return Object.fromEntries(
+    Object.entries(merged).map(([lang, namespaces]) => [lang, sortNamespaces(namespaces)]),
+  );
+}
+
 /** Loads every namespace file of one language directory. */
 function loadLanguage(
   langDir: string,

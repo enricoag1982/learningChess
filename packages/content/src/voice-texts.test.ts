@@ -4,14 +4,17 @@ import { voiceKey } from '@chess-kids/core';
 import { describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
 import { chessBadges } from './chess-content.ts';
-import { loadLocales, type Locales } from './load.ts';
+import { loadLocales, mergeLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import type { LocaleTree } from './schema.ts';
 import { loadTracks } from './tracks-load.ts';
 import { buildVoiceInventory } from './voice-texts.ts';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const locales = loadLocales(join(packageDir, 'locales'));
+const locales = mergeLocales(
+  loadLocales(join(packageDir, 'locales')),
+  loadLocales(join(packageDir, 'chess', 'locales')),
+);
 const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
 const catalog = loadTracks(
   join(packageDir, 'tracks.yaml'),

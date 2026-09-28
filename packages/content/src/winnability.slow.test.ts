@@ -6,11 +6,14 @@ import type { VersusMiniGame } from '@chess-kids/core/chess';
 /** One `domain/bot` difficulty profile (Mouse .. Bear); re-exported as a namespace, not a named type. */
 type BotLevel = (typeof bot.BOT_LEVELS)[number];
 import { describe, expect, it } from 'vitest';
-import { loadLocales } from './load.ts';
+import { loadLocales, mergeLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
-const locales = loadLocales(join(packageDir, 'locales'));
+const locales = mergeLocales(
+  loadLocales(join(packageDir, 'locales')),
+  loadLocales(join(packageDir, 'chess', 'locales')),
+);
 const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
 
 function findVersusMiniGame(id: string): VersusMiniGame {

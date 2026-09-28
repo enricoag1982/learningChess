@@ -15,7 +15,7 @@ import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from '../src/badges-load.ts';
 import { chessBadges } from '../src/chess-content.ts';
-import { ContentError, loadLocales, type Locales } from '../src/load.ts';
+import { ContentError, loadLocales, mergeLocales, type Locales } from '../src/load.ts';
 import { loadContent } from '../src/lesson-load.ts';
 import { loadTracks } from '../src/tracks-load.ts';
 import { buildVoiceInventory } from '../src/voice-texts.ts';
@@ -23,6 +23,7 @@ import { buildVoiceInventory } from '../src/voice-texts.ts';
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
 const repoRoot = join(packageDir, '..', '..');
 const localesDir = join(packageDir, 'locales');
+const chessLocalesDir = join(packageDir, 'chess', 'locales');
 const lessonsDir = join(packageDir, 'lessons');
 const minigamesDir = join(packageDir, 'minigames');
 const tracksPath = join(packageDir, 'tracks.yaml');
@@ -36,7 +37,7 @@ function fail(issues: readonly string[]): never {
 
 let locales: Locales;
 try {
-  locales = loadLocales(localesDir);
+  locales = mergeLocales(loadLocales(localesDir), loadLocales(chessLocalesDir));
 } catch (error) {
   if (error instanceof ContentError) fail(error.issues);
   throw error;

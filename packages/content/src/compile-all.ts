@@ -3,7 +3,13 @@ import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from './badges-load.ts';
 import { chessBadges } from './chess-content.ts';
-import { ContentError, compareToReference, loadLocales, type Locales } from './load.ts';
+import {
+  ContentError,
+  compareToReference,
+  loadLocales,
+  mergeLocales,
+  type Locales,
+} from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import { loadTracks } from './tracks-load.ts';
 import { buildVoiceInventory, type VoiceInventory } from './voice-texts.ts';
@@ -33,12 +39,13 @@ export function compileAll(
   extraOutputs: Readonly<Record<string, (root: string) => unknown>>,
 ): CompiledAll {
   const localesDir = join(packageDir, 'locales');
+  const chessLocalesDir = join(packageDir, 'chess', 'locales');
   const lessonsDir = join(packageDir, 'lessons');
   const minigamesDir = join(packageDir, 'minigames');
   const tracksPath = join(packageDir, 'tracks.yaml');
   const badgesPath = join(packageDir, 'badges.yaml');
 
-  const locales = loadLocales(localesDir);
+  const locales = mergeLocales(loadLocales(localesDir), loadLocales(chessLocalesDir));
 
   const referenceIssues = compareToReference(locales);
   if (referenceIssues.length > 0) {

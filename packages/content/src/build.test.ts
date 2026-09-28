@@ -4,6 +4,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { beforeAll, describe, expect, it } from 'vitest';
+import { mergeLocales } from './load.ts';
+import type { LocaleTree } from './schema.ts';
 import { parse as parseYaml } from 'yaml';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -13,19 +15,25 @@ beforeAll(() => {
 });
 
 describe('build script', () => {
-  it('builds dist/locales/en.json from the real locales', () => {
+  it('builds dist/locales/en.json from the real (platform + chess) locales', () => {
     const output: unknown = JSON.parse(
       readFileSync(join(packageDir, 'dist', 'locales', 'en.json'), 'utf8'),
     );
-    const readNamespace = (name: string): unknown =>
-      parseYaml(readFileSync(join(packageDir, 'locales', 'en', `${name}.yaml`), 'utf8'));
+    const readNamespace = (root: readonly string[], name: string): LocaleTree =>
+      parseYaml(readFileSync(join(...root, 'en', `${name}.yaml`), 'utf8')) as LocaleTree;
+    const platformDir = [packageDir, 'locales'];
+    const chessDir = [packageDir, 'chess', 'locales'];
+    const merged = mergeLocales(
+      { en: { common: readNamespace(platformDir, 'common') } },
+      { en: { common: readNamespace(chessDir, 'common') } },
+    );
 
     expect(output).toEqual({
-      common: readNamespace('common'),
-      lessons: readNamespace('lessons'),
-      characters: readNamespace('characters'),
-      journey: readNamespace('journey'),
-      rewards: readNamespace('rewards'),
+      common: merged.en?.common,
+      lessons: readNamespace(chessDir, 'lessons'),
+      characters: readNamespace(chessDir, 'characters'),
+      journey: readNamespace(platformDir, 'journey'),
+      rewards: readNamespace(platformDir, 'rewards'),
     });
   });
 
