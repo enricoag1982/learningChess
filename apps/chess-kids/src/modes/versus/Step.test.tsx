@@ -9,7 +9,7 @@ import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/te
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { chessWeb } from '../../chess-pack.ts';
 import { createTestServices } from '../../testing/test-services.ts';
-import { BossStep } from '../ui-registry.ts';
+import { BossStep } from '../BossStep.tsx';
 
 /**
  * A scripted `BotPlayer`: replies with the queued `from`/`to` moves in order (resolved into a real

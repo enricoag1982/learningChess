@@ -1,5 +1,4 @@
-// Chess's Home tiles (`SubjectWeb.homeTiles`) — part of the pack (`chess-pack.ts`), temporary
-// home until m8.18 moves it to `subject-chess/src/web`.
+// Chess's Home tiles (`SubjectWeb.homeTiles`), part of the chess pack (`chess-pack.ts`).
 import type { HomeTile } from './app/subject.ts';
 import { PlayTileIcon } from '@learn/subject-chess/web/home-tiles-icon.tsx';
 

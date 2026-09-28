@@ -2,7 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { recordMiniGameResult } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
-import { BossStep } from '../chess-pack.ts';
+import { BossStep } from '../modes/BossStep.tsx';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import type { BossPlaySession } from '@learn/platform-web/modes/mode-ui.ts';
 import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';

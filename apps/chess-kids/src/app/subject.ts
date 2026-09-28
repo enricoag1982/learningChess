@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import type { ComponentType, JSX } from 'react';
 import type {
   ContentSource,
+  ExerciseStateBase,
   GameRecord,
   Lesson,
   Profile,
@@ -9,6 +10,7 @@ import type {
   SubjectCore,
 } from '@learn/platform-core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
+import type { MiniGameModeUI } from '@learn/platform-web/modes/mode-ui.ts';
 import type { AppSet, SliceCreator } from './store.ts';
 import { DEFAULT_ROUTE_META, PLATFORM_ROUTE_META } from '@learn/platform-web/app/routes.ts';
 import type { Route, RouteMeta, RouteName } from '@learn/platform-web/app/routes.ts';
@@ -52,11 +54,14 @@ export interface SubjectWeb {
   createServices(): { readonly content: ContentSource; readonly subject: SubjectServices };
   /** Every exercise kind's UI, by `type` — `ExercisePlay`'s one dispatch point. */
   readonly kinds: Readonly<Record<string, AnyExerciseKindUI>>;
-  /** The lesson's board, Story and Demo steps: method syntax (bivariant), so a subject's own
-   * `Lesson` (concrete fields beyond `textKey`) widens here with no cast. */
+  /** This subject's mini-game mode UIs, by `mode` (chess: static, versus); `BossStep` adds `series`. */
+  readonly modes: Readonly<Record<string, MiniGameModeUI>>;
+  /** The lesson's board (Story, Demo) and a finished round's board (View): method syntax (bivariant),
+   * so a subject's own `Lesson` / state (fields beyond the base) widens here with no cast. */
   readonly surface: {
     Story(props: { readonly lesson: Lesson; readonly compact: boolean }): JSX.Element;
     Demo(props: { readonly lesson: Lesson }): JSX.Element;
+    View(props: { state: ExerciseStateBase; surface: SurfaceContext }): JSX.Element;
   };
   /** The piece-icon pill under a character's portrait, naming the piece it stands for
    * (`CharacterCard`); absent for a subject with no such badge. */

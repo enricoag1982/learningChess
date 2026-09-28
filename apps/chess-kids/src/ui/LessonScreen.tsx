@@ -11,7 +11,7 @@ import {
   totalStars,
 } from '@learn/platform-core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
-import { BossStep } from '../chess-pack.ts';
+import { BossStep } from '../modes/BossStep.tsx';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
 import { DemoStep } from './lesson/DemoStep.tsx';
 import { ExerciseStep } from './lesson/ExerciseStep.tsx';

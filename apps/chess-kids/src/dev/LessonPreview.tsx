@@ -6,7 +6,7 @@ import { createBundledContentSource } from '@learn/subject-chess/web/adapters/co
 import { createAppStore, StoreProvider } from '../app/store.ts';
 import { PackProvider } from '../app/subject.ts';
 import { chessWeb } from '../chess-pack.ts';
-import { BossStep } from '../modes/ui-registry.ts';
+import { BossStep } from '../modes/BossStep.tsx';
 import { DemoStep } from '../ui/lesson/DemoStep.tsx';
 import { ExerciseStep } from '../ui/lesson/ExerciseStep.tsx';
 import { StoryStep } from '../ui/lesson/StoryStep.tsx';

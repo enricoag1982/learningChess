@@ -4,7 +4,8 @@ import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { Color, Move, Piece, Position, Square } from '../../../chess.ts';
 import { toFen } from '../../../chess.ts';
-import { BlockedIcon, PieceBadge, PieceIcon, StarIcon } from './pieces.tsx';
+import { StarIcon } from '@learn/platform-web/ui/ds/icons.tsx';
+import { BlockedIcon, PieceBadge, PieceIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
 

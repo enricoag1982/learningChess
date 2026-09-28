@@ -10,7 +10,7 @@ import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts'
 import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';
-import { BossStep } from '../ui-registry.ts';
+import { BossStep } from '../BossStep.tsx';
 
 const EMPTY_POSITION = parseDiagram(
   [

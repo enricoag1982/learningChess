@@ -10,7 +10,7 @@ import type {
 } from '@learn/platform-core';
 import { completeRound, currentRound, startSeries } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
-import { SeriesClosingBoard, useSurfacePieceBadges } from '../../chess-pack.ts';
+import { usePack } from '../../app/subject.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
@@ -119,7 +119,7 @@ function SeriesRound({
 }
 
 /** A `series` boss mini-game: a fixed sequence of rounds through the normal exercise engine,
- * scored on total mistakes (errors + hint levels) across every round (`MINI_GAME_MODE_UI.series`). */
+ * scored on total mistakes (errors + hint levels) across every round (`BossStep`). */
 export function Step({
   lesson,
   game: minigame,
@@ -128,8 +128,8 @@ export function Step({
 }: BossStepProps<SeriesGame>): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pack = usePack();
   const goToStep = useAppStore((state) => state.goToStep);
-  const pieceBadges = useSurfacePieceBadges({ worldId: lesson.world });
   const kinds = services.deps.subject.kinds;
 
   const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame, kinds));
@@ -165,7 +165,7 @@ export function Step({
         />
       ) : (
         <GameLayout
-          board={SeriesClosingBoard(series.round, t('lesson.board-label'), pieceBadges)}
+          board={<pack.surface.View state={series.round} surface={{ worldId: lesson.world }} />}
           panel={
             <>
               <SpeechBubble text={goalText} />

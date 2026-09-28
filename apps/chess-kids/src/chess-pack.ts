@@ -1,9 +1,8 @@
-// The chess `SubjectWeb` pack (docs/refactor-v4.md §11) — temporary home until m8.18 moves it to
-// `subject-chess/src/web`. Every platform-bound module reaches chess only through this file.
+// The chess `SubjectWeb` pack (docs/refactor-v4.md §11): everything the platform reaches of chess.
 import { createElement, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { chessCore, isInCheck, kingSquare } from '@learn/subject-chess';
 import type { BotPlayer, ExerciseState, Position, Square } from '@learn/subject-chess';
-import type { ExerciseStateBase } from '@learn/platform-core';
 import { createWorkerBotPlayer } from '@learn/subject-chess/web/adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import { useAppStore } from './app/store.ts';
@@ -11,7 +10,7 @@ import type { SubjectRouteEntry, SubjectWeb, SurfaceContext } from './app/subjec
 import { createPlaySlice, type PlaySlice } from './app/slices/play.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
-import { BossStep } from './modes/ui-registry.ts';
+import { MINI_GAME_MODE_UI } from './modes/ui-registry.ts';
 import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 import { Board } from '@learn/subject-chess/web/ui/board/Board.tsx';
@@ -21,9 +20,6 @@ import {
 } from '@learn/subject-chess/web/ui/board/piece-style.ts';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
-
-// `BossStep`: the lesson/standalone boss mini-game UI, reached only through the pack.
-export { BossStep };
 
 const FriendSetupScreen = lazy(() =>
   import('./ui/FriendSetupScreen.tsx').then((module) => ({ default: module.FriendSetupScreen })),
@@ -64,7 +60,6 @@ declare module '@learn/platform-web/app/routes.ts' {
   }
 }
 
-/** One content source, shared by the app's use cases and chess's own screens. */
 function createChessServices() {
   const content = createBundledContentSource();
   return { content, subject: { botPlayer: createWorkerBotPlayer(), content } };
@@ -88,7 +83,8 @@ export const chessWeb = {
   core: chessCore,
   createServices: createChessServices,
   kinds: EXERCISE_KIND_UI,
-  surface: { Story: SurfaceStory, Demo: SurfaceDemo },
+  modes: MINI_GAME_MODE_UI,
+  surface: { Story: SurfaceStory, Demo: SurfaceDemo, View: SurfaceView },
   CharacterBadge,
   art: ANIMAL_IMAGES,
   homeTiles: HOME_TILES,
@@ -126,8 +122,13 @@ export function useSurfacePieceBadges(surface: SurfaceContext): boolean {
   return showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: surface.worldId }));
 }
 
-/** A `series` boss's closing screen: the last round's final board, plain. */
-export function SeriesClosingBoard(round: ExerciseStateBase, label: string, pieceBadges: boolean) {
-  const { position } = round as ExerciseState;
-  return createElement(Board, { position, legalMoves: [], label, pieceBadges });
+/** A finished round's final board, plain (a `series` boss's closing screen). */
+function SurfaceView({ state, surface }: { state: ExerciseState; surface: SurfaceContext }) {
+  const { t } = useTranslation();
+  return createElement(Board, {
+    position: state.position,
+    legalMoves: [],
+    label: t('lesson.board-label'),
+    pieceBadges: useSurfacePieceBadges(surface),
+  });
 }

@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import { StarIcon } from '@learn/subject-chess/web/ui/board/pieces.tsx';
+import { StarIcon } from '@learn/platform-web/ui/ds/icons.tsx';
 
 export interface StarsRowProps {
   readonly earned: number;

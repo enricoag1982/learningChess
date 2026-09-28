@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StarIcon } from '@learn/subject-chess/web/ui/board/pieces.tsx';
+import { StarIcon } from '@learn/platform-web/ui/ds/icons.tsx';
 import { InfoPill } from '@learn/platform-web/ui/ds/primitives.tsx';
 
 /** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): a star total, used in the Home and

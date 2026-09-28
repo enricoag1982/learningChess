@@ -264,40 +264,10 @@ function ShadeLines({ type }: { readonly type: PieceType }): JSX.Element {
   }
 }
 
-/** Fixed pixel size, or fill the parent when omitted (used inline on a square). */
-interface MarkerIconProps {
-  readonly size?: number;
-}
-
-/** Gold five-point star marker (collectible squares), `aria-hidden`. */
-export function StarIcon({ size }: MarkerIconProps): JSX.Element {
-  return (
-    <svg
-      viewBox="0 0 45 45"
-      aria-hidden="true"
-      className={`pointer-events-none block ${size === undefined ? 'h-full w-full' : ''}`}
-      {...(size === undefined ? {} : { width: size, height: size })}
-    >
-      <path
-        d="M22.5,5 L32.8,36.7 L5.9,17.1 L39.1,17.1 L12.2,36.7 Z"
-        fill="#E9A92B"
-        stroke="#8C5E08"
-        strokeWidth={1.8}
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 /** Friendly rock/bush marker for a blocked square, `aria-hidden`. Never a red cross. */
-export function BlockedIcon({ size }: MarkerIconProps): JSX.Element {
+export function BlockedIcon(): JSX.Element {
   return (
-    <svg
-      viewBox="0 0 45 45"
-      aria-hidden="true"
-      className={`pointer-events-none block ${size === undefined ? 'h-full w-full' : ''}`}
-      {...(size === undefined ? {} : { width: size, height: size })}
-    >
+    <svg viewBox="0 0 45 45" aria-hidden="true" className="pointer-events-none block h-full w-full">
       <path
         d="M9,32 C6.5,26 9.5,19.5 15.5,17.5 C16.5,12.5 22.5,9.5 28.5,12.5 C34.5,13.5 37.5,19.5 35,25.5 C37.5,29 36,33.5 31.5,35 C24,37.5 14.5,36.5 9,32 Z"
         fill="#9CA79A"

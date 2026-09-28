@@ -1,6 +1,5 @@
-// Chess's lazy parent-area panels (`SubjectWeb.loadParent`) — part of the pack (`chess-pack.ts`),
-// temporary home until m8.18 moves it to `subject-chess/src/web`. Dynamically imported only once
-// the parent area mounts, so this stays out of the initial bundle.
+// Chess's lazy parent-area panels (`SubjectWeb.loadParent`), part of the chess pack. Dynamically
+// imported only once the parent area mounts, so this stays out of the initial bundle.
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';

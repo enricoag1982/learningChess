@@ -1,5 +1,4 @@
-// Chess's board surfaces (`SubjectWeb.surface`) and character badge — part of the pack
-// (`chess-pack.ts`), temporary home until m8.18 moves it to `subject-chess/src/web`.
+// Chess's board surfaces (`SubjectWeb.surface`) and character badge, part of the chess pack.
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';

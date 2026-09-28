@@ -256,3 +256,18 @@ export function PlayIcon({ size = 32 }: Pick<IconProps, 'size'> = {}): JSX.Eleme
     </svg>
   );
 }
+
+/** Gold five-point star (collectible board squares, star counters), filling its parent. */
+export function StarIcon(): JSX.Element {
+  return (
+    <svg viewBox="0 0 45 45" aria-hidden="true" className="pointer-events-none block h-full w-full">
+      <path
+        d="M22.5,5 L32.8,36.7 L5.9,17.1 L39.1,17.1 L12.2,36.7 Z"
+        fill="#E9A92B"
+        stroke="#8C5E08"
+        strokeWidth={1.8}
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
