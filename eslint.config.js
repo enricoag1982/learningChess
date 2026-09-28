@@ -5,6 +5,39 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
+// Tests that genuinely exercise chess behaviour, exempted from the platform/chess boundary ratchet
+// below (both core and web) rather than fixed on the platform's own base types/kit. Each moves to
+// its target package at the m8.20 package split: `apps/chess-kids` for web flows / App / storage
+// tests, `subject-chess` for the 3 core chess-integration tests.
+const APP_INTEGRATION_TESTS = [
+  // apps/chess-kids
+  'apps/web/src/App.test.tsx',
+  'apps/web/src/adapters/persistent-storage.test.ts',
+  'apps/web/src/adapters/share-backup.test.ts',
+  'apps/web/src/adapters/storage/local-backup-importer.test.ts',
+  'apps/web/src/app/nav.test.ts',
+  'apps/web/src/modes/series/Step.test.tsx',
+  'apps/web/src/ui/Celebration.test.tsx',
+  'apps/web/src/ui/DenScreen.test.tsx',
+  'apps/web/src/ui/HomeScreen.test.tsx',
+  'apps/web/src/ui/JourneyScreen.test.tsx',
+  'apps/web/src/ui/LessonScreen.test.tsx',
+  'apps/web/src/ui/PracticeScreen.test.tsx',
+  'apps/web/src/ui/TimeTracker.test.tsx',
+  'apps/web/src/ui/TodaySession.test.tsx',
+  'apps/web/src/ui/art/animal-images.test.ts',
+  'apps/web/src/ui/assessment-flow.test.tsx',
+  'apps/web/src/ui/lesson/ExerciseStep.test.tsx',
+  'apps/web/src/ui/parent-area-flow.test.tsx',
+  'apps/web/src/ui/profiles-flow.test.tsx',
+  'apps/web/src/ui/session/ReviewExerciseStep.test.tsx',
+  'apps/web/src/ui/time-limit-flow.test.tsx',
+  // subject-chess
+  'packages/core/src/app/use-cases.test.ts',
+  'packages/core/src/app/minigames.test.ts',
+  'packages/core/src/domain/exercise/modes/series/engine.test.ts',
+];
+
 export default defineConfig([
   globalIgnores([
     '**/dist/**',
@@ -161,16 +194,10 @@ export default defineConfig([
       '**/content/src/modes/static/**',
       '**/content/src/modes/versus/**',
     ];
-    // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
-    const RATCHET_IGNORES = [
-      'packages/core/src/app/use-cases.test.ts',
-      'packages/core/src/app/minigames.test.ts',
-      'packages/core/src/domain/exercise/modes/series/engine.test.ts',
-    ];
     return [
       {
         files: PLATFORM_BOUND_PATHS,
-        ignores: RATCHET_IGNORES,
+        ignores: APP_INTEGRATION_TESTS,
         rules: {
           'no-restricted-imports': [
             'error',
@@ -415,34 +442,10 @@ export default defineConfig([
       '**/testing/fixtures.ts',
       '**/testing/test-services.ts',
     ];
-    // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
-    const WEB_RATCHET_IGNORES = [
-      'apps/web/src/App.test.tsx',
-      'apps/web/src/adapters/persistent-storage.test.ts',
-      'apps/web/src/adapters/share-backup.test.ts',
-      'apps/web/src/adapters/storage/local-backup-importer.test.ts',
-      'apps/web/src/app/nav.test.ts',
-      'apps/web/src/modes/series/Step.test.tsx',
-      'apps/web/src/ui/Celebration.test.tsx',
-      'apps/web/src/ui/DenScreen.test.tsx',
-      'apps/web/src/ui/HomeScreen.test.tsx',
-      'apps/web/src/ui/JourneyScreen.test.tsx',
-      'apps/web/src/ui/LessonScreen.test.tsx',
-      'apps/web/src/ui/PracticeScreen.test.tsx',
-      'apps/web/src/ui/TimeTracker.test.tsx',
-      'apps/web/src/ui/TodaySession.test.tsx',
-      'apps/web/src/ui/art/animal-images.test.ts',
-      'apps/web/src/ui/assessment-flow.test.tsx',
-      'apps/web/src/ui/lesson/ExerciseStep.test.tsx',
-      'apps/web/src/ui/parent-area-flow.test.tsx',
-      'apps/web/src/ui/profiles-flow.test.tsx',
-      'apps/web/src/ui/session/ReviewExerciseStep.test.tsx',
-      'apps/web/src/ui/time-limit-flow.test.tsx',
-    ];
     return [
       {
         files: PLATFORM_BOUND_WEB_PATHS,
-        ignores: WEB_RATCHET_IGNORES,
+        ignores: APP_INTEGRATION_TESTS,
         rules: {
           // Separate rule instance (typescript-eslint's) so the later e2e-import-restriction
           // block below (plain `no-restricted-imports`, same `apps/web/src/**` files) does not
