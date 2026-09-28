@@ -14,7 +14,7 @@ import {
   positionFields,
   textRefSchema,
 } from './kinds/common.ts';
-import type { DemoContent, StimulusContent, Where } from './subject.ts';
+import type { BadgesContent, ContentIds, DemoContent, StimulusContent, Where } from './subject.ts';
 
 interface StimulusYaml {
   readonly board?: string;
@@ -113,6 +113,74 @@ export const chessDemo: DemoContent = {
     const { position } = demo as { readonly position: Position };
     if (!hasPieceOf(position, position.toMove)) {
       at.issues.push(`${at.where}: side to move has no piece`);
+    }
+  },
+};
+
+/** A badge condition's chess-only fields (shape-only; `chessBadges.validate` checks the rest). */
+interface ChessBadgeCondition {
+  readonly type: string;
+  readonly opponent?: string;
+  readonly extra?: 'queen-kept';
+  readonly event?: 'promotion' | 'castling';
+  readonly mode?: 'local';
+}
+
+const BOT_LEVELS = [1, 2, 3, 4, 5];
+
+/** Chess's own badge condition fields and the `game-win`/`game-event`/`game-played` checks the
+ * engine's 7 generic condition types don't cover. */
+export const chessBadges: BadgesContent = {
+  fields: {
+    /** `game-win`: `'queen-kept'` counts wins where the kid's queen was never captured. */
+    extra: z.enum(['queen-kept']).optional(),
+    /** `game-event`: which `GameRecord.moves` pattern to count. */
+    event: z.enum(['promotion', 'castling']).optional(),
+    /** `game-played`: `'local'` (vs a friend). */
+    mode: z.enum(['local']).optional(),
+  },
+
+  validate(condition, at, ids: ContentIds) {
+    const c = condition as ChessBadgeCondition;
+    switch (c.type) {
+      case 'game-win': {
+        if (c.extra === 'queen-kept') {
+          if (c.opponent !== undefined) {
+            at.issues.push(`${at.where}: extra "queen-kept" does not take "opponent"`);
+          }
+          return;
+        }
+        if (c.opponent === undefined) {
+          at.issues.push(
+            `${at.where}: type "game-win" requires "opponent" (or extra "queen-kept")`,
+          );
+          return;
+        }
+        if (c.opponent === 'any') return;
+        if (c.opponent.startsWith('computer:')) {
+          const level = Number(c.opponent.slice('computer:'.length));
+          if (!BOT_LEVELS.includes(level)) {
+            at.issues.push(
+              `${at.where}: opponent "computer:<n>" must be a level 1-5, got "${c.opponent}"`,
+            );
+          }
+          return;
+        }
+        if (!ids.minigameIds.has(c.opponent)) {
+          at.issues.push(`${at.where}: opponent references unknown mini-game "${c.opponent}"`);
+        }
+        return;
+      }
+      case 'game-event':
+        if (c.event === undefined) {
+          at.issues.push(`${at.where}: type "game-event" requires "event"`);
+        }
+        return;
+      case 'game-played':
+        if (c.mode === undefined) {
+          at.issues.push(`${at.where}: type "game-played" requires "mode"`);
+        }
+        return;
     }
   },
 };

@@ -14,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from '../src/badges-load.ts';
+import { chessBadges } from '../src/chess-content.ts';
 import { ContentError, loadLocales, type Locales } from '../src/load.ts';
 import { loadContent } from '../src/lesson-load.ts';
 import { loadTracks } from '../src/tracks-load.ts';
@@ -59,7 +60,14 @@ try {
 
 let badges: readonly BadgeDef[];
 try {
-  badges = loadBadges(badgesPath, locales, catalog, content.lessons, content.minigames);
+  badges = loadBadges(
+    badgesPath,
+    locales,
+    catalog,
+    content.lessons,
+    content.minigames,
+    chessBadges,
+  );
 } catch (error) {
   if (error instanceof ContentError) fail(error.issues);
   throw error;

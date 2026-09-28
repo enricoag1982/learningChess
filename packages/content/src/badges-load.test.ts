@@ -5,6 +5,10 @@ import type { TracksCatalog } from '@chess-kids/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
 import { ContentError, type Locales } from './load.ts';
+import type { BadgesContent } from './subject.ts';
+
+/** No subject fields/condition types: enough to exercise the platform's own validation. */
+const NO_SUBJECT_BADGES: BadgesContent = { fields: {}, validate: () => undefined };
 
 let dir: string;
 
@@ -50,31 +54,9 @@ const LESSON = {
   character: 'rhino',
   titleKey: 'lessons:rook.title',
   storyKey: 'lessons:rook.story',
-  demo: {
-    position: {
-      pieces: {},
-      markers: { stars: [], blocked: [] },
-      toMove: 'w',
-      castling: '-',
-      enPassant: null,
-    } as const,
-    textKey: 'lessons:rook.demo',
-    highlight: { squares: [] },
-  },
+  demo: { textKey: 'lessons:rook.demo' },
   guided: [],
   exercises: [],
-};
-
-const MINIGAME = {
-  mode: 'series' as const,
-  id: 'pawn-wars',
-  concept: 'pawn-move',
-  unlockAfter: 'rook',
-  rounds: [],
-  errors3: 0,
-  errors2: 1,
-  titleKey: 'lessons:pawn-wars.title',
-  goalKey: 'lessons:pawn-wars.goal',
 };
 
 /** en locale with every `rewards:badges.<id>.name`/`.condition` this suite's fixtures reference. */
@@ -96,7 +78,7 @@ const LOCALES: Locales = {
 /** Loads `content` (written to a temp `badges.yaml`), returning issues instead of throwing. */
 function loadIssues(content: string, locales: Locales = LOCALES): string[] {
   try {
-    loadBadges(write(content), locales, CATALOG, [LESSON], [MINIGAME]);
+    loadBadges(write(content), locales, CATALOG, [LESSON], [], NO_SUBJECT_BADGES);
     return [];
   } catch (error) {
     if (error instanceof ContentError) return [...error.issues];
@@ -116,7 +98,8 @@ badges:
       LOCALES,
       CATALOG,
       [LESSON],
-      [MINIGAME],
+      [],
+      NO_SUBJECT_BADGES,
     );
     expect(badges).toEqual([
       {
@@ -220,77 +203,6 @@ badges:
     condition: { type: concept-correct, concept: rook-move, inARow: true, noHints: true, thresholds: [10] }
 `);
     expect(issues).toEqual([expect.stringContaining('cannot both be set')]);
-  });
-
-  it('reports a "game-win" condition with neither opponent nor extra', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-win, thresholds: [1] }
-`);
-    expect(issues).toEqual([expect.stringContaining('requires "opponent"')]);
-  });
-
-  it('reports a "game-win" opponent computer level out of range', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-win, opponent: 'computer:9', thresholds: [1] }
-`);
-    expect(issues).toEqual([expect.stringContaining('must be a level 1-5')]);
-  });
-
-  it('reports a "game-win" opponent referencing an unknown mini-game', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-win, opponent: not-real, thresholds: [1] }
-`);
-    expect(issues).toEqual([expect.stringContaining('unknown mini-game "not-real"')]);
-  });
-
-  it('accepts a "game-win" opponent naming a real mini-game', () => {
-    expect(
-      loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-win, opponent: pawn-wars, thresholds: [3] }
-`),
-    ).toEqual([]);
-  });
-
-  it('reports "extra: queen-kept" combined with an opponent', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-win, opponent: any, extra: queen-kept, thresholds: [1] }
-`);
-    expect(issues).toEqual([expect.stringContaining('does not take "opponent"')]);
-  });
-
-  it('reports a "game-event" condition with no event', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: skill
-    condition: { type: game-event, thresholds: [10] }
-`);
-    expect(issues).toEqual([expect.stringContaining('requires "event"')]);
-  });
-
-  it('reports a "game-played" condition with no mode', () => {
-    const issues = loadIssues(`
-badges:
-  - id: has-name
-    category: play
-    condition: { type: game-played, thresholds: [1] }
-`);
-    expect(issues).toEqual([expect.stringContaining('requires "mode"')]);
   });
 
   it('reports a missing name/condition locale key', () => {

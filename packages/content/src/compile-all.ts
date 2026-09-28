@@ -2,6 +2,7 @@ import { join } from 'node:path';
 import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from './badges-load.ts';
+import { chessBadges } from './chess-content.ts';
 import { ContentError, compareToReference, loadLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import { loadTracks } from './tracks-load.ts';
@@ -49,7 +50,14 @@ export function compileAll(
   const resolvedExtraOutputs = Object.fromEntries(
     Object.entries(extraOutputs).map(([name, build]) => [name, build(packageDir)]),
   );
-  const badges = loadBadges(badgesPath, locales, tracks, content.lessons, content.minigames);
+  const badges = loadBadges(
+    badgesPath,
+    locales,
+    tracks,
+    content.lessons,
+    content.minigames,
+    chessBadges,
+  );
   const voiceTexts = buildVoiceInventory(locales, content, tracks, badges);
 
   return { locales, content, tracks, extraOutputs: resolvedExtraOutputs, badges, voiceTexts };

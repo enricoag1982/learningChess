@@ -22,3 +22,19 @@ export interface DemoContent {
   compile(raw: unknown, textKey: string, at: Where): { readonly textKey: string } | null;
   check?(demo: object, at: Where): void;
 }
+
+/** A zod object shape (field name -> schema), spliced into a platform schema at a fixed position. */
+export type ZodShape = Readonly<Record<string, z.ZodType>>;
+
+/** Id sets a subject's own badge validation cross-references against (chess: mini-game ids). */
+export interface ContentIds {
+  readonly minigameIds: ReadonlySet<string>;
+}
+
+/** A subject's own badge condition fields (chess: `extra`/`event`/`mode`) and the validation for
+ * the condition types the engine's 7 generic ones don't cover (chess: `game-win`/`-event`/
+ * `-played`) — the content counterpart of `core.rewards`. */
+export interface BadgesContent {
+  readonly fields: ZodShape;
+  validate(condition: object, at: Where, ids: ContentIds): void;
+}

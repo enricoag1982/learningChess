@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { voiceKey } from '@chess-kids/core';
 import { describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
+import { chessBadges } from './chess-content.ts';
 import { loadLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import type { LocaleTree } from './schema.ts';
@@ -24,6 +25,7 @@ const badges = loadBadges(
   catalog,
   content.lessons,
   content.minigames,
+  chessBadges,
 );
 
 const inventory = buildVoiceInventory(locales, content, catalog, badges);

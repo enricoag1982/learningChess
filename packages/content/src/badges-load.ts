@@ -3,14 +3,13 @@ import type { BadgeDef, Lesson, MiniGame, TracksCatalog } from '@chess-kids/core
 import { parse as parseYaml } from 'yaml';
 import { checkTextKey, ContentError, type Locales } from './load.ts';
 import { type BadgeConditionYaml, type BadgeYaml, badgesFileSchema } from './badges-schema.ts';
+import type { BadgesContent } from './subject.ts';
 
 /** First line of an error's message, for compact single-line issue reporting. */
 function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   return message.split('\n')[0] ?? message;
 }
-
-const BOT_LEVELS = [1, 2, 3, 4, 5];
 
 /** Every concept id any authored lesson teaches (a lesson's own `concept`, plus per-exercise ones). */
 function allConceptIds(lessons: readonly Lesson[]): ReadonlySet<string> {
@@ -24,6 +23,18 @@ function allConceptIds(lessons: readonly Lesson[]): ReadonlySet<string> {
   return ids;
 }
 
+/** Every condition type this file itself knows how to validate; anything else goes to the
+ * subject's own `badges.validate` (chess: `game-win`/`game-event`/`game-played`). */
+const GENERIC_CONDITION_TYPES = new Set([
+  'mastered',
+  'concept-correct',
+  'stars-total',
+  'perfect-lessons',
+  'streak-days',
+  'warmups',
+  'comeback',
+]);
+
 /** Checks one badge's `condition` matches its `type`'s own required params and that every id it
  * references exists in the compiled tracks catalog / lesson content. */
 function validateCondition(
@@ -32,6 +43,7 @@ function validateCondition(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
   minigames: readonly MiniGame[],
+  badges: BadgesContent,
   issues: string[],
 ): void {
   const where = `badges.yaml: badges.${id}.condition`;
@@ -45,6 +57,12 @@ function validateCondition(
       );
       break;
     }
+  }
+
+  if (!GENERIC_CONDITION_TYPES.has(condition.type)) {
+    const minigameIds = new Set(minigames.map((game) => game.id));
+    badges.validate(condition, { where, issues }, { minigameIds });
+    return;
   }
 
   switch (condition.type) {
@@ -82,47 +100,13 @@ function validateCondition(
       }
       break;
     }
-    case 'game-win': {
-      if (condition.extra === 'queen-kept') {
-        if (condition.opponent !== undefined) {
-          issues.push(`${where}: extra "queen-kept" does not take "opponent"`);
-        }
-        break;
-      }
-      if (condition.opponent === undefined) {
-        issues.push(`${where}: type "game-win" requires "opponent" (or extra "queen-kept")`);
-        break;
-      }
-      if (condition.opponent === 'any') break;
-      if (condition.opponent.startsWith('computer:')) {
-        const level = Number(condition.opponent.slice('computer:'.length));
-        if (!BOT_LEVELS.includes(level)) {
-          issues.push(
-            `${where}: opponent "computer:<n>" must be a level 1-5, got "${condition.opponent}"`,
-          );
-        }
-        break;
-      }
-      if (!minigames.some((game) => game.id === condition.opponent)) {
-        issues.push(`${where}: opponent references unknown mini-game "${condition.opponent}"`);
-      }
-      break;
-    }
-    case 'game-event':
-      if (condition.event === undefined) {
-        issues.push(`${where}: type "game-event" requires "event"`);
-      }
-      break;
-    case 'game-played':
-      if (condition.mode === undefined) {
-        issues.push(`${where}: type "game-played" requires "mode"`);
-      }
-      break;
     case 'stars-total':
     case 'perfect-lessons':
     case 'streak-days':
     case 'warmups':
     case 'comeback':
+      break;
+    default:
       break;
   }
 }
@@ -145,6 +129,7 @@ export function loadBadges(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
   minigames: readonly MiniGame[],
+  badges: BadgesContent,
 ): readonly BadgeDef[] {
   let raw: string;
   try {
@@ -160,7 +145,7 @@ export function loadBadges(
     throw new ContentError([`badges.yaml: YAML syntax error: ${errorMessage(error)}`]);
   }
 
-  const result = badgesFileSchema.safeParse(parsed);
+  const result = badgesFileSchema(badges.fields).safeParse(parsed);
   if (!result.success) {
     throw new ContentError(
       result.error.issues.map((issue) => {
@@ -178,7 +163,7 @@ export function loadBadges(
       issues.push(`${where}: duplicate id`);
     }
     seenIds.add(badge.id);
-    validateCondition(badge.id, badge.condition, catalog, lessons, minigames, issues);
+    validateCondition(badge.id, badge.condition, catalog, lessons, minigames, badges, issues);
     checkTextKey(`rewards:badges.${badge.id}.name`, locales, where, issues);
     checkTextKey(`rewards:badges.${badge.id}.condition`, locales, where, issues);
   }
