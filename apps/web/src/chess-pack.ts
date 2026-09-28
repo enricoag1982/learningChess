@@ -38,6 +38,7 @@ export const chessWeb = {
   CharacterBadge,
   homeTiles: HOME_TILES,
   den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },
+  loadParent: () => import('./parent-panels.tsx'),
 } satisfies SubjectWeb;
 
 /** The checked king's square right now, if any (Board's check ring, every exercise kind). */

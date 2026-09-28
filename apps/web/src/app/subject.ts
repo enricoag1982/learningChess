@@ -1,8 +1,23 @@
 import { createContext, useContext } from 'react';
-import type { JSX } from 'react';
-import type { GameRecord, Lesson, SubjectCore } from '@chess-kids/core';
+import type { ComponentType, JSX } from 'react';
+import type { GameRecord, Lesson, Profile, ProfileSettings, SubjectCore } from '@chess-kids/core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
 import type { PlainRouteName } from './routes.ts';
+
+/** Props for a subject's own settings chips (`SubjectWeb.loadParent`'s `SettingsPanel`), rendered
+ * inside `ChildSettings`'s generic settings section. */
+export interface ParentSettingsProps {
+  readonly profileId: string;
+  readonly settings: ProfileSettings;
+  readonly patchSettings: (patch: Partial<ProfileSettings>) => Promise<void>;
+}
+
+/** Props for a subject's own report section (`SubjectWeb.loadParent`'s `ReportSection`), rendered
+ * inside `ChildReport` alongside the platform's own sections. */
+export interface ReportSectionProps {
+  readonly games: readonly GameRecord[];
+  readonly profilesById: ReadonlyMap<string, Profile>;
+}
 
 /** A subject's own runtime services, augmented by module declaration (chess: `{ botPlayer }`). */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
@@ -41,6 +56,17 @@ export interface SubjectWeb {
     rankGlyph(rankId: string): string;
     Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
   };
+  /** Lazy-loaded parent-area panels (chess: level + piece-style chips, the games-played section) —
+   * a dynamic import so they stay inside the app's own lazy parent chunk, never the initial bundle.
+   * Absent for a subject with no parent-area contribution. */
+  loadParent?(): Promise<ParentPanels>;
+}
+
+/** `SubjectWeb.loadParent`'s resolved shape — named so a caller's "not loaded yet" fallback stays
+ * typed the same as the real thing. */
+export interface ParentPanels {
+  readonly SettingsPanel?: ComponentType<ParentSettingsProps>;
+  readonly ReportSection?: ComponentType<ReportSectionProps>;
 }
 
 /** One Home tile's own colours (`docs/screens.md` §1: border = `fg`, ledge a still-darker shade). */

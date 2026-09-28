@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, SubmitEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { GameRecord, Profile, ProfileSettings } from '@chess-kids/core';
-import type { Journey, PieceStyleSetting } from '@chess-kids/core/chess';
+import type { Profile, ProfileSettings } from '@chess-kids/core';
 import type { Services } from '../../app/services.ts';
 import {
   changeAvatar,
   DAILY_LIMIT_OPTIONS,
   deleteProfile,
   getProfileSettings,
-  loadJourney,
   PLAY_FROM_OPTIONS,
   PLAY_UNTIL_OPTIONS,
   renameProfile,
@@ -18,8 +16,9 @@ import {
   validateNickname,
   verifyParentPassword,
 } from '@chess-kids/core';
-import { computerLevelStatus, loadGameRecords } from '@chess-kids/core/chess';
 import { exportBackup } from '@chess-kids/core/backup';
+import { usePack } from '../../app/subject.ts';
+import type { ParentPanels } from '../../app/subject.ts';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { sendBackupToOtherDevice } from '../../adapters/share-backup.ts';
 import { AVATARS, avatarBackground } from '../art/avatar-meta.ts';
@@ -30,11 +29,11 @@ import { ScreenHeader } from '../ds/Screen.tsx';
 import { ParentConfirmDialog, ParentSection } from '../ds/parent.tsx';
 import {
   PARENT_CHIP,
-  PARENT_CHIP_LOCKED,
   PARENT_CHIP_SELECTED,
   PARENT_DANGER_BUTTON,
 } from '../ds/parent-styles-lazy.ts';
 import { AvatarBadge } from '../ds/AvatarBadge.tsx';
+import { useAsync } from '../ds/useAsync.ts';
 import {
   PARENT_INPUT,
   PARENT_NOTE,
@@ -317,7 +316,12 @@ export function ChildSettingsScreen({
 }: ChildSettingsScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pack = usePack();
   const refreshProfiles = useAppStore((state) => state.refreshProfiles);
+  const { value: parentPanel } = useAsync(
+    () => pack.loadParent?.() ?? Promise.resolve<ParentPanels>({}),
+    [pack],
+  );
 
   const [nickname, setNickname] = useState(profile.nickname);
   const [renaming, setRenaming] = useState(false);
@@ -331,21 +335,12 @@ export function ChildSettingsScreen({
   const [nicknameError, setNicknameError] = useState<string | null>(null);
 
   const [settings, setSettings] = useState<ProfileSettings | null>(null);
-  const [journey, setJourney] = useState<Journey | null>(null);
-  const [gameRecords, setGameRecords] = useState<readonly GameRecord[]>([]);
 
   // No effect resyncing `nickname`: the caller remounts this with `key={profile.id}` per child.
   useEffect(() => {
     let cancelled = false;
-    void Promise.all([
-      getProfileSettings(services.deps, profile.id),
-      loadJourney(services.deps, profile.id),
-      loadGameRecords(services.deps, profile.id),
-    ]).then(([loadedSettings, loadedJourney, loadedRecords]) => {
-      if (cancelled) return;
-      setSettings(loadedSettings);
-      setJourney(loadedJourney);
-      setGameRecords(loadedRecords);
+    void getProfileSettings(services.deps, profile.id).then((loadedSettings) => {
+      if (!cancelled) setSettings(loadedSettings);
     });
     return () => {
       cancelled = true;
@@ -412,8 +407,6 @@ export function ChildSettingsScreen({
     // 'cancelled': silent, no note (decision table "A user cancel is silent").
     setSharing(false);
   }
-
-  const levelStatuses = journey ? computerLevelStatus(gameRecords, journey) : [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -584,70 +577,13 @@ export function ChildSettingsScreen({
             }}
           />
 
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-extrabold text-ink">
-              {t('parent.computer-level-heading')}
-            </h3>
-            <div
-              className="flex flex-wrap gap-2"
-              role="group"
-              aria-label={t('parent.computer-level-heading')}
-            >
-              <button
-                type="button"
-                aria-pressed={settings.computerLevel === 'auto'}
-                onClick={() => {
-                  void patchSettings({ computerLevel: 'auto' });
-                }}
-                className={settings.computerLevel === 'auto' ? PARENT_CHIP_SELECTED : PARENT_CHIP}
-              >
-                {t('parent.computer-level-auto')}
-              </button>
-              {levelStatuses.map((status) => (
-                <button
-                  key={status.level}
-                  type="button"
-                  disabled={status.locked}
-                  aria-pressed={settings.computerLevel === status.level}
-                  onClick={() => {
-                    void patchSettings({ computerLevel: status.level });
-                  }}
-                  className={
-                    status.locked
-                      ? PARENT_CHIP_LOCKED
-                      : settings.computerLevel === status.level
-                        ? PARENT_CHIP_SELECTED
-                        : PARENT_CHIP
-                  }
-                >
-                  {t(`boss.versus.bot-name.${status.name}`)}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-extrabold text-ink">{t('parent.piece-style-heading')}</h3>
-            <div
-              className="flex flex-wrap gap-2"
-              role="group"
-              aria-label={t('parent.piece-style-heading')}
-            >
-              {(['animal', 'classic'] satisfies PieceStyleSetting[]).map((style) => (
-                <button
-                  key={style}
-                  type="button"
-                  aria-pressed={settings.pieceStyle === style}
-                  onClick={() => {
-                    void patchSettings({ pieceStyle: style });
-                  }}
-                  className={settings.pieceStyle === style ? PARENT_CHIP_SELECTED : PARENT_CHIP}
-                >
-                  {t(`parent.piece-style-${style}`)}
-                </button>
-              ))}
-            </div>
-          </div>
+          {parentPanel?.SettingsPanel && (
+            <parentPanel.SettingsPanel
+              profileId={profile.id}
+              settings={settings}
+              patchSettings={patchSettings}
+            />
+          )}
         </ParentSection>
       )}
 

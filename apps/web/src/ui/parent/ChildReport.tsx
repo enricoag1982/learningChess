@@ -1,10 +1,10 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { ChildReport, GameRecord, Profile } from '@chess-kids/core';
-import type { Lesson } from '@chess-kids/core/chess';
+import type { ChildReport, GameRecord, Lesson, Profile } from '@chess-kids/core';
 import { buildChildReport } from '@chess-kids/core';
-import { bot } from '@chess-kids/core/chess';
+import { usePack } from '../../app/subject.ts';
+import type { ParentPanels } from '../../app/subject.ts';
 import { useServices } from '../../app/store.ts';
 import { tContent } from '../../content-text.ts';
 import { RankPill } from '../RankPill.tsx';
@@ -17,25 +17,25 @@ import { PARENT_INFO_PANEL, PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './paren
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' });
 
-/** `'2026-01-05'` -> `'Jan 5'`. */
-function formatDate(iso: string): string {
+/** `'2026-01-05'` -> `'Jan 5'`. Exported for the subject's own `ReportSection`. */
+// eslint-disable-next-line react-refresh/only-export-components -- shared with ReportSection
+export function formatDate(iso: string): string {
   // Parses as UTC midnight; read back with UTC fields so the day never shifts in a
   // negative-UTC-offset timezone.
   const [year, month, day] = iso.slice(0, 10).split('-').map(Number);
   return DATE_FORMAT.format(new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, day ?? 1)));
 }
 
-function opponentLabel(
+/** Opponent display name for a non-subject-specific `GameRecord.opponent`: `'guest'` or
+ * `'profile:<id>'`. A subject's own opponent kinds (chess: `'computer:<level>'`) are its own
+ * `ReportSection`'s job. */
+// eslint-disable-next-line react-refresh/only-export-components -- shared with ReportSection
+export function opponentLabel(
   t: TFunction,
   opponent: string,
   profilesById: ReadonlyMap<string, Profile>,
 ): string {
   if (opponent === 'guest') return t('friend-play.guest');
-  if (opponent.startsWith('computer:')) {
-    const level = Number(opponent.slice('computer:'.length));
-    const name = bot.BOT_LEVELS.find((entry) => entry.level === level)?.name;
-    return name ? t(`boss.versus.bot-name.${name}`) : opponent;
-  }
   if (opponent.startsWith('profile:')) {
     const id = opponent.slice('profile:'.length);
     return profilesById.get(id)?.nickname ?? t('parent.report.opponent-friend');
@@ -43,7 +43,9 @@ function opponentLabel(
   return opponent;
 }
 
-function resultLabel(t: TFunction, result: GameRecord['result']): string {
+/** Exported for the subject's own `ReportSection`. */
+// eslint-disable-next-line react-refresh/only-export-components -- shared with ReportSection
+export function resultLabel(t: TFunction, result: GameRecord['result']): string {
   switch (result) {
     case 'win':
       return t('parent.report.result-win');
@@ -91,7 +93,8 @@ function activeRulesLine(t: TFunction, report: ChildReport): string | null {
   return parts.length > 0 ? parts.join(' · ') : null;
 }
 
-function Section({
+/** Exported for the subject's own `ReportSection`. */
+export function Section({
   title,
   children,
 }: {
@@ -123,9 +126,14 @@ export function ChildReportScreen({
 }: ChildReportScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
+  const pack = usePack();
   const { value: report } = useAsync(
     () => buildChildReport(services.deps, profileId),
     [services, profileId],
+  );
+  const { value: parentPanel } = useAsync(
+    () => pack.loadParent?.() ?? Promise.resolve<ParentPanels>({}),
+    [pack],
   );
 
   const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -300,23 +308,9 @@ export function ChildReportScreen({
             </ul>
           </Section>
 
-          <Section title={t('parent.report.games-heading')}>
-            {report.games.length === 0 ? (
-              <p className={PARENT_INFO_PANEL}>{t('parent.report.games-empty')}</p>
-            ) : (
-              <ul className="flex flex-col gap-2">
-                {report.games.map((game) => (
-                  <li key={game.id} className={`${PARENT_INFO_PANEL} flex items-center gap-3`}>
-                    <span className="flex-1 text-sm font-bold text-ink">
-                      {opponentLabel(t, game.opponent, profilesById)}
-                    </span>
-                    <span className="text-xs text-muted">{resultLabel(t, game.result)}</span>
-                    <span className="text-xs text-muted">{formatDate(game.createdAt)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Section>
+          {parentPanel?.ReportSection && (
+            <parentPanel.ReportSection games={report.games} profilesById={profilesById} />
+          )}
 
           <Section title={t('parent.report.badges-heading')}>
             {report.badges.length === 0 ? (
