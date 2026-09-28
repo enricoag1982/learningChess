@@ -8,6 +8,12 @@ import './app-i18n.ts';
 import App from './App.tsx';
 import { AppErrorBoundary } from './ui/AppErrorBoundary.tsx';
 import { createAppUpdate } from './adapters/app-update.ts';
+import { chessWeb } from './chess-pack.ts';
+import type { SubjectWeb } from './app/subject.ts';
+
+/** Widened from `chessWeb`'s own literal-keyed `dev` so a dynamic `location.hash` can index it;
+ * `chessWeb.dev` itself is `undefined` outside a dev build (`chess-pack.ts`). */
+const devScreens: NonNullable<SubjectWeb['dev']> = chessWeb.dev ?? {};
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -20,21 +26,14 @@ const root = createRoot(rootElement);
 // (unavailable outside a Vite/PWA build).
 const appUpdate = createAppUpdate(registerSW);
 
-// Dev-only board/exercise/lesson playgrounds at /#board, /#exercises, /#lesson=<id>; dynamically
-// imported so none reaches the production bundle.
-if (import.meta.env.DEV && location.hash === '#board') {
-  void import('./dev/BoardPlayground.tsx').then(({ BoardPlayground }) => {
+// Dev-only board/exercise/lesson playgrounds at /#board, /#exercises (the active subject's own,
+// `pack.dev`), /#lesson=<id>; dynamically imported so none reaches the production bundle.
+const devScreen = import.meta.env.DEV ? devScreens[location.hash] : undefined;
+if (devScreen) {
+  void devScreen().then((Screen) => {
     root.render(
       <StrictMode>
-        <BoardPlayground />
-      </StrictMode>,
-    );
-  });
-} else if (import.meta.env.DEV && location.hash === '#exercises') {
-  void import('./dev/ExercisePlayground.tsx').then(({ ExercisePlayground }) => {
-    root.render(
-      <StrictMode>
-        <ExercisePlayground />
+        <Screen />
       </StrictMode>,
     );
   });

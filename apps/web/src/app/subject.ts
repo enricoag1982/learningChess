@@ -79,6 +79,9 @@ export interface SubjectWeb {
   /** Fields reset on every "back to Home" (chess: clears `levelUpSuggestion`); absent for a
    * subject with nothing to reset. */
   readonly homeReset?: Partial<SubjectState>;
+  /** Dev-only playground screens, by URL hash (`main.tsx`, `#board`/`#exercises`); dynamically
+   * imported so they never reach the production bundle. Absent for a subject with none. */
+  readonly dev?: Readonly<Record<string, () => Promise<ComponentType>>>;
 }
 
 /** One subject-contributed route's screen, per-route flags, and optional entry side effect (chess

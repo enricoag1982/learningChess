@@ -90,6 +90,16 @@ export const chessWeb = {
   routes: CHESS_ROUTES,
   createSlice: createPlaySlice,
   homeReset: { levelUpSuggestion: null },
+  // Gated on the compile-time DEV flag (not just main.tsx's own check) so Rollup drops the whole
+  // dev-playground subtree from the production graph — an ungated `dev` field, even unread, keeps
+  // its two `import()` calls as live split points and grows the initial bundle.
+  dev: import.meta.env.DEV
+    ? {
+        '#board': () => import('./dev/BoardPlayground.tsx').then((m) => m.BoardPlayground),
+        '#exercises': () =>
+          import('./dev/ExercisePlayground.tsx').then((m) => m.ExercisePlayground),
+      }
+    : undefined,
 } satisfies SubjectWeb;
 
 /** The checked king's square right now, if any (Board's check ring, every exercise kind). */
