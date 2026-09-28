@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { ComponentType, JSX } from 'react';
 import type {
+  ContentSource,
   GameRecord,
   Lesson,
   Profile,
@@ -46,9 +47,9 @@ export interface SurfaceContext {
  * §11). Grows a field per seam commit; a subject omits what it has no use for. */
 export interface SubjectWeb {
   readonly core: SubjectCore;
-  /** Built once at composition-root time (`app/services.ts`), never per render — a subject's own
-   * services (chess: a worker-backed bot player) live on the result, not recreated on each call. */
-  createServices(): SubjectServices;
+  /** Built once at composition-root time (`app/services.ts`), never per render: the subject's own
+   * content (read by the use cases) and services (chess: a worker-backed bot player, for the UI). */
+  createServices(): { readonly content: ContentSource; readonly subject: SubjectServices };
   /** Every exercise kind's UI, by `type` — `ExercisePlay`'s one dispatch point. */
   readonly kinds: Readonly<Record<string, AnyExerciseKindUI>>;
   /** The lesson's board, Story and Demo steps: method syntax (bivariant), so a subject's own

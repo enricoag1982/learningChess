@@ -1,12 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
+import type { AppConfig } from '@learn/platform-core';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import type { RouteName } from '@learn/platform-web/app/routes.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import { PackProvider } from './app/subject.ts';
 import type { SubjectWeb } from './app/subject.ts';
-import { chessWeb, CHESS_APP_CONFIG } from './chess-pack.ts';
 import type { AppUpdate } from '@learn/platform-web/adapters/app-update.ts';
 import { AppNotice } from './ui/AppNotice.tsx';
 import { AppUpdater } from './ui/AppUpdater.tsx';
@@ -96,19 +96,20 @@ export interface AppProps {
   readonly services?: Services;
   /** Injected from `main.tsx` or a fake in tests; defaults to a no-op. */
   readonly appUpdate?: AppUpdate;
-  /** The active subject's whole web pack; defaults to chess (the app's only subject today). */
-  readonly pack?: SubjectWeb;
+  /** The active subject's whole web pack. */
+  readonly pack: SubjectWeb;
+  /** The app's identity (storage prefix, file prefixes); `version` is stamped at build time. */
+  readonly app: Omit<AppConfig, 'version'>;
 }
 
 /** App root: wires one `Services` instance to a fresh store, then renders the current screen. */
 export default function App({
   services,
   appUpdate = NOOP_APP_UPDATE,
-  pack = chessWeb,
+  pack,
+  app,
 }: AppProps): JSX.Element {
-  const [store] = useState(() =>
-    createAppStore(services ?? createServices(pack, CHESS_APP_CONFIG), pack),
-  );
+  const [store] = useState(() => createAppStore(services ?? createServices(pack, app), pack));
   const [initError, setInitError] = useState<Error | null>(null);
 
   useEffect(() => {

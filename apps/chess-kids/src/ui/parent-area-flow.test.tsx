@@ -1,9 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { createProfile, updateProfileSettings } from '@learn/platform-core';
 import type { BackupFile } from '@learn/platform-core';
 import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
-import App from '../App.tsx';
 import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import type { FakeBackupFileWriter } from '@learn/platform-web/testing/fake-backup-file-writer.ts';
 import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
@@ -18,7 +17,7 @@ import {
   seedWorldFourMastered,
 } from '../testing/app-test-helpers.ts';
 import { createTestServices } from '../testing/test-services.ts';
-import { renderApp } from '../testing/render-app.tsx';
+import { renderApp, renderAppRaw } from '../testing/render-app.tsx';
 import type { FakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
 
 afterEach(() => {
@@ -97,7 +96,7 @@ describe('Parent area overview (M5.1)', () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
     await createProfile(services.deps, 'Leo', 'panda');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     await screen.findByText('Mia');
@@ -124,7 +123,7 @@ describe('Parent area child report (M5.1)', () => {
       createdAt: now,
       updatedAt: now,
     });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openReport('Mia');
 
@@ -138,7 +137,7 @@ describe('Parent area child report (M5.1)', () => {
     const services = makeServices();
     const profile = await seedReturningProfile(services, 'Mia');
     await updateProfileSettings(services.deps, profile.id, { dailyLimitMinutes: 30 });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openReport('Mia');
 
@@ -148,7 +147,7 @@ describe('Parent area child report (M5.1)', () => {
   it('shows no daily-limit line for a profile with the limit off', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openReport('Mia');
 
@@ -161,7 +160,7 @@ describe('Parent area settings effects (M5.1)', () => {
   it('daily limit choice persists after leaving and reopening settings', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -185,7 +184,7 @@ describe('Parent area settings effects (M5.1)', () => {
   it('voice off stops the Home Owl greeting from being spoken after the profile is next selected', async () => {
     const services = makeServices();
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -214,7 +213,7 @@ describe('Parent area settings effects (M5.1)', () => {
     const services = makeServices();
     services.testVoice = () => Promise.resolve({ kind: 'audio' });
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -226,7 +225,7 @@ describe('Parent area settings effects (M5.1)', () => {
     const services = makeServices();
     services.testVoice = () => Promise.resolve({ kind: 'fallback', reason: 'still-suspended' });
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -256,7 +255,7 @@ describe('Parent area weekend and hours limits (M7.1)', () => {
   it('weekend toggle off shows one "Every day" row; toggling on shows Mon–Fri / Sat–Sun rows, each saving its own limit', async () => {
     const services = makeServices();
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -284,7 +283,7 @@ describe('Parent area weekend and hours limits (M7.1)', () => {
     const services = makeServices();
     const profile = await seedReturningProfile(services, 'Mia');
     await updateProfileSettings(services.deps, profile.id, { weekendLimitMinutes: 45 });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -302,7 +301,7 @@ describe('Parent area weekend and hours limits (M7.1)', () => {
   it('"Play until" / "Not before" chips save', async () => {
     const services = makeServices();
     const profile = await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -326,7 +325,7 @@ describe('Parent area weekend and hours limits (M7.1)', () => {
       weekendLimitMinutes: 60,
       playUntil: '20:00',
     });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openReport('Mia');
 
@@ -349,7 +348,7 @@ describe('Parent area reset (M5.1)', () => {
       createdAt: now,
       updatedAt: now,
     });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openSettings('Mia');
 
@@ -371,7 +370,7 @@ describe('Parent area privacy and version (M5.5)', () => {
   it('shows the app version on the overview, and the Privacy row opens the same policy text', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     await screen.findByText(`Version ${__APP_VERSION__}`);
@@ -390,7 +389,7 @@ describe('Parent code file (owner request 2026-09-25)', () => {
   it('"Download parent code file" writes the current code again and says where', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     const writer = services.deps.passwordFile as FakePasswordFileWriter;
     const writesBefore = writer.writes.length;
@@ -407,7 +406,7 @@ describe('Parent area backup — export (M5.1)', () => {
   it('export all writes one file via the backup file writer', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
@@ -428,7 +427,7 @@ describe('Parent area — Send to other device (M7.2 device sharing)', () => {
     vi.stubGlobal('navigator', Object.assign({}, navigator, { share, canShare }));
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -455,7 +454,7 @@ describe('Parent area — Send to other device (M7.2 device sharing)', () => {
     });
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -475,7 +474,7 @@ describe('Parent area — Send to other device (M7.2 device sharing)', () => {
       .mockImplementation(() => undefined);
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -496,7 +495,7 @@ describe('Parent area import — merge (M7.2 device sharing)', () => {
   it('shows a clear error for an invalid file, changing nothing', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -528,7 +527,7 @@ describe('Parent area import — merge (M7.2 device sharing)', () => {
         ],
       },
     );
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -550,7 +549,7 @@ describe('Parent area import — merge (M7.2 device sharing)', () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
     const incoming = incomingFileFor({ id: 'other-device-leo', nickname: 'Leo' });
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 
@@ -572,7 +571,7 @@ describe('Parent area import — merge (M7.2 device sharing)', () => {
     const services = makeServices();
     const mia = await seedReturningProfile(services, 'Mia');
     const incoming = incomingFileFor({ id: 'other-device-mia', nickname: 'mia' }); // case differs
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     fireEvent.click(screen.getByRole('button', { name: 'Backup' }));
 

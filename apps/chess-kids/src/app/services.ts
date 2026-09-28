@@ -6,7 +6,6 @@ import type {
   Narrator,
 } from '@learn/platform-core';
 import { createSubjectRuntime } from '@learn/platform-core';
-import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '@learn/platform-web/adapters/ids.ts';
 import { createSystemClock } from '@learn/platform-web/adapters/clock.ts';
 import { createDownloadPasswordFileWriter } from '@learn/platform-web/adapters/download-password-file-writer.ts';
@@ -86,6 +85,7 @@ export function createServices(
     migrations: MIGRATIONS,
     keyPrefix: appConfig.storagePrefix,
   });
+  const { content, subject } = pack.createServices();
   const deps: AppDeps = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),
@@ -94,7 +94,7 @@ export function createServices(
     assessment: new LocalStorageAssessmentRepository(store),
     clock: createSystemClock(),
     ids: createCryptoIds(),
-    content: createBundledContentSource(),
+    content,
     parentLock: new LocalStorageParentLockRepository(store),
     passwordFile: createDownloadPasswordFileWriter(appConfig.parentCodeFilePrefix),
     settings: new LocalStorageSettingsRepository(store),
@@ -117,7 +117,7 @@ export function createServices(
   return {
     deps,
     narrator,
-    subject: pack.createServices(),
+    subject,
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },

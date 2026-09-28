@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { createProfile } from '@learn/platform-core';
-import App from '../App.tsx';
+import { renderAppRaw } from '../testing/render-app.tsx';
 import { fixtureContentSource, fixtureLesson } from '@learn/subject-chess/web/testing/fixtures.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import type { FakePasswordFileWriter } from '@learn/platform-web/testing/fake-password-file-writer.ts';
@@ -25,7 +25,7 @@ function enterPassword(password: string): void {
 describe('first run', () => {
   it('welcome → password → saved → new player → placement offer → Home (fresh install)', async () => {
     const services = makeServices();
-    render(<App services={services} />);
+    renderAppRaw(services);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
 
@@ -55,7 +55,7 @@ describe('first run', () => {
   it('an existing M1 profile with no parent lock skips new-player, goes straight to Home', async () => {
     const services = makeServices();
     await createProfile(services.deps, 'Player', 'fox'); // simulates an M1 install's lone profile
-    render(<App services={services} />);
+    renderAppRaw(services);
 
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
     fireEvent.change(await screen.findByLabelText('Parent code'), { target: { value: '1234' } });
@@ -71,7 +71,7 @@ describe('first run', () => {
 
   it('the privacy policy link opens an in-screen dialog (no new store screen), closable, keeping the password step underneath (M5.5)', async () => {
     const services = makeServices();
-    render(<App services={services} />);
+    renderAppRaw(services);
     fireEvent.click(await screen.findByRole('button', { name: 'Start setup' }));
     await screen.findByRole('heading', { name: 'Set a parent code' });
 
@@ -92,7 +92,7 @@ describe('password screen', () => {
   it('wrong password up to 4 times counts attempts, the 5th locks with a countdown', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await screen.findByRole('heading', { name: "Who's playing today?" });
     await openGrownUps();
 
@@ -110,7 +110,7 @@ describe('password screen', () => {
   it('the right password opens the parent area', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await screen.findByRole('heading', { name: "Who's playing today?" });
     await openGrownUps();
 
@@ -124,7 +124,7 @@ describe('password screen', () => {
   it('back returns to the picker', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await screen.findByRole('heading', { name: "Who's playing today?" });
     await openGrownUps();
 
@@ -154,7 +154,7 @@ describe('parent area', () => {
   it('renames a child', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
     await openChildSettings('Mia');
 
@@ -169,7 +169,7 @@ describe('parent area', () => {
   it('adds a child, then deletes it after confirming', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     fireEvent.click(screen.getByRole('button', { name: 'Add child' }));
@@ -199,7 +199,7 @@ describe('parent area', () => {
   it('change password calls the password file writer', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     fireEvent.click(screen.getByRole('button', { name: 'Change parent code' }));
@@ -216,7 +216,7 @@ describe('parent area', () => {
   it('Done returns to the picker', async () => {
     const services = makeServices();
     await seedReturningProfile(services, 'Mia');
-    render(<App services={services} />);
+    renderAppRaw(services);
     await openParentArea();
 
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));

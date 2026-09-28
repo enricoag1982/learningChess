@@ -1,18 +1,13 @@
 // The chess `SubjectWeb` pack (docs/refactor-v4.md §11) — temporary home until m8.18 moves it to
 // `subject-chess/src/web`. Every platform-bound module reaches chess only through this file.
 import { createElement, lazy } from 'react';
-import { CHESS_APP_CONFIG, chessCore, isInCheck, kingSquare } from '@learn/subject-chess';
+import { chessCore, isInCheck, kingSquare } from '@learn/subject-chess';
 import type { BotPlayer, ExerciseState, Position, Square } from '@learn/subject-chess';
 import type { ExerciseStateBase } from '@learn/platform-core';
 import { createWorkerBotPlayer } from '@learn/subject-chess/web/adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import { useAppStore } from './app/store.ts';
-import type {
-  SubjectRouteEntry,
-  SubjectServices,
-  SubjectWeb,
-  SurfaceContext,
-} from './app/subject.ts';
+import type { SubjectRouteEntry, SubjectWeb, SurfaceContext } from './app/subject.ts';
 import { createPlaySlice, type PlaySlice } from './app/slices/play.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
@@ -28,7 +23,7 @@ import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
 
 // `BossStep`: the lesson/standalone boss mini-game UI, reached only through the pack.
-export { CHESS_APP_CONFIG, BossStep };
+export { BossStep };
 
 const FriendSetupScreen = lazy(() =>
   import('./ui/FriendSetupScreen.tsx').then((module) => ({ default: module.FriendSetupScreen })),
@@ -69,8 +64,10 @@ declare module '@learn/platform-web/app/routes.ts' {
   }
 }
 
-function createChessServices(): SubjectServices {
-  return { botPlayer: createWorkerBotPlayer(), content: createBundledContentSource() };
+/** One content source, shared by the app's use cases and chess's own screens. */
+function createChessServices() {
+  const content = createBundledContentSource();
+  return { content, subject: { botPlayer: createWorkerBotPlayer(), content } };
 }
 
 const CHESS_ROUTES: Readonly<Record<string, SubjectRouteEntry>> = {

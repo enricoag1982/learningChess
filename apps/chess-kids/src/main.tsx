@@ -5,10 +5,11 @@ import '@fontsource-variable/fredoka';
 import '@fontsource-variable/nunito';
 import './index.css';
 import './app-i18n.ts';
+import { CHESS_APP_CONFIG } from '@learn/subject-chess';
+import { chessWeb } from './chess-pack.ts';
 import App from './App.tsx';
 import { AppErrorBoundary } from './ui/AppErrorBoundary.tsx';
 import { createAppUpdate } from '@learn/platform-web/adapters/app-update.ts';
-import { chessWeb } from './chess-pack.ts';
 import type { SubjectWeb } from './app/subject.ts';
 
 /** Widened from `chessWeb`'s own literal-keyed `dev` so a dynamic `location.hash` can index it;
@@ -49,7 +50,7 @@ if (devScreen) {
   root.render(
     <StrictMode>
       <AppErrorBoundary>
-        <App appUpdate={appUpdate} />
+        <App appUpdate={appUpdate} pack={chessWeb} app={CHESS_APP_CONFIG} />
       </AppErrorBoundary>
     </StrictMode>,
   );
