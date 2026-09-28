@@ -5,10 +5,9 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
-// Tests that genuinely exercise chess behaviour, exempted from the platform/chess boundary ratchet
-// below (both core and web) rather than fixed on the platform's own base types/kit. Each moves to
-// its target package at the m8.20 package split: `apps/chess-kids` for web flows / App / storage
-// tests, `subject-chess` for the 3 core chess-integration tests.
+// Web tests that genuinely exercise chess behaviour, exempted from the web platform/chess ratchet
+// below rather than fixed on the platform's own base types/kit. They move to `apps/chess-kids`
+// with the web package move.
 const APP_INTEGRATION_TESTS = [
   // apps/chess-kids
   'apps/web/src/App.test.tsx',
@@ -33,6 +32,31 @@ const APP_INTEGRATION_TESTS = [
   'apps/web/src/ui/session/ReviewExerciseStep.test.tsx',
   'apps/web/src/ui/time-limit-flow.test.tsx',
 ];
+
+// Package boundaries (docs/refactor-v4.md §R4): platform packages never reach a subject,
+// platform-core / platform-content stay React-free, and subject-chess's core, content and kind
+// engines stay UI-free. `chess.js` is only allowed in the rules adapter.
+const CHESSJS_RULES = 'packages/subject-chess/src/core/chess/chessjs-rules*.ts';
+const CHESS_JS = {
+  name: 'chess.js',
+  message: 'use ChessRules from @learn/subject-chess; chess.js stays behind the adapter',
+};
+const NO_SUBJECT = {
+  group: ['@learn/subject-*', '**/subject-*/**'],
+  message: 'platform packages never import a subject package',
+};
+const NO_REACT = { group: ['react*'], message: 'this package is React-free' };
+const NO_WEB = {
+  group: ['**/web/**', '@learn/platform-web'],
+  message: 'chess core and content never import web code',
+};
+// Separate rule instance (typescript-eslint's) so it does not override the domain rule below.
+const restrict = (patterns, { banChessJs = true } = {}) => ({
+  '@typescript-eslint/no-restricted-imports': [
+    'error',
+    { paths: banChessJs ? [CHESS_JS] : [], patterns },
+  ],
+});
 
 export default defineConfig([
   globalIgnores([
@@ -62,25 +86,36 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  { files: ['packages/**', 'apps/**'], ignores: [CHESSJS_RULES], rules: restrict([]) },
   {
-    // Separate rule instance (typescript-eslint's) so it does not override the domain rule below.
-    files: ['packages/**', 'apps/**'],
-    ignores: ['packages/subject-chess/src/core/chess/chessjs-rules*.ts'],
-    rules: {
-      '@typescript-eslint/no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'chess.js',
-              message:
-                'use ChessRules from @learn/subject-chess; chess.js stays behind the adapter',
-            },
-          ],
-        },
-      ],
-    },
+    files: ['packages/platform-core/**'],
+    rules: restrict([
+      NO_SUBJECT,
+      NO_REACT,
+      {
+        group: ['@learn/platform-web', '@learn/platform-content'],
+        message: 'platform-core sits below platform-content and platform-web',
+      },
+    ]),
   },
+  {
+    files: ['packages/platform-content/**'],
+    rules: restrict([
+      NO_SUBJECT,
+      NO_REACT,
+      { group: ['@learn/platform-web'], message: 'platform-content sits below platform-web' },
+    ]),
+  },
+  {
+    files: [
+      'packages/subject-chess/src/core/**',
+      'packages/subject-chess/src/content/**',
+      'packages/subject-chess/src/kinds/*/{kind,engine,solution,content,verify}{,.test}.ts',
+    ],
+    ignores: [CHESSJS_RULES],
+    rules: restrict([NO_REACT, NO_WEB]),
+  },
+  { files: [CHESSJS_RULES], rules: restrict([NO_REACT, NO_WEB], { banChessJs: false }) },
   {
     // The cast is needed where subject-chess's `ProfileSettings` augmentation is in the program and
     // unnecessary in platform-core's own program, where this file is linted.
@@ -108,128 +143,6 @@ export default defineConfig([
       ],
     },
   },
-  // Platform/chess boundary ratchet (docs/refactor-v4.md §R4): platform-bound paths (left) may not
-  // import chess-bound paths (right) or `@learn/subject-chess`.
-  ...(() => {
-    const PLATFORM_BOUND_PATHS = [
-      'packages/core/src/index.ts',
-      'packages/core/src/domain/*.ts',
-      'packages/core/src/domain/exercise/kind.ts',
-      'packages/core/src/domain/exercise/mode.ts',
-      'packages/core/src/domain/exercise/stars.ts',
-      'packages/core/src/domain/exercise/modes/series/*.ts',
-      'packages/core/src/app/assessment.ts',
-      'packages/core/src/app/assessment.test.ts',
-      'packages/core/src/app/backup.ts',
-      'packages/core/src/app/backup.test.ts',
-      'packages/core/src/app/device.ts',
-      'packages/core/src/app/journey.ts',
-      'packages/core/src/app/journey.test.ts',
-      'packages/core/src/app/merge.ts',
-      'packages/core/src/app/merge.test.ts',
-      'packages/core/src/app/minigames.ts',
-      'packages/core/src/app/minigames.test.ts',
-      'packages/core/src/app/ports.ts',
-      'packages/core/src/app/profiles.ts',
-      'packages/core/src/app/profiles.test.ts',
-      'packages/core/src/app/report.ts',
-      'packages/core/src/app/report.test.ts',
-      'packages/core/src/app/rewards.ts',
-      'packages/core/src/app/rewards.test.ts',
-      'packages/core/src/app/session.ts',
-      'packages/core/src/app/session.test.ts',
-      'packages/core/src/app/settings.ts',
-      'packages/core/src/app/settings.test.ts',
-      'packages/core/src/app/time-limit.ts',
-      'packages/core/src/app/time-limit.test.ts',
-      'packages/core/src/app/use-cases.ts',
-      'packages/core/src/app/use-cases.test.ts',
-      'packages/content/src/load.ts',
-      'packages/content/src/load.test.ts',
-      'packages/content/src/schema.ts',
-      'packages/content/src/lesson-load.ts',
-      'packages/content/src/lesson-load.test.ts',
-      'packages/content/src/lesson-schema.ts',
-      'packages/content/src/tracks-schema.ts',
-      'packages/content/src/tracks-load.ts',
-      'packages/content/src/tracks-load.test.ts',
-      'packages/content/src/badges-schema.ts',
-      'packages/content/src/badges-load.ts',
-      'packages/content/src/badges-load.test.ts',
-      'packages/content/src/compile-all.ts',
-      'packages/content/src/voice-texts.ts',
-      'packages/content/src/voice-texts.test.ts',
-      'packages/content/src/kinds/compile-exercise.ts',
-      'packages/content/src/kinds/kind-content.ts',
-      'packages/content/src/modes/mode-content.ts',
-      'packages/content/src/modes/common.ts',
-      'packages/content/src/modes/series/content.ts',
-    ];
-    const CHESS_BOUND_PATTERNS = [
-      '**/domain/chess/**',
-      '**/domain/bot/**',
-      '**/domain/game/**',
-      '**/domain/variant/**',
-      '**/exercise/types.ts',
-      '**/exercise/state.ts',
-      '**/exercise/hint.ts',
-      '**/exercise/solver.ts',
-      '**/exercise/apply-move.ts',
-      '**/exercise/notes.ts',
-      '**/exercise/index.ts',
-      '**/exercise/kinds/**',
-      '**/exercise/modes/index.ts',
-      '**/exercise/modes/static/**',
-      '**/exercise/modes/versus/**',
-      '**/app/games.ts',
-      '**/app/friend-play.ts',
-      '**/app/bot-player.ts',
-      '**/chess-core.ts',
-      '**/content/src/chess-content.ts',
-      '**/content/src/bot-book-load.ts',
-      '**/content/src/bot-book-schema.ts',
-      '**/content/src/kinds/common.ts',
-      '**/content/src/kinds/index.ts',
-      '**/content/src/kinds/best-move/**',
-      '**/content/src/kinds/capture/**',
-      '**/content/src/kinds/choice/**',
-      '**/content/src/kinds/collect-stars/**',
-      '**/content/src/kinds/mate-in-n/**',
-      '**/content/src/kinds/select-squares/**',
-      '**/content/src/kinds/setup/**',
-      '**/content/src/kinds/yes-no/**',
-      '**/content/src/modes/index.ts',
-      '**/content/src/modes/static/**',
-      '**/content/src/modes/versus/**',
-    ];
-    return [
-      {
-        files: PLATFORM_BOUND_PATHS,
-        ignores: APP_INTEGRATION_TESTS,
-        rules: {
-          'no-restricted-imports': [
-            'error',
-            {
-              paths: [
-                {
-                  name: '@learn/subject-chess',
-                  message:
-                    'platform-bound code cannot import chess-bound code (v4 pre-split ratchet)',
-                },
-              ],
-              patterns: [
-                {
-                  group: CHESS_BOUND_PATTERNS,
-                  message:
-                    'platform-bound code cannot import chess-bound code (v4 pre-split ratchet)',
-                },
-              ],
-            },
-          ],
-        },
-      },
-    ];
-  })(),
   // Web platform/chess boundary ratchet (docs/refactor-v4.md §R4 m8.17): platform-bound web
   // modules (left) may not import chess-bound web modules (right) or `@learn/subject-chess` —
   // every platform-bound module reaches chess only through the `SubjectWeb` pack.
@@ -462,6 +375,7 @@ export default defineConfig([
             'error',
             {
               paths: [
+                CHESS_JS,
                 {
                   name: '@learn/subject-chess',
                   message:
