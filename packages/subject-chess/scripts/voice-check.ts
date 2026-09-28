@@ -11,77 +11,21 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { BadgeDef, TracksCatalog } from '@learn/platform-core';
-import type { CompiledContent } from '../src/chess.ts';
-import { loadBadges } from '@learn/platform-content/badges-load';
+import { exitOnContentError } from '@learn/platform-content/build';
+import { compileAll } from '@learn/platform-content/compile-all';
 import { chessContent } from '../src/content/chess-content.ts';
-import {
-  ContentError,
-  loadLocales,
-  mergeLocales,
-  type Locales,
-} from '@learn/platform-content/load';
-import { loadContent } from '@learn/platform-content/lesson-load';
-import { loadTracks } from '@learn/platform-content/tracks-load';
-import { buildVoiceInventory } from '@learn/platform-content/voice-texts';
-import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
-const contentDir = join(packageDir, 'content');
 const repoRoot = join(packageDir, '..', '..');
-const localesDir = PLATFORM_LOCALES_DIR;
-const chessLocalesDir = join(contentDir, 'locales');
-const lessonsDir = join(contentDir, 'lessons');
-const minigamesDir = join(contentDir, 'minigames');
-const tracksPath = join(contentDir, 'tracks.yaml');
-const badgesPath = join(contentDir, 'badges.yaml');
 const manifestPath = join(repoRoot, 'apps', 'chess-kids', 'public', 'audio', 'en', 'manifest.json');
 
-function fail(issues: readonly string[]): never {
-  for (const issue of issues) console.error(issue);
-  process.exit(1);
-}
-
-let locales: Locales;
+let compiled: ReturnType<typeof compileAll>;
 try {
-  locales = mergeLocales(loadLocales(localesDir), loadLocales(chessLocalesDir));
+  compiled = compileAll(chessContent, join(packageDir, 'content'));
 } catch (error) {
-  if (error instanceof ContentError) fail(error.issues);
-  throw error;
+  exitOnContentError(error);
 }
-
-let content: CompiledContent;
-try {
-  content = loadContent(lessonsDir, minigamesDir, locales, chessContent);
-} catch (error) {
-  if (error instanceof ContentError) fail(error.issues);
-  throw error;
-}
-
-let catalog: TracksCatalog;
-try {
-  catalog = loadTracks(tracksPath, locales, content.minigames, content.lessons);
-} catch (error) {
-  if (error instanceof ContentError) fail(error.issues);
-  throw error;
-}
-
-let badges: readonly BadgeDef[];
-try {
-  badges = loadBadges(
-    badgesPath,
-    locales,
-    catalog,
-    content.lessons,
-    content.minigames,
-    chessContent.badges,
-  );
-} catch (error) {
-  if (error instanceof ContentError) fail(error.issues);
-  throw error;
-}
-
-const { entries } = buildVoiceInventory(locales, content, catalog, badges, chessContent);
+const { entries } = compiled.voiceTexts;
 
 interface VoiceManifest {
   readonly entries?: Readonly<Record<string, { readonly text?: string }>>;

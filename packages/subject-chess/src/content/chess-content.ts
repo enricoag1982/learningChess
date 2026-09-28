@@ -1,5 +1,6 @@
 // Chess's `stimulus`/`demo` content: the concrete values the platform's compile pipeline plugs in
 // for this app. Chess-bound.
+import { join } from 'node:path';
 import type { Stars } from '@learn/platform-core';
 import {
   bot,
@@ -19,6 +20,7 @@ import {
 } from '../chess.ts';
 import { z } from 'zod';
 import { chessCore } from '../chess.ts';
+import { loadBotBook } from './bot-book-load.ts';
 import {
   checkExactlyOnePosition,
   compilePosition,
@@ -359,7 +361,7 @@ export function chessVoiceTemplates(
   exerciseNoteTemplates(add, r, all);
 }
 
-/** Chess's whole `SubjectContent`: the one value `compile-all.ts` and every script/test that loads
+/** Chess's whole `SubjectContent`: the one value `compileAll` and every script/test that loads
  * real content inject into the platform's otherwise subject-free YAML → JSON pipeline. */
 export const chessContent: SubjectContent = {
   kinds: EXERCISE_KIND_CONTENT,
@@ -368,5 +370,6 @@ export const chessContent: SubjectContent = {
   demo: chessDemo,
   badges: chessBadges,
   characters: chessCore.characters,
+  extraOutputs: { 'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')) },
   voiceTemplates: chessVoiceTemplates,
 };

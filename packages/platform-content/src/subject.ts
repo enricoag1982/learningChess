@@ -73,6 +73,8 @@ export interface SubjectContent {
   readonly demo: DemoContent;
   readonly badges: BadgesContent;
   readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
+  /** Extra `dist/` files by name, each built from the content root (chess: `bot-book.json`). */
+  readonly extraOutputs?: Readonly<Record<string, (root: string) => unknown>>;
   /** `all`: the already-compiled content, for domains only it bounds (chess: which characters need
    * a hint/note text). */
   voiceTemplates(
