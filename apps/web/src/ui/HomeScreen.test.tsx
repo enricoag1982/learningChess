@@ -5,7 +5,7 @@ import type { Track, TracksCatalog, World } from '@chess-kids/core';
 import type { MiniGame } from '@chess-kids/core/chess';
 import { makeContentSource } from '@chess-kids/core/testing';
 import { chessWeb } from '../chess-pack.ts';
-import i18n from '../i18n.ts';
+import i18n from 'i18next';
 import { tContent } from '../content-text.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { fixtureContentSource, fixtureLesson } from '../testing/fixtures.ts';

@@ -12,7 +12,7 @@ import type {
 } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
 import { chessWeb } from '../../chess-pack.ts';
-import '../../i18n.ts';
+import '../../app-i18n.ts';
 import {
   fixtureContentSource,
   fixtureExercise,

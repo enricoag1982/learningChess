@@ -1,7 +1,6 @@
 import i18next from 'i18next';
 // Node's ESM loader (this file runs straight under Playwright, outside Vite) requires this
-// attribute for a JSON import; imports `en` directly rather than through `chess-pack.ts`, whose
-// own bot-player import chain has a nested JSON import Node's loader can't yet resolve this way.
+// attribute for a JSON import.
 import en from '@chess-kids/content/locales/en.json' with { type: 'json' };
 import { i18nOptions } from '../../src/i18n-options.ts';
 

@@ -3,7 +3,7 @@ import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { VersusMiniGame } from '@chess-kids/core/chess';
 import type { BotPlayer, Move, PieceType, Square } from '@chess-kids/core/chess';
 import { chessJsRules, parseDiagram, parseFen } from '@chess-kids/core/chess';
-import '../../i18n.ts';
+import '../../app-i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
 import { createTestServices } from '../../testing/test-services.ts';

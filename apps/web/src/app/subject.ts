@@ -41,8 +41,6 @@ export interface SubjectWeb {
     rankGlyph(rankId: string): string;
     Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
   };
-  /** i18next `resources` for this subject's compiled locale bundle (`i18nOptions(resources)`). */
-  readonly resources: Readonly<Record<string, object>>;
 }
 
 /** One Home tile's own colours (`docs/screens.md` §1: border = `fg`, ledge a still-darker shade). */

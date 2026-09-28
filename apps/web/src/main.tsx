@@ -4,7 +4,7 @@ import { registerSW } from 'virtual:pwa-register';
 import '@fontsource-variable/fredoka';
 import '@fontsource-variable/nunito';
 import './index.css';
-import './i18n.ts';
+import './app-i18n.ts';
 import App from './App.tsx';
 import { AppErrorBoundary } from './ui/AppErrorBoundary.tsx';
 import { createAppUpdate } from './adapters/app-update.ts';
