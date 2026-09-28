@@ -1,27 +1,20 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CompiledContent, Lesson, MiniGame } from '@chess-kids/core/chess';
-import type { ExerciseDef, Position } from '@chess-kids/core/chess';
-import { hasPieceOf } from '@chess-kids/core/chess';
+import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@chess-kids/core';
 import { parse as parseYaml } from 'yaml';
 import type { z, ZodError } from 'zod';
-import { chessDemo } from './chess-content.ts';
 import { compileExercises } from './kinds/compile-exercise.ts';
-import { contentKindOf } from './kinds/index.ts';
 import { ContentError, type Locales } from './load.ts';
-import {
-  makeMiniGameCompileContext,
-  modeContentOf,
-  rawModeOf,
-  type ModeVerifyContext,
-} from './modes/index.ts';
+import { makeMiniGameCompileContext, type ModeVerifyContext } from './modes/mode-content.ts';
 import type { LocaleTree } from './schema.ts';
+import type { SubjectContent } from './subject.ts';
 import { lessonSchema, miniGameSchema } from './lesson-schema.ts';
 
 function compileLessonFile(
   filePath: string,
   relPath: string,
   worldName: string,
+  content: SubjectContent,
   issues: string[],
 ): Lesson | null {
   let raw: string;
@@ -47,15 +40,37 @@ function compileLessonFile(
   }
   const data = result.data;
 
-  // The subject's own concrete shape (`Lesson['demo']`); `DemoContent.compile`'s declared return
-  // type is deliberately loose (the platform never names a subject's own demo fields).
-  const demo = chessDemo.compile(data.demo, `lessons:${data.demo.text ?? `${data.id}.demo`}`, {
+  const demo = content.demo.compile(data.demo, `lessons:${data.demo.text ?? `${data.id}.demo`}`, {
     where: `${relPath}: demo`,
     issues,
-  }) as Lesson['demo'] | null;
-  const guided = compileExercises(relPath, 'guided', data.guided, data.concept, issues);
-  const exercises = compileExercises(relPath, 'exercises', data.exercises, data.concept, issues);
-  const variants = compileExercises(relPath, 'variants', data.variants ?? [], data.concept, issues);
+  });
+  const guided = compileExercises(
+    relPath,
+    'guided',
+    data.guided,
+    data.concept,
+    content.stimulus,
+    content.kinds,
+    issues,
+  );
+  const exercises = compileExercises(
+    relPath,
+    'exercises',
+    data.exercises,
+    data.concept,
+    content.stimulus,
+    content.kinds,
+    issues,
+  );
+  const variants = compileExercises(
+    relPath,
+    'variants',
+    data.variants ?? [],
+    data.concept,
+    content.stimulus,
+    content.kinds,
+    issues,
+  );
   if (demo === null || guided === null || exercises === null || variants === null) {
     return null;
   }
@@ -78,7 +93,12 @@ function compileLessonFile(
 
 /** Compiles one mini-game file: schema-validates it, then hands it to its own mode's `compile`
  * through a `MiniGameCompileContext` (board/FEN parsing, `series`' own exercise-array compiling). */
-function compileMiniGameFile(filePath: string, relPath: string, issues: string[]): MiniGame | null {
+function compileMiniGameFile(
+  filePath: string,
+  relPath: string,
+  content: SubjectContent,
+  issues: string[],
+): MiniGame | null {
   let raw: string;
   try {
     raw = readFileSync(filePath, 'utf8');
@@ -102,13 +122,9 @@ function compileMiniGameFile(filePath: string, relPath: string, issues: string[]
   }
   const data = result.data;
 
-  const ctx = makeMiniGameCompileContext(relPath, issues);
-  return modeContentOf(rawModeOf(data)).compile(data, ctx);
-}
-
-/** True when `position.toMove`'s side has at least one piece on the board. */
-function hasKidPiece(position: Position): boolean {
-  return hasPieceOf(position, position.toMove);
+  const ctx = makeMiniGameCompileContext(relPath, content.kinds, content.stimulus, issues);
+  const mode = data.mode ?? 'static';
+  return content.modes[mode]?.compile(data, ctx) ?? null;
 }
 
 /** Looks up a dot-separated key path in a locale tree (e.g. `rook.story`). */
@@ -139,24 +155,25 @@ function checkTextKey(fullKey: string, locales: Locales, where: string, issues: 
 }
 
 /** Per-exercise semantic checks, shared by a lesson's guided/exercises/variants and a series
- * mini-game's rounds: the instruction text key resolves, a kid piece sits on the position unless
- * this kind says otherwise, every extra text key the kind reports resolves too, and the kind's own
- * `verify`. */
+ * mini-game's rounds: the instruction text key resolves, the subject's own stimulus check passes
+ * unless this kind says otherwise, every extra text key the kind reports resolves too, and the
+ * kind's own `verify`. */
 function checkExerciseSemantics(
-  exercise: ExerciseDef,
+  exercise: ExerciseDefBase,
   where: string,
   locales: Locales,
+  content: SubjectContent,
   issues: string[],
 ): void {
   checkTextKey(exercise.textKey, locales, where, issues);
-  const kind = contentKindOf(exercise.type);
-  if ((kind.needsKidPiece?.(exercise) ?? true) && !hasKidPiece(exercise.position)) {
-    issues.push(`${where}: side to move has no piece`);
+  const kind = content.kinds[exercise.type];
+  if (kind?.needsKidPiece?.(exercise) ?? true) {
+    content.stimulus.check?.(exercise, { where, issues });
   }
-  for (const ref of contentKindOf(exercise.type).textKeys?.(exercise) ?? []) {
+  for (const ref of kind?.textKeys?.(exercise) ?? []) {
     checkTextKey(ref.key, locales, `${where}: ${ref.label}`, issues);
   }
-  kind.verify?.(exercise, where, issues);
+  kind?.verify?.(exercise, where, issues);
 }
 
 /** Per-lesson `easier`/`variants` rules: `easier` only on a scored exercise, referencing a variant
@@ -197,6 +214,7 @@ function validateSemantics(
   lessons: readonly Lesson[],
   minigames: readonly MiniGame[],
   locales: Locales,
+  content: SubjectContent,
   issues: string[],
 ): void {
   const claimedIds = new Map<string, string>();
@@ -224,12 +242,12 @@ function validateSemantics(
       issues,
     );
     checkTextKey(lesson.demo.textKey, locales, `${lessonWhere}: demo.text`, issues);
-    chessDemo.check?.(lesson.demo, { where: `${lessonWhere}: demo`, issues });
+    content.demo.check?.(lesson.demo, { where: `${lessonWhere}: demo`, issues });
 
     for (const exercise of [...lesson.guided, ...lesson.exercises, ...(lesson.variants ?? [])]) {
       const exerciseWhere = `${lessonWhere}: ${exercise.id}`;
       claimId(exercise.id, exerciseWhere);
-      checkExerciseSemantics(exercise, exerciseWhere, locales, issues);
+      checkExerciseSemantics(exercise, exerciseWhere, locales, content, issues);
     }
 
     if (lesson.boss !== undefined && !minigameIds.has(lesson.boss)) {
@@ -246,9 +264,8 @@ function validateSemantics(
       checkTextKey(fullKey, locales, where, issues);
     },
     checkExercise: (exercise, where) => {
-      checkExerciseSemantics(exercise, where, locales, issues);
+      checkExerciseSemantics(exercise, where, locales, content, issues);
     },
-    hasKidPiece,
   };
 
   for (const minigame of minigames) {
@@ -259,7 +276,7 @@ function validateSemantics(
     if (!lessonIds.has(minigame.unlockAfter)) {
       issues.push(`${where}: unlockAfter references unknown lesson "${minigame.unlockAfter}"`);
     }
-    modeContentOf(minigame.mode).verify(minigame, where, modeVerifyCtx);
+    content.modes[minigame.mode]?.verify(minigame, where, modeVerifyCtx);
   }
 }
 
@@ -293,13 +310,16 @@ function errorMessage(error: unknown): string {
   return message.split('\n')[0] ?? message;
 }
 
-/** Loads and validates every lesson and mini-game file, compiling them to `CompiledContent`.
- * Collects every issue before throwing a single `ContentError`. */
-export function loadContent(
+/** Loads and validates every lesson and mini-game file, compiling them to `C` (the caller's own
+ * concrete content bundle, inferred from its declared return type). Collects every issue before
+ * throwing a single `ContentError`. */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- see above.
+export function loadContent<C extends CompiledContent = CompiledContent>(
   lessonsDir: string,
   minigamesDir: string,
   locales: Locales,
-): CompiledContent {
+  content: SubjectContent,
+): C {
   const issues: string[] = [];
   const lessons: Lesson[] = [];
   const minigames: MiniGame[] = [];
@@ -318,7 +338,13 @@ export function loadContent(
         issues.push(`${relPath}: invalid file name (expected <lesson-id>.yaml)`);
         continue;
       }
-      const lesson = compileLessonFile(join(worldPath, fileName), relPath, worldName, issues);
+      const lesson = compileLessonFile(
+        join(worldPath, fileName),
+        relPath,
+        worldName,
+        content,
+        issues,
+      );
       if (lesson !== null) {
         lessons.push(lesson);
       }
@@ -331,17 +357,18 @@ export function loadContent(
       issues.push(`${relPath}: invalid file name (expected <id>.yaml)`);
       continue;
     }
-    const minigame = compileMiniGameFile(join(minigamesDir, fileName), relPath, issues);
+    const minigame = compileMiniGameFile(join(minigamesDir, fileName), relPath, content, issues);
     if (minigame !== null) {
       minigames.push(minigame);
     }
   }
 
-  validateSemantics(lessons, minigames, locales, issues);
+  validateSemantics(lessons, minigames, locales, content, issues);
 
   if (issues.length > 0) {
     throw new ContentError(issues);
   }
 
-  return { version: 1, lessons, minigames };
+  // Single trust boundary from the generic bundle to the subject's own concrete content shape.
+  return { version: 1, lessons, minigames } as unknown as C;
 }

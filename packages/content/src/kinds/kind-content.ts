@@ -1,8 +1,7 @@
 // The exercise-kind content abstraction (schema + compile + verify): a uniform interface so
 // `lesson-load.ts` dispatches through a registry (`kinds/index.ts`) — the content counterpart of
 // core's `ExerciseKind`.
-import type { TextKeyRef } from '@chess-kids/core';
-import type { ExerciseDef } from '@chess-kids/core/chess';
+import type { ExerciseDefBase, TextKeyRef } from '@chess-kids/core';
 import type { z } from 'zod';
 
 /** Fields every compiled exercise def shares, supplied by `CompileContext.build` ahead of the
@@ -58,7 +57,7 @@ export function makeCompileContext(
 /** One exercise type's content behaviour: `schema`, `refine` (union-level cross-field check),
  * `compile` (YAML → `ExerciseDef`), `verify`, and `needsKidPiece` (default `true`). Method syntax
  * is deliberate: bivariant params let a precise kind widen with no cast. */
-export interface ExerciseKindContent<D extends ExerciseDef, S extends z.ZodType> {
+export interface ExerciseKindContent<D extends ExerciseDefBase, S extends z.ZodType> {
   readonly type: D['type'];
   readonly schema: S;
   refine?(raw: z.output<S>, ctx: z.RefinementCtx): void;
@@ -68,3 +67,7 @@ export interface ExerciseKindContent<D extends ExerciseDef, S extends z.ZodType>
   /** Text keys `def` references besides its own `textKey` (e.g. a `choice` option's). */
   textKeys?(def: D): readonly TextKeyRef[];
 }
+
+/** Any exercise kind's content, widened to the base def shape (`SubjectContent.kinds`'s own
+ * entries); each concrete kind (chess: `ExerciseKindContent<CaptureDef, ...>`) widens to this. */
+export type AnyExerciseKindContent = ExerciseKindContent<ExerciseDefBase, z.ZodType>;

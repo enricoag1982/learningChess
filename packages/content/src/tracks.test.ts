@@ -1,6 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { chessContent } from './chess-content.ts';
 import { loadContent } from './lesson-load.ts';
 import { loadLocales, mergeLocales } from './load.ts';
 import { loadTracks } from './tracks-load.ts';
@@ -10,7 +11,12 @@ const locales = mergeLocales(
   loadLocales(join(packageDir, 'locales')),
   loadLocales(join(packageDir, 'chess', 'locales')),
 );
-const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
+const content = loadContent(
+  join(packageDir, 'lessons'),
+  join(packageDir, 'minigames'),
+  locales,
+  chessContent,
+);
 const catalog = loadTracks(
   join(packageDir, 'tracks.yaml'),
   locales,

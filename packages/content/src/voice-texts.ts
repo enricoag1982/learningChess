@@ -1,22 +1,17 @@
 // Inventory of every narrated string, resolved to literal English text via the same locale content
 // the app renders from, deduped by `voiceKey`: content strings, UI "owl line" templates expanded
 // over each bounded domain, and runtime string concatenations outside i18next expanded to match.
-import type { BadgeDef, Stars, TracksCatalog, World } from '@chess-kids/core';
 import type {
+  BadgeDef,
   CompiledContent,
-  ExerciseDef,
-  ExerciseFeedback,
-  ExerciseNoteCtx,
-  Hint,
-  PieceType,
-  Resolve,
-} from '@chess-kids/core/chess';
+  ExerciseDefBase,
+  TracksCatalog,
+  World,
+} from '@chess-kids/core';
 import { PLAY_FROM_OPTIONS, voiceKey } from '@chess-kids/core';
-import { chessCore, exerciseNote, isEasierOfferNote } from '@chess-kids/core/chess';
-import { chessVoiceTemplates } from './chess-content.ts';
 import type { Locales } from './load.ts';
-import { modeContentOf } from './modes/index.ts';
 import type { LocaleTree } from './schema.ts';
+import type { SubjectContent } from './subject.ts';
 
 /** One inventoried narrated text. `source` is a short human label for the report, not machine-read. */
 export interface InventoryEntry {
@@ -94,22 +89,24 @@ function resolve(
 
 // Domains derived from content, never guessed.
 
-/** The piece a lesson character stands for, from the one source (`core.characters`'s own
+/** The piece a lesson character stands for, from the subject's own `characters` (one source,
  * `topicKey`, e.g. `piece.r`); `null` for a narrator-taught (Owl) character. */
-function characterPieceOf(character: string): PieceType | null {
-  const topicKey = chessCore.characters[character]?.topicKey;
-  return topicKey?.startsWith('piece.') ? (topicKey.slice('piece.'.length) as PieceType) : null;
+function characterPieceOf(
+  characters: SubjectContent['characters'],
+  character: string,
+): string | null {
+  const topicKey = characters[character]?.topicKey;
+  return topicKey?.startsWith('piece.') ? topicKey.slice('piece.'.length) : null;
 }
-
-const PIECE_CHARACTERS = new Set(Object.keys(chessCore.characters));
 
 /** An Owl-taught lesson is named by its own title; a piece character's first lesson is named by
  * the character; every later lesson of that character by its own title. */
 function lessonDisplayName(
   locales: Locales,
+  characters: SubjectContent['characters'],
   lesson: { character: string; titleKey: string },
 ): string {
-  return PIECE_CHARACTERS.has(lesson.character)
+  return lesson.character in characters
     ? resolve(locales, `characters:${lesson.character}.name`)
     : resolve(locales, lesson.titleKey);
 }
@@ -130,7 +127,7 @@ function addText(entries: Map<string, InventoryEntry>, text: string, source: str
 function addExerciseDefs(
   entries: Map<string, InventoryEntry>,
   locales: Locales,
-  defs: readonly ExerciseDef[],
+  defs: readonly ExerciseDefBase[],
   source: string,
 ): void {
   for (const def of defs) {
@@ -142,6 +139,7 @@ function collectContentEntries(
   entries: Map<string, InventoryEntry>,
   locales: Locales,
   content: CompiledContent,
+  subject: SubjectContent,
 ): void {
   for (const lesson of content.lessons) {
     addText(entries, resolve(locales, lesson.storyKey), 'lesson-story');
@@ -153,7 +151,7 @@ function collectContentEntries(
 
   for (const minigame of content.minigames) {
     addText(entries, resolve(locales, minigame.goalKey), 'minigame-goal');
-    const rounds = modeContentOf(minigame.mode).exercises?.(minigame) ?? [];
+    const rounds = subject.modes[minigame.mode]?.exercises?.(minigame) ?? [];
     addExerciseDefs(entries, locales, rounds, 'minigame-round');
   }
 }
@@ -166,16 +164,19 @@ function collectUiTemplates(
   content: CompiledContent,
   catalog: TracksCatalog,
   badges: readonly BadgeDef[],
+  subject: SubjectContent,
 ): void {
   const worlds: readonly World[] = catalog.tracks.flatMap((track) => track.worlds);
   const minigameById = new Map(content.minigames.map((m) => [m.id, m] as const));
-  const lessonNames = content.lessons.map((lesson) => lessonDisplayName(locales, lesson));
+  const lessonNames = content.lessons.map((lesson) =>
+    lessonDisplayName(locales, subject.characters, lesson),
+  );
   const pieceLessonNames = content.lessons
-    .filter((lesson) => PIECE_CHARACTERS.has(lesson.character))
-    .map((lesson) => lessonDisplayName(locales, lesson));
+    .filter((lesson) => lesson.character in subject.characters)
+    .map((lesson) => lessonDisplayName(locales, subject.characters, lesson));
   const owlLessonNames = content.lessons
-    .filter((lesson) => !PIECE_CHARACTERS.has(lesson.character))
-    .map((lesson) => lessonDisplayName(locales, lesson));
+    .filter((lesson) => !(lesson.character in subject.characters))
+    .map((lesson) => lessonDisplayName(locales, subject.characters, lesson));
 
   // Home: next-step owl line.
   addText(entries, resolve(locales, 'home.owl-warmup-only'), 'home');
@@ -216,11 +217,12 @@ function collectUiTemplates(
 
   // Play: locked computer level / locked mini-game / locked vs-friend messages, and the versus
   // boss's own bot move / capture lines — the subject's own (chess: bot-level names, pieces).
-  chessVoiceTemplates(
+  subject.voiceTemplates(
     (text, source) => {
       addText(entries, text, source);
     },
     (key, vars) => resolve(locales, key, vars),
+    content,
   );
 
   // `unlockLabel`: the piece word for a piece character's first lesson, else the lesson's title.
@@ -231,7 +233,7 @@ function collectUiTemplates(
     }
   }
   for (const lesson of content.lessons) {
-    const piece = characterPieceOf(lesson.character);
+    const piece = characterPieceOf(subject.characters, lesson.character);
     const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
     const label =
       piece !== null && isFirstOfCharacter
@@ -248,7 +250,7 @@ function collectUiTemplates(
   }
   addText(entries, resolve(locales, 'play.vs-friend-locked'), 'play');
 
-  // Versus boss (Pawn Wars, …): kid-captured / result lines (bot move/capture: chessVoiceTemplates above).
+  // Versus boss (Pawn Wars, …): kid-captured / result lines (bot move/capture: voiceTemplates above).
   for (const piece of PIECE_TYPES) {
     addText(
       entries,
@@ -269,7 +271,7 @@ function collectUiTemplates(
       entries,
       resolve(locales, 'assessment.pass-body', {
         count: 1,
-        name: lessonDisplayName(locales, lesson),
+        name: lessonDisplayName(locales, subject.characters, lesson),
       }),
       'assessment',
     );
@@ -362,100 +364,6 @@ function collectBadgeSpokenLines(
   }
 }
 
-/** Every `EXERCISE_NOTES` entry's text, spoken as its own utterance — via the same `exerciseNote`
- * dispatch the app calls, instead of mirroring its logic by hand. Each note shape's domain is
- * bounded and content-derived: every lesson character (and the piece it stands for, defaulting to
- * rook), 1-3 stars, colour × piece type, one sample `Hint` per distinct wording. Error-kind notes
- * (`isEasierOfferNote`) also get the easier-variant-offer sentence appended, since `ExerciseStep`
- * shows that offer on them. */
-function collectExerciseNoteTexts(
-  entries: Map<string, InventoryEntry>,
-  locales: Locales,
-  content: CompiledContent,
-): void {
-  const r: Resolve = (key, vars) => resolve(locales, key, vars);
-  const characters = [...new Set(content.lessons.map((lesson) => lesson.character))];
-  const placeholderCtx: ExerciseNoteCtx = { name: '', piece: 'r', stars: 3 };
-
-  function addNote(feedback: ExerciseFeedback, ctx: ExerciseNoteCtx): void {
-    if (feedback.kind === 'instruction') return;
-    const plain = exerciseNote(r, feedback, ctx, false);
-    if (plain === undefined) return;
-    addText(entries, plain.text, 'exercise-note');
-    if (isEasierOfferNote(feedback.kind)) {
-      const withOffer = exerciseNote(r, feedback, ctx, true);
-      if (withOffer) addText(entries, withOffer.text, 'exercise-note-easier-offer');
-    }
-  }
-
-  // Every character's own display name and the piece it stands for (default rook).
-  const ctxByCharacter = characters.map((character) => ({
-    name: resolve(locales, `characters:${character}.name`),
-    piece: characterPieceOf(character) ?? 'r',
-  }));
-
-  // tap-first (never gets the easier offer: not an error kind) and illegal move (its own piece).
-  for (const { name, piece } of ctxByCharacter) {
-    addNote({ kind: 'tap-first' }, { name, piece, stars: 3 });
-    addNote({ kind: 'illegal' }, { name, piece, stars: 3 });
-  }
-
-  // Plain error notes with no variables.
-  addNote({ kind: 'select-wrong' }, placeholderCtx);
-  addNote({ kind: 'select-missing' }, placeholderCtx);
-  addNote({ kind: 'select-both' }, placeholderCtx);
-  addNote({ kind: 'wrong-answer' }, placeholderCtx);
-  addNote({ kind: 'wrong-move' }, placeholderCtx);
-  addNote({ kind: 'wrong-placement' }, placeholderCtx);
-
-  // Hint ladder (never gets the easier offer). Level-1 "squares" (piece hint) is the only shape
-  // that varies by character; every other shape's text is character-independent.
-  for (const { name, piece } of ctxByCharacter) {
-    addNote(
-      { kind: 'hint', hint: { kind: 'squares', level: 1, squares: [] } },
-      { name, piece, stars: 3 },
-    );
-  }
-  const otherHints: readonly Hint[] = [
-    { kind: 'squares', level: 2, squares: [] },
-    { kind: 'squares', level: 3, squares: [] },
-    { kind: 'yes-no', level: 1, squares: [], reveal: false },
-    { kind: 'yes-no', level: 2, squares: [], reveal: false },
-    { kind: 'yes-no', level: 3, squares: [], reveal: true },
-    { kind: 'choice', level: 1, reveal: false },
-    { kind: 'choice', level: 3, reveal: true },
-    { kind: 'setup', level: 2, piece: { color: 'w', type: 'p' }, square: 'a1', placed: false },
-    { kind: 'setup', level: 3, piece: { color: 'w', type: 'p' }, square: 'a1', placed: true },
-  ];
-  for (const hint of otherHints) {
-    addNote({ kind: 'hint', hint }, placeholderCtx);
-  }
-  for (const color of ['w', 'b'] as const) {
-    for (const type of PIECE_TYPES) {
-      addNote(
-        { kind: 'hint', hint: { kind: 'setup', level: 1, piece: { color, type }, placed: false } },
-        placeholderCtx,
-      );
-    }
-  }
-
-  // Praise (solved), 1-3 stars; checkmate concatenates the "Checkmate!" line with the same praise.
-  for (const stars of [1, 2, 3] as const satisfies readonly Stars[]) {
-    addNote({ kind: 'solved' }, { ...placeholderCtx, stars });
-    addNote({ kind: 'checkmate' }, { ...placeholderCtx, stars });
-  }
-
-  // Opponent's scripted reply (mate-in-n): colour × piece.
-  for (const color of ['w', 'b'] as const) {
-    for (const piece of PIECE_TYPES) {
-      addNote(
-        { kind: 'opponent-reply', reply: { from: 'a1', to: 'a2', san: 'a2', color, piece } },
-        placeholderCtx,
-      );
-    }
-  }
-}
-
 /** Builds the full inventory (deduped by `voiceKey`, sorted by key) plus the report's `skipped`
  * list — a pure function of already-loaded content. */
 export function buildVoiceInventory(
@@ -463,12 +371,12 @@ export function buildVoiceInventory(
   content: CompiledContent,
   catalog: TracksCatalog,
   badges: readonly BadgeDef[],
+  subject: SubjectContent,
 ): VoiceInventory {
   const entries = new Map<string, InventoryEntry>();
-  collectContentEntries(entries, locales, content);
-  collectUiTemplates(entries, locales, content, catalog, badges);
+  collectContentEntries(entries, locales, content, subject);
+  collectUiTemplates(entries, locales, content, catalog, badges, subject);
   collectBadgeSpokenLines(entries, locales, badges);
-  collectExerciseNoteTexts(entries, locales, content);
   addText(entries, resolve(locales, 'voice-check.sentence'), 'voice-check');
 
   // Nothing is skipped any more; kept as an empty list so a future unbounded template can log itself.

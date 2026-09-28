@@ -1,4 +1,4 @@
-import type { SeriesMiniGame } from '@chess-kids/core/chess';
+import type { ExerciseDefBase, MiniGameBase, SeriesGameDef } from '@chess-kids/core';
 import { z } from 'zod';
 import { exerciseSchema } from '../../kinds/index.ts';
 import { miniGameCommonFields } from '../common.ts';
@@ -7,6 +7,11 @@ import type {
   MiniGameModeContent,
   ModeVerifyContext,
 } from '../mode-content.ts';
+
+/** A `series` mini-game's compiled content: the platform's round/scoring fields (`SeriesGameDef`)
+ * plus the catalog fields every mode shares (`MiniGameBase`). */
+export type SeriesMiniGame<E extends ExerciseDefBase = ExerciseDefBase> = MiniGameBase &
+  SeriesGameDef<E> & { readonly mode: 'series' };
 
 /**
  * A `series` mini-game (Square Hunt, Setup Race, Safe or Not?, …): a fixed sequence of `rounds`,

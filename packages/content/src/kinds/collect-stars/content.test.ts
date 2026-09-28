@@ -1,5 +1,7 @@
 import { join } from 'node:path';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { chessContent } from '../../chess-content.ts';
 import { loadLocales } from '../../load.ts';
 import { loadContent } from '../../lesson-load.ts';
 import {
@@ -72,7 +74,12 @@ describe('collect-stars', () => {
 
     expect(issuesOf()).toEqual([]);
     const locales = loadLocales(join(dir, 'locales'));
-    const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+    const content = loadContent<CompiledContent>(
+      join(dir, 'lessons'),
+      join(dir, 'minigames'),
+      locales,
+      chessContent,
+    );
     const exercise = content.lessons[0]?.exercises[0];
     expect(exercise?.type === 'collect-stars' && exercise.stars2).toBe(2);
   });

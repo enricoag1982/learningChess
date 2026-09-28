@@ -4,6 +4,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { stringify } from 'yaml';
+import { chessContent } from '../chess-content.ts';
 import { ContentError, loadLocales } from '../load.ts';
 import { loadContent } from '../lesson-load.ts';
 
@@ -555,7 +556,7 @@ export function writeDefaultLocales(): void {
 
 export function load(): void {
   const locales = loadLocales(join(dir, 'locales'));
-  loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+  loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales, chessContent);
 }
 
 export function issuesOf(): string[] {

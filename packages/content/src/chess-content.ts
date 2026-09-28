@@ -1,22 +1,40 @@
 // Chess's `stimulus`/`demo` content: the concrete values the platform's compile pipeline plugs in
 // for this app. Chess-bound.
+import type { Stars } from '@chess-kids/core';
 import {
   bot,
   doubleStepBefore,
+  exerciseNote,
   hasPieceOf,
+  isEasierOfferNote,
+  type CompiledContent,
   type DemoHighlight,
+  type ExerciseFeedback,
+  type ExerciseNoteCtx,
+  type Hint,
+  type PieceType,
   type Position,
   type Resolve,
   type Square,
 } from '@chess-kids/core/chess';
 import { z } from 'zod';
+import { chessCore } from '@chess-kids/core/chess';
 import {
   checkExactlyOnePosition,
   compilePosition,
   positionFields,
   textRefSchema,
 } from './kinds/common.ts';
-import type { BadgesContent, ContentIds, DemoContent, StimulusContent, Where } from './subject.ts';
+import { EXERCISE_KIND_CONTENT } from './kinds/index.ts';
+import { MINI_GAME_MODE_CONTENT } from './modes/index.ts';
+import type {
+  BadgesContent,
+  ContentIds,
+  DemoContent,
+  StimulusContent,
+  SubjectContent,
+  Where,
+} from './subject.ts';
 
 interface StimulusYaml {
   readonly board?: string;
@@ -69,6 +87,13 @@ export const chessStimulus: StimulusContent = {
     const lastMove = parseLastMove(r.lastMove);
     checkLastMove(position, lastMove, at);
     return { head: { position }, tail: { lastMove } };
+  },
+
+  check(def, at) {
+    const { position } = def as { readonly position: Position };
+    if (!hasPieceOf(position, position.toMove)) {
+      at.issues.push(`${at.where}: side to move has no piece`);
+    }
   },
 };
 
@@ -203,9 +228,114 @@ function levelConditionTexts(r: Resolve): readonly string[] {
   ];
 }
 
-/** Chess's own Play / versus-boss voice templates: every bot level's name, combined with the Play
- * screen's locked-level messages and the versus boss's own bot move/capture lines. */
-export function chessVoiceTemplates(add: (text: string, source: string) => void, r: Resolve): void {
+/** The piece a lesson character stands for (`core.characters`'s own `topicKey`, e.g. `piece.r`);
+ * `null` for a narrator-taught (Owl) character. */
+function characterPieceOf(character: string): PieceType | null {
+  const topicKey = chessCore.characters[character]?.topicKey;
+  return topicKey?.startsWith('piece.') ? (topicKey.slice('piece.'.length) as PieceType) : null;
+}
+
+/** Every `EXERCISE_NOTES` entry's text, spoken as its own utterance — via the same `exerciseNote`
+ * dispatch the app calls, instead of mirroring its logic by hand. Each note shape's domain is
+ * bounded and content-derived: every lesson character (and the piece it stands for, defaulting to
+ * rook), 1-3 stars, colour × piece type, one sample `Hint` per distinct wording. Error-kind notes
+ * (`isEasierOfferNote`) also get the easier-variant-offer sentence appended, since `ExerciseStep`
+ * shows that offer on them. */
+function exerciseNoteTemplates(
+  add: (text: string, source: string) => void,
+  r: Resolve,
+  all: CompiledContent,
+): void {
+  const characters = [...new Set(all.lessons.map((lesson) => lesson.character))];
+  const placeholderCtx: ExerciseNoteCtx = { name: '', piece: 'r', stars: 3 };
+
+  function addNote(feedback: ExerciseFeedback, ctx: ExerciseNoteCtx): void {
+    if (feedback.kind === 'instruction') return;
+    const plain = exerciseNote(r, feedback, ctx, false);
+    if (plain === undefined) return;
+    add(plain.text, 'exercise-note');
+    if (isEasierOfferNote(feedback.kind)) {
+      const withOffer = exerciseNote(r, feedback, ctx, true);
+      if (withOffer) add(withOffer.text, 'exercise-note-easier-offer');
+    }
+  }
+
+  // Every character's own display name and the piece it stands for (default rook).
+  const ctxByCharacter = characters.map((character) => ({
+    name: r(`characters:${character}.name`),
+    piece: characterPieceOf(character) ?? 'r',
+  }));
+
+  // tap-first (never gets the easier offer: not an error kind) and illegal move (its own piece).
+  for (const { name, piece } of ctxByCharacter) {
+    addNote({ kind: 'tap-first' }, { name, piece, stars: 3 });
+    addNote({ kind: 'illegal' }, { name, piece, stars: 3 });
+  }
+
+  // Plain error notes with no variables.
+  addNote({ kind: 'select-wrong' }, placeholderCtx);
+  addNote({ kind: 'select-missing' }, placeholderCtx);
+  addNote({ kind: 'select-both' }, placeholderCtx);
+  addNote({ kind: 'wrong-answer' }, placeholderCtx);
+  addNote({ kind: 'wrong-move' }, placeholderCtx);
+  addNote({ kind: 'wrong-placement' }, placeholderCtx);
+
+  // Hint ladder (never gets the easier offer). Level-1 "squares" (piece hint) is the only shape
+  // that varies by character; every other shape's text is character-independent.
+  for (const { name, piece } of ctxByCharacter) {
+    addNote(
+      { kind: 'hint', hint: { kind: 'squares', level: 1, squares: [] } },
+      { name, piece, stars: 3 },
+    );
+  }
+  const otherHints: readonly Hint[] = [
+    { kind: 'squares', level: 2, squares: [] },
+    { kind: 'squares', level: 3, squares: [] },
+    { kind: 'yes-no', level: 1, squares: [], reveal: false },
+    { kind: 'yes-no', level: 2, squares: [], reveal: false },
+    { kind: 'yes-no', level: 3, squares: [], reveal: true },
+    { kind: 'choice', level: 1, reveal: false },
+    { kind: 'choice', level: 3, reveal: true },
+    { kind: 'setup', level: 2, piece: { color: 'w', type: 'p' }, square: 'a1', placed: false },
+    { kind: 'setup', level: 3, piece: { color: 'w', type: 'p' }, square: 'a1', placed: true },
+  ];
+  for (const hint of otherHints) {
+    addNote({ kind: 'hint', hint }, placeholderCtx);
+  }
+  for (const color of ['w', 'b'] as const) {
+    for (const type of VERSUS_PIECE_TYPES) {
+      addNote(
+        { kind: 'hint', hint: { kind: 'setup', level: 1, piece: { color, type }, placed: false } },
+        placeholderCtx,
+      );
+    }
+  }
+
+  // Praise (solved), 1-3 stars; checkmate concatenates the "Checkmate!" line with the same praise.
+  for (const stars of [1, 2, 3] as const satisfies readonly Stars[]) {
+    addNote({ kind: 'solved' }, { ...placeholderCtx, stars });
+    addNote({ kind: 'checkmate' }, { ...placeholderCtx, stars });
+  }
+
+  // Opponent's scripted reply (mate-in-n): colour × piece.
+  for (const color of ['w', 'b'] as const) {
+    for (const piece of VERSUS_PIECE_TYPES) {
+      addNote(
+        { kind: 'opponent-reply', reply: { from: 'a1', to: 'a2', san: 'a2', color, piece } },
+        placeholderCtx,
+      );
+    }
+  }
+}
+
+/** Chess's own Play / versus-boss / exercise-note voice templates: every bot level's name, combined
+ * with the Play screen's locked-level messages, the versus boss's own bot move/capture lines, and
+ * every narrated exercise-feedback note. */
+export function chessVoiceTemplates(
+  add: (text: string, source: string) => void,
+  r: Resolve,
+  all: CompiledContent,
+): void {
   const conditionTexts = levelConditionTexts(r);
   for (const name of BOT_LEVEL_NAMES) {
     const botName = r(`boss.versus.bot-name.${name}`);
@@ -225,4 +355,17 @@ export function chessVoiceTemplates(add: (text: string, source: string) => void,
   for (const piece of VERSUS_PIECE_TYPES) {
     add(r('boss.versus.kid-captured', { piece: r(`board.piece.${piece}`) }), 'versus-boss');
   }
+  exerciseNoteTemplates(add, r, all);
 }
+
+/** Chess's whole `SubjectContent`: the one value `compile-all.ts` and every script/test that loads
+ * real content inject into the platform's otherwise subject-free YAML → JSON pipeline. */
+export const chessContent: SubjectContent = {
+  kinds: EXERCISE_KIND_CONTENT,
+  modes: MINI_GAME_MODE_CONTENT,
+  stimulus: chessStimulus,
+  demo: chessDemo,
+  badges: chessBadges,
+  characters: chessCore.characters,
+  voiceTemplates: chessVoiceTemplates,
+};

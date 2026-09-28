@@ -1,6 +1,7 @@
 import type { VersusMiniGame } from '@chess-kids/core/chess';
 import { game, type Color, type Piece, type Square } from '@chess-kids/core/chess';
 import type { z } from 'zod';
+import { compilePosition } from '../../kinds/common.ts';
 import type { MiniGameCompileContext } from '../mode-content.ts';
 import type { schema, WinConditionYaml } from './schema.ts';
 
@@ -44,7 +45,7 @@ export function compile(
   raw: z.output<typeof schema>,
   ctx: MiniGameCompileContext,
 ): VersusMiniGame | null {
-  const position = ctx.position('board', raw);
+  const position = compilePosition(raw, { where: `${ctx.relPath}: board`, issues: ctx.issues });
   if (position === null) {
     return null;
   }

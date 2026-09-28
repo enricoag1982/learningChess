@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { voiceKey } from '@chess-kids/core';
 import { describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
-import { chessBadges } from './chess-content.ts';
+import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import type { LocaleTree } from './schema.ts';
@@ -15,7 +15,12 @@ const locales = mergeLocales(
   loadLocales(join(packageDir, 'locales')),
   loadLocales(join(packageDir, 'chess', 'locales')),
 );
-const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
+const content = loadContent(
+  join(packageDir, 'lessons'),
+  join(packageDir, 'minigames'),
+  locales,
+  chessContent,
+);
 const catalog = loadTracks(
   join(packageDir, 'tracks.yaml'),
   locales,
@@ -28,10 +33,10 @@ const badges = loadBadges(
   catalog,
   content.lessons,
   content.minigames,
-  chessBadges,
+  chessContent.badges,
 );
 
-const inventory = buildVoiceInventory(locales, content, catalog, badges);
+const inventory = buildVoiceInventory(locales, content, catalog, badges, chessContent);
 const textsBySource = new Map<string, string[]>();
 for (const entry of inventory.entries) {
   const list = textsBySource.get(entry.source) ?? [];
@@ -142,7 +147,7 @@ describe('voice text inventory (real content)', () => {
   });
 
   it('is deterministic across runs (same content in, same inventory out)', () => {
-    const again = buildVoiceInventory(locales, content, catalog, badges);
+    const again = buildVoiceInventory(locales, content, catalog, badges, chessContent);
     expect(again.entries).toEqual(inventory.entries);
   });
 });

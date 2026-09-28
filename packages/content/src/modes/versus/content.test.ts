@@ -1,5 +1,7 @@
 import { join } from 'node:path';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { chessContent } from '../../chess-content.ts';
 import { loadLocales } from '../../load.ts';
 import { loadContent } from '../../lesson-load.ts';
 import {
@@ -22,7 +24,12 @@ describe('versus mini-game', () => {
     writeVersusMiniGame();
     writeDefaultLocales();
     const locales = loadLocales(join(dir, 'locales'));
-    const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+    const content = loadContent<CompiledContent>(
+      join(dir, 'lessons'),
+      join(dir, 'minigames'),
+      locales,
+      chessContent,
+    );
     const game = content.minigames.find((entry) => entry.id === 'vg1');
     if (game === undefined || game.mode !== 'versus') {
       throw new Error('expected a compiled versus mini-game');
@@ -62,7 +69,12 @@ describe('versus mini-game', () => {
     expect(issues).toEqual([]);
 
     const locales = loadLocales(join(dir, 'locales'));
-    const content = loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales);
+    const content = loadContent<CompiledContent>(
+      join(dir, 'lessons'),
+      join(dir, 'minigames'),
+      locales,
+      chessContent,
+    );
     const game = content.minigames.find((entry) => entry.id === 'vg1');
     if (game === undefined || game.mode !== 'versus') {
       throw new Error('expected a compiled versus mini-game');

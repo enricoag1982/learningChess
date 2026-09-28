@@ -1,7 +1,12 @@
 import type { StaticMiniGame } from '@chess-kids/core/chess';
-import { optimalMoves, staticGoalExercise } from '@chess-kids/core/chess';
+import { hasPieceOf, optimalMoves, staticGoalExercise } from '@chess-kids/core/chess';
 import { z } from 'zod';
-import { checkExactlyOnePosition, positionFields, rules } from '../../kinds/common.ts';
+import {
+  checkExactlyOnePosition,
+  compilePosition,
+  positionFields,
+  rules,
+} from '../../kinds/common.ts';
 import { miniGameCommonFields } from '../common.ts';
 import type {
   MiniGameCompileContext,
@@ -27,7 +32,7 @@ export const schema = z
   .superRefine(checkExactlyOnePosition);
 
 function compile(raw: z.output<typeof schema>, ctx: MiniGameCompileContext): StaticMiniGame | null {
-  const position = ctx.position('board', raw);
+  const position = compilePosition(raw, { where: `${ctx.relPath}: board`, issues: ctx.issues });
   if (position === null) {
     return null;
   }
@@ -46,7 +51,7 @@ function compile(raw: z.output<typeof schema>, ctx: MiniGameCompileContext): Sta
 }
 
 function verify(miniGame: StaticMiniGame, where: string, ctx: ModeVerifyContext): void {
-  if (!ctx.hasKidPiece(miniGame.position)) {
+  if (!hasPieceOf(miniGame.position, miniGame.position.toMove)) {
     ctx.issues.push(`${where}: side to move has no piece`);
   }
   const asExercise = staticGoalExercise({

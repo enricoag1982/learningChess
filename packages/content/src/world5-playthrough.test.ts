@@ -1,8 +1,9 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef } from '@chess-kids/core/chess';
+import type { CompiledContent, ExerciseDef } from '@chess-kids/core/chess';
 import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
+import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 
@@ -11,7 +12,12 @@ const locales = mergeLocales(
   loadLocales(join(packageDir, 'locales')),
   loadLocales(join(packageDir, 'chess', 'locales')),
 );
-const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
+const content = loadContent<CompiledContent>(
+  join(packageDir, 'lessons'),
+  join(packageDir, 'minigames'),
+  locales,
+  chessContent,
+);
 
 const WORLD5_LESSON_IDS = ['castling', 'en-passant', 'draws'];
 

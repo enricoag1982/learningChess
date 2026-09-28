@@ -6,12 +6,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { loadBotBook } from './bot-book-load.ts';
+import { chessContent } from './chess-content.ts';
 import { compileAll } from './compile-all.ts';
 
 const packageDir = dirname(dirname(fileURLToPath(import.meta.url)));
-const compiled = compileAll(packageDir, {
-  'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')),
-});
+const compiled = compileAll(
+  packageDir,
+  { 'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')) },
+  chessContent,
+);
 
 const UPDATE_HINT = 'pnpm --filter @chess-kids/content exec vitest run -u, then review the diff';
 

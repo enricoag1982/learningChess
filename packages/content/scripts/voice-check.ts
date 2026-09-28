@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
 import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from '../src/badges-load.ts';
-import { chessBadges } from '../src/chess-content.ts';
+import { chessContent } from '../src/chess-content.ts';
 import { ContentError, loadLocales, mergeLocales, type Locales } from '../src/load.ts';
 import { loadContent } from '../src/lesson-load.ts';
 import { loadTracks } from '../src/tracks-load.ts';
@@ -45,7 +45,7 @@ try {
 
 let content: CompiledContent;
 try {
-  content = loadContent(lessonsDir, minigamesDir, locales);
+  content = loadContent(lessonsDir, minigamesDir, locales, chessContent);
 } catch (error) {
   if (error instanceof ContentError) fail(error.issues);
   throw error;
@@ -67,14 +67,14 @@ try {
     catalog,
     content.lessons,
     content.minigames,
-    chessBadges,
+    chessContent.badges,
   );
 } catch (error) {
   if (error instanceof ContentError) fail(error.issues);
   throw error;
 }
 
-const { entries } = buildVoiceInventory(locales, content, catalog, badges);
+const { entries } = buildVoiceInventory(locales, content, catalog, badges, chessContent);
 
 interface VoiceManifest {
   readonly entries?: Readonly<Record<string, { readonly text?: string }>>;

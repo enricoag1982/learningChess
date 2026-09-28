@@ -1,6 +1,6 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ExerciseDef } from '@chess-kids/core/chess';
+import type { CompiledContent, ExerciseDef } from '@chess-kids/core/chess';
 import {
   completeRound,
   currentRound,
@@ -10,6 +10,7 @@ import {
 } from '@chess-kids/core';
 import { playExerciseToCompletion } from '@chess-kids/core/testing';
 import { describe, expect, it } from 'vitest';
+import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
 import { EXERCISE_KINDS } from '@chess-kids/core/chess';
@@ -19,7 +20,12 @@ const locales = mergeLocales(
   loadLocales(join(packageDir, 'locales')),
   loadLocales(join(packageDir, 'chess', 'locales')),
 );
-const content = loadContent(join(packageDir, 'lessons'), join(packageDir, 'minigames'), locales);
+const content = loadContent<CompiledContent>(
+  join(packageDir, 'lessons'),
+  join(packageDir, 'minigames'),
+  locales,
+  chessContent,
+);
 
 const WORLD4_LESSON_IDS = ['check', 'escape-check', 'checkmate', 'mate-in-1', 'stalemate'];
 

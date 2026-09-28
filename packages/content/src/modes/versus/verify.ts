@@ -1,5 +1,5 @@
 import type { VersusMiniGame } from '@chess-kids/core/chess';
-import { chessJsRules, game, hasKing } from '@chess-kids/core/chess';
+import { chessJsRules, game, hasKing, hasPieceOf } from '@chess-kids/core/chess';
 import type { ModeVerifyContext } from '../mode-content.ts';
 
 /**
@@ -8,7 +8,7 @@ import type { ModeVerifyContext } from '../mode-content.ts';
  * its own start position (an instant win/draw there means the boss is unplayable).
  */
 export function verify(miniGame: VersusMiniGame, where: string, ctx: ModeVerifyContext): void {
-  if (!ctx.hasKidPiece(miniGame.position)) {
+  if (!hasPieceOf(miniGame.position, miniGame.position.toMove)) {
     ctx.issues.push(`${where}: side to move has no piece`);
   }
   if (

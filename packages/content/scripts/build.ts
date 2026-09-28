@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { bot } from '@chess-kids/core/chess';
 import { loadBotBook } from '../src/bot-book-load.ts';
+import { chessContent } from '../src/chess-content.ts';
 import { compileAll } from '../src/compile-all.ts';
 import { ContentError } from '../src/load.ts';
 
@@ -22,9 +23,11 @@ function fail(issues: readonly string[]): never {
 
 let compiled: ReturnType<typeof compileAll>;
 try {
-  compiled = compileAll(packageDir, {
-    'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')),
-  });
+  compiled = compileAll(
+    packageDir,
+    { 'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')) },
+    chessContent,
+  );
 } catch (error) {
   if (error instanceof ContentError) {
     fail(error.issues);

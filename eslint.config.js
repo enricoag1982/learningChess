@@ -170,19 +170,6 @@ export default defineConfig([
       'packages/core/src/app/use-cases.test.ts',
       'packages/core/src/app/minigames.test.ts',
       'packages/core/src/domain/exercise/modes/series/engine.test.ts',
-      'packages/content/src/lesson-schema.ts',
-      'packages/content/src/lesson-load.ts',
-      'packages/content/src/voice-texts.ts',
-      'packages/content/src/kinds/kind-content.ts',
-      'packages/content/src/kinds/compile-exercise.ts',
-      'packages/content/src/modes/mode-content.ts',
-      // Same reason as `ports.ts`: `CompiledAll.content` is the build's own concrete artifact.
-      'packages/content/src/compile-all.ts',
-      // Compiles YAML straight into chess's own `SeriesMiniGame` shape (rounds/errors3/errors2):
-      // no base equivalent exists, and generic-izing content compilation for `series` alone,
-      // ahead of the other modes' own compile files (none of them platform-bound today), is out
-      // of scope here — same "next iteration" as the content files above.
-      'packages/content/src/modes/series/content.ts',
     ];
     return [
       {
