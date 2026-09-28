@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { recordSessionMinutes } from '@chess-kids/core';
 import type { Screen } from '../app/store.ts';
 import { useAppStore, useServices } from '../app/store.ts';
-import { ROUTE_META } from '../app/routes.ts';
+import { routeMetaFor } from '../app/subject.ts';
+import type { SubjectWeb } from '../app/subject.ts';
 
 /** One real minute — the log records played time in whole minutes (domain-model.md §2 `SessionLog`). */
 const TICK_MS = 60_000;
@@ -12,15 +13,16 @@ const IDLE_LIMIT_MS = 2 * 60_000;
  * keydown covers a parent typing in the password/settings screens. */
 const INPUT_EVENTS = ['pointerdown', 'keydown'] as const;
 
-/** Screens where a kid profile is actively playing or browsing (`ROUTE_META`'s `tracked` flag). */
-function isTrackedScreen(screen: Screen): boolean {
-  return ROUTE_META[screen].tracked;
+/** Screens where a kid profile is actively playing or browsing (the route's own `tracked` flag). */
+function isTrackedScreen(pack: SubjectWeb, screen: Screen): boolean {
+  return routeMetaFor(pack, screen).tracked;
 }
 
 /** Foreground time tracker (domain-model.md §3.3): while on a tracked screen, adds one minute to
  * today's `SessionLog` every real minute the tab is visible and input is recent; else paused. */
 export function TimeTracker(): null {
   const services = useServices();
+  const pack = useAppStore((state) => state.pack);
   const profile = useAppStore((state) => state.profile);
   const screen = useAppStore((state) => state.screen);
   const checkTimeNotice = useAppStore((state) => state.checkTimeNotice);
@@ -51,13 +53,13 @@ export function TimeTracker(): null {
     screenRef.current = screen;
     // Arriving at a tracked screen counts as activity, so a kid who is reading/listening rather
     // than tapping is not immediately treated as idle.
-    if (isTrackedScreen(screen)) lastInputRef.current = Date.now();
-  }, [screen]);
+    if (isTrackedScreen(pack, screen)) lastInputRef.current = Date.now();
+  }, [pack, screen]);
 
   useEffect(() => {
     if (profileId === null) return;
     const id = window.setInterval(() => {
-      if (!isTrackedScreen(screenRef.current) || document.hidden) return;
+      if (!isTrackedScreen(pack, screenRef.current) || document.hidden) return;
       if (Date.now() - lastInputRef.current > IDLE_LIMIT_MS) return;
       void recordSessionMinutes(services.deps, profileId, 1, services.deps.clock.now());
       // The other 5-minute-warning trigger (`AppNotice.tsx` runs "screen change"): catches the
@@ -67,7 +69,7 @@ export function TimeTracker(): null {
     return () => {
       window.clearInterval(id);
     };
-  }, [profileId, services, checkTimeNotice]);
+  }, [pack, profileId, services, checkTimeNotice]);
 
   return null;
 }

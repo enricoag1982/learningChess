@@ -6,6 +6,7 @@ import { chessJsRules, parseDiagram, parseFen } from '@chess-kids/core/chess';
 import '../../app-i18n.ts';
 import { fixtureContentSource, fixtureLesson } from '../../testing/fixtures.ts';
 import { renderWithStore } from '../../testing/render-with-store.tsx';
+import { chessWeb } from '../../chess-pack.ts';
 import { createTestServices } from '../../testing/test-services.ts';
 import { BossStep } from '../ui-registry.ts';
 
@@ -129,6 +130,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     const { store } = await renderWithStore(
       <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
       services,
+      chessWeb,
     );
 
     // Move 1: a6-a7. The bot then replies (h7-h6), narrated once it lands.
@@ -158,7 +160,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       ...createTestServices(fixtureContentSource(lesson, [boss])),
       subject: { botPlayer: scriptedBotPlayer([{ from: 'h7', to: 'h6' }]) },
     };
-    await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+    await renderWithStore(
+      <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+      services,
+      chessWeb,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /^a6,/ }));
     fireEvent.click(screen.getByRole('button', { name: /^a7,/ }));
@@ -193,7 +199,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       ...createTestServices(fixtureContentSource(lesson, [boss])),
       subject: { botPlayer: scriptedBotPlayer([]) },
     };
-    await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+    await renderWithStore(
+      <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+      services,
+      chessWeb,
+    );
 
     // d4 is attacked by the black pawn on e5 and defended by no other white piece.
     expect(screen.getByRole('button', { name: /^d4,.*in danger/ })).toBeTruthy();
@@ -224,7 +234,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       // Same "d4 attacked and undefended" position as the Mouse-level test above, but Fox's own
       // danger ring is off by default: d4's accessible name carries no "in danger".
@@ -247,7 +261,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
           ]),
         },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       async function playRoundAndTakeBack(kidFrom: string, kidTo: string): Promise<void> {
         fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${kidFrom},`) }));
@@ -280,7 +298,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([{ from: 'g8', to: 'h8' }]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       // Disabled even before any move is played.
       expect(screen.getByRole('button', { name: /Take back/ })).toHaveProperty('disabled', true);
@@ -316,7 +338,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       expect(screen.getByRole('button', { name: /^e1,.*in check/ })).toBeTruthy();
     });
@@ -328,7 +354,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^a8,/ }));
@@ -358,7 +388,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^h2,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^d6,/ }));
@@ -380,7 +414,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^a2,/ }));
@@ -399,7 +437,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^e1,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^g1,/ }));
@@ -419,7 +461,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^e5,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^d6,/ }));
@@ -439,7 +485,11 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
         ...createTestServices(fixtureContentSource(lesson, [boss])),
         subject: { botPlayer: scriptedBotPlayer([]) },
       };
-      await renderWithStore(<BossStep lesson={lesson} game={boss} nextStepIndex={5} />, services);
+      await renderWithStore(
+        <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+        services,
+        chessWeb,
+      );
 
       fireEvent.click(screen.getByRole('button', { name: /^a7,/ }));
       fireEvent.click(screen.getByRole('button', { name: /^a8,/ }));

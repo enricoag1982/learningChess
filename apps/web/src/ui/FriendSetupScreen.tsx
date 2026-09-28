@@ -49,7 +49,8 @@ export function FriendSetupScreen(): JSX.Element {
   const friendSetup = useAppStore((state) => state.friendSetup);
   const updateFriendSetup = useAppStore((state) => state.updateFriendSetup);
   const startFriendGame = useAppStore((state) => state.startFriendGame);
-  const goToPlay = useAppStore((state) => state.goToPlay);
+  const navigate = useAppStore((state) => state.navigate);
+  const goToPlay = (): void => void navigate({ name: 'play' });
 
   const bubbleText = t('friend-play.setup-owl-line');
 

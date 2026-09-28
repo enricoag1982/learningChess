@@ -1,7 +1,8 @@
 import { checkActivityGate, isFirstRun, listProfiles } from '@chess-kids/core';
 import type { Profile, TimeLimitStatus } from '@chess-kids/core';
 import type { AppGet, AppSet, SliceCreator } from '../store.ts';
-import { ROUTE_META, type NavOp, type Route, type RouteName } from '../routes.ts';
+import { routeMetaFor } from '../subject.ts';
+import type { NavOp, Route, RouteName } from '../routes.ts';
 
 export interface NavSlice {
   /** The navigation stack, root first, current screen last. */
@@ -32,26 +33,25 @@ export interface NavSlice {
   readonly goToJourney: () => void;
   /** Journey's back button, Play's/Den's/Practice's back button. */
   readonly goToHome: () => void;
-  /** Opens the Play screen. */
-  readonly goToPlay: () => void;
   /** Opens My Den. */
   readonly goToDen: () => void;
   /** Opens the Practice screen. */
   readonly goToPractice: () => void;
 }
 
-/** `lesson` resumes at its own `startStep`; `full-game` clears any stale level-up banner. Runs
- * once per landed route, on every navigation. */
-function runRouteEnter(set: AppSet, route: Route): void {
+/** `lesson` resumes at its own `startStep`; a subject route's own entry side effect (chess:
+ * `full-game` clears any stale level-up banner) runs from its pack entry. Runs once per landed
+ * route, on every navigation. */
+function runRouteEnter(set: AppSet, get: AppGet, route: Route): void {
   if (route.name === 'lesson') set({ stepIndex: route.startStep });
-  if (route.name === 'full-game') set({ levelUpSuggestion: null });
+  get().pack.routes[route.name]?.onEnter?.(set);
 }
 
 /** Sets the stack and keeps `screen` equal to its top's name. */
-function setStack(set: AppSet, stack: readonly Route[]): void {
+function setStack(set: AppSet, get: AppGet, stack: readonly Route[]): void {
   const top = stack[stack.length - 1];
   set({ stack, screen: top?.name ?? 'loading' });
-  if (top) runRouteEnter(set, top);
+  if (top) runRouteEnter(set, get, top);
 }
 
 function lastIndexOfName(stack: readonly Route[], name: RouteName): number {
@@ -76,27 +76,27 @@ async function runOp(set: AppSet, get: AppGet, op: NavOp, skipGate: boolean): Pr
   const needsGate =
     !skipGate &&
     (op.op === 'push' || op.op === 'replace'
-      ? ROUTE_META[op.route.name].gated === true
+      ? routeMetaFor(get().pack, op.route.name).gated === true
       : op.gate === true);
   if (needsGate) {
     const status = await overLimitStatus(get);
     if (status) {
-      setStack(set, [...get().stack, { name: 'time-limit', status, resume: op }]);
+      setStack(set, get, [...get().stack, { name: 'time-limit', status, resume: op }]);
       return;
     }
   }
   switch (op.op) {
     case 'push':
-      setStack(set, [...get().stack, op.route]);
+      setStack(set, get, [...get().stack, op.route]);
       return;
     case 'replace':
-      setStack(set, [...get().stack.slice(0, -1), op.route]);
+      setStack(set, get, [...get().stack.slice(0, -1), op.route]);
       return;
     case 'back': {
       const stack = get().stack;
       const landingIndex = op.to ? lastIndexOfName(stack, op.to) : stack.length - 2;
       const safeIndex = landingIndex >= 0 ? landingIndex : 0;
-      setStack(set, stack.slice(0, safeIndex + 1));
+      setStack(set, get, stack.slice(0, safeIndex + 1));
       return;
     }
   }
@@ -120,7 +120,7 @@ export function setRoute(store: { readonly setState: AppSet }, route: Route): vo
 }
 
 /** A plain-route action that just navigates there, no other logic. */
-function navigateTo(get: AppGet, name: 'new-player' | 'journey' | 'play' | 'den' | 'practice') {
+function navigateTo(get: AppGet, name: 'new-player' | 'journey' | 'den' | 'practice') {
   return (): void => void get().navigate({ name });
 }
 
@@ -133,7 +133,7 @@ export const createNavSlice: SliceCreator<NavSlice> = (set, get) => {
     replace: (route) => runOp(set, get, { op: 'replace', route }, false),
     back: (to, opts) => runOp(set, get, { op: 'back', to, gate: opts?.gate }, false),
     reset: (...routes) => {
-      setStack(set, routes);
+      setStack(set, get, routes);
     },
     applyResume: (resume) => runOp(set, get, resume, true),
 
@@ -161,11 +161,10 @@ export const createNavSlice: SliceCreator<NavSlice> = (set, get) => {
     goToJourney: navigateTo(get, 'journey'),
 
     goToHome() {
-      set({ levelUpSuggestion: null });
+      set(get().pack.homeReset ?? {});
       void get().back('home', { gate: true });
     },
 
-    goToPlay: navigateTo(get, 'play'),
     goToDen: navigateTo(get, 'den'),
     goToPractice: navigateTo(get, 'practice'),
   };

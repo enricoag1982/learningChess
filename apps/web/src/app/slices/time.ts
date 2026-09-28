@@ -9,7 +9,8 @@ import {
   minutesUntilEnd,
   shouldWarn,
 } from '@chess-kids/core';
-import { ROUTE_META } from '../routes.ts';
+import { routeMetaFor } from '../subject.ts';
+import type { SubjectWeb } from '../subject.ts';
 import type { Screen, SliceCreator } from '../store.ts';
 import { reloadProfiles } from './profile.ts';
 
@@ -32,15 +33,16 @@ export interface TimeSlice {
   readonly switchPlayerFromTimeLimit: () => Promise<void>;
 }
 
-/** `true` while `screen` is calm (`ROUTE_META`) — for `'lesson'`, only once `stepIndex` lands on
- * that lesson's own `'complete'` step. */
+/** `true` while `screen` is calm (its route's own `calm` flag) — for `'lesson'`, only once
+ * `stepIndex` lands on that lesson's own `'complete'` step. */
 function isCalmScreen(
+  pack: SubjectWeb,
   screen: Screen,
   lessonId: string | null,
   stepIndex: number,
   content: ContentSource,
 ): boolean {
-  if (ROUTE_META[screen].calm) return true;
+  if (routeMetaFor(pack, screen).calm) return true;
   if (screen !== 'lesson' || lessonId === null) return false;
   const lesson = content.lesson(lessonId);
   if (!lesson) return false;
@@ -54,11 +56,11 @@ export const createTimeSlice: SliceCreator<TimeSlice> = (set, get) => {
     async checkTimeNotice(trigger) {
       const { services } = get();
       if (trigger === 'screen') set({ timeNoticeVisible: false });
-      const { profile, screen, stack, stepIndex } = get();
+      const { pack, profile, screen, stack, stepIndex } = get();
       if (!profile) return;
       const top = stack[stack.length - 1];
       const lessonId = top?.name === 'lesson' ? top.lessonId : null;
-      if (!isCalmScreen(screen, lessonId, stepIndex, services.deps.content)) return;
+      if (!isCalmScreen(pack, screen, lessonId, stepIndex, services.deps.content)) return;
       const now = services.deps.clock.now();
       const settings = await getProfileSettings(services.deps, profile.id);
       const log = await combinedSessionLog(services.deps, profile.id, now);

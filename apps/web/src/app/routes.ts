@@ -1,7 +1,16 @@
 import type { AssessmentScope, TimeLimitStatus } from '@chess-kids/core';
+// `ConceptTask`/`PlacementWorldPlan` stay concrete here (not the generic base): review/placement
+// task rendering (`ReviewTaskRunner`) still reads a task's own kind-specific exercise fields
+// directly — a platform-wide leak of its own (session/kind-dispatch area), out of this seam's scope.
 import type { ConceptTask, PlacementWorldPlan } from '@chess-kids/core/chess';
 
-/** Screen names with no route params of their own. */
+/** A subject-contributed route's own param fields, keyed by route name — augmented per subject
+ * (chess: `play`, `'full-game'` `{level}`, `'friend-setup'`, `'friend-game'`). Each subject's own
+ * screens/flows read the params back through `useRoute`. */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
+export interface SubjectRoutes {}
+
+/** Platform screen names with no route params of their own. */
 export type PlainRouteName =
   | 'loading'
   | 'first-run'
@@ -10,26 +19,23 @@ export type PlainRouteName =
   | 'parent'
   | 'home'
   | 'journey'
-  | 'play'
   | 'den'
-  | 'friend-setup'
-  | 'friend-game'
   | 'warmup'
   | 'practice'
   | 'today-summary'
   | 'placement-offer';
 
-/** Every top-level screen name. */
+/** Every top-level screen name: the platform's own, plus every subject-contributed one. */
 export type RouteName =
   | PlainRouteName
   | 'password'
   | 'lesson'
   | 'minigame'
-  | 'full-game'
   | 'practice-run'
   | 'assessment'
   | 'placement'
-  | 'time-limit';
+  | 'time-limit'
+  | keyof SubjectRoutes;
 
 /** A navigable place in the app, carried on the route stack (`app/slices/nav.ts`). `today` marks a
  * Today-session activity: `exitLesson`/`exitMiniGame` abandon the whole session, not a plain back(). */
@@ -43,7 +49,6 @@ export type Route =
       readonly today?: true;
     }
   | { readonly name: 'minigame'; readonly miniGameId: string; readonly today?: true }
-  | { readonly name: 'full-game'; readonly level: 1 | 2 | 3 | 4 | 5 }
   | {
       readonly name: 'practice-run';
       readonly conceptId: string | null;
@@ -64,7 +69,10 @@ export type Route =
       readonly status: TimeLimitStatus | null;
       /** The blocked navigation, replayed by `grantMoreTimeAndResume` once granted, unchecked. */
       readonly resume: NavOp | null;
-    };
+    }
+  | {
+      readonly [N in keyof SubjectRoutes]: { readonly name: N } & SubjectRoutes[N];
+    }[keyof SubjectRoutes];
 
 /** One requested stack change (`app/slices/nav.ts`): `navigate`/`replace`/`back` each build one of
  * these, and it is what a gate remembers as `time-limit`'s `resume`. */
@@ -73,7 +81,7 @@ export type NavOp =
   | { readonly op: 'replace'; readonly route: Route }
   | { readonly op: 'back'; readonly to?: RouteName; readonly gate?: boolean };
 
-interface RouteMeta {
+export interface RouteMeta {
   /** Counted by `TimeTracker` while a profile is active. */
   readonly tracked: boolean;
   /** The 5-minute warning may show here (`AppNotice`); `lesson` is calm only on its own
@@ -85,8 +93,13 @@ interface RouteMeta {
   readonly gated?: true;
 }
 
-/** Per-route flags read by `TimeTracker`, `AppNotice` and `AppUpdater`. */
-export const ROUTE_META: Readonly<Record<RouteName, RouteMeta>> = {
+/** Fallback for a route this session's `RouteMeta` lookup somehow misses (never in practice: every
+ * `RouteName` is either here or in the active pack's own `routes`). */
+export const DEFAULT_ROUTE_META: RouteMeta = { tracked: false };
+
+/** Per-platform-route flags read by `TimeTracker`, `AppNotice` and `AppUpdater`; a subject route's
+ * own flags live on its `SubjectWeb.routes` entry instead (`subject.ts`'s `routeMetaFor`). */
+export const PLATFORM_ROUTE_META: Readonly<Partial<Record<RouteName, RouteMeta>>> = {
   loading: { tracked: false },
   'first-run': { tracked: false },
   'new-player': { tracked: false },
@@ -96,12 +109,8 @@ export const ROUTE_META: Readonly<Record<RouteName, RouteMeta>> = {
   home: { tracked: true, calm: true, safeUpdate: true },
   journey: { tracked: true, calm: true },
   lesson: { tracked: true, gated: true },
-  play: { tracked: true, calm: true },
   den: { tracked: true, calm: true },
   minigame: { tracked: true, gated: true },
-  'full-game': { tracked: true, gated: true },
-  'friend-setup': { tracked: true },
-  'friend-game': { tracked: true, gated: true },
   warmup: { tracked: true, gated: true },
   practice: { tracked: true, calm: true },
   'practice-run': { tracked: true, gated: true },

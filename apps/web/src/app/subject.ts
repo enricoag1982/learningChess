@@ -2,7 +2,14 @@ import { createContext, useContext } from 'react';
 import type { ComponentType, JSX } from 'react';
 import type { GameRecord, Lesson, Profile, ProfileSettings, SubjectCore } from '@chess-kids/core';
 import type { AnyExerciseKindUI } from '../kinds/kind-ui.ts';
-import type { PlainRouteName } from './routes.ts';
+import type { AppSet, SliceCreator } from './store.ts';
+import { DEFAULT_ROUTE_META, PLATFORM_ROUTE_META } from './routes.ts';
+import type { Route, RouteMeta, RouteName } from './routes.ts';
+
+/** A subject's own store state, augmented by module declaration (chess: `PlaySlice`'s
+ * `levelUpSuggestion`/`friendSetup` and their actions). */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
+export interface SubjectState {}
 
 /** Props for a subject's own settings chips (`SubjectWeb.loadParent`'s `SettingsPanel`), rendered
  * inside `ChildSettings`'s generic settings section. */
@@ -60,6 +67,29 @@ export interface SubjectWeb {
    * a dynamic import so they stay inside the app's own lazy parent chunk, never the initial bundle.
    * Absent for a subject with no parent-area contribution. */
   loadParent?(): Promise<ParentPanels>;
+  /** Every route this subject contributes (chess: `play`, `full-game`, `friend-setup`,
+   * `friend-game`), keyed by name; the platform's own routes never appear here. */
+  readonly routes: Readonly<Record<string, SubjectRouteEntry>>;
+  /** This subject's own store slice (chess: `PlaySlice`), spread into `AppState` alongside the
+   * platform's own; absent for a subject with no state of its own. */
+  readonly createSlice?: SliceCreator<SubjectState>;
+  /** Fields reset on every "back to Home" (chess: clears `levelUpSuggestion`); absent for a
+   * subject with nothing to reset. */
+  readonly homeReset?: Partial<SubjectState>;
+}
+
+/** One subject-contributed route's screen, per-route flags, and optional entry side effect (chess
+ * `full-game`: clears a stale level-up banner). */
+export interface SubjectRouteEntry {
+  readonly screen: ComponentType;
+  readonly meta: RouteMeta;
+  onEnter?(set: AppSet): void;
+}
+
+/** `name`'s own flags: the platform's, or (for a subject route) its pack entry's — never both, so
+ * this is always defined for a real `RouteName`. */
+export function routeMetaFor(pack: SubjectWeb, name: RouteName): RouteMeta {
+  return PLATFORM_ROUTE_META[name] ?? pack.routes[name]?.meta ?? DEFAULT_ROUTE_META;
 }
 
 /** `SubjectWeb.loadParent`'s resolved shape — named so a caller's "not loaded yet" fallback stays
@@ -84,8 +114,9 @@ export interface HomeTile {
   readonly labelKey: string;
   readonly Icon: () => JSX.Element;
   readonly colors: HomeTileColors;
-  /** Tapping the tile navigates here — a plain, param-less screen (chess: `play`). */
-  readonly route: PlainRouteName;
+  /** Tapping the tile navigates here — a literal `Route` value, so a subject's own routes stay
+   * fully typed (chess: `{ name: 'play' }`). */
+  readonly route: Route;
 }
 
 const PackContext = createContext<SubjectWeb | null>(null);

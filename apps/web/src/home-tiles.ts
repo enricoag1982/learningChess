@@ -12,6 +12,6 @@ export const HOME_TILES: readonly HomeTile[] = [
     labelKey: 'home.play-tile',
     Icon: PlayTileIcon,
     colors: { bg: '#FBE3D2', fg: '#7A3A10', ledge: '#55290B' },
-    route: 'play',
+    route: { name: 'play' },
   },
 ];

@@ -6,6 +6,7 @@ import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../testing
 import { seedReturningProfile } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
 import { renderWithStore } from '../testing/render-with-store.tsx';
+import { chessWeb } from '../chess-pack.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { PracticeScreen } from './PracticeScreen.tsx';
 
@@ -13,7 +14,7 @@ describe('PracticeScreen', () => {
   it('nothing complete yet: no topics, warm-up disabled ("All done for today!")', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
-    await renderWithStore(<PracticeScreen />, services);
+    await renderWithStore(<PracticeScreen />, services, chessWeb);
 
     await screen.findByText('Finish a lesson to see it here!');
     expect(screen.getByText('All done for today!')).toBeTruthy();
@@ -25,7 +26,7 @@ describe('PracticeScreen', () => {
   it('a complete lesson shows as a topic, with accuracy dots from its attempts', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
-    const { store } = await renderWithStore(<PracticeScreen />, services);
+    const { store } = await renderWithStore(<PracticeScreen />, services, chessWeb);
     const profileId = store.getState().profile?.id ?? '';
     const exercise = lesson.exercises[0] ?? fixtureExercise();
 
@@ -47,7 +48,7 @@ describe('PracticeScreen', () => {
   it('a weak concept (accuracy < 60%, ≥3 results) gets the "Needs practice" tag', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
-    const { store } = await renderWithStore(<PracticeScreen />, services);
+    const { store } = await renderWithStore(<PracticeScreen />, services, chessWeb);
     const profileId = store.getState().profile?.id ?? '';
 
     await services.deps.progress.saveLesson({

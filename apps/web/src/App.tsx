@@ -1,20 +1,18 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
-import { CHESS_APP_CONFIG } from '@chess-kids/core/chess';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import type { RouteName } from './app/routes.ts';
 import { createServices } from './app/services.ts';
 import type { Services } from './app/services.ts';
 import { PackProvider } from './app/subject.ts';
 import type { SubjectWeb } from './app/subject.ts';
-import { chessWeb } from './chess-pack.ts';
+import { chessWeb, CHESS_APP_CONFIG } from './chess-pack.ts';
 import type { AppUpdate } from './adapters/app-update.ts';
 import { AppNotice } from './ui/AppNotice.tsx';
 import { AppUpdater } from './ui/AppUpdater.tsx';
 import { Celebration } from './ui/Celebration.tsx';
 import { DenScreen } from './ui/DenScreen.tsx';
 import { FirstRunScreen } from './ui/FirstRunScreen.tsx';
-import { FullGameScreen } from './ui/FullGameScreen.tsx';
 import { HomeScreen } from './ui/HomeScreen.tsx';
 import { JourneyScreen } from './ui/JourneyScreen.tsx';
 import { LazyFallback } from './ui/LazyFallback.tsx';
@@ -22,7 +20,6 @@ import { LessonScreen } from './ui/LessonScreen.tsx';
 import { MiniGameSessionScreen } from './ui/MiniGameSessionScreen.tsx';
 import { NewPlayerScreen } from './ui/NewPlayerScreen.tsx';
 import { PasswordScreen } from './ui/PasswordScreen.tsx';
-import { PlayScreen } from './ui/PlayScreen.tsx';
 import { PracticeRunScreen } from './ui/PracticeRunScreen.tsx';
 import { PracticeScreen } from './ui/PracticeScreen.tsx';
 import { ProfilePickerScreen } from './ui/ProfilePickerScreen.tsx';
@@ -33,15 +30,10 @@ import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
 // Lazy-loaded screens (non-functional.md §4): each split into its own chunk, precached by the
 // service worker right after first fetch. Picked for size (Parent area) or for being off the
-// every-session path (Friend play, placement/test-out); every other screen stays static.
+// every-session path (placement/test-out); every other screen stays static. A subject's own
+// lazy screens (chess: Friend play) are its `pack.routes`' own concern.
 const ParentAreaScreen = lazy(() =>
   import('./ui/ParentAreaScreen.tsx').then((module) => ({ default: module.ParentAreaScreen })),
-);
-const FriendSetupScreen = lazy(() =>
-  import('./ui/FriendSetupScreen.tsx').then((module) => ({ default: module.FriendSetupScreen })),
-);
-const FriendGameScreen = lazy(() =>
-  import('./ui/FriendGameScreen.tsx').then((module) => ({ default: module.FriendGameScreen })),
 );
 const PlacementOfferScreen = lazy(() =>
   import('./ui/PlacementOfferScreen.tsx').then((module) => ({
@@ -60,8 +52,9 @@ function LoadingScreen(): JSX.Element {
   return <main className="min-h-dvh bg-cream" />;
 }
 
-/** Route → component table. */
-const ROUTE_SCREENS: Readonly<Record<RouteName, ComponentType>> = {
+/** Platform route → component table; a subject's own routes (chess: Play, Full game, Friend play)
+ * come from `pack.routes` instead. */
+const PLATFORM_ROUTE_SCREENS: Readonly<Partial<Record<RouteName, ComponentType>>> = {
   loading: LoadingScreen,
   'first-run': FirstRunScreen,
   'new-player': NewPlayerScreen,
@@ -71,12 +64,8 @@ const ROUTE_SCREENS: Readonly<Record<RouteName, ComponentType>> = {
   lesson: LessonScreen,
   home: HomeScreen,
   journey: JourneyScreen,
-  play: PlayScreen,
   den: DenScreen,
   minigame: MiniGameSessionScreen,
-  'full-game': FullGameScreen,
-  'friend-setup': FriendSetupScreen,
-  'friend-game': FriendGameScreen,
   warmup: WarmUpScreen,
   practice: PracticeScreen,
   'practice-run': PracticeRunScreen,
@@ -88,8 +77,10 @@ const ROUTE_SCREENS: Readonly<Record<RouteName, ComponentType>> = {
 };
 
 function Screens(): JSX.Element {
+  const pack = useAppStore((state) => state.pack);
   const screen = useAppStore((state) => state.screen);
-  const ScreenComponent = ROUTE_SCREENS[screen];
+  const ScreenComponent = PLATFORM_ROUTE_SCREENS[screen] ?? pack.routes[screen]?.screen;
+  if (!ScreenComponent) throw new Error(`No screen registered for route "${screen}"`);
   return <ScreenComponent />;
 }
 
@@ -116,7 +107,7 @@ export default function App({
   pack = chessWeb,
 }: AppProps): JSX.Element {
   const [store] = useState(() =>
-    createAppStore(services ?? createServices(pack, CHESS_APP_CONFIG)),
+    createAppStore(services ?? createServices(pack, CHESS_APP_CONFIG), pack),
   );
   const [initError, setInitError] = useState<Error | null>(null);
 

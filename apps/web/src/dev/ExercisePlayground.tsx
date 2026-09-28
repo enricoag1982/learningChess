@@ -32,7 +32,9 @@ function ExercisePreview({
   readonly lesson: Lesson;
   readonly def: ExerciseDef;
 }): JSX.Element {
-  const [store] = useState(() => createAppStore(createTestServices(fixtureContentSource(lesson))));
+  const [store] = useState(() =>
+    createAppStore(createTestServices(fixtureContentSource(lesson)), chessWeb),
+  );
   const [ready, setReady] = useState(false);
 
   useEffect(() => {

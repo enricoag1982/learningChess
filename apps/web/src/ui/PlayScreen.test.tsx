@@ -186,7 +186,7 @@ describe('PlayScreen: vs Computer (M3.5)', () => {
 
   it('shows Owl’s suggestion line once a finished full game moves the suggestion up a level', async () => {
     const services = createTestServices('bundled');
-    const { store } = await renderWithStore(<PlayScreen />, services);
+    const { store } = await renderWithStore(<PlayScreen />, services, chessWeb);
     const profile = store.getState().profile;
     if (!profile) throw new Error('renderWithStore: no profile');
     await seedWorldFourMastered(services, profile.id);

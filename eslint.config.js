@@ -423,7 +423,6 @@ export default defineConfig([
     // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
     const WEB_RATCHET_IGNORES = [
       'apps/web/src/App.test.tsx',
-      'apps/web/src/App.tsx',
       'apps/web/src/adapters/content/bundled-content-source.ts',
       'apps/web/src/adapters/persistent-storage.test.ts',
       'apps/web/src/adapters/share-backup.test.ts',
@@ -433,7 +432,6 @@ export default defineConfig([
       'apps/web/src/app/slices/learn.ts',
       'apps/web/src/app/slices/profile.ts',
       'apps/web/src/app/slices/today.ts',
-      'apps/web/src/app/store.ts',
       'apps/web/src/dev/ExercisePlayground.tsx',
       'apps/web/src/dev/LessonPreview.tsx',
       'apps/web/src/modes/boss-run.tsx',

@@ -244,7 +244,7 @@ export function HomeScreen(): JSX.Element {
             label: tContent(t, tile.labelKey),
             colors: tile.colors,
             onClick: () => {
-              void navigate({ name: tile.route });
+              void navigate(tile.route);
             },
           })),
           {

@@ -4,6 +4,7 @@ import type { EarnedBadge } from '@chess-kids/core';
 import { StoreProvider } from '../app/store.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { renderWithStore } from '../testing/render-with-store.tsx';
+import { chessWeb } from '../chess-pack.ts';
 import { Celebration } from './Celebration.tsx';
 
 function makeEarnedBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
@@ -23,13 +24,13 @@ function makeEarnedBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
 describe('Celebration', () => {
   it('shows nothing when there is no active celebration', async () => {
     const services = createTestServices('bundled');
-    await renderWithStore(<Celebration />, services);
+    await renderWithStore(<Celebration />, services, chessWeb);
     expect(screen.queryByRole('alertdialog')).toBeNull();
   });
 
   it('shows the oldest unseen badge and clears it on Continue', async () => {
     const services = createTestServices('bundled');
-    const { store } = await renderWithStore(<Celebration />, services);
+    const { store } = await renderWithStore(<Celebration />, services, chessWeb);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
 
@@ -51,7 +52,7 @@ describe('Celebration', () => {
 
   it('shows a tiered badge with its tier label', async () => {
     const services = createTestServices('bundled');
-    const { store } = await renderWithStore(<Celebration />, services);
+    const { store } = await renderWithStore(<Celebration />, services, chessWeb);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
 
@@ -67,7 +68,7 @@ describe('Celebration', () => {
 
   it('caps celebrations at 2 per session: a 3rd unseen badge does not auto-show', async () => {
     const services = createTestServices('bundled');
-    const { store } = await renderWithStore(<Celebration />, services);
+    const { store } = await renderWithStore(<Celebration />, services, chessWeb);
     const profileId = store.getState().profile?.id;
     if (!profileId) throw new Error('no profile');
 
@@ -102,7 +103,7 @@ describe('Celebration (no active celebration in a plain StoreProvider render)', 
   it('renders null without throwing when used outside renderWithStore helpers', async () => {
     const services = createTestServices('bundled');
     const { createAppStore } = await import('../app/store.ts');
-    const store = createAppStore(services);
+    const store = createAppStore(services, chessWeb);
     render(
       <StoreProvider value={store}>
         <Celebration />
