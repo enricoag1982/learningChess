@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import type { CompiledContent, Lesson, TracksCatalog } from '@chess-kids/core';
+import type { TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent, Lesson } from '@chess-kids/core/chess';
 import type { ExerciseDef, Square } from '@chess-kids/core/chess';
 import { createVariantRules, chessJsRules, findMoveBySan } from '@chess-kids/core/chess';
 import { solutionOf } from '@chess-kids/core/testing';

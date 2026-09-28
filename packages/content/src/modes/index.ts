@@ -1,6 +1,6 @@
 // The mini-game-mode content registry — the only place mode dispatch happens in `packages/content`
 // for schemas, compiling and semantic verification.
-import type { MiniGame } from '@chess-kids/core';
+import type { MiniGame } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { makeMiniGameCompileContext } from './mode-content.ts';
 import type { MiniGameModeContent } from './mode-content.ts';

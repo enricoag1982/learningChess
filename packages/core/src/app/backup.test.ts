@@ -4,7 +4,6 @@ import { DEFAULT_PROFILE_SETTINGS } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import type { AppConfig } from '../domain/subject.ts';
 import {
   makeExercise as buildExercise,
@@ -46,7 +45,7 @@ function makeExercise(id: string) {
   return buildExercise({ id, concept: `${id}-concept` });
 }
 
-const L1: Lesson = buildLesson({
+const L1 = buildLesson({
   id: 'l1',
   world: 'w1',
   concept: 'l1-concept',

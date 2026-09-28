@@ -4,6 +4,7 @@ import type { Lesson } from './lesson.ts';
 import type { StoredRecord } from './profile.ts';
 import type { Random } from './random.ts';
 import type { ConceptTask } from './review.ts';
+import type { ExerciseDefBase } from './subject.ts';
 
 /** `'test-out'`: the kid taps a locked lesson or world on the Journey. `'placement'`: offered once
  * after creating a new player, one run per Basics world in order. */
@@ -41,7 +42,7 @@ function shuffle<T>(items: readonly T[], random: Random): T[] {
 }
 
 /** One task per lesson exercise, for sampling into an assessment run. */
-function poolOf(lesson: Lesson): readonly ConceptTask[] {
+function poolOf<E extends ExerciseDefBase>(lesson: Lesson<E>): readonly ConceptTask<E>[] {
   return lesson.exercises.map((exercise) => ({
     conceptId: exercise.concept,
     lessonId: lesson.id,
@@ -50,11 +51,11 @@ function poolOf(lesson: Lesson): readonly ConceptTask[] {
 }
 
 /** `count` tasks picked at random from `pool` (no repeats); every task in `pool` when it has fewer. */
-function samplePool(
-  pool: readonly ConceptTask[],
+function samplePool<E extends ExerciseDefBase>(
+  pool: readonly ConceptTask<E>[],
   count: number,
   random: Random,
-): readonly ConceptTask[] {
+): readonly ConceptTask<E>[] {
   if (count <= 0 || pool.length === 0) return [];
   return shuffle(pool, random).slice(0, Math.min(count, pool.length));
 }
@@ -79,17 +80,20 @@ function spreadQuota(sizes: readonly number[], total: number, random: Random): r
 
 /** Plans a lesson test-out: up to {@link TEST_OUT_LESSON_TASKS} tasks from `lesson`'s own scored
  * exercises, picked with `random`. */
-export function planTestOutLesson(lesson: Lesson, random: Random): readonly ConceptTask[] {
+export function planTestOutLesson<E extends ExerciseDefBase>(
+  lesson: Lesson<E>,
+  random: Random,
+): readonly ConceptTask<E>[] {
   return samplePool(poolOf(lesson), TEST_OUT_LESSON_TASKS, random);
 }
 
 /** Plans a world test-out: up to {@link TEST_OUT_WORLD_TASKS} tasks spread over every lesson of
  * `world` (≥ 1 each where the lesson has exercises), picked with `random`. */
-export function planTestOutWorld(
+export function planTestOutWorld<E extends ExerciseDefBase>(
   world: World,
-  lessons: readonly Lesson[],
+  lessons: readonly Lesson<E>[],
   random: Random,
-): readonly ConceptTask[] {
+): readonly ConceptTask<E>[] {
   const worldLessonsList = worldLessons(world, lessons);
   if (worldLessonsList.length === 0) return [];
   const quotas = spreadQuota(
@@ -103,22 +107,22 @@ export function planTestOutWorld(
 }
 
 /** One Basics world's placement run: its {@link PLACEMENT_TASKS_PER_WORLD} tasks. */
-export interface PlacementWorldPlan {
+export interface PlacementWorldPlan<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly world: World;
-  readonly tasks: readonly ConceptTask[];
+  readonly tasks: readonly ConceptTask<E>[];
 }
 
 /** Plans the whole placement test: one run per Basics world, in order, `PLACEMENT_TASKS_PER_WORLD`
  * tasks each. Skips a world with no authored lessons yet. `[]` with no main (Basics) track. */
-export function planPlacement(
+export function planPlacement<E extends ExerciseDefBase>(
   catalog: TracksCatalog,
-  lessons: readonly Lesson[],
+  lessons: readonly Lesson<E>[],
   random: Random,
-): readonly PlacementWorldPlan[] {
+): readonly PlacementWorldPlan<E>[] {
   const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
   if (mainTrack === undefined) return [];
   const sortedWorlds = [...mainTrack.worlds].sort((a, b) => a.order - b.order);
-  const plans: PlacementWorldPlan[] = [];
+  const plans: PlacementWorldPlan<E>[] = [];
   for (const world of sortedWorlds) {
     const worldLessonsList = worldLessons(world, lessons);
     if (worldLessonsList.length === 0) continue;

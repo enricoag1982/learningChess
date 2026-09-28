@@ -11,7 +11,8 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { BadgeDef, CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from '../src/badges-load.ts';
 import { ContentError, loadLocales, type Locales } from '../src/load.ts';
 import { loadContent } from '../src/lesson-load.ts';

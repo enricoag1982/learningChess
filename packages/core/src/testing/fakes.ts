@@ -7,8 +7,8 @@
  */
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
-import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
+import type { Lesson, MiniGame } from '../chess.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import { seededRandom } from '../domain/random.ts';

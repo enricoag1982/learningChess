@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, Stars } from '@chess-kids/core';
+import type { Stars } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core/chess';
 import type { MiniGameState } from '@chess-kids/core/chess';
 import { recordBossResult } from '@chess-kids/core';
 import { modeOf } from '@chess-kids/core/chess';

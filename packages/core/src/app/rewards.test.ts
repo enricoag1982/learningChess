@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
 import {
@@ -38,7 +37,7 @@ function makeLesson(
   id: string,
   world: string,
   exercises: readonly ReturnType<typeof buildExercise>[],
-): Lesson {
+) {
   return buildLesson({ id, world, exercises: [...exercises] });
 }
 
@@ -57,7 +56,10 @@ function makeRewardsRepo(initialEarned: readonly EarnedBadge[] = []): RewardsRep
   return buildRewardsRepo({ badges: initialEarned });
 }
 
-function makeContent(lessons: readonly Lesson[], badges: readonly BadgeDef[] = []): ContentSource {
+function makeContent(
+  lessons: readonly ReturnType<typeof buildLesson>[],
+  badges: readonly BadgeDef[] = [],
+): ContentSource {
   return makeContentSource({ lessons, badges, catalog: CATALOG });
 }
 

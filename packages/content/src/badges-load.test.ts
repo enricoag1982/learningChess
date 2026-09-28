@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Lesson, MiniGame, TracksCatalog } from '@chess-kids/core';
+import type { TracksCatalog } from '@chess-kids/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { loadBadges } from './badges-load.ts';
 import { ContentError, type Locales } from './load.ts';
@@ -42,7 +42,7 @@ const CATALOG: TracksCatalog = {
   ranks: [{ id: 'pawn', after: 'start' }],
 };
 
-const LESSON: Lesson = {
+const LESSON = {
   id: 'rook',
   world: 'board',
   order: 1,
@@ -57,7 +57,7 @@ const LESSON: Lesson = {
       toMove: 'w',
       castling: '-',
       enPassant: null,
-    },
+    } as const,
     textKey: 'lessons:rook.demo',
     highlight: { squares: [] },
   },
@@ -65,8 +65,8 @@ const LESSON: Lesson = {
   exercises: [],
 };
 
-const MINIGAME: MiniGame = {
-  mode: 'series',
+const MINIGAME = {
+  mode: 'series' as const,
   id: 'pawn-wars',
   concept: 'pawn-move',
   unlockAfter: 'rook',

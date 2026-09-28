@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { MiniGame } from '@chess-kids/core';
+import type { MiniGame } from '@chess-kids/core/chess';
 import type { ComputerLevelCondition, ComputerLevelStatus } from '@chess-kids/core/chess';
 import { unlockedMiniGames } from '@chess-kids/core';
 import { computerLevelStatus, friendGameOptions, suggestedLevel } from '@chess-kids/core/chess';

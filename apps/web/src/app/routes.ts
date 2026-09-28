@@ -1,9 +1,5 @@
-import type {
-  AssessmentScope,
-  ConceptTask,
-  PlacementWorldPlan,
-  TimeLimitStatus,
-} from '@chess-kids/core';
+import type { AssessmentScope, TimeLimitStatus } from '@chess-kids/core';
+import type { ConceptTask, PlacementWorldPlan } from '@chess-kids/core/chess';
 
 /** Screen names with no route params of their own. */
 export type PlainRouteName =

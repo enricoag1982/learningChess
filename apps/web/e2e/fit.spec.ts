@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { SQUARES } from '@chess-kids/core/chess';
 import rawContent from '@chess-kids/content/content.json' with { type: 'json' };
 import rawTracks from '@chess-kids/content/tracks.json' with { type: 'json' };

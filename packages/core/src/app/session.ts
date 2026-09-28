@@ -5,6 +5,7 @@ import { unlockedMiniGames } from '../domain/play.ts';
 import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptPoolEntry, ConceptStats, ConceptTask } from '../domain/review.ts';
 import { conceptPool, pickPracticeTasks, pickWarmUp } from '../domain/review.ts';
+import type { ExerciseDefBase } from '../domain/subject.ts';
 import { loadUnlocked } from './assessment.ts';
 import type { ContentSource, Random } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
@@ -19,11 +20,11 @@ function requireCatalog(content: ContentSource): TracksCatalog {
 }
 
 /** Every pool a set of concept ids needs, keyed by concept id (`conceptPool`, computed once). */
-function poolsFor(
-  lessons: readonly Lesson[],
+function poolsFor<E extends ExerciseDefBase>(
+  lessons: readonly Lesson<E>[],
   conceptIds: Iterable<string>,
-): ReadonlyMap<string, readonly ConceptPoolEntry[]> {
-  const pools = new Map<string, readonly ConceptPoolEntry[]>();
+): ReadonlyMap<string, readonly ConceptPoolEntry<E>[]> {
+  const pools = new Map<string, readonly ConceptPoolEntry<E>[]>();
   for (const conceptId of conceptIds) {
     pools.set(conceptId, conceptPool(lessons, conceptId));
   }
@@ -31,12 +32,12 @@ function poolsFor(
 }
 
 /** Today's warm-up tasks: `[]` when no concept is in review. */
-export function planWarmUp(
-  lessons: readonly Lesson[],
+export function planWarmUp<E extends ExerciseDefBase>(
+  lessons: readonly Lesson<E>[],
   conceptStats: readonly ConceptStats[],
   now: Date,
   random: Random,
-): readonly ConceptTask[] {
+): readonly ConceptTask<E>[] {
   const inReview = conceptStats.filter((stats) => stats.box !== undefined);
   const pools = poolsFor(
     lessons,
@@ -45,11 +46,10 @@ export function planWarmUp(
   return pickWarmUp(conceptStats, pools, now, random);
 }
 
-/** Loads today's warm-up tasks for a profile (see `planWarmUp`). */
-export async function loadWarmUp(
-  deps: AppDeps,
-  profileId: string,
-): Promise<readonly ConceptTask[]> {
+/** Loads today's warm-up tasks for a profile (see `planWarmUp`). Inferred (not annotated) return
+ * type: preserves the subject's own concrete exercise def, from `deps.content`, through to the
+ * caller (chess: `ConceptTask<ExerciseDef>`). */
+export async function loadWarmUp(deps: AppDeps, profileId: string) {
   const [lessons, conceptStats] = await Promise.all([
     Promise.resolve(deps.content.lessons()),
     deps.progress.listConceptStats(profileId),
@@ -60,13 +60,14 @@ export async function loadWarmUp(
 /** Practice screen's default task count for one topic run. */
 export const PRACTICE_TASK_COUNT = 5;
 
-/** Loads `count` Practice tasks for one concept (see `pickPracticeTasks`). */
+/** Loads `count` Practice tasks for one concept (see `pickPracticeTasks`). Inferred return type,
+ * same reason as `loadWarmUp`'s. */
 export async function loadPracticeTasks(
   deps: AppDeps,
   profileId: string,
   conceptId: string,
   count: number = PRACTICE_TASK_COUNT,
-): Promise<readonly ConceptTask[]> {
+) {
   const [lessons, stats] = await Promise.all([
     Promise.resolve(deps.content.lessons()),
     deps.progress.getConceptStats(profileId, conceptId),
@@ -76,15 +77,15 @@ export async function loadPracticeTasks(
 }
 
 /** One activity of a Today session, in play order. */
-export type TodayActivity =
-  | { readonly kind: 'warmup'; readonly tasks: readonly ConceptTask[] }
+export type TodayActivity<E extends ExerciseDefBase = ExerciseDefBase> =
+  | { readonly kind: 'warmup'; readonly tasks: readonly ConceptTask<E>[] }
   | { readonly kind: 'lesson'; readonly lesson: Lesson }
   | { readonly kind: 'world-boss'; readonly world: World }
   | { readonly kind: 'minigame'; readonly miniGame: MiniGame };
 
 /** A Today session's full ordered plan (see `planTodaySession`). */
-export interface TodaySessionPlan {
-  readonly activities: readonly TodayActivity[];
+export interface TodaySessionPlan<E extends ExerciseDefBase = ExerciseDefBase> {
+  readonly activities: readonly TodayActivity<E>[];
 }
 
 /** Picks the session's one mini-game: the most recently unlocked one with best stars < 3, else the
@@ -133,9 +134,9 @@ function pickSessionMiniGame(
 
 /** Plans a Today session: warm-up (if due/weak) → the Journey's next step ({@link nextStep}) → one
  * mini-game (`pickSessionMiniGame`), skipping any activity with nothing to offer. Pure. */
-export function planTodaySession(
+export function planTodaySession<E extends ExerciseDefBase>(
   catalog: TracksCatalog,
-  lessons: readonly Lesson[],
+  lessons: readonly Lesson<E>[],
   minigames: readonly MiniGame[],
   progresses: readonly LessonProgress[],
   miniGameProgresses: readonly MiniGameProgress[],
@@ -144,8 +145,8 @@ export function planTodaySession(
   random: Random,
   /** Lesson/world ids unlocked out of order by a test-out/placement/parent unlock. */
   unlocked?: ReadonlySet<string>,
-): TodaySessionPlan {
-  const activities: TodayActivity[] = [];
+): TodaySessionPlan<E> {
+  const activities: TodayActivity<E>[] = [];
 
   const warmUpTasks = planWarmUp(lessons, conceptStats, now, random);
   if (warmUpTasks.length > 0) {
@@ -183,10 +184,8 @@ export function planTodaySession(
 }
 
 /** Loads and plans a profile's Today session (see `planTodaySession`). */
-export async function loadTodaySession(
-  deps: AppDeps,
-  profileId: string,
-): Promise<TodaySessionPlan> {
+/** Inferred (not annotated) return type — same reason as `loadWarmUp`'s. */
+export async function loadTodaySession(deps: AppDeps, profileId: string) {
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();
   const minigames = deps.content.minigames();

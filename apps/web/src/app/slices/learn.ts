@@ -12,10 +12,9 @@ import {
   submitAssessment,
   type AssessmentScope,
   type AssessmentScore,
-  type ConceptTask,
-  type Lesson,
   type ParentUnlockTarget,
 } from '@chess-kids/core';
+import type { ConceptTask, Lesson } from '@chess-kids/core/chess';
 import type { Route } from '../routes.ts';
 import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 

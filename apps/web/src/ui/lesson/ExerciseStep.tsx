@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, SkippablePhase } from '@chess-kids/core';
+import type { SkippablePhase } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core/chess';
 import type { ExerciseDef } from '@chess-kids/core/chess';
 import {
   EASIER_VARIANT_STARS,

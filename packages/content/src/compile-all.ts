@@ -1,5 +1,6 @@
 import { join } from 'node:path';
-import type { BadgeDef, CompiledContent, TracksCatalog } from '@chess-kids/core';
+import type { BadgeDef, TracksCatalog } from '@chess-kids/core';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { loadBadges } from './badges-load.ts';
 import { ContentError, compareToReference, loadLocales, type Locales } from './load.ts';
 import { loadContent } from './lesson-load.ts';
@@ -10,6 +11,9 @@ import { buildVoiceInventory, type VoiceInventory } from './voice-texts.ts';
 export interface CompiledAll {
   /** Per-language, per-namespace locale trees — one `dist/locales/<lang>.json` per key. */
   readonly locales: Locales;
+  /** The subject's own concrete content (chess: exercises/demos with real board positions) — a
+   * build artifact, not a platform port, so unlike `ContentSource` (`packages/core`) it stays
+   * concretely typed rather than generic. */
   readonly content: CompiledContent;
   readonly tracks: TracksCatalog;
   /** The subject's own extra `dist/` outputs, by file name (chess: `'bot-book.json'` ->

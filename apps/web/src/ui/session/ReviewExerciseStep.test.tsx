@@ -1,7 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen } from '@testing-library/react';
-import type { ConceptTask } from '@chess-kids/core';
-import type { MateInNDef } from '@chess-kids/core/chess';
+import type { ConceptTask, MateInNDef } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
 import '../../i18n.ts';
 import { fixtureContentSource, fixtureExercise, fixtureLesson } from '../../testing/fixtures.ts';

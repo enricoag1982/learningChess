@@ -1,4 +1,5 @@
-import type { Lesson, MiniGame, Track, TracksCatalog, World } from '@chess-kids/core';
+import type { Track, TracksCatalog, World } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import type { ExerciseDef } from '@chess-kids/core/chess';
 import { parseDiagram } from '@chess-kids/core/chess';
 import { makeContentSource } from '@chess-kids/core/testing';

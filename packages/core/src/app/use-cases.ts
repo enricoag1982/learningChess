@@ -1,12 +1,8 @@
-import type { ExerciseState } from '../domain/exercise/state.ts';
-import type { GameState } from '../domain/exercise/modes/static/def.ts';
-import type { SeriesGameState } from '../domain/exercise/modes/series/def.ts';
-import type { VersusState } from '../domain/exercise/modes/versus/def.ts';
 import type { Lesson } from '../domain/lesson.ts';
 import { EASIER_AFTER_ERRORS, EASIER_VARIANT_STARS } from '../domain/lesson-session.ts';
 import type { SkippablePhase } from '../domain/lesson-session.ts';
 import type { LessonProgress } from '../domain/progress.ts';
-import type { AppConfig } from '../domain/subject.ts';
+import type { AppConfig, ExerciseStateBase, MiniGameStateBase } from '../domain/subject.ts';
 import type { SubjectRuntime } from '../domain/runtime.ts';
 import {
   newLessonProgress,
@@ -72,7 +68,7 @@ export interface AppDeps {
 }
 
 /** Stars earned so far for `state`, via its subject's own kind; `0` until solved. */
-function starsFor(subject: SubjectRuntime, state: ExerciseState): 0 | 1 | 2 | 3 {
+function starsFor(subject: SubjectRuntime, state: ExerciseStateBase): 0 | 1 | 2 | 3 {
   if (!state.solved) {
     return 0;
   }
@@ -132,7 +128,7 @@ export async function getLessonProgress(
 export interface RecordAttemptInput {
   readonly profileId: string;
   readonly lesson: Lesson;
-  readonly state: ExerciseState;
+  readonly state: ExerciseStateBase;
   /** `false` for guided tries and the demo: recorded as an attempt but never scored. */
   readonly scored: boolean;
   readonly durationMs: number;
@@ -173,7 +169,7 @@ export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): P
 export interface RecordExerciseResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
-  readonly state: ExerciseState;
+  readonly state: ExerciseStateBase;
   /** `false` for guided tries and the demo: recorded as an attempt but never scored. */
   readonly scored: boolean;
   readonly durationMs: number;
@@ -234,7 +230,7 @@ export async function recordExerciseResult(
 export interface RecordBossResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
-  readonly state: GameState | SeriesGameState | VersusState;
+  readonly state: MiniGameStateBase;
   readonly durationMs: number;
   /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
@@ -291,7 +287,7 @@ export async function recordBossResult(
 export interface RecordReviewResultInput {
   readonly profileId: string;
   readonly task: ConceptTask;
-  readonly state: ExerciseState;
+  readonly state: ExerciseStateBase;
   readonly durationMs: number;
   /** `'warmup'` for Today's inline warm-up or Practice's "Daily warm-up" card, `'practice'` for a
    * Practice topic run. */

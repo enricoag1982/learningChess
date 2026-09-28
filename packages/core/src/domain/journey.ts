@@ -1,6 +1,7 @@
 import type { Lesson } from './lesson.ts';
 import { lessonStatus, totalStars } from './progress.ts';
 import type { LessonProgress, MiniGameProgress } from './progress.ts';
+import type { ExerciseDefBase } from './subject.ts';
 
 /** Fixed set of habitats a world can be set in (app-structure.md §8: one habitat per world). */
 export const HABITATS = [
@@ -78,7 +79,10 @@ export type WorldBossStatus = 'none' | 'locked' | 'available' | 'won';
  * `lessons` belonging to `world`, sorted by `order`. A world with no authored lessons yet (content
  * not written) has none: callers treat that as `coming-soon` (see {@link worldStatus}).
  */
-export function worldLessons(world: World, lessons: readonly Lesson[]): readonly Lesson[] {
+export function worldLessons<
+  E extends ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+>(world: World, lessons: readonly Lesson<E, Demo>[]): readonly Lesson<E, Demo>[] {
   return lessons
     .filter((lesson) => lesson.world === world.id)
     .slice()
@@ -94,10 +98,10 @@ function worldsSorted(track: Track): readonly World[] {
  * world's lessons via `worldLessons`). Branch tracks are left out: they only ever open once the
  * whole main track is mastered.
  */
-export function mainTrackLessons(
-  catalog: TracksCatalog,
-  lessons: readonly Lesson[],
-): readonly Lesson[] {
+export function mainTrackLessons<
+  E extends ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+>(catalog: TracksCatalog, lessons: readonly Lesson<E, Demo>[]): readonly Lesson<E, Demo>[] {
   const mainTrack = catalog.tracks.find((track) => track.kind === 'main');
   if (!mainTrack) throw new Error('mainTrackLessons: catalog has no main track');
   return worldsSorted(mainTrack).flatMap((world) => worldLessons(world, lessons));
@@ -378,16 +382,19 @@ function orderedTracksForNext(
  * available-but-unwon world boss — see {@link nextStep} for that case). The branch-track tie-break
  * is a simple placeholder — refine once more than one branch track has authored content.
  */
-export function nextLesson(
+export function nextLesson<
+  E extends ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+>(
   catalog: TracksCatalog,
-  lessons: readonly Lesson[],
+  lessons: readonly Lesson<E, Demo>[],
   progresses: readonly LessonProgress[],
   unlocked?: ReadonlySet<string>,
   miniGames?: readonly MiniGameProgress[],
-): Lesson | null {
+): Lesson<E, Demo> | null {
   const availability = lessonAvailability(catalog, lessons, progresses, unlocked, miniGames);
 
-  const firstAvailableIn = (track: Track): Lesson | null => {
+  const firstAvailableIn = (track: Track): Lesson<E, Demo> | null => {
     for (const world of worldsSorted(track)) {
       for (const lesson of worldLessons(world, lessons)) {
         if (availability.get(lesson.id) === 'available') {
@@ -415,17 +422,23 @@ export function nextLesson(
  * order as `nextLesson`, so at most one boss can ever be "next" (an earlier one blocks anything
  * after it). `null` once every lesson and every world boss is done.
  */
-export type NextStep =
-  | { readonly kind: 'lesson'; readonly lesson: Lesson }
+export type NextStep<
+  E extends ExerciseDefBase = ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+> =
+  | { readonly kind: 'lesson'; readonly lesson: Lesson<E, Demo> }
   | { readonly kind: 'world-boss'; readonly world: World };
 
-export function nextStep(
+export function nextStep<
+  E extends ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+>(
   catalog: TracksCatalog,
-  lessons: readonly Lesson[],
+  lessons: readonly Lesson<E, Demo>[],
   progresses: readonly LessonProgress[],
   unlocked?: ReadonlySet<string>,
   miniGames?: readonly MiniGameProgress[],
-): NextStep | null {
+): NextStep<E, Demo> | null {
   const lesson = nextLesson(catalog, lessons, progresses, unlocked, miniGames);
   if (lesson !== null) {
     return { kind: 'lesson', lesson };

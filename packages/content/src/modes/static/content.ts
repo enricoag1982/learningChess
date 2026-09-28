@@ -1,4 +1,4 @@
-import type { StaticMiniGame } from '@chess-kids/core';
+import type { StaticMiniGame } from '@chess-kids/core/chess';
 import { optimalMoves, staticGoalExercise } from '@chess-kids/core/chess';
 import { z } from 'zod';
 import { checkExactlyOnePosition, positionFields, rules } from '../../kinds/common.ts';

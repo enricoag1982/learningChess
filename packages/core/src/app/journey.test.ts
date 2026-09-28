@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { Lesson, MiniGame } from '../domain/lesson.ts';
+import type { Lesson } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
 import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import {
   EMPTY_POSITION,
   makeExercise,
   makeLesson as buildLesson,
+  makeMiniGame as buildMiniGame,
   makeContentSource,
   makeDeps as buildDeps,
   makeProgressRepo as buildProgressRepo,
@@ -18,7 +19,7 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
-function makeLesson(id: string, world: string, order: number): Lesson {
+function makeLesson(id: string, world: string, order: number) {
   return buildLesson({
     id,
     world,
@@ -138,8 +139,7 @@ describe('loadJourney', () => {
 const W1_BOSS: World = { ...W1, boss: 'boss-mg' };
 const BASICS_BOSS: Track = { ...BASICS, worlds: [W1_BOSS] };
 const CATALOG_BOSS: TracksCatalog = { ...CATALOG, tracks: [BASICS_BOSS] };
-const BOSS_MINIGAME: MiniGame = {
-  mode: 'static',
+const BOSS_MINIGAME = buildMiniGame({
   id: 'boss-mg',
   concept: 'boss-concept',
   titleKey: 'fixtures:boss-mg.title',
@@ -147,7 +147,7 @@ const BOSS_MINIGAME: MiniGame = {
   unlockAfter: 'l2',
   position: EMPTY_POSITION,
   par: 5,
-};
+});
 
 function makeContentWithBoss(): ContentSource {
   return makeContentSource({ lessons: LESSONS, minigames: [BOSS_MINIGAME], catalog: CATALOG_BOSS });

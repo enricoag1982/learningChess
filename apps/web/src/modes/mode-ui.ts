@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
-import type { Lesson, MiniGame, SeriesGameState } from '@chess-kids/core';
+import type { SeriesGameState } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import type { GameState, ModeType, VersusState } from '@chess-kids/core/chess';
 
 /** Overrides a boss step's end-of-play save + "continue" action, for reuse outside a lesson

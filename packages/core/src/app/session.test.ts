@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Track, TracksCatalog, World } from '../domain/journey.ts';
-import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import { newLessonProgress, recordExerciseStars, withResumeStep } from '../domain/progress.ts';
 import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';
@@ -9,6 +8,7 @@ import {
   EMPTY_POSITION,
   makeExercise as buildExercise,
   makeLesson as buildLesson,
+  makeMiniGame as buildMiniGame,
   makeContentSource,
   makeDeps as buildDeps,
   makeProgressRepo as buildProgressRepo,
@@ -20,7 +20,7 @@ import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-02-01T00:00:00.000Z');
 
-function makeLesson(id: string, world: string, order: number): Lesson {
+function makeLesson(id: string, world: string, order: number) {
   return buildLesson({
     id,
     world,
@@ -33,7 +33,7 @@ function makeLesson(id: string, world: string, order: number): Lesson {
   });
 }
 
-function completeProgress(lesson: Lesson): LessonProgress {
+function completeProgress(lesson: ReturnType<typeof makeLesson>): LessonProgress {
   let progress = newLessonProgress(`p-${lesson.id}`, 'profile-1', lesson.id, NOW);
   for (const exercise of lesson.exercises) {
     progress = recordExerciseStars(progress, exercise.id, 3, lesson, NOW);
@@ -66,8 +66,7 @@ const L1 = makeLesson('l1', 'w1', 1);
 const L2 = makeLesson('l2', 'w1', 2);
 const LESSONS = [L1, L2];
 
-const MG1: MiniGame = {
-  mode: 'static',
+const MG1 = buildMiniGame({
   id: 'mg1',
   concept: 'mg1-concept',
   titleKey: 'fixtures:mg1.title',
@@ -75,11 +74,14 @@ const MG1: MiniGame = {
   unlockAfter: 'l1',
   position: EMPTY_POSITION,
   par: 5,
-};
-const MG2: MiniGame = { ...MG1, id: 'mg2', unlockAfter: 'l2', titleKey: 'fixtures:mg2.title' };
+});
+const MG2 = { ...MG1, id: 'mg2', unlockAfter: 'l2', titleKey: 'fixtures:mg2.title' };
 
 function makeContent(
-  overrides: Partial<{ lessons: readonly Lesson[]; minigames: readonly MiniGame[] }> = {},
+  overrides: Partial<{
+    lessons: readonly ReturnType<typeof makeLesson>[];
+    minigames: readonly ReturnType<typeof buildMiniGame>[];
+  }> = {},
 ): ContentSource {
   return makeContentSource({
     lessons: overrides.lessons ?? LESSONS,

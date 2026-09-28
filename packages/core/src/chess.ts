@@ -18,6 +18,19 @@ export type { BotPlayer } from './app/bot-player.ts';
 // Chess's `SubjectCore` + `AppConfig`.
 export { chessCore, CHESS_APP_CONFIG, CHESS_CHARACTERS } from './chess-core.ts';
 
+// Chess's concrete lesson/mini-game content shapes — the platform's own `Lesson`/`MiniGame`
+// (`./index.ts`) at chess's exercise def / demo instantiation.
+export type {
+  DemoHighlight,
+  LessonDemo,
+  Lesson,
+  StaticMiniGame,
+  SeriesMiniGame,
+  VersusMiniGame,
+  MiniGame,
+  CompiledContent,
+} from './domain/chess/lesson.ts';
+
 export type {
   Color,
   PieceType,
@@ -159,3 +172,19 @@ export {
 // static-capture mini-game API above (`GameState`, `playGameMove`, `gameResult`).
 export * as game from './domain/game/index.ts';
 export * as bot from './domain/bot/index.ts';
+
+// Platform types generic in the subject's own exercise def, at chess's `ExerciseDef` — so web
+// (which reads real board/exercise fields off `Journey.lessons`, `TodaySessionPlan`'s warm-up
+// tasks and `ConceptTask.exercise`) gets them concretely just by importing from here instead of
+// `./index.ts`; the platform code producing them (`loadJourney`, `loadTodaySession`, `review.ts`)
+// never names `ExerciseDef` itself.
+import type { Journey as PlatformJourney } from './app/journey.ts';
+import type { TodaySessionPlan as PlatformTodaySessionPlan } from './app/session.ts';
+import type { PlacementWorldPlan as PlatformPlacementWorldPlan } from './domain/assessment.ts';
+import type { ConceptTask as PlatformConceptTask } from './domain/review.ts';
+import type { ExerciseDef } from './domain/exercise/types.ts';
+import type { LessonDemo } from './domain/chess/lesson.ts';
+export type Journey = PlatformJourney<ExerciseDef, LessonDemo>;
+export type TodaySessionPlan = PlatformTodaySessionPlan<ExerciseDef>;
+export type ConceptTask = PlatformConceptTask<ExerciseDef>;
+export type PlacementWorldPlan = PlatformPlacementWorldPlan<ExerciseDef>;

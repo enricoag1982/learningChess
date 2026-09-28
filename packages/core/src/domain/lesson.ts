@@ -1,54 +1,23 @@
-import type { Position, Square } from './chess/types.ts';
-import type { StaticCaptureGameDef } from './exercise/modes/static/def.ts';
-import type { ExerciseDef } from './exercise/types.ts';
-import type { VersusGameDef } from './exercise/modes/versus/def.ts';
-import type { Lesson as LessonBase, MiniGameBase } from './subject.ts';
+import type { ExerciseDefBase, Lesson as LessonBase, MiniGameBase } from './subject.ts';
 
-/**
- * A demo's board highlight: every square one piece can reach from `legalMovesFrom` (most lessons),
- * or an explicit list of `squares` (World 1: a row/column/diagonal, a corner, or nothing at all).
- */
-export type DemoHighlight =
-  { readonly legalMovesFrom: Square } | { readonly squares: readonly Square[] };
+// The platform's own base types for lesson/mini-game content: every subject's concrete shapes
+// (chess: `domain/chess/lesson.ts`, exported via `./chess`) build on these. Code here only ever
+// reads base fields (id, world, order, concept, …) — a concrete value always widens to fit; kept
+// generic in `E`/`Demo` (default: base) so a function that only ever passes a whole `Lesson`
+// through (`journey.ts`) infers the caller's concrete type back rather than losing it.
 
-/** Legal-moves demo shown before the guided tries. */
-export interface LessonDemo {
-  readonly position: Position;
-  /** i18n key for the demo's spoken text. */
-  readonly textKey: string;
-  readonly highlight: DemoHighlight;
-}
+/** The generic `Lesson<E, Demo>` (`subject.ts`), at its base defaults. */
+export type Lesson<
+  E extends ExerciseDefBase = ExerciseDefBase,
+  Demo extends { readonly textKey: string } = { readonly textKey: string },
+> = LessonBase<E, Demo>;
 
-/** One lesson: story, demo, guided tries, scored exercises, optional boss mini-game. The chess
- * instantiation of the platform's generic `Lesson<E, Demo>` (`subject.ts`); shape unchanged. */
-export type Lesson = LessonBase<ExerciseDef, LessonDemo>;
+/** One mini-game's base fields, under the name platform code imports for it. A subject's concrete
+ * mini-game shape (chess: `domain/chess/lesson.ts`'s `MiniGame` union) widens to this. */
+export type MiniGame = MiniGameBase;
 
-/** Static-opponent mini-game (Hungry Piece, Knight Maze, King Walk, …). */
-export interface StaticMiniGame extends StaticCaptureGameDef, MiniGameBase {
-  readonly mode: 'static';
-}
-
-/** Series mini-game (Square Hunt, Setup Race, Safe or Not?, Escape the Check, …). */
-export interface SeriesMiniGame extends MiniGameBase {
-  readonly mode: 'series';
-  readonly id: string;
-  readonly concept: string;
-  readonly rounds: readonly ExerciseDef[];
-  /** Total mistakes (errors + hint levels) across all rounds at/under which the boss earns 3 stars. */
-  readonly errors3: number;
-  /** …2 stars threshold; `errors2 >= errors3`. */
-  readonly errors2: number;
-}
-
-/** `versus` mini-game (Pawn Wars, …): variant rules played against the computer opponent. */
-export interface VersusMiniGame extends VersusGameDef, MiniGameBase {
-  readonly mode: 'versus';
-}
-
-/** Mini-game content: `static` (capture-all / collect-stars), `series`, or `versus`. */
-export type MiniGame = StaticMiniGame | SeriesMiniGame | VersusMiniGame;
-
-/** Whole compiled content bundle written to `content.json`. */
+/** Whole compiled content bundle, at its base fields — a subject's concrete bundle (chess:
+ * `domain/chess/lesson.ts`'s `CompiledContent`) widens to this. */
 export interface CompiledContent {
   readonly version: 1;
   readonly lessons: readonly Lesson[];

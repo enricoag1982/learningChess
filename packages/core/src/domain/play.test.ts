@@ -5,14 +5,14 @@ import {
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
 } from '../testing/index.ts';
-import type { Lesson, MiniGame, StaticMiniGame } from './lesson.ts';
+import type { Lesson, MiniGame } from './lesson.ts';
 import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 import { unlockedMiniGames } from './play.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 
-function makeLesson(id: string, overrides: Partial<Lesson> = {}): Lesson {
+function makeLesson(id: string, overrides: Partial<ReturnType<typeof buildLesson>> = {}) {
   return buildLesson({
     id,
     exercises: [makeExercise({ id: `${id}-01` })],
@@ -21,7 +21,7 @@ function makeLesson(id: string, overrides: Partial<Lesson> = {}): Lesson {
   });
 }
 
-function makeMiniGame(unlockAfter: string, id = `${unlockAfter}-boss`): StaticMiniGame {
+function makeMiniGame(unlockAfter: string, id = `${unlockAfter}-boss`) {
   return buildMiniGame({ id, unlockAfter });
 }
 

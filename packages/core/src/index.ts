@@ -9,15 +9,7 @@ export { stripNickname, voiceKey } from './domain/voice-text.ts';
 export type { ParentLock } from './domain/parent-lock.ts';
 export { isValidPassword } from './domain/parent-lock.ts';
 
-export type {
-  DemoHighlight,
-  Lesson,
-  MiniGame,
-  StaticMiniGame,
-  SeriesMiniGame,
-  VersusMiniGame,
-  CompiledContent,
-} from './domain/lesson.ts';
+export type { Lesson, MiniGame, CompiledContent } from './domain/lesson.ts';
 export type {
   Stars,
   LessonProgress,

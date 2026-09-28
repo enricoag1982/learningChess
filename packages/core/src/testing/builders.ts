@@ -4,9 +4,7 @@
  * `index.ts`, so none of this reaches the app bundle. Each builder returns sensible defaults;
  * pass `overrides` to change just the fields a test cares about.
  */
-import type { Position } from '../domain/chess/types.ts';
-import type { ExerciseDef } from '../domain/exercise/types.ts';
-import type { Lesson, StaticMiniGame } from '../domain/lesson.ts';
+import type { ExerciseDef, Lesson, Position, StaticMiniGame } from '../chess.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { Attempt, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import type { ConceptStats } from '../domain/review.ts';

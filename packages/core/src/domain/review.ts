@@ -1,7 +1,7 @@
 import type { Lesson } from './lesson.ts';
-import type { ExerciseDef } from './exercise/types.ts';
 import type { StoredRecord } from './profile.ts';
 import type { Random } from './random.ts';
+import type { ExerciseDefBase } from './subject.ts';
 
 /** Review box 1–5 (Leitner), or absent = the concept has not entered review yet. */
 export type ReviewBox = 1 | 2 | 3 | 4 | 5;
@@ -95,17 +95,17 @@ export function isDue(stats: ConceptStats, now: Date): boolean {
 }
 
 /** One lesson exercise available for a concept's review pool, alongside the lesson it belongs to. */
-export interface ConceptPoolEntry {
+export interface ConceptPoolEntry<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly lessonId: string;
-  readonly exercise: ExerciseDef;
+  readonly exercise: E;
 }
 
 /** `conceptId`'s scored exercise pool: every scored exercise of every lesson whose exercise concept
  * matches, across the whole curriculum — not only the lesson that first taught it. */
-export function conceptPool(
-  lessons: readonly Lesson[],
+export function conceptPool<E extends ExerciseDefBase>(
+  lessons: readonly Lesson<E>[],
   conceptId: string,
-): readonly ConceptPoolEntry[] {
+): readonly ConceptPoolEntry<E>[] {
   return lessons.flatMap((lesson) =>
     lesson.exercises
       .filter((exercise) => exercise.concept === conceptId)
@@ -114,21 +114,21 @@ export function conceptPool(
 }
 
 /** One task picked for warm-up or practice: a concept's pool exercise, alongside its lesson id. */
-export interface ConceptTask {
+export interface ConceptTask<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly conceptId: string;
   readonly lessonId: string;
-  readonly exercise: ExerciseDef;
+  readonly exercise: E;
 }
 
 /** Warm-up is always exactly this many tasks (or fewer when review has fewer concepts to draw on). */
 const WARM_UP_SIZE = 3;
 
 /** One random pick from `entries`, avoiding `avoidExerciseId` when another candidate exists. */
-function pickOne(
-  entries: readonly ConceptPoolEntry[],
+function pickOne<E extends ExerciseDefBase>(
+  entries: readonly ConceptPoolEntry<E>[],
   avoidExerciseId: string | undefined,
   random: Random,
-): ConceptPoolEntry | undefined {
+): ConceptPoolEntry<E> | undefined {
   const filtered =
     entries.length > 1 ? entries.filter((entry) => entry.exercise.id !== avoidExerciseId) : entries;
   const pool = filtered.length > 0 ? filtered : entries;
@@ -141,12 +141,12 @@ function pickOne(
 
 /** Picks the warm-up's tasks: concepts in review due oldest-`dueAt`-first, max 1 per concept, up to
  * {@link WARM_UP_SIZE}; short of that, fills with the weakest concepts still in review. */
-export function pickWarmUp(
+export function pickWarmUp<E extends ExerciseDefBase>(
   stats: readonly ConceptStats[],
-  pool: ReadonlyMap<string, readonly ConceptPoolEntry[]>,
+  pool: ReadonlyMap<string, readonly ConceptPoolEntry<E>[]>,
   now: Date,
   random: Random,
-): readonly ConceptTask[] {
+): readonly ConceptTask<E>[] {
   const inReview = stats.filter((entry) => entry.box !== undefined);
   if (inReview.length === 0) {
     return [];
@@ -172,7 +172,7 @@ export function pickWarmUp(
     }
   }
 
-  const tasks: ConceptTask[] = [];
+  const tasks: ConceptTask<E>[] = [];
   for (const entry of chosen) {
     const picked = pickOne(pool.get(entry.conceptId) ?? [], entry.lastExerciseId, random);
     if (picked !== undefined) {
@@ -203,13 +203,13 @@ function shuffle<T>(items: readonly T[], random: Random): T[] {
 
 /** Picks `count` practice tasks for one concept, shuffled by `random`; cycles the pool again when
  * `count` exceeds it. Avoids opening on `lastExerciseId` by moving it to the end. */
-export function pickPracticeTasks(
+export function pickPracticeTasks<E extends ExerciseDefBase>(
   conceptId: string,
-  pool: readonly ConceptPoolEntry[],
+  pool: readonly ConceptPoolEntry<E>[],
   lastExerciseId: string | undefined,
   count: number,
   random: Random,
-): readonly ConceptTask[] {
+): readonly ConceptTask<E>[] {
   if (pool.length === 0) {
     return [];
   }
@@ -222,7 +222,7 @@ export function pickPracticeTasks(
         ]
       : shuffled;
 
-  const tasks: ConceptTask[] = [];
+  const tasks: ConceptTask<E>[] = [];
   for (let i = 0; i < count; i += 1) {
     const entry = ordered[i % ordered.length];
     if (entry !== undefined) {

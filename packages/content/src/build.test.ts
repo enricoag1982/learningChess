@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CompiledContent } from '@chess-kids/core';
+import type { CompiledContent } from '@chess-kids/core/chess';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { parse as parseYaml } from 'yaml';
 

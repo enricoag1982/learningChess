@@ -26,8 +26,8 @@ function makeLesson(
   id: string,
   world: string,
   order: number,
-  overrides: Partial<Lesson> = {},
-): Lesson {
+  overrides: Partial<ReturnType<typeof buildLesson>> = {},
+) {
   return buildLesson({
     id,
     world,

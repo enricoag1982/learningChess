@@ -1,7 +1,8 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import type { ChildReport, GameRecord, Lesson, Profile } from '@chess-kids/core';
+import type { ChildReport, GameRecord, Profile } from '@chess-kids/core';
+import type { Lesson } from '@chess-kids/core/chess';
 import { buildChildReport } from '@chess-kids/core';
 import { bot } from '@chess-kids/core/chess';
 import { useServices } from '../../app/store.ts';

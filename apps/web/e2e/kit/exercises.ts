@@ -4,7 +4,7 @@
 // replacing each type's own hand-rolled solver + the versus board's fixed waits/aria-label reads.
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import type { Lesson, MiniGame } from '@chess-kids/core';
+import type { Lesson, MiniGame } from '@chess-kids/core/chess';
 import type {
   ExerciseAction,
   ExerciseDef,

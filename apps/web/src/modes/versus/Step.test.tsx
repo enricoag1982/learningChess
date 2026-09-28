@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { VersusMiniGame } from '@chess-kids/core';
+import type { VersusMiniGame } from '@chess-kids/core/chess';
 import type { BotPlayer, Move, PieceType, Square } from '@chess-kids/core/chess';
 import { chessJsRules, parseDiagram, parseFen } from '@chess-kids/core/chess';
 import '../../i18n.ts';

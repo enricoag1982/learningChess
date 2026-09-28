@@ -1,6 +1,6 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { CompiledContent, DemoHighlight, Lesson, MiniGame } from '@chess-kids/core';
+import type { CompiledContent, DemoHighlight, Lesson, MiniGame } from '@chess-kids/core/chess';
 import type { ExerciseDef, Position, Square } from '@chess-kids/core/chess';
 import { hasPieceOf } from '@chess-kids/core/chess';
 import { solutionOf } from '@chess-kids/core/testing';

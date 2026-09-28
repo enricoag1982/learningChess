@@ -1,8 +1,9 @@
 // Inventory of every narrated string, resolved to literal English text via the same locale content
 // the app renders from, deduped by `voiceKey`: content strings, UI "owl line" templates expanded
 // over each bounded domain, and runtime string concatenations outside i18next expanded to match.
-import type { BadgeDef, CompiledContent, Stars, TracksCatalog, World } from '@chess-kids/core';
+import type { BadgeDef, Stars, TracksCatalog, World } from '@chess-kids/core';
 import type {
+  CompiledContent,
   ExerciseDef,
   ExerciseFeedback,
   ExerciseNoteCtx,

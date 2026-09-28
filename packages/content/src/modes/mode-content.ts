@@ -1,7 +1,7 @@
 // The mini-game-mode content abstraction (schema + compile + verify): a uniform interface so
 // `lesson-load.ts` dispatches through a registry (`modes/index.ts`) — the content counterpart of
 // core's `MiniGameMode`.
-import type { MiniGame } from '@chess-kids/core';
+import type { MiniGame } from '@chess-kids/core/chess';
 import type { ExerciseDef, Position } from '@chess-kids/core/chess';
 import type { z } from 'zod';
 import { compileExercises } from '../kinds/compile-exercise.ts';

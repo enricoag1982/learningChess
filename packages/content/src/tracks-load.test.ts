@@ -1,7 +1,6 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import type { Lesson, MiniGame } from '@chess-kids/core';
 import { makeLesson as buildLesson, makeMiniGame as buildMiniGame } from '@chess-kids/core/testing';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ContentError, loadLocales } from './load.ts';
@@ -60,7 +59,10 @@ ranks:
 `;
 
 /** Loads `dir/tracks.yaml` against `dir/locales`, returning issues instead of throwing. */
-function issuesOf(minigames: readonly MiniGame[] = [], lessons: readonly Lesson[] = []): string[] {
+function issuesOf(
+  minigames: readonly ReturnType<typeof buildMiniGame>[] = [],
+  lessons: readonly ReturnType<typeof buildLesson>[] = [],
+): string[] {
   try {
     const locales = loadLocales(join(dir, 'locales'));
     loadTracks(join(dir, 'tracks.yaml'), locales, minigames, lessons);
@@ -72,12 +74,12 @@ function issuesOf(minigames: readonly MiniGame[] = [], lessons: readonly Lesson[
 }
 
 /** A minimal, otherwise-content-shaped lesson for `checkWorldBoss` fixture tests. */
-function makeLesson(id: string, world: string): Lesson {
+function makeLesson(id: string, world: string) {
   return buildLesson({ id, world, guided: [], exercises: [] });
 }
 
 /** A minimal static mini-game unlocked by `unlockAfter`, for `checkWorldBoss` fixture tests. */
-function makeMiniGame(id: string, unlockAfter: string): MiniGame {
+function makeMiniGame(id: string, unlockAfter: string) {
   return buildMiniGame({ id, concept: `${id}-concept`, par: 5, unlockAfter });
 }
 
