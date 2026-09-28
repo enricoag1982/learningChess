@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SkippablePhase } from '@chess-kids/core';
-import type { Lesson } from '@chess-kids/core/chess';
-import type { ExerciseDef } from '@chess-kids/core/chess';
+import type { ExerciseDefBase, Lesson, SkippablePhase } from '@chess-kids/core';
 import {
   EASIER_VARIANT_STARS,
   easierVariant,
@@ -22,7 +20,7 @@ import { SkipButton } from './SkipButton.tsx';
 
 export interface ExerciseStepProps {
   readonly lesson: Lesson;
-  readonly exercise: ExerciseDef;
+  readonly exercise: ExerciseDefBase;
   /** Guided tries: hint level 1 auto-shown, never scored. */
   readonly guided: boolean;
   readonly nextStepIndex: number;
@@ -35,7 +33,7 @@ export interface ExerciseStepProps {
 
 interface ExerciseAttemptProps extends ExerciseStepProps {
   /** The scored exercise's easier variant, if it has one — offered once errors pile up. */
-  readonly easier?: ExerciseDef;
+  readonly easier?: ExerciseDefBase;
   /** Swaps the board to `easier`'s variant; only ever passed alongside `easier`. */
   readonly onTakeEasier?: () => void;
   /** Set when `exercise` is itself an easier variant: the original exercise id it stands in for. */

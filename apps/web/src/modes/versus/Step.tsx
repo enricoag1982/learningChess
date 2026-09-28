@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { PieceType, Square, VersusState } from '@chess-kids/core/chess';
+import type { PieceType, Square, VersusMiniGame, VersusState } from '@chess-kids/core/chess';
 import {
   bot,
   canTakeBack,
@@ -32,7 +32,7 @@ import { prefersReducedMotion } from '../../ui/useMediaQuery.ts';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
 import type { BossStepProps } from '../mode-ui.ts';
 
-export interface VersusStepProps extends BossStepProps<'versus'> {
+export interface VersusStepProps extends BossStepProps<VersusMiniGame> {
   /** Fired after every ply with the latest state — for a caller that needs the in-progress game
    * outside `session.save`'s terminal-only call (recording an abandoned game on Leave). */
   readonly onStateChange?: (state: VersusState) => void;

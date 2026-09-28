@@ -6,7 +6,7 @@ import type { ExerciseDef, ModeType } from '@chess-kids/core/chess';
 import { seriesE2E } from './series/e2e.ts';
 import { staticE2E } from './static/e2e.ts';
 import { versusE2E } from './versus/e2e.ts';
-import type { GameOf } from './mode-ui.ts';
+import type { GameOf } from './ui-registry.ts';
 
 /** One mini-game mode's e2e driver: plays `game` to its end (result panel showing, before its own
  * "Next" tap — `e2e/kit/exercises.ts`'s `completeBoss` does that once, for every mode). */

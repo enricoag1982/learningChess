@@ -2,8 +2,7 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { MiniGame } from '@chess-kids/core/chess';
-import type { ComputerLevelCondition, ComputerLevelStatus } from '@chess-kids/core/chess';
+import type { ComputerLevelCondition, ComputerLevelStatus, MiniGame } from '@chess-kids/core/chess';
 import { unlockedMiniGames } from '@chess-kids/core';
 import {
   chessCore,
@@ -67,7 +66,7 @@ export function PlayScreen(): JSX.Element {
     return <BlankScreen />;
   }
 
-  const games = unlockedMiniGames(journey.lessons, services.deps.content.minigames(), progress);
+  const games = unlockedMiniGames(journey.lessons, services.subject.content.minigames(), progress);
   const lessonById = new Map(journey.lessons.map((lesson) => [lesson.id, lesson]));
   const worldOrder = new Map(
     journey.catalog.tracks.flatMap((track) =>
@@ -83,7 +82,7 @@ export function PlayScreen(): JSX.Element {
     gameRecords,
     journey,
     journey.lessons,
-    services.deps.content.minigames(),
+    services.subject.content.minigames(),
     progress,
   );
   const friendUnlocked = friendOptions.length > 0;

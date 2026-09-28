@@ -63,7 +63,7 @@ export function createTestServices(
   return {
     deps,
     narrator,
-    subject: { botPlayer: createWorkerBotPlayer() },
+    subject: { botPlayer: createWorkerBotPlayer(), content: createBundledContentSource() },
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },

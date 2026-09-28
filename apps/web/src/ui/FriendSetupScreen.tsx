@@ -62,8 +62,8 @@ export function FriendSetupScreen(): JSX.Element {
   const options = friendGameOptions(
     gameRecords,
     journey,
-    services.deps.content.lessons(),
-    services.deps.content.minigames(),
+    services.subject.content.lessons(),
+    services.subject.content.minigames(),
     progress,
   );
 

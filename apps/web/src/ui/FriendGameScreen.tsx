@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ContentSource } from '@chess-kids/core';
 import type { Color, LocalPlayer, Position, Square } from '@chess-kids/core/chess';
+import type { ChessContentSource } from '../adapters/content/bundled-content-source.ts';
 import {
   chessJsRules,
   game,
@@ -104,7 +104,7 @@ interface FriendGameDef {
 
 /** The rules/position for `gameId`: the full game, or an unlocked `versus` mini-game's own
  * content; `null` for an unknown id (defensive only). */
-function gameDefFor(gameId: string, content: ContentSource): FriendGameDef | null {
+function gameDefFor(gameId: string, content: ChessContentSource): FriendGameDef | null {
   if (gameId === 'full') {
     return {
       rules: {
@@ -460,7 +460,7 @@ export function FriendGameScreen(): JSX.Element {
     return <BlankScreen />;
   }
   const gameId = friendSetup.gameId ?? 'full';
-  const def = gameDefFor(gameId, services.deps.content);
+  const def = gameDefFor(gameId, services.subject.content);
   if (!def) {
     return <BlankScreen />;
   }

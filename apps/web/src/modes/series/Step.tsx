@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { SeriesGameState } from '@chess-kids/core';
-import type { ExerciseDef, ExerciseState } from '@chess-kids/core/chess';
-import { EXERCISE_KINDS } from '@chess-kids/core/chess';
+import type {
+  ExerciseDefBase,
+  ExerciseStateBase,
+  MiniGameBase,
+  SeriesGameDef,
+  SeriesGameState,
+} from '@chess-kids/core';
 import { completeRound, currentRound, startSeries } from '@chess-kids/core';
 import { useAppStore, useServices } from '../../app/store.ts';
+import { SeriesClosingBoard, useSurfacePieceBadges } from '../../chess-pack.ts';
 import { tContent } from '../../content-text.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { Board } from '../../ui/board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../../ui/board/piece-style.ts';
 import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
 import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
@@ -18,6 +21,9 @@ import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
 import { NextButton } from '../../ui/lesson/NextButton.tsx';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
 import type { BossStepProps } from '../mode-ui.ts';
+
+/** A `series` mini-game's content, at the platform's own base round def. */
+type SeriesGame = MiniGameBase & SeriesGameDef;
 
 /** Round counter + mistakes-so-far card, shared by a round in progress and the result screen. */
 function SeriesCounters({
@@ -41,13 +47,13 @@ function SeriesCounters({
 interface SeriesRoundProps {
   readonly character: string;
   readonly worldId: string;
-  readonly exercise: ExerciseDef;
+  readonly exercise: ExerciseDefBase;
   readonly roundNumber: number;
   readonly totalRounds: number;
   /** Mistakes already folded in from every round completed before this one. */
   readonly priorMistakes: number;
   /** Called once, the moment the kid taps Next after solving this round. */
-  readonly onNext: (roundState: ExerciseState) => void;
+  readonly onNext: (roundState: ExerciseStateBase) => void;
 }
 
 /** One round of a series boss: `ExerciseStep`'s own UI, scored only as part of the series' total
@@ -90,9 +96,7 @@ function SeriesRound({
     <div className="mt-auto flex flex-col items-center gap-4">
       <NextButton
         onClick={() => {
-          // `useExerciseSession` (generic) types `state.core` by its base shape; the pack's own
-          // registry narrows `def.type` to a chess kind at runtime, so this always is one.
-          onNext(state.core as ExerciseState);
+          onNext(state.core);
         }}
         className="w-full"
       />
@@ -121,27 +125,25 @@ export function Step({
   game: minigame,
   nextStepIndex,
   session,
-}: BossStepProps<'series'>): JSX.Element {
+}: BossStepProps<SeriesGame>): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
-  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
+  const pieceBadges = useSurfacePieceBadges({ worldId: lesson.world });
+  const kinds = services.deps.subject.kinds;
 
-  const [series, setSeries] = useState<SeriesGameState<ExerciseDef>>(() =>
-    startSeries(minigame, EXERCISE_KINDS),
-  );
+  const [series, setSeries] = useState<SeriesGameState>(() => startSeries(minigame, kinds));
   const run = useBossRun(series, { lesson, nextStepIndex, session });
   const goalText = tContent(t, minigame.goalKey);
   const replay = useNarratedText(services.narrator, goalText);
 
-  function handleRoundNext(roundState: ExerciseState): void {
-    setSeries((current) => completeRound(current, roundState, EXERCISE_KINDS));
+  function handleRoundNext(roundState: ExerciseStateBase): void {
+    setSeries((current) => completeRound(current, roundState, kinds));
   }
 
   /** Standalone-only: restarts the series at its first round (a lesson boss never restarts inline). */
   function handlePlayAgain(): void {
-    setSeries(startSeries(minigame, EXERCISE_KINDS));
+    setSeries(startSeries(minigame, kinds));
     run.restart();
   }
 
@@ -163,14 +165,7 @@ export function Step({
         />
       ) : (
         <GameLayout
-          board={
-            <Board
-              position={(series.round as ExerciseState).position}
-              legalMoves={[]}
-              label={t('lesson.board-label')}
-              pieceBadges={pieceBadges}
-            />
-          }
+          board={SeriesClosingBoard(series.round, t('lesson.board-label'), pieceBadges)}
           panel={
             <>
               <SpeechBubble text={goalText} />

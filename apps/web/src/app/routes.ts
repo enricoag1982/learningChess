@@ -1,8 +1,9 @@
-import type { AssessmentScope, TimeLimitStatus } from '@chess-kids/core';
-// `ConceptTask`/`PlacementWorldPlan` stay concrete here (not the generic base): review/placement
-// task rendering (`ReviewTaskRunner`) still reads a task's own kind-specific exercise fields
-// directly — a platform-wide leak of its own (session/kind-dispatch area), out of this seam's scope.
-import type { ConceptTask, PlacementWorldPlan } from '@chess-kids/core/chess';
+import type {
+  AssessmentScope,
+  ConceptTask,
+  PlacementWorldPlan,
+  TimeLimitStatus,
+} from '@chess-kids/core';
 
 /** A subject-contributed route's own param fields, keyed by route name — augmented per subject
  * (chess: `play`, `'full-game'` `{level}`, `'friend-setup'`, `'friend-game'`). Each subject's own

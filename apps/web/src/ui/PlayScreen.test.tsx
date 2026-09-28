@@ -51,7 +51,7 @@ describe('PlayScreen', () => {
     const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const rook = services.deps.content.lesson('rook');
-    const hungryRook = services.deps.content.minigame('hungry-rook');
+    const hungryRook = services.subject.content.minigame('hungry-rook');
     if (!rook || !hungryRook || hungryRook.mode !== 'static') {
       throw new Error('bundled content: "rook" lesson / "hungry-rook" mini-game not found');
     }

@@ -1,9 +1,11 @@
 // The chess `SubjectWeb` pack (docs/refactor-v4.md §11) — temporary home until m8.18 moves it to
 // `subject-chess/src/web`. Every platform-bound module reaches chess only through this file.
-import { lazy } from 'react';
+import { createElement, lazy } from 'react';
 import { CHESS_APP_CONFIG, chessCore, isInCheck, kingSquare } from '@chess-kids/core/chess';
-import type { BotPlayer, Position, Square } from '@chess-kids/core/chess';
+import type { BotPlayer, ExerciseState, Position, Square } from '@chess-kids/core/chess';
+import type { ExerciseStateBase } from '@chess-kids/core';
 import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
+import { createBundledContentSource } from './adapters/content/bundled-content-source.ts';
 import { useAppStore } from './app/store.ts';
 import type {
   SubjectRouteEntry,
@@ -14,13 +16,16 @@ import type {
 import { createPlaySlice, type PlaySlice } from './app/slices/play.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
+import { BossStep } from './modes/ui-registry.ts';
 import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { ANIMAL_IMAGES } from './ui/art/animal-images.ts';
+import { Board } from './ui/board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
 
-export { CHESS_APP_CONFIG };
+// `BossStep`: the lesson/standalone boss mini-game UI, reached only through the pack.
+export { CHESS_APP_CONFIG, BossStep };
 
 const FriendSetupScreen = lazy(() =>
   import('./ui/FriendSetupScreen.tsx').then((module) => ({ default: module.FriendSetupScreen })),
@@ -42,6 +47,8 @@ const RANK_GLYPH: Readonly<Record<string, string>> = {
 declare module './app/subject.ts' {
   interface SubjectServices {
     readonly botPlayer: BotPlayer;
+    /** Chess's own concrete `ContentSource`; chess code reads content only through this. */
+    readonly content: ReturnType<typeof createBundledContentSource>;
   }
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation via `extends`, not a type alias, so declaration merging still applies
   interface SubjectState extends PlaySlice {}
@@ -60,7 +67,7 @@ declare module './app/routes.ts' {
 }
 
 function createChessServices(): SubjectServices {
-  return { botPlayer: createWorkerBotPlayer() };
+  return { botPlayer: createWorkerBotPlayer(), content: createBundledContentSource() };
 }
 
 const CHESS_ROUTES: Readonly<Record<string, SubjectRouteEntry>> = {
@@ -116,4 +123,10 @@ export function useSurfacePieceBadges(surface: SurfaceContext): boolean {
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   if (surface.worldId === null) return false;
   return showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: surface.worldId }));
+}
+
+/** A `series` boss's closing screen: the last round's final board, plain. */
+export function SeriesClosingBoard(round: ExerciseStateBase, label: string, pieceBadges: boolean) {
+  const { position } = round as ExerciseState;
+  return createElement(Board, { position, legalMoves: [], label, pieceBadges });
 }

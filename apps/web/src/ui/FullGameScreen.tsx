@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Lesson, VersusMiniGame } from '@chess-kids/core/chess';
-import type { VersusState } from '@chess-kids/core/chess';
+import type { MiniGameStateBase } from '@chess-kids/core';
+import type { Lesson, VersusMiniGame, VersusState } from '@chess-kids/core/chess';
 import {
   bot,
   parseFen,
@@ -22,6 +22,11 @@ const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 /** Kid-move cap and 3-star threshold, matching World 4's own full game (`first-game.yaml`). */
 const FULL_GAME_MOVE_LIMIT = 100;
 const FULL_GAME_PAR = 60;
+
+/** Narrows `BossPlaySession.save`'s base state back to `VersusState` (this screen is always `versus`). */
+function isVersusState(state: MiniGameStateBase): state is VersusState {
+  return state.mode === 'versus';
+}
 
 /** `VersusStep` requires a `lesson` prop but never reads it once `session` is set — a harmless
  * stand-in, not a real lesson. */
@@ -118,7 +123,7 @@ export function FullGameScreen(): JSX.Element {
 
   const session: BossPlaySession = {
     save: (state) => {
-      if (state.mode !== 'versus') {
+      if (!isVersusState(state)) {
         return Promise.resolve();
       }
       const { result, reason } = versusGameRecordResult(state);

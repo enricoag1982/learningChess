@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createTestServices } from '../testing/test-services.ts';
 import { seedReturningProfile, seedWorldFourMastered } from '../testing/app-test-helpers.ts';
 import { renderApp } from '../testing/render-app.tsx';
@@ -27,6 +28,7 @@ describe('FullGameScreen (M3.5)', () => {
     const services = {
       ...createTestServices('bundled'),
       subject: {
+        content: createBundledContentSource(),
         botPlayer: scriptedBotPlayer([
           { from: 'e7', to: 'e5' },
           { from: 'b8', to: 'c6' },
@@ -71,7 +73,10 @@ describe('FullGameScreen (M3.5)', () => {
   it('leaving mid-game asks to confirm; confirming records it as abandoned, not a loss', async () => {
     const services = {
       ...createTestServices('bundled'),
-      subject: { botPlayer: scriptedBotPlayer([{ from: 'e7', to: 'e5' }]) },
+      subject: {
+        content: createBundledContentSource(),
+        botPlayer: scriptedBotPlayer([{ from: 'e7', to: 'e5' }]),
+      },
     };
     const profile = await seedReturningProfile(services, 'Mia');
     await seedWorldFourMastered(services, profile.id);

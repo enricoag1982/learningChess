@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Stars } from '@chess-kids/core';
-import type { Lesson } from '@chess-kids/core/chess';
-import type { MiniGameState } from '@chess-kids/core/chess';
+import type { Lesson, MiniGameStateBase, Stars } from '@chess-kids/core';
 import { recordBossResult } from '@chess-kids/core';
-import { modeOf } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../app/store.ts';
 import { StarsRow } from '../ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '../ui/lesson/button-styles.ts';
@@ -32,13 +29,14 @@ export interface BossRun {
  * once play is over (`session.save`, else `recordBossResult`), exposes `isOver`/`isWin`/`stars` via
  * the mode registry, and a `restart` for a standalone session's own "Play again". */
 // eslint-disable-next-line react-refresh/only-export-components -- paired with BossResultPanel below
-export function useBossRun(state: MiniGameState, options: UseBossRunOptions): BossRun {
+export function useBossRun(state: MiniGameStateBase, options: UseBossRunOptions): BossRun {
   const { lesson, nextStepIndex, session } = options;
   const services = useServices();
   const profile = useAppStore((appState) => appState.profile);
   const refreshProgress = useAppStore((appState) => appState.refreshProgress);
 
-  const mode = modeOf(state);
+  const mode = services.deps.subject.modes[state.mode];
+  if (!mode) throw new Error(`useBossRun: no mode registered for "${state.mode}"`);
   const isOver = mode.isOver(state);
 
   // A lazy `useState` initializer (not a direct `Date.now()` call) keeps render pure; the ref

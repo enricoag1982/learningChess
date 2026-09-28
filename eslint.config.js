@@ -163,10 +163,6 @@ export default defineConfig([
     ];
     // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
     const RATCHET_IGNORES = [
-      // `ContentSource` (`AppDeps.content`) is a build artifact carrier, not a subject-generic
-      // port: the UI reads real board/exercise fields straight off it, so it stays concrete
-      // (see the file's own comment) rather than forcing a cast onto every read site.
-      'packages/core/src/app/ports.ts',
       'packages/core/src/app/use-cases.test.ts',
       'packages/core/src/app/minigames.test.ts',
       'packages/core/src/domain/exercise/modes/series/engine.test.ts',
@@ -210,7 +206,6 @@ export default defineConfig([
       'apps/web/src/adapters/app-update.ts',
       'apps/web/src/adapters/clock.ts',
       'apps/web/src/adapters/content/bundled-content-source.test.ts',
-      'apps/web/src/adapters/content/bundled-content-source.ts',
       'apps/web/src/adapters/download-backup-file-writer.ts',
       'apps/web/src/adapters/download-password-file-writer.test.ts',
       'apps/web/src/adapters/download-password-file-writer.ts',
@@ -423,7 +418,6 @@ export default defineConfig([
     // Files still pending a chess-bound import fix; empty once the boundary holds everywhere.
     const WEB_RATCHET_IGNORES = [
       'apps/web/src/App.test.tsx',
-      'apps/web/src/adapters/content/bundled-content-source.ts',
       'apps/web/src/adapters/persistent-storage.test.ts',
       'apps/web/src/adapters/share-backup.test.ts',
       'apps/web/src/adapters/storage/local-backup-importer.test.ts',

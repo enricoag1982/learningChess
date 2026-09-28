@@ -1,7 +1,8 @@
 import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
 import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
 import type { TracksCatalog } from '../domain/journey.ts';
-import type { Lesson, MiniGame } from '../chess.ts';
+import type { Lesson } from '../domain/lesson.ts';
+import type { MiniGameBase } from '../domain/subject.ts';
 import type { ParentLock } from '../domain/parent-lock.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { ProfileSettings } from '../domain/profile-settings.ts';
@@ -121,14 +122,14 @@ export interface Narrator {
   cancel(): void;
 }
 
-/** Loads compiled lesson content (built from `packages/content`). Concretely typed, not generic
- * over the subject's exercise def: the UI reads real board/exercise fields straight off it (e.g.
- * `LessonScreen`), so a base type here would only push a cast onto every one of those call sites. */
+/** Loads compiled lesson content, at the platform's own base shapes. A subject's own adapter
+ * (chess: `ChessContentSource`) stays concrete and widens here with no cast; chess UI reads the
+ * concrete one via `services.subject.content`. */
 export interface ContentSource {
   lessons(): readonly Lesson[];
   lesson(id: string): Lesson | undefined;
-  minigames(): readonly MiniGame[];
-  minigame(id: string): MiniGame | undefined;
+  minigames(): readonly MiniGameBase[];
+  minigame(id: string): MiniGameBase | undefined;
   /** Tracks/worlds/ranks catalog, used by `loadJourney`. Optional so an existing `ContentSource`
    * fixture keeps typechecking unchanged. */
   catalog?(): TracksCatalog;

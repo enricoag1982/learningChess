@@ -11,7 +11,7 @@ import {
   totalStars,
 } from '@chess-kids/core';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
-import { BossStep } from '../modes/ui-registry.ts';
+import { BossStep } from '../chess-pack.ts';
 import { CompleteStep } from './lesson/CompleteStep.tsx';
 import { DemoStep } from './lesson/DemoStep.tsx';
 import { ExerciseStep } from './lesson/ExerciseStep.tsx';

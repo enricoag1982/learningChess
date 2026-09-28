@@ -8,7 +8,7 @@ import {
   playGameMove,
   startStaticCaptureGame,
 } from '@chess-kids/core/chess';
-import type { GameState } from '@chess-kids/core/chess';
+import type { GameState, StaticMiniGame } from '@chess-kids/core/chess';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { chessWeb } from '../../chess-pack.ts';
 import { tContent } from '../../content-text.ts';
@@ -28,7 +28,7 @@ export function Step({
   game: minigame,
   nextStepIndex,
   session,
-}: BossStepProps<'static'>): JSX.Element {
+}: BossStepProps<StaticMiniGame>): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
