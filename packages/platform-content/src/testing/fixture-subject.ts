@@ -301,16 +301,6 @@ export function writeFullContent(): void {
       'voice-check': { sentence: 'Say hello' },
       'time-limit': { 'early-body': 'Opens at {{time}}' },
       placement: { 'offer-question': 'Want to start?', 'summary-none-body': 'Start here' },
-      play: {
-        'locked-condition': 'After {{label}}',
-        'vs-friend-locked': 'Locked',
-        'owl-line': 'Go',
-      },
-      'friend-play': { 'setup-owl-line': 'Set up' },
-      boss: {
-        versus: { 'kid-captured': 'Took {{piece}}', won: 'Won', draw: 'Draw', lost: 'Lost' },
-      },
-      board: { piece: { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' } },
     }),
   );
 }
