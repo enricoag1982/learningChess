@@ -80,6 +80,12 @@ if (initialBytes > BUDGET_BYTES) {
   throw new Error(`initial JS size budget exceeded: ${initialKb} KB > ${budgetKb} KB`);
 }
 
+// v4 ceiling (`docs/refactor-v4.md` §6): never above `v2.0.0`'s initial JS; raise it only on purpose.
+const V2_CEILING_BYTES = Math.round(186.2 * 1024);
+if (initialBytes > V2_CEILING_BYTES) {
+  throw new Error(`initial JS above the v2.0.0 ceiling: ${initialKb} KB > 186.2 KB`);
+}
+
 /**
  * Offline precache size (M6.3 item 5; `docs/non-functional.md` §1's ≤ 50 MB/language budget,
  * `docs/voice.md`'s own ≤ 25 MB English audio slice being the dominant piece of it): every file
