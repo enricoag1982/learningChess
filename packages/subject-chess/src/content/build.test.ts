@@ -25,16 +25,26 @@ describe('build script', () => {
     const platformDir = [PLATFORM_LOCALES_DIR];
     const chessDir = [packageDir, 'content', 'locales'];
     const merged = mergeLocales(
-      { en: { common: readNamespace(platformDir, 'common') } },
-      { en: { common: readNamespace(chessDir, 'common') } },
+      {
+        en: {
+          common: readNamespace(platformDir, 'common'),
+          journey: readNamespace(platformDir, 'journey'),
+        },
+      },
+      {
+        en: {
+          common: readNamespace(chessDir, 'common'),
+          journey: readNamespace(chessDir, 'journey'),
+        },
+      },
     );
 
     expect(output).toEqual({
       common: merged.en?.common,
       lessons: readNamespace(chessDir, 'lessons'),
       characters: readNamespace(chessDir, 'characters'),
-      journey: readNamespace(platformDir, 'journey'),
-      rewards: readNamespace(platformDir, 'rewards'),
+      journey: merged.en?.journey,
+      rewards: readNamespace(chessDir, 'rewards'),
     });
   });
 

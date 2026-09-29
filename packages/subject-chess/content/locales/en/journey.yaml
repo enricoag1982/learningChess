@@ -1,0 +1,21 @@
+tracks:
+  basics: Basics
+  openings: Openings
+  tactics: Tactics
+  endgames: Checkmates & Endgames
+worlds:
+  board: Board
+  pieces: Pieces
+  attack: Attack & Defence
+  check: Check & Mate
+  rules: Full Rules
+  openings: Openings
+  tactics: Tactics
+  endgames: Checkmates & Endgames
+ranks:
+  pawn: Pawn
+  knight: Knight
+  bishop: Bishop
+  rook: Rook
+  queen: Queen
+  king: King

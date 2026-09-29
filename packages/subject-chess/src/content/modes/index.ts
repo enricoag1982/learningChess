@@ -5,7 +5,8 @@ import type {
   MiniGameModeContent,
   MiniGameSchema,
 } from '@learn/platform-content/modes/mode-content';
-import { seriesMode } from './series/content.ts';
+import { createSeriesContent } from '@learn/platform-content/modes/series';
+import { exerciseSchema } from '../kinds/index.ts';
 import { staticMode } from '../../modes/static/content.ts';
 import { versusMode } from '../../modes/versus/content.ts';
 
@@ -19,7 +20,7 @@ type ChessSeriesMode = MiniGameModeContent<
 export const MINI_GAME_MODE_CONTENT = {
   static: staticMode,
   // Single trust boundary from the generic round type to chess's own concrete rounds.
-  series: seriesMode as unknown as ChessSeriesMode,
+  series: createSeriesContent(exerciseSchema) as unknown as ChessSeriesMode,
   versus: versusMode,
 } as const satisfies {
   readonly static: MiniGameModeContent<Extract<MiniGame, { readonly mode: 'static' }>, z.ZodType>;

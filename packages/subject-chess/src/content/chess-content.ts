@@ -305,8 +305,34 @@ function exerciseNoteTemplates(
   }
 }
 
+/** Play screen and versus boss texts: a locked lesson / mini-game (a character's first lesson is named by its piece, any other
+ * by its title), the locked vs-friend line, the boss result lines and the Play / friend-setup owl lines. */
+function playScreenTemplates(
+  add: (text: string, source: string) => void,
+  r: Resolve,
+  all: CompiledContent,
+): void {
+  const named = new Set<string>();
+  for (const lesson of all.lessons) {
+    const topicKey = chessCore.characters[lesson.character]?.topicKey;
+    const label =
+      topicKey !== undefined && !named.has(lesson.character) ? r(topicKey) : r(lesson.titleKey);
+    named.add(lesson.character);
+    add(r('play.locked-condition', { label }), 'play');
+  }
+  for (const minigame of all.minigames) {
+    add(r('play.locked-condition', { label: r(minigame.titleKey) }), 'play');
+  }
+  add(r('play.vs-friend-locked'), 'play');
+  for (const key of ['won', 'draw', 'lost']) {
+    add(r(`boss.versus.${key}`), 'versus-boss');
+  }
+  add(r('play.owl-line'), 'owl-line');
+  add(r('friend-play.setup-owl-line'), 'owl-line');
+}
+
 /** Chess's Play / versus-boss / exercise-note voice templates: bot level names with the locked-level messages, the boss's bot
- * move / capture lines, every exercise-feedback note. */
+ * move / capture lines, every exercise-feedback note, the Play screen's own lines. */
 export function chessVoiceTemplates(
   add: (text: string, source: string) => void,
   r: Resolve,
@@ -332,6 +358,7 @@ export function chessVoiceTemplates(
     add(r('boss.versus.kid-captured', { piece: r(`board.piece.${piece}`) }), 'versus-boss');
   }
   exerciseNoteTemplates(add, r, all);
+  playScreenTemplates(add, r, all);
 }
 
 /** Chess's whole `SubjectContent`: what `compileAll` and every script / test that loads real content inject into the platform pipeline. */
@@ -342,6 +369,7 @@ export const chessContent: SubjectContent = {
   demo: chessDemo,
   badges: chessBadges,
   characters: chessCore.characters,
+  defaultMode: 'static',
   extraOutputs: { 'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')) },
   voiceTemplates: chessVoiceTemplates,
 };

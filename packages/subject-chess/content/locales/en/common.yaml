@@ -34,6 +34,8 @@ parent:
   piece-style-heading: Piece style
   piece-style-animal: Animal badge
   piece-style-classic: Classic
+  privacy:
+    intro: Chess for Kids keeps everything on this device. Here's exactly what that means.
 boss:
   versus:
     bot-name:
@@ -61,6 +63,9 @@ boss:
     stop-game-title: Stop this game?
     stop-game-cancel: Keep playing
     stop-game-confirm: Stop game
+  captured-of: 'Captured {{current}} of {{total}}'
+  stars-of: 'Stars {{current}} of {{total}}'
+  moves-par: 'Moves {{moves}} · Par {{par}}'
 play:
   title: Play
   owl-line: Pick a game!
@@ -84,14 +89,9 @@ play:
   level-unplayed: Not played yet
   level-condition-beat: 'Beat {{name}} {{times}} times'
   level-up-suggestion: 'Ready for the {{name}}?'
-  close: Close
-  back-to-play: Back to Play
-  back-to-journey: Back to Journey
-  back-to-home: Back to Home
 friend-play:
   setup-title: vs Friend
   setup-owl-line: Who's playing?
-  guest: Guest
   second-player-heading: Second player
   no-other-profiles: Add another player to play against them, or pick Guest.
   game-heading: Game
@@ -110,3 +110,57 @@ friend-play:
   turn: Turn now
   result-win: '{{name}} wins!'
   result-draw: "It's a draw!"
+time-limit:
+  early-body: 'Chess opens at {{time}}. See you soon!'
+placement:
+  offer-question: Already know some chess? Let's find out where to start you!
+  summary-none-body: Every chess champion starts with the first step.
+home:
+  play-tile: Play
+lesson:
+  board-label: Chess board
+exercise:
+  undo: Undo
+  yes: Yes
+  no: 'No'
+  moves-label: Moves
+  moves-of: '{{current}} of {{total}}'
+  moves-target_one: 'in {{count}} move'
+  moves-target_other: 'in {{count}} moves'
+  tap-piece-first: 'Tap {{name}} first.'
+  select-wrong: Not quite! Tap the orange squares again to take them away.
+  select-missing: Almost! Tap the squares with a dashed orange line too.
+  select-both: Not quite! Take away the orange squares and tap the dashed ones.
+  move-wrong: Not this one. Try again!
+  checkmate: Checkmate!
+  opponent-moved: '{{color}} moved the {{piece}}.'
+  opponent-color:
+    w: White
+    b: Black
+  hint-piece: 'Look at {{name}}.'
+  hint-target: Try the orange square.
+  hint-look: Look closely.
+  hint-think-again: Think about it again.
+  illegal:
+    r: '{{name}} only runs in straight lines!'
+    b: '{{name}} only walks on diagonal paths!'
+    q: '{{name}} moves straight or diagonal, not like that!'
+    k: '{{name}} only steps one square at a time!'
+    n: '{{name}} only jumps in an L shape!'
+    p: '{{name}} only moves straight ahead (and captures diagonally)!'
+  setup:
+    wrong: Not quite! Try a different piece or square.
+    palette-label: Pieces to place
+    palette-item: '{{color}} {{piece}}, {{count}} left'
+    hint-piece: 'Place the {{color}} {{piece}} next.'
+    hint-square: Put it on the orange square.
+app:
+  title: Chess for Kids
+voice-check:
+  # Parent area "Test voice" (M6.3 item 2): the one fixed sentence it speaks. Deliberately its own
+  # top-level key, not under `parent:` — every `parent.*`/`new-player.*`/`backup.*`/`privacy.*` key
+  # is grown-up-only and never narrated (`voice-texts.ts`'s `EXCLUDED_KEY_PREFIXES`), but this text
+  # must be in the voice inventory to actually test the recorded voice.
+  sentence: Let's play chess together!
+demo:
+  board-label: "{{name}}'s board"

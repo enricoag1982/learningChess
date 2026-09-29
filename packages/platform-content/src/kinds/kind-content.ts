@@ -50,14 +50,14 @@ export function makeCompileContext(
 }
 
 /** One exercise type's content behaviour: `schema`, `refine` (union-level cross-field check), `compile` (YAML → def),
- * `verify`, `needsKidPiece` (default `true`). Method syntax: bivariance lets a precise kind widen with no cast. */
+ * `verify`, `checksStimulus` (default `true`). Method syntax: bivariance lets a precise kind widen with no cast. */
 export interface ExerciseKindContent<D extends ExerciseDefBase, S extends z.ZodType> {
   readonly type: D['type'];
   readonly schema: S;
   refine?(raw: z.output<S>, ctx: z.RefinementCtx): void;
   compile(raw: z.output<S>, ctx: CompileContext): D | null;
   verify?(def: D, where: string, issues: string[]): void;
-  needsKidPiece?(def: D): boolean;
+  checksStimulus?(def: D): boolean;
   textKeys?(def: D): readonly TextKeyRef[];
 }
 

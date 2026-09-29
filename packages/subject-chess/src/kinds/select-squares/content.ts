@@ -123,7 +123,7 @@ export const selectSquares: ExerciseKindContent<SelectSquaresDef, typeof schema>
   verify,
   /** Explicit `squares` answer: a board-geometry question where a piece would only distract.
    * `derive`d answers still need a kid piece. */
-  needsKidPiece(def: SelectSquaresDef): boolean {
+  checksStimulus(def: SelectSquaresDef): boolean {
     return !('squares' in def.answer);
   },
 };

@@ -67,6 +67,8 @@ export interface SubjectContent {
   readonly demo: DemoContent;
   readonly badges: BadgesContent;
   readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
+  /** The mode a mini-game file without `mode` uses (chess: `static`); absent = every file must name its mode. */
+  readonly defaultMode?: string;
   /** Extra `dist/` files by name, each built from the content root (chess: `bot-book.json`). */
   readonly extraOutputs?: Readonly<Record<string, (root: string) => unknown>>;
   /** `all`: the already-compiled content, for domains only it bounds (chess: which characters need

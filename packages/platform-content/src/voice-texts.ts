@@ -85,16 +85,6 @@ function resolve(
 
 // Domains derived from content, never guessed.
 
-/** The piece a lesson character stands for, from the subject's own `characters` (one source,
- * `topicKey`, e.g. `piece.r`); `null` for a narrator-taught (Owl) character. */
-function characterPieceOf(
-  characters: SubjectContent['characters'],
-  character: string,
-): string | null {
-  const topicKey = characters[character]?.topicKey;
-  return topicKey?.startsWith('piece.') ? topicKey.slice('piece.'.length) : null;
-}
-
 /** An Owl-taught lesson is named by its own title; a piece character's first lesson is named by
  * the character; every later lesson of that character by its own title. */
 function lessonDisplayName(
@@ -106,8 +96,6 @@ function lessonDisplayName(
     ? resolve(locales, `characters:${lesson.character}.name`)
     : resolve(locales, lesson.titleKey);
 }
-
-const PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
 
 function addText(entries: Map<string, InventoryEntry>, text: string, source: string): void {
   if (text.trim() === '') return;
@@ -210,8 +198,7 @@ function collectUiTemplates(
     );
   }
 
-  // Play: locked computer level / locked mini-game / locked vs-friend messages, and the versus
-  // boss's own bot move / capture lines — the subject's own (chess: bot-level names, pieces).
+  // The subject's own narrated texts (chess: Play screen, versus boss, exercise notes).
   subject.voiceTemplates(
     (text, source) => {
       addText(entries, text, source);
@@ -219,45 +206,6 @@ function collectUiTemplates(
     (key, vars) => resolve(locales, key, vars),
     content,
   );
-
-  // `unlockLabel`: the piece word for a piece character's first lesson, else the lesson's title.
-  const firstLessonOfCharacter = new Map<string, string>();
-  for (const lesson of content.lessons) {
-    if (!firstLessonOfCharacter.has(lesson.character)) {
-      firstLessonOfCharacter.set(lesson.character, lesson.id);
-    }
-  }
-  for (const lesson of content.lessons) {
-    const piece = characterPieceOf(subject.characters, lesson.character);
-    const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
-    const label =
-      piece !== null && isFirstOfCharacter
-        ? resolve(locales, `piece.${piece}`)
-        : resolve(locales, lesson.titleKey);
-    addText(entries, resolve(locales, 'play.locked-condition', { label }), 'play');
-  }
-  for (const minigame of content.minigames) {
-    addText(
-      entries,
-      resolve(locales, 'play.locked-condition', { label: resolve(locales, minigame.titleKey) }),
-      'play',
-    );
-  }
-  addText(entries, resolve(locales, 'play.vs-friend-locked'), 'play');
-
-  // Versus boss (Pawn Wars, …): kid-captured / result lines (bot move/capture: voiceTemplates above).
-  for (const piece of PIECE_TYPES) {
-    addText(
-      entries,
-      resolve(locales, 'boss.versus.kid-captured', {
-        piece: resolve(locales, `board.piece.${piece}`),
-      }),
-      'versus-boss',
-    );
-  }
-  addText(entries, resolve(locales, 'boss.versus.won'), 'versus-boss');
-  addText(entries, resolve(locales, 'boss.versus.draw'), 'versus-boss');
-  addText(entries, resolve(locales, 'boss.versus.lost'), 'versus-boss');
 
   addText(entries, resolve(locales, 'assessment.fail-body'), 'assessment');
   for (const lesson of content.lessons) {
@@ -286,9 +234,8 @@ function collectUiTemplates(
   addText(entries, resolve(locales, 'placement.offer-question'), 'placement');
   addText(entries, resolve(locales, 'placement.summary-none-body'), 'placement');
   addText(entries, resolve(locales, 'placement.summary-all-body'), 'placement');
-  const basicsWorldCount =
-    catalog.tracks.find((track) => track.id === 'basics')?.worlds.length ?? 0;
-  for (let passedCount = 1; passedCount < basicsWorldCount; passedCount++) {
+  const mainWorldCount = catalog.tracks.find((track) => track.kind === 'main')?.worlds.length ?? 0;
+  for (let passedCount = 1; passedCount < mainWorldCount; passedCount++) {
     addText(
       entries,
       resolve(locales, 'placement.summary-passed-body', { count: passedCount }),
@@ -311,8 +258,6 @@ function collectUiTemplates(
     'notice.five-minutes',
     'practice.owl-line',
     'den.owl-line',
-    'play.owl-line',
-    'friend-play.setup-owl-line',
     'first-run.welcome.owl',
   ]) {
     addText(entries, resolve(locales, key), 'owl-line');

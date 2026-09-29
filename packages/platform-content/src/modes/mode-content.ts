@@ -51,7 +51,7 @@ export interface MiniGameModeContent<G extends MiniGameBase, S extends z.ZodType
   exercises?(game: G): readonly ExerciseDefBase[];
 }
 
-/** What every mode's file shares for the generic loader: `mode` picks the mode (absent = `static`). */
+/** What every mode's file shares for the generic loader: `mode` picks the mode (absent = the subject's `defaultMode`). */
 export interface MiniGameYamlBase {
   readonly mode?: string;
 }

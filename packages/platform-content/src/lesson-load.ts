@@ -91,7 +91,11 @@ function compileMiniGameFile(
   const data = loaded.data;
 
   const ctx = makeMiniGameCompileContext(relPath, content.kinds, content.stimulus, issues);
-  const mode = data.mode ?? 'static';
+  const mode = data.mode ?? content.defaultMode;
+  if (mode === undefined) {
+    issues.push(`${relPath}: mode: required (the subject has no default mode)`);
+    return null;
+  }
   return content.modes[mode]?.compile(data, ctx) ?? null;
 }
 
@@ -106,7 +110,7 @@ function checkExerciseSemantics(
 ): void {
   checkTextKey(exercise.textKey, locales, where, issues);
   const kind = content.kinds[exercise.type];
-  if (kind?.needsKidPiece?.(exercise) ?? true) {
+  if (kind?.checksStimulus?.(exercise) ?? true) {
     content.stimulus.check?.(exercise, { where, issues });
   }
   for (const ref of kind?.textKeys?.(exercise) ?? []) {
