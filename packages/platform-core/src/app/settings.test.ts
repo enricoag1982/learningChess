@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import { makeSettingsRepo, makeDeps as buildDeps } from '@learn/platform-core/testing';
-import { getProfileSettings, updateProfileSettings } from '@learn/platform-core/app/settings';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
-import type { AppSettings } from '@learn/platform-core/app/ports';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
+import { makeSettingsRepo, makeDeps as buildDeps } from '../testing/index.ts';
+import { getProfileSettings, updateProfileSettings } from './settings.ts';
+import type { AppDeps } from './use-cases.ts';
+import type { AppSettings } from './ports.ts';
 
 function makeDeps(initialSettings: AppSettings): AppDeps {
   return buildDeps({ settings: makeSettingsRepo(initialSettings) });

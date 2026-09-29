@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
-import type { Lesson } from '@learn/platform-core/domain/lesson';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { LessonProgress, MiniGameProgress } from '@learn/platform-core/domain/progress';
+import type { Track, TracksCatalog, World } from '../domain/journey.ts';
+import type { Lesson } from '../domain/lesson.ts';
+import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
 import {
   makeProgressRepo as buildProgressRepo,
   makeExercise,
@@ -11,10 +11,10 @@ import {
   makeMiniGame as buildMiniGame,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
-import { loadJourney } from '@learn/platform-core/app/journey';
-import type { ContentSource } from '@learn/platform-core/app/ports';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from '../testing/index.ts';
+import { loadJourney } from './journey.ts';
+import type { ContentSource } from './ports.ts';
+import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 

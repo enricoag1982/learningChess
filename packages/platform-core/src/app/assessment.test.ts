@@ -1,19 +1,19 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AssessmentScope } from '@learn/platform-core/domain/assessment';
-import { scorePlacementWorld, scoreTestOut } from '@learn/platform-core/domain/assessment';
-import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
+import type { AssessmentScope } from '../domain/assessment.ts';
+import { scorePlacementWorld, scoreTestOut } from '../domain/assessment.ts';
+import type { Track, TracksCatalog, World } from '../domain/journey.ts';
 import {
   makeAssessmentRepo as buildAssessmentRepo,
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
-import { loadUnlocked, parentUnlock, submitAssessment } from '@learn/platform-core/app/assessment';
-import { loadJourney } from '@learn/platform-core/app/journey';
-import type { AssessmentRepository, ContentSource } from '@learn/platform-core/app/ports';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from '../testing/index.ts';
+import { loadUnlocked, parentUnlock, submitAssessment } from './assessment.ts';
+import { loadJourney } from './journey.ts';
+import type { AssessmentRepository, ContentSource } from './ports.ts';
+import type { AppDeps } from './use-cases.ts';
 
 function makeLesson(
   id: string,

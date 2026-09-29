@@ -4,7 +4,7 @@ import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
-} from '@learn/platform-core/testing';
+} from '../testing/index.ts';
 import {
   easierVariant,
   isSkippablePhase,
@@ -12,7 +12,7 @@ import {
   phaseEndIndex,
   shouldOfferEasier,
   stepPhase,
-} from '@learn/platform-core/domain/lesson-session';
+} from './lesson-session.ts';
 
 function makeExercise(id: string) {
   return buildExercise({ id });

@@ -4,15 +4,11 @@ import {
   makeExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
-} from '@learn/platform-core/testing';
-import type { Lesson, MiniGame } from '@learn/platform-core/domain/lesson';
-import {
-  newLessonProgress,
-  recordBossStars,
-  recordExerciseStars,
-} from '@learn/platform-core/domain/progress';
-import type { LessonProgress } from '@learn/platform-core/domain/progress';
-import { unlockedMiniGames } from '@learn/platform-core/domain/play';
+} from '../testing/index.ts';
+import type { Lesson, MiniGame } from './lesson.ts';
+import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
+import type { LessonProgress } from './progress.ts';
+import { unlockedMiniGames } from './play.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 

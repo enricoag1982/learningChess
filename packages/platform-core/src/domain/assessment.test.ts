@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  makeExercise as buildExercise,
-  makeLesson as buildLesson,
-} from '@learn/platform-core/testing';
+import { makeExercise as buildExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import {
   newAssessmentResult,
   newUnlock,
@@ -12,9 +9,9 @@ import {
   planTestOutWorld,
   scorePlacementWorld,
   scoreTestOut,
-} from '@learn/platform-core/domain/assessment';
-import type { TracksCatalog, Track, World } from '@learn/platform-core/domain/journey';
-import { seededRandom } from '@learn/platform-core/domain/random';
+} from './assessment.ts';
+import type { TracksCatalog, Track, World } from './journey.ts';
+import { seededRandom } from './random.ts';
 
 function makeLesson(id: string, world: string, order: number, exerciseCount: number) {
   return buildLesson({

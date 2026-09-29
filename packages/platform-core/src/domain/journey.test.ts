@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise, makeLesson as buildLesson } from '@learn/platform-core/testing';
+import { makeExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import {
   HABITATS,
   currentRank,
@@ -14,14 +14,10 @@ import {
   type Track,
   type TracksCatalog,
   type World,
-} from '@learn/platform-core/domain/journey';
-import type { Lesson } from '@learn/platform-core/domain/lesson';
-import type { LessonProgress, MiniGameProgress } from '@learn/platform-core/domain/progress';
-import {
-  newLessonProgress,
-  recordBossStars,
-  recordExerciseStars,
-} from '@learn/platform-core/domain/progress';
+} from './journey.ts';
+import type { Lesson } from './lesson.ts';
+import type { LessonProgress, MiniGameProgress } from './progress.ts';
+import { newLessonProgress, recordBossStars, recordExerciseStars } from './progress.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 

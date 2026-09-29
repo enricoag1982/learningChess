@@ -1,24 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import type { SessionLog } from '@learn/platform-core/domain/session-log';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
+import type { SessionLog } from '../domain/session-log.ts';
 import {
   makeRewardsRepo as buildRewardsRepo,
   makeClock,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
+} from '../testing/index.ts';
 import {
   checkActivityGate,
   grantExtraTime,
   grantHoursOverride,
   markTimeWarning,
-} from '@learn/platform-core/app/time-limit';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
-import type {
-  AppSettings,
-  RewardsRepository,
-  SettingsRepository,
-} from '@learn/platform-core/app/ports';
+} from './time-limit.ts';
+import type { AppDeps } from './use-cases.ts';
+import type { AppSettings, RewardsRepository, SettingsRepository } from './ports.ts';
 
 const NOW = new Date(2026, 0, 5, 10, 0, 0); // 2026-01-05, local
 

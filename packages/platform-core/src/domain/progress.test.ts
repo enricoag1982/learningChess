@@ -4,7 +4,7 @@ import {
   makeProgress,
   makeExercise as buildExercise,
   makeLesson as buildLesson,
-} from '@learn/platform-core/testing';
+} from '../testing/index.ts';
 import {
   lessonStars,
   lessonStatus,
@@ -15,7 +15,7 @@ import {
   withoutSkippedPhase,
   withResumeStep,
   withSkippedPhase,
-} from '@learn/platform-core/domain/progress';
+} from './progress.ts';
 
 function makeExercise(id: string) {
   return buildExercise({ id });

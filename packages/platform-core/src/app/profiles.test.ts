@@ -5,7 +5,7 @@ import {
   makeGameRecordRepo,
   makeRewardsRepo,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
+} from '../testing/index.ts';
 import {
   changeAvatar,
   changeParentPassword,
@@ -19,9 +19,9 @@ import {
   selectProfile,
   setupParentPassword,
   verifyParentPassword,
-} from '@learn/platform-core/app/profiles';
-import type { PasswordFileWriter } from '@learn/platform-core/app/ports';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from './profiles.ts';
+import type { PasswordFileWriter } from './ports.ts';
+import type { AppDeps } from './use-cases.ts';
 
 /** This app writes to "Downloads" (app-structure.md §2); the kit's own fake location format
  * ("fake/…") is generic, so this test keeps its own. */

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise as buildExercise, makeLesson } from '@learn/platform-core/testing';
-import { seededRandom } from '@learn/platform-core/domain/random';
-import type { ConceptPoolEntry, ConceptStats } from '@learn/platform-core/domain/review';
+import { makeExercise as buildExercise, makeLesson } from '../testing/index.ts';
+import { seededRandom } from './random.ts';
+import type { ConceptPoolEntry, ConceptStats } from './review.ts';
 import {
   accuracy,
   applyReviewResult,
@@ -14,7 +14,7 @@ import {
   newConceptStats,
   pickPracticeTasks,
   pickWarmUp,
-} from '@learn/platform-core/domain/review';
+} from './review.ts';
 
 function makeExercise(id: string, concept: string) {
   return buildExercise({ id, concept });

@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise, makeLesson as buildLesson } from '@learn/platform-core/testing';
-import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
-import type { Lesson } from '@learn/platform-core/domain/lesson';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { LessonProgress } from '@learn/platform-core/domain/progress';
-import { animalFriends, rankLadder } from '@learn/platform-core/domain/rewards';
-import type { SubjectCore } from '@learn/platform-core/domain/subject';
+import { makeExercise, makeLesson as buildLesson } from '../testing/index.ts';
+import type { Track, TracksCatalog, World } from './journey.ts';
+import type { Lesson } from './lesson.ts';
+import { newLessonProgress, recordExerciseStars } from './progress.ts';
+import type { LessonProgress } from './progress.ts';
+import { animalFriends, rankLadder } from './rewards.ts';
+import type { SubjectCore } from './subject.ts';
 
 const NOW = new Date('2026-01-01T00:00:00.000Z');
 

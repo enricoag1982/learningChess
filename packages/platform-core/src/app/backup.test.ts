@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import { newProfile } from '@learn/platform-core/domain/profile';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { GameRecord, LessonProgress } from '@learn/platform-core/domain/progress';
-import type { AppConfig } from '@learn/platform-core/domain/subject';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
+import { newProfile } from '../domain/profile.ts';
+import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import type { GameRecord, LessonProgress } from '../domain/progress.ts';
+import type { AppConfig } from '../domain/subject.ts';
 import {
   makeGameRecordRepo,
   makeProfileRepo,
@@ -18,7 +18,7 @@ import {
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
+} from '../testing/index.ts';
 import {
   BackupValidationError,
   backupFileName,
@@ -27,9 +27,9 @@ import {
   exportBackup,
   importBackup,
   parseBackupFile,
-} from '@learn/platform-core/backup';
-import type { BackupFile } from '@learn/platform-core/backup';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from './backup.ts';
+import type { BackupFile } from './backup.ts';
+import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 

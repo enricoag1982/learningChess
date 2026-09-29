@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import { newProfile } from '@learn/platform-core/domain/profile';
-import type { Profile } from '@learn/platform-core/domain/profile';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { LessonProgress } from '@learn/platform-core/domain/progress';
-import { newEarnedBadge } from '@learn/platform-core/domain/badges';
-import type { EarnedBadge } from '@learn/platform-core/domain/badges';
-import type { BackupFile } from '@learn/platform-core/backup';
-import type { BackupImporter } from '@learn/platform-core/app/ports';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
+import { newProfile } from '../domain/profile.ts';
+import type { Profile } from '../domain/profile.ts';
+import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import type { LessonProgress } from '../domain/progress.ts';
+import { newEarnedBadge } from '../domain/badges.ts';
+import type { EarnedBadge } from '../domain/badges.ts';
+import type { BackupFile } from './backup.ts';
+import type { BackupImporter } from './ports.ts';
 import {
   makeProfileRepo,
   makeProgressRepo as buildProgressRepo,
@@ -19,9 +19,9 @@ import {
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
-import { importMerged, planImport, previewChildChange } from '@learn/platform-core/merge';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from '../testing/index.ts';
+import { importMerged, planImport, previewChildChange } from './merge.ts';
+import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 

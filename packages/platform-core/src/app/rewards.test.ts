@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import type { BadgeDef, EarnedBadge } from '@learn/platform-core/domain/badges';
-import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { Attempt, GameRecord, LessonProgress } from '@learn/platform-core/domain/progress';
+import type { BadgeDef, EarnedBadge } from '../domain/badges.ts';
+import type { Track, TracksCatalog, World } from '../domain/journey.ts';
+import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import type { Attempt, GameRecord, LessonProgress } from '../domain/progress.ts';
 import {
   makeClock,
   makeGameRecordRepo,
@@ -14,8 +14,8 @@ import {
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
-import type { ContentSource, RewardsRepository } from '@learn/platform-core/app/ports';
+} from '../testing/index.ts';
+import type { ContentSource, RewardsRepository } from './ports.ts';
 import {
   buildBadgeFacts,
   checkRewards,
@@ -24,8 +24,8 @@ import {
   recordDailyActivity,
   recordSessionMinutes,
   starsToday,
-} from '@learn/platform-core/app/rewards';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from './rewards.ts';
+import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-05T12:00:00.000Z'); // a Monday
 
@@ -208,7 +208,7 @@ describe('buildBadgeFacts', () => {
       progress: makeProgressRepo([progress]),
     });
 
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
 
@@ -244,7 +244,7 @@ describe('buildBadgeFacts', () => {
       }),
     ];
     const deps = baseDeps({ progress: makeProgressRepo([], attempts) });
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
 
@@ -265,7 +265,7 @@ describe('buildBadgeFacts', () => {
       makeAttempt({ review: true, reviewSource: 'practice' }),
     ];
     const deps = baseDeps({ progress: makeProgressRepo([], attempts) });
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
     expect(facts.warmupsCompleted).toBe(2);
@@ -278,7 +278,7 @@ describe('buildBadgeFacts', () => {
       makeAttempt({ stars: 3, errors: 0 }), // solved cleanly: does not count
     ];
     const deps = baseDeps({ progress: makeProgressRepo([], attempts) });
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const facts = await buildBadgeFacts(deps, 'p1', journey, 0);
     expect(facts.comebackCount).toBe(1);
@@ -310,7 +310,7 @@ describe('evaluateAndRecordBadges', () => {
       rewards,
     });
 
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const earned = await evaluateAndRecordBadges(deps, 'p1', journey, 0, NOW);
 
@@ -320,7 +320,7 @@ describe('evaluateAndRecordBadges', () => {
 
   it('returns [] when the content has no badges wired up', async () => {
     const deps = baseDeps({ content: makeContent([]) });
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     expect(await evaluateAndRecordBadges(deps, 'p1', journey, 0, NOW)).toEqual([]);
   });
@@ -348,7 +348,7 @@ describe('evaluateAndRecordBadges', () => {
       content: makeContent([], [badge]),
       gameRecords: makeGameRecordRepo([record]),
     });
-    const { loadJourney } = await import('@learn/platform-core/app/journey');
+    const { loadJourney } = await import('./journey.ts');
     const journey = await loadJourney(deps, 'p1');
     const earned = await evaluateAndRecordBadges(deps, 'p1', journey, 0, NOW);
     expect(earned.map((b) => b.badgeId)).toEqual(['mouse-tamer']);

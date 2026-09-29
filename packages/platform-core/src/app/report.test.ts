@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import type { AssessmentResult } from '@learn/platform-core/domain/assessment';
-import type { EarnedBadge } from '@learn/platform-core/domain/badges';
-import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
-import { newProfile } from '@learn/platform-core/domain/profile';
-import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
-import type { GameRecord, LessonProgress } from '@learn/platform-core/domain/progress';
-import type { ConceptStats } from '@learn/platform-core/domain/review';
-import type { SessionLog } from '@learn/platform-core/domain/session-log';
-import type { Streak } from '@learn/platform-core/domain/streak';
+import type { AssessmentResult } from '../domain/assessment.ts';
+import type { EarnedBadge } from '../domain/badges.ts';
+import type { Track, TracksCatalog, World } from '../domain/journey.ts';
+import { newProfile } from '../domain/profile.ts';
+import { composeDefaultSettings } from '../domain/profile-settings.ts';
+import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import type { GameRecord, LessonProgress } from '../domain/progress.ts';
+import type { ConceptStats } from '../domain/review.ts';
+import type { SessionLog } from '../domain/session-log.ts';
+import type { Streak } from '../domain/streak.ts';
 import {
   makeProfileRepo,
   makeProgressRepo as buildProgressRepo,
@@ -20,10 +20,10 @@ import {
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '@learn/platform-core/testing';
-import { buildChildOverview, buildChildReport } from '@learn/platform-core/app/report';
-import type { AppSettings, ContentSource, RewardsRepository } from '@learn/platform-core/app/ports';
-import type { AppDeps } from '@learn/platform-core/app/use-cases';
+} from '../testing/index.ts';
+import { buildChildOverview, buildChildReport } from './report.ts';
+import type { AppSettings, ContentSource, RewardsRepository } from './ports.ts';
+import type { AppDeps } from './use-cases.ts';
 
 const NOW = new Date('2026-01-10T12:00:00.000Z');
 
