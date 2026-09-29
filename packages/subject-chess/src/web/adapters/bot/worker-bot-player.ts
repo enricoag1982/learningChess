@@ -3,15 +3,23 @@ import type { BotPlayer } from '../../../core/app/bot-player.ts';
 import type { Move } from '../../../core/chess/rules.ts';
 import { chessJsRules } from '../../../core/chess/chessjs-rules.ts';
 import { bot } from '../../../chess.ts';
-import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
-function chooseMoveInThread(state: game.GameState, level: number, seed: number): Move | null {
+/** In-thread fallback: search and opening book load on first use (lazy chunks). */
+async function chooseMoveInThread(
+  state: game.GameState,
+  level: number,
+  seed: number,
+): Promise<Move | null> {
   const botLevel = bot.BOT_LEVELS.find((entry) => entry.level === level);
   if (botLevel === undefined) {
     throw new Error(`worker-bot-player: unknown bot level ${String(level)}`);
   }
-  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
+  const [{ chooseMove }, { botBook }] = await Promise.all([
+    import('../../../core/bot/search.ts'),
+    import('./book.ts'),
+  ]);
+  return chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
 }
 
 /** `BotPlayer` backed by a module Web Worker, so a Bear-depth search never blocks the UI thread.
@@ -20,7 +28,7 @@ export function createWorkerBotPlayer(): BotPlayer {
   if (typeof Worker === 'undefined') {
     return {
       chooseMove(state, level, seed) {
-        return Promise.resolve(chooseMoveInThread(state, level, seed));
+        return chooseMoveInThread(state, level, seed);
       },
     };
   }

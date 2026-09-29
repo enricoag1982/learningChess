@@ -1,4 +1,5 @@
 import { bot, game } from '../src/chess.ts';
+import { chooseMove } from '../src/core/bot/search.ts';
 import { chessJsRules } from '../src/core/chess/chessjs-rules.ts';
 import { parseFen } from '../src/core/chess/fen.ts';
 import type { GameRulesDef } from '../src/core/game/types.ts';
@@ -47,7 +48,7 @@ function playOne(higher: BotLevel, lower: BotLevel, seed: number, higherColor: C
     const isHigherToMove = state.position.toMove === higherColor;
     const level = isHigherToMove ? higher : lower;
     const random = isHigherToMove ? higherRandom : lowerRandom;
-    const move = bot.chooseMove(state, level, chessJsRules, random);
+    const move = chooseMove(state, level, chessJsRules, random);
     if (move === null) {
       // No legal move outside checkmate/stalemate/draw (already handled above) should not happen
       // in a real game of chess; treat it as a loss for whichever side is stuck rather than crash.

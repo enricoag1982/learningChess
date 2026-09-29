@@ -1,6 +1,7 @@
 import type { game } from '../../../chess.ts';
 import type { Move } from '../../../core/chess/rules.ts';
 import { bot, chessJsRules } from '../../../bot-worker.ts';
+import { chooseMove as searchMove } from '../../../core/bot/search.ts';
 import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
@@ -13,7 +14,7 @@ function chooseMove(state: game.GameState, level: number, seed: number): Move | 
   if (botLevel === undefined) {
     throw new Error(`bot.worker: unknown bot level ${String(level)}`);
   }
-  return bot.chooseMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
+  return searchMove(state, botLevel, chessJsRules, bot.seededRandom(seed), botBook);
 }
 
 ctx.onmessage = (event: MessageEvent<BotRequest>) => {

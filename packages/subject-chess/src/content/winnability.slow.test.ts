@@ -1,6 +1,7 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bot, game } from '../chess.ts';
+import { chooseMove } from '../core/bot/search.ts';
 import { chessJsRules } from '../core/chess/chessjs-rules.ts';
 import type { CompiledContent, VersusMiniGame } from '../core/chess/lesson.ts';
 
@@ -64,7 +65,7 @@ function simulateVersusGame(minigame: VersusMiniGame, seed: number, kidLevel: Bo
     const isKid = state.position.toMove === minigame.kidColor;
     const level = isKid ? kidLevel : opponentLevel;
     const random = isKid ? kidRandom : opponentRandom;
-    const move = bot.chooseMove(state, level, chessJsRules, random);
+    const move = chooseMove(state, level, chessJsRules, random);
     if (move === null) {
       return { outcome: 'stuck', kidMoves };
     }
