@@ -3,7 +3,7 @@
 Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-structure.md), [architecture.md](architecture.md).
 
 Two groups of entities:
-- **Content** (static, authored in `packages/content`, read-only at runtime).
+- **Content** (static, authored in `packages/subject-chess/content`, read-only at runtime).
 - **Profile data** (per child, stored via repositories).
 
 ## 1. Content entities
@@ -177,7 +177,7 @@ Not built (future idea): a "world test" (mixed tasks from every concept of an al
   kid was headed to; **Switch player** (picker) or **Parent: more time** (password →
   `grantExtraTime`, +`EXTRA_TIME_GRANT_MINUTES` (15) today, repeatable) resumes the exact activity
   the gate blocked, unchecked. What counts: foreground time with a kid profile active (lessons,
-  practice, play, Home/Journey/Den browsing), tracked client-side (`apps/web`'s `TimeTracker`) —
+  practice, play, Home/Journey/Den browsing), tracked client-side (`packages/platform-web`'s `TimeTracker`) —
   paused while the page is hidden or idle > 2 min without input, added to `SessionLog.minutes` once
   per real minute. Resets at local midnight: `isOverLimit`/`timeUsedToday` read a stale (not-today)
   log as "nothing played yet", no explicit reset step needed.
@@ -197,6 +197,8 @@ Not built (future idea): a "world test" (mixed tasks from every concept of an al
 
 ## 4. Use cases (app layer)
 
+`app/…`, `domain/…` = `packages/platform-core/src/`; `core/…` = `packages/subject-chess/src/`.
+
 | Area | Use cases |
 |---|---|
 | Profiles | `createProfile`, `selectProfile`, `renameProfile`, `changeAvatar`, `deleteProfile`, `resetProfileData` (cascades progress/attempts/concept stats/mini-game progress/game records/rewards, keeps the profile itself) |
@@ -204,13 +206,13 @@ Not built (future idea): a "world test" (mixed tasks from every concept of an al
 | Report (`app/report.ts`) | `buildChildOverview` (Overview card), `buildChildReport` (full per-child report incl. the minutes-per-day chart's limit line and the active time-controls rules); `minutesByDay` (`app/rewards.ts`) backs both |
 | Time limit (`app/time-limit.ts`) | `checkActivityGate` (reads settings + today's `SessionLog`, reports `overLimit`/`usedMinutes`/`limitMinutes`/`extraMinutes`/`reason` (`'limit'`\|`'late'`\|`'early'`\|`null`)/`remainingMinutes`), `grantExtraTime` (+`EXTRA_TIME_GRANT_MINUTES`, repeatable), `grantHoursOverride` (allows `HOURS_OVERRIDE_MINUTES` from now, resets not sums), `markTimeWarning`; domain (`domain/session-log.ts`, `domain/time-policy.ts`): `limitForDay`, `timeUsedToday`, `isOverLimit`, `grantExtraMinutes`, `setHoursOverride`, `markWarned`, `allowedHoursReason`, `minutesUntilEnd`, `shouldWarn` (all pure, clock-driven); `starsToday` (`app/rewards.ts`) backs the "See you tomorrow" screen |
 | Backup (`app/backup.ts`) | `buildBackupFile`/`exportBackup` (one profile or every profile), `parseBackupFile` (validate), `buildShareFile`/`shareFileName` ("Send to other device" — same JSON, a different filename, returned instead of written) |
-| Device sharing (`app/merge.ts`, behind `@chess-kids/core/merge`; pure rules in `domain/merge.ts`) | `planImport` (per-child auto-merge/choice + default), `previewChildChange` (a choice's own stars/badges/minutes-this-week delta), `importMerged` (folds the chosen children into this device's full current data, writes atomically via `BackupImporter.writeMerged`); `getOrCreateDeviceId` (`app/device.ts`) |
+| Device sharing (`app/merge.ts`, behind `@learn/platform-core/merge`; pure rules in `domain/merge.ts`) | `planImport` (per-child auto-merge/choice + default), `previewChildChange` (a choice's own stars/badges/minutes-this-week delta), `importMerged` (folds the chosen children into this device's full current data, writes atomically via `BackupImporter.writeMerged`); `getOrCreateDeviceId` (`app/device.ts`) |
 | Assessment | `loadUnlocked`, `submitAssessment`, `parentUnlock` (`app/assessment.ts`); domain (`domain/assessment.ts`): `planTestOutLesson`, `planTestOutWorld`, `planPlacement`, `scoreTestOut`, `scorePlacementWorld` |
 | Session | `loadTodaySession`/`planTodaySession` (§3.3 order), `loadWarmUp`, `loadPracticeTasks`, `recordReviewResult` (box move); `recordExerciseResult`/`recordAttempt` also fold into `ConceptStats` (§3.1) |
 | Exercise | `startExercise`, `submitMove`, `submitAnswer`, `requestHint`, `completeExercise` |
 | Games | `startMiniGame`, `playMove`, `finishGame` |
-| Full game | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (domain, `domain/bot/hint.ts`) |
-| Friend play | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`domain/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
+| Full game | `recordGame`, `loadGameRecords`, `computerLevelStatus` (per-level locked/condition or unlocked + wins/games); `mateHint` (`core/bot/hint.ts`) |
+| Friend play | `friendGameOptions` (unlocked games for the setup sheet), `recordLocalMatch` (one `GameRecord` per profile involved, guest excluded); domain (`core/game`): `startLocalMatch`, `playLocalMove`, `canTakeBack`/`takeBack`, `localMatchResult` — the same variant rules a `versus` boss plays against the bot, minus every bot concern |
 | Rewards | `checkRewards` (the one call every activity choke point makes: folds today into the streak, then evaluates + persists new badges — permissive no-op without `AppDeps.rewards`/`ContentSource.catalog()`); `evaluateAndRecordBadges`, `buildBadgeFacts`, `recordDailyActivity`, `recordSessionMinutes` (`app/rewards.ts`) |
 
 ## 5. Ports
@@ -234,14 +236,13 @@ Not built (future idea): a "world test" (mixed tasks from every concept of an al
 ## 6. Content files
 
 ```
-packages/content/
+packages/subject-chess/content/
   tracks.yaml                  tracks, worlds, habitats, ranks
-  characters.yaml
   bot-book.yaml                opening book (computer-opponent.md §2); bot levels are TS, not content
   badges.yaml                  badge catalogue
   lessons/<world>/<lesson>.yaml
   minigames/<id>.yaml
-  locales/<lang>/*.yaml        text by key
+  locales/<lang>/*.yaml        text by key (chess); platform's own: packages/platform-content/locales/
 ```
 
 Optional, default when absent: exercise `text` ← `id`; lesson `world` ← folder name; `title`/`story` ← `<id>.title`/`<id>.story`; demo `text` ← `<id>.demo`; mini-game `title`/`goal` ← `<id>.title`/`<id>.goal`; `stars2` ← `stars3 + 1`.

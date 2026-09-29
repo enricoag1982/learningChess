@@ -12,11 +12,11 @@ is never narrated. Size budget: ≤ 25 MB English (`non-functional.md` §1's ≤
 
 | Output | Path |
 |---|---|
-| Inventory (build input) | `packages/content/dist/voice-texts.json` (gitignored) |
-| Audio | `apps/web/public/audio/en/<key>.mp3` (committed) |
-| Manifest | `apps/web/public/audio/en/manifest.json` (`{ config, entries: { <key>: { text, ms } } }`, committed) |
+| Inventory (build input) | `packages/subject-chess/dist/voice-texts.json` (gitignored) |
+| Audio | `apps/chess-kids/public/audio/en/<key>.mp3` (committed) |
+| Manifest | `apps/chess-kids/public/audio/en/manifest.json` (`{ config, entries: { <key>: { text, ms } } }`, committed) |
 
-`key` = first 16 hex of `sha256(normalizeVoiceText(text))` (`packages/core/src/domain/voice-text.ts`).
+`key` = first 16 hex of `sha256(normalizeVoiceText(text))` (`packages/platform-core/src/domain/voice-text.ts`).
 
 ## 2. Config
 
@@ -26,7 +26,7 @@ is never narrated. Size budget: ≤ 25 MB English (`non-functional.md` §1's ≤
 ## 3. Regenerate
 
 ```sh
-pnpm --filter @chess-kids/content voice-texts   # dist/voice-texts.json + report
+pnpm --filter @learn/subject-chess voice-texts   # dist/voice-texts.json + report
 python3 tools/voice/generate.py                 # public/audio/en/*.mp3 + manifest.json (--limit N for a sample)
 pnpm voice:generate                             # root wrapper: both commands above, in order
 pnpm voice:check                                # CI "Voice coverage" step: inventory vs. manifest
@@ -39,13 +39,13 @@ a key already generated under the same config, prunes files no longer inventorie
 to 2 (`--threads`); full run, 4-core machine: roughly 1–2 h. `voice:check` fails (names the missing
 texts) on any inventory key without audio, warns (does not fail) on an orphan manifest entry.
 
-**Adding a language:** `packages/content/locales/<lang>/` (same keys as `en`) + that language's
-Kokoro voice/`lang` in `config.json` → commands above, output to `apps/web/public/audio/<lang>/`
+**Adding a language:** `packages/subject-chess/content/locales/<lang>/` (same keys as `en`) + that language's
+Kokoro voice/`lang` in `config.json` → commands above, output to `apps/chess-kids/public/audio/<lang>/`
 (`createAudioNarrator` takes `baseUrl` per language).
 
 ## 4. Fallback rules
 
-Per call (never the whole session), `audio-narrator.ts` falls back to Web Speech (device voice)
+Per call (never the whole session), `audio-narrator.ts` (`platform-web`) falls back to Web Speech (device voice)
 when: no manifest entry for the key; manifest missing/unreachable/malformed; no `AudioContext`; mp3
 fetch/`decodeAudioData` fails; or a `suspended` `AudioContext` whose `resume()` doesn't settle to
 `'running'` within 300 ms for that call. A newer `speak`/`cancel` invalidates any in-flight
@@ -56,8 +56,8 @@ inside `touchend`/`click`: the unlock listener covers all four gesture types, ke
 
 An exercise's (or series-boss round's) instruction is spoken once, when it starts. Each feedback
 note (hint/error/praise/…) after that is spoken alone, as its own utterance — never with the
-instruction re-read first (`useInstructionNarration`, `apps/web/src/ui/useNarratedText.ts`, on top of
-`speakSequence`, `apps/web/src/ui/`; owner report 2026-09-26: submit re-read the whole instruction).
+instruction re-read first (`useInstructionNarration` in `packages/platform-web/src/ui/ds/useNarratedText.ts`, on top of
+`speakSequence` in the same folder; owner report 2026-09-26: submit re-read the whole instruction).
 A note arriving while the instruction is still being read waits for it to finish rather than cutting
 it off. "Say it again" replays the instruction + current note together, from the top. A newer
 sequence (or an explicit cancel) stops whatever is currently playing before its next text starts.
@@ -72,7 +72,7 @@ sentence, showing "Recorded voice ✓" or the fallback reason (`ChildSettings.ts
 
 ## 7. Offline size
 
-`apps/web/scripts/check-size.ts` (`pnpm size`) also sums every file the built service worker
+`apps/chess-kids/scripts/check-size.ts` (`pnpm size`) also sums every file the built service worker
 precaches (parsed from `dist/sw.js`'s `precacheAndRoute([...])`), fails above 50 MB
 (`non-functional.md` §1); the `audio/en/*` slice is reported separately.
 
@@ -81,4 +81,4 @@ precaches (parsed from `dist/sw.js`'s `precacheAndRoute([...])`), fails above 50
 Never in generated audio. `speak(text)` looks up `stripNickname(text, nickname)` (name + one
 adjacent `, `/` ,`/space, word-boundary safe); `setNickname` wired wherever the active profile is
 set. A miss still passes the *original* text to the fallback (Web Speech has no such limit;
-subtitles already show the name). `packages/content`'s inventory applies the same rule to templates.
+subtitles already show the name). `packages/platform-content/src/voice-texts.ts`'s inventory applies the same rule to templates.

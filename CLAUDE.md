@@ -1,6 +1,6 @@
 # Chess for Kids — project guide
 
-Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voice & art + M7 time controls & device sharing); planned: v4 platform refactor (`docs/refactor-v4.md`).
+Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voice & art + M7 time controls & device sharing); v4 platform refactor under way (`docs/refactor-v4.md`; R0–R4 done).
 
 ## Working style (user preferences)
 
@@ -11,6 +11,7 @@ Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voi
   - `model: "sonnet"`: implementation tasks with a clear spec (files, interfaces, tests to write).
   - `model: "haiku"`: running lint / typecheck / tests, mechanical edits, dependency checks.
   - Main agent: plans, writes precise task specs, reviews diffs, decides, commits.
+  - Agent specs: ≤ 3–4 commits and one concern per run; the lead decides interfaces and types in the spec; fast checks per commit, full e2e once at the end; prove every new lint / guard rule with a failing fixture (`docs/retrospective.md` §9).
 - Git workflow: see `CONTRIBUTING.md`. `master` only via PR; required check `quality`; 0 approvals; squash merge. Claude opens the PR (template), waits for `quality` green, then squash-merges. Branches from `master` (one per milestone / iteration); commit and push after each step; ask the user before merging a milestone PR unless merging was delegated. Each merged iteration: log row in `docs/validation.md` (checks run, manual checks) + squash title `M<N>.<i>: …` → CI creates annotated tag `m<N>.<i>` (session cannot push tags: HTTP 403).
 
 ## Docs (read the relevant one before working on an area)
@@ -36,15 +37,15 @@ Offline chess learning app for an 8-year-old beginner. Released `v2.0.0` (M6 voi
 
 - Offline app: no server; all data on device. v2 = offline time controls + device sharing by file with merge (owner 2026-09-25). Online (login, remote play, automatic sync) parked, hooks only.
 - TypeScript + React + Vite PWA; Capacitor later for Android / iPad. GitHub Pages hosts the static app.
-- Layers: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`. Content in YAML → Zod → JSON.
+- Packages (`packages/*`, `apps/*`): `@learn/platform-core` (pure TS: domain, use cases, ports); `@learn/platform-content` (YAML → Zod → JSON build); `@learn/platform-web` (React shell, adapters); `@learn/subject-chess` (chess pack: core, kinds, modes, content, web); app `@learn/chess-kids` (thin shell). Dependencies point only to earlier entries; platform never imports a subject (ESLint boundaries, `docs/architecture.md` §3).
 - Animal theme; English first (i18n); narration = Web Speech API (device voices) up to v1.1, pre-generated audio (Kokoro) from M6.
 - Parent code (UI term; not a real password) kept in a simple plain-text file; the code screen reminds where the file is (web: copy in Downloads, again via "Download parent code file" in the grown-ups area; store apps: editable file in app Documents). Daily time limit in v1.
 
 ## Status and next step
 
-- Done: M0–M7 (`m0` … `m7`), releases `v1.0.0`, `v1.1.0` (owner playtest 2), `v1.1.1` (iPad mini 4 / iOS 15 fix), `v2.0.0` (generated voice, Fluent 3D art, parent code, time controls, device sharing). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
-- Next: v4 learning-platform refactor (`docs/refactor-v4.md`; owner decisions §8 pending); follow-ups F4 (Bear strength), F5 (mate-in-2+ freeze outside a lesson step); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
-- Local: `pnpm install` · `pnpm dev` · `pnpm test` · `pnpm test:slow` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size`.
+- Done: M0–M7 (`m0` … `m7`), releases `v1.0.0`, `v1.1.0` (owner playtest 2), `v1.1.1` (iPad mini 4 / iOS 15 fix), `v2.0.0` (generated voice, Fluent 3D art, parent code, time controls, device sharing); M8 = v4 refactor, `m8.1` … `m8.23` (R0–R4: platform / subject package split). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
+- Next: v4 R4.5 trim, then R5 (math demo app, `v4.0.0`) (`docs/refactor-v4.md` §5); follow-up F4 (Bear strength); apply `docs/retrospective.md` §6 learnings. Release steps: `docs/release.md`.
+- Local: `pnpm install` (also builds the content JSON) · `pnpm dev` · `pnpm test` (one package: `pnpm --filter @learn/<pkg> test`) · `pnpm test:slow` · `pnpm lint` · `pnpm typecheck` · `pnpm format:check` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size` · `pnpm compat` · `pnpm voice:check`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
 - Content review rule: every select-squares / yes-no / choice / setup text is checked against its board so exactly one reading leads to the accepted answer (log it as check N). No distractor pieces: a piece the question is not about pulls the eye (playtest: "row closest to you" with a king in the middle was read as "squares closest to the king"); say "bottom row" / "top row", not "closest to you". Diagonals: every non-corner square sits on two; "tap the diagonal" only from a corner square, otherwise name which one ("from corner to corner", "the short one") (owner 2026-09-26).
 

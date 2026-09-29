@@ -1,7 +1,7 @@
 # Privacy Policy — Chess for Kids
 
 Same text as the in-app page (parent area → Privacy; linked from the first-run parent password
-screen). Source of truth for wording: `common:parent.privacy.*` (`packages/content/locales/en/common.yaml`).
+screen). Source of truth for wording: `common:parent.privacy.*` (`packages/platform-content/locales/en/common.yaml`).
 
 Chess for Kids keeps everything on this device. Here's exactly what that means.
 

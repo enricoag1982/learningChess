@@ -1,6 +1,6 @@
 # Computer Opponent — Chess for Kids
 
-Related: [domain-model.md](domain-model.md), [architecture.md](architecture.md).
+Related: [domain-model.md](domain-model.md), [architecture.md](architecture.md). Paths: `packages/subject-chess/` unless `packages/…`.
 
 ## 1. Goals
 
@@ -25,16 +25,16 @@ For every move, the level's profile picks one of three modes:
 Evaluation: material (P1 N3 B3 R5 Q9) + simple bonuses (centre, development, king safety, pawn advance). Level 5 adds a capture-sequence check at the end of the search.
 
 **Opening book:** before the mode roll, a level with `book: true` (Fox/Wolf/Bear) checks
-`packages/content/bot-book.yaml` — e4/d4 main lines, ≤ 6 plies, both colours (a line is a shared
+`content/bot-book.yaml` — e4/d4 main lines, ≤ 6 plies, both colours (a line is a shared
 move sequence; whoever is to move at a given ply plays it, not "White's" or "Black's" book).
-`domain/bot/book.ts`'s `bookCandidates` matches the game's own SAN history so far against every
+`src/core/bot/book.ts`'s `bookCandidates` matches the game's own SAN history so far against every
 line's prefix, offers each matching line's next move (deduped, and only if it is still legal in the
 current position — defensive, in case a non-standard start coincides with a prefix by pure text
 accident), and `bookMove` picks uniformly among them with the seeded `Random`. `chooseMove` takes
-the compiled book as an optional parameter (kept out of `domain`'s own dependencies — `apps/web`'s
-bot worker/in-thread fallback import `@chess-kids/content/bot-book.json` and pass it in) so a
+the compiled book as an optional parameter (kept out of the bot's own dependencies — the bot worker/in-thread fallback in
+`src/web/adapters/bot/` import `dist/bot-book.json` and pass it in) so a
 forced mate-in-1 (`alwaysMateInOne`) still always wins outright, book or not. `pnpm build`
-(`packages/content/src/bot-book-load.ts`, its own module — not `lesson-load.ts`) checks every
+(`src/content/bot-book-load.ts`) checks every
 line is legal, ≤ 6 plies, and that its authored SAN matches chess.js's own SAN, failing the build
 otherwise.
 
@@ -48,11 +48,11 @@ otherwise.
 | 4 | Wolf | 5% | 5% | 3 (90%) | Yes | Small book | Beat Fox 3× |
 | 5 | Bear | 0% | 0% | 4 + capture check | Yes | Small book | Beat Wolf 3× |
 
-All values in `packages/core/src/domain/bot/levels.ts` (`BOT_LEVELS`) — plain TS, not a content
+All values in `src/core/bot/levels.ts` (`BOT_LEVELS`) — plain TS, not a content
 file; `BotLevel` (`level`, `name`, `random`, `shallow`, `depth`, `searchShare`, `alwaysMateInOne`,
 `queenHomeMoves`, `book`, `aids`) is domain-layer data.
 
-**Unlock:** `computerLevelStatus(records, journey)` (`packages/core/src/app/games.ts`) computes
+**Unlock:** `computerLevelStatus(records, journey)` (`src/core/app/games.ts`) computes
 each level's lock state for the Play screen's vs Computer card. Mouse: unlocked once World 4
 ("check") is mastered (`app-structure.md` §7). Every level above it unlocks with 3 full-game wins
 vs the level right below (Rabbit vs Mouse, Fox vs Rabbit, Wolf vs Fox, Bear vs Wolf) — *or*, once
@@ -70,7 +70,7 @@ full-game win vs Mouse, one of Rabbit's 3).
 | Legal-move dots | On | On | On (default; parent override later) |
 
 Parent settings can override each aid; only the default is implemented (`BotLevel.aids`,
-`packages/core/src/domain/bot/levels.ts` — read by `VersusStep.tsx`'s `aidsForLevel`), no parent
+`src/core/bot/levels.ts` — read by `src/modes/versus/Step.tsx`'s `aidsForLevel`), no parent
 settings screen for it yet.
 
 ## 5. Automatic level
@@ -81,7 +81,7 @@ settings screen for it yet.
   - ≤ 1 win → drop one level silently.
 - Never skips more than one level at a time.
 - Computed only once 5 full games have actually been played at that level (`nextSuggestedLevel`,
-  `packages/core/src/app/games.ts`) — a single early result cannot swing it either way.
+  `src/core/app/games.ts`) — a single early result cannot swing it either way.
 - Stored per profile in `AppSettings.suggestedLevels` (device-wide settings, keyed by profile id);
   `suggestedLevel` (same module) is what the Play screen's chips actually default to: the stored
   suggestion if it still names an unlocked level, else the highest level already unlocked (a fresh
@@ -92,12 +92,12 @@ settings screen for it yet.
 - Move shown after 0.8–1.5 s (so the kid sees it; 0.3 s under reduced motion), with animation.
 - Computer never resigns.
 - No progress after 60 kid moves (e.g. kid can't finish the mate) → Owl offers a hint toward mate:
-  a tap runs `mateHint(state, rules)` (`packages/core/src/domain/bot/hint.ts`) — a depth-2 search
+  a tap runs `mateHint(state, rules)` (`src/core/bot/hint.ts`) — a depth-2 search
   for the kid's own side, no randomness — and highlights the returned move's piece and target
   square on the board (`Board`'s existing `highlights.hint` ring). Cleared on the next move, take
   back, or "Play again".
 - Draws (stalemate, insufficient material, threefold repetition, 50-move rule — all already
-  detected in `domain/game/rules.ts`'s `gameResult`) show a draw screen with Owl explaining which
+  detected in `src/core/game/rules.ts`'s `gameResult`) show a draw screen with Owl explaining which
   one (`VersusState.endReason`, a second line under the generic "It's a draw!" text).
 - Leave (Play's full-game screen only): a "Stop game?" confirm; confirming ends the game
   without playing it out, saved as `abandoned` — never a loss.
@@ -105,12 +105,12 @@ settings screen for it yet.
   `first-game` boss, which *is* a full game — or a `versus` mini-game's own content id otherwise;
   `opponent: computer:<level>`; `result`: `win` / `loss` / `draw` / `abandoned`; `reason`: the draw
   reason above, `checkmate`, or `left`; `moves`: SAN). `recordGame`/`loadGameRecords`
-  (`packages/core/src/app/games.ts`) and the `GameRecordRepository` port persist it (localStorage
-  adapter: `apps/web/src/adapters/storage/local-game-record-repository.ts`, schema v3).
+  (`src/core/app/games.ts`) and the `GameRecordRepository` port persist it (localStorage
+  adapter: `packages/platform-web/src/adapters/storage/local-game-record-repository.ts`, schema v3).
 
 ## 6.5 Bear speed
 
-All in `packages/core/src/domain/bot/search.ts`, **Bear only**: a transposition table keyed by
+All in `src/core/bot/search.ts`, **Bear only**: a transposition table keyed by
 `SearchBoard.hash()` (chess.js's own incrementally-maintained Zobrist hash), with the standard
 mate-score ply adjustment on store/probe; killer moves (quiet moves that caused a beta cutoff at
 the same ply, tried early); MVV capture ordering; quiescence (captures only, depth-capped at 4
@@ -143,7 +143,7 @@ depth only if that still beats `alpha`: `LMR_MIN_DEPTH = 3`, `LMR_FULL_MOVE_COUN
 `LMR_REDUCTION = 1`), and a history heuristic (`HistoryTable`, keyed by colour + from + to,
 weighted by `depth²`, reused as `orderMoves`'s tiebreak below captures/TT/killers at any ply).
 
-**Measured** (`pnpm --filter @chess-kids/core calibrate 30 bear`, same seeds before/after): bear vs
+**Measured** (`pnpm --filter @learn/subject-chess calibrate 30 bear`, same seeds before/after): bear vs
 wolf **13.3% → 20.0%** (6/30 wins) — a real ≈ 1.5× gain, still well short of the ≥ 70% target
 (§8). Speed unaffected (p50/p95 stay in §6.5's range); `fox vs rabbit`/`wolf vs fox` unchanged.
 Richer eval (mobility, king safety, passed pawns) is the next lever not yet tried (§9).
@@ -165,7 +165,7 @@ Richer eval (mobility, king safety, passed pawns) is the next lever not yet trie
 | Determinism | Same position + seed → same move (Bear's own case, `search.test.ts`, given §6.5's mid-search time cap) |
 | Performance | Bear ≤ 300 ms per move (p50) / ≤ 600 ms (p95, CI) on a 10-position reference set |
 | Book | `bookCandidates`/`bookMove` (`book.test.ts`): prefix matching, ply cap, dedup, determinism; `chooseMove` wiring (`search.test.ts`) |
-| Calibration (manual, not in CI) | `pnpm --filter @chess-kids/core calibrate [games] [level]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate; the optional 3rd arg filters to one pairing by its higher level's name (`calibrate 30 bear`, a quick smoke check while tuning one level). Not a nightly job (no CI schedule wired up) |
+| Calibration (manual, not in CI) | `pnpm --filter @learn/subject-chess calibrate [games] [level]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate; the optional 3rd arg filters to one pairing by its higher level's name (`calibrate 30 bear`, a quick smoke check while tuning one level). Not a nightly job (no CI schedule wired up) |
 | Mate hint | `mateHint` returns a legal move for the side to move; finds a mate-in-1 when one exists; `null` only with no legal move at all |
 
 ## 9. Later

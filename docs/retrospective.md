@@ -134,3 +134,32 @@ Tokens, design → v1.1.0 (per message, duplicates removed):
 | Deploy (Pages) | 35 | 25 min (22 failures before Pages was enabled) |
 | Tag | 36 | 6 min |
 | **Total** | **151** | **433 min (7.2 h)**; 4 real CI failures, all fixed at root cause |
+
+## 9. M8 slowdown (v4 refactor, `m8.1`–`m8.24`, analysed 2026-09-29)
+
+| Phase | Wall-clock / iteration | Agent time / run |
+|---|---|---|
+| M6–M7 (features) | 0.5–1 h | 1–2 h |
+| `m8.1`–`m8.5` (safety nets, kits) | 20–40 min | 0.4–1.8 h |
+| `m8.6`–`m8.14` (exercise kinds, web platform) | 1.5–3 h | 1.4–3.3 h |
+| `m8.15`–`m8.19` (platform / chess seams) | 2.3–5.4 h (`m8.17`: 11.6 h) | 2–4.6 h, 600–900 tool calls |
+| `m8.20`–`m8.24` (package moves, docs) | ≈ 1 h | 0.3–1.1 h |
+
+| Cause | Evidence | Cost |
+|---|---|---|
+| Specs too large (7–10 commits, ~100 files) | `m8.17` agent ran out of context 3×, 5 resumes; runs up to 790 K tokens | slow turns, partial delivery |
+| Design choices left to agents | `m8.15`, `m8.16`, `m8.18` deferred the hard parts as "risky" | 5 of 10 R4 iterations were follow-ups (≈ 8–9 h) |
+| Ratchet lint matched package specifiers only | relative chess imports undetected until the package moves | 2 extra iterations (`m8.22`, `m8.23`) |
+| Verification loop | fast checks ≈ 2.5 min; full e2e 8 min, run 3+× per iteration | ≈ 45–60 min per iteration |
+| Infra | container restart (`m8.15`); permission-check outage stopped `m8.17` until the owner replied | ≈ 9 h idle (overnight) |
+
+Went well: lead-designed seams (`m8.19`, `m8.22`, `m8.23`) landed in one pass (1–2 h); scripted moves (`m8.20`, `m8.21`) ≈ 45 min.
+
+Applied from `m8.25` on (owner 2026-09-29):
+
+| Rule | Detail |
+|---|---|
+| Small specs | ≤ 3–4 commits, one concern per agent run |
+| Lead designs seams | interfaces and types decided in the spec; agents implement, don't choose |
+| Lighter loop | fast checks per commit; full 6-project e2e once at the end (CI runs it on every PR) |
+| Test the guard first | every new lint / guard rule proven by a failing fixture before relying on it |

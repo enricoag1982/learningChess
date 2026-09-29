@@ -16,7 +16,7 @@
 
 ## Quality gate (`quality` job, `.github/workflows/ci.yml`)
 
-Format check → lint → typecheck → unit + content tests → build → E2E smoke test (Playwright). New checks are added as steps of the same job, so the required check name never changes.
+`quality` waits on parallel jobs `checks` (format, lint, typecheck, unit + content tests, build, size, compat, voice), `slow` (`pnpm test:slow`) and `e2e` × 3 shards (Playwright). New checks are steps of one of those jobs, so the required check name never changes.
 
 ## Local commands
 
