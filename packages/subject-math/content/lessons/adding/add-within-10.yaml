@@ -1,0 +1,35 @@
+id: add-within-10
+order: 2
+concept: add-within-10
+character: owl
+demo:
+  problem: 6 + 3
+guided:
+  - id: add10-g1
+    type: number-entry
+    problem: 4 + 3
+    answer: 7
+exercises:
+  - id: add10-01
+    type: choice
+    problem: 5 + 3
+    options:
+      - { id: a, value: 7 }
+      - { id: b, value: 8 }
+      - { id: c, value: 9 }
+    answer: b
+  - id: add10-02
+    type: number-entry
+    problem: 6 + 2
+    answer: 8
+  - id: add10-03
+    type: number-entry
+    problem: 4 + 5
+    answer: 9
+  - id: add10-04
+    type: choice
+    problem: 7 + 3
+    options:
+      - { id: a, value: 9 }
+      - { id: b, value: 10 }
+    answer: b

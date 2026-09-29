@@ -1,0 +1,35 @@
+id: add-within-5
+order: 1
+concept: add-within-5
+character: hedgehog
+demo:
+  problem: 2 + 1
+guided:
+  - id: add5-g1
+    type: number-entry
+    problem: 1 + 1
+    answer: 2
+exercises:
+  - id: add5-01
+    type: choice
+    problem: 2 + 2
+    options:
+      - { id: a, value: 3 }
+      - { id: b, value: 4 }
+      - { id: c, value: 5 }
+    answer: b
+  - id: add5-02
+    type: number-entry
+    problem: 3 + 1
+    answer: 4
+  - id: add5-03
+    type: number-entry
+    problem: 2 + 3
+    answer: 5
+  - id: add5-04
+    type: choice
+    problem: 1 + 4
+    options:
+      - { id: a, value: 4 }
+      - { id: b, value: 5 }
+    answer: b

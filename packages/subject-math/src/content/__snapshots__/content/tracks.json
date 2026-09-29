@@ -1,0 +1,29 @@
+{
+ "tracks": [
+  {
+   "id": "numbers",
+   "kind": "main",
+   "titleKey": "journey:tracks.numbers",
+   "worlds": [
+    {
+     "id": "adding",
+     "track": "numbers",
+     "order": 1,
+     "habitat": "meadow",
+     "titleKey": "journey:worlds.adding",
+     "boss": "number-parade"
+    }
+   ]
+  }
+ ],
+ "ranks": [
+  {
+   "id": "counter",
+   "after": "start"
+  },
+  {
+   "id": "adder",
+   "after": "world:adding"
+  }
+ ]
+}

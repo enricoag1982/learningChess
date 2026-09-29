@@ -1,0 +1,8 @@
+# Two badges; name / condition text live in locales/en/rewards.yaml under `badges.<id>.name` / `.condition`.
+badges:
+  - id: first-sums
+    category: milestone
+    condition: { type: mastered, scope: 'world:adding', thresholds: [1] }
+  - id: star-counter
+    category: skill
+    condition: { type: stars-total, thresholds: [10, 30] }

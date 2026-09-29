@@ -1,0 +1,434 @@
+{
+ "version": 1,
+ "lessons": [
+  {
+   "id": "add-within-10",
+   "world": "adding",
+   "order": 2,
+   "concept": "add-within-10",
+   "character": "owl",
+   "titleKey": "lessons:add-within-10.title",
+   "storyKey": "lessons:add-within-10.story",
+   "demo": {
+    "textKey": "lessons:add-within-10.demo",
+    "problem": {
+     "a": 6,
+     "op": "+",
+     "b": 3
+    }
+   },
+   "guided": [
+    {
+     "id": "add10-g1",
+     "concept": "add-within-10",
+     "textKey": "lessons:add10-g1",
+     "problem": {
+      "a": 4,
+      "op": "+",
+      "b": 3
+     },
+     "type": "number-entry",
+     "answer": 7
+    }
+   ],
+   "exercises": [
+    {
+     "id": "add10-01",
+     "concept": "add-within-10",
+     "textKey": "lessons:add10-01",
+     "problem": {
+      "a": 5,
+      "op": "+",
+      "b": 3
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 7
+      },
+      {
+       "id": "b",
+       "value": 8
+      },
+      {
+       "id": "c",
+       "value": 9
+      }
+     ],
+     "answer": "b"
+    },
+    {
+     "id": "add10-02",
+     "concept": "add-within-10",
+     "textKey": "lessons:add10-02",
+     "problem": {
+      "a": 6,
+      "op": "+",
+      "b": 2
+     },
+     "type": "number-entry",
+     "answer": 8
+    },
+    {
+     "id": "add10-03",
+     "concept": "add-within-10",
+     "textKey": "lessons:add10-03",
+     "problem": {
+      "a": 4,
+      "op": "+",
+      "b": 5
+     },
+     "type": "number-entry",
+     "answer": 9
+    },
+    {
+     "id": "add10-04",
+     "concept": "add-within-10",
+     "textKey": "lessons:add10-04",
+     "problem": {
+      "a": 7,
+      "op": "+",
+      "b": 3
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 9
+      },
+      {
+       "id": "b",
+       "value": 10
+      }
+     ],
+     "answer": "b"
+    }
+   ]
+  },
+  {
+   "id": "add-within-5",
+   "world": "adding",
+   "order": 1,
+   "concept": "add-within-5",
+   "character": "hedgehog",
+   "titleKey": "lessons:add-within-5.title",
+   "storyKey": "lessons:add-within-5.story",
+   "demo": {
+    "textKey": "lessons:add-within-5.demo",
+    "problem": {
+     "a": 2,
+     "op": "+",
+     "b": 1
+    }
+   },
+   "guided": [
+    {
+     "id": "add5-g1",
+     "concept": "add-within-5",
+     "textKey": "lessons:add5-g1",
+     "problem": {
+      "a": 1,
+      "op": "+",
+      "b": 1
+     },
+     "type": "number-entry",
+     "answer": 2
+    }
+   ],
+   "exercises": [
+    {
+     "id": "add5-01",
+     "concept": "add-within-5",
+     "textKey": "lessons:add5-01",
+     "problem": {
+      "a": 2,
+      "op": "+",
+      "b": 2
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 3
+      },
+      {
+       "id": "b",
+       "value": 4
+      },
+      {
+       "id": "c",
+       "value": 5
+      }
+     ],
+     "answer": "b"
+    },
+    {
+     "id": "add5-02",
+     "concept": "add-within-5",
+     "textKey": "lessons:add5-02",
+     "problem": {
+      "a": 3,
+      "op": "+",
+      "b": 1
+     },
+     "type": "number-entry",
+     "answer": 4
+    },
+    {
+     "id": "add5-03",
+     "concept": "add-within-5",
+     "textKey": "lessons:add5-03",
+     "problem": {
+      "a": 2,
+      "op": "+",
+      "b": 3
+     },
+     "type": "number-entry",
+     "answer": 5
+    },
+    {
+     "id": "add5-04",
+     "concept": "add-within-5",
+     "textKey": "lessons:add5-04",
+     "problem": {
+      "a": 1,
+      "op": "+",
+      "b": 4
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 4
+      },
+      {
+       "id": "b",
+       "value": 5
+      }
+     ],
+     "answer": "b"
+    }
+   ]
+  },
+  {
+   "id": "take-away",
+   "world": "adding",
+   "order": 3,
+   "concept": "take-away",
+   "character": "owl",
+   "titleKey": "lessons:take-away.title",
+   "storyKey": "lessons:take-away.story",
+   "demo": {
+    "textKey": "lessons:take-away.demo",
+    "problem": {
+     "a": 5,
+     "op": "-",
+     "b": 2
+    }
+   },
+   "guided": [
+    {
+     "id": "takeaway-g1",
+     "concept": "take-away",
+     "textKey": "lessons:takeaway-g1",
+     "problem": {
+      "a": 3,
+      "op": "-",
+      "b": 1
+     },
+     "type": "number-entry",
+     "answer": 2
+    }
+   ],
+   "exercises": [
+    {
+     "id": "takeaway-01",
+     "concept": "take-away",
+     "textKey": "lessons:takeaway-01",
+     "problem": {
+      "a": 5,
+      "op": "-",
+      "b": 2
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 2
+      },
+      {
+       "id": "b",
+       "value": 3
+      },
+      {
+       "id": "c",
+       "value": 4
+      }
+     ],
+     "answer": "b"
+    },
+    {
+     "id": "takeaway-02",
+     "concept": "take-away",
+     "textKey": "lessons:takeaway-02",
+     "problem": {
+      "a": 6,
+      "op": "-",
+      "b": 4
+     },
+     "type": "number-entry",
+     "answer": 2
+    },
+    {
+     "id": "takeaway-03",
+     "concept": "take-away",
+     "textKey": "lessons:takeaway-03",
+     "problem": {
+      "a": 9,
+      "op": "-",
+      "b": 5
+     },
+     "type": "number-entry",
+     "answer": 4
+    },
+    {
+     "id": "takeaway-04",
+     "concept": "take-away",
+     "textKey": "lessons:takeaway-04",
+     "problem": {
+      "a": 8,
+      "op": "-",
+      "b": 3
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 4
+      },
+      {
+       "id": "b",
+       "value": 5
+      }
+     ],
+     "answer": "b"
+    }
+   ]
+  }
+ ],
+ "minigames": [
+  {
+   "mode": "series",
+   "id": "number-parade",
+   "concept": "add-within-10",
+   "rounds": [
+    {
+     "id": "number-parade-r1",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r1",
+     "problem": {
+      "a": 3,
+      "op": "+",
+      "b": 4
+     },
+     "type": "number-entry",
+     "answer": 7
+    },
+    {
+     "id": "number-parade-r2",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r2",
+     "problem": {
+      "a": 9,
+      "op": "-",
+      "b": 3
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 5
+      },
+      {
+       "id": "b",
+       "value": 6
+      },
+      {
+       "id": "c",
+       "value": 7
+      }
+     ],
+     "answer": "b"
+    },
+    {
+     "id": "number-parade-r3",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r3",
+     "problem": {
+      "a": 5,
+      "op": "+",
+      "b": 5
+     },
+     "type": "number-entry",
+     "answer": 10
+    },
+    {
+     "id": "number-parade-r4",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r4",
+     "problem": {
+      "a": 8,
+      "op": "-",
+      "b": 2
+     },
+     "type": "number-entry",
+     "answer": 6
+    },
+    {
+     "id": "number-parade-r5",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r5",
+     "problem": {
+      "a": 6,
+      "op": "+",
+      "b": 2
+     },
+     "type": "choice",
+     "options": [
+      {
+       "id": "a",
+       "value": 7
+      },
+      {
+       "id": "b",
+       "value": 8
+      },
+      {
+       "id": "c",
+       "value": 9
+      }
+     ],
+     "answer": "b"
+    },
+    {
+     "id": "number-parade-r6",
+     "concept": "add-within-10",
+     "textKey": "lessons:number-parade-r6",
+     "problem": {
+      "a": 7,
+      "op": "-",
+      "b": 4
+     },
+     "type": "number-entry",
+     "answer": 3
+    }
+   ],
+   "errors3": 0,
+   "errors2": 2,
+   "titleKey": "lessons:number-parade.title",
+   "goalKey": "lessons:number-parade.goal",
+   "unlockAfter": "take-away"
+  }
+ ]
+}

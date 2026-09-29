@@ -1,0 +1,8 @@
+badges:
+  first-sums:
+    name: First Sums
+    condition: 'Master World 1: Adding'
+  star-counter:
+    name: Star Counter
+    condition_one: 'Earn {{count}} star'
+    condition_other: 'Earn {{count}} stars'

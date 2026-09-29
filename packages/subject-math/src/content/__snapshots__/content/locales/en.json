@@ -1,0 +1,556 @@
+{
+ "characters": {
+  "hedgehog": {
+   "name": "Hedgie"
+  },
+  "owl": {
+   "name": "Owl"
+  }
+ },
+ "common": {
+  "app": {
+   "title": "Math for Kids"
+  },
+  "app-error": {
+   "body": "Tap \"Try again\". If this keeps happening, ask a grown-up to send the text below to the app's maker.",
+   "retry": "Try again",
+   "title": "Oops, something went wrong"
+  },
+  "assessment": {
+   "continue": "Continue",
+   "fail-body": "No worries — nothing is lost. Keep practising on your path!",
+   "fail-title": "Keep going!",
+   "pass-body_one": "You already know {{name}}!",
+   "pass-body_other": "You already know {{name}} — {{count}} lessons are yours!",
+   "pass-title": "You did it!",
+   "score": "You got {{correct}} of {{total}} right.",
+   "task-of": "Task {{current}}/{{total}}"
+  },
+  "avatar": {
+   "bear": "Bear",
+   "cat": "Cat",
+   "elephant": "Elephant",
+   "fox": "Fox",
+   "frog": "Frog",
+   "panda": "Panda",
+   "penguin": "Penguin",
+   "rabbit": "Rabbit"
+  },
+  "badges": {
+   "category-habit": "Habits",
+   "category-milestone": "Milestones",
+   "category-play": "Play",
+   "category-skill": "Skills",
+   "heading": "Badges",
+   "new-dot": "New",
+   "tile-earned": "{{name}}, earned",
+   "tile-earned-tier": "{{name}}, {{tier}} tier, earned",
+   "tile-locked": "{{name}}, locked. {{condition}}"
+  },
+  "boss": {
+   "ended": "Good try!",
+   "series": {
+    "mistakes_one": "{{count}} mistake so far",
+    "mistakes_other": "{{count}} mistakes so far",
+    "round-of": "Round {{current}} of {{total}}"
+   }
+  },
+  "celebration": {
+   "continue": "Continue",
+   "heading": "New badge!",
+   "owl-line": "You earned the {{name}} badge!"
+  },
+  "complete": {
+   "new-in-play": "New in Play",
+   "stars-pill": "+{{count}} stars",
+   "title": "Lesson complete!"
+  },
+  "continue": "Continue",
+  "den": {
+   "friend-condition": "Finish the {{piece}} lesson",
+   "friend-name": "{{character}}, friend",
+   "friend-name-locked": "{{character}}, locked, finish the {{piece}} lesson",
+   "friends-heading": "Animal friends",
+   "games-with-friends_one": "{{count}} game with friends",
+   "games-with-friends_other": "{{count}} games with friends",
+   "games-won_one": "{{count}} game won",
+   "games-won_other": "{{count}} games won",
+   "owl-line": "Look at all your friends!",
+   "rank-after-track": "After {{track}}",
+   "rank-after-world": "After World {{order}}",
+   "rank-all-tracks": "After all paths",
+   "rank-current": "You are here",
+   "rank-heading": "My rank",
+   "rank-start": "Start",
+   "title": "{{name}}'s Den"
+  },
+  "exercise": {
+   "answer-wrong": "Not quite! Try again.",
+   "check": "Check",
+   "easier": "Easier one",
+   "easier-offer": "This one is tricky. Want an easier one?",
+   "hint": "Hint",
+   "hint-answer": "Here is the answer.",
+   "hint-look": "Look closely.",
+   "hint-remove-option": "One choice is ruled out.",
+   "praise-1": "Good try!",
+   "praise-2": "Well done!",
+   "praise-3": "Amazing!",
+   "replay": "Say it again"
+  },
+  "first-run": {
+   "password": {
+    "body": "You'll need this parent code to open the grown-ups area. It keeps children out of the settings; it is not a security password.",
+    "hide": "Hide",
+    "label": "Parent code",
+    "mismatch": "The parent codes do not match.",
+    "primary": "Save parent code",
+    "privacy-link": "Read our privacy policy",
+    "repeat-label": "Repeat parent code",
+    "rules": "At least 4 characters. Numbers are OK.",
+    "show": "Show",
+    "title": "Set a parent code",
+    "too-short": "Use at least 4 characters."
+   },
+   "saved": {
+    "body": "Saved a copy: {{location}}",
+    "primary": "Next",
+    "title": "Parent code saved!"
+   },
+   "welcome": {
+    "owl": "A grown-up helps set things up first.",
+    "primary": "Start setup"
+   }
+  },
+  "friend-play": {
+   "guest": "Guest"
+  },
+  "home": {
+   "avatar-alt": "{{name}} avatar",
+   "den-tile": "My Den",
+   "journey-tile": "Journey",
+   "owl-all-done": "You finished everything for now. Come back soon for more!",
+   "owl-next": "Today you meet {{character}}!",
+   "owl-next-topic": "Hi! I'm Owl. Today: {{topic}}!",
+   "owl-resume": "Let's keep going!",
+   "owl-warmup-only": "Let's warm up what you know!",
+   "owl-world-boss": "World boss time: {{title}}!",
+   "practice-tile": "Practice",
+   "start-today": "Start today",
+   "subtitle-lesson-only": "New lesson",
+   "subtitle-warmup": "Warm-up",
+   "subtitle-with-minigame": "New lesson · Mini-game",
+   "subtitle-world-boss": "World boss",
+   "switch-player": "Switch player"
+  },
+  "install-banner": {
+   "dismiss": "Got it",
+   "steps": "Tap the Share button, then \"Add to Home Screen\".",
+   "title": "Add to Home Screen so your progress stays safe"
+  },
+  "lesson": {
+   "close": "Close lesson",
+   "skip": "Skip",
+   "stage-of": "{{current}} of {{total}}",
+   "steps": {
+    "boss": "Boss",
+    "demo": "Demo",
+    "exercises": "Exercises",
+    "skipped": "{{step}}, skipped",
+    "story": "Story",
+    "try": "Try"
+   }
+  },
+  "loading": "Loading…",
+  "math": {
+   "entry-label": "Your answer: {{value}}",
+   "erase": "Delete",
+   "hint-count-back": "Start at {{a}} and count back {{b}}.",
+   "hint-count-on": "Start at {{a}} and count on {{b}}.",
+   "hint-dots": "Count the dots.",
+   "pad-label": "Number pad"
+  },
+  "new-player": {
+   "avatar": {
+    "primary": "Let's play!",
+    "title": "Pick your animal!"
+   },
+   "nickname": {
+    "invalid": "Use 1-12 letters or numbers.",
+    "placeholder": "Your name",
+    "primary": "Next",
+    "title": "What is your name?"
+   }
+  },
+  "next": "Next",
+  "notice": {
+   "five-minutes": "5 minutes left — pick something short!"
+  },
+  "offline": {
+   "ready": "Ready to play offline."
+  },
+  "parent": {
+   "add-child": "Add child",
+   "back": "Back",
+   "backup": {
+    "export-body": "Save one file with every child's progress. Keep it somewhere safe.",
+    "export-button": "Export all",
+    "export-heading": "Export",
+    "import-body": "Pick a backup file from another device. Its progress merges with what's already here — nothing is lost.",
+    "import-change-badges_one": "+{{count}} badge",
+    "import-change-badges_other": "+{{count}} badges",
+    "import-change-minutes": "+{{count}} min this week",
+    "import-change-stars_one": "+{{count}} star",
+    "import-change-stars_other": "+{{count}} stars",
+    "import-child-add-new": "Add as new child",
+    "import-child-auto-merge": "Merging into {{name}}",
+    "import-child-choice-label": "{{name}}'s progress",
+    "import-child-merge-into": "Merge into {{name}}",
+    "import-confirm": "Merge",
+    "import-done": "Import complete.",
+    "import-error-generic": "This file could not be read.",
+    "import-heading": "Import",
+    "import-pick-file": "Choose file",
+    "import-preview_one": "{{count}} child",
+    "import-preview_other": "{{count}} children",
+    "import-warning": "Nothing is lost: both devices' progress is kept.",
+    "share-body": "Send every child's progress to the other device (AirDrop, Messages, Drive…). Nothing is lost: both devices' progress is kept.",
+    "share-button": "Send to other device",
+    "share-button-child": "Send to other device",
+    "share-downloaded": "Saved a copy: {{location}}",
+    "share-heading": "Send to other device",
+    "share-shared": "Sent."
+   },
+   "backup-heading": "Backup",
+   "backup-nav": "Backup",
+   "backup-title": "Backup",
+   "cancel": "Cancel",
+   "change-avatar": "Change avatar",
+   "change-password": "Change parent code",
+   "children": "Children",
+   "code-downloaded": "Saved a copy: {{location}}",
+   "daily-limit-everyday": "Every day",
+   "daily-limit-heading": "Daily time limit",
+   "daily-limit-minutes_one": "{{count}} min",
+   "daily-limit-minutes_other": "{{count}} min",
+   "daily-limit-note": "Enforced from M5.2.",
+   "daily-limit-off": "Off",
+   "daily-limit-weekday": "Mon–Fri",
+   "daily-limit-weekend": "Sat–Sun",
+   "danger-heading": "Danger zone",
+   "delete": "Delete",
+   "delete-cancel": "Cancel",
+   "delete-confirm": "Delete",
+   "delete-confirm-body": "This removes all saved progress for this child. This cannot be undone.",
+   "delete-confirm-title": "Delete {{name}} and all progress?",
+   "done": "Done",
+   "download-code": "Download parent code file",
+   "export-child": "Export this child's data",
+   "hints-label": "Hints",
+   "lessons-complete_one": "{{count}} lesson complete",
+   "lessons-complete_other": "{{count}} lessons complete",
+   "new-password-label": "New parent code",
+   "overview": {
+    "minutes-7-days_one": "{{count}} min this week",
+    "minutes-7-days_other": "{{count}} min this week",
+    "minutes-today_one": "{{count}} min today",
+    "minutes-today_other": "{{count}} min today",
+    "streak_one": "{{count}} day streak",
+    "streak_other": "{{count}} day streak"
+   },
+   "password-label": "Parent code",
+   "play-from-heading": "Not before",
+   "play-until-heading": "Play until",
+   "privacy": {
+    "close": "Close",
+    "contact-body": "Open an issue on the project's GitHub repository: {{url}}",
+    "contact-heading": "Questions?",
+    "control-body": "Export or delete any child's data any time, from Backup and from that child's Settings in the parent area.",
+    "control-heading": "Parent control",
+    "data-body": "A nickname, an avatar picture, and lesson progress for each child — stored only on this device, never sent anywhere.",
+    "data-heading": "What we keep",
+    "intro": "Math for Kids keeps everything on this device. Here's exactly what that means.",
+    "network-body": "The only network access is checking for app updates. Updates are static files delivered from GitHub Pages. \"Send to other device\" hands the file to whichever app or device the parent picks — the app itself still sends nothing.",
+    "network-heading": "Network use",
+    "no-accounts-body": "No sign-up, no analytics, no ads, no third-party services. The app never phones home.",
+    "no-accounts-heading": "No accounts, no tracking",
+    "title": "Privacy"
+   },
+   "privacy-nav": "Privacy",
+   "rename": "Rename",
+   "rename-label": "Nickname",
+   "report": {
+    "accuracy": "{{percent}}% ({{attempts}} tries)",
+    "assessment-failed": "Not passed",
+    "assessment-kind": {
+     "placement": "Placement",
+     "test-out": "Test-out"
+    },
+    "assessment-passed": "Passed",
+    "assessment-score": "{{correct}}/{{total}}",
+    "assessments-empty": "No test-out or placement runs yet.",
+    "assessments-heading": "Assessments",
+    "badges-empty": "No badges earned yet.",
+    "badges-heading": "Badges earned",
+    "concepts-empty": "No exercises attempted yet.",
+    "concepts-heading": "Concept accuracy",
+    "games-empty": "No games played yet.",
+    "games-heading": "Games (last 10)",
+    "intro-skipped": "Intro skipped: {{list}}",
+    "lessons-complete": "{{complete}}/{{total}} lessons complete",
+    "lessons-mastered_one": "{{count}} mastered",
+    "lessons-mastered_other": "{{count}} mastered",
+    "loading": "Loading report…",
+    "minutes-heading": "Minutes per day (last 14 days)",
+    "minutes-limit": "Daily limit: {{count}} min (line on the chart)",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "needs-practice": "Needs practice: {{list}}",
+    "needs-practice-tag": "Needs practice",
+    "opponent-friend": "A friend",
+    "progress-heading": "Progress by world",
+    "result-abandoned": "Left unfinished",
+    "result-draw": "Draw",
+    "result-loss": "Loss",
+    "result-win": "Win",
+    "rules-everyday": "Every day {{limit}}",
+    "rules-from": "from {{time}}",
+    "rules-until": "until {{time}}",
+    "rules-weekday": "Mon–Fri {{limit}}",
+    "rules-weekend": "Sat–Sun {{limit}}",
+    "stars": "{{earned}}/{{max}} stars"
+   },
+   "reset": "Reset progress",
+   "reset-confirm": "Reset",
+   "reset-confirm-body": "This clears lessons, stars, games, badges and streak. Nickname, avatar and settings stay. This cannot be undone.",
+   "reset-confirm-title": "Reset {{name}}'s progress?",
+   "reset-done": "Progress reset.",
+   "save": "Save",
+   "settings": "Settings",
+   "settings-title": "{{name}}'s settings",
+   "sound-label": "Sounds",
+   "stars-total_one": "{{count}} star",
+   "stars-total_other": "{{count}} stars",
+   "title": "Parent area",
+   "unlock-empty": "Everything is already unlocked for this child.",
+   "unlock-lesson": "Unlock",
+   "unlock-lessons-worlds": "Unlock lessons & worlds",
+   "unlock-world": "Unlock world",
+   "unlocked": "Unlocked",
+   "version": "Version {{version}}",
+   "voice-label": "Voice",
+   "voice-test-audio": "Recorded voice ✓",
+   "voice-test-button": "Test voice",
+   "voice-test-fallback": "Device voice — recorded voice unavailable ({{reason}})",
+   "voice-test-reason": {
+    "decode-failed": "audio file unreadable",
+    "file-missing": "audio file missing",
+    "manifest-not-loaded": "voice list unavailable",
+    "no-audio-context": "no sound support",
+    "no-generated-audio": "no recorded line for this text",
+    "still-suspended": "still starting up"
+   },
+   "weekend-limit-toggle": "Different limit at the weekend",
+   "wrong-password": "Wrong parent code."
+  },
+  "password-screen": {
+   "back": "Back",
+   "forgot": "Forgot it? It is in the file {{location}}.",
+   "label": "Parent code",
+   "locked": "Try again in {{time}}",
+   "primary": "Open",
+   "title": "Grown-ups",
+   "wrong": "Wrong parent code ({{attempt}} of {{max}})"
+  },
+  "picker": {
+   "grown-ups": "Grown-ups",
+   "grown-ups-hint": "Parent code",
+   "new-player": "New player",
+   "title": "Who's playing today?"
+  },
+  "placement": {
+   "continue": "Continue",
+   "offer-no": "No, start at World 1",
+   "offer-question": "Already know some math? Let's find out where to start you!",
+   "offer-yes": "Yes, test me!",
+   "summary-all-body": "You're ready to explore every path.",
+   "summary-all-title": "Wow, you know it all!",
+   "summary-none-body": "Every math whiz starts with the first step.",
+   "summary-none-title": "Let's start at World 1!",
+   "summary-passed-body_one": "You already know {{count}} world! Off you go!",
+   "summary-passed-body_other": "You already know {{count}} worlds! Off you go!",
+   "summary-passed-title": "Great job!",
+   "world-of": "World {{order}} · Task {{current}}/{{total}}"
+  },
+  "play": {
+   "back-to-home": "Back to Home",
+   "back-to-journey": "Back to Journey",
+   "back-to-play": "Back to Play",
+   "close": "Close"
+  },
+  "play-again": "Play again",
+  "practice": {
+   "back": "Back to Home",
+   "owl-line": "Pick a topic, or start your warm-up!",
+   "title": "Practice",
+   "topic-accuracy": "{{correct}} of {{total}} correct",
+   "topic-of": "Practice {{current}}/{{total}}",
+   "topics-empty": "Finish a lesson to see it here!",
+   "topics-heading": "Topics",
+   "warmup-all-done": "All done for today!",
+   "warmup-card-title": "Daily warm-up",
+   "warmup-due_one": "{{count}} due today",
+   "warmup-due_other": "{{count}} due today",
+   "weak-tag": "Needs practice"
+  },
+  "session": {
+   "leave": "Leave",
+   "summary-closing": "See you tomorrow!",
+   "summary-done": "Done",
+   "summary-new-friend": "New friend!",
+   "summary-new-rank": "New rank!",
+   "summary-title": "Great session!",
+   "warmup-of": "Warm-up {{current}}/{{total}}"
+  },
+  "stars-count": "{{count}} stars",
+  "story": {
+   "listen-again": "Listen again",
+   "primary": "Let me try"
+  },
+  "streak": {
+   "best": "Best: {{count}}",
+   "current_one": "{{count}} day",
+   "current_other": "{{count}} days",
+   "heading": "Streak",
+   "none": "Play today to start a streak!",
+   "pill": "{{count}} day streak"
+  },
+  "tier": {
+   "bronze": "Bronze",
+   "gold": "Gold",
+   "silver": "Silver"
+  },
+  "time-limit": {
+   "body": "You've used up all your play time for today. Come back tomorrow!",
+   "early-body": "Math opens at {{time}}. See you soon!",
+   "early-title": "Too early!",
+   "late-body": "It's getting late. See you tomorrow!",
+   "late-title": "Time to rest!",
+   "more-time": "Parent: more time",
+   "stars-today": "{{count}} stars today",
+   "title": "See you tomorrow!"
+  },
+  "topic": {
+   "counter": "Counter"
+  },
+  "voice-check": {
+   "sentence": "Let's do some math together!"
+  }
+ },
+ "journey": {
+  "habitats": {
+   "arctic": "Arctic",
+   "forest": "Forest",
+   "jungle": "Jungle",
+   "meadow": "Meadow",
+   "mountains": "Mountains",
+   "ocean": "Ocean",
+   "river": "River",
+   "savannah": "Savannah"
+  },
+  "ranks": {
+   "adder": "Adder",
+   "counter": "Counter"
+  },
+  "tracks": {
+   "numbers": "Numbers"
+  },
+  "ui": {
+   "back": "Back to Home",
+   "boss-status-available": "available",
+   "boss-status-locked": "locked",
+   "boss-status-won": "won",
+   "character-piece": "{{character}} the {{piece}}",
+   "coming-soon": "Coming soon",
+   "coming-soon-message": "More lessons are on their way here.",
+   "coming-soon-title": "Coming soon!",
+   "finish-first": "Finish {{name}} first!",
+   "locked": "Locked",
+   "locked-world-message": "Finish the earlier worlds first to unlock this one.",
+   "node-name": "{{name}}, {{status}}",
+   "node-name-stars": "{{name}}, {{status}}, {{count}} stars",
+   "paths-after-basics": "Paths after Basics",
+   "rank-pill": "{{rank}} rank",
+   "show-you-know-it": "Show you know it",
+   "status-complete": "complete",
+   "status-current": "current",
+   "status-locked": "locked",
+   "test-out-lesson-question": "Want to show me you already know {{name}}?",
+   "test-out-no": "Not yet",
+   "test-out-world-question": "Want to show me you already know World {{order}} · {{name}}?",
+   "test-out-yes": "Yes, test me!",
+   "world-boss": "World boss",
+   "world-boss-name": "World boss: {{title}}, {{status}}",
+   "world-heading": "World {{order}} · {{name}}",
+   "world-stars": "{{earned}} of {{max}} stars"
+  },
+  "worlds": {
+   "adding": "Adding"
+  }
+ },
+ "lessons": {
+  "add-within-10": {
+   "demo": "Owl has 6 acorns and finds 3 more. Start at 6 and count on 3. 6 plus 3 makes 9!",
+   "story": "Owl has bigger numbers to add today. Start at the bigger number and count on. It is quicker than counting everything again!",
+   "title": "Adding up to 10"
+  },
+  "add-within-5": {
+   "demo": "Hedgie has 2 berries and finds 1 more. Count all the dots. 2 plus 1 makes 3!",
+   "story": "Hedgie loves collecting berries! When she finds some more, she counts them all together. Adding means putting groups together to see how many there are.",
+   "title": "Adding with Hedgie"
+  },
+  "add10-01": "What is 5 plus 3?",
+  "add10-02": "What is 6 plus 2?",
+  "add10-03": "What is 4 plus 5?",
+  "add10-04": "What is 7 plus 3?",
+  "add10-g1": "What is 4 plus 3?",
+  "add5-01": "What is 2 plus 2?",
+  "add5-02": "What is 3 plus 1?",
+  "add5-03": "What is 2 plus 3?",
+  "add5-04": "What is 1 plus 4?",
+  "add5-g1": "What is 1 plus 1?",
+  "number-parade": {
+   "goal": "Solve every sum in the parade. How few mistakes can you make?",
+   "title": "Number Parade"
+  },
+  "number-parade-r1": "What is 3 plus 4?",
+  "number-parade-r2": "What is 9 minus 3?",
+  "number-parade-r3": "What is 5 plus 5?",
+  "number-parade-r4": "What is 8 minus 2?",
+  "number-parade-r5": "What is 6 plus 2?",
+  "number-parade-r6": "What is 7 minus 4?",
+  "take-away": {
+   "demo": "Owl has 5 apples and eats 2. Cross out 2 dots, and 3 are left. 5 minus 2 makes 3!",
+   "story": "Taking away means some go away, and we count what is left. If Owl has 5 apples and eats 2, there are 3 left.",
+   "title": "Taking away"
+  },
+  "takeaway-01": "What is 5 minus 2?",
+  "takeaway-02": "What is 6 minus 4?",
+  "takeaway-03": "What is 9 minus 5?",
+  "takeaway-04": "What is 8 minus 3?",
+  "takeaway-g1": "What is 3 minus 1?"
+ },
+ "rewards": {
+  "badges": {
+   "first-sums": {
+    "condition": "Master World 1: Adding",
+    "name": "First Sums"
+   },
+   "star-counter": {
+    "condition_one": "Earn {{count}} star",
+    "condition_other": "Earn {{count}} stars",
+    "name": "Star Counter"
+   }
+  }
+ }
+}

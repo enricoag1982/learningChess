@@ -1,0 +1,42 @@
+add-within-5:
+  title: Adding with Hedgie
+  story: >-
+    Hedgie loves collecting berries! When she finds some more, she counts them all together.
+    Adding means putting groups together to see how many there are.
+  demo: Hedgie has 2 berries and finds 1 more. Count all the dots. 2 plus 1 makes 3!
+add5-g1: What is 1 plus 1?
+add5-01: What is 2 plus 2?
+add5-02: What is 3 plus 1?
+add5-03: What is 2 plus 3?
+add5-04: What is 1 plus 4?
+add-within-10:
+  title: Adding up to 10
+  story: >-
+    Owl has bigger numbers to add today. Start at the bigger number and count on. It is quicker
+    than counting everything again!
+  demo: Owl has 6 acorns and finds 3 more. Start at 6 and count on 3. 6 plus 3 makes 9!
+add10-g1: What is 4 plus 3?
+add10-01: What is 5 plus 3?
+add10-02: What is 6 plus 2?
+add10-03: What is 4 plus 5?
+add10-04: What is 7 plus 3?
+take-away:
+  title: Taking away
+  story: >-
+    Taking away means some go away, and we count what is left. If Owl has 5 apples and eats 2,
+    there are 3 left.
+  demo: Owl has 5 apples and eats 2. Cross out 2 dots, and 3 are left. 5 minus 2 makes 3!
+takeaway-g1: What is 3 minus 1?
+takeaway-01: What is 5 minus 2?
+takeaway-02: What is 6 minus 4?
+takeaway-03: What is 9 minus 5?
+takeaway-04: What is 8 minus 3?
+number-parade:
+  title: Number Parade
+  goal: Solve every sum in the parade. How few mistakes can you make?
+number-parade-r1: What is 3 plus 4?
+number-parade-r2: What is 9 minus 3?
+number-parade-r3: What is 5 plus 5?
+number-parade-r4: What is 8 minus 2?
+number-parade-r5: What is 6 plus 2?
+number-parade-r6: What is 7 minus 4?

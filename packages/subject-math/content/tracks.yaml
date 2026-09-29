@@ -1,0 +1,9 @@
+tracks:
+  - id: numbers
+    kind: main
+    title: tracks.numbers
+    worlds:
+      - { id: adding, order: 1, habitat: meadow, title: worlds.adding, boss: number-parade }
+ranks:
+  - { id: counter, after: start }
+  - { id: adder, after: world:adding }

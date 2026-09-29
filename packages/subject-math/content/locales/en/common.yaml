@@ -1,0 +1,23 @@
+app:
+  title: Math for Kids
+parent:
+  privacy:
+    intro: Math for Kids keeps everything on this device. Here's exactly what that means.
+voice-check:
+  sentence: Let's do some math together!
+time-limit:
+  early-body: 'Math opens at {{time}}. See you soon!'
+placement:
+  offer-question: Already know some math? Let's find out where to start you!
+  summary-none-body: Every math whiz starts with the first step.
+exercise:
+  hint-look: Look closely.
+math:
+  pad-label: Number pad
+  erase: Delete
+  entry-label: 'Your answer: {{value}}'
+  hint-dots: Count the dots.
+  hint-count-on: 'Start at {{a}} and count on {{b}}.'
+  hint-count-back: 'Start at {{a}} and count back {{b}}.'
+topic:
+  counter: Counter

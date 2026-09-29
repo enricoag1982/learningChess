@@ -12,6 +12,7 @@
     "./dist/*": "./dist/*"
   },
   "scripts": {
+    "build": "node scripts/build-content.ts",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
   },

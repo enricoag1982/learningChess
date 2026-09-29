@@ -1,0 +1,39 @@
+id: number-parade
+mode: series
+concept: add-within-10
+unlockAfter: take-away
+errors3: 0
+errors2: 2
+rounds:
+  - id: number-parade-r1
+    type: number-entry
+    problem: 3 + 4
+    answer: 7
+  - id: number-parade-r2
+    type: choice
+    problem: 9 - 3
+    options:
+      - { id: a, value: 5 }
+      - { id: b, value: 6 }
+      - { id: c, value: 7 }
+    answer: b
+  - id: number-parade-r3
+    type: number-entry
+    problem: 5 + 5
+    answer: 10
+  - id: number-parade-r4
+    type: number-entry
+    problem: 8 - 2
+    answer: 6
+  - id: number-parade-r5
+    type: choice
+    problem: 6 + 2
+    options:
+      - { id: a, value: 7 }
+      - { id: b, value: 8 }
+      - { id: c, value: 9 }
+    answer: b
+  - id: number-parade-r6
+    type: number-entry
+    problem: 7 - 4
+    answer: 3

@@ -1,0 +1,28 @@
+[
+ {
+  "id": "first-sums",
+  "category": "milestone",
+  "nameKey": "rewards:badges.first-sums.name",
+  "conditionKey": "rewards:badges.first-sums.condition",
+  "condition": {
+   "type": "mastered",
+   "thresholds": [
+    1
+   ],
+   "scope": "world:adding"
+  }
+ },
+ {
+  "id": "star-counter",
+  "category": "skill",
+  "nameKey": "rewards:badges.star-counter.name",
+  "conditionKey": "rewards:badges.star-counter.condition",
+  "condition": {
+   "type": "stars-total",
+   "thresholds": [
+    10,
+    30
+   ]
+  }
+ }
+]
