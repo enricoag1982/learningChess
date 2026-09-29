@@ -8,14 +8,13 @@ import bundledBadges from '../../../../dist/badges.json';
  * conversion, not a runtime check. */
 const content = bundled as unknown as CompiledContent;
 
-/** Same conversion as `content` above, for `packages/content/tracks.yaml`'s compiled output. */
+/** Same conversion as `content`, for the compiled tracks. */
 const tracks = bundledTracks as unknown as TracksCatalog;
 
-/** Same conversion as `content` above, for `packages/content/badges.yaml`'s compiled output. */
+/** Same conversion as `content`, for the compiled badges. */
 const badges = bundledBadges as unknown as BadgeDef[];
 
-/** `ContentSource` over the content package's build-time compiled bundle, at chess's own concrete
- * shapes — widens to the platform's base `ContentSource` with no cast (`app/ports.ts`). */
+/** `ContentSource` over the build-time compiled bundle at chess's concrete shapes; widens to the platform's base `ContentSource` with no cast. */
 export function createBundledContentSource() {
   const lessonsById = new Map(content.lessons.map((lesson) => [lesson.id, lesson]));
   const minigamesById = new Map(content.minigames.map((minigame) => [minigame.id, minigame]));

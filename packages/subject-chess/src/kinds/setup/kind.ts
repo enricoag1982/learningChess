@@ -10,14 +10,12 @@ export interface PlaceAction {
   readonly piece: Piece;
 }
 
-/** Result of a `setup` placement attempt. */
 export interface PlaceOutcome {
   readonly kind: 'placed' | 'wrong' | 'solved';
   readonly square: Square;
   readonly piece: Piece;
 }
 
-/** One remaining piece in a `setup` exercise's palette. */
 export interface PalettePiece {
   readonly color: Color;
   readonly type: PieceType;

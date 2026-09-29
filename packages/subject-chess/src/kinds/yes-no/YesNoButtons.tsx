@@ -16,7 +16,6 @@ const CrossIcon = (): JSX.Element => (
 );
 
 export interface YesNoButtonsProps {
-  /** The value that was picked and was wrong, if any: that one turns orange and disables. */
   readonly wrongValue?: boolean;
   readonly onAnswer: (value: boolean) => void;
 }

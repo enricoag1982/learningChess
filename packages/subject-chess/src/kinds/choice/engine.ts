@@ -2,10 +2,7 @@ import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { ChoiceDef } from '../../core/exercise/types.ts';
 
-/**
- * Picks an option for a choice exercise. Correct → solved; wrong → errors + 1 and the option is
- * added to `wrongOptions` (disabled in the UI). No-op once solved.
- */
+/** Correct → solved; wrong → errors + 1 and the option joins `wrongOptions` (disabled in the UI). No-op once solved. */
 export function answerChoice(
   state: ExerciseStateOf<ChoiceDef>,
   optionId: string,

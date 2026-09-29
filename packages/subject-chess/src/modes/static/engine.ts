@@ -17,12 +17,10 @@ function toGoalDef(def: StaticCaptureGameDef): CaptureDef | CollectStarsDef {
   });
 }
 
-/** Starts a fresh mini-game at its authored position. */
 export function startStaticCaptureGame(def: StaticCaptureGameDef): GameState {
   return { mode: 'static', def, exercise: initState(toGoalDef(def)), ended: false };
 }
 
-/** Plays one kid move. Reuses the capture exercise engine for legality and win detection. */
 export function playGameMove(
   state: GameState,
   rules: VariantRules,
@@ -37,9 +35,8 @@ export function playGameMove(
     return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
   }
   if (outcome.kind === 'wrong') {
-    // Mini-games are always `capture` or `collect-stars` exercises (see `toGoalDef`): `playMove`
-    // never produces this outcome for them (best-move only). Handled for exhaustiveness, not
-    // reachability.
+    // Mini-games are always `capture` / `collect-stars` exercises (`toGoalDef`), so `playMove` never returns this (best-move only);
+    // handled for exhaustiveness, not reachability.
     return { state: { ...state, exercise }, outcome: { kind: 'illegal' } };
   }
 
@@ -64,7 +61,6 @@ export function playGameMove(
   };
 }
 
-/** Current mini-game status. */
 export function gameResult(state: GameState): 'playing' | 'won' | 'ended' {
   if (state.exercise.solved) {
     return 'won';

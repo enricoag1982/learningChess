@@ -10,13 +10,11 @@ import { BlockedIcon, PieceBadge, PieceIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
 
-/** A move the board asks its parent to play (legality already came from `legalMoves`). */
 export interface BoardMove {
   readonly from: Square;
   readonly to: Square;
 }
 
-/** A tap that could not be turned into a move. */
 export interface IllegalAttempt {
   readonly from: Square | null;
   readonly to: Square;
@@ -24,15 +22,11 @@ export interface IllegalAttempt {
 
 /** Visual marks layered on top of the board; none of them affect legality. */
 export interface BoardHighlights {
-  /** Select-squares exercises: the kid's current selection (ring). */
   readonly selectedSquares?: readonly Square[];
-  /** Pulsing orange ring: the hint ladder. */
   readonly hint?: readonly Square[];
-  /** Orange mark for a wrong try — never red. */
   readonly wrong?: readonly Square[];
   /** Dashed orange mark (steady): select-squares answer squares still missing after a check. */
   readonly missed?: readonly Square[];
-  /** Squares of the move just played, for the slide/fade animation and a soft tint. */
   readonly lastMove?: { readonly from: Square; readonly to: Square };
   /** Steady (non-pulsing) ring, always shown: yes-no exercises' question square. */
   readonly focus?: readonly Square[];
@@ -57,13 +51,11 @@ export interface BoardProps {
   /** Square mode (select-squares exercises): every tap toggles a square. When set, piece moving is off. */
   readonly onSquareTap?: (square: Square) => void;
   readonly highlights?: BoardHighlights;
-  /** Show file/rank labels on the edge squares. Default `false` (kids: no notation). */
   readonly showCoordinates?: boolean;
   /** Face-to-face vs Friend: draws the side opposite `orientation` rotated 180°, visual only. */
   readonly rotateTopPieces?: boolean;
   /** vs Friend's difficulty toggle: `false` hides the possible-move dot/ring; squares stay tappable. */
   readonly showLegalMoveDots?: boolean;
-  /** Accessible name of the board, e.g. "Chess board". */
   readonly label: string;
   /** Small corner badge naming each piece's taught animal; callers gate this on `showPieceBadges`. */
   readonly pieceBadges?: boolean;
@@ -78,7 +70,6 @@ function isLightSquare(square: Square): boolean {
   return (file + rank) % 2 === 0;
 }
 
-/** Screen-reader name for one square, e.g. "e4, white bishop, selected" (non-functional.md §2). */
 function describeSquare(
   t: TFunction,
   square: Square,
@@ -127,7 +118,6 @@ interface DragState {
   readonly x: number;
   readonly y: number;
   readonly dragging: boolean;
-  /** Board square size in CSS px at pick-up time, for sizing the floating piece. */
   readonly squareSize: number;
 }
 
@@ -144,12 +134,10 @@ interface CaptureFadeState {
   readonly piece: Piece;
 }
 
-/** A drag/tap threshold in CSS pixels: smaller pointer movements count as a tap. */
 const DRAG_THRESHOLD_PX = 6;
 
-/** Renders `position`; tap-tap or drag moves constrained to `legalMoves`; `role="grid"` with one
- * labelled button per square (a11y) and `data-fen` on it (e2e — `toFen(position)`, no board parsing
- * needed). Holds no chess rules of its own. */
+/** Renders `position`; tap-tap or drag moves constrained to `legalMoves`; `role="grid"`, one labelled button per square (a11y)
+ * and `data-fen` (e2e). Holds no chess rules. */
 export function Board({
   position,
   legalMoves,

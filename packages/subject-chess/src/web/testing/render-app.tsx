@@ -8,7 +8,7 @@ import { pickProfileFromPicker } from './app-test-helpers.ts';
 
 /**
  * Renders the app over `services` and gets past the picker: `at: 'home'` taps the tile named
- * `nickname` (default `'Mia'`) — the caller seeds that returning profile first, same as before —
+ * `nickname` (default `'Mia'`) — the caller seeds that returning profile first —
  * landing on Home; `at: 'picker'` renders and waits for the picker itself, without picking anyone
  * (first-run/onboarding tests, with no profile yet, use `renderAppRaw` instead).
  */

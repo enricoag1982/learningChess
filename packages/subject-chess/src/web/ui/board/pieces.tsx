@@ -3,7 +3,6 @@ import type { Color, PieceType } from '../../../core/chess/types.ts';
 import { characterForPiece } from '../art/character-meta.ts';
 import { animalImage, characterColor } from '@learn/platform-web/ui/art/animal-images.ts';
 
-/** A drawable piece: its type and colour. */
 export interface PieceIconProps {
   readonly piece: { readonly color: Color; readonly type: PieceType };
   /** Fixed rendered width/height in CSS pixels. Omit to fill the parent (the board's own squares). */
@@ -17,7 +16,6 @@ const PALETTE = {
 
 const STROKE_WIDTH = 2;
 
-/** Rounded base every piece stands on (chunky: ~31 wide, sits at the very bottom of the viewBox). */
 function Base(): JSX.Element {
   return <rect x={7} y={37} width={31} height={5} rx={2.5} />;
 }
@@ -187,8 +185,7 @@ const SHAPES: Record<PieceType, (props: { readonly color: Color }) => JSX.Elemen
   k: King,
 };
 
-/** One SVG piece drawing (our own artwork, `aria-hidden`). With no `size`, fills its container;
- * pass `size` for a fixed pixel drawing (e.g. the piece gallery). */
+/** One SVG piece drawing (own artwork, `aria-hidden`); without `size` it fills its container (the piece gallery passes one). */
 export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
   const colours = PALETTE[piece.color];
   const Shape = SHAPES[piece.type];
@@ -217,8 +214,7 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
   );
 }
 
-/** Small animal-face badge overlaid on a piece's corner. Purely decorative (`aria-hidden`); drawn
- * as an SVG `<image>` so it composes with the badge's ring/background at this small size. */
+/** Small animal-face badge on a piece's corner, decorative (`aria-hidden`); an SVG `<image>` so it composes with the badge ring at this size. */
 export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
   const character = characterForPiece(type);
   return (
@@ -241,7 +237,6 @@ export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element 
   );
 }
 
-/** Light inner detail strokes on black pieces, so shape detail stays visible against the dark fill. */
 function ShadeLines({ type }: { readonly type: PieceType }): JSX.Element {
   switch (type) {
     case 'p':
@@ -264,7 +259,6 @@ function ShadeLines({ type }: { readonly type: PieceType }): JSX.Element {
   }
 }
 
-/** Friendly rock/bush marker for a blocked square, `aria-hidden`. Never a red cross. */
 export function BlockedIcon(): JSX.Element {
   return (
     <svg viewBox="0 0 45 45" aria-hidden="true" className="pointer-events-none block h-full w-full">

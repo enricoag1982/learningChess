@@ -92,7 +92,7 @@ describe('legality', () => {
 });
 
 // Regression guards only: bounds are wide so slower CI runners never flake. The real budget
-// (≤ 300 ms per move on reference tablets, non-functional.md §4) is measured on devices in M4.
+// (≤ 300 ms per move on reference tablets, non-functional.md §4) is measured on devices.
 describe('performance', () => {
   it('Bear stays within budget on the start position', () => {
     const state = startGame(STANDARD, parseFen(START_FEN));
@@ -121,7 +121,7 @@ describe('performance', () => {
 
   // 10 varied middlegame positions (`docs/computer-opponent.md` §3/§8 "Bear speed" reference set):
   // open and closed, tactical and quiet, both sides to move. Measured p50/p95 on this machine
-  // before M4.2's move ordering / transposition table / iterative deepening / quiescence:
+  // before move ordering / transposition table / iterative deepening / quiescence:
   // p50 ≈ 1850ms, p95 ≈ 4080ms; after: p50 ≈ 270-330ms, p95 ≈ 290-360ms (`TIME_BUDGET_MS = 250`
   // plus overshoot until the next deadline check). The 300ms/600ms bounds below are the "≤ 300 ms
   // locally + ≤ 600 ms in CI" option (spec's other option, a documented CI multiplier on a single

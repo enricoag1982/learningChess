@@ -28,7 +28,6 @@ import type { MoveExtra } from './move-ui.ts';
 import { moveKindLegalMoves } from './move-ui.ts';
 import { MoveBoard } from './MoveBoard.tsx';
 
-/** Shared with `VersusStep`'s take-back button — the one place a move-counted "undo" icon lives. */
 export const UndoIcon = (): JSX.Element => (
   <Svg size={26}>
     <path d="M9 14L4 9l5-5" />
@@ -41,8 +40,7 @@ export interface MovesCardProps {
   readonly target: number;
 }
 
-/** Moves-so-far counter for a move-counted exercise (collect-stars / capture) — info, flat
- * (docs/screens.md §1): read-only, never a button. */
+/** Moves-so-far counter (collect-stars / capture): info, flat (docs/screens.md §1), never a button. */
 export function MovesCard({ current, target }: MovesCardProps): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -71,14 +69,10 @@ interface MovePlayAreaProps {
   readonly surface: SurfaceContext;
   readonly top: ReactNode;
   readonly done: ReactNode | null;
-  /** Shown above the controls (a move-counted kind's `MovesCard`). */
   readonly counter?: ReactNode;
-  /** The controls row's one extra button (a move-counted kind's Undo). */
   readonly undo?: ReactNode;
 }
 
-/** Every move kind's play area (collect-stars, capture, best-move, mate-in-n): the board, Hint,
- * and — for the move-counted kinds — the moves card and Undo. */
 export function MovePlayArea({
   state,
   dispatch,
@@ -131,7 +125,6 @@ export function MovePlayArea({
   return <ExerciseFrame board={board} panel={panelBody(top, state.core.solved, done, controls)} />;
 }
 
-/** collect-stars / capture's play area: `MovePlayArea` plus the moves card and Undo. */
 export function CountedPlayArea(
   props: PlayAreaProps<
     CollectStarsDef | CaptureDef,

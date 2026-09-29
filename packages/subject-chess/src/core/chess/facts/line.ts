@@ -1,7 +1,6 @@
 import type { ChessRules, Move } from '../rules.ts';
 import type { Position } from '../types.ts';
 
-/** A SAN line replayed to its end: the position after each move, and the moves themselves. */
 export interface ReplayedLine {
   readonly positions: readonly Position[];
   readonly moves: readonly Move[];
@@ -14,7 +13,6 @@ export interface FailedReplay {
 
 export type ReplayResult = ReplayedLine | FailedReplay;
 
-/** Plays `sans` in order from `position` under real chess rules, or stops at the first illegal one. */
 export function replaySanLine(
   position: Position,
   sans: readonly string[],

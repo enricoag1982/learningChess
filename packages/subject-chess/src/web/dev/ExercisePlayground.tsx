@@ -14,7 +14,6 @@ interface ExerciseSample {
   readonly def: ExerciseDef;
 }
 
-/** Every exercise kind's own `sample.ts` (dev-only fixtures), one glob per type folder. */
 const SAMPLE_MODULES = import.meta.glob<{ readonly samples: readonly ExerciseSample[] }>(
   '../../kinds/*/sample.ts',
   { eager: true },
@@ -68,7 +67,6 @@ function ExercisePreview({
   );
 }
 
-/** Dev-only visual harness for every exercise kind (`kinds/<type>/sample.ts`), at `/#exercises`. */
 export function ExercisePlayground(): JSX.Element {
   const [selected, setSelected] = useState(0);
   const current = EXERCISES[selected] ?? EXERCISES[0];

@@ -5,7 +5,6 @@ import { checkOptimalMoves, exerciseCommonFields } from '../../content/kinds/com
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 
-/** Capture every opponent piece (opponent is static); `stars3`/`stars2` are move-count thresholds. */
 export const schema = z
   .object({
     ...exerciseCommonFields,

@@ -1,7 +1,7 @@
 import { CHARACTER_PIECES } from '../../../core/chess-core.ts';
 import type { PieceType } from '../../../core/chess/types.ts';
 
-/** Piece type for a lesson character, or `null` for one that doesn't stand for a single piece (Owl: World 1 is about the board itself, not one piece). */
+/** Piece type for a lesson character, or `null` for one that is not a single piece (Owl: World 1 is about the board). */
 export function characterPieceOrNull(character: string): PieceType | null {
   return CHARACTER_PIECES[character] ?? null;
 }
@@ -17,7 +17,6 @@ const PIECE_CHARACTER: Readonly<Record<PieceType, string>> = {
   p: 'caterpillar',
 };
 
-/** The animal character a piece type is taught as. */
 export function characterForPiece(type: PieceType): string {
   return PIECE_CHARACTER[type];
 }

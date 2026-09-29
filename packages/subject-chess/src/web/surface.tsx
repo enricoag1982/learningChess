@@ -15,8 +15,7 @@ import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts
 import { PieceIcon } from './ui/board/pieces.tsx';
 import { InfoPill } from '@learn/platform-web/ui/ds/primitives.tsx';
 
-/** The piece-icon pill under a character's portrait, naming the piece it stands for; nothing for
- * a narrator-taught character (Owl — no `core.characters` entry). */
+/** The piece-icon pill under a character's portrait; nothing for a narrator-taught character (Owl). */
 export function CharacterBadge({ character }: { readonly character: string }): JSX.Element | null {
   const { t } = useTranslation();
   const topicKey = chessCore.characters[character]?.topicKey;
@@ -32,8 +31,7 @@ export function CharacterBadge({ character }: { readonly character: string }): J
   );
 }
 
-/** Story step's board: the demo position with its highlighted squares, sized for a phone-width
- * column (`compact`) or a side-by-side row. */
+/** Story board: the demo position with its highlighted squares, sized for a phone column (`compact`) or a side-by-side row. */
 export function SurfaceStory({
   lesson,
   compact,
@@ -68,7 +66,6 @@ export function SurfaceStory({
   );
 }
 
-/** Demo step's board: free play with the lesson's own piece, every legal move open. */
 export function SurfaceDemo({ lesson }: { readonly lesson: Lesson }): JSX.Element {
   const { t } = useTranslation();
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
@@ -96,7 +93,6 @@ export function SurfaceDemo({ lesson }: { readonly lesson: Lesson }): JSX.Elemen
   );
 }
 
-/** My Den's own stats row: games won, games played with a friend. */
 export function Stats({
   gameRecords,
 }: {

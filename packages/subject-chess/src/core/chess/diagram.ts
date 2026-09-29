@@ -1,7 +1,6 @@
 import type { Color, Piece, Position, Square } from './types.ts';
 import { PIECE_BY_LETTER, squareAt } from './notation.ts';
 
-/** Thrown when a board diagram string is malformed. */
 export class DiagramError extends Error {
   constructor(message: string) {
     super(message);
@@ -9,10 +8,7 @@ export class DiagramError extends Error {
   }
 }
 
-/**
- * Parses a board diagram (8 rows of 8 whitespace-separated tokens, rank 8 first) into a
- * `Position`. Tolerates indentation and leading/trailing/blank lines.
- */
+/** Parses a diagram (8 rows of 8 whitespace-separated tokens, rank 8 first) into a `Position`; tolerates indentation and blank lines. */
 export function parseDiagram(diagram: string, options?: { toMove?: Color }): Position {
   const rows = diagram
     .split('\n')

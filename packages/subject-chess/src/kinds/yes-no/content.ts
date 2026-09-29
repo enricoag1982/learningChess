@@ -6,19 +6,14 @@ import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-con
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 import { checkYesNoVerify } from './verify.ts';
 
-/**
- * A `yes-no` exercise's optional load-time-only check: the loader computes the named rule fact on
- * the exercise's own position and fails the build if it contradicts `answer`, so a "safe?" /
- * "in check?" answer can never be authored wrong. Never compiled into the runtime `ExerciseDef`.
- * Also supports `can-castle kingside|queenside`, `can-en-passant` and `insufficient-material`.
- */
+/** Optional load-time-only check: the loader computes the named fact on the exercise's position and fails the build if it
+ * contradicts `answer`. Also `can-castle kingside|queenside`, `can-en-passant`, `insufficient-material`; never compiled. */
 const yesNoVerifySchema = z
   .string()
   .regex(
     /^(?:hanging|attacked|defended) [a-h][1-8]$|^(?:in-check|checkmate|stalemate|insufficient-material)$|^can-castle (?:kingside|queenside)$|^can-en-passant$/,
   );
 
-/** Answer a yes/no question about the position; `focus`, if given, is the square in question. */
 export const schema = z
   .object({
     ...exerciseCommonFields,

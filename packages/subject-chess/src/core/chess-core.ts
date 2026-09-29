@@ -23,9 +23,8 @@ import { composeDefaultSettings } from '@learn/platform-core/domain/profile-sett
 import type { AppConfig, SubjectCore } from '@learn/platform-core/domain/subject';
 import type { ProfileSettings } from '@learn/platform-core/domain/profile-settings';
 
-/** The World-2 piece-lesson characters' own piece, Rhino .. Caterpillar — the one source both
- * `CHESS_CHARACTERS.topicKey` (below) and the web's `character-meta.ts`/content's
- * `voice-texts.ts` (each importing this instead of keeping their own copy) derive from. */
+/** The World-2 piece-lesson characters' pieces, Rhino .. Caterpillar: the one source `CHESS_CHARACTERS.topicKey`,
+ * `character-meta.ts` and content's `voice-texts.ts` derive from. */
 export const CHARACTER_PIECES: Readonly<Record<string, PieceType>> = {
   rhino: 'r',
   elephant: 'b',
@@ -35,8 +34,7 @@ export const CHARACTER_PIECES: Readonly<Record<string, PieceType>> = {
   caterpillar: 'p',
 };
 
-/** The World-2 piece-lesson characters, Rhino .. Caterpillar — key order is `animalFriends`' own
- * friend order. Exported so `animalFriends`' callers can pass it in. */
+/** The World-2 piece-lesson characters; key order is `animalFriends`' friend order. */
 export const CHESS_CHARACTERS = Object.fromEntries(
   Object.entries(CHARACTER_PIECES).map(([character, piece]) => [
     character,
@@ -44,9 +42,8 @@ export const CHESS_CHARACTERS = Object.fromEntries(
   ]),
 );
 
-/** Chess's `SubjectCore`: today's 8 exercise kinds, the `static`/`versus` modes (`series` is added
- * by `createSubjectRuntime`, subject-free), its own badge facts (`game-win`/`game-event`/
- * `game-played`), its versus→GameRecord translation and animal friends. */
+/** Chess's `SubjectCore`: 8 exercise kinds, `static` / `versus` modes (`series` comes from `createSubjectRuntime`), its badge
+ * facts, versus→GameRecord translation and animal friends. */
 export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   id: 'chess',
   context: createVariantRules(chessJsRules),
@@ -65,13 +62,11 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   },
 };
 
-/** The chess app's own full default settings, for code that needs a plain constant (the web
- * store's initial/new-profile state) rather than an `AppDeps` round trip. */
+/** The chess app's full default settings as a plain constant (the web store's initial / new-profile state). */
 export const DEFAULT_PROFILE_SETTINGS: ProfileSettings = composeDefaultSettings(chessCore.settings);
 
-/** Chess app's storage / backup / parent-code identifiers, read by `backup.ts`, `merge.ts`, web
- * `local-store.ts` and `download-password-file-writer.ts`. No `version`: that is the running
- * build's own, not the subject's — the platform-web shell fills it in (web: `__APP_VERSION__`). */
+/** Chess's storage / backup / parent-code identifiers. No `version`: it is the running build's, filled in by the
+ * platform-web shell (`__APP_VERSION__`). */
 export const CHESS_APP_CONFIG: Omit<AppConfig, 'version'> = {
   storagePrefix: 'chess-kids:',
   backupAppId: 'chess-kids',

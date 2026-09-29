@@ -4,7 +4,6 @@ import type { ChoiceDef } from '../../core/exercise/types.ts';
 import type { Position } from '../../core/chess/types.ts';
 import { classifyTrade } from '../../content/kinds/common.ts';
 
-/** A `choice` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */
 type ChoiceVerify =
   | { readonly kind: 'higher-value' }
   | { readonly kind: 'worth'; readonly value: number }
@@ -20,7 +19,6 @@ function parseChoiceVerify(raw: string): ChoiceVerify {
   return { kind: 'trade', san: raw.slice('trade '.length) };
 }
 
-/** Every option's piece value, or `null` (with an issue pushed) if any option is not a piece. */
 function optionValues(
   exercise: ChoiceDef,
   verifyLabel: string,
@@ -137,8 +135,7 @@ function checkChoiceDrawKind(exercise: ChoiceDef, where: string, issues: string[
   }
 }
 
-/** A `choice` exercise's optional `verify`: `higher-value`/`worth <n>` need every option to be a
- * piece; `trade <SAN>` classifies a kid capture; `draw-kind` classifies the position. Load-time only. */
+/** `higher-value` / `worth <n>` need every option to be a piece; `trade <SAN>` classifies a kid capture; `draw-kind` classifies the position. Load-time only. */
 export function checkChoiceVerify(
   exercise: ChoiceDef,
   verify: string | undefined,

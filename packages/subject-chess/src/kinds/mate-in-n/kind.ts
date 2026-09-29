@@ -6,7 +6,6 @@ import type { MoveAction } from '../base.ts';
 import type { MateInNDef } from '../../core/exercise/types.ts';
 import { mateInNHint, playMateInN } from './engine.ts';
 
-/** Result of a kid move in a `mate-in-n` exercise. */
 export type MateInNOutcome =
   | { readonly kind: 'illegal' }
   /** A legal move that neither mates nor matches the scripted line for this ply. Position unchanged. */

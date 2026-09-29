@@ -7,9 +7,7 @@ import { PieceIcon } from '../../web/ui/board/pieces.tsx';
 
 export interface SetupPaletteProps {
   readonly palette: readonly PalettePiece[];
-  /** Currently selected palette piece (tap a square next to place it), if any. */
   readonly selected: Piece | null;
-  /** Active hint, if any: highlights the suggested piece (levels 1–2). */
   readonly hint: Hint | null;
   readonly onSelect: (piece: Piece) => void;
   /** One non-wrapping, horizontally scrollable row (phone / iPad portrait, under the board); default wraps for the side panel. */
@@ -20,7 +18,6 @@ function pieceKey(piece: { readonly color: string; readonly type: string }): str
   return `${piece.color}${piece.type}`;
 }
 
-/** Setup exercise's piece tray: tap a piece here, then a square on the board, to place it. */
 export function SetupPalette({
   palette,
   selected,

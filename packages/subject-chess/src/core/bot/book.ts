@@ -9,18 +9,15 @@ export interface BookLine {
   readonly moves: readonly string[];
 }
 
-/** A small set of opening lines, used by Fox/Wolf/Bear (`BotLevel.book`) while still following one.
- * Content-owned data, passed in rather than imported, so `domain` stays content-free. */
+/** Opening lines for Fox/Wolf/Bear (`BotLevel.book`) while a game follows one; content-owned and passed in so `domain` stays content-free. */
 export interface BotBook {
   readonly lines: readonly BookLine[];
 }
 
-/** Plies within which the book applies. */
 export const MAX_BOOK_PLIES = 6;
 
-/** Every book move that still applies at `state`'s current ply: one per line whose SAN prefix
- * matches `state.history`, deduplicated, kept only when still legal in the current position. `[]`
- * once past `MAX_BOOK_PLIES` or off every line. */
+/** Every book move still applying at `state`: one per line whose SAN prefix matches `state.history`, deduplicated, still
+ * legal; `[]` past `MAX_BOOK_PLIES` or off every line. */
 export function bookCandidates(state: GameState, book: BotBook, rules: ChessRules): Move[] {
   const played = state.history.map((move) => move.san);
   if (played.length >= MAX_BOOK_PLIES) {
@@ -52,8 +49,7 @@ export function bookCandidates(state: GameState, book: BotBook, rules: ChessRule
   return candidates;
 }
 
-/** Picks a book move for `state` (uniformly among `bookCandidates`, via the seeded `random`), or
- * `null` once none applies. Deterministic: same state + book + seed → same move. */
+/** A book move (uniform among `bookCandidates`, seeded `random`), or `null`; deterministic for the same state + book + seed. */
 export function bookMove(
   state: GameState,
   book: BotBook,

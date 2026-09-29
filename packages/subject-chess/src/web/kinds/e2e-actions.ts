@@ -7,17 +7,12 @@ import type { VariantRules } from '../../core/variant/rules.ts';
 import { SQUARES } from '../../core/chess/types.ts';
 import { findMoveBySan } from '../../core/chess/facts/san.ts';
 
-/** Clicks the board cell named "<square>, ..." (Board.tsx's accessible square names). */
 export async function clickSquare(page: Page, square: string): Promise<void> {
   await page.getByRole('button', { name: new RegExp(`^${square},`) }).click();
 }
 
-/**
- * Taps a piece, then a square that is neither a legal destination for it nor another piece's own
- * square (`Board.tsx`'s tap-tap: tapping another piece's square reselects instead of erroring) —
- * always rejected as an illegal move (an error), leaving the position unchanged, then deselects the
- * piece again so a `solution` played right after starts from a clean board.
- */
+/** Taps a piece, then a square that is neither a legal destination nor another piece's square (`Board.tsx`: that reselects) so
+ * it is rejected as illegal (+1 error, position unchanged), then deselects so a following `solution` starts clean. */
 async function tapIllegalMove(page: Page, position: Position, rules: VariantRules): Promise<void> {
   const moves = rules.legalMoves(position, { staticOpponent: true });
   const [firstMove] = moves;
@@ -33,13 +28,8 @@ async function tapIllegalMove(page: Page, position: Position, rules: VariantRule
   await clickSquare(page, firstMove.from);
 }
 
-/**
- * Drives a move kind's `MoveAction` (collect-stars / capture / best-move / mate-in-n all share this
- * shape): a SAN move resolves to its `from`/`to` first (`findMoveBySan`), then both forms play as a
- * from→to tap. The universally-illegal `wrongAction` (`from === to`) has no literal tap equivalent —
- * a second tap on the same square only deselects it (`Board.tsx`) — so it reproduces the same
- * outcome (`onIllegal`, +1 error, position unchanged) via `tapIllegalMove` instead.
- */
+/** Drives a move kind's `MoveAction`: a SAN move resolves to from/to (`findMoveBySan`), then plays as a from→to tap. The illegal
+ * `wrongAction` (`from === to`) has no literal tap (a second tap only deselects), so `tapIllegalMove` reproduces its outcome. */
 export async function performMove(
   page: Page,
   move: MoveInput,

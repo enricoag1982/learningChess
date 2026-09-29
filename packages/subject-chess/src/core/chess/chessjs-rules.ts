@@ -14,9 +14,8 @@ function hasKing(position: Position, color: Color): boolean {
   );
 }
 
-/** Builds a chess.js instance from a `Position`. Lessons/mini-games may omit either or both kings
- * (lone rook, Pawn Wars, …): those load with `skipValidation`; a position with both kings still
- * goes through chess.js's own FEN validation (rejects e.g. two white kings). */
+/** Lessons / mini-games may omit either king (lone rook, Pawn Wars, …): those load with `skipValidation`; a position with
+ * both kings goes through chess.js's FEN validation. */
 function buildChess(position: Position): Chess {
   const fen = toFen(position);
   const missingKing = !hasKing(position, 'w') || !hasKing(position, 'b');
@@ -48,10 +47,8 @@ function toChessJsMove(move: MoveInput): string | { from: string; to: string; pr
   return { from: move.from, to: move.to, promotion: move.promotion ?? 'q' };
 }
 
-/** chess.js's private, pre-SAN move shape (0x88 indices). The public `moves()`/`move()` wrap this
- * with full SAN + a checkmate check per move — far too slow per search node (~40x this shape's
- * cost) — so `SearchBoard` reaches into these internals; a chess.js upgrade that renames them
- * fails loudly here (the cast stops matching) rather than silently miscomputing. */
+/** chess.js's private pre-SAN move shape (0x88 indices). The public `moves()`/`move()` add SAN + a checkmate check per move
+ * (~40x slower per search node), so `SearchBoard` uses these internals; a chess.js rename fails loudly here (the cast stops matching). */
 interface InternalMove {
   readonly color: Color;
   readonly from: number;
@@ -65,8 +62,7 @@ interface FastChess {
   _moves(options: { legal: true }): InternalMove[];
   _makeMove(move: InternalMove): void;
   _undoMove(): void;
-  /** chess.js's own incremental Zobrist hash, XOR-updated in `_makeMove`/`_undoMove` — O(1) to
-   * read, no recomputation. Same internals trade-off as above; only `hash()` reads this. */
+  /** chess.js's incremental Zobrist hash (O(1) read); same internals trade-off as above, only `hash()` reads it. */
   readonly _hash: bigint;
 }
 
@@ -76,15 +72,13 @@ function fast(chess: Chess): FastChess {
   return chess as unknown as FastChess;
 }
 
-/** 0x88 index → algebraic square (inverse of chess.js's private `Ox88` table). */
 function squareOf(index: number): Square {
   const file = index & 0xf;
   const rank = 8 - (index >> 4);
   return `${String.fromCharCode(97 + file)}${String(rank)}` as Square;
 }
 
-/** `SearchBoard`'s move, from the fast internal shape. `san` is a cheap long-algebraic placeholder,
- * not real chess notation: every move returned to a caller comes from `ChessRules` instead. */
+/** From the fast internal shape; `san` is a cheap long-algebraic placeholder, never real notation (callers get moves from `ChessRules`). */
 function toSearchMove(move: InternalMove): Move {
   const from = squareOf(move.from);
   const to = squareOf(move.to);
@@ -108,7 +102,6 @@ function internalMoveMatches(internal: InternalMove, move: Move): boolean {
   );
 }
 
-/** `ChessRules` backed by chess.js. */
 export const chessJsRules: ChessRules = {
   legalMoves(position, from) {
     const chess = buildChess(position);

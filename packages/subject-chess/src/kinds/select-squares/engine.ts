@@ -7,7 +7,6 @@ import type { Hint } from '../../core/exercise/hint.ts';
 import type { SelectionResult } from './kind.ts';
 import type { SelectSquaresDef } from '../../core/exercise/types.ts';
 
-/** Adds or removes a square from the current selection (select-squares). No-op once solved. */
 export function toggleSquare(
   state: ExerciseStateOf<SelectSquaresDef>,
   square: Square,
@@ -21,15 +20,13 @@ export function toggleSquare(
   return { ...state, selected };
 }
 
-/** Resolves a select-squares exercise's answer squares. */
 export function selectSquaresAnswer(def: SelectSquaresDef, rules: VariantRules): readonly Square[] {
   if ('squares' in def.answer) {
     return def.answer.squares;
   }
   if (def.answer.derive === 'legal-moves') {
-    // A promoting pawn's legal moves include one entry per promotion piece, all sharing the same
-    // `to` (e.g. 4 pushes to d8): de-duplicated, or toggling that square an even number of times
-    // would end it unselected instead of selected.
+    // A promoting pawn's legal moves repeat one `to` per promotion piece (4 pushes to d8): de-duplicated, or toggling that square an
+    // even number of times would end it unselected.
     const targets = rules
       .legalMoves(def.position, { staticOpponent: true }, def.answer.from)
       .map((move) => move.to);
@@ -52,7 +49,6 @@ export function selectSquaresAnswer(def: SelectSquaresDef, rules: VariantRules):
   return [...new Set(targets)];
 }
 
-/** Checks the current selection against the answer (select-squares). */
 export function submitSelection(
   state: ExerciseStateOf<SelectSquaresDef>,
   rules: VariantRules,

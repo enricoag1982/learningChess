@@ -6,7 +6,6 @@ import { PieceIcon } from '../../web/ui/board/pieces.tsx';
 
 export interface ChoiceOptionsProps {
   readonly options: readonly ChoiceOption[];
-  /** Option ids already ruled out (wrong pick or hint-removed): orange, disabled. */
   readonly wrongOptionIds: readonly string[];
   readonly onPick: (optionId: string) => void;
 }

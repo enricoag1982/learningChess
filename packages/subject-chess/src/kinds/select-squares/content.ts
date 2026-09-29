@@ -8,7 +8,6 @@ import { exerciseCommonFields, rules, squareSchema } from '../../content/kinds/c
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 
-/** Tap the correct set of squares: explicit `answer`, or `derive`d from the position. */
 export const schema = z
   .object({
     ...exerciseCommonFields,
@@ -53,7 +52,6 @@ function refine(value: z.output<typeof schema>, ctx: z.RefinementCtx): void {
   }
 }
 
-/** Value guaranteed non-`undefined` by a zod schema that already validated successfully. */
 function assertValidated<T>(value: T | undefined, context: string): T {
   if (value === undefined) {
     throw new Error(`lesson-load: ${context}: expected a value already validated by the schema`);

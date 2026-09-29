@@ -1,4 +1,3 @@
-/** Kid aids for one level. */
 export interface BotAids {
   readonly takeBack: 'unlimited' | 'limited' | 'none';
   /** Only meaningful when `takeBack === 'limited'`; `Infinity` for `'unlimited'`, `0` for `'none'`. */
@@ -7,7 +6,6 @@ export interface BotAids {
   readonly danger: boolean;
 }
 
-/** One difficulty profile for the computer opponent. */
 export interface BotLevel {
   readonly level: 1 | 2 | 3 | 4 | 5;
   readonly name: 'mouse' | 'rabbit' | 'fox' | 'wolf' | 'bear';
@@ -23,7 +21,7 @@ export interface BotLevel {
   readonly alwaysMateInOne: boolean;
   /** Own moves during which the queen stays home, unless attacked or it is the only legal move. */
   readonly queenHomeMoves: number;
-  /** Uses the small opening book (`packages/content/bot-book.yaml`) while the game stays in it. */
+  /** Uses the small opening book (`packages/subject-chess/content/bot-book.yaml`) while the game stays in it. */
   readonly book: boolean;
   readonly aids: BotAids;
 }
@@ -32,7 +30,6 @@ const MOUSE_RABBIT_AIDS: BotAids = { takeBack: 'unlimited', takeBackLimit: Infin
 const FOX_AIDS: BotAids = { takeBack: 'limited', takeBackLimit: 3, danger: false };
 const WOLF_BEAR_AIDS: BotAids = { takeBack: 'none', takeBackLimit: 0, danger: false };
 
-/** Mouse → Bear. */
 export const BOT_LEVELS: readonly BotLevel[] = [
   {
     level: 1,

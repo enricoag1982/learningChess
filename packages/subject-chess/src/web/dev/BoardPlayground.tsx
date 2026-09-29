@@ -178,7 +178,6 @@ function HighlightSamples(): JSX.Element {
   );
 }
 
-/** Dev-only visual harness for the board component, at `/#board` in development. */
 export function BoardPlayground(): JSX.Element {
   return (
     <main className="min-h-dvh bg-cream p-6">

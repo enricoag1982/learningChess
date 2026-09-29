@@ -16,28 +16,23 @@ function current(state: VersusState): VariantGameState {
   return last;
 }
 
-/** Starts a fresh `versus` boss at its authored position. */
 export function startVersus(def: VersusGameDef): VersusState {
   return { mode: 'versus', def, states: [startGame(def.rules, def.position)], status: 'playing' };
 }
 
-/** The position currently on the board. */
 export function versusPosition(state: VersusState): Position {
   return current(state).position;
 }
 
-/** Why the game ended (see `VersusState.endReason`), or `undefined` while still playing. */
 export function versusEndReason(state: VersusState): string | undefined {
   return state.endReason;
 }
 
-/** The underlying variant-game state, for a caller that needs more than the bare position —
- * chiefly a `BotPlayer` adapter, whose `chooseMove` port takes this same shape. */
+/** The underlying variant-game state, e.g. for a `BotPlayer` adapter's `chooseMove` port. */
 export function versusGameState(state: VersusState): VariantGameState {
   return current(state);
 }
 
-/** True when it is the kid's turn to move (the opponent otherwise). */
 export function isKidTurn(state: VersusState): boolean {
   return current(state).position.toMove === state.def.kidColor;
 }
@@ -87,14 +82,12 @@ export function playVersusMove(
   return { state: nextState, outcome: { kind: 'ended', move: played.move, status } };
 }
 
-/** Take back: undoes the kid's last move and the bot's reply, returning to the kid's turn before
- * that move. Only while it is the kid's turn again with a full round played; the per-level aid gate
- * is the caller's job — this only guards the shape of `states`. */
+/** Undoes the kid's last move and the bot's reply, only when it is the kid's turn with a full round played; the per-level aid
+ * gate is the caller's job. */
 export function canTakeBack(state: VersusState): boolean {
   return state.status === 'playing' && isKidTurn(state) && state.states.length >= 3;
 }
 
-/** Undoes the kid's last move and the bot's reply; no-op (returns `state` unchanged) if `!canTakeBack(state)`. */
 export function takeBackVersusMove(state: VersusState): VersusState {
   if (!canTakeBack(state)) {
     return state;

@@ -34,8 +34,8 @@ export async function pickProfileFromPicker(nickname: string): Promise<void> {
  * (every exercise at 3 stars, boss at 3 stars where it has one), plus both World 3's and World 4's
  * own world bosses (`win-the-queen`, `first-game`) won — the ingredients `worldStatus`/
  * `worldBossStatus` need before World 4 counts as "mastered" (`docs/domain-model.md` §3, mirrors
- * the e2e helpers' pattern). Unlocks Mouse on the Play screen's vs Computer card (M3.5,
- * `app-structure.md` §7). Seeded via `ProgressRepository` directly (not `recordGame`), so it
+ * the e2e helpers' pattern). Unlocks Mouse on the Play screen's vs Computer card
+ * (`app-structure.md` §7). Seeded via `ProgressRepository` directly (not `recordGame`), so it
  * writes no `GameRecord` — same as a real World 4 playthrough, the kid's first `first-game` win
  * still counts toward Rabbit's "beat Mouse 3x", just not from this shortcut.
  */

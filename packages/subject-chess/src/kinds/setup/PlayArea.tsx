@@ -56,8 +56,7 @@ export function PlayArea({
     />
   );
 
-  // Stacked layout (phone / iPad portrait): the tray goes directly under the board (`belowBoard`,
-  // M2.4 §2b) instead of the controls row.
+  // Stacked layout (phone / iPad portrait): the tray goes under the board (`belowBoard`) instead of the controls row.
   const tray = (
     <SetupPalette
       palette={setupPalette(state.core)}

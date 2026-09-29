@@ -8,10 +8,7 @@ import { exerciseCommonFields, rules } from '../../content/kinds/common.ts';
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 
-/**
- * Deliver checkmate under real chess rules (both kings, real turn alternation): `line` is the full
- * scripted sequence in SAN — kid move, opponent reply, kid move, …, final kid move (which mates).
- */
+/** Checkmate under real chess rules: `line` is the full SAN sequence (kid, opponent reply, …, final mating kid move). */
 export const schema = z
   .object({
     ...exerciseCommonFields,

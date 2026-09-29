@@ -6,7 +6,6 @@ import { chessJsRules } from '../chessjs-rules.ts';
 import { parseFen } from '../fen.ts';
 import { STANDARD_START_BOARD } from './start.ts';
 
-/** Standard chess start position, castling rights included (same board `isStandardStart` checks). */
 const STANDARD_START_FEN = `${STANDARD_START_BOARD} w KQkq - 0 1`;
 
 /** True if the opponent ever captured this profile's queen while replaying `moves` from the
@@ -24,12 +23,10 @@ function queenCapturedByOpponent(moves: readonly string[], color: 'w' | 'b'): bo
   return false;
 }
 
-/** Chess's own badge facts: win counts, SAN-derived events, local-game count and queen-kept wins —
- * everything `game-win`/`game-event`/`game-played` badge conditions read (`chessConditionValue`). */
+/** Chess's own badge facts, read by `game-win` / `game-event` / `game-played` conditions (`chessConditionValue`). */
 export interface ChessRewardFacts {
   /** Win counts keyed like `BadgeCondition.opponent`: `'any'`, `'computer:<n>'`, a mini-game id. */
   readonly gameWins: Readonly<Record<string, number>>;
-  /** Wins where the kid's queen was never captured. */
   readonly queenKeptWins: number;
   /** Promotion move count / games-with-a-castle count, across all non-abandoned games. */
   readonly gameEvents: Readonly<{ promotion: number; castling: number }>;
@@ -37,10 +34,8 @@ export interface ChessRewardFacts {
   readonly localGamesPlayed: number;
 }
 
-/** Derives {@link ChessRewardFacts} from every `GameRecord`, abandoned games excluded.
- * `gameWins.any`/`['computer:<n>']` count only full games; a mini-game win counts only under its
- * own id. `gameEvents.castling` counts games with >= 1 castling move (a game, not a move); reads
- * `GameRecord.moves` directly, both sides alike. */
+/** Derives {@link ChessRewardFacts} from every non-abandoned `GameRecord`: `gameWins.any` / `['computer:<n>']` count full games
+ * only, a mini-game win only its own id; `gameEvents.castling` counts games with >= 1 castling move. */
 export function chessRewardFacts(records: readonly GameRecord[]): ChessRewardFacts {
   const nonAbandoned = records.filter((record) => record.result !== 'abandoned');
 
@@ -79,8 +74,7 @@ export function chessRewardFacts(records: readonly GameRecord[]): ChessRewardFac
   return { gameWins, queenKeptWins, gameEvents: { promotion, castling }, localGamesPlayed };
 }
 
-/** `SubjectCore.rewards.conditionValue`: the fact value for chess's 3 game-record badge condition
- * types; `undefined` for any other type (the badge engine's own 7 generic ones). */
+/** `SubjectCore.rewards.conditionValue` for chess's 3 game-record condition types; `undefined` for the engine's own 7. */
 export function chessConditionValue(
   condition: BadgeCondition,
   facts: ChessRewardFacts,

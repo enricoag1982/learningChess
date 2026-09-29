@@ -4,11 +4,8 @@ import { hasKing, hasPieceOf } from '../../core/chess/facts/pieces.ts';
 import { game } from '../../chess.ts';
 import type { ModeVerifyContext } from '@learn/platform-content/modes/mode-content';
 
-/**
- * `versus` mini-game checks (domain-model.md §1.4: "position valid, win conditions valid"): the
- * board matches `rules.kings` (both present / both absent), and the game is not already over at
- * its own start position (an instant win/draw there means the boss is unplayable).
- */
+/** `versus` checks (domain-model.md §1.4): the board matches `rules.kings` (both present / both absent) and the game is not
+ * already over at its start (an instant win/draw there makes the boss unplayable). */
 export function verify(miniGame: VersusMiniGame, where: string, ctx: ModeVerifyContext): void {
   if (!hasPieceOf(miniGame.position, miniGame.position.toMove)) {
     ctx.issues.push(`${where}: side to move has no piece`);

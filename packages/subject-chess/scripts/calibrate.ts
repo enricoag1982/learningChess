@@ -6,9 +6,9 @@ import type { Color } from '../src/core/chess/types.ts';
 import type { BotLevel } from '../src/core/bot/levels.ts';
 
 /**
- * Calibration self-play (`docs/computer-opponent.md` §8 "Calibration (nightly)", M4.2's own
- * `docs/computer-opponent.md` §5 target): plays each level a full standard game against the level
- * right below it, `N` seeded games each (default 40, `pnpm --filter @chess-kids/core calibrate 100`
+ * Calibration self-play (`docs/computer-opponent.md` §8 "Calibration (nightly)",
+ * §5 target): plays each level a full standard game against the level
+ * right below it, `N` seeded games each (default 40, `pnpm --filter @learn/subject-chess calibrate 100`
  * for more), and prints win rates. Not part of `pnpm test` — self-play at Bear's depth is much too
  * slow for CI (a handful of minutes for the whole run); this is a manual tuning tool, run once per
  * change to `levels.ts` and read by a person, not asserted on.
@@ -90,10 +90,10 @@ if (!Number.isInteger(N) || N <= 0) {
   throw new Error(`calibrate: expected a positive integer game count, got "${String(gamesArg)}"`);
 }
 
-/** Optional 3rd arg (`pnpm --filter @chess-kids/core calibrate 15 bear`): only the pairing whose
- * `higher` level has this name — a quick smoke check while tuning one level (M5.4's own Bear
+/** Optional 3rd arg (`pnpm --filter @learn/subject-chess calibrate 15 bear`): only the pairing whose
+ * `higher` level has this name — a quick smoke check while tuning one level (Bear
  * strength work, `docs/computer-opponent.md` §9) without paying for the other 3 pairings every
- * time. Omitted runs every pairing, as before. */
+ * time. Omitted runs every pairing. */
 const filterArg = process.argv[3];
 const pairings =
   filterArg === undefined ? PAIRINGS : PAIRINGS.filter((p) => p.higher === filterArg);

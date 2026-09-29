@@ -5,16 +5,14 @@ import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-con
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 import { checkBestMoveVerify, verify } from './verify.ts';
 
-/** A `best-move` exercise's optional load-time-only check: the loader computes the exact set of
- * legal kid moves satisfying the named rule and fails the build unless `solutions` equals that set.
- * Never compiled into the runtime `BestMoveDef`. See `verify.ts` for each rule's meaning. */
+/** Optional load-time-only check: the loader computes the exact set of legal kid moves satisfying the rule and fails the build
+ * unless `solutions` equals it; never compiled (see `verify.ts`). */
 const bestMoveVerifySchema = z
   .string()
   .regex(
     /^attack [a-h][1-8]$|^save [a-h][1-8]$|^take-free$|^good-trade$|^check$|^escape-king$|^escape-block$|^escape-capture$|^castle$|^en-passant$/,
   );
 
-/** Play the right move; any SAN in `solutions` solves it. Opponent, if any, is static. */
 export const schema = z
   .object({
     ...exerciseCommonFields,

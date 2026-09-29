@@ -1,8 +1,7 @@
 import type { JSX } from 'react';
 import { Svg } from '@learn/platform-web/ui/ds/icons.tsx';
 
-/** Home's "Play" tile icon (vs Computer / vs Friend / mini-games) — its own file: `home-tiles.ts`
- * (plain data, `SubjectWeb.homeTiles`) stays JSX-free so Fast Refresh treats it as a data module. */
+/** Home's "Play" tile icon, in its own file so `home-tiles.ts` stays JSX-free (a data module for Fast Refresh). */
 export function PlayTileIcon(): JSX.Element {
   return (
     <Svg size={32} stroke="#B8561A">

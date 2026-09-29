@@ -6,14 +6,12 @@ import type { VariantRules } from '../variant/rules.ts';
 import { applyKidMove } from './apply-move.ts';
 import type { ExerciseDef } from './types.ts';
 
-/** One step of a solution line. */
 export interface SolverMove {
   readonly from: Square;
   readonly to: Square;
 }
 
-/** Deterministic key for everything move generation depends on: piece placement, castling rights
- * and en passant square. */
+/** Deterministic key for what move generation depends on: piece placement, castling rights, en passant square. */
 function placementKey(position: Position): string {
   const placement = Object.entries(position.pieces)
     .sort(([a], [b]) => (a < b ? -1 : 1))
@@ -22,14 +20,12 @@ function placementKey(position: Position): string {
   return `${placement}|${position.castling}|${position.enPassant ?? '-'}`;
 }
 
-/** Full search state key: piece placement plus remaining stars. */
 function stateKey(position: Position): string {
   return `${placementKey(position)}|${[...position.markers.stars].sort().join(',')}`;
 }
 
-/** Applies an already-legal move to the board, the way a static-opponent kid move always does:
- * turn stays with the kid, en passant cleared, a landed-on star collected. Updates the piece map
- * directly rather than a full chess.js round trip, to keep the search fast. */
+/** Applies an already-legal move the way a static-opponent kid move does: turn stays with the kid, en passant cleared, a
+ * landed-on star collected; edits the piece map directly (no chess.js round trip) to keep the search fast. */
 function applyForSearch(position: Position, move: Move, rules: VariantRules): Position {
   if (position.castling !== '-') {
     // Castling moves the rook and changes rights: replay through the rules instead.
@@ -76,9 +72,8 @@ function pathTo(node: Node): SolverMove[] {
   return path;
 }
 
-/** Shortest line of kid moves (opponent static) reaching `goal` from `position`, or `null` within
- * `maxDepth` plies. Breadth-first, deduplicated by piece placement + remaining stars; legal moves
- * are cached per placement since they never depend on the star subset. */
+/** Shortest line of kid moves reaching `goal`, or `null` within `maxDepth` plies. BFS deduplicated by piece placement +
+ * remaining stars; legal moves are cached per placement (independent of the star subset). */
 export function solve(
   position: Position,
   rules: VariantRules,
@@ -131,7 +126,6 @@ export function solve(
   return null;
 }
 
-/** True for the two exercise types that are also a static-opponent `Goal` (`staticGoalExercise`'s domain). */
 function isGoalType(type: ExerciseDef['type']): type is Goal {
   return type === 'collect-stars' || type === 'capture';
 }

@@ -16,14 +16,11 @@ export interface MiniBoardProps {
   /** Squares to mark with a green dot (e.g. a demo's legal moves). Purely decorative. */
   readonly highlightSquares?: readonly Square[];
   readonly orientation?: Color;
-  /** Accessible label; the board itself is a static illustration, not a control. */
   readonly label: string;
-  /** Animal-badge piece look (`board/piece-style.ts`), default `false` (classic only). */
   readonly pieceBadges?: boolean;
 }
 
-/** A small, non-interactive board diagram: the Story step's "here's how I move" illustration.
- * Unlike `Board`, nothing here responds to taps or drags. */
+/** A small non-interactive board diagram (the Story step's "here's how I move"): nothing responds to taps or drags. */
 export function MiniBoard({
   position,
   highlightSquares = [],

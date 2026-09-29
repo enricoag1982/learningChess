@@ -2,7 +2,6 @@ import { SQUARES } from '../../core/chess/types.ts';
 import type { PlaceAction } from './kind.ts';
 import type { SetupDef } from '../../core/exercise/types.ts';
 
-/** Every target piece still missing from `position`, placed in board reading order. */
 export function setupSolution(def: SetupDef): readonly PlaceAction[] {
   const actions: PlaceAction[] = [];
   for (const square of SQUARES) {
@@ -15,10 +14,7 @@ export function setupSolution(def: SetupDef): readonly PlaceAction[] {
   return actions;
 }
 
-/**
- * The first needed piece, placed on a square the target leaves empty: always wrong (a chess
- * position never fills all 64 squares), for exactly 1 error, nothing placed.
- */
+/** The first needed piece on a square the target leaves empty: always wrong (a position never fills all 64 squares), exactly 1 error, nothing placed. */
 export function setupWrongAction(def: SetupDef): readonly PlaceAction[] {
   const solution = setupSolution(def);
   const first = solution[0];

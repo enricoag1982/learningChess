@@ -1,7 +1,5 @@
-// Golden snapshot: every dist output, pretty-printed for reviewable diffs. These files change only
-// when content or the build pipeline changes on purpose — a mismatch means either a real change
-// (review the diff, update with `pnpm --filter @chess-kids/content exec vitest run -u`) or an
-// accidental behaviour change (fix the code instead).
+// Golden snapshot: every dist output, pretty-printed for reviewable diffs. A mismatch is either a real change
+// (review the diff, update with the `UPDATE_HINT` command) or an accidental behaviour change (fix the code).
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -11,7 +9,8 @@ import { compileAll } from '@learn/platform-content/compile-all';
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'content');
 const compiled = compileAll(chessContent, packageDir);
 
-const UPDATE_HINT = 'pnpm --filter @chess-kids/content exec vitest run -u, then review the diff';
+const UPDATE_HINT =
+  'pnpm --filter @learn/subject-chess exec vitest run src/content/content-snapshot.test.ts -u, then review the diff';
 
 /** Pretty-printed (`JSON.stringify(v, null, 1)`, one-space indent) so a content diff stays reviewable. */
 function pretty(value: unknown): string {

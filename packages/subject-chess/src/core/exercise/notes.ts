@@ -1,6 +1,5 @@
-// The Owl bubble's feedback note, as data: one entry per `ExerciseFeedback` kind, driving both the
-// live app (`exerciseNote`) and the content build's voice inventory (loops `EXERCISE_NOTES`).
-// Chess-bound: platform note dispatch (`domain/notes.ts`) is subject-free.
+// The Owl bubble's feedback note as data: one entry per `ExerciseFeedback` kind, driving the live app (`exerciseNote`) and the
+// content build's voice inventory. Chess-bound: platform note dispatch (`domain/notes.ts`) is subject-free.
 import type { Move } from '../chess/rules.ts';
 import type {
   AnyNoteEntry,
@@ -17,7 +16,6 @@ import type { Hint } from './hint.ts';
 
 export type { AnyNoteEntry, ExerciseNote, ExerciseNoteCtx, Resolve };
 
-/** What the Owl bubble should say right now; resolved to text by `exerciseNote`. */
 export type ExerciseFeedback =
   | { readonly kind: 'instruction' }
   | { readonly kind: 'tap-first' }
@@ -45,19 +43,16 @@ export type ExerciseNoteKind = Exclude<ExerciseFeedback['kind'], 'instruction'>;
 
 type NoteFeedback<K extends ExerciseNoteKind> = Extract<ExerciseFeedback, { readonly kind: K }>;
 
-/** The piece-specific "that's not how I move" line (docs/screens.md: errors are never red). */
 function illegalMoveText(r: Resolve, piece: string, name: string): string {
   return r(`exercise.illegal.${piece}`, { name });
 }
 
-/** Praise line shown once an exercise is solved, picked by stars earned. */
 function praiseText(r: Resolve, stars: number): string {
   if (stars >= 3) return r('exercise.praise-3');
   if (stars === 2) return r('exercise.praise-2');
   return r('exercise.praise-1');
 }
 
-/** Hint-ladder text: shape (and so wording) depends on the exercise type (`hint.kind`). */
 function hintNoteText(r: Resolve, hint: Hint, name: string): string {
   if (hint.kind === 'squares') {
     if (hint.level === 1) return r('exercise.hint-piece', { name });
@@ -82,10 +77,8 @@ function hintNoteText(r: Resolve, hint: Hint, name: string): string {
   });
 }
 
-/** One entry per non-`instruction` `ExerciseFeedback` kind — the content build's voice inventory
- * loops this same table instead of mirroring `exerciseNote`'s logic by hand. Covers both chess's
- * own kinds and the platform-shaped ones (tap-first, wrong-answer, hint, solved): `core.notes`
- * (`SubjectCore`) is this whole table. */
+/** One entry per non-`instruction` `ExerciseFeedback` kind; the content build's voice inventory loops this table instead of
+ * mirroring `exerciseNote` by hand. Covers chess's kinds and the platform-shaped ones (tap-first, wrong-answer, hint, solved). */
 export const EXERCISE_NOTES = {
   'tap-first': {
     tone: 'attention',
@@ -118,16 +111,13 @@ export const EXERCISE_NOTES = {
   },
 } as const satisfies { readonly [K in ExerciseNoteKind]: NoteEntry<NoteFeedback<K>> };
 
-/** True for the feedback kinds the easier-variant offer piggybacks on (never a hint, toggle or
- * undo) — the one place besides `exerciseNote` itself that needs to know, without indexing
- * `EXERCISE_NOTES` by a non-literal kind (whose union type loses the optional `error` field). */
+/** True for the feedback kinds the easier-variant offer piggybacks on (never a hint, toggle or undo); avoids indexing
+ * `EXERCISE_NOTES` by a non-literal kind, whose union loses the optional `error` field. */
 export function isEasierOfferNote(kind: ExerciseNoteKind): boolean {
   return platformIsEasierOfferNote(EXERCISE_NOTES, kind);
 }
 
-/** The note under the instruction for the current feedback, or `undefined` while just reading the
- * instruction (teaching-process.md §3.3). `offer` appends the easier-variant sentence on an error
- * note (never on a hint, toggle or undo). */
+/** The note under the instruction for the current feedback (teaching-process.md §3.3); `offer` appends the easier-variant sentence on error notes. */
 export function exerciseNote(
   r: Resolve,
   feedback: ExerciseFeedback,

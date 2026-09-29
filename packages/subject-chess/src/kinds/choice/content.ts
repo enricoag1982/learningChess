@@ -9,7 +9,6 @@ import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-con
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 import { checkChoiceVerify } from './verify.ts';
 
-/** FEN letter of a piece, either colour (`K`, `q`, …). */
 const FEN_PIECE_PATTERN = /^[KQRBNPkqrbnp]$/;
 
 const choiceOptionSchema = z
@@ -27,7 +26,6 @@ const choiceOptionSchema = z
 
 export type ChoiceOptionYaml = z.infer<typeof choiceOptionSchema>;
 
-/** Pick the correct option (e.g. "which piece is worth more?"). */
 export const schema = z
   .object({
     ...exerciseCommonFields,
@@ -45,7 +43,6 @@ export const schema = z
   })
   .strict();
 
-/** Every option id unique, and `answer` references one of `options`. */
 function refine(value: z.output<typeof schema>, ctx: z.RefinementCtx): void {
   const ids = value.options.map((option) => option.id);
   const seen = new Set<string>();
@@ -64,7 +61,6 @@ function refine(value: z.output<typeof schema>, ctx: z.RefinementCtx): void {
   }
 }
 
-/** FEN letter → `Piece`; `choiceOptionSchema` already restricts the alphabet to `PIECE_BY_LETTER`'s keys. */
 function pieceFromLetter(letter: string): Piece {
   const piece = PIECE_BY_LETTER[letter];
   if (piece === undefined) {
@@ -92,8 +88,6 @@ function compile(raw: z.output<typeof schema>, ctx: CompileContext): ChoiceDef {
   return exercise;
 }
 
-/** Every option's own text key (besides the exercise's own `textKey`), for `lesson-load.ts`'s
- * locale check. */
 function textKeys(def: ChoiceDef): readonly TextKeyRef[] {
   return def.options
     .filter(

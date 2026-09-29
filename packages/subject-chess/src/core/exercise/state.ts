@@ -2,10 +2,8 @@ import type { Position, Square } from '../chess/types.ts';
 import type { ExerciseProgress } from '@learn/platform-core/domain/exercise/kind';
 import type { ExerciseDef } from './types.ts';
 
-/** Immutable exercise progress, `def`'s own type carried through. */
 export interface ExerciseStateOf<D> extends ExerciseProgress {
   readonly def: D;
-  /** Current position. */
   readonly position: Position;
   /** Positions before each played move, for `undo`. */
   readonly history: readonly Position[];
@@ -17,11 +15,9 @@ export interface ExerciseStateOf<D> extends ExerciseProgress {
   readonly wrongOptions?: readonly string[];
 }
 
-/** Immutable exercise progress; public shape unchanged (`def`'s own type is `ExerciseDef` here). */
 export type ExerciseState = ExerciseStateOf<ExerciseDef>;
 
-/** Builds a fresh `ExerciseStateOf<D>` at `def`'s own authored position. Every kind's `init` calls
- * this directly — the one non-dispatching implementation dispatch bottoms out at. */
+/** A fresh state at `def`'s authored position; every kind's `init` calls it. */
 export function initState<D extends { readonly position: Position }>(def: D): ExerciseStateOf<D> {
   return {
     def,

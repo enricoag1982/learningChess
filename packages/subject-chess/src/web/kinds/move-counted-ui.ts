@@ -7,7 +7,6 @@ import { CountedPlayArea } from './MovePlayArea.tsx';
 import type { MoveExtra } from './move-ui.ts';
 import { baseInitUi, moveToUi } from './move-ui.ts';
 
-/** collect-stars / capture UI: a move's usual feedback; an undo drops the last try's highlights. */
 export function moveCountedUi<D extends CollectStarsDef | CaptureDef>(
   type: D['type'],
 ): ExerciseKindUI<

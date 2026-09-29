@@ -16,11 +16,8 @@ import type {
   ModeVerifyContext,
 } from '@learn/platform-content/modes/mode-content';
 
-/**
- * A `static` mini-game (default `mode`, back-compat with every file authored before per-kind
- * modes): `type` is the win condition (`capture-all`, the default, or `collect-stars`); `goal` is
- * the spoken-text key for the goal line shown in-game.
- */
+/** A `static` mini-game (the default `mode`): `type` is the win condition (`capture-all`, default, or `collect-stars`); `goal`
+ * is the spoken-text key for the in-game goal line. */
 export const schema = z
   .object({
     ...miniGameCommonFields,

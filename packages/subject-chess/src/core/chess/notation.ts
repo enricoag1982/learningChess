@@ -1,7 +1,6 @@
 import type { Piece, Square } from './types.ts';
 import { SQUARES } from './types.ts';
 
-/** FEN / diagram letter → piece (upper case = white). */
 export const PIECE_BY_LETTER: Readonly<Record<string, Piece>> = {
   K: { color: 'w', type: 'k' },
   Q: { color: 'w', type: 'q' },
@@ -17,7 +16,6 @@ export const PIECE_BY_LETTER: Readonly<Record<string, Piece>> = {
   p: { color: 'b', type: 'p' },
 };
 
-/** FEN / diagram letter of a piece. */
 export function pieceLetter(piece: Piece): string {
   return piece.color === 'w' ? piece.type.toUpperCase() : piece.type;
 }

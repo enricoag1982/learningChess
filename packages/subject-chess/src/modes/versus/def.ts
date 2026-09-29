@@ -2,9 +2,8 @@ import type { Move } from '../../core/chess/rules.ts';
 import type { Color, Position } from '../../core/chess/types.ts';
 import type { GameRulesDef, GameState as VariantGameState } from '../../core/game/types.ts';
 
-/** Content definition for a `versus` mini-game (Pawn Wars, …): variant rules played against the
- * computer opponent, not a static/scripted enemy. `opponentLevel` is the bot level (1 Mouse .. 5
- * Bear); `kidColor` defaults to `w` at the content layer. */
+/** A `versus` mini-game (Pawn Wars, …): variant rules played against the computer; `opponentLevel` is the bot level (1 Mouse ..
+ * 5 Bear), `kidColor` defaults to `w` at the content layer. */
 export interface VersusGameDef {
   readonly id: string;
   readonly concept: string;
@@ -30,7 +29,6 @@ export interface VersusState {
   readonly endReason?: string;
 }
 
-/** Result of playing one ply (kid or bot — both go through the same variant-game rules). */
 export type VersusMoveOutcome =
   | { readonly kind: 'illegal' }
   | { readonly kind: 'played'; readonly move: Move }

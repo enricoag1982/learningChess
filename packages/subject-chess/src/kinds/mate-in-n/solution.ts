@@ -4,11 +4,7 @@ import { illegalTapMove } from '../base.ts';
 import type { MateInNDef } from '../../core/exercise/types.ts';
 import type { MoveAction } from '../base.ts';
 
-/**
- * The scripted line's own kid moves, in order — every other ply (indices 0, 2, 4, …): the
- * opponent's scripted replies are auto-applied by `act` (`playMateInN`), never played as a kid
- * action themselves.
- */
+/** The scripted line's kid moves (indices 0, 2, 4, …); the opponent's replies are auto-applied by `act`, never played as a kid action. */
 export function mateInNSolution(def: MateInNDef, ctx: VariantRules): readonly MoveAction[] {
   const replayed = replaySanLine(def.position, def.line, ctx.chess);
   if ('failedAt' in replayed) {

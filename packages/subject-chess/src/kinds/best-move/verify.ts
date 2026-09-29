@@ -17,7 +17,6 @@ type SquarelessKind =
   | 'castle'
   | 'en-passant';
 
-/** A `best-move` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */
 type BestMoveVerify =
   { readonly kind: 'attack' | 'save'; readonly square: Square } | { readonly kind: SquarelessKind };
 
@@ -125,7 +124,6 @@ function computeVerifiedBestMoves(
       .map((move) => move.san);
   }
 
-  // good-trade
   return candidates
     .filter((move) => {
       if (move.captured === undefined) return false;
@@ -139,8 +137,6 @@ function computeVerifiedBestMoves(
     .map((move) => move.san);
 }
 
-/** A `best-move` exercise's optional `verify`: computes the exact set of legal kid moves satisfying
- * the named rule and fails the build unless `solutions` equals that set. Load-time only. */
 export function checkBestMoveVerify(
   exercise: BestMoveDef,
   verify: string | undefined,

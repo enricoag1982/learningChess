@@ -4,7 +4,6 @@ import { checkOptimalMoves, exerciseCommonFields } from '../../content/kinds/com
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 
-/** Move a piece over every star; `stars3`/`stars2` are move-count thresholds. */
 export const schema = z
   .object({
     ...exerciseCommonFields,

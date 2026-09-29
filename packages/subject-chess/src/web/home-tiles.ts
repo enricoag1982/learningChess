@@ -2,8 +2,7 @@
 import type { HomeTile } from '@learn/platform-web/app/subject.ts';
 import { PlayTileIcon } from './home-tiles-icon.tsx';
 
-/** Home's "Play" tile (vs Computer / vs Friend / mini-games): between Practice and My Den, same
- * colours both already use. */
+/** Home's "Play" tile: between Practice and My Den, in the colours both already use. */
 export const HOME_TILES: readonly HomeTile[] = [
   {
     id: 'play',

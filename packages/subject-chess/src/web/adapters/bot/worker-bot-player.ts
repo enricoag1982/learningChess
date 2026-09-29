@@ -6,7 +6,6 @@ import { bot } from '../../../chess.ts';
 import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';
 
-/** In-thread fallback: the same search, run synchronously on the caller's own thread. */
 function chooseMoveInThread(state: game.GameState, level: number, seed: number): Move | null {
   const botLevel = bot.BOT_LEVELS.find((entry) => entry.level === level);
   if (botLevel === undefined) {

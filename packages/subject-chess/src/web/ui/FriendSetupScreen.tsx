@@ -10,7 +10,6 @@ import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
-/** A picked/unpicked chip button, ≥64px tall (kid touch target, `docs/screens.md` §1). */
 function ChoiceChip({
   label,
   selected,
@@ -36,8 +35,7 @@ function ChoiceChip({
   );
 }
 
-/** Play's vs Friend setup sheet (`docs/app-structure.md` §6): second player, game (unlocked
- * only), board mode, legal-move dots, swap-colours; "Start" opens `FriendGameScreen`. */
+/** vs Friend setup sheet (`docs/app-structure.md` §6): second player, unlocked game, board mode, legal-move dots, swap colours; "Start" opens `FriendGameScreen`. */
 export function FriendSetupScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

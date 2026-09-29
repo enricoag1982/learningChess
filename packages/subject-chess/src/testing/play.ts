@@ -1,8 +1,8 @@
 /**
  * Plays any `ExerciseDef` using its own kind's `solution()` / `wrongAction()` — the content build
  * (or the caller) already proved the authored answer / solutions / target / line is correct; this
- * only proves the engine accepts it end to end. Shared by every `packages/content` playthrough test
- * (World 1, 3, 4, 5) and by the content package's own kind-solution test.
+ * only proves the engine accepts it end to end. Shared by every content playthrough test
+ * (World 1, 3, 4, 5) and by the kind-solution test.
  */
 import { chessJsRules } from '../core/chess/chessjs-rules.ts';
 import type { ExerciseState } from '../core/exercise/state.ts';

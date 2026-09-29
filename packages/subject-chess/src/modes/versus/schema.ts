@@ -6,7 +6,6 @@ import {
 } from '../../content/kinds/common.ts';
 import { miniGameCommonFields } from '@learn/platform-content/modes/common';
 
-/** FEN letter of a non-king piece type, for a `capture` win condition (`p`, `n`, `b`, `r`, `q`). */
 const NON_KING_PIECE_PATTERN = /^[pnbrq]$/;
 
 /** One side's win condition, as authored: the parameterless kinds are a bare string, the

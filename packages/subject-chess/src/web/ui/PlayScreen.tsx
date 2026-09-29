@@ -22,7 +22,6 @@ import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Scr
 import { useAsync } from '@learn/platform-web/ui/ds/useAsync.ts';
 import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
-/** The Play screen's vs Computer condition text for a locked level (docs/computer-opponent.md §3). */
 function levelConditionText(t: TFunction, condition: ComputerLevelCondition): string {
   if (condition.kind === 'world-mastered') {
     return t('play.full-game-locked');
@@ -33,8 +32,7 @@ function levelConditionText(t: TFunction, condition: ComputerLevelCondition): st
   });
 }
 
-/** Play: vs Computer, vs Friend (unlocked once the profile has any game unlocked — the
- * setup sheet, `FriendSetupScreen`), and the unlocked mini-games grid. */
+/** Play: vs Computer, vs Friend (setup sheet `FriendSetupScreen`, once any game is unlocked) and the unlocked mini-games grid. */
 export function PlayScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

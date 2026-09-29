@@ -12,13 +12,11 @@ import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
 import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 import { ConfirmDialog } from '@learn/platform-web/ui/ds/ConfirmDialog.tsx';
 
-/** Standard starting position, castling rights included (same as content's `first-game.yaml`). */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 /** Kid-move cap and 3-star threshold, matching World 4's own full game (`first-game.yaml`). */
 const FULL_GAME_MOVE_LIMIT = 100;
 const FULL_GAME_PAR = 60;
 
-/** Narrows `BossPlaySession.save`'s base state back to `VersusState` (this screen is always `versus`). */
 function isVersusState(state: MiniGameStateBase): state is VersusState {
   return state.mode === 'versus';
 }
@@ -66,8 +64,7 @@ function fullGameDef(level: number): VersusMiniGame {
   };
 }
 
-/** Play's "Full game" button: `VersusStep` at a level the kid picked. Unlike a lesson boss or
- * standalone mini-game, keeps no `MiniGameProgress`/`Attempt`, only a `GameRecord`. */
+/** Play's "Full game": `VersusStep` at a level the kid picked; keeps only a `GameRecord`, no `MiniGameProgress` / `Attempt`. */
 export function FullGameScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

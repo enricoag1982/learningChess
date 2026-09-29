@@ -2,7 +2,6 @@ import type { Move } from '../chess/rules.ts';
 import type { Color, Piece, PieceType, Square } from '../chess/types.ts';
 import type { GameResult, GameRulesDef } from './types.ts';
 
-/** Minimal board facts needed to decide whether a game has just ended. */
 export interface GameBoardView {
   readonly toMove: Color;
   readonly pieces: Readonly<Partial<Record<Square, Piece>>>;

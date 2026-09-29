@@ -13,7 +13,6 @@ import { initState } from '../core/exercise/state.ts';
 import type { MoveAction } from './base.ts';
 import type { ChessKind } from './index.ts';
 
-/** Result of a piece move attempt (collect-stars / capture / best-move). */
 export type MoveOutcome =
   | { readonly kind: 'illegal' }
   /** best-move only: a legal move that is not one of `solutions`. Position is unchanged. */
@@ -31,12 +30,10 @@ export type MoveOutcome =
       readonly captured?: PieceType;
     };
 
-/** Reverts the last kid move (collect-stars / capture only). */
 export interface UndoAction {
   readonly type: 'undo';
 }
 
-/** Result of an `UndoAction`. */
 export type UndoOutcome = { readonly kind: 'undone' };
 
 function isCaptureSolved(position: Position, kidColor: Position['toMove']): boolean {
@@ -47,7 +44,6 @@ function isSolutionMove(solutions: readonly string[], san: string): boolean {
   return solutions.some((solution) => sameSan(solution, san));
 }
 
-/** Plays a kid move for a collect-stars / capture / best-move exercise. */
 export function playMove<D extends CollectStarsDef | CaptureDef | BestMoveDef>(
   state: ExerciseStateOf<D>,
   rules: VariantRules,
@@ -142,7 +138,6 @@ export function moveHint<D extends CollectStarsDef | CaptureDef>(
   return moveLadderHint(goalMove(state, rules), level);
 }
 
-/** Caps move-count stars by hint level used (collect-stars / capture only). */
 export function capMoveStars(base: 1 | 2 | 3, hintLevel: 0 | 1 | 2 | 3): 1 | 2 | 3 {
   if (hintLevel === 3) {
     return 1;
@@ -164,7 +159,6 @@ export function moveCountStars(
   return capMoveStars(base, hintLevel);
 }
 
-/** collect-stars / capture kind: the kid's moves are counted against `stars3` / `stars2`, undo allowed. */
 export function moveCountedKind<D extends CollectStarsDef | CaptureDef>(
   type: D['type'],
 ): ChessKind<D, MoveAction | UndoAction, MoveOutcome | UndoOutcome> {

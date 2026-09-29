@@ -12,7 +12,6 @@ export interface MateHint {
   readonly to: Square;
 }
 
-/** True once Owl should offer a hint: `kidMoveCount` kid moves with the game still ongoing. */
 export function shouldOfferMateHint(kidMoveCount: number): boolean {
   return kidMoveCount >= MATE_HINT_AFTER_MOVES;
 }
@@ -20,11 +19,8 @@ export function shouldOfferMateHint(kidMoveCount: number): boolean {
 /** Search depth for the mate hint (docs/computer-opponent.md §6): shallow — a nudge, not a solver. */
 const MATE_HINT_DEPTH = 2;
 
-/**
- * Owl's mate hint: the best move for the side to move in `state` (the kid, by the caller's
- * contract — offered only on the kid's own turn), found by a depth-2 search. `null` only when the
- * side to move has no legal move at all.
- */
+/** Owl's mate hint: the best move for the side to move (the kid; offered only on their turn) by a depth-2 search; `null`
+ * only with no legal move. */
 export function mateHint(state: GameState, rules: ChessRules): MateHint | null {
   const move = searchBestMove(state, rules, MATE_HINT_DEPTH);
   return move === null ? null : { from: move.from, to: move.to };

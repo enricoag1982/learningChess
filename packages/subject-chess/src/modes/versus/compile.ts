@@ -6,7 +6,6 @@ import { compilePosition } from '../../content/kinds/common.ts';
 import type { MiniGameCompileContext } from '@learn/platform-content/modes/mode-content';
 import type { schema, WinConditionYaml } from './schema.ts';
 
-/** One authored win condition (`schema.ts`'s `winConditionSchema`) → domain `WinCondition`. */
 function compileWinCondition(raw: WinConditionYaml): game.WinCondition {
   if (typeof raw === 'string') {
     return { kind: raw };
@@ -20,11 +19,8 @@ function compileWinCondition(raw: WinConditionYaml): game.WinCondition {
   return { kind: 'survive', moves: raw.survive };
 }
 
-/**
- * A `versus` mini-game's authored `rules` (kid/opponent win lists) → `GameRulesDef` (`w`/`b` win
- * lists), by `kidColor`. `checkRules` is derived from `kings`: check/checkmate/stalemate only ever
- * apply when both kings are on the board (`domain-model.md` §1.4).
- */
+/** Authored `rules` (kid / opponent win lists) → `GameRulesDef` by `kidColor`; `checkRules` derives from `kings` (check / mate /
+ * stalemate only when both kings exist, `domain-model.md` §1.4). */
 function compileVersusRules(
   raw: z.output<typeof schema>['rules'],
   kidColor: Color,

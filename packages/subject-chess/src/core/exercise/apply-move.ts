@@ -2,7 +2,6 @@ import type { Move, MoveInput } from '../chess/rules.ts';
 import type { Position, Square } from '../chess/types.ts';
 import type { VariantRules } from '../variant/rules.ts';
 
-/** Result of playing one kid move against a static opponent. */
 export interface AppliedMove {
   readonly position: Position;
   readonly move: Move;
@@ -10,10 +9,8 @@ export interface AppliedMove {
   readonly collected: readonly Square[];
 }
 
-/**
- * Plays one kid move (opponent stays put) and collects any star the move lands on. Shared by the
- * exercise engine and the solver so both apply exactly the same star-collection rule.
- */
+/** Plays one kid move (opponent stays put) and collects any star landed on; shared by the exercise engine and the solver so
+ * both use one star-collection rule. */
 export function applyKidMove(
   position: Position,
   rules: VariantRules,

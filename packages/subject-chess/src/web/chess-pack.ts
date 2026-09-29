@@ -33,7 +33,6 @@ const FriendGameScreen = lazy(() =>
   import('./ui/FriendGameScreen.tsx').then((module) => ({ default: module.FriendGameScreen })),
 );
 
-/** Unicode glyph per rank id (they are exactly the six piece words: pawn .. king). */
 const RANK_GLYPH: Readonly<Record<string, string>> = {
   pawn: '♙',
   knight: '♘',
@@ -46,7 +45,6 @@ const RANK_GLYPH: Readonly<Record<string, string>> = {
 declare module '@learn/platform-web/app/subject.ts' {
   interface SubjectServices {
     readonly botPlayer: BotPlayer;
-    /** Chess's own concrete `ContentSource`; chess code reads content only through this. */
     readonly content: ReturnType<typeof createBundledContentSource>;
   }
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmentation via `extends`, not a type alias, so declaration merging still applies
@@ -98,9 +96,8 @@ export const chessWeb = {
   routes: CHESS_ROUTES,
   createSlice: createPlaySlice,
   homeReset: { levelUpSuggestion: null },
-  // Gated on the compile-time DEV flag (not just main.tsx's own check) so Rollup drops the whole
-  // dev-playground subtree from the production graph — an ungated `dev` field, even unread, keeps
-  // its two `import()` calls as live split points and grows the initial bundle.
+  // Gated on the compile-time DEV flag (not only main.tsx's check) so Rollup drops the dev-playground subtree: an ungated `dev`
+  // field keeps its two `import()` calls as live split points and grows the initial bundle.
   dev: import.meta.env.DEV
     ? {
         '#board': () => import('./dev/BoardPlayground.tsx').then((m) => m.BoardPlayground),
@@ -110,23 +107,20 @@ export const chessWeb = {
     : undefined,
 } satisfies SubjectWeb;
 
-/** The checked king's square right now, if any (Board's check ring, every exercise kind). */
 export function checkSquareFor(position: Position): Square | undefined {
   return isInCheck(position, chessCore.context.chess)
     ? kingSquare(position, position.toMove)
     : undefined;
 }
 
-/** Animal-badge piece look (`board/piece-style.ts`) for a surface: `null` (a review task) is
- * always plain; otherwise the active profile's piece-style setting, minus classic-only contexts
- * (World 5, a full game). */
+/** Animal-badge piece look for a surface: `null` (a review task) is always plain; else the profile's piece-style setting, minus
+ * classic-only contexts (World 5, a full game). */
 export function useSurfacePieceBadges(surface: SurfaceContext): boolean {
   const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   if (surface.worldId === null) return false;
   return showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: surface.worldId }));
 }
 
-/** A finished round's final board, plain (a `series` boss's closing screen). */
 function SurfaceView({ state, surface }: { state: ExerciseState; surface: SurfaceContext }) {
   const { t } = useTranslation();
   return createElement(Board, {

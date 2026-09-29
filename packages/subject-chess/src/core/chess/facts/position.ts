@@ -7,10 +7,8 @@ function opponentOf(color: Color): Color {
   return color === 'w' ? 'b' : 'w';
 }
 
-/** Standard piece values: P1 N3 B3 R5 Q9, king unused. */
 const PIECE_VALUE: Readonly<Record<PieceType, number>> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
-/** Standard value of a piece type (P1 N3 B3 R5 Q9); `k` has no trade value, reported as `0`. */
 export function pieceValue(type: PieceType): number {
   return PIECE_VALUE[type];
 }
@@ -23,14 +21,12 @@ export function isAttacked(position: Position, square: Square, rules: ChessRules
   return rules.attackers(position, square, by).length > 0;
 }
 
-/** True when the piece on `square` is defended by another piece of its own colour. `false` if empty. */
 export function isDefended(position: Position, square: Square, rules: ChessRules): boolean {
   const occupant = position.pieces[square];
   if (occupant === undefined) return false;
   return rules.attackers(position, square, occupant.color).length > 0;
 }
 
-/** True when the piece on `square` is attacked and not defended by its own side. `false` if empty. */
 export function isHanging(position: Position, square: Square, rules: ChessRules): boolean {
   const occupant = position.pieces[square];
   if (occupant === undefined) return false;
@@ -51,17 +47,14 @@ export function isSafe(position: Position, square: Square, rules: ChessRules): b
   return attackerSquares.length === 0 || isDefended(position, square, rules);
 }
 
-/** True when the side to move is in check. */
 export function isInCheck(position: Position, rules: ChessRules): boolean {
   return rules.status(position).check;
 }
 
-/** True when the side to move is checkmated. */
 export function isCheckmate(position: Position, rules: ChessRules): boolean {
   return rules.status(position).checkmate;
 }
 
-/** True when the side to move is stalemated. */
 export function isStalemate(position: Position, rules: ChessRules): boolean {
   return rules.status(position).stalemate;
 }
@@ -71,7 +64,6 @@ export function isInsufficientMaterial(position: Position, rules: ChessRules): b
   return rules.status(position).insufficientMaterial;
 }
 
-/** True when the side to move can castle `side` right now (a legal `O-O` / `O-O-O` move exists). */
 export function canCastle(
   position: Position,
   side: 'kingside' | 'queenside',
@@ -83,7 +75,6 @@ export function canCastle(
   );
 }
 
-/** True when the side to move has at least one legal en passant capture right now. */
 export function canEnPassant(position: Position, rules: ChessRules): boolean {
   if (position.enPassant === null) return false;
   return enPassantMoves(rules.legalMoves(position), position).length > 0;

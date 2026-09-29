@@ -1,23 +1,19 @@
 import type { ChessRules, Move, MoveInput } from '../chess/rules.ts';
 import type { Color, Piece, Position, Square } from '../chess/types.ts';
 
-/** Lesson-variant behaviour layered on top of standard chess rules. */
 export interface VariantOptions {
   /** Opponent never moves: after each kid move the turn returns to the kid (en passant cleared). */
   readonly staticOpponent: boolean;
 }
 
-/** Standard chess rules plus lesson variants (walls, static opponent), driven by `VariantOptions`. */
 export interface VariantRules {
   /** Legal moves for the side to move, optionally only from one square. Never crosses or lands on a wall. */
   legalMoves(position: Position, options: VariantOptions, from?: Square): Move[];
-  /** New position (markers kept) and the played move, or `null` if illegal. */
   play(
     position: Position,
     options: VariantOptions,
     move: MoveInput,
   ): { readonly position: Position; readonly move: Move } | null;
-  /** Squares of `by` pieces attacking `square` (real board geometry; walls block sliding as usual). */
   attackers(position: Position, square: Square, by: Color): Square[];
   /** The real chess rules this variant is built on. `mate-in-n` plays under real turn alternation
    * (never walls/static-opponent), so it uses this directly. */
@@ -39,7 +35,6 @@ function wrapWalls(position: Position): Position {
   return { ...position, pieces };
 }
 
-/** Removes wall pieces so the returned position only ever holds real pieces. Markers stay as-is. */
 function stripWalls(position: Position): Position {
   const { blocked } = position.markers;
   if (blocked.length === 0) {
@@ -52,7 +47,6 @@ function stripWalls(position: Position): Position {
   return { ...position, pieces };
 }
 
-/** Builds `VariantRules` on top of a `ChessRules` adapter. */
 export function createVariantRules(rules: ChessRules): VariantRules {
   return {
     chess: rules,

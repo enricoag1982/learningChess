@@ -3,7 +3,6 @@ import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { YesNoDef } from '../../core/exercise/types.ts';
 
-/** Answers a yes-no exercise. Correct → solved; wrong → errors + 1. No-op once solved. */
 export function answerYesNo(
   state: ExerciseStateOf<YesNoDef>,
   value: boolean,

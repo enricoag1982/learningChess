@@ -128,7 +128,6 @@ function toTT(score: number, plyFromRoot: number): number {
   return score;
 }
 
-// Inverse of `toTT`.
 function fromTT(score: number, plyFromRoot: number): number {
   if (score >= MATE_THRESHOLD) {
     return score - plyFromRoot;
@@ -147,7 +146,6 @@ interface BearSearch {
   readonly history: HistoryTable;
 }
 
-// Null-move reduction (standard R = 2).
 const NULL_MOVE_REDUCTION = 2;
 
 // Never null-moves below this depth: `depth - 1 - NULL_MOVE_REDUCTION` must stay >= 0.
@@ -166,9 +164,8 @@ function hasNonPawnMaterial(pieces: Position['pieces'], color: Color): boolean {
   );
 }
 
-// Null-move pruning: if the side to move got a free pass, would the reply still stay <= beta? If
-// so this node's real moves can be skipped. Guards: not in check, no mate score in flight, not
-// likely zugzwang (`hasNonPawnMaterial`). Returns a fail-soft score >= beta, or null (search as usual).
+// Null-move pruning: if a free pass still leaves the reply <= beta, skip this node's real moves. Guards: not in check, no mate
+// score in flight, not likely zugzwang (`hasNonPawnMaterial`); returns a fail-soft score >= beta, or null.
 function tryNullMove(
   board: SearchBoard,
   def: GameRulesDef,
@@ -206,9 +203,8 @@ function tryNullMove(
   return score >= beta ? score : null;
 }
 
-// Late move reductions: a quiet move ordered late is searched one ply shallower first; only a
-// move that still beats alpha at that depth earns a full-depth re-search. Skips checks and the
-// first LMR_FULL_MOVE_COUNT moves (already tried first by ordering).
+// Late move reductions: a late-ordered quiet move is searched one ply shallower first, and re-searched at full depth only if it
+// beats alpha. Skips checks and the first LMR_FULL_MOVE_COUNT moves.
 const LMR_MIN_DEPTH = 3;
 const LMR_FULL_MOVE_COUNT = 3;
 const LMR_REDUCTION = 1;
@@ -353,9 +349,8 @@ function quiesce(
   return localAlpha;
 }
 
-// Alpha-beta negamax. Checks evaluateTerminal at every node (a variant can win mid-tree, not only
-// at the leaves). tt/killers/quiesce/null-move/LMR/history are Bear-only (`bear !== undefined`);
-// every other level runs its original, unoptimised search unchanged.
+// Alpha-beta negamax; checks evaluateTerminal at every node (a variant can win mid-tree). tt / killers / quiesce / null-move /
+// LMR / history are Bear-only (`bear !== undefined`); other levels run the plain search.
 function negamax(
   board: SearchBoard,
   def: GameRulesDef,
@@ -611,9 +606,8 @@ function searchRoot(
   return scored;
 }
 
-// Wall-clock budget for one chooseBySearch call; checkDeadline can abort mid-depth since a single
-// depth-4 pass can itself run well past it. Only a fully completed depth's result is ever used, so
-// the chosen move stays a deterministic function of the position and seed.
+// Wall-clock budget for one chooseBySearch call; `checkDeadline` can abort mid-depth (a depth-4 pass may overrun it). Only a
+// completed depth's result is used, so the move stays deterministic in position + seed.
 const TIME_BUDGET_MS = 250;
 
 // Iterative deepening to level.depth: each shallower pass orders the next by its own best-first,
@@ -667,8 +661,7 @@ function chooseBySearch(
   );
 }
 
-/** Best move at `depth` plies by the same search `chooseBySearch` uses, but no randomness and no
- * near-best pool — used by `mateHint`, not by `chooseMove`'s probability-weighted levels. */
+/** Best move at `depth` plies by the `chooseBySearch` search, without randomness or a near-best pool; used by `mateHint`. */
 export function searchBestMove(state: GameState, rules: ChessRules, depth: number): Move | null {
   const legalMoves = rules.legalMoves(state.position);
   if (legalMoves.length === 0) {

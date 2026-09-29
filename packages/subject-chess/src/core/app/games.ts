@@ -13,7 +13,6 @@ import type { Journey } from '@learn/platform-core/app/journey';
 import { checkRewards } from '@learn/platform-core/app/rewards';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
 
-/** Result + reason for a `GameRecord`, from a `VersusState` that has already ended. */
 export function versusGameRecordResult(state: VersusState): {
   readonly result: GameRecordResult;
   readonly reason: string;
@@ -32,9 +31,8 @@ function gameRecordId(state: VersusState): string {
   return def.rules.kings && isStandardStart(def.position) ? 'full' : def.id;
 }
 
-/** `SubjectCore.gameRecordOf`: a `versus` mini-game's `GameRecord` (`null` for `static`/`series`,
- * which have no computer opponent to log). `state` is narrowed from `MiniGameStateBase` once
- * `mode` says `'versus'` — same cast pattern `kinds/` uses for its own subject state. */
+/** `SubjectCore.gameRecordOf`: a `versus` mini-game's `GameRecord` (`null` for `static` / `series`: no opponent to log);
+ * `state` is narrowed once `mode` is `'versus'`, the cast pattern `kinds/` uses. */
 export function chessGameRecordOf(
   game: MiniGameBase,
   state: MiniGameStateBase,
@@ -53,7 +51,6 @@ export function chessGameRecordOf(
   };
 }
 
-/** Saves one `GameRecord`: a finished full game / versus mini-game, or a left one. */
 export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise<GameRecord> {
   const { profileId, game, opponent, result, reason, moves } = input;
   const now = deps.clock.now().toISOString();
@@ -78,17 +75,14 @@ export async function recordGame(deps: AppDeps, input: RecordGameInput): Promise
   return record;
 }
 
-/** A locked computer level's unlock condition, for the Play screen's vs Computer card. */
 export type ComputerLevelCondition =
   | { readonly kind: 'world-mastered'; readonly worldId: string }
   | { readonly kind: 'beat'; readonly level: BotLevel['name']; readonly times: number };
 
-/** One bot level's Play-screen status: locked (+ condition) or unlocked, with its full-game tally. */
 export interface ComputerLevelStatus {
   readonly level: BotLevel['level'];
   readonly name: BotLevel['name'];
   readonly locked: boolean;
-  /** Set iff `locked`. */
   readonly condition?: ComputerLevelCondition;
   readonly wins: number;
   readonly games: number;
@@ -96,7 +90,6 @@ export interface ComputerLevelStatus {
 
 const LEVEL_NAMES: readonly BotLevel['name'][] = BOT_LEVELS.map((level) => level.name);
 
-/** Full games ("game: 'full'", not mini-games) played vs `level`, excluding abandoned ones. */
 function fullGameTally(
   records: readonly GameRecord[],
   level: number,
@@ -112,10 +105,8 @@ function fullGameTally(
   };
 }
 
-/** Per-level status for the Play screen's vs Computer card. Mouse unlocks with World 4 ("check")
- * mastered. Every level above unlocks with 3 full-game wins vs the level below, or — once any
- * full-game win is recorded directly against this level — stays unlocked regardless of that count
- * (covers a world boss fought at a level before 3 separate Play-screen wins caught up). */
+/** Play's vs Computer card: Mouse unlocks with World 4 mastered; each higher level with 3 full-game wins vs the level below,
+ * or stays unlocked once any full-game win is recorded against it (a world boss fought early). */
 export function computerLevelStatus(
   records: readonly GameRecord[],
   journey: Journey,
@@ -160,15 +151,13 @@ const LAST_N_GAMES = 5;
 const LEVEL_UP_MIN_WINS = 4;
 const LEVEL_DOWN_MAX_WINS = 1;
 
-/** One update to a profile's "Automatic level" suggestion, from `nextSuggestedLevel` after a
- * completed full game. `leveledUp` tells the caller whether to show Owl's suggestion line — the
- * drop is silent. */
+/** One "Automatic level" suggestion update after a completed full game; `leveledUp` tells the caller whether to show Owl's
+ * suggestion line (the drop is silent). */
 export interface SuggestedLevelUpdate {
   readonly level: BotLevel['level'];
   readonly leveledUp: boolean;
 }
 
-/** Full, non-abandoned games at `level`, most-recent-first (by `createdAt`). */
 function recentFullGames(records: readonly GameRecord[], level: number): GameRecord[] {
   const opponent = `computer:${String(level)}`;
   return records
@@ -177,9 +166,8 @@ function recentFullGames(records: readonly GameRecord[], level: number): GameRec
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-/** The "Automatic level" suggestion update after one full game finishes: among the last
- * `LAST_N_GAMES` full games at `level`, `>= 4` wins suggests the next level (only if unlocked),
- * `<= 1` win drops one level silently (never below Mouse). Otherwise `null`. */
+/** After a full game: of the last `LAST_N_GAMES` at `level`, `>= 4` wins suggests the next level (if unlocked), `<= 1` win
+ * drops one silently (never below Mouse); else `null`. */
 export function nextSuggestedLevel(
   records: readonly GameRecord[],
   level: BotLevel['level'],
@@ -202,14 +190,12 @@ export function nextSuggestedLevel(
   return null;
 }
 
-/** Highest currently unlocked level, for `suggestedLevel`'s fallback (Mouse if somehow none is). */
 function highestUnlocked(statuses: readonly ComputerLevelStatus[]): BotLevel['level'] {
   const unlockedLevels = statuses.filter((status) => !status.locked).map((status) => status.level);
   return unlockedLevels.length > 0 ? (Math.max(...unlockedLevels) as BotLevel['level']) : 1;
 }
 
-/** Play's vs Computer level chips default to this: the profile's stored suggestion, as long as it
- * still names an unlocked level. No suggestion stored yet falls back to the highest unlocked level. */
+/** Default for Play's level chips: the stored suggestion while it names an unlocked level, else the highest unlocked one. */
 export function suggestedLevel(
   stored: number | undefined,
   statuses: readonly ComputerLevelStatus[],
@@ -223,8 +209,7 @@ export function suggestedLevel(
   return highestUnlocked(statuses);
 }
 
-/** Persists `nextSuggestedLevel`'s update (if any) for `profileId`, folding it into the shared
- * `AppSettings.suggestedLevels` map. */
+/** Persists `nextSuggestedLevel`'s update (if any) into `AppSettings.suggestedLevels`. */
 export async function updateSuggestedLevel(
   deps: AppDeps,
   profileId: string,

@@ -8,16 +8,12 @@ import type {
   ModeVerifyContext,
 } from '@learn/platform-content/modes/mode-content';
 
-/** A `series` mini-game's compiled content: the platform's round/scoring fields (`SeriesGameDef`)
- * plus the catalog fields every mode shares (`MiniGameBase`). */
+/** A `series` mini-game's compiled content: the platform's round / scoring fields plus the shared catalog fields. */
 export type SeriesMiniGame<E extends ExerciseDefBase = ExerciseDefBase> = MiniGameBase &
   SeriesGameDef<E> & { readonly mode: 'series' };
 
-/**
- * A `series` mini-game (Square Hunt, Setup Race, Safe or Not?, …): a fixed sequence of `rounds`,
- * each an exercise of any type (validated the same way as a lesson's own exercises), scored on
- * total mistakes (errors + hint levels) across every round.
- */
+/** A `series` mini-game (Square Hunt, Setup Race, Safe or Not?, …): `rounds` of any exercise type validated like a lesson's,
+ * scored on total mistakes across rounds. */
 export const schema = z
   .object({
     ...miniGameCommonFields,

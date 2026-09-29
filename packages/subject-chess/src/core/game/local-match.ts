@@ -3,9 +3,8 @@ import type { Position } from '../chess/types.ts';
 import type { GameResult, GameRulesDef, GameState } from './types.ts';
 import { gameResult, playGameMove, startGame } from './rules.ts';
 
-/** Two-human game: the same variant rules a `versus` boss plays against the bot, minus every bot
- * concern — both sides are a person at this same device. `states` holds every position reached so
- * far, oldest first, so `takeBack` can drop the last one. */
+/** Two-human game on one device: the variant rules a `versus` boss plays against the bot, minus bot concerns. `states` holds
+ * every position reached (oldest first) so `takeBack` can drop the last. */
 export interface LocalMatchState {
   readonly mode: 'local-match';
   readonly rules: GameRulesDef;
@@ -20,33 +19,27 @@ function current(state: LocalMatchState): GameState {
   return last;
 }
 
-/** Starts a fresh local match at `position` under `rules` (full game, Pawn Wars, Win the Queen, …). */
 export function startLocalMatch(rules: GameRulesDef, position: Position): LocalMatchState {
   return { mode: 'local-match', rules, states: [startGame(rules, position)] };
 }
 
-/** The position currently on the board. */
 export function localMatchPosition(state: LocalMatchState): Position {
   return current(state).position;
 }
 
-/** The underlying variant-game state, for a caller that needs more than the bare position. */
 export function localMatchGameState(state: LocalMatchState): GameState {
   return current(state);
 }
 
-/** Current outcome: ongoing, a win (with the winning colour), or a draw — see `domain/game`'s `gameResult`. */
 export function localMatchResult(state: LocalMatchState, chessRules: ChessRules): GameResult {
   return gameResult(current(state), chessRules);
 }
 
-/** Result of playing one ply — either player's move, both go through the same rules. */
 export type LocalMoveOutcome =
   | { readonly kind: 'illegal' }
   | { readonly kind: 'played'; readonly move: Move }
   | { readonly kind: 'ended'; readonly move: Move; readonly result: GameResult };
 
-/** Plays one ply for whichever colour is to move. `illegal` if the move (or the game) has already ended. */
 export function playLocalMove(
   state: LocalMatchState,
   chessRules: ChessRules,
@@ -68,13 +61,11 @@ export function playLocalMove(
   return { state: nextState, outcome: { kind: 'ended', move: played.move, result } };
 }
 
-/** Take back: undoes the last move played, returning to the mover's own turn again. The UI asks the
- * player now to move first; no bot-style limit, either player may ask at any point mid-match. */
+/** Either player may ask at any point mid-match, no bot-style limit; the UI asks the player now to move first. */
 export function canTakeBack(state: LocalMatchState, chessRules: ChessRules): boolean {
   return state.states.length >= 2 && localMatchResult(state, chessRules).kind === 'ongoing';
 }
 
-/** Undoes the last ply; no-op (returns `state` unchanged) if `!canTakeBack(state, chessRules)`. */
 export function takeBack(state: LocalMatchState, chessRules: ChessRules): LocalMatchState {
   if (!canTakeBack(state, chessRules)) {
     return state;

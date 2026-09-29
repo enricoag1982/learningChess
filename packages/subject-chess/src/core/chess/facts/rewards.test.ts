@@ -62,7 +62,7 @@ describe('chessRewardFacts', () => {
   });
 
   it("replays from the profile's own colour: Black keeps its queen when White loses one", () => {
-    // Friend game (M4.3): the profile played Black and won; White's queen was captured (by Black),
+    // Friend game: the profile played Black and won; White's queen was captured (by Black),
     // Black's never was.
     const blackWin = record({
       id: 'g3',

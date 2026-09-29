@@ -1,6 +1,5 @@
 import type { Color, Piece, PieceType, Position, Square } from './types.ts';
 
-/** A played or candidate move. */
 export interface Move {
   readonly from: Square;
   readonly to: Square;
@@ -33,27 +32,21 @@ export class InvalidPositionError extends Error {
 /** One board, built once from a `Position` and mutated in place via `play`/`undo` — rebuilding a
  * fresh chess.js instance per node is too slow for engines (bots, perft) walking thousands of them. */
 export interface SearchBoard {
-  /** Legal moves for the side to move. */
   moves(): Move[];
-  /** Plays a move obtained from `moves()` (or an equivalent legal move) in place. */
   play(move: Move): void;
-  /** Undoes the last move played. */
   undo(): void;
   turn(): Color;
   inCheck(): boolean;
-  /** Occupied squares only. */
   pieces(): Partial<Record<Square, Piece>>;
   /** Current position (markers carried over unchanged from the board this was built from). */
   position(): Position;
-  /** Cheap Zobrist-style hash of the current position — O(1) per `play`/`undo`, for keying a
-   * transposition table without building a FEN. Not cryptographic; collisions are astronomically
-   * unlikely, same trade-off every chess engine's TT makes. */
+  /** Cheap Zobrist-style hash, O(1) per `play` / `undo`, for keying a transposition table without a FEN; not cryptographic
+   * (collisions astronomically unlikely, as in every engine's TT). */
   hash(): bigint;
 }
 
-/** Standard chess rules. Variant rules (blocked squares, custom wins) live in a separate layer (M1). */
+/** Standard chess rules; variant rules (blocked squares, custom wins) live in a separate layer. */
 export interface ChessRules {
-  /** Legal moves for the side to move, optionally only from one square. */
   legalMoves(position: Position, from?: Square): Move[];
   /** New position (markers kept) and the played move, or `null` if illegal. */
   play(
@@ -61,8 +54,6 @@ export interface ChessRules {
     move: MoveInput,
   ): { readonly position: Position; readonly move: Move } | null;
   status(position: Position): PositionStatus;
-  /** Squares of `by` pieces attacking `square`. */
   attackers(position: Position, square: Square, by: Color): Square[];
-  /** One reusable board for fast search (bots, perft); see `SearchBoard`. */
   searchBoard(position: Position): SearchBoard;
 }

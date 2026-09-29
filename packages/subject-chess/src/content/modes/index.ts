@@ -1,5 +1,4 @@
-// The mini-game-mode content registry — the only place mode dispatch happens in `packages/content`
-// for schemas, compiling and semantic verification.
+// The mini-game-mode content registry: the only place mode dispatch happens for schemas, compiling and verification.
 import type { MiniGame } from '../../core/chess/lesson.ts';
 import { z } from 'zod';
 import type {
@@ -15,9 +14,8 @@ type ChessSeriesMode = MiniGameModeContent<
   MiniGameSchema
 >;
 
-/** Every mode's content, by `mode`. Only 3 modes exist, so this is spelled out rather than derived
- * through a generic helper. `series` compiles its rounds through the generic kind registry (any
- * exercise def), so its own content is widened here to chess's own concrete round type. */
+/** Every mode's content by `mode`; only 3 exist, so spelled out. `series` compiles rounds through the generic kind registry, so
+ * it is widened here to chess's concrete round type. */
 export const MINI_GAME_MODE_CONTENT = {
   static: staticMode,
   // Single trust boundary from the generic round type to chess's own concrete rounds.

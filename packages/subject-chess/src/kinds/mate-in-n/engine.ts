@@ -7,9 +7,8 @@ import { moveLadderHint } from '../../core/exercise/hint.ts';
 import type { MateInNOutcome } from './kind.ts';
 import type { MateInNDef } from '../../core/exercise/types.ts';
 
-/** Plays a kid move for a `mate-in-n` exercise, under real chess rules (both kings, real turn
- * alternation). Any move delivering checkmate solves it; otherwise it must match the scripted
- * line, whose opponent reply (if any) is applied automatically. */
+/** A kid move under real chess rules: any checkmate solves it, else it must match the scripted line, whose opponent reply (if
+ * any) is applied automatically. */
 export function playMateInN(
   state: ExerciseStateOf<MateInNDef>,
   rules: ChessRules,

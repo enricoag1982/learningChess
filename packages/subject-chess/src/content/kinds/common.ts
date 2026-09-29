@@ -14,18 +14,15 @@ import type { Where } from '@learn/platform-content/subject';
 // Re-exported for kind schema files that already import it from here.
 export { textRefSchema };
 
-/** Algebraic square, e.g. `e4`. */
 const SQUARE_PATTERN = /^[a-h][1-8]$/;
 export const squareSchema = z.string().regex(SQUARE_PATTERN);
 
-/** Fields shared by anything authored as a board diagram or FEN (see `parseDiagram` / `parseFen`). */
 export const positionFields = {
   board: z.string().optional(),
   fen: z.string().optional(),
   toMove: z.enum(['w', 'b']).optional(),
 };
 
-/** Cross-field check shared by every schema with `positionFields`: exactly one of `board` / `fen`. */
 export function checkExactlyOnePosition(
   value: { readonly board?: string; readonly fen?: string },
   ctx: z.RefinementCtx,
@@ -35,7 +32,6 @@ export function checkExactlyOnePosition(
   }
 }
 
-/** Fields every chess exercise type shares: the platform's, plus its last move and position. */
 export const exerciseCommonFields = {
   ...exerciseBaseFields,
   /** The opponent's last move, `<from><to>` (e.g. `d7d5`), display only: the loader checks a piece
@@ -57,7 +53,6 @@ export interface PositionYaml {
   readonly toMove?: 'w' | 'b';
 }
 
-/** Parses a board diagram or FEN into a `Position`, reporting `DiagramError` / `FenError` as an issue. */
 export function compilePosition(raw: PositionYaml, at: Where): Position | null {
   try {
     if (raw.board !== undefined) {

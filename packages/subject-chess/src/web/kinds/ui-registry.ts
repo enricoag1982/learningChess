@@ -10,7 +10,6 @@ import { selectSquaresUi } from '../../kinds/select-squares/ui.ts';
 import { setupUi } from '../../kinds/setup/ui.ts';
 import { yesNoUi } from '../../kinds/yes-no/ui.ts';
 
-/** Every exercise type's UI, by `type`. */
 export const EXERCISE_KIND_UI: Readonly<Record<string, AnyExerciseKindUI>> = {
   'collect-stars': collectStarsUi,
   capture: captureUi,

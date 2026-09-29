@@ -3,7 +3,6 @@ import { baseInitUi } from '../../web/kinds/move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
 export interface YesNoExtra extends WrongSquaresExtra {
-  /** The value last picked wrong, if any — that button turns orange and disables. */
   readonly wrongAnswer?: boolean;
 }
 

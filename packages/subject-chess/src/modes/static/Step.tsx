@@ -18,8 +18,7 @@ import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
 import { BossResultPanel, useBossRun } from '@learn/platform-web/modes/boss-run.tsx';
 import type { BossStepProps } from '@learn/platform-web/modes/mode-ui.ts';
 
-/** A `static` boss mini-game: capture every enemy piece (or collect every star) before the move
- * limit, no hints (`MINI_GAME_MODE_UI.static`). */
+/** A `static` boss: capture every enemy piece (or collect every star) before the move limit, no hints. */
 export function Step({
   lesson,
   game: minigame,

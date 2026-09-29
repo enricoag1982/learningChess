@@ -12,20 +12,17 @@ import { checkRewards } from '@learn/platform-core/app/rewards';
 import type { Journey } from '@learn/platform-core/app/journey';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
 
-/** The second player in a vs Friend match: another profile on this device, or a guest — no
- * password, no saved `GameRecord` for them. */
+/** The second player in a vs Friend match: another profile on this device or a guest (no password, no saved `GameRecord`). */
 export type LocalPlayer =
   { readonly kind: 'profile'; readonly profileId: string } | { readonly kind: 'guest' };
 
-/** One game offered on the vs Friend setup sheet: `'full'` for the full game, else a `versus`
- * mini-game's content id (Pawn Wars, Win the Queen, …), with its content title key. */
+/** A game on the vs Friend setup sheet: `'full'` or a `versus` mini-game's content id, with its title key. */
 export interface FriendGameOption {
   readonly id: string;
   readonly titleKey: string;
 }
 
-/** The only mini-game ids vs Friend ever offers: the standalone Pawn Wars / Win the Queen
- * mini-games, never a lesson- or world-specific reuse of their rules. */
+/** The only mini-games vs Friend offers (standalone Pawn Wars / Win the Queen), never a lesson- or world-specific reuse. */
 const FRIEND_MINI_GAME_IDS: readonly string[] = ['pawn-wars', 'win-the-queen'];
 
 /** Games the active profile may offer a friend: the full game once unlocked (World 4 mastered),
@@ -50,13 +47,11 @@ export function friendGameOptions(
   return options;
 }
 
-/** Whether a `GameRecord.opponent` names a friend (another profile or a guest), not the computer. */
 export function isFriendOpponent(opponent: string): boolean {
   return opponent === 'guest' || opponent.startsWith('profile:');
 }
 
-/** This profile's `GameRecord`s played vs a friend (My Den's "Games with friends" count), excluding
- * abandoned ones. */
+/** This profile's non-abandoned `GameRecord`s vs a friend (My Den's "Games with friends" count). */
 export function friendGamesPlayed(records: readonly GameRecord[]): number {
   return records.filter(
     (record) => isFriendOpponent(record.opponent) && record.result !== 'abandoned',
@@ -67,7 +62,6 @@ function opponentTag(player: LocalPlayer): string {
   return player.kind === 'guest' ? 'guest' : `profile:${player.profileId}`;
 }
 
-/** Per-colour `GameRecord` result + reason, from a finished (or abandoned) `LocalMatchState`. */
 function resultFor(
   color: Color,
   outcome: RecordLocalMatchInput['outcome'],
@@ -86,19 +80,16 @@ function resultFor(
 }
 
 export interface RecordLocalMatchInput {
-  /** `'full'` for a full standard game, else the `versus` mini-game's content id. */
   readonly game: string;
   readonly white: LocalPlayer;
   readonly black: LocalPlayer;
   /** The finished game's outcome, or `abandoned` when it was left mid-game ("Stop" confirmed). */
   readonly outcome:
     { readonly kind: 'result'; readonly result: GameResult } | { readonly kind: 'abandoned' };
-  /** SAN moves played, in order (both sides). */
   readonly moves: readonly string[];
 }
 
-/** Saves one `GameRecord` per profile involved in a vs Friend match — a guest gets none. No stars,
- * mastery or review effects: only appends to the game log, same as a vs-computer `recordGame`. */
+/** One `GameRecord` per profile in a vs Friend match (a guest gets none); only appends to the game log: no stars, mastery or review. */
 export async function recordLocalMatch(
   deps: AppDeps,
   input: RecordLocalMatchInput,

@@ -3,13 +3,11 @@ import type { Color, File, Rank, Square } from '../../../core/chess/types.ts';
 const FILES: readonly File[] = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 const RANKS: readonly Rank[] = ['1', '2', '3', '4', '5', '6', '7', '8'];
 
-/** A point in the same coordinate space as a `Rect` (e.g. pointer client coordinates). */
 export interface Point {
   readonly x: number;
   readonly y: number;
 }
 
-/** A rectangle in that same space (the subset of `DOMRect` geometry needs). */
 export interface Rect {
   readonly left: number;
   readonly top: number;
@@ -23,7 +21,6 @@ export interface Cell {
   readonly col: number;
 }
 
-/** Visual cell of `square` for a board drawn with `orientation` at the bottom. */
 export function squareToCell(square: Square, orientation: Color): Cell {
   const fileIndex = FILES.indexOf(square[0] as File);
   const rankIndex = RANKS.indexOf(square[1] as Rank);
@@ -32,7 +29,6 @@ export function squareToCell(square: Square, orientation: Color): Cell {
     : { row: rankIndex, col: 7 - fileIndex };
 }
 
-/** Inverse of `squareToCell`; `null` when the cell falls outside the 8x8 grid. */
 export function cellToSquare(row: number, col: number, orientation: Color): Square | null {
   if (row < 0 || row > 7 || col < 0 || col > 7) return null;
   const rankIndex = orientation === 'w' ? 7 - row : row;
@@ -42,7 +38,6 @@ export function cellToSquare(row: number, col: number, orientation: Color): Squa
   return file !== undefined && rank !== undefined ? `${file}${rank}` : null;
 }
 
-/** Square under `point` on a board drawn inside `rect`, or `null` when the point falls outside it. */
 export function squareAt(point: Point, rect: Rect, orientation: Color = 'w'): Square | null {
   if (rect.width <= 0 || rect.height <= 0) return null;
   const x = point.x - rect.left;
@@ -53,7 +48,6 @@ export function squareAt(point: Point, rect: Rect, orientation: Color = 'w'): Sq
   return cellToSquare(row, col, orientation);
 }
 
-/** Straight-line pixel distance between two points (drag-vs-tap threshold). */
 export function distance(a: Point, b: Point): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }

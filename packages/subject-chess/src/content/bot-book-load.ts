@@ -5,12 +5,10 @@ import { ContentError } from '@learn/platform-content/load';
 import { loadYaml } from '@learn/platform-content/yaml-file';
 import { botBookFileSchema, type BookLineYaml } from './bot-book-schema.ts';
 
-/** Standard starting position (castling rights included) — every book line is authored from here. */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-/** Checks one line's moves are all legal, in order, from the standard start position, and within
- * the book's ply cap. Also rejects a move whose authored SAN does not match chess.js's own —
- * `bookCandidates` matches by exact SAN string, so a mismatch would never match at runtime. */
+/** Every move legal in order from the start position and within the ply cap; also rejects a SAN differing from chess.js's own
+ * (`bookCandidates` matches exact SAN strings). */
 function validateLine(line: BookLineYaml, issues: string[]): void {
   const where = `bot-book.yaml: lines.${line.name}`;
   if (line.moves.length > bot.MAX_BOOK_PLIES) {
@@ -38,8 +36,7 @@ function validateLine(line: BookLineYaml, issues: string[]): void {
   }
 }
 
-/** Loads and validates `bot-book.yaml` (Fox/Wolf/Bear's small opening book), compiling it to
- * `bot.BotBook`. Deliberately its own module, not part of `lesson-load.ts`. */
+/** Loads and validates `bot-book.yaml` (Fox/Wolf/Bear's opening book) into `bot.BotBook`; its own module, not part of `lesson-load.ts`. */
 export function loadBotBook(filePath: string): bot.BotBook {
   const loaded = loadYaml(filePath, 'bot-book.yaml', botBookFileSchema);
   if ('issues' in loaded) {

@@ -14,7 +14,6 @@ import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import type { Position, Square } from '../../core/chess/types.ts';
 import type { YesNoDef } from '../../core/exercise/types.ts';
 
-/** A `yes-no` exercise's parsed `verify` field (`schema.ts`'s regex already restricts the shape). */
 type VerifyFact =
   | { readonly kind: 'hanging' | 'attacked' | 'defended'; readonly square: Square }
   | { readonly kind: 'in-check' | 'checkmate' | 'stalemate' | 'insufficient-material' }
@@ -55,8 +54,6 @@ function computeVerifyFact(fact: VerifyFact, position: Position): boolean {
   return canEnPassant(position, chessJsRules);
 }
 
-/** A `yes-no` exercise's optional `verify`: computes the named rule fact on the position and fails
- * the build if it contradicts `answer`. Load-time only. */
 export function checkYesNoVerify(
   exercise: YesNoDef,
   verify: string | undefined,

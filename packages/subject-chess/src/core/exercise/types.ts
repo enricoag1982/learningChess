@@ -1,11 +1,8 @@
 import type { Piece, Position, Square } from '../chess/types.ts';
 
-/** Fields shared by every exercise definition. */
 interface ExerciseBase {
   readonly id: string;
-  /** Concept id (e.g. `rook-move`), used for mastery and review tracking. */
   readonly concept: string;
-  /** i18n key for the exercise's instruction text. */
   readonly textKey: string;
   readonly position: Position;
   /** Id of an entry in the lesson's `variants`, offered after `EASIER_AFTER_ERRORS` errors on this (scored) exercise. */
@@ -29,12 +26,10 @@ export interface CaptureDef extends ExerciseBase {
   readonly stars2: number;
 }
 
-/** Tap the correct set of squares. */
 export interface SelectSquaresDef extends ExerciseBase {
   readonly type: 'select-squares';
-  /** Explicit answer, or derived: every legal destination of the piece on `from` (`legal-moves`),
-   * every square it attacks (`attacked-by`), or every escape square with the king in check
-   * (`check-escapes`). */
+  /** Explicit answer, or derived: every legal destination of the piece on `from` (`legal-moves`), every square it attacks
+   * (`attacked-by`), or every escape square with the king in check (`check-escapes`). */
   readonly answer:
     | { readonly squares: readonly Square[] }
     | { readonly derive: 'legal-moves'; readonly from: Square }
@@ -84,7 +79,6 @@ export interface MateInNDef extends ExerciseBase {
   readonly line: readonly string[];
 }
 
-/** All exercise definitions. */
 export type ExerciseDef =
   | CollectStarsDef
   | SelectSquaresDef

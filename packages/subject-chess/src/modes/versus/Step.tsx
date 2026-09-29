@@ -43,7 +43,6 @@ export interface VersusStepProps extends BossStepProps<VersusMiniGame> {
 /** localStorage key for a deterministic bot seed and a shortened "thinking" pause (tests only). */
 const TEST_SEED_KEY = 'chess-kids:test-seed';
 
-/** Reads the test-only seed override, if any; never throws (private browsing, disabled storage). */
 function readTestSeed(): number | null {
   try {
     const raw = window.localStorage.getItem(TEST_SEED_KEY);
@@ -65,8 +64,7 @@ function botThinkDelayMs(): number {
   return readTestSeed() !== null || prefersReducedMotion() ? 300 : 800 + Math.random() * 700;
 }
 
-/** Aids per bot level (`docs/computer-opponent.md` §4, `domain/bot/levels.ts`); falls back to
- * Mouse's for an unknown level (never happens — `opponentLevel` is always 1-5). */
+/** Aids per bot level (`docs/computer-opponent.md` §4); Mouse's for an unknown level (never: `opponentLevel` is 1-5). */
 function aidsForLevel(level: number): bot.BotAids {
   return (
     bot.BOT_LEVELS.find((entry) => entry.level === level)?.aids ??
@@ -93,9 +91,7 @@ function dangerSquares(state: VersusState): readonly Square[] {
     );
 }
 
-/** A `versus` boss mini-game: the kid plays their colour against the computer opponent (in a
- * worker), with level-based aids and Owl narrating moves and the result
- * (`MINI_GAME_MODE_UI.versus`). */
+/** A `versus` boss: the kid plays their colour against the computer (in a worker) with level-based aids, and Owl narrates moves and the result. */
 export function Step({
   lesson,
   game: minigame,
@@ -242,7 +238,6 @@ export function Step({
     }
   }
 
-  /** Owl's mate hint (docs/computer-opponent.md §6): the best kid move by a depth-2 search. */
   function handleMateHint(): void {
     const found = bot.mateHint(versusGameState(versus), chessJsRules);
     if (found !== null) {
@@ -255,8 +250,7 @@ export function Step({
   const legalMoves = kidTurn ? chessJsRules.legalMoves(position) : [];
   const danger = aids.danger && versus.status === 'playing' ? dangerSquares(versus) : [];
   const moves = kidMoveCount(versus);
-  // The checked king's square, whichever side (kid or bot) — `Board`'s check ring applies to any
-  // exercise type, and a full game (M3.3) is the first `versus` boss where check is ever possible.
+  // The checked king's square, whichever side (kid or bot): `Board`'s check ring applies to any exercise type.
   const checkSquare = isInCheck(position, chessJsRules)
     ? kingSquare(position, position.toMove)
     : undefined;

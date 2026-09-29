@@ -1,4 +1,4 @@
-// The exercise-kind registry — the only place exercise-type dispatch happens in `packages/core`.
+// The exercise-kind registry: the only place exercise-type dispatch happens.
 import type { VariantRules } from '../core/variant/rules.ts';
 import type { Hint } from '../core/exercise/hint.ts';
 import type { ExerciseKind } from '@learn/platform-core/domain/exercise/kind';
@@ -22,7 +22,6 @@ import { yesNoKind } from './yes-no/kind.ts';
 export type ExerciseType = ExerciseDef['type'];
 export type DefOf<T extends ExerciseType> = Extract<ExerciseDef, { readonly type: T }>;
 
-/** Every action an exercise kind's `act` accepts, across every exercise type. */
 export type ExerciseAction =
   | MoveAction
   | UndoAction
@@ -31,7 +30,6 @@ export type ExerciseAction =
   | AnswerChoiceAction
   | PlaceAction;
 
-/** One chess exercise kind: `ExerciseKind` specialised to this domain's `Hint` / `VariantRules`. */
 export type ChessKind<D extends ExerciseDef, A extends ExerciseAction, O> = ExerciseKind<
   D,
   ExerciseStateOf<D>,
@@ -41,7 +39,6 @@ export type ChessKind<D extends ExerciseDef, A extends ExerciseAction, O> = Exer
   VariantRules
 >;
 
-/** Every exercise type's kind, by `type`. */
 export const EXERCISE_KINDS = {
   'collect-stars': collectStarsKind,
   capture: captureKind,
@@ -58,15 +55,12 @@ export type OutcomeOf<T extends ExerciseType> = ReturnType<
   (typeof EXERCISE_KINDS)[T]['act']
 >['outcome'];
 
-/** Any exercise kind, widened from its own precise type — the shape every dispatch site works with. */
 export type AnyExerciseKind = ChessKind<ExerciseDef, ExerciseAction, OutcomeOf<ExerciseType>>;
 
-/** The kind implementing `def`'s exercise type. */
 export function kindOf(def: ExerciseDef): AnyExerciseKind {
   return EXERCISE_KINDS[def.type];
 }
 
-/** Starts a fresh exercise at its authored position. */
 export function startExercise(def: ExerciseDef): ExerciseState {
   return kindOf(def).init(def);
 }

@@ -20,12 +20,10 @@ import { BlankScreen } from '@learn/platform-web/ui/ds/Screen.tsx';
 import { ConfirmDialog } from '@learn/platform-web/ui/ds/ConfirmDialog.tsx';
 import { AvatarBadge } from '@learn/platform-web/ui/ds/AvatarBadge.tsx';
 
-/** Standard starting position, castling rights included — same as `FullGameScreen`'s vs-computer one. */
 const FULL_GAME_START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const FULL_GAME_MOVE_LIMIT = 100;
 
-/** Sizes `children` to the largest square that fits this wrapper's space (docs/screens.md §1),
- * measured via `ResizeObserver`; no-op in jsdom. */
+/** Sizes `children` to the largest square that fits (docs/screens.md §1) via `ResizeObserver`; no-op in jsdom. */
 function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);
@@ -60,7 +58,6 @@ function SquareArea({ children }: { readonly children: ReactNode }): JSX.Element
   );
 }
 
-/** One local player, as the friend game screen displays it (both sides read alike). */
 type PlayerDisplay =
   | {
       readonly kind: 'profile';
@@ -100,8 +97,7 @@ interface FriendGameDef {
   readonly position: Position;
 }
 
-/** The rules/position for `gameId`: the full game, or an unlocked `versus` mini-game's own
- * content; `null` for an unknown id (defensive only). */
+/** The rules / position for `gameId`: the full game or an unlocked `versus` mini-game; `null` for an unknown id (defensive). */
 function gameDefFor(gameId: string, content: ChessContentSource): FriendGameDef | null {
   if (gameId === 'full') {
     return {

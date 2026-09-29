@@ -37,7 +37,6 @@ interface StimulusYaml {
   readonly lastMove?: string;
 }
 
-/** Parses `lastMove`'s `<from><to>` shape (the schema's regex already restricted it). */
 function parseLastMove(raw: string): { readonly from: Square; readonly to: Square } {
   return { from: raw.slice(0, 2) as Square, to: raw.slice(2, 4) as Square };
 }
@@ -67,7 +66,6 @@ function checkLastMove(
   }
 }
 
-/** Chess's stimulus: a board position (the "head") plus an optional last move (the "tail"). */
 export const chessStimulus: StimulusContent = {
   refine: checkExactlyOnePosition,
 
@@ -103,11 +101,8 @@ function compileHighlight(raw: string): DemoHighlight {
   return { squares: rest === '' ? [] : (rest.split(' ') as Square[]) };
 }
 
-/**
- * A lesson's demo: position, spoken text, and its board highlight — either `legal-moves <square>`
- * (most lessons: every square that piece can reach) or `squares [<sq> …]` (World 1: an explicit
- * list, e.g. a row/diagonal or a corner; zero squares highlights nothing).
- */
+/** A lesson's demo: position, spoken text, board highlight: `legal-moves <square>` (most lessons) or `squares [<sq> …]`
+ * (World 1: a row / diagonal / corner; zero squares highlights nothing). */
 const chessDemoSchema = z
   .object({
     ...positionFields,
@@ -118,7 +113,6 @@ const chessDemoSchema = z
   .strict()
   .superRefine(checkExactlyOnePosition);
 
-/** Chess's lesson demo: position + spoken text + board highlight. */
 export const chessDemo: DemoContent = {
   schema: chessDemoSchema,
 
@@ -139,7 +133,6 @@ export const chessDemo: DemoContent = {
   },
 };
 
-/** A badge condition's chess-only fields (shape-only; `chessBadges.validate` checks the rest). */
 interface ChessBadgeCondition {
   readonly type: string;
   readonly opponent?: string;
@@ -150,15 +143,11 @@ interface ChessBadgeCondition {
 
 const BOT_LEVELS = [1, 2, 3, 4, 5];
 
-/** Chess's own badge condition fields and the `game-win`/`game-event`/`game-played` checks the
- * engine's 7 generic condition types don't cover. */
+/** Chess's badge condition fields and the `game-win` / `game-event` / `game-played` checks the engine's 7 generic types don't cover. */
 export const chessBadges: BadgesContent = {
   fields: {
-    /** `game-win`: `'queen-kept'` counts wins where the kid's queen was never captured. */
     extra: z.enum(['queen-kept']).optional(),
-    /** `game-event`: which `GameRecord.moves` pattern to count. */
     event: z.enum(['promotion', 'castling']).optional(),
-    /** `game-played`: `'local'` (vs a friend). */
     mode: z.enum(['local']).optional(),
   },
 
@@ -207,10 +196,8 @@ export const chessBadges: BadgesContent = {
   },
 };
 
-/** Mouse → Bear ladder, from the one source (`domain/bot/levels.ts`'s `BOT_LEVELS`). */
 const BOT_LEVEL_NAMES = bot.BOT_LEVELS.map((level) => level.name);
 
-/** Every board piece type, for the versus boss's move/capture lines. */
 const VERSUS_PIECE_TYPES = ['p', 'n', 'b', 'r', 'q', 'k'] as const;
 
 /** `PlayScreen.tsx`'s `levelConditionText`: either "full game locked" or "beat <name> 3 times". */
@@ -223,19 +210,14 @@ function levelConditionTexts(r: Resolve): readonly string[] {
   ];
 }
 
-/** The piece a lesson character stands for (`core.characters`'s own `topicKey`, e.g. `piece.r`);
- * `null` for a narrator-taught (Owl) character. */
+/** The piece a lesson character stands for (`core.characters`' `topicKey`); `null` for a narrator-taught (Owl) character. */
 function characterPieceOf(character: string): PieceType | null {
   const topicKey = chessCore.characters[character]?.topicKey;
   return topicKey?.startsWith('piece.') ? (topicKey.slice('piece.'.length) as PieceType) : null;
 }
 
-/** Every `EXERCISE_NOTES` entry's text, spoken as its own utterance — via the same `exerciseNote`
- * dispatch the app calls, instead of mirroring its logic by hand. Each note shape's domain is
- * bounded and content-derived: every lesson character (and the piece it stands for, defaulting to
- * rook), 1-3 stars, colour × piece type, one sample `Hint` per distinct wording. Error-kind notes
- * (`isEasierOfferNote`) also get the easier-variant-offer sentence appended, since `ExerciseStep`
- * shows that offer on them. */
+/** Every `EXERCISE_NOTES` entry's text as its own utterance via the app's `exerciseNote` dispatch. Each note shape's domain is
+ * bounded and content-derived (characters, 1-3 stars, colour × piece, one `Hint` per wording); error notes also get the easier-offer sentence. */
 function exerciseNoteTemplates(
   add: (text: string, source: string) => void,
   r: Resolve,
@@ -323,9 +305,8 @@ function exerciseNoteTemplates(
   }
 }
 
-/** Chess's own Play / versus-boss / exercise-note voice templates: every bot level's name, combined
- * with the Play screen's locked-level messages, the versus boss's own bot move/capture lines, and
- * every narrated exercise-feedback note. */
+/** Chess's Play / versus-boss / exercise-note voice templates: bot level names with the locked-level messages, the boss's bot
+ * move / capture lines, every exercise-feedback note. */
 export function chessVoiceTemplates(
   add: (text: string, source: string) => void,
   r: Resolve,
@@ -353,8 +334,7 @@ export function chessVoiceTemplates(
   exerciseNoteTemplates(add, r, all);
 }
 
-/** Chess's whole `SubjectContent`: the one value `compileAll` and every script/test that loads
- * real content inject into the platform's otherwise subject-free YAML → JSON pipeline. */
+/** Chess's whole `SubjectContent`: what `compileAll` and every script / test that loads real content inject into the platform pipeline. */
 export const chessContent: SubjectContent = {
   kinds: EXERCISE_KIND_CONTENT,
   modes: MINI_GAME_MODE_CONTENT,

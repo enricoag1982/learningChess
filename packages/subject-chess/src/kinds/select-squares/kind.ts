@@ -5,14 +5,11 @@ import { initState } from '../../core/exercise/state.ts';
 import type { SelectSquaresDef } from '../../core/exercise/types.ts';
 import { selectSquaresHint, submitSelection, toggleSquare } from './engine.ts';
 
-/** Result of a select-squares submission. */
 export interface SelectionResult {
   readonly correct: boolean;
-  /** Count of answer squares not selected. */
   readonly missing: number;
   /** Answer squares not selected (shown as "still missing" after a wrong check). */
   readonly missingSquares: readonly Square[];
-  /** Selected squares that are not part of the answer. */
   readonly wrong: readonly Square[];
 }
 
@@ -27,7 +24,6 @@ export interface SubmitAction {
 
 export type SelectSquaresAction = ToggleAction | SubmitAction;
 
-/** Result of a select-squares action. */
 export type SelectOutcome =
   { readonly kind: 'toggled' } | { readonly kind: 'checked'; readonly result: SelectionResult };
 

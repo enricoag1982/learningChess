@@ -53,7 +53,7 @@ export function createTestServices(
     parentLock: new LocalStorageParentLockRepository(store),
     passwordFile: createFakePasswordFileWriter(),
     settings: new LocalStorageSettingsRepository(store),
-    // Deterministic (M3.4 warm-up/practice task picking): RTL tests can assert exact tasks shown.
+    // Deterministic (warm-up/practice task picking): RTL tests can assert exact tasks shown.
     random: bot.seededRandom(1),
     backupFileWriter: createFakeBackupFileWriter(),
     backupImporter: new LocalStorageBackupImporter(store),
@@ -71,12 +71,12 @@ export function createTestServices(
     setVoiceEnabled: (enabled) => {
       narrator.setEnabled(enabled);
     },
-    // M6.2: the real `createAudioNarrator` is web-speech/audio-only plumbing `FakeNarrator`
+    // The real `createAudioNarrator` is web-speech/audio-only plumbing `FakeNarrator`
     // deliberately skips (its own doc comment) — nothing here to wire it into.
     setNickname: () => {
       // no-op
     },
-    // M6.3 item 2: same reason — `FakeNarrator` has no `lastOutcome` of its own to report. A test
+    // Same reason — `FakeNarrator` has no `lastOutcome` of its own to report. A test
     // that needs the other outcome overrides `services.testVoice` directly (`Services.testVoice`
     // is not `readonly`, same as `setVoiceEnabled`/`setNickname` above).
     testVoice: () => Promise.resolve({ kind: 'audio' }),

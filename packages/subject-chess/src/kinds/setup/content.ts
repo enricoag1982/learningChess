@@ -10,13 +10,11 @@ import {
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';
 import type { CompileContext } from '@learn/platform-content/kinds/kind-content';
 
-/** A setup exercise's goal position: same shape as `positionFields`, minus `toMove` (unused). */
 const targetSchema = z
   .object({ board: z.string().optional(), fen: z.string().optional() })
   .strict()
   .superRefine(checkExactlyOnePosition);
 
-/** Place pieces from a palette to match `target`; `board`/`fen` is the (often empty) start position. */
 export const schema = z
   .object({
     ...exerciseCommonFields,

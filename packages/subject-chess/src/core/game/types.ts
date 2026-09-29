@@ -10,7 +10,6 @@ export type WinCondition =
   | { readonly kind: 'reach'; readonly squares: readonly Square[] }
   | { readonly kind: 'survive'; readonly moves: number };
 
-/** Rules for one variant game (standard chess or a mini-game), independent of chess.js. */
 export interface GameRulesDef {
   /** Kings on the board; false for kingless mini-games (Pawn Wars, Army Battle, Win the Queen). */
   readonly kings: boolean;
@@ -23,7 +22,6 @@ export interface GameRulesDef {
   readonly moveLimit?: number;
 }
 
-/** Current outcome of a variant game. */
 export type GameResult =
   | { readonly kind: 'ongoing' }
   | { readonly kind: 'win'; readonly winner: Color; readonly reason: string }

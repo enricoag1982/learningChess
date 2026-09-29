@@ -23,7 +23,6 @@ function backRank(color: Color): string {
   return color === 'w' ? '1' : '8';
 }
 
-/** Ranks advanced from the piece's own starting rank (0 for a pawn still on it). */
 function pawnAdvance(square: Square, color: Color): number {
   const rank = Number(square[1]);
   return color === 'w' ? rank - 2 : 7 - rank;
@@ -38,7 +37,6 @@ export function needsPiecesForTerminal(def: GameRulesDef): boolean {
 
 const NO_PIECES: GameBoardView['pieces'] = {};
 
-/** Builds the view `evaluateTerminal` needs, skipping the piece map when the def does not use it. */
 export function boardView(
   board: SearchBoard,
   moves: readonly Move[],
@@ -71,7 +69,6 @@ export function terminalScore(
   return null;
 }
 
-/** Material + small positional bonuses, from the perspective of `view.toMove`. */
 export function staticEval(view: GameBoardView, def: GameRulesDef): number {
   let score = 0;
   for (const [squareKey, piece] of Object.entries(view.pieces)) {
@@ -97,9 +94,8 @@ export function staticEval(view: GameBoardView, def: GameRulesDef): number {
   return score;
 }
 
-/** Value of the position after `lastMove`, from `board.turn()`'s perspective; terminal results
- * always beat a material score. Always builds the full piece map — a one-off value (shallow mode),
- * not the search's hot loop. */
+/** Value after `lastMove` from `board.turn()`'s view; terminal results beat material. Always builds the full piece map (a
+ * one-off value, not the search's hot loop). */
 export function evaluateBoard(
   board: SearchBoard,
   def: GameRulesDef,

@@ -3,7 +3,6 @@ import { selectSquaresAnswer } from './engine.ts';
 import type { SelectSquaresAction } from './kind.ts';
 import type { SelectSquaresDef } from '../../core/exercise/types.ts';
 
-/** Toggles every answer square, then submits. */
 export function selectSquaresSolution(
   def: SelectSquaresDef,
   ctx: VariantRules,

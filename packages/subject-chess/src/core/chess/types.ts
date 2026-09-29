@@ -1,7 +1,5 @@
-/** White or black. */
 export type Color = 'w' | 'b';
 
-/** Piece kind, FEN letters lower-cased. */
 export type PieceType = 'k' | 'q' | 'r' | 'b' | 'n' | 'p';
 
 export type File = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h';
@@ -40,7 +38,6 @@ export const SQUARES: readonly Square[] = RANKS.flatMap((rank) =>
 const FILE_SET: ReadonlySet<string> = new Set(FILES);
 const RANK_SET: ReadonlySet<string> = new Set(RANKS);
 
-/** True when `value` is a valid algebraic square (e.g. `e4`). */
 export function isSquare(value: string): value is Square {
   return value.length === 2 && FILE_SET.has(value[0] ?? '') && RANK_SET.has(value[1] ?? '');
 }

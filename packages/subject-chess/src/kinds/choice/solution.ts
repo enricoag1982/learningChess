@@ -1,7 +1,6 @@
 import type { AnswerChoiceAction } from './kind.ts';
 import type { ChoiceDef } from '../../core/exercise/types.ts';
 
-/** The correct option, straight from `def`. */
 export function choiceSolution(def: ChoiceDef): readonly AnswerChoiceAction[] {
   return [{ type: 'answer-choice', optionId: def.answer }];
 }

@@ -23,7 +23,6 @@ import {
   Section,
 } from '@learn/platform-web/ui/parent/ChildReport.tsx';
 
-/** The computer-level + piece-style chips (`ChildSettings`'s generic settings section). */
 export function SettingsPanel({
   profileId,
   settings,
@@ -114,8 +113,7 @@ export function SettingsPanel({
   );
 }
 
-/** `ChildReport`'s "games played" section: opponent (bot name via `bot.BOT_LEVELS`, else the
- * platform's own `opponentLabel`), result, date — same DOM as before the seam. */
+/** `ChildReport`'s "games played" section: opponent (bot name via `bot.BOT_LEVELS`, else the platform's `opponentLabel`), result, date. */
 export function ReportSection({ games, profilesById }: ReportSectionProps): JSX.Element {
   const { t } = useTranslation();
 

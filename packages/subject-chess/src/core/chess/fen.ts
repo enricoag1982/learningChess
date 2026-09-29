@@ -2,7 +2,6 @@ import type { Color, Piece, Position, Square } from './types.ts';
 import { PIECE_BY_LETTER, pieceLetter, squareAt } from './notation.ts';
 import { isSquare } from './types.ts';
 
-/** Thrown when a FEN string is malformed. */
 export class FenError extends Error {
   constructor(message: string) {
     super(message);

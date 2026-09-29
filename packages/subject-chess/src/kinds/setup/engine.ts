@@ -6,18 +6,14 @@ import type { Hint } from '../../core/exercise/hint.ts';
 import type { PalettePiece, PlaceOutcome } from './kind.ts';
 import type { SetupDef } from '../../core/exercise/types.ts';
 
-/** Setup exercise: target squares still missing their piece, in board reading order. */
 export function remainingSetupSquares(position: Position, target: Position): readonly Square[] {
   return SQUARES.filter(
     (square) => target.pieces[square] !== undefined && position.pieces[square] === undefined,
   );
 }
 
-/**
- * Places `piece` on `square` for a setup exercise: correct when `square` holds that exact piece in
- * `target` and is still free. Wrong → errors + 1, nothing placed. Solved once every target piece is
- * on the board. No-op (outcome `wrong`) once solved.
- */
+/** Correct when `square` holds that exact piece in `target` and is still free; wrong → errors + 1, nothing placed. Solved once
+ * every target piece is on the board; no-op once solved. */
 export function placePiece(
   state: ExerciseStateOf<SetupDef>,
   square: Square,
@@ -50,7 +46,6 @@ export function placePiece(
   };
 }
 
-/** Remaining setup pieces, grouped by colour + type with counts, in board reading order. */
 export function setupPalette(state: ExerciseStateOf<SetupDef>): readonly PalettePiece[] {
   const def = state.def;
   const counts = new Map<string, PalettePiece>();

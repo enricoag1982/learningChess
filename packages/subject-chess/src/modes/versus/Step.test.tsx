@@ -76,7 +76,7 @@ function racingPawnsGame(overrides: Partial<VersusMiniGame> = {}): VersusMiniGam
 }
 
 /**
- * A full-rules `versus` boss (M3.3 `first-game`): both kings, real check rules, checkmate wins,
+ * A full-rules `versus` boss (`first-game`): both kings, real check rules, checkmate wins,
  * everything else (stalemate, insufficient material, move-limit) a draw — `position` defaults to a
  * simple check-in-one-move setup, overridable per test.
  */
@@ -221,7 +221,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     expect(screen.getByRole('button', { name: /^a2, white pawn$/ })).toBeTruthy();
   });
 
-  // Aids per level (M4.2, docs/computer-opponent.md §4): Mouse/Rabbit unlimited take-back + danger
+  // Aids per level (docs/computer-opponent.md §4): Mouse/Rabbit unlimited take-back + danger
   // ring on; Fox 3 take-backs/game, danger off by default; Wolf/Bear no take-back, danger off.
   describe('aids by level', () => {
     it('Fox: danger ring is off by default (Mouse/Rabbit: on)', async () => {
@@ -329,7 +329,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
     });
   });
 
-  // M3.3: `first-game` is the first `versus` boss with real check rules (every earlier boss is
+  // `first-game` is the first `versus` boss with real check rules (every earlier boss is
   // kingless), so this is the first place check/checkmate/stalemate and castling/en passant/
   // promotion ever reach a `versus` game through the UI, not just the exercise engine.
   describe('a full game with real check rules (M3.3 first-game)', () => {
@@ -412,7 +412,7 @@ describe('VersusStep (via BossStep dispatching on mode)', () => {
       fireEvent.click(screen.getByRole('button', { name: /^d6,/ }));
 
       await screen.findByText("It's a draw! Want to try again?");
-      // M3.5: Owl explains *which* draw, alongside the existing generic result text.
+      // Owl explains *which* draw, alongside the existing generic result text.
       expect(screen.getByText("No safe moves left for anyone — that's a stalemate.")).toBeTruthy();
     });
 

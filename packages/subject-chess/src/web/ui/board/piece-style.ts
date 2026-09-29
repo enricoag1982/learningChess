@@ -2,8 +2,7 @@ import type { PieceStyleSetting } from '../../../core/chess/settings.ts';
 import type { Position } from '../../../core/chess/types.ts';
 import { toFen } from '../../../core/chess/fen.ts';
 
-/** World 5's id (`packages/content/tracks.yaml`, order 5, "Full Rules"): its lessons always show
- * classic pieces, no animal badge (docs/app-structure.md "Piece look on board"). */
+/** World 5's id (`tracks.yaml`, order 5, "Full Rules"): its lessons always show classic pieces, no animal badge (docs/app-structure.md). */
 const WORLD_FIVE_ID = 'rules';
 
 /** Standard chess start position's board part of its FEN, duplicated from `app/minigames.ts`'s own

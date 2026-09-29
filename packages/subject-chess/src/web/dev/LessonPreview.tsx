@@ -20,8 +20,7 @@ type View =
   | { readonly kind: 'exercise'; readonly exercise: ExerciseDef }
   | { readonly kind: 'boss'; readonly game: MiniGame };
 
-/** Renders one lesson step full-viewport, the same way `LessonScreen` wraps it (see
- * `ExercisePlayground.tsx`: `GameLayout`'s `lg:` breakpoint reacts to the page viewport). */
+/** One lesson step full-viewport, wrapped like `LessonScreen` (see `ExercisePlayground.tsx`). */
 function StepPreview({
   lesson,
   view,
@@ -79,8 +78,7 @@ function parseHash(): { readonly lessonId: string; readonly view: string } {
   return { lessonId: lessonId ?? LESSON_IDS[0] ?? 'rook', view: view ?? 'demo' };
 }
 
-/** Dev-only visual harness for a lesson's demo/exercises/boss, at `/#lesson=<id>&view=<view>`.
- * Renders the real bundled content, not a fixture. */
+/** Dev-only harness for a lesson's demo / exercises / boss at `/#lesson=<id>&view=<view>`, on the real bundled content. */
 export function LessonPreview(): JSX.Element {
   const initial = parseHash();
   const [lessonId, setLessonId] = useState(initial.lessonId);

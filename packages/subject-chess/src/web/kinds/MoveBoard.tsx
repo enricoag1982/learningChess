@@ -13,7 +13,6 @@ export interface MoveBoardProps {
   /** A legal move, or an illegal one attempted from a known square — both dispatched as `move` and
    * left for the kind's own engine to accept or reject. */
   readonly onMove: (move: FromTo) => void;
-  /** A tap with no piece selected yet (`IllegalAttempt.from === null`). */
   readonly onTapFirst: () => void;
   readonly hint: Hint | null;
   readonly lastMove?: FromTo;

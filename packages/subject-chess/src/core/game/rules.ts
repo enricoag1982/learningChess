@@ -5,7 +5,6 @@ import type { GameBoardView } from './terminal.ts';
 import { evaluateTerminal } from './terminal.ts';
 import type { GameResult, GameRulesDef, GameState, WinCondition } from './types.ts';
 
-/** Starts a new variant game at `position` under `def`. */
 export function startGame(def: GameRulesDef, position: Position): GameState {
   return { position, history: [], def, positions: [position], halfmoveClock: 0 };
 }
@@ -15,7 +14,6 @@ export function legalGameMoves(state: GameState, rules: ChessRules): Move[] {
   return rules.legalMoves(state.position);
 }
 
-/** Plays a move, or returns `null` if it is illegal or the game has already ended. */
 export function playGameMove(
   state: GameState,
   rules: ChessRules,
@@ -39,7 +37,6 @@ export function playGameMove(
   return { state: nextState, move: played.move };
 }
 
-/** Occurrences of the current position (piece placement, side to move, castling, en passant). */
 function repetitionCount(state: GameState): number {
   const key = toFen(state.position);
   return state.positions.filter((position) => toFen(position) === key).length;
@@ -58,7 +55,6 @@ function findSurvive(
   );
 }
 
-/** Current outcome: ongoing, a win (with a reason), or a draw (with a reason). */
 export function gameResult(state: GameState, rules: ChessRules): GameResult {
   const { position, def, history } = state;
   const lastMove = history[history.length - 1];
