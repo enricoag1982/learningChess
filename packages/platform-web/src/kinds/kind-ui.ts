@@ -42,8 +42,11 @@ export type UiPatch<
   D extends ExerciseDefBase = ExerciseDefBase,
   S extends ExerciseStateBase<D> = ExerciseStateBase<D>,
   Extra extends object = object,
-> = Partial<Omit<ExerciseUIState<D, S, Extra>, 'core'>> &
-  Pick<ExerciseUIState<D, S, Extra>, 'feedback'>;
+> = Partial<Extra> & {
+  readonly feedback: ExerciseFeedbackBase;
+  readonly hint?: HintBase | null;
+  readonly pending?: ExerciseUIState<D, S, Extra>['pending'];
+};
 
 export interface PlayAreaProps<
   D extends ExerciseDefBase = ExerciseDefBase,

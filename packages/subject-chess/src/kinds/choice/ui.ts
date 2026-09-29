@@ -1,21 +1,14 @@
-import type { WrongSquaresExtra, ChessKindUI } from '../../web/kinds/move-ui.ts';
+import { createChoiceUi } from '@learn/platform-web/kinds/choice/create-choice-ui.tsx';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { ChoiceDef } from '../../core/exercise/types.ts';
+import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
 import { baseInitUi } from '../../web/kinds/move-ui.ts';
-import { PlayArea } from './PlayArea.tsx';
+import { ChoiceBoard } from './ChoiceBoard.tsx';
+import { CHESS_CHOICE_LOOK } from './look.tsx';
 
-export const choiceUi: ChessKindUI<'choice', WrongSquaresExtra> = {
-  type: 'choice',
-
+export const choiceUi = createChoiceUi<ChoiceDef, ExerciseStateOf<ChoiceDef>, WrongSquaresExtra>({
   initUi: baseInitUi,
-
   clearWrongUi: () => ({ wrongSquares: [] }),
-
-  toUi(outcome) {
-    if (outcome.kind === 'wrong') {
-      return { feedback: { kind: 'wrong-answer' }, hint: null, wrongSquares: [] };
-    }
-    // 'solved' or 'ignored' (already solved: the tiles are hidden by then, unreachable in the UI).
-    return { feedback: { kind: 'solved' }, hint: null, wrongSquares: [] };
-  },
-
-  PlayArea,
-};
+  stimulus: ChoiceBoard,
+  look: CHESS_CHOICE_LOOK,
+});
