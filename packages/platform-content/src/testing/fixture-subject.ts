@@ -63,7 +63,7 @@ const read: ExerciseKindContent<ReadDef, typeof readSchema> = {
   type: 'read',
   schema: readSchema,
   compile: (_raw, ctx) => ctx.build<ReadDef>({ type: 'read' }),
-  needsKidPiece: () => false,
+  checksStimulus: () => false,
 };
 
 /** Both kinds, by `type`. */
@@ -163,6 +163,7 @@ export const fixtureSubject: SubjectContent = {
   },
   badges: { fields: {}, validate: () => undefined },
   characters: { char1: { topicKey: 'topic.char1' } },
+  defaultMode: 'static',
   extraOutputs: { 'extra.json': (root) => ({ root }) },
   voiceTemplates: () => undefined,
 };
@@ -305,14 +306,14 @@ export function writeFullContent(): void {
   );
 }
 
-export function load(): void {
+export function load(subject: SubjectContent = fixtureSubject): void {
   const locales = loadLocales(join(dir, 'locales'));
-  loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales, fixtureSubject);
+  loadContent(join(dir, 'lessons'), join(dir, 'minigames'), locales, subject);
 }
 
-export function issuesOf(): string[] {
+export function issuesOf(subject: SubjectContent = fixtureSubject): string[] {
   try {
-    load();
+    load(subject);
     return [];
   } catch (error) {
     if (error instanceof ContentError) return [...error.issues];

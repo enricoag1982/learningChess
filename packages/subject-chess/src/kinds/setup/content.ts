@@ -62,5 +62,5 @@ export const setup: ExerciseKindContent<SetupDef, typeof schema> = {
   compile,
   verify,
   // Starts from an empty (or near-empty) board: no piece of the side to move is expected.
-  needsKidPiece: () => false,
+  checksStimulus: () => false,
 };

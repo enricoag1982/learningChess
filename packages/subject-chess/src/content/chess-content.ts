@@ -369,6 +369,7 @@ export const chessContent: SubjectContent = {
   demo: chessDemo,
   badges: chessBadges,
   characters: chessCore.characters,
+  defaultMode: 'static',
   extraOutputs: { 'bot-book.json': (root) => loadBotBook(join(root, 'bot-book.yaml')) },
   voiceTemplates: chessVoiceTemplates,
 };

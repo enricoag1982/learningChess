@@ -319,13 +319,23 @@ describe('loadContent through the subject registries', () => {
       );
     }
 
-    it('takes a file without `mode` as the static mode', () => {
+    it("takes a file without `mode` as the subject's default mode", () => {
       writeLesson();
       writeMiniGame();
       writeDefaultLocales();
 
       expect(issuesOf()).toEqual([]);
       expect(loaded().minigames[0]).toMatchObject({ mode: 'static', par: 3 });
+    });
+
+    it('reports a file without `mode` when the subject has no default mode', () => {
+      writeLesson();
+      writeMiniGame();
+      writeDefaultLocales();
+
+      expect(issuesOf({ ...fixtureSubject, defaultMode: undefined })).toEqual([
+        'minigames/mg1.yaml: mode: required (the subject has no default mode)',
+      ]);
     });
 
     it("compiles a mode's own exercises through the kind registry", () => {
