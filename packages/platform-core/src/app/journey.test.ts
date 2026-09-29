@@ -134,7 +134,7 @@ describe('loadJourney', () => {
   });
 });
 
-// World with its own boss (M3.2a): w1's lessons plus a `boss-mg` mini-game unlocked by l2.
+// World with its own boss: w1's lessons plus a `boss-mg` mini-game unlocked by l2.
 const W1_BOSS: World = { ...W1, boss: 'boss-mg' };
 const BASICS_BOSS: Track = { ...BASICS, worlds: [W1_BOSS] };
 const CATALOG_BOSS: TracksCatalog = { ...CATALOG, tracks: [BASICS_BOSS] };

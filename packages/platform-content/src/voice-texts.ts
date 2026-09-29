@@ -1,6 +1,5 @@
-// Inventory of every narrated string, resolved to literal English text via the same locale content
-// the app renders from, deduped by `voiceKey`: content strings, UI "owl line" templates expanded
-// over each bounded domain, and runtime string concatenations outside i18next expanded to match.
+// Inventory of every narrated string as literal English text (the same locale content the app renders), deduped by `voiceKey`:
+// content strings, UI "owl line" templates expanded over bounded domains, and runtime concatenations outside i18next.
 import type {
   BadgeDef,
   CompiledContent,

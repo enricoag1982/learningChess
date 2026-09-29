@@ -64,7 +64,7 @@ test('a lazy-loaded screen (parent area) and a World 5 exercise both work after 
   page,
   context,
 }) => {
-  // M5.4 (non-functional.md §1/§4 "Lazy loading"/"Precache"): the parent area is one of the
+  // Offline (non-functional.md §1/§4 "Lazy loading"/"Precache"): the parent area is one of the
   // screens `App.tsx` now code-splits into its own chunk (`React.lazy`), never fetched during
   // this test's own online session below (Home -> Journey -> World 5 never visits it) — so it can
   // only work offline because the service worker precached *every* chunk up front, not only the

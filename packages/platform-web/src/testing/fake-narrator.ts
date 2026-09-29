@@ -2,7 +2,7 @@ import type { GatedNarrator } from '../adapters/narration/gated-narrator.ts';
 
 export interface FakeNarrator extends GatedNarrator {
   /** Every text actually spoken so far (never records one while `setEnabled(false)` — same
-   * "voice off means nothing is spoken" contract `GatedNarrator` gives the real narrator, M5.1). */
+   * "voice off means nothing is spoken" contract `GatedNarrator` gives the real narrator). */
   readonly spoken: readonly string[];
   readonly cancelCount: number;
   /** Manual mode only: resolves the current `speak()` as if playback finished on its own (not a

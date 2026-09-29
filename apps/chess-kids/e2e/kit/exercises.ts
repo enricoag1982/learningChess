@@ -129,7 +129,7 @@ export async function shownExercise(
 
 /**
  * Solves whichever of `candidates` is currently on screen, then advances past its success panel;
- * returns the matched definition. For a review task (M3.4 warm-up / Practice), whose exact
+ * returns the matched definition. For a review task (warm-up / Practice), whose exact
  * exercise the app picks at random from a concept's pool — each candidate's own instruction text
  * (never interpolated, so a plain equality match) tells them apart.
  */

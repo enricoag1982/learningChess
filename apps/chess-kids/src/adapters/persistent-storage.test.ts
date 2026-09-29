@@ -9,9 +9,8 @@ function services(storage: Storage): ReturnType<typeof createTestServices> {
 }
 
 /** Reads the raw stored settings record, bypassing `LocalStorageSettingsRepository.get()`'s own
- * `normalize` (M5.1's file, out of this milestone's scope — see `ports.ts`'s own note on
- * `AppSettings.storagePersisted`): as of M5.4 that whitelist does not yet carry this field through
- * a read, so asserting through `deps.settings.get()` here would fail for a reason outside this
+ * `normalize` (see `ports.ts`'s note on `AppSettings.storagePersisted`): that whitelist does not
+ * yet carry this field through a read, so asserting through `deps.settings.get()` here would fail for a reason outside this
  * module's own responsibility. This reads exactly what `save()` actually persisted instead — what
  * `requestPersistentStorageIfNeeded` itself is responsible for. */
 function rawStoredSettings(storage: Storage): unknown {

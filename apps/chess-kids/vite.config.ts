@@ -6,14 +6,14 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Shown in the parent area (M5.5, `docs/release.md`); read once at build/dev-server start, not
+// Shown in the parent area (`docs/release.md`); read once at build/dev-server start, not
 // imported as JSON (that would pull the whole file, incl. `devDependencies`, into the dep graph).
 const { version } = JSON.parse(
   readFileSync(fileURLToPath(new URL('./package.json', import.meta.url)), 'utf-8'),
 ) as { version: string };
 
 /**
- * Content Security Policy (`non-functional.md` §6 "Security", M5.4 decision table): no remote
+ * Content Security Policy (`non-functional.md` §6 "Security"): no remote
  * code, no third-party network access at all (non-functional.md §3 "No tracking" already promises
  * this — this is the browser-enforced version of the same promise). `worker-src 'self' blob:` —
  * the bot worker (`adapters/bot/worker-bot-player.ts`) loads as a same-origin module URL in the
@@ -60,7 +60,7 @@ function cspPlugin(): Plugin {
 // Deploy workflow sets BASE_PATH to `/<repo>/` for GitHub Pages; local dev/build default to `/`.
 export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
-  // Compile-time string replacement (not `import.meta.env`): fine under the M5.4 CSP's
+  // Compile-time string replacement (not `import.meta.env`): fine under the CSP's
   // `script-src 'self'` (no `unsafe-inline`/`eval`) since nothing is evaluated at runtime.
   define: { __APP_VERSION__: JSON.stringify(version) },
   // One instance of each stateful library across the linked workspace packages.
@@ -70,7 +70,7 @@ export default defineConfig({
     // Vite's default target (Safari 16.4+) would let newer syntax through; `pnpm compat` checks
     // the result for what cannot be lowered.
     target: ['es2022', 'safari15.4', 'chrome100', 'edge100', 'firefox100'],
-    // The M6.4 Fluent Emoji 3D art (`ui/art/animal-images.ts`) is 3-6 KB per file — under Vite's
+    // Fluent Emoji 3D art (`ui/art/animal-images.ts`) is 3-6 KB per file — under Vite's
     // default 4096-byte inline limit, which would base64 several of them straight into the JS
     // bundle (bloating the initial-JS budget, `scripts/check-size.ts`) instead of shipping them as
     // real, service-worker-precached files. Never inline `.webp`; leave every other asset type

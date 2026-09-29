@@ -23,7 +23,7 @@ const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
 /**
- * World 3 "Attack" (M3.2b): every prior lesson is seeded mastered (`pawn-wars.spec.ts`'s pattern),
+ * World 3 "Attack": every prior lesson is seeded mastered (`pawn-wars.spec.ts`'s pattern),
  * then the lesson is played end to end — story, demo, both guided tries, all 8 exercises (3
  * select-squares `derive: attacked-by`, 5 best-move `verify: attack`) — up to its `queen-vs-pawns`
  * boss screen. One kid move there proves the versus boss itself is playable; finishing the whole

@@ -153,7 +153,7 @@ export async function seedMiniGameWon(
 
 /**
  * Seeds `count` full-game wins vs `opponentLevel` — used to unlock a higher computer level without
- * playing every prerequisite game through the UI (M4.2, `docs/computer-opponent.md` §3: 3 full-game
+ * playing every prerequisite game through the UI (`docs/computer-opponent.md` §3: 3 full-game
  * wins vs the level right below unlocks the next one).
  */
 export async function seedGameRecordWins(
@@ -182,7 +182,7 @@ export async function seedGameRecordWins(
 }
 
 /**
- * Sets a profile's daily time limit (M5.2) — every other setting defaults exactly as
+ * Sets a profile's daily time limit — every other setting defaults exactly as
  * `DEFAULT_PROFILE_SETTINGS` does.
  */
 export async function seedDailyLimit(
@@ -200,8 +200,8 @@ export async function seedDailyLimit(
 }
 
 /**
- * Patches `playUntil` onto `profileId`'s stored settings (M7.1), merged over whatever is already
- * stored (the M5.1 defaults if none yet) so a spec can seed just this one allowed-hours edge
+ * Patches `playUntil` onto `profileId`'s stored settings, merged over whatever is already
+ * stored (the defaults if none yet) so a spec can seed just this one allowed-hours edge
  * without clobbering an earlier `seedDailyLimit` call.
  */
 export async function seedPlayUntil(
@@ -305,7 +305,7 @@ export async function seedLessonsMastered(
 /**
  * Seeds every lesson through World 4 ("check") mastered, plus World 3's and World 4's own world
  * bosses won (`win-the-queen`, `first-game`) — the same ingredients `world4.spec.ts` seeds by hand,
- * bundled here for specs that only need "World 4 mastered" as a starting point (M4.3's vs Friend:
+ * bundled here for specs that only need "World 4 mastered" as a starting point (vs Friend:
  * unlocks the full game, and, from earlier worlds, Pawn Wars and Win the Queen too).
  */
 export async function seedWorldFourMastered(
@@ -332,7 +332,7 @@ export async function seedWorldFourMastered(
 }
 
 /**
- * Seeds one concept's review state directly, due now by default — the M3.4 Leitner scheduler's
+ * Seeds one concept's review state directly, due now by default — the Leitner scheduler's
  * `ConceptStats`. Used to put a concept in today's warm-up / Practice's due count without playing
  * an exercise wrong first.
  */

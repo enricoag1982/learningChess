@@ -46,7 +46,7 @@ async function seedUpTo(page: import('@playwright/test').Page, lessonId: string)
 }
 
 /**
- * World 5 "Castling" (M4.1, no boss of its own — `docs/curriculum.md` World 5): every prior world
+ * World 5 "Castling" (no boss of its own — `docs/curriculum.md` World 5): every prior world
  * mastered, then the lesson is played end to end via `playLesson` — story, demo, both guided tries,
  * all 8 exercises (yes-no `can-castle` and best-move `castle`, the two new verify kinds this
  * milestone adds), same generic `solveExercise` helper every other lesson type uses.
@@ -73,7 +73,7 @@ test.describe('World 5: Castling lesson to completion', () => {
 });
 
 /**
- * World 5 "En passant" (M4.1): its first guided try is a best-move exercise authored with
+ * World 5 "En passant": its first guided try is a best-move exercise authored with
  * `lastMove: d7d5` (the double step that makes the capture legal) — the board must show that move's
  * highlight tint on d7 and d5 from the very start, before the kid plays anything (`exercise-reducer.ts`'s
  * `initExerciseState` seeding, `Board.tsx`'s existing `highlights.lastMove` tint).

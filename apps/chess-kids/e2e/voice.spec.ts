@@ -10,7 +10,7 @@ const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
 /**
- * M6.2 (`docs/voice.md`): a text with generated audio plays it instead of Web Speech, and the same
+ * Generated voice (`docs/voice.md`): a text with generated audio plays it instead of Web Speech, and the same
  * audio still loads once the service worker's precache is the only source (offline). Uses the
  * first Journey lesson's Story text — whichever lesson that currently is (`nextLesson`, same as
  * `lesson.spec.ts`) — since every lesson story is inventoried (`voice-texts.test.ts`).

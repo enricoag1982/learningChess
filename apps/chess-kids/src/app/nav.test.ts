@@ -17,9 +17,8 @@ import type { AppStore } from '@learn/platform-web/app/store.ts';
 import { setRoute } from '@learn/platform-web/app/slices/nav.ts';
 
 /**
- * Store-level coverage of `design-r2-web.md` PR C's flow table (v4 R2 web C, C4b — HIGH RISK):
- * every row drives real store actions over `createAppStore` (no rendering) and asserts on the
- * resulting `stack`. No behaviour change from pre-refactor `store.ts` is the whole point here.
+ * Store-level navigation flows: every row drives real store actions over `createAppStore` (no
+ * rendering) and asserts on the resulting `stack`.
  */
 
 function names(store: AppStore): readonly string[] {

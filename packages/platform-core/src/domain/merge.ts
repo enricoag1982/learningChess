@@ -21,7 +21,7 @@ export interface MergeableProfileData {
   readonly unlocks: readonly Unlock[];
 }
 
-// Mirrors the web storage layer's own caps; duplicated here so `packages/core` never imports a web
+// Mirrors the web storage layer's own caps; duplicated here so `platform-core` never imports a web
 // adapter constant.
 const MAX_ATTEMPTS = 2000;
 const MAX_GAME_RECORDS = 500;

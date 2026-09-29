@@ -165,7 +165,7 @@ describe('HomeScreen', () => {
   });
 });
 
-// A one-lesson world with its own boss (M3.2a dev fixture, not the real tracks.yaml).
+// A one-lesson world with its own boss (dev fixture, not the real tracks.yaml).
 const WORLD_BOSS: World = {
   id: 'test',
   track: 'test',
@@ -226,7 +226,7 @@ describe('HomeScreen next step is a world boss', () => {
 
     fireEvent.click(button);
 
-    // "Start today" now opens the full Today session (M3.4): the world boss is its one activity,
+    // "Start today" now opens the full Today session: the world boss is its one activity,
     // reached asynchronously (`loadTodaySession`).
     await waitFor(() => {
       expect(store.getState().screen).toBe('minigame');

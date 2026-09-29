@@ -323,7 +323,7 @@ describe('currentRank', () => {
   });
 });
 
-// World bosses (M3.2a): a dedicated 2-world catalog, bw1 and bw2 each with their own boss
+// World bosses: a dedicated 2-world catalog, bw1 and bw2 each with their own boss
 // mini-game, kept separate from CATALOG above so its own-boss rules don't affect other tests.
 const BW1: World = {
   id: 'bw1',

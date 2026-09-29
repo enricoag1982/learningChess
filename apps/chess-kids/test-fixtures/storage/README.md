@@ -6,7 +6,7 @@ device"). `storage-compat.test.ts`/`.spec.ts` load these against `master`; a fix
 load cleanly there is a real compat bug, not a fixture problem.
 
 **Add one for a new release**: worktree the tag, `pnpm install --frozen-lockfile && pnpm build`;
-copy `generate-fixture.spec.ts` into its `apps/web/e2e/`, set `TAG`, adapt to that release's own
+copy `generate-fixture.spec.ts` into its e2e folder (`apps/web/e2e/` up to `v2.0.0`, `apps/chess-kids/e2e/` from v4), set `TAG`, adapt to that release's own
 labels/features (never its app code); run it (`PW_CHROMIUM_PATH=... PW_PORT=<free>
 pnpm exec playwright test e2e/generate-fixture.spec.ts --project=chromium`); move the written
 `test-fixtures/storage/<tag>/` here; remove the scratch worktree.

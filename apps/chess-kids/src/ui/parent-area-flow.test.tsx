@@ -24,7 +24,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-/** A minimal, valid incoming `BackupFile` for one child (M7.2 device sharing tests). */
+/** A minimal, valid incoming `BackupFile` for one child (device sharing tests). */
 function incomingFileFor(
   profileOverrides: { readonly id: string; readonly nickname: string; readonly avatar?: string },
   dataOverrides: Partial<BackupFile['data'][string]> = {},

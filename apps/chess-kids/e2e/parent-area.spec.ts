@@ -69,7 +69,7 @@ test.describe('Parent area: overview, report, backup (M5.1)', () => {
 
     // Backup: importing the earlier export merges Mia's reset-away progress back in. Same profile
     // id as this device's own Mia (a re-import of this very device's own earlier export) -> auto
-    // merge, no choice control (M7.2 device sharing).
+    // merge, no choice control (device sharing).
     await page.getByRole('button', { name: 'Backup' }).click();
     await page.getByLabel('Choose file').setInputFiles(exportedPath);
     await page.getByText(/^1 child$/).waitFor();

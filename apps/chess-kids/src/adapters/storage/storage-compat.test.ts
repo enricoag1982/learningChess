@@ -1,7 +1,7 @@
 // Snapshot rule (docs/refactor-v4.md R0 "storage-compat fixtures"): these snapshots change ONLY
 // when the storage or backup format changes on purpose — a v4 refactor PR must leave them
 // untouched. A fixture that fails to load cleanly here is a real compat bug: fix the storage code,
-// never the fixture (`apps/web/test-fixtures/storage/README.md`).
+// never the fixture (`test-fixtures/storage/README.md`).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { AppDeps, AppSettings, BackupFile, ParentLock } from '@learn/platform-core';
@@ -64,7 +64,7 @@ async function snapshotOf(deps: AppDeps): Promise<DeviceSnapshot> {
 }
 
 /** Pretty-printed (`JSON.stringify(v, null, 1)`) so a diff here stays reviewable, same convention
- * as `packages/content/src/content-snapshot.test.ts`. */
+ * as `packages/subject-chess/src/content/content-snapshot.test.ts`. */
 function pretty(value: unknown): string {
   return `${JSON.stringify(value, null, 1)}\n`;
 }

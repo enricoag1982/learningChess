@@ -42,7 +42,7 @@ const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
 /**
- * Clears any concept stats this walk's own deep-scanning has produced (M3.4: an exercise scanned
+ * Clears any concept stats this walk's own deep-scanning has produced (an exercise scanned
  * through its wrong-answer states reaches `EASIER_AFTER_ERRORS` and puts its concept in review,
  * due immediately) so the next Home "Start/Continue" goes straight to its lesson/mini-game — this
  * walk exists to scan lesson/exercise/boss/Practice/summary screens, not the warm-up run itself
@@ -57,7 +57,7 @@ async function clearConceptStats(page: Page): Promise<void> {
 
 /**
  * A lesson finished via Home's Start/Continue may also be followed by one trailing mini-game
- * (M3.4 session order: warm-up → lesson → mini-game → summary), whichever the session picked at
+ * (session order: warm-up → lesson → mini-game → summary), whichever the session picked at
  * its start. Plays it through like `completeBoss`, but its own final "Continue" (not "Next" —
  * `BossPlaySession.primaryLabel`, `miniGameOrigin: 'today'`) leads to the session summary.
  */
@@ -200,8 +200,8 @@ async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<
 }
 
 /** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). `role` defaults to
- * `'button'`; a toggle (M5.1 voice/sound/hints) is `role="switch"` instead. `scope` narrows the
- * lookup (M7.1: the daily-limit block's own "Off" chip is no longer unique on the settings screen
+ * `'button'`; a toggle (voice/sound/hints) is `role="switch"` instead. `scope` narrows the
+ * lookup (the daily-limit block's own "Off" chip is no longer unique on the settings screen
  * — "Play until"/"Not before" each have one too — so a caller passes that chip row's own `group`
  * locator instead of the whole `page`). */
 async function expectParentTouchTarget(
@@ -228,7 +228,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Save parent code');
   await expectNoSeriousViolations(page, 'First run: Password');
 
-  // 2.5. Its "Read our privacy policy" link (M5.5): an in-screen dialog, not a new store screen.
+  // 2.5. Its "Read our privacy policy" link: an in-screen dialog, not a new store screen.
   await page.getByRole('button', { name: 'Read our privacy policy' }).click();
   const privacyDialog = page.getByRole('dialog', { name: 'Privacy' });
   await privacyDialog.waitFor();
@@ -261,7 +261,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectNoSeriousViolations(page, 'New player: avatar');
   await page.getByRole('button', { name: "Let's play!" }).click();
 
-  // 5.5. Placement offer (M4.5, kid style): declined here (a full placement run is scanned in its
+  // 5.5. Placement offer (kid style): declined here (a full placement run is scanned in its
   // own dedicated test below, alongside the test-out sheet/runner/results).
   await page.getByText(contentText('placement.offer-question')).waitFor();
   await expectKidTouchTarget(page, contentText('placement.offer-yes'));
@@ -281,7 +281,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Open');
   await expectNoSeriousViolations(page, 'Password screen');
 
-  // 8. Parent area overview (parent style, M5.1: tappable child cards, no inline management
+  // 8. Parent area overview (parent style: tappable child cards, no inline management
   // buttons any more — those moved to the child's own Settings screen, scanned next).
   await page.getByLabel('Parent code', { exact: true }).fill('1234');
   await page.getByRole('button', { name: 'Open' }).click();
@@ -296,7 +296,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectNoSeriousViolations(page, 'Parent area: child report');
   await expectOnlyButtonsRaised(page, 'Parent area: child report');
 
-  // 8.6. Report -> Settings: rename/avatar, daily limit (M7.1: weekend toggle + hours), voice/
+  // 8.6. Report -> Settings: rename/avatar, daily limit (weekend toggle + hours), voice/
   // sound/hints, computer level, piece style, unlock panel, export, reset/delete — every control
   // on the busiest parent screen.
   await page.getByRole('button', { name: 'Settings' }).click();
@@ -322,14 +322,14 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page, 'Export all');
   await expectNoSeriousViolations(page, 'Parent area: backup');
 
-  // 8.8. Backup -> Overview -> Privacy (M5.5): same policy text as the first-run dialog above.
+  // 8.8. Backup -> Overview -> Privacy: same policy text as the first-run dialog above.
   await page.getByRole('button', { name: 'Back' }).click();
   await page.getByRole('button', { name: 'Privacy' }).click();
   await expectParentTouchTarget(page, 'Back');
   await expectNoSeriousViolations(page, 'Parent area: privacy');
   await expectOnlyButtonsRaised(page, 'Parent area: privacy');
 
-  // 8.9. Daily time limit (M5.2): "See you tomorrow" (kid style) once over the limit, then its own
+  // 8.9. Daily time limit: "See you tomorrow" (kid style) once over the limit, then its own
   // "Parent: more time" password flow resuming the gated activity.
   await page.getByRole('button', { name: 'Back' }).click(); // Privacy -> Overview
   await page.getByRole('button', { name: contentText('parent.done') }).click(); // Overview -> picker
@@ -422,13 +422,13 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     testInfo.project.name !== 'chromium',
     'full curriculum walk runs on chromium only; see the seeded scan test below',
   );
-  // Walking far enough into the curriculum to reach a versus boss (M2.6, possibly two: Pawn Wars
+  // Walking far enough into the curriculum to reach a versus boss (possibly two: Pawn Wars
   // Jr. and Pawn Wars, the latter reached for its `choice`/`best-move` exercises) pushes this well
   // past the 30s default even with the bot's "thinking" pause shortened below (typically ~1min).
   // Walks the whole curriculum: grows with every world (2.3–2.5 min at World 4 under load).
   test.setTimeout(300_000);
 
-  // M6.3 item 4 (`docs/voice.md`): the missed-text report, chromium project only (this walk
+  // Voice (`docs/voice.md`): the missed-text report, chromium project only (this walk
   // already runs 3x, once per viewport project — no need to also fetch/decode the same audio 3x).
   const checkVoiceMisses = testInfo.project.name === 'chromium';
 
@@ -492,7 +492,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   await expectOnlyButtonsRaised(page, 'My Den');
   await page.getByRole('button', { name: 'Back to Home' }).click();
 
-  // Practice (M3.4): nothing complete yet, so the "All done for today!" / no-topics state.
+  // Practice: nothing complete yet, so the "All done for today!" / no-topics state.
   await page.getByRole('button', { name: 'Practice', exact: true }).click();
   await expectKidTouchTarget(page, 'Back to Home');
   await expectKidTouchTarget(page, /Daily warm-up/);
@@ -570,7 +570,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
         await page.getByRole('button', { name: contentText('play.back-to-journey') }).click();
 
         if (previousWorldBoss.id === 'first-game') {
-          // M3.5: Play's own "Full game" entry (vs Computer card) — reachable only once World 4
+          // Play's own "Full game" entry (vs Computer card) — reachable only once World 4
           // is mastered, which winning `first-game` above just did. Scans the level-picked start,
           // a mid-game position, and the "Stop this game?" leave confirm, then returns to Journey
           // (this block's exit invariant, same as the plain mini-game-won path above).
@@ -595,7 +595,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('heading', { name: 'Play' }).waitFor();
           await page.getByRole('button', { name: 'Back to Home' }).click();
 
-          // M4.3: vs Friend — Pawn Wars and Win the Queen unlocked earlier already, so this is the
+          // vs Friend — Pawn Wars and Win the Queen unlocked earlier already, so this is the
           // full choice of games. Only one profile exists in this walk, so the second player is
           // Guest (no second `GameRecord`, decision log). Pass-and-play (not face-to-face) keeps
           // every control to a single on-screen instance for the touch-target checks below.
@@ -745,7 +745,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
     // Complete.
     await expect(page.getByText('Lesson complete!')).toBeVisible();
-    // M4.4: a newly earned badge celebrates first, its own "Continue" sharing this screen's own
+    // A newly earned badge celebrates first, its own "Continue" sharing this screen's own
     // button text — dismissed here (scanned on its own in `rewards.spec.ts`) so the checks below,
     // and the plain Continue click past them, see this screen alone, unambiguously.
     await dismissCelebrationIfShown(page);
@@ -761,7 +761,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
       // A lesson opened from the Journey returns to the Journey, not Home, on Continue.
       await page.getByRole('button', { name: /Back to Home/ }).click();
     } else {
-      // A lesson opened via Home's Start/Continue is its own Today session (M3.4): Continue may
+      // A lesson opened via Home's Start/Continue is its own Today session: Continue may
       // first lead through a trailing mini-game, then lands on the session summary — not Home
       // directly.
       await passThroughTrailingMiniGame(page);

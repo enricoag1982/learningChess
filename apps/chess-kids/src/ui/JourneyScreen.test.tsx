@@ -74,7 +74,7 @@ describe('JourneyScreen', () => {
   });
 });
 
-// A one-lesson world with its own boss (M3.2a): dev fixture only, not the real tracks.yaml (the
+// A one-lesson world with its own boss: dev fixture only, not the real tracks.yaml (the
 // real World 3 boss arrives from another agent; the lead wires `boss: win-the-queen` at integration).
 const WORLD_BOSS: World = { ...WORLD, boss: 'boss-mg' };
 const TRACK_BOSS: Track = {

@@ -32,7 +32,7 @@ export interface ParentConfirmDialogProps {
   readonly confirmLabel: string;
   readonly onCancel: () => void;
   /** Plain confirm (delete): called directly. Password re-entry (reset) passes `onSubmit`
-   * instead — this then renders a `<form>` so Enter submits it, same as before. */
+   * instead — this then renders a `<form>` so Enter submits it. */
   readonly onConfirm?: () => void;
   readonly onSubmit?: (event: SubmitEvent<HTMLFormElement>) => void;
   readonly confirmDisabled?: boolean;

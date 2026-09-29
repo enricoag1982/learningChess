@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 /**
  * Offline size budget (non-functional.md §4): *initial* JS ≤ 300 KB gzipped — the app shell before
- * a kid ever opens a lazy-loaded screen (M5.4: parent area, friend play, placement / test-out —
+ * a kid ever opens a lazy-loaded screen (parent area, friend play, placement / test-out —
  * `App.tsx`'s own `React.lazy` calls), not the whole app. `dist/index.html`'s own
  * `<script type="module">` (the entry chunk) plus every `<link rel="modulepreload">` it lists (the
  * entry's own static, non-lazy dependencies — Vite already resolved exactly the set a first paint
@@ -81,7 +81,7 @@ if (initialBytes > BUDGET_BYTES) {
 }
 
 /**
- * Offline precache size (M6.3 item 5; `docs/non-functional.md` §1's ≤ 50 MB/language budget,
+ * Offline precache size (`docs/non-functional.md` §1's ≤ 50 MB/language budget,
  * `docs/voice.md`'s own ≤ 25 MB English audio slice being the dominant piece of it): every file
  * the built service worker (`vite-plugin-pwa`'s `dist/sw.js`) actually precaches on first install,
  * parsed straight out of its own `precacheAndRoute([{ url, revision }, …])` call — the exact list

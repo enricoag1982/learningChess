@@ -15,7 +15,7 @@ import { createTestServices } from '@learn/subject-chess/web/testing/test-servic
 // Two worlds, three lessons: w1 (no boss) = l1 (Rhino, collect-stars) -> l2 (Elephant, yes-no);
 // w2 (no boss) = l3 (Lioness, yes-no). Distinct characters keep every Journey node's accessible
 // name unambiguous ("<Character> the <piece>, <status>"); yes-no's Yes/No buttons are the most
-// reliable way to force a deliberately-wrong first try in these tests (M4.5's own "Fail" runs).
+// reliable way to force a deliberately-wrong first try in these tests (the "Fail" runs).
 const L1_EXERCISE = fixtureExercise('l1-ex');
 const YES_NO_POSITION = parseDiagram(`
   . . . . . . . .
@@ -312,7 +312,7 @@ describe('Parent unlock (M4.5)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
-    // M5.1: the unlock panel moved from the overview row into the child's own Settings screen.
+    // The unlock panel moved from the overview row into the child's own Settings screen.
     const miaCard = (await screen.findByText('Mia')).closest('button');
     if (!miaCard) throw new Error('Mia card not found');
     fireEvent.click(miaCard);
@@ -353,7 +353,7 @@ describe('Parent unlock (M4.5)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Open' }));
     await screen.findByRole('heading', { name: 'Parent area' });
 
-    // M5.1: the unlock panel moved from the overview row into the child's own Settings screen.
+    // The unlock panel moved from the overview row into the child's own Settings screen.
     const miaCard = screen.getByText('Mia').closest('button');
     if (!miaCard) throw new Error('Mia card not found');
     fireEvent.click(miaCard);

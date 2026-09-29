@@ -235,7 +235,7 @@ describe('5-minute warning notice (M7.1)', () => {
     expect(screen.queryByText(FIVE_MINUTES_TEXT)).toBeNull();
     expect(narrator.spoken.filter((text) => text === FIVE_MINUTES_TEXT)).toHaveLength(1);
     // The hidden banner never speaks (an empty speak after the next screen's own narration
-    // interrupted it: that screen stayed silent — found by the M6.3 voice-miss report).
+    // interrupted it: that screen stayed silent — found by the voice-miss report).
     expect(narrator.spoken).not.toContain('');
   });
 

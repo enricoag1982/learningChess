@@ -41,7 +41,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /Continue/ }));
 
     // The lesson was this Today session's only activity: its end is the session summary, not Home
-    // directly (M3.4, domain-model.md §3.3).
+    // directly (domain-model.md §3.3).
     await screen.findByText('Great session!');
     fireEvent.click(screen.getByRole('button', { name: 'Done' }));
 

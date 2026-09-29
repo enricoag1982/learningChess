@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { completeFirstRun, contentText, pickProfileFromPicker } from './helpers.ts';
 
 /**
- * Offline + performance hardening (M5.4, `non-functional.md` §4/§6): lazy-loaded screens actually
+ * Offline + performance hardening (`non-functional.md` §4/§6): lazy-loaded screens actually
  * fetch their own chunk over the network (not just bundled into the main one), the app's main
  * flows raise no Content-Security-Policy violation, and Home becomes interactive within budget
  * under a throttled CPU.

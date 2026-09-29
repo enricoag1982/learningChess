@@ -63,7 +63,7 @@ async function seedEarnedBadge(page: Page, profileId: string, badgeId: string): 
  * id on import). Distinct from `helpers.ts`'s own `seedMinutesToday`: that one never stamps
  * `deviceId`, which would make two "devices'" seeded rows here collide under the same fixed id once
  * merged onto one profile — this spec needs genuinely distinct per-device rows instead, matching
- * what `app/rewards.ts`'s real `recordSessionMinutes` stamps once a device has its own id (M7.2).
+ * what `app/rewards.ts`'s real `recordSessionMinutes` stamps once a device has its own id.
  */
 async function seedTodayMinutesForDevice(
   page: Page,

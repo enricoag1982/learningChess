@@ -7,7 +7,7 @@ import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 
 const PIECE_TYPES: readonly PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
 
-/** Every lesson-character id real content authors (`packages/content/lessons/**\/*.yaml`,
+/** Every lesson-character id real content authors (`packages/subject-chess/content/lessons/**\/*.yaml`,
  * `character:`), plus Owl (the narrator, World 1) and Fox (the kid's own avatar, also usable as a
  * `CharacterIcon` — `characters.tsx`). */
 const LESSON_CHARACTER_IDS = [...PIECE_TYPES.map(characterForPiece), 'owl', 'fox'];

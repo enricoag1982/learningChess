@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { contentText } from './i18n.ts';
 
 /**
- * Welcome → password → saved → new player (nickname, avatar), stopping right at the M4.5
+ * Welcome → password → saved → new player (nickname, avatar), stopping right at the
  * "Already know some chess?" placement offer (domain-model.md §3.2) — shared by `completeFirstRun`
  * (declines it, same landing-on-Home contract every other spec relies on) and specs that exercise
  * placement itself.
@@ -32,7 +32,7 @@ export async function completeFirstRunToPlacementOffer(
  * or a lesson call this first instead of `page.goto('/')` directly (`profiles.spec.ts` is the one
  * spec that exercises first run's own screens in detail). `completeFirstRunToPlacementOffer`, then
  * declines placement ("No, start at World 1") — every spec that only needs a fresh profile on Home
- * keeps this same contract after M4.5.
+ * keeps this same contract.
  */
 export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<void> {
   await completeFirstRunToPlacementOffer(page, nickname);
@@ -41,7 +41,7 @@ export async function completeFirstRun(page: Page, nickname = 'Kid'): Promise<vo
 }
 
 /**
- * Dismisses the M4.4 badge celebration overlay if one is showing (a no-op otherwise) — lesson
+ * Dismisses the badge celebration overlay if one is showing (a no-op otherwise) — lesson
  * complete, a game's result and the session summary can each now surface one, and its own
  * "Continue" button shares its text with that same screen's own primary button underneath, so
  * specs call this first to avoid an ambiguous match. Loops (bounded, celebrations cap at 2 per

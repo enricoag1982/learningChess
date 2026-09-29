@@ -22,7 +22,7 @@ const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
 /**
- * Direct Pawn Wars test (M2.6): a fixed `chess-kids:test-seed` makes the Mouse-level bot
+ * Direct Pawn Wars test: a fixed `chess-kids:test-seed` makes the Mouse-level bot
  * deterministic and shortens its "thinking" pause, so this focuses purely on the versus boss
  * itself — every prior lesson is seeded mastered (`journey.spec.ts`'s pattern) rather than played.
  */

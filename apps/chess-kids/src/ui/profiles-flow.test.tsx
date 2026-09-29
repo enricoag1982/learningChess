@@ -117,7 +117,7 @@ describe('password screen', () => {
     enterPassword('1234');
 
     await screen.findByRole('heading', { name: 'Parent area' });
-    // M5.1 overview cards load after the (lazy, M5.4) screen mounts.
+    // Overview cards load after the (lazy) screen mounts.
     expect(await screen.findByText('Mia')).toBeTruthy();
   });
 
@@ -142,7 +142,7 @@ describe('parent area', () => {
     await screen.findByRole('heading', { name: 'Parent area' });
   }
 
-  /** Overview → that child's card → Report → "Settings" (M5.1: rename/avatar/delete moved there). */
+  /** Overview → that child's card → Report → "Settings" (rename/avatar/delete live there). */
   async function openChildSettings(nickname: string): Promise<void> {
     const card = screen.getByText(nickname).closest('button');
     if (!card) throw new Error(`${nickname} card not found`);

@@ -70,7 +70,7 @@ test.describe('Play screen and My Den', () => {
 });
 
 /**
- * Play -> vs Computer: Fox playable (M4.2, `docs/computer-opponent.md` §3): Fox unlocks with 3
+ * Play -> vs Computer: Fox playable (`docs/computer-opponent.md` §3): Fox unlocks with 3
  * full-game wins vs Rabbit (`computerLevelStatus`, `opponent: computer:2`), seeded directly —
  * unlike Mouse/Rabbit this needs no World mastery at all. A seeded bot keeps every reply fast and
  * deterministic (`world4.spec.ts`'s pattern); `first-game`'s own position/rules stand in for the

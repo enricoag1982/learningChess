@@ -1,12 +1,12 @@
 /**
  * Fixture generator (docs/refactor-v4.md R0 "storage-compat fixtures") — NOT part of the regular
- * suite: it lives outside `apps/web/e2e/` (Playwright's `testDir`), so `pnpm test:e2e` never runs
+ * suite: it lives outside `apps/chess-kids/e2e/` (Playwright's `testDir`), so `pnpm test:e2e` never runs
  * it. It plays a realistic session through a released tag's own build (real UI actions, not
  * seeding, wherever that's cheap) and dumps the resulting `localStorage` plus real backup/share
  * exports, for `storage-compat.test.ts`/`storage-compat.spec.ts` (on `master`) to replay against.
  *
  * See `README.md` in this folder for how to run this against an old tag and add a fixture for a new
- * release — it needs copying into that tag's own `apps/web/e2e/` and adapting to that version's own
+ * release — it needs copying into that tag's own e2e folder (`apps/web/e2e/` up to `v2.0.0`) and adapting to that version's own
  * labels/features (never the tag's app code).
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -31,7 +31,7 @@ import {
 
 /** Set to the release tag being generated when this file is copied into its own worktree. */
 const TAG = 'v2.0.0';
-/** Relative to `apps/web` (playwright's own cwd) — move the result into this package's own copy. */
+/** Relative to the app dir (`apps/web` in a pre-v4 tag; playwright's own cwd) — move the result into this package's own copy. */
 const OUT_DIR = join('test-fixtures', 'storage', TAG);
 
 /** Every scored exercise in the whole bundle — a safe superset of candidates for whichever concept
@@ -39,7 +39,7 @@ const OUT_DIR = join('test-fixtures', 'storage', TAG);
 const everyExercise = content.lessons.flatMap((lesson) => lesson.exercises);
 
 /**
- * Clicks Home's "Start" and clears any due warm-up review first (M3.4): a concept just practiced
+ * Clicks Home's "Start" and clears any due warm-up review first: a concept just practiced
  * for the first time can become due again immediately, so every "Start" after the very first one
  * in a sitting can show 1+ of these before the next lesson's own Story step.
  */

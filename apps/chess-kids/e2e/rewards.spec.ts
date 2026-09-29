@@ -25,7 +25,7 @@ function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// M4.4: badges, streak, session log. "Perfect Lesson" (bronze, rewards.md §3: 3 stars on every
+// Badges, streak, session log. "Perfect Lesson" (bronze, rewards.md §3: 3 stars on every
 // exercise, 1 lesson) is evaluated after every scored exercise completion (`checkRewards`, app
 // layer), never automatically — so seeding the "3 stars on every exercise" fact straight into
 // storage (`seedLessonMastered`, near-threshold: the fact is already true, but no `EarnedBadge` row

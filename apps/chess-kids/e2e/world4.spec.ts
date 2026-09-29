@@ -24,7 +24,7 @@ const content = rawContent as unknown as CompiledContent;
 const catalog = rawTracks as unknown as TracksCatalog;
 
 /**
- * World 4 "Mate in 1" (M3.3): every prior lesson (Worlds 1-3 plus Check, Escape the Check,
+ * World 4 "Mate in 1": every prior lesson (Worlds 1-3 plus Check, Escape the Check,
  * Checkmate) is seeded mastered, then the lesson is played end to end via `playLesson` — story,
  * demo, both guided tries, all 12 `mate-in-n` exercises (each solved with `solveExercise`, the same
  * generic helper as every other exercise type), and its `mate-hunt` series boss (all 10 rounds).
@@ -72,7 +72,7 @@ test.describe('World 4: Mate in 1 lesson to and through its boss', () => {
 });
 
 /**
- * World 4's world boss `first-game` (M3.3): kid White vs Mouse on the standard starting position,
+ * World 4's world boss `first-game`: kid White vs Mouse on the standard starting position,
  * real check rules. Unlocked (same as any other mini-game, `docs/domain-model.md` §1.4) once the
  * `stalemate` lesson is complete, so it is reachable from the Play screen without any special
  * world-boss navigation. A seeded bot keeps every reply fast and deterministic (`pawn-wars.spec.ts`'s
@@ -137,7 +137,7 @@ test.describe('World 4 world boss: first-game (seeded smoke test)', () => {
 });
 
 /**
- * Play's own "Full game" entry (M3.5, `PlayScreen`'s vs Computer card): a separate route to the
+ * Play's own "Full game" entry (`PlayScreen`'s vs Computer card): a separate route to the
  * same versus UI `first-game` uses, picked by bot level (Mouse is unlocked once World 4 is
  * mastered). Seeds World 4 mastered the same way as the boss smoke test above, plus `first-game`'s
  * own `MiniGameProgress` win (the world boss, needed for World 4 to count as "mastered" at all —

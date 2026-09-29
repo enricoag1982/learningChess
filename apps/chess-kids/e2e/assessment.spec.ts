@@ -28,7 +28,7 @@ function worldExercisePool(worldId: string): readonly ExerciseDef[] {
  * Solves `count` assessment/placement tasks in a row, each of which the app picked at random from
  * `candidates` (that lesson's or world's own exercise pool) — matches by the task's own instruction
  * text (and board, `shownExercise`), same as `solveWhicheverExercise` for warm-up/Practice. `wrong` answers every task
- * wrong on the first try (still solving it, M4.5: only hints are off — see
+ * wrong on the first try (still solving it: only hints are off — see
  * `answerExerciseWrongThenSolve`), guaranteeing a fail.
  */
 async function runTasks(
