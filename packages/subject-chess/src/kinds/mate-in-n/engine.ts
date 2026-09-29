@@ -3,6 +3,7 @@ import { findMoveBySan, sameSan } from '../../core/chess/facts/san.ts';
 import type { VariantRules } from '../../core/variant/rules.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
+import { moveLadderHint } from '../../core/exercise/hint.ts';
 import type { MateInNOutcome } from './kind.ts';
 import type { MateInNDef } from '../../core/exercise/types.ts';
 
@@ -75,17 +76,5 @@ export function mateInNHint(
 ): Hint {
   const san = def.line[state.history.length];
   const candidates = rules.legalMoves(state.position, { staticOpponent: true });
-  const move = san === undefined ? undefined : findMoveBySan(candidates, san);
-  if (level === 1) {
-    return { kind: 'squares', level: 1, squares: move === undefined ? [] : [move.from] };
-  }
-  if (level === 2) {
-    return { kind: 'squares', level: 2, squares: move === undefined ? [] : [move.to] };
-  }
-  return {
-    kind: 'squares',
-    level: 3,
-    squares: move === undefined ? [] : [move.from, move.to],
-    ...(move === undefined ? {} : { move: { from: move.from, to: move.to } }),
-  };
+  return moveLadderHint(san === undefined ? undefined : findMoveBySan(candidates, san), level);
 }

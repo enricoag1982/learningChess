@@ -7,37 +7,26 @@ import type { BestMoveDef } from '../../core/exercise/types.ts';
 import type { Color, Position, Square } from '../../core/chess/types.ts';
 import { classifyTrade, rules } from '../../content/kinds/common.ts';
 
+type SquarelessKind =
+  | 'take-free'
+  | 'good-trade'
+  | 'check'
+  | 'escape-king'
+  | 'escape-block'
+  | 'escape-capture'
+  | 'castle'
+  | 'en-passant';
+
 /** A `best-move` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */
 type BestMoveVerify =
-  | { readonly kind: 'attack' | 'save'; readonly square: Square }
-  | {
-      readonly kind:
-        | 'take-free'
-        | 'good-trade'
-        | 'check'
-        | 'escape-king'
-        | 'escape-block'
-        | 'escape-capture'
-        | 'castle'
-        | 'en-passant';
-    };
+  { readonly kind: 'attack' | 'save'; readonly square: Square } | { readonly kind: SquarelessKind };
 
 function parseBestMoveVerify(raw: string): BestMoveVerify {
   const [kind, square] = raw.split(' ');
   if (kind === 'attack' || kind === 'save') {
     return { kind, square: square as Square };
   }
-  return {
-    kind: kind as
-      | 'take-free'
-      | 'good-trade'
-      | 'check'
-      | 'escape-king'
-      | 'escape-block'
-      | 'escape-capture'
-      | 'castle'
-      | 'en-passant',
-  };
+  return { kind: kind as SquarelessKind };
 }
 
 /** The exact set of legal kid moves (SAN) satisfying a `best-move` `verify` rule in `position`, or

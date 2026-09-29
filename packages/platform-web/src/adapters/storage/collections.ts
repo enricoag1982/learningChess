@@ -15,6 +15,30 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+const FIELD_CHECKS: Readonly<Record<string, (field: unknown) => boolean>> = {
+  string: (field) => typeof field === 'string',
+  nullableString: (field) => field === null || typeof field === 'string',
+  number: (field) => typeof field === 'number',
+  boolean: (field) => typeof field === 'boolean',
+  array: (field) => Array.isArray(field),
+  object: (field) => typeof field === 'object' && field !== null,
+};
+
+type ShapeField = 'string' | 'nullableString' | 'number' | 'boolean' | 'array' | 'object';
+
+/** A stored-record guard: `value` is an object whose named fields have the listed kinds (per kind,
+ * the field names). Cheap enough to run on every read; not a full schema. */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- `T` is the guard's claim, not inferable from `fields`.
+export function shapeGuard<T>(
+  fields: Readonly<Partial<Record<ShapeField, readonly string[]>>>,
+): (value: unknown) => value is T {
+  return (value): value is T =>
+    isPlainRecord(value) &&
+    Object.entries(fields).every(([kind, names]) =>
+      names.every((name) => FIELD_CHECKS[kind]?.(value[name]) === true),
+    );
+}
+
 /** A record map: every `T` stored as one JSON object under `name`, keyed by `keyOf(record)`. */
 export interface KeyedCollection<T> {
   get(key: string): Promise<T | undefined>;

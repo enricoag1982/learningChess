@@ -1,16 +1,12 @@
 import type { Profile, ProfileRepository } from '@learn/platform-core';
 import type { KeyedCollection } from './collections.ts';
-import { keyedCollection } from './collections.ts';
+import { keyedCollection, shapeGuard } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
-function isProfileShape(value: unknown): value is Profile {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    typeof (value as { id?: unknown }).id === 'string'
-  );
-}
+const isProfileShape = shapeGuard<Profile>({
+  string: ['id'],
+});
 
 /** `ProfileRepository` storing every profile under one `LocalStore` record, keyed by id. */
 export class LocalStorageProfileRepository implements ProfileRepository {

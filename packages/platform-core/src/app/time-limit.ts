@@ -88,9 +88,17 @@ export async function checkActivityGate(
   };
 }
 
-/** Parent "more time": grants {@link EXTRA_TIME_GRANT_MINUTES} more for today, on top of the daily
- * limit. Repeatable (each tap adds another); throws without `deps.rewards` wired up. */
-export async function grantExtraTime(deps: AppDeps, profileId: string): Promise<SessionLog> {
+/** Rewrites today's session log through `update` and saves it; throws without `deps.rewards` wired up. */
+async function updateTodaysLog(
+  deps: AppDeps,
+  profileId: string,
+  update: (
+    existing: SessionLog | undefined,
+    date: string,
+    now: Date,
+    deviceId: string,
+  ) => SessionLog,
+): Promise<SessionLog> {
   if (deps.rewards === undefined) {
     throw new Error('AppDeps.rewards is not wired up');
   }
@@ -100,58 +108,48 @@ export async function grantExtraTime(deps: AppDeps, profileId: string): Promise<
     deps.rewards.getSessionLog(profileId, date),
     getOrCreateDeviceId(deps),
   ]);
-  const log = grantExtraMinutes(
-    existing,
-    deps.ids.next(),
-    profileId,
-    date,
-    EXTRA_TIME_GRANT_MINUTES,
-    now,
-    deviceId,
-  );
+  const log = update(existing, date, now, deviceId);
   await deps.rewards.saveSessionLog(log);
   return log;
+}
+
+/** Parent "more time": grants {@link EXTRA_TIME_GRANT_MINUTES} more for today, on top of the daily
+ * limit. Repeatable (each tap adds another); throws without `deps.rewards` wired up. */
+export function grantExtraTime(deps: AppDeps, profileId: string): Promise<SessionLog> {
+  return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
+    grantExtraMinutes(
+      existing,
+      deps.ids.next(),
+      profileId,
+      date,
+      EXTRA_TIME_GRANT_MINUTES,
+      now,
+      deviceId,
+    ),
+  );
 }
 
 /** Parent "more time" for a late/early gate: grants {@link HOURS_OVERRIDE_MINUTES} from now,
  * regardless of `playUntil`/`playFrom`. Repeatable (resets the window, does not stack); throws
  * without `deps.rewards` wired up. */
-export async function grantHoursOverride(deps: AppDeps, profileId: string): Promise<SessionLog> {
-  if (deps.rewards === undefined) {
-    throw new Error('AppDeps.rewards is not wired up');
-  }
-  const now = deps.clock.now();
-  const date = localDayString(now);
-  const [existing, deviceId] = await Promise.all([
-    deps.rewards.getSessionLog(profileId, date),
-    getOrCreateDeviceId(deps),
-  ]);
-  const log = setHoursOverride(
-    existing,
-    deps.ids.next(),
-    profileId,
-    date,
-    HOURS_OVERRIDE_MINUTES,
-    now,
-    deviceId,
+export function grantHoursOverride(deps: AppDeps, profileId: string): Promise<SessionLog> {
+  return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
+    setHoursOverride(
+      existing,
+      deps.ids.next(),
+      profileId,
+      date,
+      HOURS_OVERRIDE_MINUTES,
+      now,
+      deviceId,
+    ),
   );
-  await deps.rewards.saveSessionLog(log);
-  return log;
 }
 
 /** Marks the 5-minute warning shown for today, so `shouldWarn` never shows it twice the same day.
  * Throws without `deps.rewards` wired up. */
-export async function markTimeWarning(deps: AppDeps, profileId: string): Promise<SessionLog> {
-  if (deps.rewards === undefined) {
-    throw new Error('AppDeps.rewards is not wired up');
-  }
-  const now = deps.clock.now();
-  const date = localDayString(now);
-  const [existing, deviceId] = await Promise.all([
-    deps.rewards.getSessionLog(profileId, date),
-    getOrCreateDeviceId(deps),
-  ]);
-  const log = markWarnedLog(existing, deps.ids.next(), profileId, date, now, deviceId);
-  await deps.rewards.saveSessionLog(log);
-  return log;
+export function markTimeWarning(deps: AppDeps, profileId: string): Promise<SessionLog> {
+  return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
+    markWarnedLog(existing, deps.ids.next(), profileId, date, now, deviceId),
+  );
 }

@@ -37,11 +37,10 @@ export function makeMiniGameCompileContext(
 }
 
 /** Semantic-check helpers every mode's `verify` needs, without repeating the lesson-level logic
- * they share: `claimId`, `checkTextKey`, `checkExercise`. `issues` is the shared sink. */
+ * they share: `claimId`, `checkExercise`. `issues` is the shared sink. */
 export interface ModeVerifyContext {
   readonly issues: string[];
   claimId(id: string, where: string): void;
-  checkTextKey(fullKey: string, where: string): void;
   checkExercise(exercise: ExerciseDefBase, where: string): void;
 }
 

@@ -5,9 +5,13 @@ import { sameSan } from '../core/chess/facts/san.ts';
 import type { VariantRules } from '../core/variant/rules.ts';
 import { applyKidMove } from '../core/exercise/apply-move.ts';
 import type { Hint } from '../core/exercise/hint.ts';
+import { moveLadderHint } from '../core/exercise/hint.ts';
 import { solve } from '../core/exercise/solver.ts';
 import type { ExerciseStateOf } from '../core/exercise/state.ts';
 import type { BestMoveDef, CaptureDef, CollectStarsDef } from '../core/exercise/types.ts';
+import { initState } from '../core/exercise/state.ts';
+import type { MoveAction } from './base.ts';
+import type { ChessKind } from './index.ts';
 
 /** Result of a piece move attempt (collect-stars / capture / best-move). */
 export type MoveOutcome =
@@ -135,19 +139,7 @@ export function moveHint<D extends CollectStarsDef | CaptureDef>(
   rules: VariantRules,
   level: 1 | 2 | 3,
 ): Hint {
-  const move = goalMove(state, rules);
-  if (level === 1) {
-    return { kind: 'squares', level: 1, squares: move === null ? [] : [move.from] };
-  }
-  if (level === 2) {
-    return { kind: 'squares', level: 2, squares: move === null ? [] : [move.to] };
-  }
-  return {
-    kind: 'squares',
-    level: 3,
-    squares: move === null ? [] : [move.from, move.to],
-    ...(move === null ? {} : { move }),
-  };
+  return moveLadderHint(goalMove(state, rules), level);
 }
 
 /** Caps move-count stars by hint level used (collect-stars / capture only). */
@@ -170,4 +162,41 @@ export function moveCountStars(
 ): 1 | 2 | 3 {
   const base: 1 | 2 | 3 = moves <= stars3 ? 3 : moves <= stars2 ? 2 : 1;
   return capMoveStars(base, hintLevel);
+}
+
+/** collect-stars / capture kind: the kid's moves are counted against `stars3` / `stars2`, undo allowed. */
+export function moveCountedKind<D extends CollectStarsDef | CaptureDef>(
+  type: D['type'],
+): ChessKind<D, MoveAction | UndoAction, MoveOutcome | UndoOutcome> {
+  return {
+    type,
+    input: 'static-move',
+    init: initState,
+    act(state, action, ctx) {
+      if (action.type === 'undo') {
+        return { state: undo(state), outcome: { kind: 'undone' } };
+      }
+      return playMove(state, ctx, action.move);
+    },
+    hint(state, level, ctx) {
+      const bumped = { ...state, hintLevel: level };
+      return { state: bumped, hint: moveHint(bumped, ctx, level) };
+    },
+    stars(state) {
+      return moveCountStars(state.moves, state.def.stars3, state.def.stars2, state.hintLevel);
+    },
+  };
+}
+
+/** collect-stars / capture solution: the solver's shortest line, as move actions. */
+export function goalSolution<D extends CollectStarsDef | CaptureDef>(
+  type: D['type'],
+): (def: D, ctx: VariantRules) => readonly MoveAction[] {
+  return (def, ctx) => {
+    const line = solve(def.position, ctx, type);
+    if (line === null) {
+      throw new Error(`${type} "${def.id}": no solution found`);
+    }
+    return line.map((move) => ({ type: 'move', move: { from: move.from, to: move.to } }));
+  };
 }

@@ -1,21 +1,15 @@
 import type { ParentLock, ParentLockRepository } from '@learn/platform-core';
 import type { SingletonRecord } from './collections.ts';
-import { singleton } from './collections.ts';
+import { shapeGuard, singleton } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { StorageError } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
-function isParentLockShape(value: unknown): value is ParentLock {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.password === 'string' &&
-    typeof record.fileLocation === 'string' &&
-    typeof record.failedAttempts === 'number' &&
-    (record.lockedUntil === null || typeof record.lockedUntil === 'string')
-  );
-}
+const isParentLockShape = shapeGuard<ParentLock>({
+  string: ['id', 'password', 'fileLocation'],
+  number: ['failedAttempts'],
+  nullableString: ['lockedUntil'],
+});
 
 /** `ParentLockRepository` storing the single device-wide lock under one `LocalStore` record. */
 export class LocalStorageParentLockRepository implements ParentLockRepository {

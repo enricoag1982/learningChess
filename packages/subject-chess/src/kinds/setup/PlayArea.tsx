@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf } from '../index.ts';
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { Piece, Square } from '../../core/chess/types.ts';
 import { setupPalette } from './engine.ts';
@@ -12,8 +10,7 @@ import { useIsStackedLayout } from '@learn/platform-web/ui/useMediaQuery.ts';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
-import type { PlayAreaProps } from '@learn/platform-web/kinds/kind-ui.ts';
-import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
+import type { WrongSquaresExtra, ChessPlayAreaProps } from '../../web/kinds/move-ui.ts';
 import { SetupPalette } from './SetupPalette.tsx';
 
 export function PlayArea({
@@ -24,12 +21,7 @@ export function PlayArea({
   surface,
   top,
   done,
-}: PlayAreaProps<
-  DefOf<'setup'>,
-  ExerciseStateOf<DefOf<'setup'>>,
-  ActionOf<'setup'>,
-  WrongSquaresExtra
->): JSX.Element {
+}: ChessPlayAreaProps<'setup', WrongSquaresExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
   const isStacked = useIsStackedLayout();

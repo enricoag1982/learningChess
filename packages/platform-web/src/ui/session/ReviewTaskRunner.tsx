@@ -2,36 +2,8 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { ConceptTask, ExerciseStateBase } from '@learn/platform-core';
 import { ReviewExerciseStep } from './ReviewExerciseStep.tsx';
+import { ProgressDots } from '../ds/ProgressDots.tsx';
 import { BlankScreen, Screen, ScreenHeader } from '../ds/Screen.tsx';
-
-/** Dots mirroring the lesson's `StageDots`, sized for a short (3–5 task) review run. */
-function TaskDots({
-  current,
-  total,
-}: {
-  readonly current: number;
-  readonly total: number;
-}): JSX.Element {
-  return (
-    <div className="flex items-center justify-center gap-2" aria-hidden="true">
-      {Array.from({ length: total }, (_, index) => {
-        const state = index < current ? 'done' : index === current ? 'current' : 'upcoming';
-        return (
-          <span
-            key={index}
-            className={`h-3 w-3 rounded-full border-2 ${
-              state === 'done'
-                ? 'border-go bg-go'
-                : state === 'current'
-                  ? 'border-today bg-white'
-                  : 'border-[#E8DFC9] bg-[#E8DFC9]'
-            }`}
-          />
-        );
-      })}
-    </div>
-  );
-}
 
 export interface ReviewTaskRunnerProps {
   readonly tasks: readonly ConceptTask[];
@@ -93,7 +65,7 @@ export function ReviewTaskRunner({
         <div className="h-16 w-16 flex-shrink-0" aria-hidden="true" />
       </ScreenHeader>
 
-      <TaskDots current={index} total={tasks.length} />
+      <ProgressDots current={index} total={tasks.length} hidden />
 
       <div className="flex min-h-0 flex-1 flex-col">
         <ReviewExerciseStep

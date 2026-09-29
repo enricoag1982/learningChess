@@ -1,42 +1,40 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { CaptureDef, CollectStarsDef } from '../../core/exercise/types.ts';
+import type {
+  BestMoveDef,
+  CaptureDef,
+  CollectStarsDef,
+  MateInNDef,
+} from '../../core/exercise/types.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { MoveAction } from '../../kinds/base.ts';
 import type { UndoAction } from '../../kinds/static-move.ts';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
 import type { SurfaceContext } from '@learn/platform-web/app/subject.ts';
+import { Svg } from '@learn/platform-web/ui/ds/icons.tsx';
 import { InfoPanel } from '@learn/platform-web/ui/ds/primitives.tsx';
 import { StarsRow } from '@learn/platform-web/ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
-import type { ExerciseUIState, SessionAction } from '@learn/platform-web/kinds/kind-ui.ts';
+import type {
+  ExerciseUIState,
+  PlayAreaProps,
+  SessionAction,
+} from '@learn/platform-web/kinds/kind-ui.ts';
 import type { MoveExtra } from './move-ui.ts';
 import { moveKindLegalMoves } from './move-ui.ts';
 import { MoveBoard } from './MoveBoard.tsx';
 
 /** Shared with `VersusStep`'s take-back button — the one place a move-counted "undo" icon lives. */
-export function UndoIcon(): JSX.Element {
-  return (
-    <svg
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M9 14L4 9l5-5" />
-      <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
-    </svg>
-  );
-}
+export const UndoIcon = (): JSX.Element => (
+  <Svg size={26}>
+    <path d="M9 14L4 9l5-5" />
+    <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+  </Svg>
+);
 
 export interface MovesCardProps {
   readonly current: number;
@@ -63,24 +61,25 @@ export function MovesCard({ current, target }: MovesCardProps): JSX.Element {
   );
 }
 
-type MoveCountedDef = CollectStarsDef | CaptureDef;
+type MoveDef = CollectStarsDef | CaptureDef | BestMoveDef | MateInNDef;
 
-export interface MoveCountedPlayAreaProps {
-  readonly def: MoveCountedDef;
-  readonly state: ExerciseUIState<MoveCountedDef, ExerciseStateOf<MoveCountedDef>, MoveExtra>;
-  readonly dispatch: (action: SessionAction<MoveAction | UndoAction>) => void;
+interface MovePlayAreaProps {
+  readonly state: ExerciseUIState<MoveDef, ExerciseStateOf<MoveDef>, MoveExtra>;
+  readonly dispatch: (action: SessionAction<MoveAction>) => void;
   readonly showHint: boolean;
   readonly showCheck: boolean;
   readonly surface: SurfaceContext;
   readonly top: ReactNode;
   readonly done: ReactNode | null;
+  /** Shown above the controls (a move-counted kind's `MovesCard`). */
+  readonly counter?: ReactNode;
+  /** The controls row's one extra button (a move-counted kind's Undo). */
+  readonly undo?: ReactNode;
 }
 
-/** collect-stars / capture's shared play area — the only difference between the two kinds is the
- * goal already folded into `state.core` (`solve`d star collection vs. captures); the UI is the
- * same: move-count card, board, Hint + Undo. */
-export function MoveCountedPlayArea({
-  def,
+/** Every move kind's play area (collect-stars, capture, best-move, mate-in-n): the board, Hint,
+ * and — for the move-counted kinds — the moves card and Undo. */
+export function MovePlayArea({
   state,
   dispatch,
   showHint,
@@ -88,15 +87,18 @@ export function MoveCountedPlayArea({
   surface,
   top,
   done,
-}: MoveCountedPlayAreaProps): JSX.Element {
-  const { t } = useTranslation();
+  counter,
+  undo,
+}: MovePlayAreaProps): JSX.Element {
   const pieceBadges = useSurfacePieceBadges(surface);
-  const solved = state.core.solved;
+  // While mate-in-n's reply is pending, the board shows the position right after the kid's own
+  // move (not the reply, already applied in `state.core`) until `reveal` fires.
+  const displayPosition = state.pending ? state.pending.state.position : state.core.position;
 
   const board = (
     <MoveBoard
-      position={state.core.position}
-      legalMoves={moveKindLegalMoves(state.core, chessWeb.core.context)}
+      position={displayPosition}
+      legalMoves={state.pending ? [] : moveKindLegalMoves(state.core, chessWeb.core.context)}
       onMove={(move) => {
         dispatch({ type: 'move', move });
       }}
@@ -107,34 +109,55 @@ export function MoveCountedPlayArea({
       // registry narrows `def.type` to a chess kind at runtime, so this always is one.
       hint={state.hint as Hint | null}
       lastMove={state.lastMove}
-      checkSquare={showCheck ? checkSquareFor(state.core.position) : undefined}
+      wrongMove={state.wrongMove}
+      checkSquare={showCheck ? checkSquareFor(displayPosition) : undefined}
       pieceBadges={pieceBadges}
     />
   );
 
   const controls = (
     <>
-      <MovesCard current={state.core.moves} target={def.stars3} />
+      {counter}
       <ExerciseControls
         showHint={showHint}
         onHint={() => {
           dispatch({ type: 'hint' });
         }}
-        slot={
-          <button
-            type="button"
-            onClick={() => {
-              dispatch({ type: 'undo' });
-            }}
-            className={SECONDARY_BUTTON}
-          >
-            <UndoIcon />
-            {t('exercise.undo')}
-          </button>
-        }
+        slot={undo}
       />
     </>
   );
 
-  return <ExerciseFrame board={board} panel={panelBody(top, solved, done, controls)} />;
+  return <ExerciseFrame board={board} panel={panelBody(top, state.core.solved, done, controls)} />;
+}
+
+/** collect-stars / capture's play area: `MovePlayArea` plus the moves card and Undo. */
+export function CountedPlayArea(
+  props: PlayAreaProps<
+    CollectStarsDef | CaptureDef,
+    ExerciseStateOf<CollectStarsDef | CaptureDef>,
+    MoveAction | UndoAction,
+    MoveExtra
+  >,
+): JSX.Element {
+  const { t } = useTranslation();
+  const { def, state, dispatch } = props;
+  return (
+    <MovePlayArea
+      {...props}
+      counter={<MovesCard current={state.core.moves} target={def.stars3} />}
+      undo={
+        <button
+          type="button"
+          onClick={() => {
+            dispatch({ type: 'undo' });
+          }}
+          className={SECONDARY_BUTTON}
+        >
+          <UndoIcon />
+          {t('exercise.undo')}
+        </button>
+      }
+    />
+  );
 }

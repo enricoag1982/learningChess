@@ -1,8 +1,5 @@
-import type { ActionOf, DefOf, OutcomeOf } from '../index.ts';
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Square } from '../../core/chess/types.ts';
-import type { ExerciseKindUI } from '@learn/platform-web/kinds/kind-ui.ts';
-import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
+import type { WrongSquaresExtra, ChessKindUI } from '../../web/kinds/move-ui.ts';
 import { baseInitUi } from '../../web/kinds/move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
@@ -12,13 +9,7 @@ export interface SelectSquaresExtra extends WrongSquaresExtra {
   readonly missedSquares: readonly Square[];
 }
 
-export const selectSquaresUi: ExerciseKindUI<
-  DefOf<'select-squares'>,
-  ExerciseStateOf<DefOf<'select-squares'>>,
-  ActionOf<'select-squares'>,
-  OutcomeOf<'select-squares'>,
-  SelectSquaresExtra
-> = {
+export const selectSquaresUi: ChessKindUI<'select-squares', SelectSquaresExtra> = {
   type: 'select-squares',
 
   initUi: (def) => ({ ...baseInitUi(def), missedSquares: [] }),

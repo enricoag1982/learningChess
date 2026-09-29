@@ -1,14 +1,8 @@
 import { z } from 'zod';
 import { composeDefaultSettings, isValidProfileSettings } from '../domain/profile-settings.ts';
 import { localDayString } from '../domain/streak.ts';
-import type { AssessmentResult, Unlock } from '../domain/assessment.ts';
-import type { EarnedBadge } from '../domain/badges.ts';
-import type { ProfileSettings } from '../domain/profile-settings.ts';
 import type { Profile } from '../domain/profile.ts';
-import type { Attempt, GameRecord, LessonProgress, MiniGameProgress } from '../domain/progress.ts';
-import type { ConceptStats } from '../domain/review.ts';
-import type { SessionLog } from '../domain/session-log.ts';
-import type { Streak } from '../domain/streak.ts';
+import type { MergeableProfileData } from '../domain/merge.ts';
 import type { AppConfig, SettingsBackupShape } from '../domain/subject.ts';
 import type { BackupFileWriter, BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
@@ -19,19 +13,7 @@ z.config({ jitless: true });
 
 /** One profile's full backed-up data: every stored record this app keeps for a child, except its
  * `Profile` row (kept alongside, once, in `BackupFile.profiles`) and the parent password. */
-export interface ProfileBackupData {
-  readonly settings: ProfileSettings;
-  readonly lessonProgress: readonly LessonProgress[];
-  readonly attempts: readonly Attempt[];
-  readonly miniGameProgress: readonly MiniGameProgress[];
-  readonly conceptStats: readonly ConceptStats[];
-  readonly gameRecords: readonly GameRecord[];
-  readonly earnedBadges: readonly EarnedBadge[];
-  readonly streak?: Streak;
-  readonly sessionLogs: readonly SessionLog[];
-  readonly assessmentResults: readonly AssessmentResult[];
-  readonly unlocks: readonly Unlock[];
-}
+export type ProfileBackupData = MergeableProfileData;
 
 /** The backup file itself: one JSON file for either every profile on the device ("Export") or a
  * single one ("Export per child" — same format, `profiles`/`data` just hold the one). */

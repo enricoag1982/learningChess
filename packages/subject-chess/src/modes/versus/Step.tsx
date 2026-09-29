@@ -22,7 +22,7 @@ import { kingSquare } from '../../core/chess/facts/pieces.ts';
 import { bot } from '../../chess.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
-import { UndoIcon } from '../../web/kinds/MoveCountedPlayArea.tsx';
+import { UndoIcon } from '../../web/kinds/MovePlayArea.tsx';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../../web/ui/board/piece-style.ts';
 import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';

@@ -20,6 +20,7 @@ import { StepPills } from './lesson/StepPills.tsx';
 import { StoryStep } from './lesson/StoryStep.tsx';
 import { StarsPill } from './StarsPill.tsx';
 import { useIsCompact } from './useMediaQuery.ts';
+import { ProgressDots } from './ds/ProgressDots.tsx';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
 /** Exercise stage dots + "N of M", shown only while working through the scored exercises. */
@@ -35,28 +36,13 @@ function StageDots({
 }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div className="flex items-center justify-center gap-2">
-      {Array.from({ length: total }, (_, index) => {
-        const state = index < current ? 'done' : index === current ? 'current' : 'upcoming';
-        return (
-          <span
-            key={index}
-            className={`h-3 w-3 rounded-full border-2 ${
-              state === 'done'
-                ? 'border-go bg-go'
-                : state === 'current'
-                  ? 'border-today bg-white'
-                  : 'border-[#E8DFC9] bg-[#E8DFC9]'
-            }`}
-          />
-        );
-      })}
+    <ProgressDots current={current} total={total}>
       {showLabel && (
         <span className="ml-2 text-sm font-extrabold text-muted">
           {t('lesson.stage-of', { current: current + 1, total })}
         </span>
       )}
-    </div>
+    </ProgressDots>
   );
 }
 

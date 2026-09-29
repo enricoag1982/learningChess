@@ -137,11 +137,7 @@ interface SlideState {
   readonly dy: number;
 }
 
-interface BounceState {
-  readonly square: Square;
-  readonly dx: number;
-  readonly dy: number;
-}
+type BounceState = SlideState;
 
 interface CaptureFadeState {
   readonly square: Square;

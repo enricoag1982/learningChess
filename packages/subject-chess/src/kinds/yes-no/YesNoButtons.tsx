@@ -1,42 +1,19 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Svg } from '@learn/platform-web/ui/ds/icons.tsx';
 import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
 
-function CheckIcon(): JSX.Element {
-  return (
-    <svg
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 12.5l4.5 4.5L19 7" />
-    </svg>
-  );
-}
+const CheckIcon = (): JSX.Element => (
+  <Svg size={26} strokeWidth={2.8}>
+    <path d="M5 12.5l4.5 4.5L19 7" />
+  </Svg>
+);
 
-function CrossIcon(): JSX.Element {
-  return (
-    <svg
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M6 6l12 12M18 6L6 18" />
-    </svg>
-  );
-}
+const CrossIcon = (): JSX.Element => (
+  <Svg size={26} strokeWidth={2.8}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </Svg>
+);
 
 export interface YesNoButtonsProps {
   /** The value that was picked and was wrong, if any: that one turns orange and disables. */

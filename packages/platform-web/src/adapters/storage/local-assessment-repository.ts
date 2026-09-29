@@ -1,36 +1,21 @@
 import type { AssessmentRepository, AssessmentResult, Unlock } from '@learn/platform-core';
 import type { CappedList } from './collections.ts';
-import { cappedList } from './collections.ts';
+import { cappedList, shapeGuard } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
 /** Oldest results are dropped once storage holds more than this many (parent report only needs recent ones). */
 export const MAX_ASSESSMENT_RESULTS = 500;
 
-function isAssessmentResultShape(value: unknown): value is AssessmentResult {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.kind === 'string' &&
-    typeof record.correct === 'number' &&
-    typeof record.total === 'number' &&
-    typeof record.passed === 'boolean'
-  );
-}
+const isAssessmentResultShape = shapeGuard<AssessmentResult>({
+  string: ['id', 'profileId', 'kind'],
+  number: ['correct', 'total'],
+  boolean: ['passed'],
+});
 
-function isUnlockShape(value: unknown): value is Unlock {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.targetType === 'string' &&
-    typeof record.targetId === 'string' &&
-    typeof record.via === 'string'
-  );
-}
+const isUnlockShape = shapeGuard<Unlock>({
+  string: ['id', 'profileId', 'targetType', 'targetId', 'via'],
+});
 
 /** `AssessmentRepository` over one `LocalStore`: results as a capped, append-only list; unlocked
  * lesson/world ids as an uncapped append-only list. */

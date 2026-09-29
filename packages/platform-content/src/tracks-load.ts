@@ -1,27 +1,12 @@
-import { readFileSync } from 'node:fs';
 import type { Lesson, MiniGame, RankDef, Track, TracksCatalog, World } from '@learn/platform-core';
-import { parse as parseYaml } from 'yaml';
-import type { ZodError } from 'zod';
 import { checkTextKey, ContentError, type Locales } from './load.ts';
+import { loadYaml } from './yaml-file.ts';
 import {
   type RankYaml,
   type TrackYaml,
   type WorldYaml,
   tracksFileSchema,
 } from './tracks-schema.ts';
-
-/** First line of an error's message, for compact single-line issue reporting. */
-function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.split('\n')[0] ?? message;
-}
-
-function formatZodIssues(relPath: string, error: ZodError): string[] {
-  return error.issues.map((issue) => {
-    const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
-    return `${relPath}: ${path}: ${issue.message}`;
-  });
-}
 
 function compileWorld(raw: WorldYaml, trackId: string): World {
   return {
@@ -161,28 +146,14 @@ export function loadTracks(
   minigames: readonly MiniGame[] = [],
   lessons: readonly Lesson[] = [],
 ): TracksCatalog {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    throw new ContentError([`tracks.yaml: cannot read file: ${errorMessage(error)}`]);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    throw new ContentError([`tracks.yaml: YAML syntax error: ${errorMessage(error)}`]);
-  }
-
-  const result = tracksFileSchema.safeParse(parsed);
-  if (!result.success) {
-    throw new ContentError(formatZodIssues('tracks.yaml', result.error));
+  const loaded = loadYaml(filePath, 'tracks.yaml', tracksFileSchema);
+  if ('issues' in loaded) {
+    throw new ContentError(loaded.issues);
   }
 
   const catalog: TracksCatalog = {
-    tracks: result.data.tracks.map(compileTrack),
-    ranks: result.data.ranks.map(compileRank),
+    tracks: loaded.data.tracks.map(compileTrack),
+    ranks: loaded.data.ranks.map(compileRank),
   };
 
   const issues: string[] = [];

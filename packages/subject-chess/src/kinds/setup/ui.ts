@@ -1,17 +1,8 @@
-import type { ActionOf, DefOf, OutcomeOf } from '../index.ts';
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
-import type { ExerciseKindUI } from '@learn/platform-web/kinds/kind-ui.ts';
-import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
+import type { WrongSquaresExtra, ChessKindUI } from '../../web/kinds/move-ui.ts';
 import { baseInitUi } from '../../web/kinds/move-ui.ts';
 import { PlayArea } from './PlayArea.tsx';
 
-export const setupUi: ExerciseKindUI<
-  DefOf<'setup'>,
-  ExerciseStateOf<DefOf<'setup'>>,
-  ActionOf<'setup'>,
-  OutcomeOf<'setup'>,
-  WrongSquaresExtra
-> = {
+export const setupUi: ChessKindUI<'setup', WrongSquaresExtra> = {
   type: 'setup',
 
   initUi: baseInitUi,

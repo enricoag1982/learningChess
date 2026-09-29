@@ -1,15 +1,13 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf } from '../index.ts';
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import { checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
+import type { ChessPlayAreaProps } from '../../web/kinds/move-ui.ts';
 import { hintSquares } from '../../web/kinds/move-ui.ts';
-import type { PlayAreaProps } from '@learn/platform-web/kinds/kind-ui.ts';
 import type { YesNoExtra } from './ui.ts';
 import { YesNoButtons } from './YesNoButtons.tsx';
 
@@ -22,12 +20,7 @@ export function PlayArea({
   surface,
   top,
   done,
-}: PlayAreaProps<
-  DefOf<'yes-no'>,
-  ExerciseStateOf<DefOf<'yes-no'>>,
-  ActionOf<'yes-no'>,
-  YesNoExtra
->): JSX.Element {
+}: ChessPlayAreaProps<'yes-no', YesNoExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
   const solved = state.core.solved;

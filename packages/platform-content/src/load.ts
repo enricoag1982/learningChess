@@ -1,6 +1,5 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { join } from 'node:path';
-import { parse as parseYaml } from 'yaml';
 import {
   keySchema,
   langSchema,
@@ -10,6 +9,7 @@ import {
   textLeafSchema,
   type LocaleTree,
 } from './schema.ts';
+import { readEntries, readYaml } from './yaml-file.ts';
 
 /** All namespaces of all languages, keyed by language then namespace name. */
 export type Locales = Record<string, Record<string, LocaleTree>>;
@@ -153,21 +153,12 @@ function loadNamespace(
   relPath: string,
   issues: string[],
 ): LocaleTree | undefined {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    issues.push(`${relPath}: cannot read file: ${errorMessage(error)}`);
+  const read = readYaml(filePath, relPath);
+  if ('issues' in read) {
+    issues.push(...read.issues);
     return undefined;
   }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    issues.push(`${relPath}: YAML syntax error: ${errorMessage(error)}`);
-    return undefined;
-  }
+  const parsed = read.data;
 
   if (!isPlainObject(parsed)) {
     issues.push(`${relPath}: root: must be a map of keys to text or nested maps`);
@@ -325,22 +316,6 @@ export function compareToReference(locales: Locales, reference = 'en'): string[]
 /** Key path without an i18next plural suffix (`a.moves_one` → `a.moves`). */
 function withoutPluralSuffix(path: string): string {
   return path.replace(PLURAL_SUFFIX_PATTERN, '');
-}
-
-/** Reads a directory's entry names, reporting an issue (and returning `[]`) if it cannot be read. */
-function readEntries(dir: string, issues: string[], description: string): string[] {
-  try {
-    return readdirSync(dir).sort();
-  } catch (error) {
-    issues.push(`${dir}: cannot read ${description}: ${errorMessage(error)}`);
-    return [];
-  }
-}
-
-/** First line of an error's message, for compact single-line issue reporting. */
-function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.split('\n')[0] ?? message;
 }
 
 function isPlainObject(value: unknown): value is Record<string, unknown> {

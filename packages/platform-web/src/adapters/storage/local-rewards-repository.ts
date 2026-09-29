@@ -1,6 +1,6 @@
 import type { EarnedBadge, RewardsRepository, SessionLog, Streak } from '@learn/platform-core';
 import type { CappedList, KeyedCollection } from './collections.ts';
-import { cappedList, keyedCollection } from './collections.ts';
+import { cappedList, keyedCollection, shapeGuard } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
@@ -8,40 +8,20 @@ function sessionLogKey(profileId: string, date: string): string {
   return `${profileId}:${date}`;
 }
 
-function isEarnedBadgeShape(value: unknown): value is EarnedBadge {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.badgeId === 'string' &&
-    typeof record.at === 'string' &&
-    typeof record.seen === 'boolean'
-  );
-}
+const isEarnedBadgeShape = shapeGuard<EarnedBadge>({
+  string: ['id', 'profileId', 'badgeId', 'at'],
+  boolean: ['seen'],
+});
 
-function isStreakShape(value: unknown): value is Streak {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.current === 'number' &&
-    typeof record.best === 'number' &&
-    typeof record.skipsUsedThisWeek === 'number'
-  );
-}
+const isStreakShape = shapeGuard<Streak>({
+  string: ['id', 'profileId'],
+  number: ['current', 'best', 'skipsUsedThisWeek'],
+});
 
-function isSessionLogShape(value: unknown): value is SessionLog {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.date === 'string' &&
-    typeof record.minutes === 'number'
-  );
-}
+const isSessionLogShape = shapeGuard<SessionLog>({
+  string: ['id', 'profileId', 'date'],
+  number: ['minutes'],
+});
 
 /** `RewardsRepository` over one `LocalStore`: earned badges as an uncapped append-only list; one
  * streak per profile; one session log row per `"<profileId>:<date>"`. */

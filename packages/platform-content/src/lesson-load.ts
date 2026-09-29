@@ -1,14 +1,12 @@
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { statSync } from 'node:fs';
 import { join } from 'node:path';
 import type { CompiledContent, ExerciseDefBase, Lesson, MiniGame } from '@learn/platform-core';
-import { parse as parseYaml } from 'yaml';
-import type { z, ZodError } from 'zod';
 import { compileExercises } from './kinds/compile-exercise.ts';
 import { createLessonSchemas } from './lesson-schema.ts';
-import { ContentError, type Locales } from './load.ts';
+import { checkTextKey, ContentError, type Locales } from './load.ts';
 import { makeMiniGameCompileContext, type ModeVerifyContext } from './modes/mode-content.ts';
-import type { LocaleTree } from './schema.ts';
 import type { SubjectContent } from './subject.ts';
+import { loadYaml, readEntries } from './yaml-file.ts';
 
 type LessonSchemas = ReturnType<typeof createLessonSchemas>;
 
@@ -20,28 +18,12 @@ function compileLessonFile(
   schemas: LessonSchemas,
   issues: string[],
 ): Lesson | null {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    issues.push(`${relPath}: cannot read file: ${errorMessage(error)}`);
+  const loaded = loadYaml(filePath, relPath, schemas.lessonSchema);
+  if ('issues' in loaded) {
+    issues.push(...loaded.issues);
     return null;
   }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    issues.push(`${relPath}: YAML syntax error: ${errorMessage(error)}`);
-    return null;
-  }
-
-  const result = schemas.lessonSchema.safeParse(parsed);
-  if (!result.success) {
-    issues.push(...formatZodIssues(relPath, result.error));
-    return null;
-  }
-  const data = result.data;
+  const data = loaded.data;
 
   const demo = content.demo.compile(data.demo, `lessons:${data.demo.text ?? `${data.id}.demo`}`, {
     where: `${relPath}: demo`,
@@ -103,59 +85,16 @@ function compileMiniGameFile(
   schemas: LessonSchemas,
   issues: string[],
 ): MiniGame | null {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    issues.push(`${relPath}: cannot read file: ${errorMessage(error)}`);
+  const loaded = loadYaml(filePath, relPath, schemas.miniGameSchema);
+  if ('issues' in loaded) {
+    issues.push(...loaded.issues);
     return null;
   }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    issues.push(`${relPath}: YAML syntax error: ${errorMessage(error)}`);
-    return null;
-  }
-
-  const result = schemas.miniGameSchema.safeParse(parsed);
-  if (!result.success) {
-    issues.push(...formatZodIssues(relPath, result.error));
-    return null;
-  }
-  const data = result.data;
+  const data = loaded.data;
 
   const ctx = makeMiniGameCompileContext(relPath, content.kinds, content.stimulus, issues);
   const mode = data.mode ?? 'static';
   return content.modes[mode]?.compile(data, ctx) ?? null;
-}
-
-/** Looks up a dot-separated key path in a locale tree (e.g. `rook.story`). */
-function hasKeyPath(tree: LocaleTree, dotPath: string): boolean {
-  let node: LocaleTree | string = tree;
-  for (const segment of dotPath.split('.')) {
-    if (typeof node === 'string') {
-      return false;
-    }
-    const child: LocaleTree | string | undefined = node[segment];
-    if (child === undefined) {
-      return false;
-    }
-    node = child;
-  }
-  return typeof node === 'string';
-}
-
-/** Checks that `fullKey` (e.g. `lessons:rook.story`) resolves to a leaf in the `en` locale. */
-function checkTextKey(fullKey: string, locales: Locales, where: string, issues: string[]): void {
-  const separatorIndex = fullKey.indexOf(':');
-  const namespace = separatorIndex < 0 ? '' : fullKey.slice(0, separatorIndex);
-  const dotPath = separatorIndex < 0 ? '' : fullKey.slice(separatorIndex + 1);
-  const tree = locales.en?.[namespace];
-  if (tree === undefined || dotPath === '' || !hasKeyPath(tree, dotPath)) {
-    issues.push(`${where}: missing text key "${fullKey}" in en locale`);
-  }
 }
 
 /** Per-exercise semantic checks, shared by a lesson's guided/exercises/variants and a series
@@ -264,9 +203,6 @@ function validateSemantics(
   const modeVerifyCtx: ModeVerifyContext = {
     issues,
     claimId,
-    checkTextKey: (fullKey, where) => {
-      checkTextKey(fullKey, locales, where, issues);
-    },
     checkExercise: (exercise, where) => {
       checkExerciseSemantics(exercise, where, locales, content, issues);
     },
@@ -282,37 +218,6 @@ function validateSemantics(
     }
     content.modes[minigame.mode]?.verify(minigame, where, modeVerifyCtx);
   }
-}
-
-/** One issue, formatted `<file>: <path>: <message>`. A mini-game's `mode` makes its schema a union:
- * `invalid_union` is flattened into every branch's own issues; an unknown discriminator has none. */
-function formatZodIssue(relPath: string, issue: z.core.$ZodIssue): string[] {
-  if (issue.code === 'invalid_union') {
-    const branchLines = issue.errors.flatMap((branchIssues) =>
-      branchIssues.flatMap((branchIssue) => formatZodIssue(relPath, branchIssue)),
-    );
-    if (branchLines.length > 0) return branchLines;
-  }
-  const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
-  return [`${relPath}: ${path}: ${issue.message}`];
-}
-
-function formatZodIssues(relPath: string, error: ZodError): string[] {
-  return error.issues.flatMap((issue) => formatZodIssue(relPath, issue));
-}
-
-function readEntries(dir: string, issues: string[], description: string): string[] {
-  try {
-    return readdirSync(dir).sort();
-  } catch (error) {
-    issues.push(`${dir}: cannot read ${description}: ${errorMessage(error)}`);
-    return [];
-  }
-}
-
-function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.split('\n')[0] ?? message;
 }
 
 /** Loads and validates every lesson and mini-game file, compiling them to `C` (the caller's own

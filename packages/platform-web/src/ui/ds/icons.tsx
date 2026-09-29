@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- every icon is a component built by `strokeIcon`. */
 import type { JSX, ReactNode } from 'react';
 
 export interface IconProps {
@@ -38,152 +39,118 @@ export function Svg({
   );
 }
 
-/** Kid-style "Back" chevron (JourneyScreen, PracticeScreen, DenScreen, FriendSetupScreen, PlayScreen). */
-export function BackIcon({ size = 30, strokeWidth = 2.4, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M15 18l-6-6 6-6" />
-    </Svg>
-  );
+interface StrokeLook {
+  readonly size: number;
+  readonly strokeWidth: number;
+  readonly className?: string;
+  readonly stroke?: string;
 }
+
+/** A stroke icon over `Svg`: `look` holds its own defaults, the caller's props win. */
+function strokeIcon(look: StrokeLook, shapes: ReactNode): (props?: IconProps) => JSX.Element {
+  return function StrokeIcon({
+    size = look.size,
+    strokeWidth = look.strokeWidth,
+    className = look.className,
+  }: IconProps = {}): JSX.Element {
+    return (
+      <Svg size={size} strokeWidth={strokeWidth} className={className} stroke={look.stroke}>
+        {shapes}
+      </Svg>
+    );
+  };
+}
+
+/** Kid-style "Back" chevron (JourneyScreen, PracticeScreen, DenScreen, FriendSetupScreen, PlayScreen). */
+export const BackIcon = strokeIcon({ size: 30, strokeWidth: 2.4 }, <path d="M15 18l-6-6 6-6" />);
 
 /** Forward chevron: lesson "Next" (kid-sized) and parent-area row/pagination links (smaller, muted). */
-export function ChevronRightIcon({
-  size = 20,
-  strokeWidth = 2.5,
-  className = 'flex-shrink-0 text-muted',
-}: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="m9 6 6 6-6 6" />
-    </Svg>
-  );
-}
+export const ChevronRightIcon = strokeIcon(
+  { size: 20, strokeWidth: 2.5, className: 'flex-shrink-0 text-muted' },
+  <path d="m9 6 6 6-6 6" />,
+);
 
 /** "X" close button (mini-game/full-game/review/lesson exit). */
-export function CloseIcon({
-  size = 24,
-  strokeWidth = 2.6,
-  className,
-}: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M6 6l12 12M18 6L6 18" />
-    </Svg>
-  );
-}
+export const CloseIcon = strokeIcon(
+  { size: 24, strokeWidth: 2.6 },
+  <path d="M6 6l12 12M18 6L6 18" />,
+);
 
 /** Locked padlock (Journey nodes, password/parent screens, Play's locked tiles). */
-export function LockIcon({ size = 22, strokeWidth = 2, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-    </Svg>
-  );
-}
+export const LockIcon = strokeIcon(
+  { size: 22, strokeWidth: 2 },
+  <>
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </>,
+);
 
 /** Check mark (Journey's mastered node, StepPills' done marker). */
-export function CheckIcon({ size = 20, strokeWidth = 3, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M5 13l4 4L19 7" />
-    </Svg>
-  );
-}
+export const CheckIcon = strokeIcon({ size: 20, strokeWidth: 3 }, <path d="M5 13l4 4L19 7" />);
 
 /** Skip-ahead glyph (guided-try SkipButton, StepPills' skipped marker). */
-export function SkipIcon({ size = 22, strokeWidth = 2.6, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M5 5l8 7-8 7V5z" />
-      <path d="M17 5v14" />
-    </Svg>
-  );
-}
+export const SkipIcon = strokeIcon(
+  { size: 22, strokeWidth: 2.6 },
+  <>
+    <path d="M5 5l8 7-8 7V5z" />
+    <path d="M17 5v14" />
+  </>,
+);
 
 /** "Add child" plus (ProfilePickerScreen). */
-export function PlusIcon({ size = 40, strokeWidth = 2.4, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M12 5v14M5 12h14" />
-    </Svg>
-  );
-}
+export const PlusIcon = strokeIcon({ size: 40, strokeWidth: 2.4 }, <path d="M12 5v14M5 12h14" />);
 
 /** "Listen again" / "Say it again" (ReplayButton). */
-export function ReplayIcon({ size = 24, strokeWidth = 2, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className}>
-      <path d="M4 9v6h4l5 4V5L8 9H4z" />
-      <path d="M16 8.5a5 5 0 0 1 0 7" />
-    </Svg>
-  );
-}
+export const ReplayIcon = strokeIcon(
+  { size: 24, strokeWidth: 2 },
+  <>
+    <path d="M4 9v6h4l5 4V5L8 9H4z" />
+    <path d="M16 8.5a5 5 0 0 1 0 7" />
+  </>,
+);
 
 /** Two-person silhouette: "Switch player" (Home, `currentColor`) and vs Friend (Play, orange). */
-function twoPeople(props: IconProps & { readonly stroke?: string }): JSX.Element {
-  return (
-    <Svg {...props}>
-      <circle cx={9} cy={8} r={3.5} />
-      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
-      <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
-      <path d="M18 14a6 6 0 0 1 3.5 6" />
-    </Svg>
-  );
-}
+const twoPeople = (
+  <>
+    <circle cx={9} cy={8} r={3.5} />
+    <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+    <path d="M16 4.5a3.5 3.5 0 0 1 0 7" />
+    <path d="M18 14a6 6 0 0 1 3.5 6" />
+  </>
+);
 
-export function SwitchPlayerIcon({
-  size = 28,
-  strokeWidth = 2,
-  className,
-}: IconProps = {}): JSX.Element {
-  return twoPeople({ size, strokeWidth, className });
-}
+export const SwitchPlayerIcon = strokeIcon({ size: 28, strokeWidth: 2 }, twoPeople);
 
-export function FriendIcon({ size = 34, strokeWidth = 2, className }: IconProps = {}): JSX.Element {
-  return twoPeople({ size, strokeWidth, className, stroke: '#B8561A' });
-}
+export const FriendIcon = strokeIcon({ size: 34, strokeWidth: 2, stroke: '#B8561A' }, twoPeople);
 
 /** Sun/timer glyph: Practice's warm-up entry. */
-export function WarmUpIcon({ size = 34, strokeWidth = 2, className }: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className} stroke="#B8561A">
-      <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
-      <circle cx={12} cy={16} r={5} />
-    </Svg>
-  );
-}
+export const WarmUpIcon = strokeIcon(
+  { size: 34, strokeWidth: 2, stroke: '#B8561A' },
+  <>
+    <path d="M12 3v3M5.6 5.6l2.1 2.1M3 12h3M18.9 5.6l-2.1 2.1M21 12h-3" />
+    <circle cx={12} cy={16} r={5} />
+  </>,
+);
 
 /** Computer/monitor glyph: Play's vs Computer card. */
-export function ComputerIcon({
-  size = 34,
-  strokeWidth = 2,
-  className,
-}: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className} stroke="#2F5E9E">
-      <rect x={4} y={7} width={16} height={12} rx={3} />
-      <path d="M12 3v4" />
-      <circle cx={9} cy={13} r={1} fill="#2F5E9E" />
-      <circle cx={15} cy={13} r={1} fill="#2F5E9E" />
-    </Svg>
-  );
-}
+export const ComputerIcon = strokeIcon(
+  { size: 34, strokeWidth: 2, stroke: '#2F5E9E' },
+  <>
+    <rect x={4} y={7} width={16} height={12} rx={3} />
+    <path d="M12 3v4" />
+    <circle cx={9} cy={13} r={1} fill="#2F5E9E" />
+    <circle cx={15} cy={13} r={1} fill="#2F5E9E" />
+  </>,
+);
 
 /** Board/frame glyph: lesson Complete's "Play again". */
-export function NewGameIcon({
-  size = 32,
-  strokeWidth = 2,
-  className,
-}: IconProps = {}): JSX.Element {
-  return (
-    <Svg size={size} strokeWidth={strokeWidth} className={className} stroke="#2E7D5B">
-      <rect x={3} y={3} width={18} height={18} rx={3} />
-      <path d="M3 12h18M12 3v18" />
-    </Svg>
-  );
-}
+export const NewGameIcon = strokeIcon(
+  { size: 32, strokeWidth: 2, stroke: '#2E7D5B' },
+  <>
+    <rect x={3} y={3} width={18} height={18} rx={3} />
+    <path d="M3 12h18M12 3v18" />
+  </>,
+);
 
 export interface CrownIconProps extends IconProps {
   /** Filled gold when a world boss is won (Journey node). */

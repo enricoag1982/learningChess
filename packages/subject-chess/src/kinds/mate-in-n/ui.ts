@@ -1,19 +1,13 @@
-import type { ActionOf, DefOf, OutcomeOf } from '../index.ts';
+import type { DefOf } from '../index.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
-import type { ExerciseKindUI, UiPatch } from '@learn/platform-web/kinds/kind-ui.ts';
-import type { MoveExtra } from '../../web/kinds/move-ui.ts';
+import type { UiPatch } from '@learn/platform-web/kinds/kind-ui.ts';
+import type { MoveExtra, ChessKindUI } from '../../web/kinds/move-ui.ts';
 import { baseInitUi, moveToUi } from '../../web/kinds/move-ui.ts';
-import { PlayArea } from './PlayArea.tsx';
+import { MovePlayArea } from '../../web/kinds/MovePlayArea.tsx';
 
 type MateInNState = ExerciseStateOf<DefOf<'mate-in-n'>>;
 
-export const mateInNUi: ExerciseKindUI<
-  DefOf<'mate-in-n'>,
-  MateInNState,
-  ActionOf<'mate-in-n'>,
-  OutcomeOf<'mate-in-n'>,
-  MoveExtra
-> = {
+export const mateInNUi: ChessKindUI<'mate-in-n', MoveExtra> = {
   type: 'mate-in-n',
 
   initUi: baseInitUi,
@@ -57,5 +51,5 @@ export const mateInNUi: ExerciseKindUI<
     return { ...moveToUi(outcome), pending: undefined };
   },
 
-  PlayArea,
+  PlayArea: MovePlayArea,
 };

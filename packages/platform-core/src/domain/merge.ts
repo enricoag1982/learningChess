@@ -7,8 +7,7 @@ import type { SessionLog } from './session-log.ts';
 import { lastNDays, totalMinutesForDate } from './session-log.ts';
 import type { Streak } from './streak.ts';
 
-/** One profile's full backed-up data, merge-ready. Structurally identical to `app/backup.ts`'s
- * `ProfileBackupData` — declared here (not imported) so this stays a pure `domain` module. */
+/** One profile's full backed-up data, merge-ready (`app/backup.ts`'s `ProfileBackupData`). */
 export interface MergeableProfileData {
   readonly settings: ProfileSettings;
   readonly lessonProgress: readonly LessonProgress[];

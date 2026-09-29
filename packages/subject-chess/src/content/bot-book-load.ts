@@ -1,19 +1,12 @@
-import { readFileSync } from 'node:fs';
 import { bot } from '../chess.ts';
 import { chessJsRules } from '../core/chess/chessjs-rules.ts';
 import { parseFen } from '../core/chess/fen.ts';
-import { parse as parseYaml } from 'yaml';
 import { ContentError } from '@learn/platform-content/load';
+import { loadYaml } from '@learn/platform-content/yaml-file';
 import { botBookFileSchema, type BookLineYaml } from './bot-book-schema.ts';
 
 /** Standard starting position (castling rights included) — every book line is authored from here. */
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-/** First line of an error's message, for compact single-line issue reporting. */
-function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.split('\n')[0] ?? message;
-}
 
 /** Checks one line's moves are all legal, in order, from the standard start position, and within
  * the book's ply cap. Also rejects a move whose authored SAN does not match chess.js's own —
@@ -48,33 +41,14 @@ function validateLine(line: BookLineYaml, issues: string[]): void {
 /** Loads and validates `bot-book.yaml` (Fox/Wolf/Bear's small opening book), compiling it to
  * `bot.BotBook`. Deliberately its own module, not part of `lesson-load.ts`. */
 export function loadBotBook(filePath: string): bot.BotBook {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    throw new ContentError([`bot-book.yaml: cannot read file: ${errorMessage(error)}`]);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    throw new ContentError([`bot-book.yaml: YAML syntax error: ${errorMessage(error)}`]);
-  }
-
-  const result = botBookFileSchema.safeParse(parsed);
-  if (!result.success) {
-    throw new ContentError(
-      result.error.issues.map((issue) => {
-        const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
-        return `bot-book.yaml: ${path}: ${issue.message}`;
-      }),
-    );
+  const loaded = loadYaml(filePath, 'bot-book.yaml', botBookFileSchema);
+  if ('issues' in loaded) {
+    throw new ContentError(loaded.issues);
   }
 
   const issues: string[] = [];
   const seenNames = new Set<string>();
-  for (const line of result.data.lines) {
+  for (const line of loaded.data.lines) {
     if (seenNames.has(line.name)) {
       issues.push(`bot-book.yaml: lines.${line.name}: duplicate line name`);
     }
@@ -86,6 +60,6 @@ export function loadBotBook(filePath: string): bot.BotBook {
   }
 
   return {
-    lines: result.data.lines.map((line) => ({ name: line.name, moves: line.moves })),
+    lines: loaded.data.lines.map((line) => ({ name: line.name, moves: line.moves })),
   };
 }

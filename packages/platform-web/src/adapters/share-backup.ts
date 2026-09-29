@@ -1,6 +1,6 @@
 import type { AppDeps } from '@learn/platform-core';
 import { buildShareFile } from '@learn/platform-core/backup';
-import { triggerDownload } from './download-backup-file-writer.ts';
+import { triggerDownload } from './download.ts';
 
 /** Outcome of {@link sendBackupToOtherDevice}: `cancelled` shows no error UI (a user cancel is
  * silent). */

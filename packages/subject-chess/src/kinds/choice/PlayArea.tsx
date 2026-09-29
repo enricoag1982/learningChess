@@ -1,14 +1,11 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf } from '../index.ts';
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import { checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
-import type { PlayAreaProps } from '@learn/platform-web/kinds/kind-ui.ts';
-import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
+import type { WrongSquaresExtra, ChessPlayAreaProps } from '../../web/kinds/move-ui.ts';
 import { ChoiceOptions } from './ChoiceOptions.tsx';
 
 export function PlayArea({
@@ -20,12 +17,7 @@ export function PlayArea({
   surface,
   top,
   done,
-}: PlayAreaProps<
-  DefOf<'choice'>,
-  ExerciseStateOf<DefOf<'choice'>>,
-  ActionOf<'choice'>,
-  WrongSquaresExtra
->): JSX.Element {
+}: ChessPlayAreaProps<'choice', WrongSquaresExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
   const solved = state.core.solved;

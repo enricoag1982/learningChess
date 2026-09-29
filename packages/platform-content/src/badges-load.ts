@@ -1,15 +1,8 @@
-import { readFileSync } from 'node:fs';
 import type { BadgeDef, Lesson, MiniGame, TracksCatalog } from '@learn/platform-core';
-import { parse as parseYaml } from 'yaml';
 import { checkTextKey, ContentError, type Locales } from './load.ts';
+import { loadYaml } from './yaml-file.ts';
 import { type BadgeConditionYaml, type BadgeYaml, badgesFileSchema } from './badges-schema.ts';
 import type { BadgesContent } from './subject.ts';
-
-/** First line of an error's message, for compact single-line issue reporting. */
-function errorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : String(error);
-  return message.split('\n')[0] ?? message;
-}
 
 /** Every concept id any authored lesson teaches (a lesson's own `concept`, plus per-exercise ones). */
 function allConceptIds(lessons: readonly Lesson[]): ReadonlySet<string> {
@@ -131,33 +124,14 @@ export function loadBadges(
   minigames: readonly MiniGame[],
   badges: BadgesContent,
 ): readonly BadgeDef[] {
-  let raw: string;
-  try {
-    raw = readFileSync(filePath, 'utf8');
-  } catch (error) {
-    throw new ContentError([`badges.yaml: cannot read file: ${errorMessage(error)}`]);
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(raw, { uniqueKeys: true });
-  } catch (error) {
-    throw new ContentError([`badges.yaml: YAML syntax error: ${errorMessage(error)}`]);
-  }
-
-  const result = badgesFileSchema(badges.fields).safeParse(parsed);
-  if (!result.success) {
-    throw new ContentError(
-      result.error.issues.map((issue) => {
-        const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
-        return `badges.yaml: ${path}: ${issue.message}`;
-      }),
-    );
+  const loaded = loadYaml(filePath, 'badges.yaml', badgesFileSchema(badges.fields));
+  if ('issues' in loaded) {
+    throw new ContentError(loaded.issues);
   }
 
   const issues: string[] = [];
   const seenIds = new Set<string>();
-  for (const badge of result.data.badges) {
+  for (const badge of loaded.data.badges) {
     const where = `badges.yaml: badges.${badge.id}`;
     if (seenIds.has(badge.id)) {
       issues.push(`${where}: duplicate id`);
@@ -171,5 +145,5 @@ export function loadBadges(
     throw new ContentError(issues);
   }
 
-  return result.data.badges.map(compileBadge);
+  return loaded.data.badges.map(compileBadge);
 }

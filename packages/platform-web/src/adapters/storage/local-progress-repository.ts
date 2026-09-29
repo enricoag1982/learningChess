@@ -6,7 +6,7 @@ import type {
   ProgressRepository,
 } from '@learn/platform-core';
 import type { CappedList, KeyedCollection } from './collections.ts';
-import { cappedList, keyedCollection } from './collections.ts';
+import { cappedList, keyedCollection, shapeGuard } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
@@ -26,50 +26,24 @@ function conceptStatsKey(profileId: string, conceptId: string): string {
   return `${profileId}:${conceptId}`;
 }
 
-function isLessonProgressShape(value: unknown): value is LessonProgress {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.lessonId === 'string' &&
-    typeof record.bestStars === 'object' &&
-    record.bestStars !== null
-  );
-}
+const isLessonProgressShape = shapeGuard<LessonProgress>({
+  string: ['id', 'profileId', 'lessonId'],
+  object: ['bestStars'],
+});
 
-function isAttemptShape(value: unknown): value is Attempt {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.lessonId === 'string' &&
-    typeof record.exerciseId === 'string'
-  );
-}
+const isAttemptShape = shapeGuard<Attempt>({
+  string: ['id', 'profileId', 'lessonId', 'exerciseId'],
+});
 
-function isMiniGameProgressShape(value: unknown): value is MiniGameProgress {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.miniGameId === 'string' &&
-    typeof record.bestStars === 'number'
-  );
-}
+const isMiniGameProgressShape = shapeGuard<MiniGameProgress>({
+  string: ['id', 'profileId', 'miniGameId'],
+  number: ['bestStars'],
+});
 
-function isConceptStatsShape(value: unknown): value is ConceptStats {
-  if (typeof value !== 'object' || value === null) return false;
-  const record = value as Record<string, unknown>;
-  return (
-    typeof record.id === 'string' &&
-    typeof record.profileId === 'string' &&
-    typeof record.conceptId === 'string' &&
-    Array.isArray(record.recent)
-  );
-}
+const isConceptStatsShape = shapeGuard<ConceptStats>({
+  string: ['id', 'profileId', 'conceptId'],
+  array: ['recent'],
+});
 
 /** `ProgressRepository` over one `LocalStore`: lesson progress keyed by `"<profileId>:<lessonId>"`,
  * attempts as a single capped, append-only list (newest last). */
