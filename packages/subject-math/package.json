@@ -1,0 +1,29 @@
+{
+  "name": "@learn/subject-math",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/math.ts",
+    "./testing": "./src/testing/index.ts",
+    "./content": "./src/content/math-content.ts",
+    "./web/*": "./src/web/*",
+    "./kinds/*": "./src/kinds/*",
+    "./dist/*": "./dist/*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@learn/platform-content": "workspace:*",
+    "@learn/platform-core": "workspace:*",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^30.1.1",
+    "vite": "^8.3.0"
+  }
+}
