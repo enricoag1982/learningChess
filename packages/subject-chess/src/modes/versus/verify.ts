@@ -1,5 +1,7 @@
-import type { VersusMiniGame } from '../../chess.ts';
-import { chessJsRules, game, hasKing, hasPieceOf } from '../../chess.ts';
+import type { VersusMiniGame } from '../../core/chess/lesson.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { hasKing, hasPieceOf } from '../../core/chess/facts/pieces.ts';
+import { game } from '../../chess.ts';
 import type { ModeVerifyContext } from '@learn/platform-content/modes/mode-content';
 
 /**

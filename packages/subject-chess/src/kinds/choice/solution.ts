@@ -1,5 +1,6 @@
 import type { TextKeyRef } from '@learn/platform-core/domain/exercise/kind';
-import type { AnswerChoiceAction, ChoiceDef, ChoiceOption } from './kind.ts';
+import type { AnswerChoiceAction } from './kind.ts';
+import type { ChoiceDef, ChoiceOption } from '../../core/exercise/types.ts';
 
 /** The correct option, straight from `def`. */
 export function choiceSolution(def: ChoiceDef): readonly AnswerChoiceAction[] {

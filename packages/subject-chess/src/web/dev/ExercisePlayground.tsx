@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { JSX } from 'react';
-import type { Lesson } from '../../chess.ts';
-import type { ExerciseDef } from '../../chess.ts';
+import type { Lesson } from '../../core/chess/lesson.ts';
+import type { ExerciseDef } from '../../core/exercise/types.ts';
 import { createAppStore, StoreProvider } from '@learn/platform-web/app/store.ts';
 import { PackProvider } from '@learn/platform-web/app/subject.ts';
 import { chessWeb } from '../chess-pack.ts';

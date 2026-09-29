@@ -1,13 +1,10 @@
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type {
-  CaptureDef,
-  CollectStarsDef,
-  ExerciseStateOf,
-  Hint,
-  MoveAction,
-  UndoAction,
-} from '../../chess.ts';
+import type { CaptureDef, CollectStarsDef } from '../../core/exercise/types.ts';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { Hint } from '../../core/exercise/hint.ts';
+import type { MoveAction } from '../../kinds/base.ts';
+import type { UndoAction } from '../../kinds/static-move.ts';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
 import type { SurfaceContext } from '@learn/platform-web/app/subject.ts';
 import { InfoPanel } from '@learn/platform-web/ui/ds/primitives.tsx';

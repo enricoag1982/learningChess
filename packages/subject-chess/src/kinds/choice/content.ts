@@ -1,5 +1,7 @@
 import type { TextKeyRef } from '@learn/platform-core';
-import { PIECE_BY_LETTER, type ChoiceDef, type ChoiceOption, type Piece } from '../../chess.ts';
+import { PIECE_BY_LETTER } from '../../core/chess/notation.ts';
+import type { ChoiceDef, ChoiceOption } from '../../core/exercise/types.ts';
+import type { Piece } from '../../core/chess/types.ts';
 import { z } from 'zod';
 import { keySchema } from '@learn/platform-content/schema';
 import { exerciseCommonFields, textRefSchema } from '../../content/kinds/common.ts';

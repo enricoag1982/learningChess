@@ -1,17 +1,12 @@
 // Fields, cross-field checks and small helpers shared by every exercise kind's schema and
 // compile/verify logic.
-import {
-  chessJsRules,
-  createVariantRules,
-  DiagramError,
-  FenError,
-  optimalMoves,
-  parseDiagram,
-  parseFen,
-  type CaptureDef,
-  type CollectStarsDef,
-  type Position,
-} from '../../chess.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { createVariantRules } from '../../core/variant/rules.ts';
+import { DiagramError, parseDiagram } from '../../core/chess/diagram.ts';
+import { FenError, parseFen } from '../../core/chess/fen.ts';
+import { optimalMoves } from '../../core/exercise/solver.ts';
+import type { CaptureDef, CollectStarsDef } from '../../core/exercise/types.ts';
+import type { Position } from '../../core/chess/types.ts';
 import { z } from 'zod';
 import { exerciseBaseFields, textRefSchema } from '@learn/platform-content/schema';
 import type { Where } from '@learn/platform-content/subject';

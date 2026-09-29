@@ -1,10 +1,8 @@
-import {
-  chessJsRules,
-  isInCheck,
-  selectSquaresAnswer,
-  type SelectSquaresDef,
-  type Square,
-} from '../../chess.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { isInCheck } from '../../core/chess/facts/position.ts';
+import { selectSquaresAnswer } from './engine.ts';
+import type { SelectSquaresDef } from '../../core/exercise/types.ts';
+import type { Square } from '../../core/chess/types.ts';
 import { z } from 'zod';
 import { exerciseCommonFields, rules, squareSchema } from '../../content/kinds/common.ts';
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';

@@ -1,5 +1,5 @@
 import { render, screen, type RenderResult } from '@testing-library/react';
-import { CHESS_APP_CONFIG } from '../../chess.ts';
+import { CHESS_APP_CONFIG } from '../../core/chess-core.ts';
 import App from '@learn/platform-web/App.tsx';
 import type { AppProps } from '@learn/platform-web/App.tsx';
 import { chessWeb } from '../chess-pack.ts';

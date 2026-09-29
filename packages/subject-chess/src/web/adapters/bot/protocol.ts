@@ -1,4 +1,5 @@
-import type { Move, game } from '../../../chess.ts';
+import type { game } from '../../../chess.ts';
+import type { Move } from '../../../core/chess/rules.ts';
 
 /** Main thread → worker: choose a move for `state` at `level` (`BotLevel.level`), seeded. */
 export interface BotRequest {

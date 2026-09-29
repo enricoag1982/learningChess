@@ -5,7 +5,7 @@ import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { GameState } from '../../modes/static/def.ts';
 import { playVersusMove, startVersus } from '../../modes/versus/engine.ts';
 import type { VersusState } from '../../modes/versus/def.ts';
-import type { MiniGame, VersusMiniGame } from '../../chess.ts';
+import type { MiniGame, VersusMiniGame } from '../../core/chess/lesson.ts';
 import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import { parseFen } from '../../core/chess/fen.ts';
 import { makeDeps } from '../../testing/index.ts';

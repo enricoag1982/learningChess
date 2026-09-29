@@ -1,7 +1,8 @@
 import { replaySanLine } from '../../core/chess/facts/line.ts';
 import type { VariantRules } from '../../core/variant/rules.ts';
 import { illegalTapMove } from '../base.ts';
-import type { MateInNDef, MoveAction } from './kind.ts';
+import type { MateInNDef } from '../../core/exercise/types.ts';
+import type { MoveAction } from '../base.ts';
 
 /**
  * The scripted line's own kid moves, in order — every other ply (indices 0, 2, 4, …): the

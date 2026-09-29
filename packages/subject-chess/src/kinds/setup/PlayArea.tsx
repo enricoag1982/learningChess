@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ActionOf, DefOf, ExerciseStateOf, Hint, Piece, Square } from '../../chess.ts';
-import { setupPalette } from '../../chess.ts';
+import type { ActionOf, DefOf } from '../index.ts';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { Hint } from '../../core/exercise/hint.ts';
+import type { Piece, Square } from '../../core/chess/types.ts';
+import { setupPalette } from './engine.ts';
 import { checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { useIsStackedLayout } from '@learn/platform-web/ui/useMediaQuery.ts';

@@ -1,4 +1,5 @@
-import type { Move, game } from '../../../chess.ts';
+import type { game } from '../../../chess.ts';
+import type { Move } from '../../../core/chess/rules.ts';
 import { bot, chessJsRules } from '../../../bot-worker.ts';
 import { botBook } from './book.ts';
 import type { BotRequest, BotResponse } from './protocol.ts';

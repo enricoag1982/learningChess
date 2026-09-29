@@ -2,7 +2,9 @@
  * Chess fixture builders (`ExerciseDef`, `Lesson`, `StaticMiniGame`) for tests; pass `overrides` to
  * change just the fields a test cares about.
  */
-import type { ExerciseDef, Lesson, Position, StaticMiniGame } from '../chess.ts';
+import type { ExerciseDef } from '../core/exercise/types.ts';
+import type { Lesson, StaticMiniGame } from '../core/chess/lesson.ts';
+import type { Position } from '../core/chess/types.ts';
 
 /** Empty board: no pieces, white to move, no castling/en passant. Its content is never exercised
  * by a test that leaves it at the default — override `position`/`demo.position`/`target` for

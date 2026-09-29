@@ -1,7 +1,8 @@
 import type { VariantRules } from '../../core/variant/rules.ts';
 import { solve } from '../../core/exercise/solver.ts';
 import { illegalTapMove } from '../base.ts';
-import type { CaptureDef, MoveAction } from './kind.ts';
+import type { CaptureDef } from '../../core/exercise/types.ts';
+import type { MoveAction } from '../base.ts';
 
 /** Shortest capture-everything line (solver), as the move-actions that play it. */
 export function captureSolution(def: CaptureDef, ctx: VariantRules): readonly MoveAction[] {

@@ -1,4 +1,5 @@
-import type { AnswerYesNoAction, YesNoDef } from './kind.ts';
+import type { AnswerYesNoAction } from './kind.ts';
+import type { YesNoDef } from '../../core/exercise/types.ts';
 
 /** The correct answer, straight from `def`. */
 export function yesNoSolution(def: YesNoDef): readonly AnswerYesNoAction[] {

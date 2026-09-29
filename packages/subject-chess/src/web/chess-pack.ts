@@ -1,8 +1,12 @@
 // The chess `SubjectWeb` pack (docs/refactor-v4.md §11): everything the platform reaches of chess.
 import { createElement, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
-import { chessCore, isInCheck, kingSquare } from '../chess.ts';
-import type { BotPlayer, ExerciseState, Position, Square } from '../chess.ts';
+import { chessCore } from '../core/chess-core.ts';
+import { isInCheck } from '../core/chess/facts/position.ts';
+import { kingSquare } from '../core/chess/facts/pieces.ts';
+import type { BotPlayer } from '../core/app/bot-player.ts';
+import type { ExerciseState } from '../core/exercise/state.ts';
+import type { Position, Square } from '../core/chess/types.ts';
 import { createWorkerBotPlayer } from './adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from './adapters/content/bundled-content-source.ts';
 import { useAppStore } from '@learn/platform-web/app/store.ts';

@@ -1,7 +1,7 @@
 // Dev-only playground fixture (`dev/ExercisePlayground.tsx`, loaded via `import.meta.glob`) — never
 // imported by app code (see eslint.config.js).
-import type { SelectSquaresDef } from '../../chess.ts';
-import { parseDiagram } from '../../chess.ts';
+import type { SelectSquaresDef } from '../../core/exercise/types.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
 
 // White king g1, in check from the rook on g8; f2/h2 are the kid's own pawns, so f1 and h1 are the
 // only legal king moves — the exact squares `derive: check-escapes` should select.

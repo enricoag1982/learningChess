@@ -1,16 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { JSX, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Color, LocalPlayer, Position, Square } from '../../chess.ts';
+import type { Color, Position, Square } from '../../core/chess/types.ts';
+import type { LocalPlayer } from '../../chess.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { isInCheck } from '../../core/chess/facts/position.ts';
+import { kingSquare } from '../../core/chess/facts/pieces.ts';
+import { parseFen, recordLocalMatch } from '../../chess.ts';
 import type { ChessContentSource } from '../adapters/content/bundled-content-source.ts';
-import {
-  chessJsRules,
-  game,
-  isInCheck,
-  kingSquare,
-  parseFen,
-  recordLocalMatch,
-} from '../../chess.ts';
+import { game } from '../../chess.ts';
 import type { FriendBoardMode, FriendOpponentChoice } from '../slices/play.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { Board } from './board/Board.tsx';

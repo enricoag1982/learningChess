@@ -1,7 +1,8 @@
 import type { VariantRules } from '../../core/variant/rules.ts';
 import { solve } from '../../core/exercise/solver.ts';
 import { illegalTapMove } from '../base.ts';
-import type { CollectStarsDef, MoveAction } from './kind.ts';
+import type { CollectStarsDef } from '../../core/exercise/types.ts';
+import type { MoveAction } from '../base.ts';
 
 /** Shortest star-collecting line (solver), as the move-actions that play it. */
 export function collectStarsSolution(

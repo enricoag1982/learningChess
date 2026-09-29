@@ -1,4 +1,5 @@
-import { CHARACTER_PIECES, type PieceType } from '../../../chess.ts';
+import { CHARACTER_PIECES } from '../../../core/chess-core.ts';
+import type { PieceType } from '../../../core/chess/types.ts';
 
 /** Piece type for a lesson character, or `null` for one that doesn't stand for a single piece (Owl: World 1 is about the board itself, not one piece). */
 export function characterPieceOrNull(character: string): PieceType | null {

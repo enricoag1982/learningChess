@@ -1,6 +1,8 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Hint, PalettePiece, Piece } from '../../chess.ts';
+import type { Hint } from '../../core/exercise/hint.ts';
+import type { PalettePiece } from './kind.ts';
+import type { Piece } from '../../core/chess/types.ts';
 import { PieceIcon } from '../../web/ui/board/pieces.tsx';
 
 export interface SetupPaletteProps {

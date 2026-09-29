@@ -6,7 +6,6 @@ import { initState } from '../../core/exercise/state.ts';
 import type { YesNoDef } from '../../core/exercise/types.ts';
 import { answerYesNo, yesNoHint } from './engine.ts';
 
-export type { YesNoDef } from '../../core/exercise/types.ts';
 export type { AnswerOutcome };
 
 export interface AnswerYesNoAction {

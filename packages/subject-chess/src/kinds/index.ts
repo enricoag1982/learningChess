@@ -19,7 +19,6 @@ import type { UndoAction } from './static-move.ts';
 import type { AnswerYesNoAction } from './yes-no/kind.ts';
 import { yesNoKind } from './yes-no/kind.ts';
 
-export type { ExerciseDef } from '../core/exercise/types.ts';
 export type ExerciseType = ExerciseDef['type'];
 export type DefOf<T extends ExerciseType> = Extract<ExerciseDef, { readonly type: T }>;
 

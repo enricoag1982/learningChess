@@ -1,11 +1,8 @@
-import {
-  chessJsRules,
-  hasKing,
-  isCheckmate,
-  isStalemate,
-  replaySanLine,
-  type MateInNDef,
-} from '../../chess.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { hasKing } from '../../core/chess/facts/pieces.ts';
+import { isCheckmate, isStalemate } from '../../core/chess/facts/position.ts';
+import { replaySanLine } from '../../core/chess/facts/line.ts';
+import type { MateInNDef } from '../../core/exercise/types.ts';
 import { z } from 'zod';
 import { exerciseCommonFields, rules } from '../../content/kinds/common.ts';
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';

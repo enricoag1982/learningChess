@@ -1,6 +1,7 @@
 import type { AppDeps, ContentSource } from '@learn/platform-core';
 import { createSubjectRuntime } from '@learn/platform-core';
-import { CHESS_APP_CONFIG, bot, chessCore } from '../../chess.ts';
+import { bot } from '../../chess.ts';
+import { CHESS_APP_CONFIG, chessCore } from '../../core/chess-core.ts';
 import { createWorkerBotPlayer } from '../adapters/bot/worker-bot-player.ts';
 import { createBundledContentSource } from '../adapters/content/bundled-content-source.ts';
 import { createCryptoIds } from '@learn/platform-web/adapters/ids.ts';

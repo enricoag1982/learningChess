@@ -2,24 +2,16 @@
 // for this app. Chess-bound.
 import { join } from 'node:path';
 import type { Stars } from '@learn/platform-core';
-import {
-  bot,
-  doubleStepBefore,
-  exerciseNote,
-  hasPieceOf,
-  isEasierOfferNote,
-  type CompiledContent,
-  type DemoHighlight,
-  type ExerciseFeedback,
-  type ExerciseNoteCtx,
-  type Hint,
-  type PieceType,
-  type Position,
-  type Resolve,
-  type Square,
-} from '../chess.ts';
+import { bot } from '../chess.ts';
+import { doubleStepBefore } from '../core/chess/facts/special-moves.ts';
+import { exerciseNote, isEasierOfferNote } from '../core/exercise/notes.ts';
+import { hasPieceOf } from '../core/chess/facts/pieces.ts';
+import type { CompiledContent, DemoHighlight } from '../core/chess/lesson.ts';
+import type { ExerciseFeedback, ExerciseNoteCtx, Resolve } from '../core/exercise/notes.ts';
+import type { Hint } from '../core/exercise/hint.ts';
+import type { PieceType, Position, Square } from '../core/chess/types.ts';
+import { chessCore } from '../core/chess-core.ts';
 import { z } from 'zod';
-import { chessCore } from '../chess.ts';
 import { loadBotBook } from './bot-book-load.ts';
 import {
   checkExactlyOnePosition,

@@ -7,10 +7,6 @@ import type { BestMoveDef } from '../../core/exercise/types.ts';
 import type { MoveOutcome } from '../static-move.ts';
 import { bestMoveHint } from './engine.ts';
 
-export type { BestMoveDef } from '../../core/exercise/types.ts';
-export type { MoveOutcome } from '../static-move.ts';
-export type { MoveAction } from '../base.ts';
-
 export const bestMoveKind: ChessKind<BestMoveDef, MoveAction, MoveOutcome> = {
   type: 'best-move',
   input: 'static-move',

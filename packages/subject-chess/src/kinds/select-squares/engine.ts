@@ -4,7 +4,8 @@ import { kingSquare } from '../../core/chess/facts/pieces.ts';
 import type { VariantRules } from '../../core/variant/rules.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
-import type { SelectionResult, SelectSquaresDef } from './kind.ts';
+import type { SelectionResult } from './kind.ts';
+import type { SelectSquaresDef } from '../../core/exercise/types.ts';
 
 /** Adds or removes a square from the current selection (select-squares). No-op once solved. */
 export function toggleSquare(

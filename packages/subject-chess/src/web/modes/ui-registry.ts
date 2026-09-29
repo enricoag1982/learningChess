@@ -1,6 +1,7 @@
 // The chess mini-game-mode UI registry (`SubjectWeb.modes`): the only place chess dispatches on a
 // mode for the boss UI; the platform's own `series` mode is in `BossStep`.
-import type { MiniGame, ModeType } from '../../chess.ts';
+import type { MiniGame } from '../../core/chess/lesson.ts';
+import type { ModeType } from '../../modes/index.ts';
 import { Step as StaticStep } from '../../modes/static/Step.tsx';
 import { Step as VersusStep } from '../../modes/versus/Step.tsx';
 import type { MiniGameModeUI } from '@learn/platform-web/modes/mode-ui.ts';

@@ -5,8 +5,9 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GameRecord } from '@learn/platform-core';
 import { loadGameRecords, loadJourney } from '@learn/platform-core';
-import { computerLevelStatus, bot } from '../chess.ts';
-import type { ComputerLevelStatus, PieceStyleSetting } from '../chess.ts';
+import { bot, computerLevelStatus } from '../chess.ts';
+import type { ComputerLevelStatus } from '../chess.ts';
+import type { PieceStyleSetting } from '../core/chess/settings.ts';
 import { useServices } from '@learn/platform-web/app/store.ts';
 import type { ParentSettingsProps, ReportSectionProps } from '@learn/platform-web/app/subject.ts';
 import {

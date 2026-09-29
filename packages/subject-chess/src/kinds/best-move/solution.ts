@@ -1,5 +1,6 @@
 import { illegalTapMove } from '../base.ts';
-import type { BestMoveDef, MoveAction } from './kind.ts';
+import type { BestMoveDef } from '../../core/exercise/types.ts';
+import type { MoveAction } from '../base.ts';
 
 /** The first authored solution SAN, played directly (`MoveInput` accepts a plain SAN string). */
 export function bestMoveSolution(def: BestMoveDef): readonly MoveAction[] {

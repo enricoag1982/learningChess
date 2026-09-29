@@ -1,4 +1,6 @@
-import { piecesEqual, type SetupDef, type Square } from '../../chess.ts';
+import { piecesEqual } from '../../core/chess/facts/pieces.ts';
+import type { SetupDef } from '../../core/exercise/types.ts';
+import type { Square } from '../../core/chess/types.ts';
 import { z } from 'zod';
 import {
   checkExactlyOnePosition,

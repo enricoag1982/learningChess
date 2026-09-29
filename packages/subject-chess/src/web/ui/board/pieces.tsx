@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { Color, PieceType } from '../../../chess.ts';
+import type { Color, PieceType } from '../../../core/chess/types.ts';
 import { characterForPiece } from '../art/character-meta.ts';
 import { animalImage, characterColor } from '@learn/platform-web/ui/art/animal-images.ts';
 

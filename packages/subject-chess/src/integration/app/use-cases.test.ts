@@ -11,7 +11,7 @@ import type { ExerciseDef, CaptureDef } from '../../core/exercise/types.ts';
 import { playVersusMove, startVersus, versusStars } from '../../modes/versus/engine.ts';
 import type { VersusGameDef } from '../../modes/versus/def.ts';
 import type { GameRulesDef } from '../../core/game/types.ts';
-import type { Lesson, MiniGame } from '../../chess.ts';
+import type { Lesson, MiniGame } from '../../core/chess/lesson.ts';
 import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,

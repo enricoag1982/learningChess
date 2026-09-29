@@ -1,7 +1,7 @@
 // Dev-only playground fixture (`dev/ExercisePlayground.tsx`, loaded via `import.meta.glob`) — never
 // imported by app code (see eslint.config.js).
-import type { YesNoDef } from '../../chess.ts';
-import { parseDiagram } from '../../chess.ts';
+import type { YesNoDef } from '../../core/exercise/types.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
 
 const EXERCISE: YesNoDef = {
   id: 'dev-yn',

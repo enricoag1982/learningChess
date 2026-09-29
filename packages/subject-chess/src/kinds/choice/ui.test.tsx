@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import type { ChoiceOption } from '../../chess.ts';
+import type { ChoiceOption } from '../../core/exercise/types.ts';
 import { ChoiceOptions } from './ChoiceOptions.tsx';
 
 afterEach(cleanup);

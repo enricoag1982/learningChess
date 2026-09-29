@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
-import type { VersusMiniGame } from '../../chess.ts';
-import type { Color, Move, Piece, PieceType, Position, Square } from '../../chess.ts';
-import { chessJsRules } from '../../chess.ts';
+import type { VersusMiniGame } from '../../core/chess/lesson.ts';
+import type { Color, Piece, PieceType, Position, Square } from '../../core/chess/types.ts';
+import type { Move } from '../../core/chess/rules.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import { clickSquare } from '../../web/kinds/e2e-actions.ts';
 import type { ModeE2E } from '../../web/modes/e2e-registry.ts';
 

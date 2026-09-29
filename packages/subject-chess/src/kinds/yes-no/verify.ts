@@ -1,7 +1,6 @@
 import {
   canCastle,
   canEnPassant,
-  chessJsRules,
   isAttacked,
   isCheckmate,
   isDefended,
@@ -10,10 +9,10 @@ import {
   isInsufficientMaterial,
   isSafe,
   isStalemate,
-  type Position,
-  type Square,
-  type YesNoDef,
-} from '../../chess.ts';
+} from '../../core/chess/facts/position.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import type { Position, Square } from '../../core/chess/types.ts';
+import type { YesNoDef } from '../../core/exercise/types.ts';
 
 /** A `yes-no` exercise's parsed `verify` field (`schema.ts`'s regex already restricts the shape). */
 type VerifyFact =

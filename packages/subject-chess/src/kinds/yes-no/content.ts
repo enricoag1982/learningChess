@@ -1,4 +1,5 @@
-import type { Square, YesNoDef } from '../../chess.ts';
+import type { Square } from '../../core/chess/types.ts';
+import type { YesNoDef } from '../../core/exercise/types.ts';
 import { z } from 'zod';
 import { exerciseCommonFields, squareSchema } from '../../content/kinds/common.ts';
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';

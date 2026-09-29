@@ -1,7 +1,8 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bot, chessJsRules, game } from '../chess.ts';
-import type { CompiledContent, VersusMiniGame } from '../chess.ts';
+import { bot, game } from '../chess.ts';
+import { chessJsRules } from '../core/chess/chessjs-rules.ts';
+import type { CompiledContent, VersusMiniGame } from '../core/chess/lesson.ts';
 
 /** One `domain/bot` difficulty profile (Mouse .. Bear); re-exported as a namespace, not a named type. */
 type BotLevel = (typeof bot.BOT_LEVELS)[number];

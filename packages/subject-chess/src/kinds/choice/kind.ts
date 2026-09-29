@@ -6,7 +6,6 @@ import { initState } from '../../core/exercise/state.ts';
 import type { ChoiceDef } from '../../core/exercise/types.ts';
 import { answerChoice, choiceHint } from './engine.ts';
 
-export type { ChoiceDef, ChoiceOption } from '../../core/exercise/types.ts';
 export type { AnswerOutcome };
 
 export interface AnswerChoiceAction {

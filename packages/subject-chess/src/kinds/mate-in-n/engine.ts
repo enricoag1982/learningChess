@@ -3,7 +3,8 @@ import { findMoveBySan, sameSan } from '../../core/chess/facts/san.ts';
 import type { VariantRules } from '../../core/variant/rules.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
-import type { MateInNDef, MateInNOutcome } from './kind.ts';
+import type { MateInNOutcome } from './kind.ts';
+import type { MateInNDef } from '../../core/exercise/types.ts';
 
 /** Plays a kid move for a `mate-in-n` exercise, under real chess rules (both kings, real turn
  * alternation). Any move delivering checkmate solves it; otherwise it must match the scripted

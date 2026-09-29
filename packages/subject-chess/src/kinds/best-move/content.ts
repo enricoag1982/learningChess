@@ -1,4 +1,4 @@
-import type { BestMoveDef } from '../../chess.ts';
+import type { BestMoveDef } from '../../core/exercise/types.ts';
 import { z } from 'zod';
 import { exerciseCommonFields } from '../../content/kinds/common.ts';
 import type { ExerciseKindContent } from '@learn/platform-content/kinds/kind-content';

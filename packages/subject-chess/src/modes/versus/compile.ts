@@ -1,5 +1,6 @@
-import type { VersusMiniGame } from '../../chess.ts';
-import { game, type Color, type Piece, type Square } from '../../chess.ts';
+import type { VersusMiniGame } from '../../core/chess/lesson.ts';
+import type { Color, Piece, Square } from '../../core/chess/types.ts';
+import { game } from '../../chess.ts';
 import type { z } from 'zod';
 import { compilePosition } from '../../content/kinds/common.ts';
 import type { MiniGameCompileContext } from '@learn/platform-content/modes/mode-content';

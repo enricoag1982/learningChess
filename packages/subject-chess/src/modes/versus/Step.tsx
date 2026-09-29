@@ -2,22 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { PieceType, Square, VersusMiniGame, VersusState } from '../../chess.ts';
+import type { PieceType, Square } from '../../core/chess/types.ts';
+import type { VersusMiniGame } from '../../core/chess/lesson.ts';
+import type { VersusState } from './def.ts';
 import {
-  bot,
   canTakeBack,
-  chessJsRules,
-  isInCheck,
   isKidTurn,
   kidMoveCount,
-  kingSquare,
   playVersusMove,
   startVersus,
   takeBackVersusMove,
   versusEndReason,
   versusGameState,
   versusPosition,
-} from '../../chess.ts';
+} from './engine.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { isInCheck } from '../../core/chess/facts/position.ts';
+import { kingSquare } from '../../core/chess/facts/pieces.ts';
+import { bot } from '../../chess.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import { UndoIcon } from '../../web/kinds/MoveCountedPlayArea.tsx';

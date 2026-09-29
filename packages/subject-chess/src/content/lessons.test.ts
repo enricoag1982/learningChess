@@ -1,12 +1,10 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-  chessJsRules,
-  createVariantRules,
-  optimalMoves,
-  staticGoalExercise,
-  type CompiledContent,
-} from '../chess.ts';
+import { chessJsRules } from '../core/chess/chessjs-rules.ts';
+import { createVariantRules } from '../core/variant/rules.ts';
+import { optimalMoves } from '../core/exercise/solver.ts';
+import { staticGoalExercise } from '../modes/static/def.ts';
+import type { CompiledContent } from '../core/chess/lesson.ts';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from '@learn/platform-content/load';

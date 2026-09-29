@@ -1,6 +1,8 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Hint, Move, Position, Square } from '../../chess.ts';
+import type { Hint } from '../../core/exercise/hint.ts';
+import type { Move } from '../../core/chess/rules.ts';
+import type { Position, Square } from '../../core/chess/types.ts';
 import { Board } from '../ui/board/Board.tsx';
 import type { FromTo } from './move-ui.ts';
 import { hintSquares } from './move-ui.ts';

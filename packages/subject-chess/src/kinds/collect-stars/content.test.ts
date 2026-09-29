@@ -1,5 +1,5 @@
 import { join } from 'node:path';
-import type { CompiledContent } from '../../chess.ts';
+import type { CompiledContent } from '../../core/chess/lesson.ts';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { chessContent } from '../../content/chess-content.ts';
 import { loadLocales } from '@learn/platform-content/load';

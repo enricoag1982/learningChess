@@ -1,5 +1,6 @@
 import { SQUARES } from '../../core/chess/types.ts';
-import type { PlaceAction, SetupDef } from './kind.ts';
+import type { PlaceAction } from './kind.ts';
+import type { SetupDef } from '../../core/exercise/types.ts';
 
 /** Every target piece still missing from `position`, placed in board reading order. */
 export function setupSolution(def: SetupDef): readonly PlaceAction[] {

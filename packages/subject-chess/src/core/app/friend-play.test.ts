@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { parseFen } from '../chess/fen.ts';
-import type { Lesson, VersusMiniGame } from '../../chess.ts';
+import type { Lesson, VersusMiniGame } from '../chess/lesson.ts';
 import { newLessonProgress } from '@learn/platform-core/domain/progress';
 import type { GameRecord, LessonProgress } from '@learn/platform-core/domain/progress';
 import { makeGameRecordRepo as buildGameRecordRepo } from '@learn/platform-core/testing';

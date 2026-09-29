@@ -2,14 +2,9 @@
 // `Page` is a type-only import: this file (and every kind's own `e2e.ts`) is never reachable from
 // app code, only from Playwright specs (`e2e/kit/exercises.ts`), enforced by eslint.config.js.
 import type { Page } from '@playwright/test';
-import type {
-  ActionOf,
-  DefOf,
-  ExerciseStateOf,
-  ExerciseType,
-  OutcomeOf,
-  VariantRules,
-} from '../../chess.ts';
+import type { ActionOf, DefOf, ExerciseType, OutcomeOf } from '../../kinds/index.ts';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { VariantRules } from '../../core/variant/rules.ts';
 import { bestMoveE2E } from '../../kinds/best-move/e2e.ts';
 import { captureE2E } from '../../kinds/capture/e2e.ts';
 import { choiceE2E } from '../../kinds/choice/e2e.ts';

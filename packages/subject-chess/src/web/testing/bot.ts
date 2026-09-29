@@ -1,5 +1,7 @@
-import type { BotPlayer, Move, Square } from '../../chess.ts';
-import { chessJsRules } from '../../chess.ts';
+import type { BotPlayer } from '../../core/app/bot-player.ts';
+import type { Move } from '../../core/chess/rules.ts';
+import type { Square } from '../../core/chess/types.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 
 /** A scripted `BotPlayer`: replies with the queued `from`/`to` moves in order. */
 export function scriptedBotPlayer(

@@ -5,8 +5,9 @@
  */
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CompiledContent, ExerciseDef } from '../chess.ts';
-import { kindOf } from '../chess.ts';
+import type { CompiledContent } from '../core/chess/lesson.ts';
+import type { ExerciseDef } from '../core/exercise/types.ts';
+import { kindOf } from '../kinds/index.ts';
 import { playSolution, playWrongThenSolve } from '../testing/index.ts';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';

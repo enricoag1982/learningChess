@@ -5,8 +5,6 @@ import { initState } from '../../core/exercise/state.ts';
 import type { SelectSquaresDef } from '../../core/exercise/types.ts';
 import { selectSquaresHint, submitSelection, toggleSquare } from './engine.ts';
 
-export type { SelectSquaresDef } from '../../core/exercise/types.ts';
-
 /** Result of a select-squares submission. */
 export interface SelectionResult {
   readonly correct: boolean;

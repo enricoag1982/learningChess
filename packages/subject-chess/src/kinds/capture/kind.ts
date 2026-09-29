@@ -5,10 +5,6 @@ import type { MoveAction } from '../base.ts';
 import type { CaptureDef } from '../../core/exercise/types.ts';
 import type { MoveOutcome, UndoAction, UndoOutcome } from '../static-move.ts';
 
-export type { CaptureDef } from '../../core/exercise/types.ts';
-export type { MoveOutcome } from '../static-move.ts';
-export type { MoveAction } from '../base.ts';
-
 export const captureKind: ChessKind<
   CaptureDef,
   MoveAction | UndoAction,

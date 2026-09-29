@@ -12,7 +12,9 @@ import {
   chessConditionValue,
   type ChessRewardFacts,
 } from './chess/facts/rewards.ts';
-import type { PieceType } from './chess/index.ts';
+import type { PieceType } from './chess/types.ts';
+import { createVariantRules } from './variant/rules.ts';
+import type { VariantRules } from './variant/rules.ts';
 import { EXERCISE_KINDS } from '../kinds/index.ts';
 import { EXERCISE_NOTES } from './exercise/notes.ts';
 import { staticMode } from '../modes/static/mode.ts';
@@ -20,7 +22,6 @@ import { versusMode } from '../modes/versus/mode.ts';
 import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
 import type { AppConfig, SubjectCore } from '@learn/platform-core/domain/subject';
 import type { ProfileSettings } from '@learn/platform-core/domain/profile-settings';
-import { createVariantRules, type VariantRules } from './variant/index.ts';
 
 /** The World-2 piece-lesson characters' own piece, Rhino .. Caterpillar — the one source both
  * `CHESS_CHARACTERS.topicKey` (below) and the web's `character-meta.ts`/content's

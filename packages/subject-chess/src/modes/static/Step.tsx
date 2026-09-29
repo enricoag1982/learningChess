@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Square } from '../../chess.ts';
-import { enemyCount, gameResult, playGameMove, startStaticCaptureGame } from '../../chess.ts';
-import type { GameState, StaticMiniGame } from '../../chess.ts';
+import type { Square } from '../../core/chess/types.ts';
+import { enemyCount } from '../../core/chess/facts/goals.ts';
+import { gameResult, playGameMove, startStaticCaptureGame } from './engine.ts';
+import type { GameState } from './def.ts';
+import type { StaticMiniGame } from '../../core/chess/lesson.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { chessWeb } from '../../web/chess-pack.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';

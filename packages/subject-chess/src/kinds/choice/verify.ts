@@ -1,10 +1,7 @@
-import {
-  chessJsRules,
-  isDefended,
-  pieceValue,
-  type ChoiceDef,
-  type Position,
-} from '../../chess.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { isDefended, pieceValue } from '../../core/chess/facts/position.ts';
+import type { ChoiceDef } from '../../core/exercise/types.ts';
+import type { Position } from '../../core/chess/types.ts';
 import { classifyTrade } from '../../content/kinds/common.ts';
 
 /** A `choice` exercise's optional `verify` (`schema.ts`'s regex already restricts the shape). */

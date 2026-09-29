@@ -1,5 +1,7 @@
-import type { StaticMiniGame } from '../../chess.ts';
-import { hasPieceOf, optimalMoves, staticGoalExercise } from '../../chess.ts';
+import type { StaticMiniGame } from '../../core/chess/lesson.ts';
+import { hasPieceOf } from '../../core/chess/facts/pieces.ts';
+import { optimalMoves } from '../../core/exercise/solver.ts';
+import { staticGoalExercise } from './def.ts';
 import { z } from 'zod';
 import {
   checkExactlyOnePosition,

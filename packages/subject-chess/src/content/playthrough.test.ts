@@ -1,17 +1,17 @@
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { CaptureDef, CollectStarsDef, CompiledContent } from '../chess.ts';
+import type { CaptureDef, CollectStarsDef } from '../core/exercise/types.ts';
+import type { CompiledContent } from '../core/chess/lesson.ts';
+import { chessJsRules } from '../core/chess/chessjs-rules.ts';
+import { createVariantRules } from '../core/variant/rules.ts';
 import {
-  chessJsRules,
-  createVariantRules,
   gameResult,
   gameStars,
-  kindOf,
   playGameMove,
-  solve,
-  startExercise,
   startStaticCaptureGame,
-} from '../chess.ts';
+} from '../modes/static/engine.ts';
+import { kindOf, startExercise } from '../kinds/index.ts';
+import { solve } from '../core/exercise/solver.ts';
 import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from '@learn/platform-content/load';

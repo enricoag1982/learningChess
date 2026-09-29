@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { MiniGame } from '../../chess.ts';
-import { parseDiagram } from '../../chess.ts';
+import type { MiniGame } from '../../core/chess/lesson.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
 import { fixtureContentSource, fixtureLesson } from '../../web/testing/fixtures.ts';
 import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
 import { chessWeb } from '../../web/chess-pack.ts';

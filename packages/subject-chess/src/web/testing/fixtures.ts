@@ -1,7 +1,7 @@
 import type { Track, TracksCatalog, World } from '@learn/platform-core';
-import type { Lesson, MiniGame } from '../../chess.ts';
-import type { ExerciseDef } from '../../chess.ts';
-import { parseDiagram } from '../../chess.ts';
+import type { Lesson, MiniGame } from '../../core/chess/lesson.ts';
+import type { ExerciseDef } from '../../core/exercise/types.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
 import { makeContentSource } from '../../testing/index.ts';
 
 /** A tiny static boss mini-game (rook a1, pawn h1, one move to capture it). */

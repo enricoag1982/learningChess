@@ -4,8 +4,6 @@ import { initState } from '../../core/exercise/state.ts';
 import type { SetupDef } from '../../core/exercise/types.ts';
 import { placePiece, setupHint, setupStars } from './engine.ts';
 
-export type { SetupDef } from '../../core/exercise/types.ts';
-
 export interface PlaceAction {
   readonly type: 'place';
   readonly square: Square;

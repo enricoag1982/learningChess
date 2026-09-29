@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ChoiceOption } from '../../chess.ts';
+import type { ChoiceOption } from '../../core/exercise/types.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import { PieceIcon } from '../../web/ui/board/pieces.tsx';
 

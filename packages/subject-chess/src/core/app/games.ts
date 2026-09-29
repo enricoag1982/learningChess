@@ -13,8 +13,6 @@ import type { Journey } from '@learn/platform-core/app/journey';
 import { checkRewards } from '@learn/platform-core/app/rewards';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
 
-export type { RecordGameInput } from '@learn/platform-core/domain/subject';
-
 /** Result + reason for a `GameRecord`, from a `VersusState` that has already ended. */
 export function versusGameRecordResult(state: VersusState): {
   readonly result: GameRecordResult;

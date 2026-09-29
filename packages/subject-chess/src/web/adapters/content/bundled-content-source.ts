@@ -1,5 +1,5 @@
 import type { BadgeDef, TracksCatalog } from '@learn/platform-core';
-import type { CompiledContent } from '../../../chess.ts';
+import type { CompiledContent } from '../../../core/chess/lesson.ts';
 import bundled from '../../../../dist/content.json';
 import bundledTracks from '../../../../dist/tracks.json';
 import bundledBadges from '../../../../dist/badges.json';

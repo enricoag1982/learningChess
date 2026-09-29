@@ -3,7 +3,8 @@ import type { Piece, Position, Square } from '../../core/chess/types.ts';
 import { piecesEqual } from '../../core/chess/facts/pieces.ts';
 import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
-import type { PalettePiece, PlaceOutcome, SetupDef } from './kind.ts';
+import type { PalettePiece, PlaceOutcome } from './kind.ts';
+import type { SetupDef } from '../../core/exercise/types.ts';
 
 /** Setup exercise: target squares still missing their piece, in board reading order. */
 export function remainingSetupSquares(position: Position, target: Position): readonly Square[] {

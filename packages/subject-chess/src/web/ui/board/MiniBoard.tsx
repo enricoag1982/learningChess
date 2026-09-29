@@ -1,5 +1,5 @@
 import type { JSX } from 'react';
-import type { Color, Position, Square } from '../../../chess.ts';
+import type { Color, Position, Square } from '../../../core/chess/types.ts';
 import { PieceBadge, PieceIcon } from './pieces.tsx';
 import { cellToSquare } from './geometry.ts';
 

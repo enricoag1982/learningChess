@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
-import type { VersusMiniGame } from '../../chess.ts';
-import type { BotPlayer, Move, PieceType, Square } from '../../chess.ts';
-import { chessJsRules, parseDiagram, parseFen } from '../../chess.ts';
+import type { VersusMiniGame } from '../../core/chess/lesson.ts';
+import type { BotPlayer } from '../../core/app/bot-player.ts';
+import type { Move } from '../../core/chess/rules.ts';
+import type { PieceType, Square } from '../../core/chess/types.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
+import { parseFen } from '../../core/chess/fen.ts';
 import { createBundledContentSource } from '../../web/adapters/content/bundled-content-source.ts';
 import { fixtureContentSource, fixtureLesson } from '../../web/testing/fixtures.ts';
 import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';

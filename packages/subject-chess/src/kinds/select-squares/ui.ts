@@ -1,4 +1,6 @@
-import type { ActionOf, DefOf, ExerciseStateOf, OutcomeOf, Square } from '../../chess.ts';
+import type { ActionOf, DefOf, OutcomeOf } from '../index.ts';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { Square } from '../../core/chess/types.ts';
 import type { ExerciseKindUI } from '@learn/platform-web/kinds/kind-ui.ts';
 import type { WrongSquaresExtra } from '../../web/kinds/move-ui.ts';
 import { baseInitUi } from '../../web/kinds/move-ui.ts';

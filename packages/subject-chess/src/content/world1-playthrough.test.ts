@@ -12,7 +12,8 @@ import { describe, expect, it } from 'vitest';
 import { chessContent } from './chess-content.ts';
 import { loadLocales, mergeLocales } from '@learn/platform-content/load';
 import { loadContent } from '@learn/platform-content/lesson-load';
-import { EXERCISE_KINDS, type CompiledContent } from '../chess.ts';
+import { EXERCISE_KINDS } from '../kinds/index.ts';
+import type { CompiledContent } from '../core/chess/lesson.ts';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 
 const packageDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'content');

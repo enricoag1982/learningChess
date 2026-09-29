@@ -1,5 +1,7 @@
 import type { JSX } from 'react';
-import type { ActionOf, DefOf, ExerciseStateOf, Hint } from '../../chess.ts';
+import type { ActionOf, DefOf } from '../index.ts';
+import type { ExerciseStateOf } from '../../core/exercise/state.ts';
+import type { Hint } from '../../core/exercise/hint.ts';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';

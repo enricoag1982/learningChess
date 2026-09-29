@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { JSX } from 'react';
-import type { Color, Piece, PieceType, Position, Square } from '../../chess.ts';
-import { chessJsRules, parseDiagram } from '../../chess.ts';
+import type { Color, Piece, PieceType, Position, Square } from '../../core/chess/types.ts';
+import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
+import { parseDiagram } from '../../core/chess/diagram.ts';
 import { Board } from '../ui/board/Board.tsx';
 import { PieceIcon } from '../ui/board/pieces.tsx';
 

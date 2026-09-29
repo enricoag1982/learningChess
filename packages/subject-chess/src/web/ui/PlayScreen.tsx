@@ -2,9 +2,11 @@ import { useState } from 'react';
 import type { JSX } from 'react';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import type { ComputerLevelCondition, ComputerLevelStatus, MiniGame } from '../../chess.ts';
+import type { ComputerLevelCondition, ComputerLevelStatus } from '../../chess.ts';
+import type { MiniGame } from '../../core/chess/lesson.ts';
+import { chessCore } from '../../core/chess-core.ts';
+import { computerLevelStatus, friendGameOptions, suggestedLevel } from '../../chess.ts';
 import { unlockedMiniGames } from '@learn/platform-core';
-import { chessCore, computerLevelStatus, friendGameOptions, suggestedLevel } from '../../chess.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { avatarName, tContent } from '@learn/platform-web/content-text.ts';
 import {
