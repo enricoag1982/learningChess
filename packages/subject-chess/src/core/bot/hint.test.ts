@@ -14,14 +14,14 @@ const STANDARD: GameRulesDef = {
 };
 
 describe('mateHint', () => {
-  it('finds a mate-in-one for the side to move', () => {
+  it('finds a mate-in-one for the side to move', async () => {
     // Kd6/Qh2 vs Ka8: Qd6-d8 style back-rank ideas aside, a simple, unambiguous mate-in-1 for
     // White: Qh2-a2# is not forced, so use a textbook king+queen mate instead — Kb6, Qh1 vs Ka8:
     // Qh1-a1# is legal but not the *only* best move at depth 2, which is fine: `mateHint` only
     // promises the single best-scored move, and a forced mate always outscores everything else.
     const state = startGame(STANDARD, parseFen('k7/8/1K6/8/8/8/8/7Q w - - 0 1'));
 
-    const hint = mateHint(state, rules);
+    const hint = await mateHint(state, rules);
 
     if (hint === null) {
       throw new Error('expected a hint');
@@ -37,20 +37,20 @@ describe('mateHint', () => {
     }
   });
 
-  it('returns null when the side to move has no legal move at all (stalemated/checkmated)', () => {
+  it('returns null when the side to move has no legal move at all (stalemated/checkmated)', async () => {
     // Black to move, stalemated (no check, no legal move).
     const state = startGame(STANDARD, parseFen('7k/5Q2/6K1/8/8/8/8/8 b - - 0 1'));
 
-    expect(mateHint(state, rules)).toBeNull();
+    expect(await mateHint(state, rules)).toBeNull();
   });
 
-  it('picks a real legal move even with no forced mate on the board', () => {
+  it('picks a real legal move even with no forced mate on the board', async () => {
     const state = startGame(
       STANDARD,
       parseFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'),
     );
 
-    const hint = mateHint(state, rules);
+    const hint = await mateHint(state, rules);
 
     expect(hint).not.toBeNull();
     const legal = rules.legalMoves(state.position);

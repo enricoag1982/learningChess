@@ -244,10 +244,11 @@ export function Step({
 
   /** Owl's mate hint (docs/computer-opponent.md §6): the best kid move by a depth-2 search. */
   function handleMateHint(): void {
-    const found = bot.mateHint(versusGameState(versus), chessJsRules);
-    if (found !== null) {
-      setHint(found);
-    }
+    void bot.mateHint(versusGameState(versus), chessJsRules).then((found) => {
+      if (found !== null) {
+        setHint(found);
+      }
+    });
   }
 
   const position = versusPosition(versus);
