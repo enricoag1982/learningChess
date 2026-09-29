@@ -10,13 +10,11 @@ import {
   makeProgressRepo as buildProgressRepo,
   makeRewardsRepo as buildRewardsRepo,
   makeAttempt as buildAttempt,
-} from '@learn/platform-core/testing';
-import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import type { ContentSource, RewardsRepository } from '@learn/platform-core/app/ports';
 import {
   buildBadgeFacts,

@@ -4,8 +4,8 @@ import {
   makeProgressRepo,
   makeGameRecordRepo,
   makeRewardsRepo,
+  makeDeps as buildDeps,
 } from '@learn/platform-core/testing';
-import { makeDeps as buildDeps } from '../../testing/index.ts';
 import {
   changeAvatar,
   changeParentPassword,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise as buildExercise, makeLesson } from '../../testing/index.ts';
+import { makeExercise as buildExercise, makeLesson } from '@learn/platform-core/testing';
 import { seededRandom } from '@learn/platform-core/domain/random';
 import type { ConceptPoolEntry, ConceptStats } from '@learn/platform-core/domain/review';
 import {

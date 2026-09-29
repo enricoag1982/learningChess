@@ -4,7 +4,7 @@ import {
   makeExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import type { Lesson, MiniGame } from '@learn/platform-core/domain/lesson';
 import {
   newLessonProgress,

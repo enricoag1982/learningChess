@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise, makeLesson as buildLesson } from '../../testing/index.ts';
+import { makeExercise, makeLesson as buildLesson } from '@learn/platform-core/testing';
 import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
 import type { Lesson } from '@learn/platform-core/domain/lesson';
 import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise, makeLesson as buildLesson } from '../../testing/index.ts';
+import { makeExercise, makeLesson as buildLesson } from '@learn/platform-core/testing';
 import {
   HABITATS,
   currentRank,

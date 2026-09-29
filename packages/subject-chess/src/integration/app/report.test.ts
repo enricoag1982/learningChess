@@ -16,13 +16,11 @@ import {
   makeGameRecordRepo,
   makeRewardsRepo as buildRewardsRepo,
   makeAssessmentRepo,
-} from '@learn/platform-core/testing';
-import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import { buildChildOverview, buildChildReport } from '@learn/platform-core/app/report';
 import type { AppSettings, ContentSource, RewardsRepository } from '@learn/platform-core/app/ports';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';

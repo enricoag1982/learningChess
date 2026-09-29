@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeProgress } from '@learn/platform-core/testing';
-import { makeExercise as buildExercise, makeLesson as buildLesson } from '../../testing/index.ts';
+import {
+  makeProgress,
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+} from '@learn/platform-core/testing';
 import {
   lessonStars,
   lessonStatus,

@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
 import type { SessionLog } from '@learn/platform-core/domain/session-log';
-import { makeRewardsRepo as buildRewardsRepo, makeClock } from '@learn/platform-core/testing';
-import { makeDeps as buildDeps } from '../../testing/index.ts';
+import {
+  makeRewardsRepo as buildRewardsRepo,
+  makeClock,
+  makeDeps as buildDeps,
+} from '@learn/platform-core/testing';
 import {
   checkActivityGate,
   grantExtraTime,

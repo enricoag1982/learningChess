@@ -4,7 +4,7 @@ import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import {
   easierVariant,
   isSkippablePhase,

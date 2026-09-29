@@ -4,15 +4,14 @@ import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/jo
 import type { Lesson } from '@learn/platform-core/domain/lesson';
 import { newLessonProgress, recordExerciseStars } from '@learn/platform-core/domain/progress';
 import type { LessonProgress, MiniGameProgress } from '@learn/platform-core/domain/progress';
-import { makeProgressRepo as buildProgressRepo } from '@learn/platform-core/testing';
 import {
-  EMPTY_POSITION,
+  makeProgressRepo as buildProgressRepo,
   makeExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import { loadJourney } from '@learn/platform-core/app/journey';
 import type { ContentSource } from '@learn/platform-core/app/ports';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
@@ -145,7 +144,6 @@ const BOSS_MINIGAME = buildMiniGame({
   titleKey: 'fixtures:boss-mg.title',
   goalKey: 'fixtures:boss-mg.goal',
   unlockAfter: 'l2',
-  position: EMPTY_POSITION,
   par: 5,
 });
 

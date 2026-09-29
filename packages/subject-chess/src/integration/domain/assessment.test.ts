@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { makeExercise as buildExercise, makeLesson as buildLesson } from '../../testing/index.ts';
+import {
+  makeExercise as buildExercise,
+  makeLesson as buildLesson,
+} from '@learn/platform-core/testing';
 import {
   newAssessmentResult,
   newUnlock,

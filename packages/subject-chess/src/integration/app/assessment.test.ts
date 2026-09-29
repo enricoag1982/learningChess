@@ -3,13 +3,13 @@ import { describe, expect, it } from 'vitest';
 import type { AssessmentScope } from '@learn/platform-core/domain/assessment';
 import { scorePlacementWorld, scoreTestOut } from '@learn/platform-core/domain/assessment';
 import type { Track, TracksCatalog, World } from '@learn/platform-core/domain/journey';
-import { makeAssessmentRepo as buildAssessmentRepo } from '@learn/platform-core/testing';
 import {
+  makeAssessmentRepo as buildAssessmentRepo,
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import { loadUnlocked, parentUnlock, submitAssessment } from '@learn/platform-core/app/assessment';
 import { loadJourney } from '@learn/platform-core/app/journey';
 import type { AssessmentRepository, ContentSource } from '@learn/platform-core/app/ports';

@@ -14,13 +14,11 @@ import {
   makeClock as buildClock,
   makeBackupFileWriter,
   makeBackupImporter,
-} from '@learn/platform-core/testing';
-import {
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import {
   BackupValidationError,
   backupFileName,
@@ -106,7 +104,7 @@ describe('buildBackupFile', () => {
 
     const file = await buildBackupFile(deps);
 
-    expect(file.app).toBe('chess-kids');
+    expect(file.app).toBe('test-app');
     expect(file.schemaVersion).toBe(5);
     expect(file.exportedAt).toBe(NOW.toISOString());
     expect(file.profiles.map((p) => p.id)).toEqual(['p1', 'p2']);
@@ -162,7 +160,7 @@ describe('exportBackup', () => {
     await exportBackup(deps);
 
     expect(writer.writes).toHaveLength(1);
-    expect(writer.writes[0]?.filename).toBe('chess-kids-backup-2026-01-10.json');
+    expect(writer.writes[0]?.filename).toBe('test-app-backup-2026-01-10.json');
     const parsed = JSON.parse(writer.writes[0]?.contents ?? '{}') as BackupFile;
     expect(parsed.profiles).toHaveLength(2);
   });
@@ -174,7 +172,7 @@ describe('exportBackup', () => {
 
     await exportBackup(deps, ['p1']);
 
-    expect(writer.writes[0]?.filename).toBe('chess-kids-backup-mia-2026-01-10.json');
+    expect(writer.writes[0]?.filename).toBe('test-app-backup-mia-2026-01-10.json');
   });
 
   it('throws without deps.backupFileWriter wired up', async () => {

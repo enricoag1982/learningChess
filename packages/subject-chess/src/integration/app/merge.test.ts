@@ -15,13 +15,11 @@ import {
   makeRewardsRepo as buildRewardsRepo,
   makeAssessmentRepo,
   makeBackupImporter,
-} from '@learn/platform-core/testing';
-import {
   makeExercise,
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import { importMerged, planImport, previewChildChange } from '@learn/platform-core/merge';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
 

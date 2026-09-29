@@ -8,15 +8,15 @@ import {
 } from '@learn/platform-core/domain/progress';
 import type { LessonProgress, MiniGameProgress } from '@learn/platform-core/domain/progress';
 import type { ConceptStats } from '@learn/platform-core/domain/review';
-import { makeProgressRepo as buildProgressRepo, seededRandom } from '@learn/platform-core/testing';
 import {
-  EMPTY_POSITION,
+  makeProgressRepo as buildProgressRepo,
+  seededRandom,
   makeExercise as buildExercise,
   makeLesson as buildLesson,
   makeMiniGame as buildMiniGame,
   makeContentSource,
   makeDeps as buildDeps,
-} from '../../testing/index.ts';
+} from '@learn/platform-core/testing';
 import {
   loadPracticeTasks,
   loadTodaySession,
@@ -80,7 +80,6 @@ const MG1 = buildMiniGame({
   titleKey: 'fixtures:mg1.title',
   goalKey: 'fixtures:mg1.goal',
   unlockAfter: 'l1',
-  position: EMPTY_POSITION,
   par: 5,
 });
 const MG2 = { ...MG1, id: 'mg2', unlockAfter: 'l2', titleKey: 'fixtures:mg2.title' };

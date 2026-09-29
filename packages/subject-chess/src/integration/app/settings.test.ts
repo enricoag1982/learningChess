@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { composeDefaultSettings } from '@learn/platform-core/domain/profile-settings';
-import { makeSettingsRepo } from '@learn/platform-core/testing';
-import { makeDeps as buildDeps } from '../../testing/index.ts';
+import { makeSettingsRepo, makeDeps as buildDeps } from '@learn/platform-core/testing';
 import { getProfileSettings, updateProfileSettings } from '@learn/platform-core/app/settings';
 import type { AppDeps } from '@learn/platform-core/app/use-cases';
 import type { AppSettings } from '@learn/platform-core/app/ports';
@@ -74,10 +73,11 @@ describe('updateProfileSettings', () => {
     await expect(updateProfileSettings(deps, 'p1', { dailyLimitMinutes: 10 })).rejects.toThrow();
   });
 
-  it('rejects an invalid computerLevel', async () => {
+  it("rejects a value the subject's own settings refuse", async () => {
     const deps = makeDeps(EMPTY_SETTINGS);
-    await expect(
-      updateProfileSettings(deps, 'p1', { computerLevel: 9 as unknown as 'auto' }),
-    ).rejects.toThrow();
+    const valid = { hints: true, difficulty: 'hard' };
+    const invalid = { hints: true, difficulty: 'nightmare' };
+    await expect(updateProfileSettings(deps, 'p1', valid)).resolves.toMatchObject(valid);
+    await expect(updateProfileSettings(deps, 'p1', invalid)).rejects.toThrow();
   });
 });
