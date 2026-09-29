@@ -31,7 +31,7 @@ interface AppErrorBoundaryState {
   readonly message: string | null;
 }
 
-/** Top-level boundary (`main.tsx`): any render error, incl. a failing `createServices` or an `init()` rejection `App` rethrows. */
+/** Top-level boundary (`mountApp`): any render error, incl. a failing `createServices` or an `init()` rejection `App` rethrows. */
 export class AppErrorBoundary extends Component<
   { readonly children: ReactNode },
   AppErrorBoundaryState

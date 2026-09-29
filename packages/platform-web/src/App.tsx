@@ -115,7 +115,7 @@ export default function App({
       });
   }, [store]);
 
-  // A failed start (e.g. storage unreadable) reaches `AppErrorBoundary` (`main.tsx`) instead of
+  // A failed start (e.g. storage unreadable) reaches `AppErrorBoundary` (`mountApp`) instead of
   // leaving the blank 'loading' screen up forever.
   if (initError !== null) throw initError;
 

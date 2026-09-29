@@ -49,7 +49,7 @@ Workspace `packages/*` + `apps/*`. Direction: app → `subject-chess` → `platf
 | `@learn/platform-content` | YAML → Zod → JSON pipeline, platform locales, voice-text inventory, `testing/` fixture subject | platform-core, zod, yaml |
 | `@learn/platform-web` | React: `App`, routes + store slices, screens, design system, adapters, i18n, `testing/` | platform-core |
 | `@learn/subject-chess` | Chess pack: `src/{core,kinds,modes,content,web}`, `content/` (YAML), `scripts/` | platform-core, platform-content, platform-web, chess.js |
-| `@learn/chess-kids` | Shell (`apps/chess-kids`): `src/main.tsx` composes `chessWeb` + `CHESS_APP_CONFIG` into `<App>`; Vite / PWA / CSP, e2e | platform-core, platform-web, subject-chess |
+| `@learn/chess-kids` | Shell (`apps/chess-kids`): `src/main.tsx` passes `chessWeb` + `CHESS_APP_CONFIG` to `mountApp` (platform-web `src/mount.tsx`); Vite / PWA / CSP, e2e | platform-core, platform-web, subject-chess |
 
 | Seam | Defined in | Provides |
 |---|---|---|

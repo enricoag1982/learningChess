@@ -96,13 +96,14 @@ export const chessWeb = {
   routes: CHESS_ROUTES,
   createSlice: createPlaySlice,
   homeReset: { levelUpSuggestion: null },
-  // Gated on the compile-time DEV flag (not only main.tsx's check) so Rollup drops the dev-playground subtree: an ungated `dev`
-  // field keeps its two `import()` calls as live split points and grows the initial bundle.
+  // Gated on the compile-time DEV flag so Rollup drops the dev-playground subtree: an ungated `dev`
+  // field keeps its `import()` calls as live split points and grows the initial bundle.
   dev: import.meta.env.DEV
     ? {
         '#board': () => import('./dev/BoardPlayground.tsx').then((m) => m.BoardPlayground),
         '#exercises': () =>
           import('./dev/ExercisePlayground.tsx').then((m) => m.ExercisePlayground),
+        '#lesson=': () => import('./dev/LessonPreview.tsx').then((m) => m.LessonPreview),
       }
     : undefined,
 } satisfies SubjectWeb;

@@ -74,7 +74,7 @@ Reference devices: iPad (9th gen, 2021), mid-range Android tablet (e.g. Samsung 
 | Build target | `vite.config.ts` `build.target` = `es2022`, `safari15.4`, `chrome100`, `edge100`, `firefox100` (Vite's default is Safari 16.4+) |
 | Compat check | `pnpm compat` (CI, after the size budget): scans the built JS for syntax / regex features Safari 15.4 lacks and Safari 16+ only built-ins called by name |
 | Guard newer APIs | Feature-check before use; e.g. `speechSynthesis.addEventListener` does not exist before Safari 16 (not an `EventTarget`) — its call at startup was the blank page |
-| Never blank | `AppErrorBoundary` (`main.tsx`): any startup / render error shows Owl + "Try again" + the error text; a browser that cannot run the app at all shows a static "needs iOS 15.4 or newer" note after 8 s (`index.html`) |
+| Never blank | `AppErrorBoundary` (`mountApp`): any startup / render error shows Owl + "Try again" + the error text; a browser that cannot run the app at all shows a static "needs iOS 15.4 or newer" note after 8 s (`index.html`) |
 | Test | `e2e/older-safari.spec.ts`: starts with Safari 15's `SpeechSynthesis`; a startup failure shows the error screen |
 | Heights | `dvh`, never `vh`/`min-h-screen`: iOS Safari `vh` = toolbar-hidden height → page taller than the visible area (owner report, iPad mini 4, iOS 15.8, 2026-09-26). Game boards: measured to fit the space the panel leaves (`GameLayout`), no viewport-% cap. Fit test `e2e/fit.spec.ts` at Safari's visible area: 768×900, 1024×660, phone 390×844 |
 

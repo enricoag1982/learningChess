@@ -25,7 +25,7 @@ export async function renderApp(
   return result;
 }
 
-/** Renders `<App>` over `services` with the chess pack and config, as `main.tsx` composes it. */
+/** Renders `<App>` over `services` with the chess pack and config, as `mountApp` composes it. */
 export function renderAppRaw(
   services: Services,
   props: Omit<AppProps, 'services' | 'pack' | 'app'> = {},

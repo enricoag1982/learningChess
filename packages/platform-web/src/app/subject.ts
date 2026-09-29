@@ -79,7 +79,7 @@ export interface SubjectWeb {
   readonly createSlice?: SliceCreator<SubjectState>;
   /** Fields reset on every "back to Home" (chess: clears `levelUpSuggestion`). */
   readonly homeReset?: Partial<SubjectState>;
-  /** Dev-only playground screens by URL hash (`#board`, `#exercises`), dynamically imported so they never reach the production bundle. */
+  /** Dev-only playground screens by URL hash (`#board`, `#exercises`; a key ending in `=` matches as a prefix, `#lesson=`), dynamically imported so they never reach the production bundle. */
   readonly dev?: Readonly<Record<string, () => Promise<ComponentType>>>;
 }
 
