@@ -1,15 +1,15 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-import { makeLesson as buildLesson, makeMiniGame as buildMiniGame } from '../testing/index.ts';
+import type { Lesson, MiniGame } from '@learn/platform-core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { ContentError, loadLocales } from '@learn/platform-content/load';
-import { loadTracks } from '@learn/platform-content/tracks-load';
+import { ContentError, loadLocales } from './load.ts';
+import { loadTracks } from './tracks-load.ts';
 
 let dir: string;
 
 beforeEach(() => {
-  dir = mkdtempSync(join(tmpdir(), 'chess-kids-tracks-'));
+  dir = mkdtempSync(join(tmpdir(), 'fixture-tracks-'));
 });
 
 afterEach(() => {
@@ -59,10 +59,7 @@ ranks:
 `;
 
 /** Loads `dir/tracks.yaml` against `dir/locales`, returning issues instead of throwing. */
-function issuesOf(
-  minigames: readonly ReturnType<typeof buildMiniGame>[] = [],
-  lessons: readonly ReturnType<typeof buildLesson>[] = [],
-): string[] {
+function issuesOf(minigames: readonly MiniGame[] = [], lessons: readonly Lesson[] = []): string[] {
   try {
     const locales = loadLocales(join(dir, 'locales'));
     loadTracks(join(dir, 'tracks.yaml'), locales, minigames, lessons);
@@ -74,13 +71,31 @@ function issuesOf(
 }
 
 /** A minimal, otherwise-content-shaped lesson for `checkWorldBoss` fixture tests. */
-function makeLesson(id: string, world: string) {
-  return buildLesson({ id, world, guided: [], exercises: [] });
+function makeLesson(id: string, world: string): Lesson {
+  return {
+    id,
+    world,
+    order: 1,
+    concept: `${id}-concept`,
+    character: 'char1',
+    titleKey: `lessons:${id}.title`,
+    storyKey: `lessons:${id}.story`,
+    demo: { textKey: `lessons:${id}.demo` },
+    guided: [],
+    exercises: [],
+  };
 }
 
 /** A minimal static mini-game unlocked by `unlockAfter`, for `checkWorldBoss` fixture tests. */
-function makeMiniGame(id: string, unlockAfter: string) {
-  return buildMiniGame({ id, concept: `${id}-concept`, par: 5, unlockAfter });
+function makeMiniGame(id: string, unlockAfter: string): MiniGame {
+  return {
+    id,
+    mode: 'static',
+    concept: `${id}-concept`,
+    titleKey: `lessons:${id}.title`,
+    goalKey: `lessons:${id}.goal`,
+    unlockAfter,
+  };
 }
 
 describe('loadTracks', () => {
