@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
 import type { AppConfig } from '@learn/platform-core';
+import { AppUpdateProvider } from './app/app-update-context.ts';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import type { RouteName } from './app/routes.ts';
 import { createServices } from './app/services.ts';
@@ -86,6 +87,7 @@ const NOOP_APP_UPDATE: AppUpdate = {
   isUpdateReady: () => false,
   apply: () => Promise.resolve(),
   onUpdateReady: () => () => undefined,
+  forceRefresh: () => Promise.resolve('offline'),
 };
 
 export interface AppProps {
@@ -122,13 +124,15 @@ export default function App({
   return (
     <PackProvider value={pack}>
       <StoreProvider value={store}>
-        <Suspense fallback={<LazyFallback />}>
-          <Screens />
-        </Suspense>
-        <Celebration />
-        <AppNotice />
-        <TimeTracker />
-        <AppUpdater appUpdate={appUpdate} />
+        <AppUpdateProvider value={appUpdate}>
+          <Suspense fallback={<LazyFallback />}>
+            <Screens />
+          </Suspense>
+          <Celebration />
+          <AppNotice />
+          <TimeTracker />
+          <AppUpdater appUpdate={appUpdate} />
+        </AppUpdateProvider>
       </StoreProvider>
     </PackProvider>
   );
