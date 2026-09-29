@@ -285,12 +285,13 @@ function validateSemantics(
 }
 
 /** One issue, formatted `<file>: <path>: <message>`. A mini-game's `mode` makes its schema a union:
- * `invalid_union` is flattened into every branch's own issues instead of one generic line. */
+ * `invalid_union` is flattened into every branch's own issues; an unknown discriminator has none. */
 function formatZodIssue(relPath: string, issue: z.core.$ZodIssue): string[] {
   if (issue.code === 'invalid_union') {
-    return issue.errors.flatMap((branchIssues) =>
+    const branchLines = issue.errors.flatMap((branchIssues) =>
       branchIssues.flatMap((branchIssue) => formatZodIssue(relPath, branchIssue)),
     );
+    if (branchLines.length > 0) return branchLines;
   }
   const path = issue.path.length > 0 ? issue.path.join('.') : '(root)';
   return [`${relPath}: ${path}: ${issue.message}`];

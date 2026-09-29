@@ -249,6 +249,14 @@ describe('loadContent through the subject registries', () => {
     expect(issuesOf().some((issue) => issue.includes('exercises.0.options'))).toBe(true);
   });
 
+  it('reports an unknown exercise type instead of dropping the lesson', () => {
+    writeLesson({ exercises: [validExercise({ type: 'no-such-kind' })] });
+    writeMiniGame();
+    writeDefaultLocales();
+
+    expect(issuesOf().some((issue) => issue.includes('exercises.0'))).toBe(true);
+  });
+
   it("verifies through the exercise's own kind", () => {
     writeLesson({ exercises: [validExercise({ correct: 5 })] });
     writeMiniGame();
