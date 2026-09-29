@@ -6,7 +6,7 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 
 // Package boundaries (docs/refactor-v4.md §R4): platform packages (core, content, web) never reach
-// a subject, platform-core / platform-content stay React-free, subject-chess's core, content and
+// a subject, platform-core / platform-content stay React-free, every subject's core, content and
 // kind engines stay UI-free, and apps reach a package only through its `exports`. `chess.js` is
 // only allowed in the rules adapter.
 const CHESSJS_RULES = 'packages/subject-chess/src/core/chess/chessjs-rules*.ts';
@@ -87,9 +87,9 @@ export default defineConfig([
   { files: ['apps/**'], rules: restrict([NO_DEEP_PATH]) },
   {
     files: [
-      'packages/subject-chess/src/core/**',
-      'packages/subject-chess/src/content/**',
-      'packages/subject-chess/src/kinds/*/{kind,engine,solution,content,verify}{,.test}.ts',
+      'packages/subject-*/src/core/**',
+      'packages/subject-*/src/content/**',
+      'packages/subject-*/src/kinds/*/{kind,engine,solution,content,verify}{,.test}.ts',
     ],
     ignores: [CHESSJS_RULES],
     rules: restrict([NO_REACT, NO_WEB]),
@@ -120,11 +120,11 @@ export default defineConfig([
   {
     files: [
       'packages/platform-core/src/domain/**',
-      'packages/subject-chess/src/core/{chess,bot,game,variant,exercise}/**',
-      'packages/subject-chess/src/kinds/**',
-      'packages/subject-chess/src/modes/**',
+      'packages/subject-*/src/core/{chess,bot,game,variant,exercise}/**',
+      'packages/subject-*/src/kinds/**',
+      'packages/subject-*/src/modes/**',
     ],
-    ignores: ['packages/subject-chess/src/{kinds,modes}/**/*.tsx'],
+    ignores: ['packages/subject-*/src/{kinds,modes}/**/*.tsx'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -141,9 +141,9 @@ export default defineConfig([
   },
   {
     files: [
-      'apps/chess-kids/**/*.{ts,tsx}',
+      'apps/*/**/*.{ts,tsx}',
       'packages/platform-web/**/*.{ts,tsx}',
-      'packages/subject-chess/src/{web,kinds,modes}/**/*.{ts,tsx}',
+      'packages/subject-*/src/{web,kinds,modes}/**/*.{ts,tsx}',
     ],
     extends: [reactHooks.configs.flat['recommended-latest'], reactRefresh.configs.vite],
     languageOptions: {
@@ -159,16 +159,12 @@ export default defineConfig([
     // siblings and `e2e-actions.ts`/`e2e-registry.ts` do (`kinds/`, `modes/`), for the app's
     // `e2e/kit/*.ts`.
     files: [
-      'apps/chess-kids/src/**/*.{ts,tsx}',
+      'apps/*/src/**/*.{ts,tsx}',
       'packages/platform-web/src/**/*.{ts,tsx}',
-      'packages/subject-chess/src/web/**/*.{ts,tsx}',
-      'packages/subject-chess/src/{kinds,modes}/**/*.tsx',
+      'packages/subject-*/src/web/**/*.{ts,tsx}',
+      'packages/subject-*/src/{kinds,modes}/**/*.tsx',
     ],
-    ignores: [
-      'packages/subject-chess/src/web/kinds/e2e-actions.ts',
-      'packages/subject-chess/src/web/kinds/e2e-registry.ts',
-      'packages/subject-chess/src/web/modes/e2e-registry.ts',
-    ],
+    ignores: ['packages/subject-*/src/web/**/e2e-{registry,actions}.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

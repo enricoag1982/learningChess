@@ -7,7 +7,7 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "prepare": "pnpm --filter @learn/subject-chess build",
+    "prepare": "pnpm --filter \"@learn/subject-*\" build",
     "dev": "pnpm --filter @learn/chess-kids dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
