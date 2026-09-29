@@ -1,17 +1,3 @@
-tracks:
-  basics: Basics
-  openings: Openings
-  tactics: Tactics
-  endgames: Checkmates & Endgames
-worlds:
-  board: Board
-  pieces: Pieces
-  attack: Attack & Defence
-  check: Check & Mate
-  rules: Full Rules
-  openings: Openings
-  tactics: Tactics
-  endgames: Checkmates & Endgames
 habitats:
   meadow: Meadow
   savannah: Savannah
@@ -21,13 +7,6 @@ habitats:
   forest: Forest
   ocean: Ocean
   arctic: Arctic
-ranks:
-  pawn: Pawn
-  knight: Knight
-  bishop: Bishop
-  rook: Rook
-  queen: Queen
-  king: King
 ui:
   coming-soon: Coming soon
   locked: Locked

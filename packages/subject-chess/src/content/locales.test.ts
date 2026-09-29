@@ -1,21 +1,25 @@
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { compareToReference, loadLocales } from '@learn/platform-content/load';
+import { compareToReference, loadLocales, mergeLocales } from '@learn/platform-content/load';
 import { PLATFORM_LOCALES_DIR } from '@learn/platform-content/paths';
 
-const localesDir = PLATFORM_LOCALES_DIR;
+const chessLocalesDir = fileURLToPath(new URL('../../content/locales', import.meta.url));
 
-describe('real locales directory', () => {
-  it('loads without issues', () => {
-    expect(() => loadLocales(localesDir)).not.toThrow();
+function merged() {
+  return mergeLocales(loadLocales(PLATFORM_LOCALES_DIR), loadLocales(chessLocalesDir));
+}
+
+describe('real locales directories', () => {
+  it('load without issues', () => {
+    expect(() => loadLocales(PLATFORM_LOCALES_DIR)).not.toThrow();
+    expect(() => loadLocales(chessLocalesDir)).not.toThrow();
   });
 
-  it('has an en/common namespace with app.title', () => {
-    const locales = loadLocales(localesDir);
-    expect(locales.en?.common?.app).toEqual({ title: 'Chess for Kids' });
+  it('merge to an en/common namespace with app.title', () => {
+    expect(merged().en?.common?.app).toEqual({ title: 'Chess for Kids' });
   });
 
-  it('has no divergence from the reference language', () => {
-    const locales = loadLocales(localesDir);
-    expect(compareToReference(locales)).toEqual([]);
+  it('have no divergence from the reference language', () => {
+    expect(compareToReference(merged())).toEqual([]);
   });
 });

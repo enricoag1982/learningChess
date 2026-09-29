@@ -1,5 +1,3 @@
-app:
-  title: Chess for Kids
 offline:
   ready: Ready to play offline.
 install-banner:
@@ -31,7 +29,6 @@ home:
   switch-player: Switch player
   journey-tile: Journey
   practice-tile: Practice
-  play-tile: Play
   den-tile: My Den
 avatar:
   fox: Fox
@@ -229,7 +226,6 @@ parent:
   version: 'Version {{version}}'
   privacy:
     title: Privacy
-    intro: Chess for Kids keeps everything on this device. Here's exactly what that means.
     data-heading: What we keep
     data-body: A nickname, an avatar picture, and lesson progress for each child — stored only on this device, never sent anywhere.
     no-accounts-heading: No accounts, no tracking
@@ -241,12 +237,6 @@ parent:
     contact-heading: Questions?
     contact-body: "Open an issue on the project's GitHub repository: {{url}}"
     close: Close
-voice-check:
-  # Parent area "Test voice" (M6.3 item 2): the one fixed sentence it speaks. Deliberately its own
-  # top-level key, not under `parent:` — every `parent.*`/`new-player.*`/`backup.*`/`privacy.*` key
-  # is grown-up-only and never narrated (`voice-texts.ts`'s `EXCLUDED_KEY_PREFIXES`), but this text
-  # must be in the voice inventory to actually test the recorded voice.
-  sentence: Let's play chess together!
 lesson:
   close: Close lesson
   skip: Skip
@@ -258,62 +248,22 @@ lesson:
     boss: Boss
     skipped: '{{step}}, skipped'
   stage-of: '{{current}} of {{total}}'
-  board-label: Chess board
 story:
   listen-again: Listen again
   primary: Let me try
-demo:
-  board-label: "{{name}}'s board"
 exercise:
   replay: Say it again
   hint: Hint
-  undo: Undo
   check: Check
-  yes: Yes
-  no: 'No'
-  moves-label: Moves
-  moves-of: '{{current}} of {{total}}'
-  moves-target_one: 'in {{count}} move'
-  moves-target_other: 'in {{count}} moves'
-  tap-piece-first: 'Tap {{name}} first.'
-  select-wrong: Not quite! Tap the orange squares again to take them away.
-  select-missing: Almost! Tap the squares with a dashed orange line too.
-  select-both: Not quite! Take away the orange squares and tap the dashed ones.
   answer-wrong: Not quite! Try again.
-  move-wrong: Not this one. Try again!
-  checkmate: Checkmate!
-  opponent-moved: '{{color}} moved the {{piece}}.'
-  opponent-color:
-    w: White
-    b: Black
-  hint-piece: 'Look at {{name}}.'
-  hint-target: Try the orange square.
   hint-answer: Here is the answer.
-  hint-look: Look closely.
-  hint-think-again: Think about it again.
   hint-remove-option: One choice is ruled out.
   easier-offer: This one is tricky. Want an easier one?
   easier: Easier one
   praise-3: Amazing!
   praise-2: Well done!
   praise-1: Good try!
-  illegal:
-    r: '{{name}} only runs in straight lines!'
-    b: '{{name}} only walks on diagonal paths!'
-    q: '{{name}} moves straight or diagonal, not like that!'
-    k: '{{name}} only steps one square at a time!'
-    n: '{{name}} only jumps in an L shape!'
-    p: '{{name}} only moves straight ahead (and captures diagonally)!'
-  setup:
-    wrong: Not quite! Try a different piece or square.
-    palette-label: Pieces to place
-    palette-item: '{{color}} {{piece}}, {{count}} left'
-    hint-piece: 'Place the {{color}} {{piece}} next.'
-    hint-square: Put it on the orange square.
 boss:
-  captured-of: 'Captured {{current}} of {{total}}'
-  stars-of: 'Stars {{current}} of {{total}}'
-  moves-par: 'Moves {{moves}} · Par {{par}}'
   ended: Good try!
   series:
     round-of: 'Round {{current}} of {{total}}'
@@ -337,7 +287,6 @@ time-limit:
   late-title: Time to rest!
   late-body: It's getting late. See you tomorrow!
   early-title: Too early!
-  early-body: 'Chess opens at {{time}}. See you soon!'
   stars-today: '{{count}} stars today'
   more-time: 'Parent: more time'
 notice:
@@ -352,7 +301,6 @@ assessment:
   score: 'You got {{correct}} of {{total}} right.'
   continue: Continue
 placement:
-  offer-question: Already know some chess? Let's find out where to start you!
   offer-yes: Yes, test me!
   offer-no: No, start at World 1
   world-of: 'World {{order}} · Task {{current}}/{{total}}'
@@ -360,7 +308,6 @@ placement:
   summary-passed-body_one: 'You already know {{count}} world! Off you go!'
   summary-passed-body_other: 'You already know {{count}} worlds! Off you go!'
   summary-none-title: "Let's start at World 1!"
-  summary-none-body: Every chess champion starts with the first step.
   summary-all-title: Wow, you know it all!
   summary-all-body: You're ready to explore every path.
   continue: Continue
@@ -419,3 +366,10 @@ celebration:
   heading: New badge!
   owl-line: 'You earned the {{name}} badge!'
   continue: Continue
+play:
+  close: Close
+  back-to-play: Back to Play
+  back-to-journey: Back to Journey
+  back-to-home: Back to Home
+friend-play:
+  guest: Guest

@@ -251,7 +251,7 @@ export function writeDefaultLocales(): void {
 }
 
 /** Everything `compileAll` reads: the lesson, mini-game and locales above, plus one track, one
- * rank and one badge (its texts added to the platform's own `rewards` namespace). */
+ * rank and one badge, with the journey / rewards texts and the platform's subject-owned common texts. */
 export function writeFullContent(): void {
   writeLesson();
   writeMiniGame();
@@ -286,10 +286,21 @@ export function writeFullContent(): void {
     'locales/en/rewards.yaml',
     stringify({ badges: { 'fixture-stars': { name: 'Stars', condition: 'Earn a star' } } }),
   );
+  write(
+    'locales/en/journey.yaml',
+    stringify({
+      tracks: { basics: 'Basics' },
+      worlds: { board: 'Board' },
+      ranks: { pawn: 'Pawn' },
+    }),
+  );
   // Texts the platform's voice inventory reads from `common` but does not itself provide.
   write(
     'locales/en/common.yaml',
     stringify({
+      'voice-check': { sentence: 'Say hello' },
+      'time-limit': { 'early-body': 'Opens at {{time}}' },
+      placement: { 'offer-question': 'Want to start?', 'summary-none-body': 'Start here' },
       play: {
         'locked-condition': 'After {{label}}',
         'vs-friend-locked': 'Locked',
