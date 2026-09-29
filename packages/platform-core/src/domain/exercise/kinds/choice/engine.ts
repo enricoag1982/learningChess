@@ -1,12 +1,7 @@
-import type { ExerciseStateOf } from '../../core/exercise/state.ts';
-import type { Hint } from '../../core/exercise/hint.ts';
-import type { ChoiceDef } from '../../core/exercise/types.ts';
+import type { ChoiceHint, ChoiceState } from './def.ts';
 
-/** Correct → solved; wrong → errors + 1 and the option joins `wrongOptions` (disabled in the UI). No-op once solved. */
-export function answerChoice(
-  state: ExerciseStateOf<ChoiceDef>,
-  optionId: string,
-): ExerciseStateOf<ChoiceDef> {
+/** Correct → solved; wrong → errors + 1 and the option joins `wrongOptions`. No-op once solved. */
+export function answerChoice<S extends ChoiceState>(state: S, optionId: string): S {
   if (state.solved) {
     return state;
   }
@@ -18,18 +13,18 @@ export function answerChoice(
   return { ...state, errors: state.errors + 1, wrongOptions };
 }
 
-export function choiceHint(
-  state: ExerciseStateOf<ChoiceDef>,
-  def: ChoiceDef,
+/** Levels 1-2 rule out one wrong option each; level 3 reveals the answer. */
+export function choiceHint<S extends ChoiceState>(
+  state: S,
   level: 1 | 2 | 3,
-): { readonly state: ExerciseStateOf<ChoiceDef>; readonly hint: Hint } {
+): { readonly state: S; readonly hint: ChoiceHint } {
   if (level === 3) {
     return { state, hint: { kind: 'choice', level: 3, reveal: true } };
   }
   const current = state.wrongOptions ?? [];
-  const removedOptionId = def.options
+  const removedOptionId = state.def.options
     .map((option) => option.id)
-    .find((id) => id !== def.answer && !current.includes(id));
+    .find((id) => id !== state.def.answer && !current.includes(id));
   const nextState =
     removedOptionId === undefined
       ? state

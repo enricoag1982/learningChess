@@ -6,7 +6,7 @@ import { createVariantRules } from '../../core/variant/rules.ts';
 import { requestHint, starsFor } from '../../testing/kind-steps.ts';
 import { initState } from '../../core/exercise/state.ts';
 import type { ExerciseState, ExerciseStateOf } from '../../core/exercise/state.ts';
-import { answerChoice } from './engine.ts';
+import { answerChoice } from '@learn/platform-core/domain/exercise/kinds/choice/engine';
 import type { ChoiceDef } from '../../core/exercise/types.ts';
 
 const rules = createVariantRules(chessJsRules);

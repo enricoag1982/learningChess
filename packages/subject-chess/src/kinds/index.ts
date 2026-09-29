@@ -2,12 +2,12 @@
 import type { VariantRules } from '../core/variant/rules.ts';
 import type { Hint } from '../core/exercise/hint.ts';
 import type { ExerciseKind } from '@learn/platform-core/domain/exercise/kind';
+import type { AnswerChoiceAction } from '@learn/platform-core/domain/exercise/kinds/choice/def';
 import type { ExerciseState, ExerciseStateOf } from '../core/exercise/state.ts';
 import type { ExerciseDef } from '../core/exercise/types.ts';
 import type { MoveAction } from './base.ts';
 import { bestMoveKind } from './best-move/kind.ts';
 import { captureKind } from './capture/kind.ts';
-import type { AnswerChoiceAction } from './choice/kind.ts';
 import { choiceKind } from './choice/kind.ts';
 import { collectStarsKind } from './collect-stars/kind.ts';
 import { mateInNKind } from './mate-in-n/kind.ts';

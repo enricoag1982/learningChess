@@ -1,3 +1,7 @@
+import type {
+  ChoiceDefBase,
+  ChoiceOptionBase,
+} from '@learn/platform-core/domain/exercise/kinds/choice/def';
 import type { Piece, Position, Square } from '../chess/types.ts';
 
 interface ExerciseBase {
@@ -45,17 +49,12 @@ export interface YesNoDef extends ExerciseBase {
 }
 
 /** One pickable option: at least one of `textKey` / `piece` is set (schema-enforced). */
-export interface ChoiceOption {
-  readonly id: string;
-  readonly textKey?: string;
+export interface ChoiceOption extends ChoiceOptionBase {
   readonly piece?: Piece;
 }
 
 /** Pick the correct option (e.g. "which piece is worth more?"). */
-export interface ChoiceDef extends ExerciseBase {
-  readonly type: 'choice';
-  readonly options: readonly ChoiceOption[];
-  readonly answer: string;
+export interface ChoiceDef extends ExerciseBase, ChoiceDefBase<ChoiceOption> {
   readonly showBoard: boolean;
 }
 

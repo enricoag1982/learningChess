@@ -2,20 +2,12 @@ import { SQUARES } from '../core/chess/types.ts';
 import type { MoveInput } from '../core/chess/rules.ts';
 import type { Position, Square } from '../core/chess/types.ts';
 
+export { deriveAnswerOutcome } from '@learn/platform-core/domain/exercise/answer';
+export type { AnswerOutcome } from '@learn/platform-core/domain/exercise/answer';
+
 export interface MoveAction {
   readonly type: 'move';
   readonly move: MoveInput;
-}
-
-export type AnswerOutcome = { readonly kind: 'solved' | 'wrong' | 'ignored' };
-
-export function deriveAnswerOutcome(
-  before: { readonly errors: number; readonly solved: boolean },
-  after: { readonly errors: number; readonly solved: boolean },
-): AnswerOutcome {
-  if (after.solved && !before.solved) return { kind: 'solved' };
-  if (after.errors > before.errors) return { kind: 'wrong' };
-  return { kind: 'ignored' };
 }
 
 /** Any square with a piece of the side to move, for a universally-illegal `move` (`from === to`); never throws for compiled content. */

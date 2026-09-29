@@ -12,6 +12,7 @@ import {
   exerciseNote as platformExerciseNote,
   isEasierOfferNote as platformIsEasierOfferNote,
 } from '@learn/platform-core/domain/notes';
+import { choiceHintText, praiseText } from '@learn/platform-core/domain/note-text';
 import type { Hint } from './hint.ts';
 
 export type { AnyNoteEntry, ExerciseNote, ExerciseNoteCtx, Resolve };
@@ -47,12 +48,6 @@ function illegalMoveText(r: Resolve, piece: string, name: string): string {
   return r(`exercise.illegal.${piece}`, { name });
 }
 
-function praiseText(r: Resolve, stars: number): string {
-  if (stars >= 3) return r('exercise.praise-3');
-  if (stars === 2) return r('exercise.praise-2');
-  return r('exercise.praise-1');
-}
-
 function hintNoteText(r: Resolve, hint: Hint, name: string): string {
   if (hint.kind === 'squares') {
     if (hint.level === 1) return r('exercise.hint-piece', { name });
@@ -64,10 +59,7 @@ function hintNoteText(r: Resolve, hint: Hint, name: string): string {
     if (hint.level === 2) return r('exercise.hint-think-again');
     return r('exercise.hint-answer');
   }
-  if (hint.kind === 'choice') {
-    if (hint.level === 3) return r('exercise.hint-answer');
-    return r('exercise.hint-remove-option');
-  }
+  if (hint.kind === 'choice') return choiceHintText(r, hint);
   // setup
   if (hint.level === 3 || hint.piece === undefined) return r('exercise.hint-answer');
   if (hint.level === 2 && hint.square !== undefined) return r('exercise.setup.hint-square');
