@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ComponentType, JSX } from 'react';
 import type { AppConfig } from '@learn/platform-core';
-import { AppUpdateProvider } from './app/app-update-context.ts';
+import { AppUpdateProvider, NOOP_APP_UPDATE } from './app/app-update-context.ts';
 import { createAppStore, StoreProvider, useAppStore } from './app/store.ts';
 import type { RouteName } from './app/routes.ts';
 import { createServices } from './app/services.ts';
@@ -81,14 +81,6 @@ function Screens(): JSX.Element {
   if (!ScreenComponent) throw new Error(`No screen registered for route "${screen}"`);
   return <ScreenComponent />;
 }
-
-/** Never applies an update on its own: the default for tests and any render without `appUpdate`. */
-const NOOP_APP_UPDATE: AppUpdate = {
-  isUpdateReady: () => false,
-  apply: () => Promise.resolve(),
-  onUpdateReady: () => () => undefined,
-  forceRefresh: () => Promise.resolve('offline'),
-};
 
 export interface AppProps {
   /** Injected in tests (fake narrator + in-memory storage); defaults to the real web adapters. */

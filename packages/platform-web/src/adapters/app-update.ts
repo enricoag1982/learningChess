@@ -16,23 +16,6 @@ export interface AppUpdate {
   readonly forceRefresh: () => Promise<'offline' | 'reloading'>;
 }
 
-/** Drops the offline copy (service workers + Cache Storage) so the reload fetches the newest app; never touches app data.
- * Each API may be missing (dev, jsdom, old Safari); a failure still ends in the reload. */
-async function clearOfflineCopy(): Promise<void> {
-  try {
-    if ('serviceWorker' in navigator) {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((registration) => registration.unregister()));
-    }
-    if ('caches' in globalThis) {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((key) => caches.delete(key)));
-    }
-  } catch {
-    // Best effort: a plain reload is still better than a stuck button.
-  }
-}
-
 /** Registers the service worker once and tracks a waiting update so the app (not Workbox) controls when a new version reloads.
  * No periodic polling (`docs/non-functional.md` §1): the browser's own check plus one on tab visibility. */
 export function createAppUpdate(register: RegisterSW): AppUpdate {
@@ -69,12 +52,8 @@ export function createAppUpdate(register: RegisterSW): AppUpdate {
     },
     forceRefresh: async () => {
       if (!navigator.onLine) return 'offline';
-      if (updateReady) {
-        await apply();
-      } else {
-        await clearOfflineCopy();
-        window.location.reload();
-      }
+      if (updateReady) await apply();
+      else await import('./reload-fresh.ts').then((module) => module.reloadFresh());
       return 'reloading';
     },
   };
