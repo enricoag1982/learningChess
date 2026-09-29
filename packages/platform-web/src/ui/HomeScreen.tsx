@@ -17,8 +17,7 @@ import { BlankScreen, RoundIconButton } from './ds/Screen.tsx';
 import { AvatarBadge } from './ds/AvatarBadge.tsx';
 import { useAsync } from './ds/useAsync.ts';
 
-// Home's own tile icons (design-r2-web.md PR B: "Home tile icons stay in HomeScreen on the same
-// base") — one-off shapes only Home uses, built on the shared `Svg` icon base.
+// Home's own tile icons: one-off shapes built on the shared `Svg` base.
 function JourneyIcon(): JSX.Element {
   return (
     <Svg size={32} stroke="#2E7D5B">
@@ -48,8 +47,7 @@ function DenTileIcon(): JSX.Element {
   );
 }
 
-/** One Home tile (Journey/Play/My Den): icon in a white circle over a coloured label (docs/screens.md
- * §1: border = `fg`, ledge = a still-darker shade, both contrast-checked against the cream page). */
+/** One Home tile: icon in a white circle over a coloured label (docs/screens.md §1: border = `fg`, ledge = a darker shade, contrast-checked on cream). */
 function HomeTile({
   icon,
   label,
@@ -91,7 +89,6 @@ function HomeTile({
   );
 }
 
-/** Home: greeting, rank, total stars, and the one primary action into the Journey's next lesson. */
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

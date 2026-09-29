@@ -2,8 +2,7 @@
  * key, not part of the versioned app-data schema — a device-only UI preference. */
 const DISMISSED_KEY = 'chess-kids:install-banner-dismissed';
 
-/** The bits `shouldShowInstallBanner` needs, kept as plain data so the UA/standalone matrix is
- * unit-testable without a DOM. */
+/** Plain data so the UA / standalone matrix is unit-testable without a DOM. */
 export interface InstallBannerEnv {
   readonly userAgent: string;
   readonly maxTouchPoints: number;
@@ -23,8 +22,7 @@ function isIOSSafari(env: InstallBannerEnv): boolean {
   return !/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
 }
 
-/** True only for iOS Safari, not already installed — the one browser/platform combination the
- * banner's own "tap the share icon" steps are actually correct for. */
+/** iOS Safari only, not installed: the one combination the banner's "tap the share icon" steps fit. */
 export function shouldShowInstallBanner(env: InstallBannerEnv): boolean {
   return !env.standalone && isIOSSafari(env);
 }
@@ -50,8 +48,7 @@ export function readInstallBannerEnv(): InstallBannerEnv {
   };
 }
 
-/** Never throws (private browsing, disabled storage): a failure just means the banner may show
- * again, never a crash. */
+/** Never throws (private browsing, disabled storage): a failure only means the banner may show again. */
 export function isInstallBannerDismissed(): boolean {
   try {
     return window.localStorage.getItem(DISMISSED_KEY) === '1';

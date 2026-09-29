@@ -15,8 +15,7 @@ export interface TapButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElem
   readonly children: ReactNode;
 }
 
-/** A tappable control: raised card, border, ledge shadow, pressed/disabled/reduced-motion states
- * (`.tap-raised`). `children` is the icon or label docs/screens.md §1 requires. */
+/** A tappable control: raised card, border, ledge shadow, pressed / disabled / reduced-motion states (`.tap-raised`). */
 export function TapButton({
   look = 'custom',
   tone = 'neutral',
@@ -37,8 +36,7 @@ export interface InfoPanelProps extends HTMLAttributes<HTMLDivElement> {
   readonly children: ReactNode;
 }
 
-/** A flat info panel (docs/screens.md §1 "Info only"): a stat row, a read-only section, anything
- * that must never look like a button. */
+/** A flat info panel (docs/screens.md §1): a stat row or read-only section that must never look like a button. */
 export function InfoPanel({
   tint = 'bg-cream',
   className = '',
@@ -57,8 +55,7 @@ export interface InfoPillProps extends HTMLAttributes<HTMLDivElement> {
   readonly children: ReactNode;
 }
 
-/** A flat info pill (docs/screens.md §1): icon + text, no border/shadow, and (default `tint`) no
- * background box, so it never reads as a tappable chip. */
+/** A flat info pill (docs/screens.md §1): icon + text, no border / shadow; by default no background box, so it never reads as a chip. */
 export function InfoPill({
   tint = '',
   className = '',

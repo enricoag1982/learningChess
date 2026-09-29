@@ -24,12 +24,10 @@ export interface TimeSlice {
   /** Picker's "Grown-ups", or "See you tomorrow"'s "Parent: more time" — decides what a correct
    * password does next; defaults to the ordinary parent-area gate. */
   readonly goToPasswordScreen: (purpose?: 'parent-area' | 'more-time') => void;
-  /** Password screen, once verified (`purpose === 'parent-area'`). */
   readonly goToParentArea: () => Promise<void>;
   /** Password screen, once verified with `purpose === 'more-time'`: grants more time, then
    * replays the `time-limit` route's `resume` (or Home), unchecked. */
   readonly grantMoreTimeAndResume: () => Promise<void>;
-  /** "See you tomorrow"'s "Switch player": abandons whatever was gated, opens the picker. */
   readonly switchPlayerFromTimeLimit: () => Promise<void>;
 }
 

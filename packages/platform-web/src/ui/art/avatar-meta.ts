@@ -4,7 +4,6 @@ import { AVATARS } from '@learn/platform-core';
 export { AVATARS };
 export type { Avatar };
 
-/** Pastel badge background per avatar, echoing the sketches (Main.dc.html). */
 const AVATAR_BACKGROUND: Readonly<Record<Avatar, string>> = {
   fox: '#F9D9C2',
   bear: '#E8DCCB',
@@ -16,7 +15,6 @@ const AVATAR_BACKGROUND: Readonly<Record<Avatar, string>> = {
   elephant: '#DDE8F6',
 };
 
-/** Background colour for `avatar`, falling back to the fox colour for an unknown id. */
 export function avatarBackground(avatar: string): string {
   return (AVATAR_BACKGROUND as Record<string, string | undefined>)[avatar] ?? AVATAR_BACKGROUND.fox;
 }

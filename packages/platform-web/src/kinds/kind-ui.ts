@@ -7,9 +7,8 @@ import type {
 import type { JSX, ReactNode } from 'react';
 import type { SurfaceContext } from '../app/subject.ts';
 
-/** One exercise attempt's UI-only state, layered over the core state — `core`, `hint`, `feedback`
- * and `pending?` are the only fields every kind shares; a kind's own extras (`Extra`, e.g. a move
- * kind's `lastMove`) come from its `initUi`/`toUi`. */
+/** UI-only state over the core state: `core`, `hint`, `feedback`, `pending?` are shared by every kind; a kind's extras
+ * (`Extra`, e.g. `lastMove`) come from `initUi` / `toUi`. */
 export type ExerciseUIState<
   D extends ExerciseDefBase = ExerciseDefBase,
   S extends ExerciseStateBase<D> = ExerciseStateBase<D>,
@@ -27,16 +26,14 @@ export type ExerciseUIState<
   };
 } & Extra;
 
-/** Session-level actions no kind's own `act` sees — the generic reducer handles these directly.
- * Each variant its own literal `type` (not one field with a union of 4 literals) so a chain of
- * `action.type === '…'` checks narrows down to the kind's own action type at the end. */
+/** Session-level actions no kind's `act` sees; each variant has its own literal `type` (not a union field) so
+ * `action.type === '…'` chains narrow to the kind's action type. */
 export type UiAction =
   | { readonly type: 'tap-first' }
   | { readonly type: 'hint' }
   | { readonly type: 'auto-hint' }
   | { readonly type: 'reveal' };
 
-/** Every action a kind's session reducer accepts, across every exercise type. */
 export type SessionAction<A extends { readonly type: string } = { readonly type: string }> =
   A | UiAction;
 
@@ -62,7 +59,6 @@ export interface PlayAreaProps<
   /** The board's check ring (default on; a `series` round keeps it off, `docs/refactor-v4.md`
    * follow-up F6). */
   readonly showCheck: boolean;
-  /** The surface's own lesson world, for the subject's piece look (`web.surface`/board). */
   readonly surface: SurfaceContext;
   /** The instruction bubble + replay/skip/easier row — identical across every kind, computed once
    * by the host and rendered above the board/controls (or `done`). */
@@ -71,10 +67,8 @@ export interface PlayAreaProps<
   readonly done: ReactNode | null;
 }
 
-/** One exercise kind's whole UI: how a core outcome becomes a UI patch, its own extra UI fields'
- * initial values, and its board + controls. Method syntax is deliberate, same reason as
- * `ExerciseKind`: bivariant parameter checking lets a precise `ExerciseKindUI` widen to the
- * registry's general shape with no cast. */
+/** One exercise kind's whole UI: core outcome → UI patch, its extra UI fields' initial values, board + controls. Method syntax:
+ * bivariance lets a precise `ExerciseKindUI` widen with no cast. */
 export interface ExerciseKindUI<
   D extends ExerciseDefBase = ExerciseDefBase,
   S extends ExerciseStateBase<D> = ExerciseStateBase<D>,
@@ -83,8 +77,7 @@ export interface ExerciseKindUI<
   Extra extends object = object,
 > {
   readonly type: string;
-  /** `def`'s own extra UI fields at the start of a fresh attempt (e.g. a move kind's `lastMove`,
-   * seeded from `def.lastMove` when present). */
+  /** `def`'s extra UI fields at the start of an attempt (e.g. a move kind's `lastMove`, seeded from `def.lastMove`). */
   initUi(def: D): Extra;
   /** Extras to merge in on a hint request: clears a kind's own "wrong" markers without touching a
    * persistent extra like `lastMove`. */
@@ -93,5 +86,4 @@ export interface ExerciseKindUI<
   PlayArea(props: PlayAreaProps<D, S, A, Extra>): JSX.Element;
 }
 
-/** Any exercise kind's UI, widened from its own precise type — the shape `SubjectWeb.kinds` holds. */
 export type AnyExerciseKindUI = ExerciseKindUI;

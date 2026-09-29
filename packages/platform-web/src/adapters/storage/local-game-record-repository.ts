@@ -4,7 +4,6 @@ import { cappedList, shapeGuard } from './collections.ts';
 import type { LocalStore } from './local-store.ts';
 import { STORAGE_KEYS } from './storage-keys.ts';
 
-/** Oldest records are dropped once storage holds more than this many (mirrors `MAX_ATTEMPTS`). */
 export const MAX_GAME_RECORDS = 500;
 
 const isGameRecordShape = shapeGuard<GameRecord>({
@@ -12,8 +11,6 @@ const isGameRecordShape = shapeGuard<GameRecord>({
   array: ['moves'],
 });
 
-/** `GameRecordRepository` over one `LocalStore`: a single capped, append-only list (newest last),
- * the same shape `LocalStorageProgressRepository` uses for `Attempt`. */
 export class LocalStorageGameRecordRepository implements GameRecordRepository {
   private readonly records: CappedList<GameRecord>;
 

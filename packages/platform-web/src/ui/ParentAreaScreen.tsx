@@ -90,8 +90,7 @@ function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.El
   );
 }
 
-/** One child's Overview card (app-structure.md §11): avatar, nickname, rank, stars, minutes,
- * streak — a tappable row (docs/screens.md §1) that opens that child's report. */
+/** One child's Overview card (app-structure.md §11): a tappable row (docs/screens.md §1) opening that child's report. */
 function ChildOverviewCard({
   overview,
   onOpen,
@@ -130,7 +129,6 @@ function ChildOverviewCard({
   );
 }
 
-/** Which parent-area sub-screen shows, below the shared `ParentAreaScreen` header. */
 type ParentView =
   | { readonly kind: 'overview' }
   | { readonly kind: 'report'; readonly profileId: string }
@@ -138,8 +136,7 @@ type ParentView =
   | { readonly kind: 'backup' }
   | { readonly kind: 'privacy' };
 
-/** Parent area (parent style, ≥ 44px targets, WCAG 2.2 AA): overview → child report → child
- * settings; backup export / import — behind the parent gate (app-structure.md §11). */
+/** Parent area (parent style, ≥ 44px targets, WCAG 2.2 AA), behind the parent gate: overview → child report → settings; backup export / import. */
 export function ParentAreaScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

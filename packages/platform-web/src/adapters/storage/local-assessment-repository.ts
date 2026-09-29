@@ -17,8 +17,6 @@ const isUnlockShape = shapeGuard<Unlock>({
   string: ['id', 'profileId', 'targetType', 'targetId', 'via'],
 });
 
-/** `AssessmentRepository` over one `LocalStore`: results as a capped, append-only list; unlocked
- * lesson/world ids as an uncapped append-only list. */
 export class LocalStorageAssessmentRepository implements AssessmentRepository {
   private readonly results: CappedList<AssessmentResult>;
   private readonly unlocks: CappedList<Unlock>;

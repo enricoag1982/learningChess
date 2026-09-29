@@ -38,7 +38,6 @@ function createLazyBackupFileWriter(): BackupFileWriter {
   };
 }
 
-/** Same reasoning as `createLazyBackupFileWriter`. */
 function createLazyBackupImporter(store: LocalStore): BackupImporter {
   return {
     async writeMerged(file, options) {
@@ -49,25 +48,19 @@ function createLazyBackupImporter(store: LocalStore): BackupImporter {
   };
 }
 
-/** The app's wired-up use-case dependencies, plus the pieces the UI reaches for directly. */
 export interface Services {
   readonly deps: AppDeps;
   readonly narrator: Narrator;
-  /** The active subject pack's own services (chess: `{ botPlayer }`), built once here. */
   readonly subject: SubjectServices;
-  /** Gates `narrator` on the active profile's "voice" setting (app-structure.md §11 "Settings
-   * effect now") — set at every profile select. */
+  /** Gates `narrator` on the active profile's "voice" setting (app-structure.md §11); set at every profile select. */
   setVoiceEnabled(enabled: boolean): void;
-  /** The active profile's nickname, stripped from narrated text before the generated-audio lookup
-   * (`docs/voice.md`) — set at every profile select, alongside `setVoiceEnabled`. */
+  /** Active nickname, stripped from narrated text before the audio lookup (`docs/voice.md`); set with `setVoiceEnabled`. */
   setNickname(nickname: string | null): void;
-  /** The parent area "Test voice" check (`ChildSettings.tsx`): speaks `text` through the real audio
-   * narrator, bypassing the voice on/off setting, and reports whether generated audio played. */
+  /** Parent "Test voice" (`ChildSettings.tsx`): speaks `text` through the audio narrator, ignoring the voice setting, and reports if generated audio played. */
   testVoice(text: string): Promise<AudioNarratorOutcome>;
 }
 
-/** Composition root: wires `AppDeps` and friends to their web (localStorage / Web Speech) adapters,
- * over `pack`'s own subject (kind/mode registries, services). */
+/** Composition root: wires `AppDeps` to the web adapters over `pack`'s subject. */
 export function createServices(
   pack: SubjectWeb,
   appConfig: Omit<AppConfig, 'version'>,

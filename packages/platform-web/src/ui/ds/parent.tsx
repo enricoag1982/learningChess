@@ -14,7 +14,6 @@ export interface ParentSectionProps {
   readonly children: ReactNode;
 }
 
-/** A card (`<section>`, optional `<h3>`) — the parent area's common "one settings group" shell. */
 export function ParentSection({ title, gap = 3, children }: ParentSectionProps): JSX.Element {
   return (
     <section
@@ -37,12 +36,10 @@ export interface ParentConfirmDialogProps {
   readonly onConfirm?: () => void;
   readonly onSubmit?: (event: SubmitEvent<HTMLFormElement>) => void;
   readonly confirmDisabled?: boolean;
-  /** Extra content between the body text and the button row (the reset flow's password field). */
   readonly children?: ReactNode;
 }
 
-/** A parent-style confirm dialog (`role="dialog"`) — replaces the 2 near-identical shells in
- * ChildSettings.tsx (delete profile, reset progress's own password re-entry). */
+/** A parent-style confirm dialog (`role="dialog"`), shared by delete-profile and reset-progress (password re-entry). */
 export function ParentConfirmDialog({
   title,
   body,

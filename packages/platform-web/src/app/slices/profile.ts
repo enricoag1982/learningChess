@@ -22,48 +22,35 @@ import type { SubjectWeb } from '../subject.ts';
 import { loadRewards, type RewardsSlice } from './rewards.ts';
 
 export interface ProfileSlice {
-  /** Every profile on this device (picker tiles, parent area's children list). */
   readonly profiles: readonly Profile[];
-  /** The kid currently playing (Home / Lesson); `null` outside those screens. */
   readonly profile: Profile | null;
   /** `profile`'s own parent-set settings (app-structure.md §11); the composed defaults outside a
    * selected profile. Voice is applied at load time, not read from here. */
   readonly activeProfileSettings: ProfileSettings;
   readonly progress: readonly LessonProgress[];
-  /** This profile's standalone mini-game progress (Play screen's best-stars tiles). */
   readonly miniGameProgress: readonly MiniGameProgress[];
-  /** This profile's full-game / versus mini-game records (Play's vs Computer tally, My Den). */
   readonly gameRecords: readonly GameRecord[];
-  /** This profile's concept mastery + review state (Leitner scheduler): Home's "Start today"
-   * button and the Practice screen's due count / weak tags both read this. */
+  /** Concept mastery + review state; Home's "Start today" and Practice's due count / weak tags read it. */
   readonly conceptStats: readonly ConceptStats[];
-  /** This profile's Journey (tracks/worlds/lesson statuses/next lesson/rank); `null` until loaded. */
   readonly journey: Journey | null;
 
-  /** First run only: after the "Saved" screen, either straight to the new-player wizard, straight to
-   * Home (a single existing profile — the M1-upgrade path), or the picker (more than one). */
+  /** First run: after "Saved", to the new-player wizard, Home (one existing profile) or the picker (more than one). */
   readonly finishFirstRun: () => Promise<void>;
-  /** New-player wizard's last step: creates the profile, then Home or back to the parent area. */
   readonly finishNewPlayer: (nickname: string, avatar: string) => Promise<void>;
-  /** Picker: selects a profile, loads its progress, and goes to Home. */
   readonly selectProfileAndHome: (profileId: string) => Promise<void>;
-  /** Re-reads the profiles list without changing screen (parent area, after rename/avatar/delete/add). */
   readonly refreshProfiles: () => Promise<void>;
-  /** Re-reads saved progress (lesson + mini-game) and the derived Journey from storage, e.g. after
-   * a lesson or a standalone mini-game session updates it. */
+  /** Re-reads lesson + mini-game progress and the derived Journey, e.g. after a lesson or mini-game session. */
   readonly refreshProgress: () => Promise<void>;
 }
 
-/** The per-profile data `activateProfile`/`refreshProgress` load and apply together — the same
- * fields `ProfileSlice` and `RewardsSlice` already declare. */
+/** Loaded together by `activateProfile` / `refreshProgress`; the same fields `ProfileSlice` and `RewardsSlice` declare. */
 type ProfileData = Pick<
   ProfileSlice,
   'progress' | 'miniGameProgress' | 'gameRecords' | 'conceptStats' | 'journey'
 > &
   Pick<RewardsSlice, 'earnedBadges' | 'streak'>;
 
-/** One profile's progress/journey/rewards, loaded in parallel — the shared read behind
- * `activateProfile` and `refreshProgress`. */
+/** Progress, journey and rewards loaded in parallel; shared by `activateProfile` and `refreshProgress`. */
 async function loadProfileData(get: AppGet, profileId: string): Promise<ProfileData> {
   const { services } = get();
   const [progress, miniGameProgress, gameRecords, conceptStats, journey, rewards] =
@@ -107,15 +94,13 @@ async function activateProfile(
   });
 }
 
-/** Re-reads the profiles list and stores it; the shared body behind `refreshProfiles` and every
- * other call site that just needs a fresh list applied. */
+/** Re-reads and stores the profiles list; shared by `refreshProfiles` and other call sites. */
 export async function reloadProfiles(set: AppSet, get: AppGet): Promise<readonly Profile[]> {
   const profiles = await listProfiles(get().services.deps);
   set({ profiles });
   return profiles;
 }
 
-/** Selects `profile` and lands on Home; shared by `selectProfileAndHome` and `finishFirstRun`. */
 async function selectAndGoHome(set: AppSet, get: AppGet, profile: Profile): Promise<void> {
   const { services } = get();
   await selectProfile(services.deps, profile.id);

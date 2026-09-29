@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-/** `window.matchMedia(query).matches`, or `false` where `matchMedia` is unavailable (jsdom tests). */
 function getMatches(query: string): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
   try {
@@ -10,7 +9,6 @@ function getMatches(query: string): boolean {
   }
 }
 
-/** Tracks whether `query` currently matches, updating live as the viewport changes. */
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() => getMatches(query));
 

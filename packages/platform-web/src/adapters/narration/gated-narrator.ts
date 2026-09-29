@@ -1,7 +1,6 @@
 import type { Narrator } from '@learn/platform-core';
 
-/** A `Narrator` a parent-set "voice" setting (app-structure.md §11) can silence without every call
- * site checking it itself; `setEnabled(false)` also cancels whatever is mid-speaking. */
+/** A parent "voice" setting (app-structure.md §11) can silence it without every call site checking; `setEnabled(false)` also cancels speech. */
 export interface GatedNarrator extends Narrator {
   setEnabled(enabled: boolean): void;
 }

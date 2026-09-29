@@ -7,9 +7,8 @@ export interface UseAsyncResult<T> {
   readonly reload: () => Promise<void>;
 }
 
-/** Runs `load()` once on mount and again whenever `deps` changes; `value` keeps its old contents
- * until the new load settles, guarded by a cancel flag against a superseded run. `enabled: false`
- * skips the effect; `reload()` reruns `load()` on demand. */
+/** Runs `load()` on mount and when `deps` change; `value` keeps its old contents until the new load settles (a cancel flag
+ * guards a superseded run). `enabled: false` skips it; `reload()` reruns on demand. */
 export function useAsync<T>(
   load: () => Promise<T>,
   deps: DependencyList,

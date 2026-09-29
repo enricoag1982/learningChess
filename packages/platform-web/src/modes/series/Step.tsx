@@ -22,7 +22,6 @@ import { NextButton } from '../../ui/lesson/NextButton.tsx';
 import { BossResultPanel, useBossRun } from '../boss-run.tsx';
 import type { BossStepProps } from '../mode-ui.ts';
 
-/** A `series` mini-game's content, at the platform's own base round def. */
 type SeriesGame = MiniGameBase & SeriesGameDef;
 
 /** Round counter + mistakes-so-far card, shared by a round in progress and the result screen. */
@@ -52,12 +51,10 @@ interface SeriesRoundProps {
   readonly totalRounds: number;
   /** Mistakes already folded in from every round completed before this one. */
   readonly priorMistakes: number;
-  /** Called once, the moment the kid taps Next after solving this round. */
   readonly onNext: (roundState: ExerciseStateBase) => void;
 }
 
-/** One round of a series boss: `ExerciseStep`'s own UI, scored only as part of the series' total
- * mistakes — no per-round stars, moving on is an explicit "Next" tap. */
+/** One round of a series boss: `ExerciseStep`'s UI, scored only in the series' total mistakes; moving on is an explicit "Next" tap. */
 function SeriesRound({
   character,
   worldId,
@@ -109,7 +106,7 @@ function SeriesRound({
       state={state}
       dispatch={dispatch}
       showHint={hintsEnabled}
-      // The check ring stays off in a series round, as today (`docs/refactor-v4.md` follow-up F6).
+      // The check ring stays off in a series round (`docs/refactor-v4.md` follow-up F6).
       showCheck={false}
       surface={{ worldId }}
       top={top}
@@ -118,8 +115,7 @@ function SeriesRound({
   );
 }
 
-/** A `series` boss mini-game: a fixed sequence of rounds through the normal exercise engine,
- * scored on total mistakes (errors + hint levels) across every round (`BossStep`). */
+/** A series boss: fixed rounds through the exercise engine, scored on total mistakes (errors + hint levels) across all rounds. */
 export function Step({
   lesson,
   game: minigame,

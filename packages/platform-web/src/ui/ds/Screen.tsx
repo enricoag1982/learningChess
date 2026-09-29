@@ -2,8 +2,7 @@ import type { JSX, ReactNode } from 'react';
 import { BackIcon, CloseIcon } from './icons.tsx';
 import { tapClass } from './tap.ts';
 
-/** Screen shells: every screen's top-level `<main>` states its kind/header once instead of the
- * raw classes each used to repeat. */
+/** Screen shells: each screen's top-level `<main>` states its kind / header once instead of repeating raw classes. */
 
 export type ScreenKind = 'page' | 'game' | 'center' | 'form';
 
@@ -20,15 +19,13 @@ export function Screen({
   children,
 }: {
   readonly kind: ScreenKind;
-  /** Anything `kind`'s own base doesn't already cover (gap/padding for `center`/`form`, one-off). */
   readonly className?: string;
   readonly children: ReactNode;
 }): JSX.Element {
   return <main className={`${SCREEN_BASE[kind]} ${className}`.trim()}>{children}</main>;
 }
 
-/** A screen with nothing to show yet (still loading its data) — the one `<main>` shape every
- * screen falls back to rather than flashing unstyled content. */
+/** A screen with nothing to show yet (still loading): the one `<main>` shape screens fall back to. */
 export function BlankScreen(): JSX.Element {
   return <main className="min-h-dvh bg-cream" />;
 }
@@ -41,7 +38,6 @@ export interface RoundIconButtonProps {
   readonly children: ReactNode;
 }
 
-/** A round, icon-only tappable (header back/close, parent-area chevron-back). */
 export function RoundIconButton({
   label,
   onClick,
@@ -80,7 +76,6 @@ export interface ScreenHeaderProps {
   readonly children?: ReactNode;
 }
 
-/** The back/close round button + title row every screen's header repeats. */
 export function ScreenHeader({
   look = 'page',
   action,

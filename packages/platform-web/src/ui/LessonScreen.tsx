@@ -23,7 +23,6 @@ import { useIsCompact } from './useMediaQuery.ts';
 import { ProgressDots } from './ds/ProgressDots.tsx';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
-/** Exercise stage dots + "N of M", shown only while working through the scored exercises. */
 function StageDots({
   current,
   total,
@@ -46,7 +45,6 @@ function StageDots({
   );
 }
 
-/** The whole lesson session: top chrome (close, step pills, stars) plus the current step. */
 export function LessonScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

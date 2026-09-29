@@ -5,8 +5,7 @@ import { characterName } from '../../content-text.ts';
 import { characterColor } from '../art/animal-images.ts';
 import { CharacterIcon } from '../art/characters.tsx';
 
-/** Character portrait + name, and (except Owl) a subject-supplied badge (chess: a piece-icon
- * badge naming the chess piece it stands for). A compact row on phone width, a big portrait over
+/** Portrait + name, and (except Owl) a subject-supplied badge (chess: piece icon). A compact row on phones, a big portrait over
  * a column from `sm` up. */
 export function CharacterCard({ character }: { readonly character: string }): JSX.Element {
   const { t } = useTranslation();

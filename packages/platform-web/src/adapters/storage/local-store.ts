@@ -6,9 +6,7 @@ export class StorageError extends Error {
   }
 }
 
-/** Namespaced JSON storage over a `read`/`write`/`remove` triplet keyed by short names. */
 export interface LocalStore {
-  /** Parsed value at `name`, or `undefined` if absent. Throws `StorageError` on corrupt JSON. */
   read(name: string): unknown;
   write(name: string, value: unknown): void;
   remove(name: string): void;
@@ -21,20 +19,15 @@ export interface Migration {
 }
 
 export interface OpenLocalStoreOptions {
-  /** Schema version this build expects. Defaults to `SCHEMA_VERSION`. */
   readonly version?: number;
-  /** Migrations covering every version between the stored one and `version`, in any order. */
   readonly migrations?: readonly Migration[];
-  /** Namespace every key is stored under, e.g. `'chess-kids:'` (`AppConfig.storagePrefix`).
-   * Defaults to `DEFAULT_KEY_PREFIX`. */
+  /** Namespace for every key, e.g. `'chess-kids:'` (`AppConfig.storagePrefix`); defaults to `DEFAULT_KEY_PREFIX`. */
   readonly keyPrefix?: string;
 }
 
-/** Current schema version for this storage, used when `options.version` is omitted (`migrations.ts`
- * for what each version adds). */
+/** Schema version used when `options.version` is omitted (`migrations.ts`: what each adds). */
 export const SCHEMA_VERSION = 5;
 
-/** `options.keyPrefix`'s own default, when the caller has no `AppConfig` to read it from. */
 export const DEFAULT_KEY_PREFIX = 'chess-kids:';
 
 function namespacedKey(keyPrefix: string, name: string): string {
@@ -61,7 +54,6 @@ function createStore(storage: Storage, keyPrefix: string): LocalStore {
   };
 }
 
-/** True if `storage` holds any `keyPrefix`-namespaced key other than the version key. */
 function hasNamespacedData(storage: Storage, keyPrefix: string, versionKey: string): boolean {
   for (let i = 0; i < storage.length; i += 1) {
     const key = storage.key(i);
@@ -72,7 +64,6 @@ function hasNamespacedData(storage: Storage, keyPrefix: string, versionKey: stri
   return false;
 }
 
-/** Stored schema version, or `undefined` if the version key is absent. */
 function readStoredVersion(storage: Storage, versionKey: string): number | undefined {
   const raw = storage.getItem(versionKey);
   if (raw === null) return undefined;
@@ -83,8 +74,7 @@ function readStoredVersion(storage: Storage, versionKey: string): number | undef
   return parsed;
 }
 
-/** Opens namespaced, versioned JSON storage over `storage`. Fresh storage starts at the target
- * version; below it migrates up one step at a time (a missing step throws); above it, or
+/** Fresh storage starts at the target version; below it migrates one step at a time (a missing step throws); above it, or
  * unversioned namespaced data, throws without touching anything. */
 export function openLocalStore(storage: Storage, options?: OpenLocalStoreOptions): LocalStore {
   const targetVersion = options?.version ?? SCHEMA_VERSION;

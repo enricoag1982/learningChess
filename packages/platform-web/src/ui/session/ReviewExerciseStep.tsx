@@ -15,18 +15,15 @@ export interface ReviewExerciseStepProps {
   /** Threaded into `recordReviewResult` (rewards.md §4 "Warm-up Champ"). Ignored when `onRecord` is
    * given (an assessment task never touches the Leitner review scheduler this way). */
   readonly reviewSource: 'warmup' | 'practice';
-  /** Called once the solved attempt is saved (`recordReviewResult`, or `onRecord` when given) and
-   * Next is tapped. */
+  /** Called once the solved attempt is saved (`recordReviewResult`, or `onRecord`) and Next is tapped. */
   readonly onNext: () => void;
-  /** Hides the Hint control (domain-model.md §3.2: an assessment task offers no hints). Default `true`. */
   readonly showHint?: boolean;
   /** Overrides the default `recordReviewResult` save (assessment tasks: scoring is per-run, not a
    * per-task Leitner box move); must resolve before Next appears. */
   readonly onRecord?: (state: ExerciseStateBase, correct: boolean) => Promise<void>;
 }
 
-/** One warm-up/Practice review task (domain-model.md §3.1): the same board + controls a lesson's
- * scored exercise uses, minus the easier-variant machinery. */
+/** One warm-up / Practice review task (domain-model.md §3.1): a lesson exercise's board + controls minus the easier-variant machinery. */
 export function ReviewExerciseStep({
   task,
   reviewSource,

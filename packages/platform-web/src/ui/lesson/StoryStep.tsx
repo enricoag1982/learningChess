@@ -15,12 +15,10 @@ import { SkipButton } from './SkipButton.tsx';
 export interface StoryStepProps {
   readonly lesson: Lesson;
   readonly onNext: () => void;
-  /** "Skip" (playtest 2): skips straight to Demo. */
   readonly onSkip: () => void;
 }
 
-/** Story: meet the character, hear the rule, see its legal moves on a small static board (the
- * board itself is the subject's own `surface.Story`). */
+/** Meet the character, hear the rule, see its legal moves on a small static board (the subject's `surface.Story`). */
 export function StoryStep({ lesson, onNext, onSkip }: StoryStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

@@ -54,8 +54,7 @@ const TONE_FILL: Readonly<Record<TapTone, string>> = {
   none: '',
 };
 
-/** Full class string for a raised tappable: `tap-raised` + `look`'s shape + `tone`'s fill + any
- * `extra` classes appended last (a conditional fill included there overrides `tone: 'none'`). */
+/** `tap-raised` + `look`'s shape + `tone`'s fill + `extra` last (a conditional fill there overrides `tone: 'none'`). */
 export function tapClass(look: TapLook, tone: TapTone = 'neutral', extra = ''): string {
   return `tap-raised ${LOOK_BASE[look]} ${TONE_FILL[tone]} ${extra}`.replace(/\s+/g, ' ').trim();
 }

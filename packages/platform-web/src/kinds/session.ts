@@ -14,8 +14,7 @@ import type { AnyExerciseKindUI, ExerciseUIState, SessionAction } from './kind-u
 const REPLY_DELAY_MS = 600;
 const REPLY_DELAY_REDUCED_MS = 150;
 
-/** Fresh reducer state for a newly-started exercise; `kindUi.initUi(def)` seeds a kind's own extras
- * (a move kind: `def.lastMove`, if any). */
+/** Fresh reducer state; `kindUi.initUi(def)` seeds a kind's extras. */
 function initSessionState(
   def: ExerciseDefBase,
   kind: AnyKind<unknown>,
@@ -29,9 +28,8 @@ function initSessionState(
   };
 }
 
-/** The generic reducer every exercise kind shares: a `UiAction` is handled directly; any other
- * action goes through `kind.act` + `kindUi.toUi` — the one exercise-type dispatch left in session
- * plumbing, and it is the active pack's, not a local `switch`. */
+/** Shared by every kind: a `UiAction` is handled directly, any other goes through `kind.act` + `kindUi.toUi` (the pack's
+ * dispatch, not a local `switch`). */
 function sessionReducer(
   ctx: unknown,
   kind: AnyKind<unknown>,
@@ -62,8 +60,7 @@ function sessionReducer(
       const { reveal } = state.pending;
       return { ...state, pending: undefined, ...reveal };
     }
-    // The scripted reply has not been shown yet: ignore kid input until it is (F5 fix — generic,
-    // not only inside `ExerciseStep` any more).
+    // The scripted reply is not shown yet: ignore kid input until it is.
     if (state.pending) return state;
     const { state: core, outcome } = kind.act(state.core, action, ctx);
     const patch = kindUi.toUi(outcome, action, core);
@@ -96,10 +93,8 @@ export interface ExerciseSession {
   readonly elapsedMs: () => number;
 }
 
-/** One exercise attempt's whole session: the generic reducer, guided auto-hint, the mate-in-n
- * reply timer (generic here — F5 fix: a series round or review task no longer freezes on
- * mate-in-2+), the solved-save flow, and the instruction/note/narration the Owl bubble needs.
- * Shared by `ExerciseStep`, a `series` boss's round and `ReviewExerciseStep`. */
+/** One attempt's whole session: generic reducer, guided auto-hint, the mate-in-n reply timer, the solved-save flow and the
+ * Owl bubble's instruction / note / narration. Shared by `ExerciseStep`, a `series` round and `ReviewExerciseStep`. */
 export function useExerciseSession(
   def: ExerciseDefBase,
   options: ExerciseSessionOptions,
@@ -132,9 +127,8 @@ export function useExerciseSession(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // mate-in-n: reveals the scripted opponent reply — held back in `state.pending` — after a short
-  // delay, so the kid sees their own move complete first (teaching-process.md §3.3). Generic here
-  // (not only in one host) is exactly the F5 fix.
+  // mate-in-n: reveals the scripted reply held in `state.pending` after a short delay, so the kid sees their own move complete
+  // first (teaching-process.md §3.3).
   useEffect(() => {
     if (!state.pending) return;
     const delay = prefersReducedMotion() ? REPLY_DELAY_REDUCED_MS : REPLY_DELAY_MS;
@@ -162,8 +156,7 @@ export function useExerciseSession(
     void result.then(() => {
       setSaved(true);
     });
-    // `save` is a fresh closure each render (captures the host's own deps, e.g. the active
-    // profile); depending on it here reruns this until a save actually starts, same as before.
+    // `save` is a fresh closure each render (host deps, e.g. the active profile); depending on it reruns this until a save starts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solved, state.core, save]);
 

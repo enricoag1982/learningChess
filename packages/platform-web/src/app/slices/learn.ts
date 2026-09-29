@@ -22,8 +22,7 @@ import { backAndRefresh, type AppGet, type SliceCreator } from '../store.ts';
 export interface LearnSlice {
   readonly stepIndex: number;
 
-  /** Journey tap: opens an available/complete/mastered `lessonId` at its story (if done) or saved
-   * step; a locked one is a no-op (Journey intercepts with "Finish … first"). */
+  /** Journey tap: opens an unlocked `lessonId` at its story (if done) or saved step; a locked one is a no-op (Journey intercepts). */
   readonly startLesson: (lessonId: string) => Promise<void>;
   readonly goToStep: (index: number) => void;
   /** Lesson Close: back to Home/Journey (one level below on the stack); a Today lesson abandons
@@ -32,20 +31,14 @@ export interface LearnSlice {
   /** The lesson-complete screen's "Continue": a Today-session lesson advances to the session's next
    * activity (`advanceToday`); otherwise identical to `exitLesson`. */
   readonly completeLessonActivity: () => Promise<void>;
-  /** Journey locked-tap sheet "Yes, test me!" for a locked lesson (domain-model.md §3.2): plans a
-   * lesson test-out run (`planTestOutLesson`) and opens the runner (screen `assessment`). */
+  /** Journey "Yes, test me!" for a locked lesson (domain-model.md §3.2): plans `planTestOutLesson` and opens the `assessment` runner. */
   readonly startTestOutLesson: (lessonId: string, worldId: string) => void;
-  /** Same, for a locked world (`planTestOutWorld`): all its lessons at once. */
   readonly startTestOutWorld: (worldId: string) => void;
-  /** Assessment runner's `onDone`: scores + records the pass, unlocking the scope; the runner
-   * shows the result itself, then calls `exitAssessment`. */
+  /** Runner's `onDone`: scores + records the pass, unlocking the scope; the runner shows the result, then calls `exitAssessment`. */
   readonly submitAssessmentRun: (results: readonly boolean[]) => Promise<AssessmentScore>;
-  /** Leaves the assessment screen (Close, or the result screen's Continue) back to the Journey. */
   readonly exitAssessment: () => void;
-  /** Placement offer screen "No, start at World 1": straight to Home, nothing tested. */
   readonly declinePlacement: () => void;
-  /** Placement offer screen "Yes": plans the whole placement test (`planPlacement`) and opens the
-   * first Basics world's run (screen `placement`); straight to Home if there is nothing to test. */
+  /** Placement offer "Yes": plans `planPlacement` and opens the first Basics world's run; straight to Home if nothing to test. */
   readonly acceptPlacement: () => void;
   /** One placement world's `onDone`: scores + records the pass; the screen then calls
    * `advancePlacementWorld` (more worlds left) or `finishPlacement`. */
@@ -53,31 +46,23 @@ export interface LearnSlice {
     worldId: string,
     results: readonly boolean[],
   ) => Promise<AssessmentScore>;
-  /** Moves the placement run to its next Basics world. */
   readonly advancePlacementWorld: () => void;
-  /** Ends the placement run (all worlds done, a world failed, or the kid closed it early — "can be
-   * skipped any time, keeps what passed") and returns Home, refreshing progress. */
+  /** Ends placement (all worlds done, one failed, or closed early: "can be skipped any time, keeps what passed"); Home, refreshing progress. */
   readonly finishPlacement: () => void;
-  /** Parent area "Unlock" list: unlocks one lesson or world directly for `profileId`
-   * (domain-model.md §3.2 "Parent unlock", `masteredVia: 'parent'`). */
+  /** Parent area "Unlock": unlocks one lesson or world for `profileId` (domain-model.md §3.2, `masteredVia: 'parent'`). */
   readonly parentUnlockTarget: (profileId: string, target: ParentUnlockTarget) => Promise<void>;
-  /** Practice's "Daily warm-up" card: loads today's warm-up tasks and opens the task-run screen
-   * (a no-op if nothing is due — the card is disabled by then, but this guards a stale click). */
+  /** Practice "Daily warm-up": loads today's tasks and opens the run screen (a no-op if none due; guards a stale click). */
   readonly startPracticeWarmUp: () => Promise<void>;
-  /** Practice topic tap: loads that concept's review tasks and opens the task-run screen. */
   readonly startPracticeTopic: (conceptId: string) => Promise<void>;
-  /** Leaves the Practice task run back to the topic list, refreshing progress. */
   readonly exitPracticeRun: () => void;
-  /** Opens a mini-game session from Play or a Journey world-boss node, pushed on top so
-   * `exitMiniGame`'s `back()` returns there unaided. Subject-free: any mini-game mode. */
+  /** Opens a mini-game from Play or a Journey world-boss node, pushed so `exitMiniGame`'s `back()` returns there. Any mode. */
   readonly startMiniGame: (miniGameId: string) => void;
   /** Leaves the mini-game session for wherever it opened from; a Today one abandons the whole
    * session instead (`leaveToday`). */
   readonly exitMiniGame: () => void;
 }
 
-/** Enters `lessonId` via `enter` (`navigate` to open fresh, `replace` for a Today session moving
- * from one activity to the next). Shared by `startLesson` and `enterTodayActivity`. */
+/** Opens `lessonId` via `enter` (`navigate` fresh, `replace` for a Today session's next activity). */
 export async function enterLesson(
   get: AppGet,
   lessonId: string,
@@ -95,8 +80,7 @@ export async function enterLesson(
   await enter({ name: 'lesson', lessonId, startStep, ...(options?.today ? { today: true } : {}) });
 }
 
-/** Records a test-out/placement pass for the active profile; a no-op without one. Shared by
- * `submitAssessmentRun` and `submitPlacementWorldRun`. */
+/** Records a test-out / placement pass for the active profile; no-op without one. */
 async function recordScore(
   get: AppGet,
   kind: 'test-out' | 'placement',

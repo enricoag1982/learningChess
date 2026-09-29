@@ -9,7 +9,6 @@ import {
 } from '../adapters/install-banner.ts';
 import { Owl } from './ds/Owl.tsx';
 
-/** Real `navigator`/`window`/`localStorage`, read once at mount via `useState`'s lazy initialiser. */
 function initiallyVisible(): boolean {
   return !isInstallBannerDismissed() && shouldShowInstallBanner(readInstallBannerEnv());
 }

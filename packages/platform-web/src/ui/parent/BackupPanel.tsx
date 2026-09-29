@@ -22,7 +22,6 @@ import {
   PARENT_SECONDARY_BUTTON,
 } from './parent-styles.ts';
 
-/** Reads a browser `File` as text (`FileReader`, wrapped as a promise). */
 function readFileText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -38,7 +37,6 @@ function readFileText(file: File): Promise<string> {
 
 const ADD_NEW = 'add-new';
 
-/** A `<select>` option's `value`: `ADD_NEW`, or the local profile id to merge into. */
 function choiceToSelectValue(choice: ChildImportChoice): string {
   return choice.kind === 'add-new' ? ADD_NEW : (choice.localProfileId ?? ADD_NEW);
 }
@@ -53,22 +51,18 @@ interface PendingImport {
   readonly raw: string;
   readonly incomingFile: BackupFile;
   readonly plan: ImportPlan;
-  /** By incoming profile id — every non-auto-merge child's current choice (auto-merge children have
-   * no entry: `importMerged` always merges them regardless, decision table "no question"). */
+  /** By incoming profile id: each non-auto-merge child's choice (auto-merge children have none; `importMerged` merges them regardless). */
   readonly choices: Readonly<Record<string, ChildImportChoice>>;
-  /** By incoming profile id — the change summary for the current choice, recomputed on change and
-   * loaded in as each one resolves. */
+  /** By incoming profile id: the change summary for the current choice, recomputed on change. */
   readonly changes: Readonly<Record<string, ImportChangeSummary>>;
 }
 
 export interface BackupScreenProps {
   readonly onBack: () => void;
-  /** Called once an import has merged in new data — the caller refreshes its own profile list. */
   readonly onImported: () => void;
 }
 
-/** Parent area "Backup" (app-structure.md §11, §13): export every child's data, send to another
- * device, or pick a file to preview and merge in. Nothing on this device is ever lost or replaced. */
+/** Parent "Backup" (app-structure.md §11, §13): export every child, send to another device, or preview and merge a file. Nothing on this device is lost or replaced. */
 export function BackupScreen({ onBack, onImported }: BackupScreenProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

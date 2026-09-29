@@ -2,12 +2,10 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PARENT_INFO_PANEL, PARENT_PRIMARY_BUTTON } from './parent-styles.ts';
 
-/** Repository issues page (non-functional.md §3 "contact"). */
 const ISSUES_URL = 'https://github.com/enricoag1982/learningChess/issues';
 
-/** Privacy policy body (non-functional.md §3, kept in sync by hand with `docs/privacy-policy.md`):
- * shared by `PrivacyScreen` (parent area) and `PrivacyDialog` (first-run overlay), reached before
- * the parent gate, so exported here to stay in the eager bundle while `PrivacyScreen` stays lazy. */
+/** Policy body (non-functional.md §3; hand-synced with `docs/privacy-policy.md`), shared by `PrivacyScreen` and the first-run
+ * `PrivacyDialog`; exported here, in the eager bundle, since it is reached before the parent gate. */
 export function PrivacyPolicyBody(): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -46,8 +44,7 @@ export interface PrivacyDialogProps {
   readonly onClose: () => void;
 }
 
-/** First-run password step's privacy link: an in-screen overlay, not a store screen (the parent
- * area is not reachable yet). */
+/** First-run password step's privacy link: an in-screen overlay, since the parent area is not reachable yet. */
 export function PrivacyDialog({ onClose }: PrivacyDialogProps): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -80,8 +77,6 @@ export interface PrivacyLinkProps {
   readonly onClick: () => void;
 }
 
-/** The link itself (first-run password step), kept here so its label stays next to the dialog it
- * opens. */
 export function PrivacyLink({ onClick }: PrivacyLinkProps): JSX.Element {
   const { t } = useTranslation();
   return (

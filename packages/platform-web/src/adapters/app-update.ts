@@ -5,19 +5,16 @@ import type { RegisterSWOptions } from 'vite-plugin-pwa/types';
 export type RegisterSW = (options?: RegisterSWOptions) => (reloadPage?: boolean) => Promise<void>;
 
 export interface AppUpdate {
-  /** True once a new version is waiting (`onNeedRefresh` fired). */
   readonly isUpdateReady: () => boolean;
   /** Applies the waiting update: skip-waiting + reload. Call only at a safe screen (Home/picker),
    * never mid-lesson/game/parent (`docs/non-functional.md` §1). Idempotent. */
   readonly apply: () => Promise<void>;
-  /** Calls `listener` when a new version starts waiting, so a kid already sitting on a safe screen
-   * gets it without navigating first. Returns an unsubscribe. */
+  /** Calls `listener` when a new version starts waiting, so a kid on a safe screen gets it without navigating. Returns an unsubscribe. */
   readonly onUpdateReady: (listener: () => void) => () => void;
 }
 
-/** Registers the service worker once and tracks whether an update is waiting, so the app (not
- * Workbox) controls when a new version reloads the page. No periodic polling
- * (`docs/non-functional.md` §1): only the browser's own check, plus one on tab visibility. */
+/** Registers the service worker once and tracks a waiting update so the app (not Workbox) controls when a new version reloads.
+ * No periodic polling (`docs/non-functional.md` §1): the browser's own check plus one on tab visibility. */
 export function createAppUpdate(register: RegisterSW): AppUpdate {
   let updateReady = false;
   let applied = false;

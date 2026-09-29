@@ -4,12 +4,10 @@ import type { Narrator } from '@learn/platform-core';
 const RATE = 0.95;
 const PITCH = 1.05;
 
-/** `speechSynthesis` if the browser implements it (jsdom and older browsers do not). */
 function browserSpeechSynthesis(): SpeechSynthesis | undefined {
   return 'speechSynthesis' in window ? window.speechSynthesis : undefined;
 }
 
-/** Best available voice: an on-device (offline) English voice, else any English voice. */
 function pickVoice(voices: readonly SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
   const english = voices.filter((voice) => voice.lang.toLowerCase().startsWith('en'));
   return (
@@ -27,8 +25,7 @@ const silentNarrator: Narrator = {
   },
 };
 
-/** `Narrator` over the Web Speech API. Prefers an on-device English voice; falls back to a
- * silent no-op narrator when Web Speech is unavailable. */
+/** Prefers an on-device English voice; a silent no-op narrator when Web Speech is unavailable. */
 export function createWebSpeechNarrator(speech?: SpeechSynthesis): Narrator {
   const synth = speech ?? browserSpeechSynthesis();
   if (synth === undefined) {

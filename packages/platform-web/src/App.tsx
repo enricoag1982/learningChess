@@ -28,10 +28,8 @@ import { TimeLimitScreen } from './ui/TimeLimitScreen.tsx';
 import { TimeTracker } from './ui/TimeTracker.tsx';
 import { WarmUpScreen } from './ui/WarmUpScreen.tsx';
 
-// Lazy-loaded screens (non-functional.md §4): each split into its own chunk, precached by the
-// service worker right after first fetch. Picked for size (Parent area) or for being off the
-// every-session path (placement/test-out); every other screen stays static. A subject's own
-// lazy screens (chess: Friend play) are its `pack.routes`' own concern.
+// Lazy screens (non-functional.md §4): own chunks, precached by the service worker after first fetch; chosen for size (Parent
+// area) or being off the every-session path. A subject's lazy screens are its `pack.routes`' concern.
 const ParentAreaScreen = lazy(() =>
   import('./ui/ParentAreaScreen.tsx').then((module) => ({ default: module.ParentAreaScreen })),
 );
@@ -52,8 +50,7 @@ function LoadingScreen(): JSX.Element {
   return <main className="min-h-dvh bg-cream" />;
 }
 
-/** Platform route → component table; a subject's own routes (chess: Play, Full game, Friend play)
- * come from `pack.routes` instead. */
+/** Platform route → component table; a subject's routes (chess: Play, Full game, Friend play) come from `pack.routes`. */
 const PLATFORM_ROUTE_SCREENS: Readonly<Partial<Record<RouteName, ComponentType>>> = {
   loading: LoadingScreen,
   'first-run': FirstRunScreen,
@@ -94,15 +91,12 @@ const NOOP_APP_UPDATE: AppUpdate = {
 export interface AppProps {
   /** Injected in tests (fake narrator + in-memory storage); defaults to the real web adapters. */
   readonly services?: Services;
-  /** Injected from `main.tsx` or a fake in tests; defaults to a no-op. */
   readonly appUpdate?: AppUpdate;
-  /** The active subject's whole web pack. */
   readonly pack: SubjectWeb;
   /** The app's identity (storage prefix, file prefixes); `version` is stamped at build time. */
   readonly app: Omit<AppConfig, 'version'>;
 }
 
-/** App root: wires one `Services` instance to a fresh store, then renders the current screen. */
 export default function App({
   services,
   appUpdate = NOOP_APP_UPDATE,

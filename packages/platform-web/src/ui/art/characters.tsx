@@ -2,8 +2,7 @@ import type { JSX } from 'react';
 import { usePack } from '../../app/subject.ts';
 import { animalImage } from './animal-images.ts';
 
-/** Decorative animal artwork: every caller already gives the image its accessible name, so the
- * `<img>` itself is `alt=""` and never draggable. */
+/** Decorative animal artwork: callers give the accessible name, so `alt=""` and never draggable. */
 function AnimalImg({
   id,
   subjectArt,
@@ -21,14 +20,12 @@ function AnimalImg({
   );
 }
 
-/** Character portrait, keyed by lesson-character id (`docs/app-structure.md` §8) — the active
- * subject's own art (`pack.art`), falling back to the platform's own for an id it doesn't have. */
+/** Character portrait by lesson-character id (`docs/app-structure.md` §8): the pack's `art` first, else the platform's own. */
 export function CharacterIcon({ character }: { readonly character: string }): JSX.Element {
   const pack = usePack();
   return <AnimalImg id={character} subjectArt={pack.art} />;
 }
 
-/** The narrator's avatar everywhere a speech bubble appears. */
 export function OwlIcon(): JSX.Element {
   return <AnimalImg id="owl" />;
 }

@@ -4,14 +4,12 @@ import type { JSX, ReactNode } from 'react';
 export interface GameLayoutProps {
   readonly board: ReactNode;
   readonly panel: ReactNode;
-  /** Rendered directly under the board, before `panel` — e.g. a `setup` exercise's piece tray on a
-   * stacked layout, so it sits above the fold instead of at the bottom of the panel. */
+  /** Directly under the board, before `panel` (e.g. a `setup` piece tray on a stacked layout, above the fold). */
   readonly belowBoard?: ReactNode;
 }
 
-/** The board: the largest square that fits the space the panel leaves over, measured
- * (`ResizeObserver`, since the panel's height varies); shrink-only while mounted so a note coming
- * and going does not grow/shrink the board under the kid's finger. No-op in jsdom. */
+/** The largest square that fits what the panel leaves (measured by `ResizeObserver`); shrink-only while mounted so a note
+ * coming and going doesn't resize the board under the kid's finger. No-op in jsdom. */
 function FitSquare({ children }: { readonly children: ReactNode }): JSX.Element {
   const areaRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<number | null>(null);

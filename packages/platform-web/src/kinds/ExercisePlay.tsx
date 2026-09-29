@@ -9,8 +9,7 @@ export interface ExerciseFrameProps {
   readonly belowBoard?: ReactNode;
 }
 
-/** Board+panel split (`GameLayout`), or — an exercise type with its board hidden (`choice`) — the
- * panel's full width instead of leaving an empty board-shaped gap. */
+/** Board + panel split (`GameLayout`); an exercise with its board hidden (`choice`) gets the panel's full width. */
 export function ExerciseFrame({ board, panel, belowBoard }: ExerciseFrameProps): JSX.Element {
   if (board === null) {
     return <div className="flex min-h-0 flex-1 flex-col gap-4">{panel}</div>;
@@ -20,8 +19,7 @@ export function ExerciseFrame({ board, panel, belowBoard }: ExerciseFrameProps):
 
 export type ExercisePlayProps = PlayAreaProps;
 
-/** Renders `def`'s own kind's `PlayArea` — the one place exercise-type dispatch happens for the
- * exercise UI (the active pack's `kinds`, never a local `if`/`switch`). */
+/** Renders `def`'s kind's `PlayArea`: the one exercise-type dispatch for the exercise UI (the pack's `kinds`, never a local `if`). */
 export function ExercisePlay(props: ExercisePlayProps): JSX.Element {
   const pack = usePack();
   const kindUi = pack.kinds[props.def.type];

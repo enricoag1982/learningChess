@@ -26,21 +26,17 @@ export interface ExerciseStepProps {
   readonly nextStepIndex: number;
   /** "Skip": only ever set for a guided try (`guided`) — Exercises/Boss never skip. */
   readonly onSkip?: () => void;
-  /** Set when solving this leaves a skippable phase normally (Try's last guided step) — see
-   * `RecordExerciseResultInput.completesPhase`. */
+  /** Set when solving this leaves a skippable phase normally (Try's last guided step); see `RecordExerciseResultInput.completesPhase`. */
   readonly completesPhase?: SkippablePhase;
 }
 
 interface ExerciseAttemptProps extends ExerciseStepProps {
-  /** The scored exercise's easier variant, if it has one — offered once errors pile up. */
   readonly easier?: ExerciseDefBase;
-  /** Swaps the board to `easier`'s variant; only ever passed alongside `easier`. */
   readonly onTakeEasier?: () => void;
   /** Set when `exercise` is itself an easier variant: the original exercise id it stands in for. */
   readonly standsInFor?: string;
 }
 
-/** One attempt at a guided try, scored exercise, or its easier variant, of any exercise type. */
 function ExerciseAttempt({
   lesson,
   exercise,
@@ -157,8 +153,7 @@ function ExerciseAttempt({
   );
 }
 
-/** One lesson step's exercise: a guided try, a scored exercise, or — once the kid takes the offer —
- * its easier variant, credited back to the original on solve (teaching-process.md §3.3). */
+/** One lesson step's exercise: a guided try, a scored exercise, or (once taken) its easier variant, credited to the original on solve (teaching-process.md §3.3). */
 export function ExerciseStep(props: ExerciseStepProps): JSX.Element {
   const { lesson, exercise, guided } = props;
   const variant = guided ? undefined : easierVariant(lesson, exercise);

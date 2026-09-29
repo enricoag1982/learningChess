@@ -26,9 +26,7 @@ export function formatDate(iso: string): string {
   return DATE_FORMAT.format(new Date(Date.UTC(year ?? 1970, (month ?? 1) - 1, day ?? 1)));
 }
 
-/** Opponent display name for a non-subject-specific `GameRecord.opponent`: `'guest'` or
- * `'profile:<id>'`. A subject's own opponent kinds (chess: `'computer:<level>'`) are its own
- * `ReportSection`'s job. */
+/** Opponent name for a non-subject `GameRecord.opponent` (`'guest'`, `'profile:<id>'`); a subject's own kinds (chess: `'computer:<level>'`) are its `ReportSection`'s job. */
 // eslint-disable-next-line react-refresh/only-export-components -- shared with ReportSection
 export function opponentLabel(
   t: TFunction,
@@ -43,7 +41,6 @@ export function opponentLabel(
   return opponent;
 }
 
-/** Exported for the subject's own `ReportSection`. */
 // eslint-disable-next-line react-refresh/only-export-components -- shared with ReportSection
 export function resultLabel(t: TFunction, result: GameRecord['result']): string {
   switch (result) {
@@ -58,8 +55,7 @@ export function resultLabel(t: TFunction, result: GameRecord['result']): string 
   }
 }
 
-/** First lesson teaching `conceptId` (every lesson's exercises share its own top-level concept, by
- * content convention — same lookup `PracticeScreen` already uses for a topic's display name). */
+/** First lesson teaching `conceptId` (a lesson's exercises share its top-level concept, by content convention), as `PracticeScreen` does. */
 function lessonForConcept(lessons: readonly Lesson[], conceptId: string): Lesson | undefined {
   return lessons.find((lesson) => lesson.concept === conceptId);
 }
@@ -93,7 +89,6 @@ function activeRulesLine(t: TFunction, report: ChildReport): string | null {
   return parts.length > 0 ? parts.join(' · ') : null;
 }
 
-/** Exported for the subject's own `ReportSection`. */
 export function Section({
   title,
   children,
@@ -116,8 +111,7 @@ export interface ChildReportScreenProps {
   readonly onOpenSettings: () => void;
 }
 
-/** Parent area "child report" (app-structure.md §11): progress, concept accuracy, minutes,
- * games, badges, assessments — read-only, between the Overview and Settings. */
+/** Parent "child report" (app-structure.md §11): progress, concept accuracy, minutes, games, badges, assessments; read-only. */
 export function ChildReportScreen({
   profileId,
   profiles,

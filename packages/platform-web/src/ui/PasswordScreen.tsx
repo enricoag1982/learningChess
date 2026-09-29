@@ -15,7 +15,6 @@ import { Screen } from './ds/Screen.tsx';
 import { useAsync } from './ds/useAsync.ts';
 
 const MAX_ATTEMPTS = 5;
-/** How often the countdown re-reads the clock while locked. */
 const TICK_MS = 500;
 
 /** Grown-ups gate (parent style): non-functional.md §3 — 5 wrong attempts → 1-minute wait. */
@@ -37,7 +36,6 @@ export function PasswordScreen(): JSX.Element {
     [services],
   );
 
-  // Ticks every 500ms while locked, clearing it from the interval callback once time is up.
   useEffect(() => {
     if (lockedUntil === null) return;
     const id = setInterval(() => {

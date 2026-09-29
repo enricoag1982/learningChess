@@ -13,7 +13,6 @@ import { Screen } from './ds/Screen.tsx';
 
 type Step = 'welcome' | 'password' | 'saved';
 
-/** Step 1 (kid style): Owl explains a grown-up helps set things up first. */
 function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
   const { t } = useTranslation();
   const text = t('first-run.welcome.owl');
@@ -35,7 +34,6 @@ function Welcome({ onNext }: { readonly onNext: () => void }): JSX.Element {
   );
 }
 
-/** Step 2 (parent style): sets the parent password and downloads the reminder file. */
 function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => void }): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -132,8 +130,7 @@ function PasswordStep({ onSaved }: { readonly onSaved: (location: string) => voi
   );
 }
 
-/** Step 3 (parent style): confirms where the code file was saved. A new copy can be downloaded
- * later from the grown-ups area ("Download parent code file"). */
+/** Step 3 (parent style): where the code file was saved; a new copy comes later from the grown-ups area. */
 function SavedStep({
   location,
   onNext,
@@ -156,8 +153,7 @@ function SavedStep({
   );
 }
 
-/** First run: Welcome (kid) → parent password → Saved, then `finishFirstRun` decides whether to
- * open the new-player wizard, go straight to Home, or show the picker. */
+/** Welcome (kid) → parent password → Saved; `finishFirstRun` then picks the wizard, Home or the picker. */
 export function FirstRunScreen(): JSX.Element {
   const finishFirstRun = useAppStore((state) => state.finishFirstRun);
   const [step, setStep] = useState<Step>('welcome');

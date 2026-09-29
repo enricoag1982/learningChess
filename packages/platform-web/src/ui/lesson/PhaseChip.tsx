@@ -5,10 +5,8 @@ import { PHASE_BAR, PHASES, phaseState } from './phase-track.ts';
 
 export interface PhaseChipProps {
   readonly phase: LessonPhase;
-  /** Position within the phase (e.g. guided try 1 of 2); omitted where there is only one step. */
   readonly current?: number;
   readonly total?: number;
-  /** Story/Demo/Try skipped so far, shown in the mini track under the label. */
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 

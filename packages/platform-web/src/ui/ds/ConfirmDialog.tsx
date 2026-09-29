@@ -13,8 +13,7 @@ export interface ConfirmDialogProps {
   readonly onConfirm: () => void;
 }
 
-/** A kid-style yes/no confirm (take-back ask, stop-game) — `role="alertdialog"`, `aria-label` =
- * `title` (refactor-v4.md §2 finding 6: the same 5-element shape written out 5 times). */
+/** Kid-style yes/no confirm (take-back ask, stop-game): `role="alertdialog"`, `aria-label` = `title`. */
 export function ConfirmDialog({
   title,
   message,

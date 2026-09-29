@@ -104,8 +104,7 @@ function AvatarStep({
   );
 }
 
-/** New-player wizard (kid style): nickname, then avatar; last step creates the profile
- * (store.finishNewPlayer decides whether that goes to Home or back to the parent area). */
+/** New-player wizard (kid style): nickname, avatar; the last step creates the profile (`finishNewPlayer` picks Home or back to the parent area). */
 export function NewPlayerScreen(): JSX.Element {
   const finishNewPlayer = useAppStore((state) => state.finishNewPlayer);
   const [step, setStep] = useState<Step>('nickname');

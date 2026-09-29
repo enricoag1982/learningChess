@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InfoPill } from './ds/primitives.tsx';
 import { FlameIcon } from './ds/icons.tsx';
 
-/** Info pill (docs/screens.md §1 "Pills" / "Info = no box"): flame + current streak days, no pill
- * background or border. Home's top bar (>= 2 days) and My Den both use it. */
+/** Info pill (docs/screens.md §1): flame + streak days, no background or border; Home's top bar (>= 2 days) and My Den. */
 export function StreakPill({ days }: { readonly days: number }): JSX.Element {
   const { t } = useTranslation();
   return (

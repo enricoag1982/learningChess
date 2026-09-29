@@ -6,8 +6,7 @@ import { BadgeIcon } from './BadgeIcon.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 
-/** Full-screen badge celebration (rewards.md §1), shown over the current screen whenever
- * `activeCelebration` is set, capped per app sitting; other badges show as a My Den "new" dot. */
+/** Full-screen badge celebration (rewards.md §1) over the current screen whenever `activeCelebration` is set; capped per sitting. */
 export function Celebration(): JSX.Element | null {
   const { t } = useTranslation();
   const services = useServices();

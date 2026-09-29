@@ -1,5 +1,4 @@
-/** Every `LocalStore` record name this app writes; one source of truth so a repository and the
- * backup importer never drift to different strings for the same record. */
+/** Every `LocalStore` record name this app writes; one source of truth for repositories and the backup importer. */
 export const STORAGE_KEYS = {
   profiles: 'profiles',
   settings: 'settings',

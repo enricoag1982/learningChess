@@ -10,15 +10,12 @@ import { exerciseNote as coreExerciseNote } from '@learn/platform-core';
 import { characterName, tContent } from '../../content-text.ts';
 import type { SpeechBubbleNote } from '../ds/SpeechBubble.tsx';
 
-/** The exercise's instruction: always shown, never replaced by a hint / error / praise note. */
 export function exerciseInstructionText(t: TFunction, def: ExerciseDefBase): string {
   return tContent(t, def.textKey);
 }
 
-/** The note under the instruction for the current feedback, or `undefined` while just reading the
- * instruction (teaching-process.md §3.3) — resolves `character` to core `exerciseNote`'s ctx, over
- * the active subject's own note table (`notes`) and extra vars (`vars`, chess: `{ piece }`). `offer`
- * appends the easier-variant sentence on an error note (never on a hint, toggle or undo). */
+/** The note under the instruction for the current feedback, or `undefined` while just reading it (teaching-process.md §3.3);
+ * resolves `character` over the subject's note table and vars. `offer` appends the easier-variant sentence on error notes. */
 export function exerciseNote(
   t: TFunction,
   feedback: ExerciseFeedbackBase,

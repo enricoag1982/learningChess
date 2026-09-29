@@ -1,6 +1,5 @@
 import type { JSX, ReactNode } from 'react';
 
-/** A row of step dots (done / current / upcoming), then any `children` (a "N of M" label). */
 export function ProgressDots({
   current,
   total,

@@ -14,12 +14,11 @@ import { SkipButton } from './SkipButton.tsx';
 export interface DemoStepProps {
   readonly lesson: Lesson;
   readonly onNext: () => void;
-  /** "Skip" (playtest 2): skips straight to Try (or Exercises if the lesson has no guided tries). */
+  /** "Skip" goes to Try (or Exercises when the lesson has no guided tries). */
   readonly onSkip: () => void;
 }
 
-/** Free play with the lesson's piece: every legal move is open, nothing is scored (the board
- * itself is the subject's own `surface.Demo`). */
+/** Free play with the lesson's piece: every legal move is open, nothing scored (the board is the subject's `surface.Demo`). */
 export function DemoStep({ lesson, onNext, onSkip }: DemoStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

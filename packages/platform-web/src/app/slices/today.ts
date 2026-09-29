@@ -4,9 +4,7 @@ import { backAndRefresh, type SliceCreator } from '../store.ts';
 import { enterLesson } from './learn.ts';
 
 export interface TodaySlice {
-  /** The Today session in progress (`startToday`), or `null` outside one. */
   readonly todayPlan: TodaySessionPlan | null;
-  /** Index into `todayPlan.activities` of the activity currently showing. */
   readonly todayActivityIndex: number;
   /** `totalStars(progress)` snapshotted at `startToday`, so the summary can show the delta. */
   readonly todaySessionStartTotalStars: number;
@@ -15,14 +13,10 @@ export interface TodaySlice {
   /** `journey.rank.id` snapshotted at `startToday`, so the summary can show a rank-up. */
   readonly todaySessionStartRankId: string | null;
 
-  /** Home's "Start today" (domain-model.md §3.3): plans the session (`loadTodaySession`), snapshots
-   * stars/friends/rank for the summary, and opens its first activity. No-op without a profile. */
+  /** Home's "Start today" (domain-model.md §3.3): plans the session, snapshots stars / friends / rank for the summary, opens the first activity; no-op without a profile. */
   readonly startToday: () => Promise<void>;
-  /** Moves to the Today session's next activity, or the summary once there is none left. */
   readonly advanceToday: () => Promise<void>;
-  /** Abandons the Today session in progress (if any) and returns to Home, refreshing progress. */
   readonly leaveToday: () => void;
-  /** The summary screen's closing action: clears the session and returns to Home. */
   readonly finishToday: () => void;
 }
 

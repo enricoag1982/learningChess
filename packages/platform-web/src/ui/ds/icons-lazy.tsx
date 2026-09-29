@@ -5,7 +5,6 @@ import type { IconProps } from './icons.tsx';
 /** Icons used only by parent-area/friend-play (lazy-loaded) screens: kept out of `icons.tsx` so
  * they never reach the initial bundle. Every caller here must stay genuinely lazy-only. */
 
-/** Parent-area back chevron (ChildSettings, BackupPanel, ChildReport, PrivacyScreen). */
 export function ChevronLeftIcon({
   size = 20,
   strokeWidth = 2.5,
@@ -18,7 +17,6 @@ export function ChevronLeftIcon({
   );
 }
 
-/** Guest player silhouette (vs Friend setup/game, no profile picked). */
 export function GuestIcon({
   className = 'h-full w-full',
 }: Pick<IconProps, 'className'> = {}): JSX.Element {

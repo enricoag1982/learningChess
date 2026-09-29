@@ -14,7 +14,6 @@ export interface SpeechBubbleNote {
 }
 
 export interface SpeechBubbleProps {
-  /** Spoken and shown (subtitles are always on: the text itself is the subtitle). */
   readonly text: string;
   /** A hint / error / praise line under the instruction; never replaces it (teaching-process.md §3.3). */
   readonly note?: SpeechBubbleNote;
@@ -22,8 +21,7 @@ export interface SpeechBubbleProps {
   readonly bubbleClassName?: string;
 }
 
-/** Owl avatar + speech bubble; `note`, when given, appears as a second line under `text`.
- * Speaking/replaying is the caller's job via `useNarratedText`/`ReplayButton`. */
+/** Owl avatar + bubble; `note` is a second line under `text`. Speaking is the caller's job (`useNarratedText` / `ReplayButton`). */
 export function SpeechBubble({
   text,
   note,

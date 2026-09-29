@@ -18,8 +18,7 @@ export interface ExerciseControlsProps {
   readonly slot?: ReactNode;
 }
 
-/** The controls row every kind starts with: Hint (unless hidden), then its own one extra button,
- * if any (select-squares' Check or a move-counted kind's Undo — never both). */
+/** Hint (unless hidden), then the kind's one extra button if any (select-squares' Check or a move-counted kind's Undo). */
 export function ExerciseControls({ showHint, onHint, slot }: ExerciseControlsProps): JSX.Element {
   const { t } = useTranslation();
   return (

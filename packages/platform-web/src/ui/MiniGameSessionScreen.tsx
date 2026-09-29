@@ -7,8 +7,7 @@ import { tContent } from '../content-text.ts';
 import type { BossPlaySession } from '../modes/mode-ui.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
-/** A mini-game played standalone from the Play screen: the same `BossStep` a lesson uses, in a
- * simple top bar instead of the lesson chrome, saved via `recordMiniGameResult`. */
+/** A mini-game played standalone from Play: the lesson's `BossStep` in a simple top bar, saved via `recordMiniGameResult`. */
 export function MiniGameSessionScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

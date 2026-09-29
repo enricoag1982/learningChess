@@ -7,8 +7,7 @@ export interface IconProps {
   readonly className?: string;
 }
 
-/** Shared stroke-icon base (viewBox 24, round caps/joins, `aria-hidden`) behind every icon below;
- * `fill`/`stroke` default to the plain two-tone look, a few icons override one for a fixed colour. */
+/** Shared stroke-icon base (viewBox 24, round caps/joins, `aria-hidden`); `fill` / `stroke` default to the two-tone look, some icons override one. */
 export function Svg({
   size = 24,
   strokeWidth = 2,
@@ -46,7 +45,6 @@ interface StrokeLook {
   readonly stroke?: string;
 }
 
-/** A stroke icon over `Svg`: `look` holds its own defaults, the caller's props win. */
 function strokeIcon(look: StrokeLook, shapes: ReactNode): (props?: IconProps) => JSX.Element {
   return function StrokeIcon({
     size = look.size,
@@ -61,22 +59,18 @@ function strokeIcon(look: StrokeLook, shapes: ReactNode): (props?: IconProps) =>
   };
 }
 
-/** Kid-style "Back" chevron (JourneyScreen, PracticeScreen, DenScreen, FriendSetupScreen, PlayScreen). */
 export const BackIcon = strokeIcon({ size: 30, strokeWidth: 2.4 }, <path d="M15 18l-6-6 6-6" />);
 
-/** Forward chevron: lesson "Next" (kid-sized) and parent-area row/pagination links (smaller, muted). */
 export const ChevronRightIcon = strokeIcon(
   { size: 20, strokeWidth: 2.5, className: 'flex-shrink-0 text-muted' },
   <path d="m9 6 6 6-6 6" />,
 );
 
-/** "X" close button (mini-game/full-game/review/lesson exit). */
 export const CloseIcon = strokeIcon(
   { size: 24, strokeWidth: 2.6 },
   <path d="M6 6l12 12M18 6L6 18" />,
 );
 
-/** Locked padlock (Journey nodes, password/parent screens, Play's locked tiles). */
 export const LockIcon = strokeIcon(
   { size: 22, strokeWidth: 2 },
   <>
@@ -85,10 +79,8 @@ export const LockIcon = strokeIcon(
   </>,
 );
 
-/** Check mark (Journey's mastered node, StepPills' done marker). */
 export const CheckIcon = strokeIcon({ size: 20, strokeWidth: 3 }, <path d="M5 13l4 4L19 7" />);
 
-/** Skip-ahead glyph (guided-try SkipButton, StepPills' skipped marker). */
 export const SkipIcon = strokeIcon(
   { size: 22, strokeWidth: 2.6 },
   <>
@@ -97,10 +89,8 @@ export const SkipIcon = strokeIcon(
   </>,
 );
 
-/** "Add child" plus (ProfilePickerScreen). */
 export const PlusIcon = strokeIcon({ size: 40, strokeWidth: 2.4 }, <path d="M12 5v14M5 12h14" />);
 
-/** "Listen again" / "Say it again" (ReplayButton). */
 export const ReplayIcon = strokeIcon(
   { size: 24, strokeWidth: 2 },
   <>
@@ -123,7 +113,6 @@ export const SwitchPlayerIcon = strokeIcon({ size: 28, strokeWidth: 2 }, twoPeop
 
 export const FriendIcon = strokeIcon({ size: 34, strokeWidth: 2, stroke: '#B8561A' }, twoPeople);
 
-/** Sun/timer glyph: Practice's warm-up entry. */
 export const WarmUpIcon = strokeIcon(
   { size: 34, strokeWidth: 2, stroke: '#B8561A' },
   <>
@@ -132,7 +121,6 @@ export const WarmUpIcon = strokeIcon(
   </>,
 );
 
-/** Computer/monitor glyph: Play's vs Computer card. */
 export const ComputerIcon = strokeIcon(
   { size: 34, strokeWidth: 2, stroke: '#2F5E9E' },
   <>
@@ -143,7 +131,6 @@ export const ComputerIcon = strokeIcon(
   </>,
 );
 
-/** Board/frame glyph: lesson Complete's "Play again". */
 export const NewGameIcon = strokeIcon(
   { size: 32, strokeWidth: 2, stroke: '#2E7D5B' },
   <>
@@ -160,7 +147,6 @@ export interface CrownIconProps extends IconProps {
   readonly stroke?: string;
 }
 
-/** Crown: Journey's world-boss node marker (filled on win). */
 export function CrownIcon({
   size = 30,
   strokeWidth = 2,
@@ -183,7 +169,6 @@ export function CrownIcon({
   );
 }
 
-/** Small green crown badge: RankPill's rank icon. */
 export function RankCrownIcon({
   size = 18,
   className,

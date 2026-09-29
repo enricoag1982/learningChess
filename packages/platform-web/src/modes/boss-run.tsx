@@ -25,9 +25,8 @@ export interface BossRun {
   readonly restart: () => void;
 }
 
-/** The save effect + result fields shared by every boss step (`static`/`series`/`versus`): saves
- * once play is over (`session.save`, else `recordBossResult`), exposes `isOver`/`isWin`/`stars` via
- * the mode registry, and a `restart` for a standalone session's own "Play again". */
+/** The save effect + result fields shared by every boss step: saves once play is over (`session.save`, else `recordBossResult`),
+ * exposes `isOver` / `isWin` / `stars` via the mode registry, and a `restart` for "Play again". */
 // eslint-disable-next-line react-refresh/only-export-components -- paired with BossResultPanel below
 export function useBossRun(state: MiniGameStateBase, options: UseBossRunOptions): BossRun {
   const { lesson, nextStepIndex, session } = options;
@@ -79,9 +78,8 @@ export function useBossRun(state: MiniGameStateBase, options: UseBossRunOptions)
 export interface BossResultPanelProps {
   readonly stars: Stars;
   readonly saved: boolean;
-  /** True when "Play again" shows even without a standalone session — a lesson boss that did not
-   * win outright (static's move-limit end, versus lost/draw). A win always offers it once there is
-   * a session, never on its own inside a lesson. */
+  /** True when "Play again" shows even without a standalone session: a lesson boss that did not win outright (static's
+   * move-limit end, versus lost/draw). A win offers it only in a session. */
   readonly alwaysPlayAgain: boolean;
   /** Extra line shown above the stars (static's "ended" text, versus's draw reason). */
   readonly note?: ReactNode;
@@ -91,9 +89,8 @@ export interface BossResultPanelProps {
   readonly onNext: () => void;
 }
 
-/** The result block every boss step ends on: stars, then — once the play is saved — either a plain
- * "Next" (a lesson boss that won outright, no session) or "Play again" + "Next"/session's primary
- * action. Same DOM every boss mode rendered by hand before this (dedup target of C6). */
+/** The result block every boss step ends on: stars, then once saved either "Next" (a lesson boss won outright, no session)
+ * or "Play again" + "Next" / the session's primary action. */
 export function BossResultPanel({
   stars,
   saved,

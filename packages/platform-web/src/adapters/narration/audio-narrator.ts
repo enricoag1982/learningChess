@@ -4,16 +4,14 @@ import { stripNickname, voiceKey } from '@learn/platform-core';
 export interface CreateAudioNarratorOptions {
   /** e.g. `import.meta.env.BASE_URL + 'audio/en/'` — every file this adapter fetches is `<baseUrl><key>.mp3`/`<baseUrl>manifest.json`. */
   readonly baseUrl: string;
-  /** Web Speech (or another `Narrator`), used for any text with no generated audio, or when audio playback itself is unavailable/fails. */
+  /** For text with no generated audio, or when playback is unavailable or fails. */
   readonly fallback: Narrator;
-  /** Injectable `fetch` (tests). Defaults to the global `fetch`. */
   readonly fetch?: typeof fetch;
-  /** Injectable `AudioContext` constructor (tests; also where a `webkitAudioContext` shim would go). Defaults to `window.AudioContext`. */
+  /** Injectable `AudioContext` constructor (tests, `webkitAudioContext` shim). */
   readonly audioContextFactory?: () => AudioContext;
 }
 
-/** Why a `speak()` call fell back to the device voice instead of playing generated audio — the same
- * cases `docs/voice.md` "Fallback rules" lists, one id per case. */
+/** Why a `speak()` fell back to the device voice (the cases `docs/voice.md` "Fallback rules" lists). */
 export type AudioNarratorFallbackReason =
   | 'no-audio-context'
   | 'still-suspended'
@@ -22,22 +20,18 @@ export type AudioNarratorFallbackReason =
   | 'file-missing'
   | 'decode-failed';
 
-/** The outcome of one `speak()` call: generated audio actually played, or it fell back and why. */
 export type AudioNarratorOutcome =
   | { readonly kind: 'audio' }
   | { readonly kind: 'fallback'; readonly reason: AudioNarratorFallbackReason };
 
 export interface AudioNarrator extends Narrator {
-  /** The active profile's nickname (or `null`), stripped from text before the generated-audio
-   * lookup, same as the content inventory strips it from templates (`stripNickname`). */
+  /** Active nickname (or `null`), stripped before the audio lookup like the content inventory does (`stripNickname`). */
   setNickname(nickname: string | null): void;
-  /** The outcome of the most recently *completed* `speak()` call, or `null` before any has
-   * finished — read by the parent area's "Test voice" check right after its own `speak()`. */
+  /** Outcome of the last *completed* `speak()`, `null` before any; read by the parent area's "Test voice". */
   lastOutcome(): AudioNarratorOutcome | null;
 }
 
-/** Decoded-buffer cache size (docs/voice.md): enough to cover one lesson/screen's worth of
- * repeats (replay button, a few exercises in a row) without holding the whole language in memory. */
+/** Decoded-buffer cache (docs/voice.md): covers one screen's repeats without holding the whole language. */
 const BUFFER_CACHE_SIZE = 20;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -81,8 +75,7 @@ function defaultAudioContextFactory(): AudioContext {
   return new Ctor();
 }
 
-/** `Narrator` over pre-generated Kokoro audio (`docs/voice.md`), falling back to `fallback` (Web
- * Speech) for any text without generated audio or when playback itself cannot go ahead. */
+/** Pre-generated Kokoro audio (`docs/voice.md`), falling back to `fallback` for text without audio or when playback cannot go ahead. */
 export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioNarrator {
   const { baseUrl, fallback } = options;
   const fetchFn = options.fetch ?? fetch;

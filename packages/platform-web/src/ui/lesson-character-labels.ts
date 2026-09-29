@@ -1,10 +1,8 @@
 import type { TFunction } from 'i18next';
 import { characterName, tContent } from '../content-text.ts';
 
-/** A subject's `SubjectCore.characters` map — narrowed here to the one field these labels use. */
 type Characters = Readonly<Record<string, { readonly topicKey: string }>>;
 
-/** First lesson id per character, in curriculum order (world order, then lesson order within it). */
 export function firstLessonsByCharacter(
   lessons: readonly {
     readonly id: string;

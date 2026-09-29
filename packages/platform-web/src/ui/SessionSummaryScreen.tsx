@@ -10,8 +10,7 @@ import { StarsRow } from './StarsRow.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen } from './ds/Screen.tsx';
 
-/** Today session's closing screen (domain-model.md §3.3): stars earned, any new animal friend, a
- * rank-up, and Owl's line — then back to Home. */
+/** Today session's closing screen (domain-model.md §3.3): stars, any new animal friend, a rank-up, Owl's line; then Home. */
 export function SessionSummaryScreen(): JSX.Element {
   const { t } = useTranslation();
   const characters = usePack().core.characters;

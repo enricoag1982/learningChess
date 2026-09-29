@@ -35,7 +35,6 @@ function isAppSettingsShape(value: unknown): value is {
   );
 }
 
-/** Fills in `suggestedLevels: {}` / `profileSettings: {}` for a record stored before either existed. */
 function normalize(stored: {
   lastProfileId: string | null;
   suggestedLevels?: unknown;
@@ -54,7 +53,6 @@ function normalize(stored: {
   };
 }
 
-/** `SettingsRepository` storing device-wide settings under one `LocalStore` record. */
 export class LocalStorageSettingsRepository implements SettingsRepository {
   private readonly record: SingletonRecord<unknown>;
 

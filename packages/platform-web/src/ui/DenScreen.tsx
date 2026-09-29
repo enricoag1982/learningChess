@@ -26,11 +26,9 @@ const BADGE_CATEGORIES: readonly BadgeCategory[] = ['milestone', 'skill', 'play'
 
 const TIER_RANK: Readonly<Record<BadgeTier, number>> = { bronze: 1, silver: 2, gold: 3 };
 
-/** One badge's My Den display state, derived from every `EarnedBadge` row for its id. */
 interface BadgeDisplay {
   readonly earned: boolean;
   readonly tier?: BadgeTier;
-  /** Any not-yet-seen row for this badge (rewards.md §1 "new" dot). */
   readonly isNew: boolean;
   /** The next threshold not yet reached (locked, or a lower tier already earned); `undefined` once maxed. */
   readonly nextThreshold?: number;
@@ -71,7 +69,6 @@ function rankNote(t: TFunction, catalog: TracksCatalog, entry: RankLadderEntry):
   return t('den.rank-after-track', { track: track ? tContent(t, track.titleKey) : '' });
 }
 
-/** My Den: rank ladder, animal-friend collection, and the badge grid (rewards.md §2–3). */
 export function DenScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

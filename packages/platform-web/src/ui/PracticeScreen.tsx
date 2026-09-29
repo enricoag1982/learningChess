@@ -10,7 +10,6 @@ import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
-/** One topic's last-10 accuracy, as a row of filled/empty dots (never red — errors are orange, not shown per-dot). */
 function AccuracyDots({ recent }: { readonly recent: readonly boolean[] }): JSX.Element {
   return (
     <div className="flex items-center gap-1" aria-hidden="true">
@@ -60,7 +59,6 @@ function practiceTopics(
   }));
 }
 
-/** Practice: the daily warm-up card, and a topic run (5 tasks) for any concept already taught. */
 export function PracticeScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

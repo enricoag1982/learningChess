@@ -20,16 +20,14 @@ import type { Route, RouteMeta, RouteName } from './routes.ts';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
 export interface SubjectState {}
 
-/** Props for a subject's own settings chips (`SubjectWeb.loadParent`'s `SettingsPanel`), rendered
- * inside `ChildSettings`'s generic settings section. */
+/** Props for a subject's settings chips (`SubjectWeb.loadParent`'s `SettingsPanel`), rendered in `ChildSettings`. */
 export interface ParentSettingsProps {
   readonly profileId: string;
   readonly settings: ProfileSettings;
   readonly patchSettings: (patch: Partial<ProfileSettings>) => Promise<void>;
 }
 
-/** Props for a subject's own report section (`SubjectWeb.loadParent`'s `ReportSection`), rendered
- * inside `ChildReport` alongside the platform's own sections. */
+/** Props for a subject's report section (`loadParent`'s `ReportSection`), rendered in `ChildReport`. */
 export interface ReportSectionProps {
   readonly games: readonly GameRecord[];
   readonly profilesById: ReadonlyMap<string, Profile>;
@@ -45,14 +43,11 @@ export interface SurfaceContext {
   readonly worldId: string | null;
 }
 
-/** One subject's whole web behaviour behind the platform's uniform interface (docs/refactor-v4.md
- * §11). Grows a field per seam commit; a subject omits what it has no use for. */
+/** One subject's whole web behaviour behind the platform interface (docs/refactor-v4.md §11); a subject omits what it doesn't use. */
 export interface SubjectWeb {
   readonly core: SubjectCore;
-  /** Built once at composition-root time (`app/services.ts`), never per render: the subject's own
-   * content (read by the use cases) and services (chess: a worker-backed bot player, for the UI). */
+  /** Built once at composition-root time, never per render: the subject's content (for the use cases) and services (chess: a worker-backed bot). */
   createServices(): { readonly content: ContentSource; readonly subject: SubjectServices };
-  /** Every exercise kind's UI, by `type` — `ExercisePlay`'s one dispatch point. */
   readonly kinds: Readonly<Record<string, AnyExerciseKindUI>>;
   /** This subject's mini-game mode UIs, by `mode` (chess: static, versus); `BossStep` adds `series`. */
   readonly modes: Readonly<Record<string, MiniGameModeUI>>;
@@ -63,41 +58,32 @@ export interface SubjectWeb {
     Demo(props: { readonly lesson: Lesson }): JSX.Element;
     View(props: { state: ExerciseStateBase; surface: SurfaceContext }): JSX.Element;
   };
-  /** The piece-icon pill under a character's portrait, naming the piece it stands for
-   * (`CharacterCard`); absent for a subject with no such badge. */
+  /** The piece-icon pill under a character's portrait (`CharacterCard`); absent for a subject without one. */
   CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
   /** This subject's own art (chess: lesson characters, bot levels), keyed by id; falls back to the
    * platform's own (avatars, Owl) for an id it doesn't have. */
   readonly art: Readonly<Record<string, string>>;
-  /** Extra Home tiles this subject contributes (chess: Play), merged with the platform's own
-   * (Journey/Practice/My Den) and sorted by `order`; absent for a subject with none. */
+  /** Extra Home tiles (chess: Play), merged with the platform's and sorted by `order`. */
   readonly homeTiles?: readonly HomeTile[];
-  /** My Den's own bits: the rank ladder's glyph per rank id, and an extra stats row (chess: games
-   * won / with friends) under the rank/friends panels; `Stats` absent for a subject with none. */
+  /** My Den bits: a glyph per rank id, and an optional extra stats row (chess: games won / with friends). */
   readonly den: {
     rankGlyph(rankId: string): string;
     Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
   };
-  /** Lazy-loaded parent-area panels (chess: level + piece-style chips, the games-played section) —
-   * a dynamic import so they stay inside the app's own lazy parent chunk, never the initial bundle.
-   * Absent for a subject with no parent-area contribution. */
+  /** Lazy parent-area panels (chess: level + piece-style chips, games-played section): a dynamic import, so they stay in the
+   * lazy parent chunk, not the initial bundle. */
   loadParent?(): Promise<ParentPanels>;
-  /** Every route this subject contributes (chess: `play`, `full-game`, `friend-setup`,
-   * `friend-game`), keyed by name; the platform's own routes never appear here. */
+  /** Routes this subject contributes (chess: `play`, `full-game`, `friend-setup`, `friend-game`); the platform's never appear here. */
   readonly routes: Readonly<Record<string, SubjectRouteEntry>>;
-  /** This subject's own store slice (chess: `PlaySlice`), spread into `AppState` alongside the
-   * platform's own; absent for a subject with no state of its own. */
+  /** This subject's store slice (chess: `PlaySlice`), spread into `AppState`. */
   readonly createSlice?: SliceCreator<SubjectState>;
-  /** Fields reset on every "back to Home" (chess: clears `levelUpSuggestion`); absent for a
-   * subject with nothing to reset. */
+  /** Fields reset on every "back to Home" (chess: clears `levelUpSuggestion`). */
   readonly homeReset?: Partial<SubjectState>;
-  /** Dev-only playground screens, by URL hash (`main.tsx`, `#board`/`#exercises`); dynamically
-   * imported so they never reach the production bundle. Absent for a subject with none. */
+  /** Dev-only playground screens by URL hash (`#board`, `#exercises`), dynamically imported so they never reach the production bundle. */
   readonly dev?: Readonly<Record<string, () => Promise<ComponentType>>>;
 }
 
-/** One subject-contributed route's screen, per-route flags, and optional entry side effect (chess
- * `full-game`: clears a stale level-up banner). */
+/** One subject route: screen, per-route flags and an optional entry side effect (chess `full-game`: clears a stale level-up banner). */
 export interface SubjectRouteEntry {
   readonly screen: ComponentType;
   readonly meta: RouteMeta;

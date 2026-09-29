@@ -10,7 +10,6 @@ import { characterName, tContent } from '../../content-text.ts';
 import { PARENT_NOTE, PARENT_SECONDARY_BUTTON } from './parent-styles.ts';
 import { useAsync } from '../ds/useAsync.ts';
 
-/** Locked-lesson name: title for an Owl-taught lesson (no piece character), else its character's name. */
 function lessonName(t: TFunction, characters: SubjectCore['characters'], lesson: Lesson): string {
   return characters[lesson.character] === undefined
     ? tContent(t, lesson.titleKey)
@@ -21,8 +20,7 @@ export interface UnlockPanelProps {
   readonly profileId: string;
 }
 
-/** Parent area "Unlock lessons & worlds" (domain-model.md §3.2): locked worlds/lessons, each with
- * an unlock button. Loads this profile's own `Journey` directly, bypassing the store's. */
+/** Parent "Unlock lessons & worlds" (domain-model.md §3.2): locked worlds / lessons with an unlock button; loads the profile's own `Journey`, bypassing the store's. */
 export function UnlockPanel({ profileId }: UnlockPanelProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

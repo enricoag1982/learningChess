@@ -8,8 +8,7 @@ export interface PrivacyScreenProps {
   readonly onBack: () => void;
 }
 
-/** Parent area "Privacy" row's own screen — its own file, not `PrivacyPolicy.tsx`, since that
- * module is also reached eagerly and must never import the lazy-only `ChevronLeftIcon`. */
+/** Own file, not `PrivacyPolicy.tsx`: that module is reached eagerly and must never import the lazy-only `ChevronLeftIcon`. */
 export function PrivacyScreen({ onBack }: PrivacyScreenProps): JSX.Element {
   const { t } = useTranslation();
   return (

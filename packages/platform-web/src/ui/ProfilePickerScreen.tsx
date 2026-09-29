@@ -5,7 +5,6 @@ import { LockIcon, PlusIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { AvatarBadge } from './ds/AvatarBadge.tsx';
 
-/** Profile picker (kid style): app start whenever a parent lock exists (app-structure.md §3). */
 export function ProfilePickerScreen(): JSX.Element {
   const { t } = useTranslation();
   const profiles = useAppStore((state) => state.profiles);

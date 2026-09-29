@@ -1,7 +1,6 @@
 import type { JSX } from 'react';
 import type { BadgeTier } from '@learn/platform-core';
 
-/** Fill colour per tier (`docs/screens.md` §1.1 tokens where they fit; gold reuses the star token). */
 const TIER_COLOR: Readonly<Record<BadgeTier | 'none', string>> = {
   bronze: '#C97C43',
   silver: '#ADB5BD',
@@ -11,13 +10,11 @@ const TIER_COLOR: Readonly<Record<BadgeTier | 'none', string>> = {
 
 export interface BadgeIconProps {
   readonly tier?: BadgeTier;
-  /** Grey outline instead of a filled medal (My Den: locked). */
   readonly locked?: boolean;
   readonly className?: string;
 }
 
-/** A round medal/rosette (docs/screens.md §1: grey + lock = locked): earned shows a checkmark
- * filled by tier colour; locked shows a grey outline with a lock glyph, never the checkmark. */
+/** Round medal (docs/screens.md §1): earned = tier-coloured checkmark; locked = grey outline with a lock glyph, never the checkmark. */
 export function BadgeIcon({ tier, locked = false, className }: BadgeIconProps): JSX.Element {
   const color = locked ? '#8C8C8C' : TIER_COLOR[tier ?? 'none'];
   return (

@@ -10,13 +10,10 @@ import { tapClass } from '../ds/tap.ts';
 
 export interface CompleteStepProps {
   readonly lesson: Lesson;
-  /** Restart this lesson at the story. */
   readonly onPlayAgain: () => void;
-  /** Back to Home. */
   readonly onContinue: () => void;
 }
 
-/** Reward stars (1–3) from the percentage of the lesson's max stars actually earned. */
 function ratingStars(earned: number, max: number): 1 | 2 | 3 {
   if (max <= 0) return 1;
   const percent = earned / max;
@@ -25,7 +22,6 @@ function ratingStars(earned: number, max: number): 1 | 2 | 3 {
   return 1;
 }
 
-/** Lesson complete: reward stars, what's new, and the choice to replay or head home. */
 export function CompleteStep({ lesson, onPlayAgain, onContinue }: CompleteStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

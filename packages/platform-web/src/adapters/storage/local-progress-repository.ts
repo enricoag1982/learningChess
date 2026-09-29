@@ -45,8 +45,6 @@ const isConceptStatsShape = shapeGuard<ConceptStats>({
   array: ['recent'],
 });
 
-/** `ProgressRepository` over one `LocalStore`: lesson progress keyed by `"<profileId>:<lessonId>"`,
- * attempts as a single capped, append-only list (newest last). */
 export class LocalStorageProgressRepository implements ProgressRepository {
   private readonly lessons: KeyedCollection<LessonProgress>;
   private readonly attempts: CappedList<Attempt>;

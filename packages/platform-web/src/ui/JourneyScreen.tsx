@@ -25,7 +25,6 @@ import { CheckIcon, CrownIcon, FlagIcon, LockIcon } from './ds/icons.tsx';
 import { tapClass } from './ds/tap.ts';
 import { BlankScreen, Screen, ScreenHeader } from './ds/Screen.tsx';
 
-/** Pastel tint per habitat (app-structure.md §8: one habitat per world), for the map panel. */
 const HABITAT_COLOR: Readonly<Record<Habitat, string>> = {
   meadow: '#E7F0D6',
   savannah: '#F6EBC9',
@@ -46,7 +45,6 @@ function nodeStatus(status: JourneyLessonStatus): NodeStatus {
   return 'complete';
 }
 
-/** Reward stars (1–3) from the percentage of a lesson's max stars earned (matches `CompleteStep`). */
 function ratingStars(earned: number, max: number): 1 | 2 | 3 {
   if (max <= 0) return 1;
   const percent = earned / max;
@@ -55,14 +53,12 @@ function ratingStars(earned: number, max: number): 1 | 2 | 3 {
   return 1;
 }
 
-/** A point in a 0–100 normalized coordinate space, matching the map's `viewBox`. */
 interface NodePoint {
   readonly x: number;
   readonly y: number;
 }
 
-/** A gentle winding "snake" of `count` points across the 0–100 normalized map: left-to-right when
- * `wide` (tablet landscape), bottom-to-top otherwise (phone / tablet portrait). */
+/** A winding snake of `count` points on the 0–100 map: left-to-right when `wide` (tablet landscape), else bottom-to-top. */
 function layoutNodes(count: number, wide: boolean): readonly NodePoint[] {
   if (count <= 0) return [];
   if (count === 1) return [{ x: 50, y: 50 }];
@@ -83,7 +79,6 @@ function layoutNodes(count: number, wide: boolean): readonly NodePoint[] {
   });
 }
 
-/** Smooth Catmull-Rom curve through `points`, as a cubic-bezier SVG path. */
 function smoothPath(points: readonly NodePoint[]): string {
   if (points.length === 0) return '';
   if (points.length === 1) return `M ${String(points[0]?.x)} ${String(points[0]?.y)}`;
@@ -129,7 +124,6 @@ export function JourneyScreen(): JSX.Element {
     readonly lessonId: string;
     readonly worldId: string;
   } | null>(null);
-  /** "Show you know it?" sheet (domain-model.md §3.2), for the locked lesson/world just tapped. */
   const [testOutOffer, setTestOutOffer] = useState<
     | {
         readonly bodyText: string;
@@ -208,13 +202,11 @@ export function JourneyScreen(): JSX.Element {
     void startLesson(lesson.id);
   }
 
-  /** Locked-lesson bar's "Show you know it?" button: opens the sheet for that lesson. */
   function offerTestOutLesson(lessonId: string, worldId: string, lessonName: string): void {
     const bodyText = tContent(t, 'journey:ui.test-out-lesson-question', { name: lessonName });
     setTestOutOffer({ bodyText, kind: 'lesson', lessonId, worldId });
   }
 
-  /** Locked-world banner's "Show you know it?" button: opens the sheet for that whole world. */
   function offerTestOutWorld(world: World): void {
     const bodyText = tContent(t, 'journey:ui.test-out-world-question', {
       order: world.order,
@@ -462,10 +454,8 @@ function WorldMap({
   readonly statuses: ReadonlyMap<string, JourneyLessonStatus>;
   readonly progress: readonly LessonProgress[];
   readonly isWorldOne: boolean;
-  /** First lesson id per character (curriculum order), for a repeated character's node label. */
   readonly firstLessonOfCharacter: ReadonlyMap<string, string>;
   readonly onActivate: (lesson: Lesson) => void;
-  /** This world's boss content, when it has one (`bossStatus` is then not `'none'`). */
   readonly bossMiniGame: MiniGame | undefined;
   readonly bossStatus: WorldBossStatus;
   readonly onActivateBoss: () => void;
@@ -538,7 +528,6 @@ function LessonNode({
   readonly status: JourneyLessonStatus;
   readonly progress: LessonProgress | undefined;
   readonly isWorldOne: boolean;
-  /** First lesson id per character (curriculum order), for a repeated character's node label. */
   readonly firstLessonOfCharacter: ReadonlyMap<string, string>;
   readonly point: NodePoint;
   readonly onActivate: () => void;
@@ -619,8 +608,7 @@ function LessonNode({
   );
 }
 
-/** A world boss's node, shown after its world's last lesson node (crown badge). Status style
- * mirrors `LessonNode`; tapping a locked boss does nothing, `available`/`won` calls `onActivate`. */
+/** A world boss's node after its world's last lesson (crown badge); like `LessonNode`, but a locked boss does nothing. */
 function BossNode({
   miniGame,
   status,

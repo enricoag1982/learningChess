@@ -2,8 +2,7 @@ import type { AppDeps } from '@learn/platform-core';
 import { buildShareFile } from '@learn/platform-core/backup';
 import { triggerDownload } from './download.ts';
 
-/** Outcome of {@link sendBackupToOtherDevice}: `cancelled` shows no error UI (a user cancel is
- * silent). */
+/** `cancelled` shows no error UI (a user cancel is silent). */
 export type ShareBackupOutcome = 'shared' | 'downloaded' | 'cancelled';
 
 /** `true` when this browser can share `file` via the Web Share API; feature-checked since Safari
@@ -13,9 +12,8 @@ function canShareFile(file: File): boolean {
   return typeof canShare === 'function' && canShare.call(navigator, { files: [file] });
 }
 
-/** Parent area "Send to other device": builds the backup JSON and offers it through the Web Share
- * API (OS share sheet) when available, else falls back to a same-origin download. `profileIds:
- * [id]` shares just that one child; omitted shares every child. */
+/** Parent "Send to other device": offers the backup JSON via the Web Share API when available, else a same-origin download;
+ * `profileIds: [id]` shares one child, omitted shares all. */
 export async function sendBackupToOtherDevice(
   deps: AppDeps,
   profileIds?: readonly string[],

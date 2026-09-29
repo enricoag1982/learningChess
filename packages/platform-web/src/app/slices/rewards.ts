@@ -6,11 +6,8 @@ import type { AppGet, SliceCreator } from '../store.ts';
 const MAX_CELEBRATIONS_PER_SESSION = 2;
 
 export interface RewardsSlice {
-  /** This profile's earned badges (My Den's grid + celebrations' "new" dot). */
   readonly earnedBadges: readonly EarnedBadge[];
-  /** This profile's daily-play streak; `null` before it has any counted day yet. */
   readonly streak: Streak | null;
-  /** The badge celebration currently showing full-screen (rewards.md §1); `null` when none is. */
   readonly activeCelebration: EarnedBadge | null;
   /** Celebrations already shown this app sitting (reset on profile select); caps at {@link MAX_CELEBRATIONS_PER_SESSION}. */
   readonly celebrationsShownThisSession: number;
@@ -21,11 +18,9 @@ export interface RewardsSlice {
   /** Marks `activeCelebration` seen, counts it against this session's cap, and clears it — then
    * queues the next one, if any and still under cap. */
   readonly dismissCelebration: () => Promise<void>;
-  /** My Den: marks one earned badge's "new" dot cleared (tapped/viewed), a no-op if already seen. */
   readonly markBadgeSeen: (earnedBadgeId: string) => Promise<void>;
 }
 
-/** This profile's earned badges + streak, `[]`/`undefined` when `rewards` is not wired. */
 export async function loadRewards(
   get: AppGet,
   profileId: string,
@@ -39,8 +34,6 @@ export async function loadRewards(
 }
 
 export const createRewardsSlice: SliceCreator<RewardsSlice> = (set, get) => {
-  /** Queues the oldest unseen badge as `activeCelebration`, under cap; assumes the reward fields
-   * are already current. */
   function queueNextCelebration(): void {
     const { activeCelebration, celebrationsShownThisSession, earnedBadges } = get();
     if (activeCelebration || celebrationsShownThisSession >= MAX_CELEBRATIONS_PER_SESSION) return;

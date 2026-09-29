@@ -6,7 +6,6 @@ import { CheckIcon, SkipIcon } from '../ds/icons.tsx';
 
 export interface StepPillsProps {
   readonly current: LessonPhase;
-  /** Story/Demo/Try phases skipped so far this run (`LessonProgress.skippedPhases`). */
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 

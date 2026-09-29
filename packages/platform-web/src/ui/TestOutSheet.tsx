@@ -5,14 +5,12 @@ import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 
 export interface TestOutSheetProps {
-  /** The offer question, already resolved (e.g. "Want to show me you already know Rhino?"). */
   readonly bodyText: string;
   readonly onYes: () => void;
   readonly onNo: () => void;
 }
 
-/** "Show you know it?" sheet (domain-model.md §3.2): shown after tapping a locked lesson or world
- * on the Journey. A dialog, so the Owl row is always stacked (docs/screens.md §1). */
+/** "Show you know it?" sheet (domain-model.md §3.2) after tapping a locked lesson / world; a dialog, so the Owl row is always stacked (docs/screens.md §1). */
 export function TestOutSheet({ bodyText, onYes, onNo }: TestOutSheetProps): JSX.Element {
   const { t } = useTranslation();
 

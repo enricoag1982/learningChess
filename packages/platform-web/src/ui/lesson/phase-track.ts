@@ -1,11 +1,10 @@
 import type { LessonPhase, SkippablePhase } from '@learn/platform-core';
 
-/** Lesson phases in track order (`StepPills` on tablets, `PhaseChip`'s mini track on phones). */
 export const PHASES: readonly LessonPhase[] = ['story', 'demo', 'try', 'exercises', 'boss'];
 
 export type PhaseState = 'done' | 'current' | 'skipped' | 'rest';
 
-/** One phase's state in the track: skipped (playtest 2) wins over done. */
+/** Skipped wins over done. */
 export function phaseState(
   phase: LessonPhase,
   current: LessonPhase,

@@ -23,8 +23,6 @@ const isSessionLogShape = shapeGuard<SessionLog>({
   number: ['minutes'],
 });
 
-/** `RewardsRepository` over one `LocalStore`: earned badges as an uncapped append-only list; one
- * streak per profile; one session log row per `"<profileId>:<date>"`. */
 export class LocalStorageRewardsRepository implements RewardsRepository {
   private readonly store: LocalStore;
   private readonly earnedBadges: CappedList<EarnedBadge>;

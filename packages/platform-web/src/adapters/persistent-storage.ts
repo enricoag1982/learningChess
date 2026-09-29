@@ -20,9 +20,8 @@ function markRequested(): void {
   }
 }
 
-/** Requests persistent storage once, the first profile created on this device
- * (`non-functional.md` §1): browsers may otherwise evict `localStorage` under pressure. Feature-
- * detects `navigator.storage.persist`; best-effort, never blocks profile creation. */
+/** Asks once, at the first profile created (`non-functional.md` §1): browsers may evict `localStorage` under pressure.
+ * Feature-detected, best-effort, never blocks creation. */
 export async function requestPersistentStorageIfNeeded(deps: AppDeps): Promise<void> {
   try {
     if (alreadyRequested()) {

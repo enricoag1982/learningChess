@@ -42,7 +42,6 @@ import {
 } from './parent-styles.ts';
 import { UnlockPanel } from './UnlockPanel.tsx';
 
-/** Small inline avatar picker (parent style, ≥ 44px targets). */
 function AvatarPicker({ onPick }: { readonly onPick: (avatar: string) => void }): JSX.Element {
   return (
     <div className="flex flex-wrap gap-2">
@@ -68,7 +67,6 @@ function AvatarPicker({ onPick }: { readonly onPick: (avatar: string) => void })
   );
 }
 
-/** A parent password re-entry dialog, for a dangerous action (Reset). */
 function PasswordConfirmDialog({
   title,
   body,
@@ -152,7 +150,6 @@ function DeleteConfirmDialog({
   );
 }
 
-/** One {@link DAILY_LIMIT_OPTIONS} chip row (reused for "Every day" / "Mon–Fri" / "Sat–Sun"). */
 function LimitChipRow({
   label,
   value,
@@ -225,8 +222,7 @@ function HoursChipRow({
 
 type VoiceOutcome = Awaited<ReturnType<Services['testVoice']>>;
 
-/** Parent area "Test voice" check: speaks one fixed sentence through the real narrator and reports
- * whether generated audio played, or a short reason why it fell back (`docs/voice.md`). */
+/** Parent "Test voice": speaks one fixed sentence through the real narrator and reports whether generated audio played or why it fell back (`docs/voice.md`). */
 function VoiceTestRow(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -307,8 +303,7 @@ export interface ChildSettingsScreenProps {
   readonly onDeleted: () => void;
 }
 
-/** Parent area "child settings" (app-structure.md §11): rename/avatar/delete, per-child settings,
- * unlock lessons & worlds, export, reset. Daily limit is enforced live; the rest next profile select. */
+/** Parent "child settings" (app-structure.md §11): rename / avatar / delete, per-child settings, unlock, export, reset. Daily limit applies live; the rest on next profile select. */
 export function ChildSettingsScreen({
   profile,
   onBack,

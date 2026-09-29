@@ -13,7 +13,6 @@ const IDLE_LIMIT_MS = 2 * 60_000;
  * keydown covers a parent typing in the password/settings screens. */
 const INPUT_EVENTS = ['pointerdown', 'keydown'] as const;
 
-/** Screens where a kid profile is actively playing or browsing (the route's own `tracked` flag). */
 function isTrackedScreen(pack: SubjectWeb, screen: Screen): boolean {
   return routeMetaFor(pack, screen).tracked;
 }

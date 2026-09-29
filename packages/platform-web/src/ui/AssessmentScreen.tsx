@@ -11,7 +11,6 @@ import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { BlankScreen, Screen } from './ds/Screen.tsx';
 
-/** Scope's display name, for the result screen's headline. */
 function scopeName(
   t: TFunction,
   scope: AssessmentScope,
@@ -32,8 +31,7 @@ function scopeName(
   return world ? tContent(t, world.titleKey) : '';
 }
 
-/** Pass/fail result (domain-model.md §3.2 "Pass"/"Fail"): pass unlocks + confetti-lite, fail
- * encourages, no penalty — both return to the Journey. */
+/** Pass (domain-model.md §3.2) unlocks + confetti-lite; fail encourages, no penalty; both return to the Journey. */
 function AssessmentResult({
   outcome,
   scope,
@@ -82,8 +80,7 @@ function AssessmentResult({
   );
 }
 
-/** Test-out run (domain-model.md §3.2): reuses `ReviewTaskRunner` (no hints/easier variants),
- * scoring the whole run via `onRecord` instead of moving the Leitner box per task. */
+/** Test-out run (domain-model.md §3.2): reuses `ReviewTaskRunner` (no hints / easier variants), scoring the whole run via `onRecord`. */
 export function AssessmentScreen(): JSX.Element {
   const { t } = useTranslation();
   const assessmentRun = useRoute('assessment');

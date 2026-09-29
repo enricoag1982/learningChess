@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore, useRoute, useServices } from '../app/store.ts';
 import { Owl } from './ds/Owl.tsx';
 
-/** 5-minute warning banner: `timeNoticeVisible` (`checkTimeNotice`) decides whether it shows; this
- * re-runs that check on every screen change, incl. reaching the lesson-complete step. */
+/** 5-minute warning banner; re-runs `checkTimeNotice` on every screen change, incl. reaching the lesson-complete step. */
 export function AppNotice(): JSX.Element | null {
   const { t } = useTranslation();
   const services = useServices();

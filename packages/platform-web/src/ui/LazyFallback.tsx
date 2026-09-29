@@ -2,8 +2,7 @@ import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Owl } from './ds/Owl.tsx';
 
-/** `Suspense` fallback for a lazy-loaded screen: a spinning ring around the Owl avatar, shown only
- * while that chunk downloads. `role="status"` for a11y; `.lazy-spin` zeroes under reduced motion. */
+/** `Suspense` fallback while a lazy chunk downloads: spinning ring around the Owl; `role="status"`, `.lazy-spin` zeroes under reduced motion. */
 export function LazyFallback(): JSX.Element {
   const { t } = useTranslation();
   return (

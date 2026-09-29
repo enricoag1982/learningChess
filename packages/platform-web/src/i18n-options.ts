@@ -1,8 +1,6 @@
 import type { InitOptions } from 'i18next';
 
-/** i18next init options for `resources` (the active subject's compiled locale bundle) — split out
- * of `i18n.ts` so the e2e kit's own standalone instance can init with the exact same options and
- * resolve identical strings. */
+/** Split from `i18n.ts` so the e2e kit's standalone instance inits with the same options and resolves identical strings. */
 export function i18nOptions(resources: InitOptions['resources']): InitOptions {
   return {
     resources,

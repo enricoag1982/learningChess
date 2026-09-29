@@ -14,11 +14,8 @@ function tap(look: string, fill: string): string {
 }
 
 export const PARENT_DANGER_BUTTON = tap(PARENT_LOOK, DANGER_FILL);
-/** A pressed/selected chip (daily limit, computer level, piece style pickers) — tappable, raised. */
 export const PARENT_CHIP_SELECTED = tap(CHIP_LOOK, INFO_FILL);
-/** An unselected, available chip — tappable, raised. */
 export const PARENT_CHIP = tap(CHIP_LOOK, NEUTRAL_FILL);
 /** A locked/unavailable chip (docs/screens.md §1: never red — grey + a lock icon). */
 export const PARENT_CHIP_LOCKED = tap(CHIP_LOOK, LOCKED_FILL);
-/** Tappable row (docs/screens.md §1): a raised card with a border, unlike a flat info panel. */
 export const PARENT_TAPPABLE_ROW = tap(ROW_LOOK, '');

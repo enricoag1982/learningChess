@@ -17,8 +17,7 @@ import frog from '../../assets/art/frog.webp';
 import mouse from '../../assets/art/mouse.webp';
 import wolf from '../../assets/art/wolf.webp';
 
-/** Every animal image this app ships, keyed by id: lesson characters, profile avatars, and bot
- * levels. `animal-images.test.ts` checks every id each module uses resolves here. */
+/** Every animal image this app ships, by id (characters, avatars, bot levels); `animal-images.test.ts` checks each module's ids resolve here. */
 export const ANIMAL_IMAGES = {
   rhino,
   elephant,
@@ -38,17 +37,14 @@ export const ANIMAL_IMAGES = {
   wolf,
 } as const;
 
-/** Image URL for `id`: `subjectArt` (a subject's own `pack.art`) first, else the platform's own;
- * falls back to the fox image for an id neither knows (should never happen for a real
- * character/avatar/bot-level id — defensive only). */
+/** `subjectArt` (the pack's `art`) first, else the platform's own; the fox for an unknown id (defensive only). */
 export function animalImage(id: string, subjectArt: Readonly<Record<string, string>> = {}): string {
   return (
     subjectArt[id] ?? (ANIMAL_IMAGES as Record<string, string | undefined>)[id] ?? ANIMAL_IMAGES.fox
   );
 }
 
-/** Pastel badge colour per character, echoing its habitat in the sketches (animal theme, not
- * chess — same reasoning as `journey.ts`'s habitat colours). */
+/** Pastel badge colour per character, echoing its habitat (animal theme, not chess). */
 const CHARACTER_COLOR: Readonly<Record<string, string>> = {
   rhino: '#DCE3D9',
   elephant: '#DCE3EA',
@@ -58,7 +54,6 @@ const CHARACTER_COLOR: Readonly<Record<string, string>> = {
   caterpillar: '#DCEFE3',
 };
 
-/** Background colour for a character's round badge/avatar. */
 export function characterColor(character: string): string {
   return CHARACTER_COLOR[character] ?? '#E9DFF3';
 }

@@ -1,8 +1,6 @@
 import type { JSX, ReactNode } from 'react';
 
-/** `top` (bubble + replay row), then — solved — `done`, else `controls` wrapped the same way every
- * kind's panel always has (`mt-auto`, pinning it to the panel's bottom). Shared so no kind repeats
- * this wrapper by hand. */
+/** `top`, then (solved) `done`, else `controls` wrapped as every kind's panel always has (`mt-auto`, pinned to the bottom). */
 export function panelBody(
   top: ReactNode,
   solved: boolean,

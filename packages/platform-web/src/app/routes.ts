@@ -5,13 +5,11 @@ import type {
   TimeLimitStatus,
 } from '@learn/platform-core';
 
-/** A subject-contributed route's own param fields, keyed by route name — augmented per subject
- * (chess: `play`, `'full-game'` `{level}`, `'friend-setup'`, `'friend-game'`). Each subject's own
- * screens/flows read the params back through `useRoute`. */
+/** A subject route's param fields by route name, augmented per subject (chess: `play`, `'full-game'` `{level}`,
+ * `'friend-setup'`, `'friend-game'`); read back via `useRoute`. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
 export interface SubjectRoutes {}
 
-/** Platform screen names with no route params of their own. */
 export type PlainRouteName =
   | 'loading'
   | 'first-run'
@@ -26,7 +24,6 @@ export type PlainRouteName =
   | 'today-summary'
   | 'placement-offer';
 
-/** Every top-level screen name: the platform's own, plus every subject-contributed one. */
 export type RouteName =
   | PlainRouteName
   | 'password'
@@ -75,8 +72,7 @@ export type Route =
       readonly [N in keyof SubjectRoutes]: { readonly name: N } & SubjectRoutes[N];
     }[keyof SubjectRoutes];
 
-/** One requested stack change (`app/slices/nav.ts`): `navigate`/`replace`/`back` each build one of
- * these, and it is what a gate remembers as `time-limit`'s `resume`. */
+/** One requested stack change (`slices/nav.ts`); a gate remembers it as `time-limit`'s `resume`. */
 export type NavOp =
   | { readonly op: 'push'; readonly route: Route }
   | { readonly op: 'replace'; readonly route: Route }
@@ -94,8 +90,7 @@ export interface RouteMeta {
   readonly gated?: true;
 }
 
-/** Fallback for a route this session's `RouteMeta` lookup somehow misses (never in practice: every
- * `RouteName` is either here or in the active pack's own `routes`). */
+/** Fallback for a route the `RouteMeta` lookup misses (never in practice). */
 export const DEFAULT_ROUTE_META: RouteMeta = { tracked: false };
 
 /** Per-platform-route flags read by `TimeTracker`, `AppNotice` and `AppUpdater`; a subject route's

@@ -7,7 +7,6 @@ const PLATFORM_MODE_UI: Readonly<Record<string, MiniGameModeUI>> = {
   series: { mode: 'series', Step: SeriesStep },
 };
 
-/** The lesson's boss mini-game: the platform's own mode UI, else the subject's (`pack.modes`). */
 export function BossStep(props: BossStepProps): JSX.Element {
   const pack = usePack();
   const modeUi = PLATFORM_MODE_UI[props.game.mode] ?? pack.modes[props.game.mode];

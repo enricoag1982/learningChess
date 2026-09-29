@@ -10,8 +10,7 @@ import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
 import { useAsync } from './ds/useAsync.ts';
 
-/** `TimeLimitStatus.reason` -> title/body text ("limit"; "late"/"early", app-structure.md §13);
- * falls back to the daily-limit text for `null` (should not normally happen). */
+/** `TimeLimitStatus.reason` → title / body text (app-structure.md §13); `null` falls back to the daily-limit text. */
 function timeLimitText(
   t: TFunction,
   reason: TimeLimitReason | null,
@@ -31,8 +30,7 @@ function timeLimitText(
   }
 }
 
-/** "See you tomorrow" screen, shown once the gate finds the kid blocked. **Switch player** or
- * **Parent: more time**, which resumes the blocked navigation. */
+/** "See you tomorrow": **Switch player** or **Parent: more time**, which resumes the blocked navigation. */
 export function TimeLimitScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();

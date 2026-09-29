@@ -5,7 +5,6 @@ import { tapClass } from '../ds/tap.ts';
 
 export interface NextButtonProps {
   readonly onClick: () => void;
-  /** Overrides the default "Next" label, e.g. Story's "Let me try". */
   readonly label?: string;
   readonly className?: string;
 }

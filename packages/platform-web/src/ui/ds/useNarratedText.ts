@@ -26,19 +26,16 @@ export function useSpeak(
   };
 }
 
-/** Same as {@link useSpeak} in its default mode — the name Story/Demo call sites use. */
 export const useNarratedText = useSpeak;
 
-/** An exercise's instruction plus its feedback note, without re-reading the instruction on every
- * note; a note arriving mid-instruction waits for it (guarded by a `cancelled` ref) instead of
- * cutting it off. `replay` speaks both together, dropping any note still waiting. */
+/** Instruction plus feedback note without re-reading the instruction per note; a note arriving mid-instruction waits
+ * (`cancelled` ref) rather than cut it off. `replay` speaks both, dropping a waiting note. */
 export function useInstructionNarration(
   narrator: Narrator,
   instruction: string,
   note: string | undefined,
 ): () => void {
   const instructionRunRef = useRef<Promise<void> | null>(null);
-  /** Drops a note still waiting for the instruction to end — replay speaks it itself. */
   const cancelWaitingNoteRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {

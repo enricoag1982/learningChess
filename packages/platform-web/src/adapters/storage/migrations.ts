@@ -6,25 +6,25 @@ export const MIGRATIONS: readonly Migration[] = [
   {
     to: 2,
     migrate: () => {
-      // No-op: see the module doc above.
+      // No-op: nothing to transform.
     },
   },
   {
     to: 3,
     migrate: () => {
-      // No-op: see the module doc above.
+      // No-op: nothing to transform.
     },
   },
   {
     to: 4,
     migrate: () => {
-      // No-op: see the module doc above.
+      // No-op: nothing to transform.
     },
   },
   {
     to: 5,
     migrate: () => {
-      // No-op: see the module doc above.
+      // No-op: nothing to transform.
     },
   },
 ];

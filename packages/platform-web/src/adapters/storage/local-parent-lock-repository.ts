@@ -11,7 +11,6 @@ const isParentLockShape = shapeGuard<ParentLock>({
   nullableString: ['lockedUntil'],
 });
 
-/** `ParentLockRepository` storing the single device-wide lock under one `LocalStore` record. */
 export class LocalStorageParentLockRepository implements ParentLockRepository {
   private readonly record: SingletonRecord<unknown>;
 

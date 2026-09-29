@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Owl } from './ds/Owl.tsx';
 import { TapButton } from './ds/primitives.tsx';
 
-/** What a child (or the parent helping) sees instead of a blank page when the app cannot start or
- * a screen crashes: Owl, a short message, the error text, and "Try again". */
+/** Shown instead of a blank page when the app cannot start or a screen crashes: Owl, a short message, the error text, "Try again". */
 function AppErrorScreen({ message }: { readonly message: string }): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -32,8 +31,7 @@ interface AppErrorBoundaryState {
   readonly message: string | null;
 }
 
-/** Top-level error boundary (`main.tsx`): any render error — including a failing composition root
- * (`createServices`) or an `init()` rejection that `App` rethrows — shows `AppErrorScreen`. */
+/** Top-level boundary (`main.tsx`): any render error, incl. a failing `createServices` or an `init()` rejection `App` rethrows. */
 export class AppErrorBoundary extends Component<
   { readonly children: ReactNode },
   AppErrorBoundaryState

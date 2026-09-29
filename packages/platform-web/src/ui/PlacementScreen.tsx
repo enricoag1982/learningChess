@@ -6,7 +6,6 @@ import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { Screen } from './ds/Screen.tsx';
 
-/** Placement's own closing summary (domain-model.md §3.2): how many Basics worlds were passed. */
 function PlacementSummary({
   passedCount,
   totalWorlds,
@@ -47,8 +46,7 @@ function PlacementSummary({
   );
 }
 
-/** The placement test (domain-model.md §3.2): one run per Basics world in order, stopping at the
- * first failed world; closing it any time keeps whatever already passed. */
+/** Placement test (domain-model.md §3.2): one run per Basics world in order, stopping at the first failed one; closing keeps what passed. */
 export function PlacementScreen(): JSX.Element {
   const { t } = useTranslation();
   const route = useRoute('placement');

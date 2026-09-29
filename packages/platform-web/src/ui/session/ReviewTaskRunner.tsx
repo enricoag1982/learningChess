@@ -7,20 +7,13 @@ import { BlankScreen, Screen, ScreenHeader } from '../ds/Screen.tsx';
 
 export interface ReviewTaskRunnerProps {
   readonly tasks: readonly ConceptTask[];
-  /** e.g. "Warm-up {{current}}/{{total}}" (warm-up) or "Practice {{current}}/{{total}}" (Practice). */
   readonly headerText: (current: number, total: number) => string;
   readonly closeAriaLabel: string;
-  /** Threaded into every `recordReviewResult` call (rewards.md §4 "Warm-up Champ"). Ignored when
-   * `onRecord` is given. */
+  /** Threaded into `recordReviewResult` (rewards.md §4 "Warm-up Champ"); ignored when `onRecord` is given. */
   readonly reviewSource: 'warmup' | 'practice';
-  /** Called once every task is solved and its result saved. */
   readonly onDone: () => void;
-  /** Top-bar Close: leaves the run early (kid can leave any time). */
   readonly onClose: () => void;
-  /** Hides every task's Hint control (assessment runs, domain-model.md §3.2). Default `true`. */
   readonly showHint?: boolean;
-  /** Overrides the default per-task `recordReviewResult` save; see
-   * `ReviewExerciseStepProps.onRecord`. */
   readonly onRecord?: (
     task: ConceptTask,
     state: ExerciseStateBase,

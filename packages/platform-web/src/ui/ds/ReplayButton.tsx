@@ -4,13 +4,11 @@ import { tapClass } from './tap.ts';
 
 export interface ReplayButtonProps {
   readonly onClick: () => void;
-  /** e.g. "Listen again" (Story) or "Say it again" (Exercise / Demo / Boss / Home). */
   readonly label: string;
   readonly className?: string;
 }
 
-/** Replays the current spoken text. Kept separate from `SpeechBubble` so a screen can place it
- * wherever its responsive layout needs (docs/screens.md: every text is spoken, with a replay button). */
+/** Replays the spoken text; separate from `SpeechBubble` so a screen can place it where its layout needs (docs/screens.md). */
 export function ReplayButton({ onClick, label, className = '' }: ReplayButtonProps): JSX.Element {
   return (
     <button

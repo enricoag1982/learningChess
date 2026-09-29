@@ -5,49 +5,35 @@ import { routeMetaFor } from '../subject.ts';
 import type { NavOp, Route, RouteName } from '../routes.ts';
 
 export interface NavSlice {
-  /** The navigation stack, root first, current screen last. */
   readonly stack: readonly Route[];
-  /** The current screen's name; always `stack[stack.length - 1].name`. */
   readonly screen: RouteName;
   /** Pushes `route`; a gated route (`ROUTE_META`) over the limit pushes `time-limit` instead. */
   readonly navigate: (route: Route) => Promise<void>;
-  /** Same as `navigate`, but replaces the current top instead of pushing. */
   readonly replace: (route: Route) => Promise<void>;
   /** Pops back to the nearest `to` frame (or one level). `gate: true` runs the activity gate on
    * the way even though the landing route is not itself gated. */
   readonly back: (to?: RouteName, opts?: { readonly gate?: boolean }) => Promise<void>;
-  /** Replaces the whole stack, ungated. */
   readonly reset: (...routes: readonly Route[]) => void;
-  /** Applies a `time-limit` route's `resume` without re-gating. Shared with `time.ts`'s
-   * `grantMoreTimeAndResume`. */
+  /** Applies a `time-limit` route's `resume` without re-gating (shared with `time.ts`). */
   readonly applyResume: (resume: NavOp) => Promise<void>;
 
-  /** Decides the first screen: first run, or the picker (app-structure.md §3). */
   readonly init: () => Promise<void>;
-  /** Opens the new-player wizard, pushed on whatever opened it; `finishNewPlayer` reads that
-   * back off the stack. */
+  /** Opens the new-player wizard on top of whatever opened it; `finishNewPlayer` reads that off the stack. */
   readonly startNewPlayer: () => void;
-  /** Refreshes the profiles list and shows the picker, last-used first. */
   readonly goToPicker: () => Promise<void>;
-  /** Opens the Journey map. */
   readonly goToJourney: () => void;
-  /** Journey's back button, Play's/Den's/Practice's back button. */
   readonly goToHome: () => void;
-  /** Opens My Den. */
   readonly goToDen: () => void;
-  /** Opens the Practice screen. */
   readonly goToPractice: () => void;
 }
 
-/** `lesson` resumes at its own `startStep`; a subject route's own entry side effect (chess:
- * `full-game` clears any stale level-up banner) runs from its pack entry. Runs once per landed
- * route, on every navigation. */
+/** `lesson` resumes at its `startStep`; a subject route's entry side effect (chess: `full-game` clears a stale level-up
+ * banner) runs from its pack entry. Once per landed route. */
 function runRouteEnter(set: AppSet, get: AppGet, route: Route): void {
   if (route.name === 'lesson') set({ stepIndex: route.startStep });
   get().pack.routes[route.name]?.onEnter?.(set);
 }
 
-/** Sets the stack and keeps `screen` equal to its top's name. */
 function setStack(set: AppSet, get: AppGet, stack: readonly Route[]): void {
   const top = stack[stack.length - 1];
   set({ stack, screen: top?.name ?? 'loading' });
@@ -102,7 +88,6 @@ async function runOp(set: AppSet, get: AppGet, op: NavOp, skipGate: boolean): Pr
   }
 }
 
-/** Last-used profile first (docs/screens.md: picker shows it first), rest unchanged. */
 function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | null): Profile[] {
   const ordered = [...profiles];
   if (lastProfileId === null) return ordered;
@@ -113,13 +98,11 @@ function orderByLastUsed(profiles: readonly Profile[], lastProfileId: string | n
   return ordered;
 }
 
-/** Test-only: drops the whole stack down to exactly `route`, no gate, no `ROUTE_ENTER`. Replaces
- * `store.setState({ screen: ... })` now that a screen's own data lives in its route. */
+/** Test-only: drops the stack to exactly `route`, no gate, no `ROUTE_ENTER`. */
 export function setRoute(store: { readonly setState: AppSet }, route: Route): void {
   store.setState({ stack: [route], screen: route.name });
 }
 
-/** A plain-route action that just navigates there, no other logic. */
 function navigateTo(get: AppGet, name: 'new-player' | 'journey' | 'den' | 'practice') {
   return (): void => void get().navigate({ name });
 }

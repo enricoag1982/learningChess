@@ -39,7 +39,6 @@ export function shapeGuard<T>(
     );
 }
 
-/** A record map: every `T` stored as one JSON object under `name`, keyed by `keyOf(record)`. */
 export interface KeyedCollection<T> {
   get(key: string): Promise<T | undefined>;
   list(filter?: (record: T) => boolean): Promise<T[]>;
@@ -105,7 +104,6 @@ export function keyedCollection<T>(
   };
 }
 
-/** An append-only array: every `T` stored as one JSON list under `name`, newest last. */
 export interface CappedList<T> {
   list(filter?: (record: T) => boolean): Promise<T[]>;
   add(record: T): Promise<void>;
@@ -155,7 +153,6 @@ export function cappedList<T>(
   };
 }
 
-/** A single JSON value stored under `name` (device-wide settings, the one parent lock). */
 export interface SingletonRecord<T> {
   get(): Promise<T | undefined>;
   set(value: T): Promise<void>;

@@ -4,7 +4,6 @@ import { useAppStore } from '../app/store.ts';
 import { ReviewTaskRunner } from './session/ReviewTaskRunner.tsx';
 import { BlankScreen } from './ds/Screen.tsx';
 
-/** A Today session's warm-up activity (domain-model.md §3.1, §3.3): up to 3 review tasks. */
 export function WarmUpScreen(): JSX.Element {
   const { t } = useTranslation();
   const todayPlan = useAppStore((state) => state.todayPlan);

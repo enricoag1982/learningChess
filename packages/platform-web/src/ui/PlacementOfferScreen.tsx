@@ -5,8 +5,7 @@ import { NarratedBubble } from './ds/NarratedBubble.tsx';
 import { tapClass } from './ds/tap.ts';
 import { Screen } from './ds/Screen.tsx';
 
-/** "Already know some chess?" offer (domain-model.md §3.2), shown once after creating a new
- * player. Yes starts the placement test; No goes straight to Home at World 1. */
+/** "Already know some chess?" (domain-model.md §3.2), once after creating a new player: Yes starts placement, No goes Home at World 1. */
 export function PlacementOfferScreen(): JSX.Element {
   const { t } = useTranslation();
   const acceptPlacement = useAppStore((state) => state.acceptPlacement);

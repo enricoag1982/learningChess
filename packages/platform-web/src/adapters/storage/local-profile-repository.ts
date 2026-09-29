@@ -8,7 +8,6 @@ const isProfileShape = shapeGuard<Profile>({
   string: ['id'],
 });
 
-/** `ProfileRepository` storing every profile under one `LocalStore` record, keyed by id. */
 export class LocalStorageProfileRepository implements ProfileRepository {
   private readonly profiles: KeyedCollection<Profile>;
 

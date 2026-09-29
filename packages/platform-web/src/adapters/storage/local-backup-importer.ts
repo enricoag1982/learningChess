@@ -61,8 +61,7 @@ function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined
   return isLocal ? `${log.profileId}:${log.date}` : `${log.profileId}:${log.date}:${log.deviceId}`;
 }
 
-/** `file`'s data, reshaped into the exact raw value each `RECORD_NAMES` entry is stored as — same
- * shapes `LocalStorageXRepository`'s own private `readAll`/`writeAll` build and read. */
+/** `file`'s data reshaped into the raw value each `RECORD_NAMES` entry is stored as (as the repositories' `readAll` / `writeAll` do). */
 function toRawRecords(
   file: BackupFile,
   options: MergeWriteOptions,
@@ -135,9 +134,8 @@ function toRawRecords(
 
 const STAGING_PREFIX = 'backup-staging:';
 
-/** `BackupImporter` for the web (`docs/architecture.md` §11): stages every replaced record under
- * `backup-staging:<name>` first, then copies all to the real keys — a quota error partway leaves
- * every real key untouched instead of a mix of old and new data. */
+/** Stages every replaced record under `backup-staging:<name>`, then copies all to the real keys: a quota error partway
+ * leaves the real keys untouched (`docs/architecture.md` §11). */
 export class LocalStorageBackupImporter implements BackupImporter {
   private readonly store: LocalStore;
 
@@ -160,7 +158,6 @@ export class LocalStorageBackupImporter implements BackupImporter {
     }
   }
 
-  /** Stages every `raw` record, then copies all to the real keys. */
   private stageThenSwap(raw: Readonly<Record<(typeof RECORD_NAMES)[number], unknown>>): void {
     const staged: (typeof RECORD_NAMES)[number][] = [];
     try {
