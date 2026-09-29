@@ -28,7 +28,7 @@ Owner request (2026-09-25): same features, better structure (e.g. one folder per
 | 10 | Docs and comments carry history | architecture decision rows up to 7.9 k characters; comments = 23 % of web source characters, some now wrong (`DenScreen.tsx:102`, `persistent-storage.ts:3-11`) |
 | 11 | Latent bug | mate-in-n reply timer only in `ExerciseStep`: a mate-in-2+ inside a boss series or review task would freeze (today all 27 are mate-in-1) |
 
-## 3. Structure (as built, `m8.23`)
+## 3. Structure (as built, `m8.34`)
 
 ▲ = differs from the plan. Seams, boundaries: [architecture.md](architecture.md) §3.
 
@@ -56,12 +56,14 @@ packages/
     src/testing/      chess builders, makeDeps, playExerciseToCompletion, solutionOf
     content/          YAML: lessons, minigames, tracks, badges, bot-book, locales
     scripts/          content build, voice, calibrate
+  subject-math/       math demo pack (R5): src/{core,kinds/{choice,number-entry},content,web}, content/ (1 world, 3 lessons, series boss)
 apps/
-  chess-kids/         shell: main.tsx, vite / PWA / CSP, public/, e2e/ + e2e/kit/ ▲ (plan: platform-web testing/), test-fixtures/, scripts/ (size, compat, icons)
+  chess-kids/         shell: main.tsx (mountApp), app-i18n.ts, configs via platform-web build/, public/, e2e/ + e2e/kit/ (binds platform-web e2e/), test-fixtures/, scripts/ (size, compat, icons)
+  math-demo/          shell like chess-kids (dev / test only, not deployed): main.tsx, configs, e2e/
 tools/                voice/, art/ ▲ (size, compat: app scripts/)
 ```
 
-Generic kinds `choice` / `yes-no` still live in `subject-chess` ▲ (platform: registry interfaces + `series` only; generic `choice` at R5). Math demo app: R5, not built.
+Platform-web also holds `build/` (`defineAppConfig`, `defineAppTestConfig`, `defineE2EConfig`), `theme.css`, `e2e/` (page flows, texts) and `src/mount.tsx`. Generic `choice` kind: platform (core engine, content factory, web UI); `yes-no` stays in chess (its only user).
 
 ## 4. Rules for v4 code
 
@@ -87,7 +89,7 @@ Generic kinds `choice` / `yes-no` still live in `subject-chess` ▲ (platform: r
 | R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds done (loader 1 459 → 376 lines); `m8.8` YAML defaults done; `m8.13` web kinds done; `m8.14` web modes + e2e via core solutions done — R3 done |
 | R4 Platform / subject split | Seams first (in place), then package moves; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, Den, report, services; import boundary lint (design §11) | platform builds and tests without `subject-chess`. Done: `m8.15`–`m8.19` seams (ratchet 28 → 0, web 47 → 0, 0 casts); `m8.20`–`m8.21` package moves; `m8.22` web composition seams, app = shell; `m8.23` content pipeline + test kit into the platform; `m8.24` docs |
 | R4.5 Trim | Production TS back to ≤ 31.6 k (`v2.0.0`): remove the R4 content-boundary casts, merge thin seam files, cut stale comments; bundle analysis (initial JS ≤ 186.2 KB) | Done: `m8.25` dead code + clones (code −1.0 k), `m8.26` initial JS 185.5 KB (ceiling enforced by `pnpm size`), `m8.27` comments → 30.8 k lines |
-| R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
+| R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI. Done (design §12): `m8.28` content pipeline subject-neutral; `m8.29` platform-web shell (`mountApp`, build configs, `theme.css`); `m8.30` generic `choice`; `m8.31` `subject-math` core + content; `m8.32` math web + `apps/math-demo`; `m8.33` platform e2e kit + math e2e in CI; `m8.34` release docs, chess `4.0.0` |
 
 Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs in the web app's `src/ui/**`, R0–R1 stay out of those files; web test kit, e2e helper reuse and comment trim follow once those fixes merge.
 
@@ -166,4 +168,18 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | Boundaries | ESLint import rules (list: architecture.md §3) |
 | Build | CI job names unchanged; Pages uploads `apps/chess-kids/dist` (same URL, same `sw.js`); dedupe, `@source`: architecture.md §11 |
 | R5 needs | Generic `choice` kind in platform, `number-entry` kind, math stimulus + surface, Home grid columns from tile count, `defineAppConfig` + `mountApp`; voice inventory's chess `common` keys → `voiceTemplates`; no default mini-game mode in the loader |
+
+## 12. R5 design (2026-09-29)
+
+| Piece | Decision |
+|---|---|
+| Chess invariants | Every R5 iteration proves chess unchanged: content dist sha, storage-compat, CSS sha, initial JS ≤ 186.2 KB, e2e 124 / 4 skipped; whole web dist sha where claimed |
+| Content pipeline | `SubjectContent.defaultMode?` (chess `static`; absent = a mode-less mini-game is an error); kind content `checksStimulus`; `createSeriesContent(schema)` in the platform; subject-only locale keys moved to the subject root, platform-read keys to the platform root; voice inventory's chess keys → `chessVoiceTemplates` |
+| Generic `choice` | platform-core engine (`createChoiceKind`, hints, solution), platform-content `createChoiceContent(spec)` (owns type / options / answer checks, key order), platform-web `createChoiceUi` + `ChoiceOptions` / `ChoiceLook`; chess `choice` = a spec (piece look, board stimulus) |
+| Shell | `mountApp({ pack, app, registerSW })`; `defineAppConfig` / `defineAppTestConfig` / `defineE2EConfig`; `theme.css`; storage keys from `AppConfig.storagePrefix`; Home grid columns from tile count |
+| Math subject | `subject-math`: `Problem { a, op, b }` stimulus (build checks a ≥ b for `-`, result ≤ 20, answer = result); kinds `choice` (option `value`) + `number-entry` (≤ 2 digits, pad 3 × 4 of 64 px keys, entry shown in the problem card); `series` boss; no settings slot, rewards or Play tab; Web Speech only (no audio); art: hedgehog + reused Owl / avatars; `AppConfig` prefix `math-demo:` |
+| Guards | ESLint globs `subject-*` / `apps/*`; one `dispatchGuard` helper (`platform-web/src/testing/dispatch-guard.ts`) per pack; `prepare` builds every subject |
+| e2e + CI | Page flows / texts in `platform-web/e2e/`; chess kit binds them; math: 4 specs (lesson, parent area, backup, world boss) in the CI e2e job, shard 3; Pages still deploys chess only |
+| Size | Math lines counted outside the chess target (§6) |
+| Deferred | Roadmap F7 (chess art in platform-web), F8 (chess-named narrator report key + dev flag) |
 

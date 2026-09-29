@@ -57,6 +57,7 @@ pnpm test             # unit + content tests
 pnpm test:slow        # slow unit tests (bot self-play / strength / timing, winnability, deep perft)
 pnpm build             # production build
 pnpm test:e2e         # Playwright, against the production build
+pnpm dev:math          # math demo app (proves the platform is reusable; not deployed)
 ```
 
 ## Documentation

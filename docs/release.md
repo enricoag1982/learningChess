@@ -7,7 +7,7 @@ Related: [validation.md](validation.md), [roadmap.md](roadmap.md), [../CONTRIBUT
 | Check | How |
 |---|---|
 | CI green | `quality` check passes on the PR head (branch up to date with `master`), incl. `pnpm compat` (Safari 15.4 floor) |
-| Version bump | `apps/chess-kids/package.json` `version` set to the release version (`1.0.0` for MVP); shown in the parent area (`__APP_VERSION__`, injected at build by `apps/chess-kids/vite.config.ts`'s `define` — see `docs/architecture.md` §11) |
+| Version bump | `apps/chess-kids/package.json` `version` set to the release version (`1.0.0` for MVP); shown in the parent area (`__APP_VERSION__`, injected at build by `defineAppConfig`'s `define`, `packages/platform-web/build/app-config.ts` — see `docs/architecture.md` §11) |
 | Validation log row | `docs/validation.md` has a row for this iteration's tag (checks run, notes) — the tag workflow refuses to create a tag without one |
 | Privacy page | Parent area → Privacy renders; link from the first-run parent password screen opens it; `docs/privacy-policy.md` matches the in-app text |
 | Offline test | Built app (`pnpm build && pnpm --filter @learn/chess-kids preview`), airplane mode / devtools offline, on an iPad and an Android tablet: reload works, a lesson plays, computer opponent still moves |

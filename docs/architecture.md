@@ -41,36 +41,38 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 
 ## 3. Layers
 
-Workspace `packages/*` + `apps/*`. Direction: app → `subject-chess` → `platform-web` / `platform-content` → `platform-core`. Inside a package: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`.
+Workspace `packages/*` + `apps/*`. Direction: app → `subject-*` → `platform-web` / `platform-content` → `platform-core`. Inside a package: `domain` (pure TS) → `app` (use cases, ports) → adapters / `ui`.
 
 | Package | Contains | Depends on |
 |---|---|---|
 | `@learn/platform-core` | Pure TS: `domain/` (profiles, progress, journey, rewards, time policy, merge, seam types), `app/` (use cases, ports, backup), `testing/` | zod |
-| `@learn/platform-content` | YAML → Zod → JSON pipeline, platform locales, voice-text inventory, `testing/` fixture subject | platform-core, zod, yaml |
-| `@learn/platform-web` | React: `App`, routes + store slices, screens, design system, adapters, i18n, `testing/` | platform-core |
+| `@learn/platform-content` | YAML → Zod → JSON pipeline, platform locales, voice-text inventory, `createChoiceContent`, `createSeriesContent`, `testing/` fixture subject | platform-core, zod, yaml |
+| `@learn/platform-web` | React: `App`, `mountApp`, routes + store slices, screens, design system, adapters, i18n, generic `choice` UI, `testing/` (incl. `dispatchGuard`); outside `src`: `build/` (Vite / Vitest / Playwright config factories), `theme.css`, `e2e/` (page flows, texts) | platform-core |
 | `@learn/subject-chess` | Chess pack: `src/{core,kinds,modes,content,web}`, `content/` (YAML), `scripts/` | platform-core, platform-content, platform-web, chess.js |
-| `@learn/chess-kids` | Shell (`apps/chess-kids`): `src/main.tsx` passes `chessWeb` + `CHESS_APP_CONFIG` to `mountApp` (platform-web `src/mount.tsx`); Vite / PWA / CSP, e2e | platform-core, platform-web, subject-chess |
+| `@learn/subject-math` | Math demo pack: `src/{core,kinds,content,web}`, `content/` (YAML) | platform-core, platform-content, platform-web |
+| `@learn/chess-kids` | Shell (`apps/chess-kids`): `src/main.tsx` passes `chessWeb` + `CHESS_APP_CONFIG` to `mountApp` (platform-web `src/mount.tsx`); configs via platform-web `build/`, e2e | platform-core, platform-web, subject-chess |
+| `@learn/math-demo` | Shell (`apps/math-demo`), same shape with `mathWeb` + `MATH_APP_CONFIG`; dev / test only, not deployed | platform-web, subject-math |
 
 | Seam | Defined in | Provides |
 |---|---|---|
 | `SubjectCore` | platform-core `domain/subject.ts` | `id`, `context`, `kinds`, `modes`, `characters`, `settings` slot, `notes`, `noteVars`, `rewards?`, `gameRecordOf?`; `createSubjectRuntime(core)` (`domain/runtime.ts`, called by `createServices`) builds the kind + mode registries plus the platform `series` mode |
-| `SubjectContent` | platform-content `subject.ts` | `kinds`, `modes`, `stimulus`, `demo`, `badges`, `characters`, `voiceTemplates`, `extraOutputs?`; `buildContent({ subject, root, out })` writes `dist/` |
+| `SubjectContent` | platform-content `subject.ts` | `kinds`, `modes`, `defaultMode?`, `stimulus`, `demo`, `badges`, `characters`, `voiceTemplates`, `extraOutputs?`; `buildContent({ subject, root, out })` writes `dist/` |
 | `SubjectWeb` | platform-web `app/subject.ts` | `core`, `createServices`, kind / mode UIs, `surface`, `CharacterBadge?`, `art`, `den`, `routes`, `homeTiles?`, `createSlice?`, `loadParent?`, `dev?` |
 | `AppConfig` | platform-core `domain/subject.ts` | `storagePrefix`, `backupAppId`, file prefixes, `version` |
 
-Chess: `chessCore` (`src/core/chess-core.ts`), `chessContent` (`src/content/chess-content.ts`), `chessWeb` (`src/web/chess-pack.ts`), `CHESS_APP_CONFIG`. Dispatch on exercise `type` / mini-game `mode` only through registries: `EXERCISE_KINDS` (`src/kinds/index.ts`), `MINI_GAME_MODES` (`src/modes/index.ts`), `EXERCISE_SOLUTIONS` (`src/kinds/solutions.ts`, tests only), `EXERCISE_KIND_UI` / `MINI_GAME_MODE_UI` (`src/web/{kinds,modes}/ui-registry.ts`); `dispatch-registries.test.ts` (`platform-web/src`, `subject-chess/src/web`) guards it.
+Chess: `chessCore` (`src/core/chess-core.ts`), `chessContent` (`src/content/chess-content.ts`), `chessWeb` (`src/web/chess-pack.ts`), `CHESS_APP_CONFIG`. Dispatch on exercise `type` / mini-game `mode` only through registries: `EXERCISE_KINDS` (`src/kinds/index.ts`), `MINI_GAME_MODES` (`src/modes/index.ts`), `EXERCISE_SOLUTIONS` (`src/kinds/solutions.ts`, tests only), `EXERCISE_KIND_UI` / `MINI_GAME_MODE_UI` (`src/web/{kinds,modes}/ui-registry.ts`); `dispatch-registries.test.ts` (`platform-web/src`, `subject-chess/src/web`, `subject-math/src/web`, all via `dispatchGuard`) guards it. Math: `mathCore`, `mathContent`, `mathWeb`, `MATH_APP_CONFIG` (prefix `math-demo:`), same registry layout.
 
 **Boundary lint** (`eslint.config.js`, errors):
 
 - Platform packages never import `@learn/subject-*`; core < content < web; core and content are React-free.
-- Chess `src/core`, `src/content`, kind `kind` / `engine` / `solution` / `content` / `verify` files: no React, no `web/`.
-- Pure TS (no `app`, adapters, React): platform-core `domain/`, chess `core/{chess,bot,game,variant,exercise}`, `kinds/`, `modes/` (non-`.tsx`).
+- Every subject's `src/core`, `src/content`, kind `kind` / `engine` / `solution` / `content` / `verify` files: no React, no `web/`.
+- Pure TS (no `app`, adapters, React): platform-core `domain/`, subject `core/{chess,bot,game,variant,exercise}`, `kinds/`, `modes/` (non-`.tsx`).
 - Apps use a package only through its `exports`; `chess.js` only in `core/chess/chessjs-rules.ts`; no `e2e.ts` / `sample.ts` / Playwright import outside the e2e registries.
 
 ## 4. Repository layout
 
-- `packages/*` (§3): `src/`, plus `platform-content/locales/`, `subject-chess/{content,scripts,dist}` (YAML, build scripts, content build output: git-ignored).
-- `apps/chess-kids`: `index.html`, `vite.config.ts`, `src/`, `e2e/`, `test-fixtures/`, `scripts/`, `public/`. `tools/`: `voice/` (Kokoro), `art/`.
+- `packages/*` (§3): `src/`, plus `platform-content/locales/`, `platform-web/{build,e2e,theme.css}`, `subject-*/{content,scripts,dist}` (YAML, build scripts, content build output: git-ignored).
+- `apps/chess-kids`: `index.html`, `vite.config.ts`, `src/`, `e2e/`, `test-fixtures/`, `scripts/`, `public/`. `apps/math-demo`: same shell, no `test-fixtures/` / `scripts/`. `tools/`: `voice/` (Kokoro), `art/`.
 - One line per folder: [refactor-v4.md](refactor-v4.md) §3. A native UI, if ever needed: a new `apps/*`.
 
 ## 5. Ports
@@ -159,7 +161,7 @@ stars2: 5              # explicit: default (stars3 + 1) doesn't match the optima
 | Mobile | PWA first → Capacitor |
 | Online (login, sync, remote play) | Off in v1; ports + local adapters only |
 | Content format | YAML authoring → JSON runtime; locale files; board diagram or FEN; SAN moves |
-| Packages | 3 platform packages + `subject-chess` + app `@learn/chess-kids`, one repo, not published ([refactor-v4.md](refactor-v4.md) §8) |
+| Packages | 3 platform packages + `subject-chess` / `subject-math` + apps `@learn/chess-kids` / `@learn/math-demo`, one repo, not published ([refactor-v4.md](refactor-v4.md) §8, §12); Pages deploys chess only |
 | Web hosting | GitHub Pages (static files only: install + update checks) |
 | Illustrations | Microsoft Fluent Emoji 3D (MIT), bundled WebP |
 
@@ -168,7 +170,7 @@ stars2: 5              # explicit: default (stars3 + 1) doesn't match the optima
 | Topic | Note |
 |---|---|
 | Tooling | pnpm workspace; TypeScript 6.0 (`strict`, `noUncheckedIndexedAccess`, erasable syntax only); Vitest; Playwright |
-| Internal packages | Export TS source (`exports` in each `package.json`); relative imports carry `.ts` → same files run in Vite, Vitest, `tsc` and Node. App `vite.config.ts`: `resolve.dedupe` for react(-dom), zustand, i18next(-react), zod; Tailwind `@source` per package (`apps/chess-kids/src/index.css`) |
+| Internal packages | Export TS source (`exports` in each `package.json`); relative imports carry `.ts` → same files run in Vite, Vitest, `tsc` and Node. `defineAppConfig` (platform-web `build/app-config.ts`, used by every app's `vite.config.ts`): `resolve.dedupe` for react(-dom), zustand, i18next(-react), zod; Tailwind `@source` per package (each app's `src/index.css`, which imports platform-web `theme.css`) |
 | Lint layer rules | §3 Boundary lint |
 | Formatting | Prettier for code, YAML, JSON; Markdown excluded (hand-formatted) |
 | Position | Plain JSON: pieces, markers (stars, blocked), side to move, castling, en passant; no move clocks (50-move / repetition come from game history) |
@@ -185,6 +187,6 @@ stars2: 5              # explicit: default (stars3 + 1) doesn't match the optima
 | Board | `subject-chess/src/web/ui/board/Board.tsx`: legality only from a `legalMoves` prop; tap-tap + drag (pointer events, 6 px tap threshold); `role="grid"` with one labelled button per square; own SVG piece set; dev playground at `/#board` (dev builds only) |
 | Backup / merge | `BackupFile` is a hand-written domain type validated by a parallel, lighter zod schema (not `z.infer`'d directly, so the schema can't silently drift from the real field types) and trusted after a successful parse; import writes every replaced record to staging keys first and only swaps them over the real ones once every write succeeds (atomic replace); merge/import live behind the `@learn/platform-core/merge` subpath |
 | Test layers (web) | Vitest + jsdom + Testing Library (components, adapters; own config per package); Playwright on the production build |
-| App version | `packages/platform-web/src/app-version.d.ts` declares `__APP_VERSION__: string`, set by `apps/chess-kids/vite.config.ts`'s and `vitest.config.ts`'s own `define` (each reads `apps/chess-kids/package.json`'s `version`) — compile-time only; shown as a small line under the parent-area overview |
+| App version | `packages/platform-web/src/app-version.d.ts` declares `__APP_VERSION__: string`, set by `defineAppConfig` / `defineAppTestConfig`'s `define` (each reads the calling app's `package.json` `version`) — compile-time only; shown as a small line under the parent-area overview |
 
 Offline, PWA update, CSP and lazy-loading details: [non-functional.md](non-functional.md) §1. Bear's search techniques and their Bear-only scoping: [computer-opponent.md](computer-opponent.md) §6.5–6.6. Parent area, backup screen and device-sharing merge rules: [app-structure.md](app-structure.md) §11, [domain-model.md](domain-model.md) §3.5.
