@@ -224,6 +224,10 @@ parent:
     import-error-generic: This file could not be read.
   privacy-nav: Privacy
   version: 'Version {{version}}'
+  refresh:
+    button: Reload latest version
+    hint: Downloads the app again from the internet. Progress and settings stay on this device.
+    offline: No internet connection. Connect and try again.
   privacy:
     title: Privacy
     data-heading: What we keep

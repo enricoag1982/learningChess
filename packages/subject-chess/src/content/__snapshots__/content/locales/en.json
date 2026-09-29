@@ -409,6 +409,11 @@
     "title": "Privacy"
    },
    "privacy-nav": "Privacy",
+   "refresh": {
+    "button": "Reload latest version",
+    "hint": "Downloads the app again from the internet. Progress and settings stay on this device.",
+    "offline": "No internet connection. Connect and try again."
+   },
    "rename": "Rename",
    "rename-label": "Nickname",
    "report": {

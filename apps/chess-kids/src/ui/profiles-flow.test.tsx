@@ -88,6 +88,17 @@ describe('first run', () => {
   });
 });
 
+describe('profile picker', () => {
+  it('shows the app version at the bottom', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    renderAppRaw(services);
+
+    await screen.findByRole('heading', { name: "Who's playing today?" });
+    expect(screen.getByText(`Version ${__APP_VERSION__}`)).toBeTruthy();
+  });
+});
+
 describe('password screen', () => {
   it('wrong password up to 4 times counts attempts, the 5th locks with a countdown', async () => {
     const services = makeServices();

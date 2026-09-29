@@ -28,7 +28,32 @@ function fakeRegistration(): {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
 });
+
+/** Stands in for the browser APIs `forceRefresh` touches; `workers` / `cacheKeys` left out means that API is missing (old Safari, jsdom). */
+function stubBrowser(options: {
+  readonly online: boolean;
+  readonly workers?: readonly ReturnType<typeof vi.fn>[];
+  readonly cacheKeys?: readonly string[];
+}): { readonly reload: ReturnType<typeof vi.fn>; readonly deleteCache: ReturnType<typeof vi.fn> } {
+  const reload = vi.fn();
+  const deleteCache = vi.fn().mockResolvedValue(true);
+  const { workers, cacheKeys } = options;
+  vi.stubGlobal('location', { reload });
+  vi.stubGlobal('navigator', {
+    onLine: options.online,
+    ...(workers && {
+      serviceWorker: {
+        getRegistrations: () => Promise.resolve(workers.map((unregister) => ({ unregister }))),
+      },
+    }),
+  });
+  if (cacheKeys) {
+    vi.stubGlobal('caches', { keys: () => Promise.resolve(cacheKeys), delete: deleteCache });
+  }
+  return { reload, deleteCache };
+}
 
 describe('createAppUpdate', () => {
   it('isUpdateReady is false until onNeedRefresh fires', () => {
@@ -115,5 +140,91 @@ describe('createAppUpdate', () => {
       createAppUpdate(fake.register);
       fake.options?.onRegisteredSW?.('/sw.js', undefined);
     }).not.toThrow();
+  });
+});
+
+describe('forceRefresh', () => {
+  it('offline: reports it and changes nothing (no unregister, no cache delete, no reload)', async () => {
+    const unregister = vi.fn().mockResolvedValue(true);
+    const { reload, deleteCache } = stubBrowser({
+      online: false,
+      workers: [unregister],
+      cacheKeys: ['precache'],
+    });
+    const fake = new FakeRegister();
+    const appUpdate = createAppUpdate(fake.register);
+
+    await expect(appUpdate.forceRefresh()).resolves.toBe('offline');
+
+    expect(unregister).not.toHaveBeenCalled();
+    expect(deleteCache).not.toHaveBeenCalled();
+    expect(reload).not.toHaveBeenCalled();
+    expect(fake.updateSW).not.toHaveBeenCalled();
+  });
+
+  it('update waiting: takes the apply path (skip-waiting + reload), leaves workers and caches alone', async () => {
+    const unregister = vi.fn().mockResolvedValue(true);
+    const { reload, deleteCache } = stubBrowser({
+      online: true,
+      workers: [unregister],
+      cacheKeys: ['precache'],
+    });
+    const fake = new FakeRegister();
+    const appUpdate = createAppUpdate(fake.register);
+    fake.options?.onNeedRefresh?.();
+
+    await expect(appUpdate.forceRefresh()).resolves.toBe('reloading');
+
+    expect(fake.updateSW).toHaveBeenCalledTimes(1);
+    expect(fake.updateSW).toHaveBeenCalledWith(true);
+    expect(unregister).not.toHaveBeenCalled();
+    expect(deleteCache).not.toHaveBeenCalled();
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it('no update waiting: unregisters every worker, deletes every cache, then reloads', async () => {
+    const first = vi.fn().mockResolvedValue(true);
+    const second = vi.fn().mockResolvedValue(true);
+    const { reload, deleteCache } = stubBrowser({
+      online: true,
+      workers: [first, second],
+      cacheKeys: ['precache', 'runtime'],
+    });
+    const fake = new FakeRegister();
+    const appUpdate = createAppUpdate(fake.register);
+
+    await expect(appUpdate.forceRefresh()).resolves.toBe('reloading');
+
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledTimes(1);
+    expect(deleteCache).toHaveBeenCalledTimes(2);
+    expect(deleteCache).toHaveBeenCalledWith('precache');
+    expect(deleteCache).toHaveBeenCalledWith('runtime');
+    expect(fake.updateSW).not.toHaveBeenCalled();
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('missing serviceWorker and caches APIs: still reloads', async () => {
+    const { reload } = stubBrowser({ online: true });
+    const fake = new FakeRegister();
+    const appUpdate = createAppUpdate(fake.register);
+
+    await expect(appUpdate.forceRefresh()).resolves.toBe('reloading');
+
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it('never touches localStorage', async () => {
+    const clear = vi.fn();
+    const removeItem = vi.fn();
+    vi.stubGlobal('localStorage', { clear, removeItem });
+    const { reload } = stubBrowser({ online: true, workers: [], cacheKeys: [] });
+    const fake = new FakeRegister();
+
+    await createAppUpdate(fake.register).forceRefresh();
+
+    expect(reload).toHaveBeenCalledTimes(1);
+    expect(clear).not.toHaveBeenCalled();
+    expect(removeItem).not.toHaveBeenCalled();
   });
 });

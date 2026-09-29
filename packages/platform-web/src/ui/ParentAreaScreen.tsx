@@ -8,6 +8,7 @@ import {
   downloadParentCodeFile,
   isValidPassword,
 } from '@learn/platform-core';
+import { useAppUpdate } from '../app/app-update-context.ts';
 import { useAppStore, useServices } from '../app/store.ts';
 import { RankPill } from './RankPill.tsx';
 import { BackupScreen } from './parent/BackupPanel.tsx';
@@ -87,6 +88,44 @@ function ChangePasswordForm({ onDone }: { readonly onDone: () => void }): JSX.El
         </button>
       </div>
     </form>
+  );
+}
+
+/** Version line plus the grown-up "Reload latest version" (`AppUpdate.forceRefresh`); offline → a status line, the button stays. */
+function RefreshBlock(): JSX.Element {
+  const { t } = useTranslation();
+  const appUpdate = useAppUpdate();
+  const [state, setState] = useState<'idle' | 'running' | 'offline'>('idle');
+
+  async function onRefresh(): Promise<void> {
+    setState('running');
+    try {
+      setState((await appUpdate.forceRefresh()) === 'offline' ? 'offline' : 'running');
+    } catch {
+      setState('idle');
+    }
+  }
+
+  return (
+    <section className="flex flex-col items-center gap-2 text-center">
+      <p className="text-xs text-muted">{t('parent.version', { version: __APP_VERSION__ })}</p>
+      <button
+        type="button"
+        disabled={state === 'running'}
+        onClick={() => {
+          void onRefresh();
+        }}
+        className={PARENT_SECONDARY_BUTTON}
+      >
+        {t('parent.refresh.button')}
+      </button>
+      <p className="text-xs text-muted">{t('parent.refresh.hint')}</p>
+      {state === 'offline' && (
+        <p role="status" className={PARENT_NOTE}>
+          {t('parent.refresh.offline')}
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -280,9 +319,7 @@ export function ParentAreaScreen(): JSX.Element {
               )}
             </section>
 
-            <p className="text-center text-xs text-muted">
-              {t('parent.version', { version: __APP_VERSION__ })}
-            </p>
+            <RefreshBlock />
           </>
         )}
 

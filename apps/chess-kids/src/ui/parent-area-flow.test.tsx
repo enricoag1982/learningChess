@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { createProfile, updateProfileSettings } from '@learn/platform-core';
 import type { BackupFile } from '@learn/platform-core';
 import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
+import type { AppUpdate } from '@learn/platform-web/adapters/app-update.ts';
 import { createBundledContentSource } from '@learn/subject-chess/web/adapters/content/bundled-content-source.ts';
 import type { FakeBackupFileWriter } from '@learn/platform-web/testing/fake-backup-file-writer.ts';
 import type { FakeNarrator } from '@learn/platform-web/testing/fake-narrator.ts';
@@ -105,6 +106,68 @@ describe('Parent area overview (M5.1)', () => {
 
     await openReport('Mia');
     await screen.findByText('Progress by world');
+  });
+});
+
+describe('Parent area: reload latest version (M8.34)', () => {
+  function fakeAppUpdate(forceRefresh: AppUpdate['forceRefresh']): AppUpdate {
+    return {
+      isUpdateReady: () => false,
+      apply: () => Promise.resolve(),
+      onUpdateReady: () => () => undefined,
+      forceRefresh,
+    };
+  }
+
+  it('shows the version, the reload button and its hint on the overview', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    renderAppRaw(services);
+    await openParentArea();
+
+    await screen.findByText(`Version ${__APP_VERSION__}`);
+    expect(screen.getByRole('button', { name: 'Reload latest version' })).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Downloads the app again from the internet. Progress and settings stay on this device.',
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('offline: shows the status line and keeps the button usable', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    const forceRefresh = vi.fn<AppUpdate['forceRefresh']>().mockResolvedValue('offline');
+    renderAppRaw(services, { appUpdate: fakeAppUpdate(forceRefresh) });
+    await openParentArea();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reload latest version' }));
+
+    const status = await screen.findByRole('status');
+    expect(status.textContent).toBe('No internet connection. Connect and try again.');
+    expect(forceRefresh).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByRole<HTMLButtonElement>('button', { name: 'Reload latest version' }).disabled,
+    ).toBe(false);
+  });
+
+  it('reloading: disables the button while the reload runs, no offline line', async () => {
+    const services = makeServices();
+    await seedReturningProfile(services, 'Mia');
+    const forceRefresh = vi.fn<AppUpdate['forceRefresh']>().mockResolvedValue('reloading');
+    renderAppRaw(services, { appUpdate: fakeAppUpdate(forceRefresh) });
+    await openParentArea();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reload latest version' }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole<HTMLButtonElement>('button', { name: 'Reload latest version' }).disabled,
+      ).toBe(true);
+    });
+    expect(forceRefresh).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('status')).toBeNull();
   });
 });
 

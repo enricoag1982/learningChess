@@ -32,7 +32,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 
 ## 3. Profiles
 
-- App start: profile picker (animal avatar + nickname, no password).
+- App start: profile picker (animal avatar + nickname, no password). The app version is shown as a small line at the bottom of the picker and of Home (owner 2026-09-29).
 - New profile: nickname → avatar → create → placement offer (once, only right after creating a new player — not when a parent adds a child from the parent area): Owl "Already know some chess?"
   - No → start at World 1 (default, and always available from the offer screen).
   - Yes → placement test (domain-model.md §3.2): 4 tasks per Basics world in order, ≥3/4 passes it (`masteredVia: 'placement'`); stops at the first failed world; skippable any time, keeps whatever passed so far.
@@ -140,7 +140,7 @@ Behind the parent gate; three screens deep — **Overview → child report → c
 
 | Screen | Content |
 |---|---|
-| Overview | One card per child: avatar, nickname, rank, total stars, minutes today / last 7 days, streak (≥ 2 days). Tap → that child's report. Also: Add child, Backup, Change password |
+| Overview | One card per child: avatar, nickname, rank, total stars, minutes today / last 7 days, streak (≥ 2 days). Tap → that child's report. Also: Add child, Backup, Change password. At the bottom: the app version and **Reload latest version** (hint: downloads the app again from the internet; progress and settings stay on this device). Offline → "No internet connection. Connect and try again.", nothing changes |
 | Child report | Progress by world (lessons complete/mastered, stars) — worlds with no authored lessons yet are skipped. Concept accuracy (last 10 results) with a "needs practice" summary + a tag on each weak row. Minutes per day, last 14 days (bar + the exact number as visible text, so it reads to a screen reader too; a line marks the daily limit). Games, last 10, newest first (opponent by name, result, date). Badges earned (name + tier). Assessments (test-out/placement: kind, score, pass/fail, date). A **Settings** button opens that child's settings |
 | Child settings | Rename, change avatar. Daily limit (off / 15 / 20 / 30 / 45 / 60 min). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Piece style (animal badge / classic). Unlock lessons & worlds panel. Send to other device / Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent code). Delete (removes the profile entirely) |
 | Backup | **Send to other device** (primary button, per child and "all children"): shares the same JSON via the share sheet (`chess-for-kids-<nickname or all>-<date>.json`), falling back to a download when file sharing is unavailable. Export: one JSON file for every child, or (from a child's own Settings) just that one — `chess-kids-backup-<date>.json` / `chess-kids-backup-<nickname>-<date>.json`. Import: pick a file → preview, per incoming child ("Merging into Mia", or a choice between "Add as new child"/"Merge into ‹local child›" + what would change) → **Merge**: folds the file's progress into this device's own — nothing on either side is lost, importing the same file twice changes nothing (`docs/domain-model.md` §3.5); an invalid or too-new file shows a clear error and changes nothing |

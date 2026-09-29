@@ -11,6 +11,9 @@ export interface AppUpdate {
   readonly apply: () => Promise<void>;
   /** Calls `listener` when a new version starts waiting, so a kid on a safe screen gets it without navigating. Returns an unsubscribe. */
   readonly onUpdateReady: (listener: () => void) => () => void;
+  /** Grown-up action: fetch the newest app now. Offline → 'offline' (nothing changes). Otherwise applies a waiting
+   * update if there is one; else unregisters every service worker, deletes every Cache Storage entry and reloads. */
+  readonly forceRefresh: () => Promise<'offline' | 'reloading'>;
 }
 
 /** Registers the service worker once and tracks a waiting update so the app (not Workbox) controls when a new version reloads.
@@ -32,18 +35,26 @@ export function createAppUpdate(register: RegisterSW): AppUpdate {
     },
   });
 
+  async function apply(): Promise<void> {
+    if (!updateReady || applied) return;
+    applied = true;
+    await updateSW(true);
+  }
+
   return {
     isUpdateReady: () => updateReady,
-    apply: async () => {
-      if (!updateReady || applied) return;
-      applied = true;
-      await updateSW(true);
-    },
+    apply,
     onUpdateReady: (listener) => {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
       };
+    },
+    forceRefresh: async () => {
+      if (!navigator.onLine) return 'offline';
+      if (updateReady) await apply();
+      else await import('./reload-fresh.ts').then((module) => module.reloadFresh());
+      return 'reloading';
     },
   };
 }

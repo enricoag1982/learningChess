@@ -62,6 +62,7 @@ describe('App', () => {
         return Promise.resolve();
       },
       onUpdateReady: () => () => undefined,
+      forceRefresh: () => Promise.resolve('offline'),
     };
     renderAppRaw(services, { appUpdate });
 
@@ -101,6 +102,7 @@ describe('App', () => {
         listeners.push(listener);
         return () => undefined;
       },
+      forceRefresh: () => Promise.resolve('offline'),
     };
     renderAppRaw(services, { appUpdate });
     await screen.findByRole('heading', { name: "Who's playing today?" });

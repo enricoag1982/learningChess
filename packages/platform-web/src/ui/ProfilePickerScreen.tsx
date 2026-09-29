@@ -68,6 +68,10 @@ export function ProfilePickerScreen(): JSX.Element {
           <span className="text-xs text-muted">{t('picker.grown-ups-hint')}</span>
         </span>
       </button>
+
+      <p className="-mt-4 text-center text-xs text-muted">
+        {t('parent.version', { version: __APP_VERSION__ })}
+      </p>
     </main>
   );
 }
