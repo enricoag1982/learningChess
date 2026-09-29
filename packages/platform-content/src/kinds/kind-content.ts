@@ -1,22 +1,18 @@
-// The exercise-kind content abstraction (schema + compile + verify): a uniform interface so
-// `lesson-load.ts` dispatches through a registry (`kinds/index.ts`) — the content counterpart of
-// core's `ExerciseKind`.
+// Exercise-kind content abstraction (schema + compile + verify): `lesson-load.ts` dispatches through a registry
+// (`kinds/index.ts`), the content counterpart of core's `ExerciseKind`.
 import type { ExerciseDefBase, TextKeyRef } from '@learn/platform-core';
 import type { z } from 'zod';
 import type { ExerciseYamlBase } from '../subject.ts';
 
-/** Fields every compiled exercise def shares, supplied by `CompileContext.build` ahead of the
- * subject's own stimulus head and the kind's own body. */
+/** Fields every compiled def shares, supplied by `CompileContext.build`. */
 interface GenericHead {
   readonly id: string;
   readonly concept: string;
   readonly textKey: string;
 }
 
-/** Per-exercise compile helpers, threaded through a kind's `compile(raw, ctx)`: `ctx.where` is
- * `<relPath>: <fieldPath>`, `ctx.issues` collects them, and `ctx.build` prepends the generic and
- * subject head fields and appends `easier` and the subject's tail fields every exercise shares.
- * `D` (each kind's own concrete def) is inferred from the caller's own return type. */
+/** Threaded through a kind's `compile(raw, ctx)`: `ctx.where` = `<relPath>: <fieldPath>`, `ctx.issues` collects issues,
+ * `ctx.build` adds the generic + subject head fields and `easier` + tail fields. `D` is inferred from the kind's return type. */
 export interface CompileContext {
   readonly where: string;
   readonly issues: string[];
@@ -25,10 +21,8 @@ export interface CompileContext {
   build<D extends { readonly type: string }>(body: object): D;
 }
 
-/** Builds the `CompileContext` for one exercise (`kinds/compile-exercise.ts`'s generic compiler);
- * `stimulus` is the subject's own `head`/`tail` for this exercise (`StimulusContent.compile`'s
- * result), spliced in at the position `docs/refactor-v4.md` fixes: id, concept, textKey, [head],
- * body, easier, [tail]. */
+/** `stimulus` is the subject's `head` / `tail` for this exercise, spliced in at the order `docs/refactor-v4.md` fixes:
+ * id, concept, textKey, [head], body, easier, [tail]. */
 export function makeCompileContext(
   relPath: string,
   fieldPath: string,
@@ -55,9 +49,8 @@ export function makeCompileContext(
   };
 }
 
-/** One exercise type's content behaviour: `schema`, `refine` (union-level cross-field check),
- * `compile` (YAML → `ExerciseDef`), `verify`, and `needsKidPiece` (default `true`). Method syntax
- * is deliberate: bivariant params let a precise kind widen with no cast. */
+/** One exercise type's content behaviour: `schema`, `refine` (union-level cross-field check), `compile` (YAML → def),
+ * `verify`, `needsKidPiece` (default `true`). Method syntax: bivariance lets a precise kind widen with no cast. */
 export interface ExerciseKindContent<D extends ExerciseDefBase, S extends z.ZodType> {
   readonly type: D['type'];
   readonly schema: S;
@@ -65,13 +58,10 @@ export interface ExerciseKindContent<D extends ExerciseDefBase, S extends z.ZodT
   compile(raw: z.output<S>, ctx: CompileContext): D | null;
   verify?(def: D, where: string, issues: string[]): void;
   needsKidPiece?(def: D): boolean;
-  /** Text keys `def` references besides its own `textKey` (e.g. a `choice` option's). */
   textKeys?(def: D): readonly TextKeyRef[];
 }
 
-/** A kind's schema: an object schema whose `type` discriminates the exercise union. */
 export type KindSchema = z.ZodType<ExerciseYamlBase> & z.core.$ZodTypeDiscriminable;
 
-/** Any exercise kind's content, widened to the base def shape (`SubjectContent.kinds`'s own
- * entries); each concrete kind (chess: `ExerciseKindContent<CaptureDef, ...>`) widens to this. */
+/** Widened to the base def shape (`SubjectContent.kinds` entries); concrete kinds widen to it. */
 export type AnyExerciseKindContent = ExerciseKindContent<ExerciseDefBase, KindSchema>;

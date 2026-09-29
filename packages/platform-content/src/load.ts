@@ -11,12 +11,9 @@ import {
 } from './schema.ts';
 import { readEntries, readYaml } from './yaml-file.ts';
 
-/** All namespaces of all languages, keyed by language then namespace name. */
 export type Locales = Record<string, Record<string, LocaleTree>>;
 
-/** Thrown by {@link loadLocales} when one or more content issues are found. */
 export class ContentError extends Error {
-  /** Every issue found, each already prefixed with its file path and key path. */
   readonly issues: readonly string[];
 
   constructor(issues: readonly string[]) {
@@ -26,7 +23,6 @@ export class ContentError extends Error {
   }
 }
 
-/** Reads, parses and validates every locale file under `localesDir`, throwing {@link ContentError} on any issue. */
 export function loadLocales(localesDir: string): Locales {
   const issues: string[] = [];
   const locales: Locales = {};
@@ -53,10 +49,8 @@ export function loadLocales(localesDir: string): Locales {
   return locales;
 }
 
-/** Deep-merges one namespace's tree from the platform root with the subject's own (chess), a leaf
- * key defined by both is a build error. Key order is canonical (`sortNamespaces` sorts both
- * inputs already and the caller re-sorts the result), so which root a key lives in never affects
- * the merged output. */
+/** Deep-merges the platform's namespace tree with the subject's; a leaf defined by both is a build error. Key order is
+ * canonical (inputs pre-sorted, result re-sorted), so the root a key lives in never changes the output. */
 function mergeTree(
   platform: LocaleTree,
   subject: LocaleTree,
@@ -78,8 +72,7 @@ function mergeTree(
   return result;
 }
 
-/** Deep-merges the subject's own locales (chess) into the platform's, namespace by namespace, per
- * language; throws {@link ContentError} on any key both roots define. */
+/** Deep-merges the subject's locales into the platform's per language; a key both roots define throws {@link ContentError}. */
 export function mergeLocales(platform: Locales, subject: Locales): Locales {
   const issues: string[] = [];
   const languages = new Set([...Object.keys(platform), ...Object.keys(subject)]);
@@ -113,7 +106,6 @@ export function mergeLocales(platform: Locales, subject: Locales): Locales {
   );
 }
 
-/** Loads every namespace file of one language directory. */
 function loadLanguage(
   langDir: string,
   langName: string,
@@ -147,7 +139,6 @@ function loadLanguage(
   return sortNamespaces(namespaces);
 }
 
-/** Reads and parses one namespace YAML file, then validates it as a {@link LocaleTree}. */
 function loadNamespace(
   filePath: string,
   relPath: string,
@@ -168,7 +159,6 @@ function loadNamespace(
   return validateNode(parsed, [], relPath, issues);
 }
 
-/** Recursively validates one map node of a locale tree, collecting issues per key path. */
 function validateNode(
   node: Record<string, unknown>,
   path: readonly string[],
@@ -206,7 +196,6 @@ function validateNode(
   return result;
 }
 
-/** Looks up a dot-separated key path in a locale tree (e.g. `tracks.basics`). */
 export function hasKeyPath(tree: LocaleTree, dotPath: string): boolean {
   let node: LocaleTree | string = tree;
   for (const segment of dotPath.split('.')) {
@@ -243,7 +232,6 @@ export function checkTextKey(
   }
 }
 
-/** Flattened, sorted dot paths of every leaf in a locale tree. */
 export function keyPaths(tree: LocaleTree): string[] {
   const paths: string[] = [];
 
@@ -262,7 +250,6 @@ export function keyPaths(tree: LocaleTree): string[] {
   return paths.sort();
 }
 
-/** Issues where a language's namespaces or keys diverge from the reference language's. */
 export function compareToReference(locales: Locales, reference = 'en'): string[] {
   const issues: string[] = [];
   const referenceNamespaces = locales[reference];

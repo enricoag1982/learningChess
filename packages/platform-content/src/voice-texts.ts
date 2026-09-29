@@ -20,7 +20,6 @@ export interface InventoryEntry {
   readonly source: string;
 }
 
-/** A template whose bounded variable domain could not be established — logged, not generated. */
 export interface SkippedTemplate {
   readonly source: string;
   readonly reason: string;
@@ -52,11 +51,9 @@ function interpolate(template: string, vars: Readonly<Record<string, string | nu
   });
 }
 
-/** Grown-up-only strings are never narrated to the kid — enforced here so a future source added
- * without checking this rule fails loudly instead of silently narrating one. */
+/** Grown-up-only strings are never narrated to the kid; enforced here so a new source added without this rule fails loudly. */
 const EXCLUDED_KEY_PREFIXES = ['parent.', 'new-player.', 'backup.', 'privacy.'];
 
-/** Resolves `fullKey` (e.g. `lessons:rook.story`, or `home.owl-next` for the default `common` namespace) to text. */
 function resolve(
   locales: Locales,
   fullKey: string,
@@ -178,7 +175,6 @@ function collectUiTemplates(
     .filter((lesson) => !(lesson.character in subject.characters))
     .map((lesson) => lessonDisplayName(locales, subject.characters, lesson));
 
-  // Home: next-step owl line.
   addText(entries, resolve(locales, 'home.owl-warmup-only'), 'home');
   addText(entries, resolve(locales, 'home.owl-all-done'), 'home');
   addText(entries, resolve(locales, 'home.owl-resume'), 'home');
@@ -264,7 +260,6 @@ function collectUiTemplates(
   addText(entries, resolve(locales, 'boss.versus.draw'), 'versus-boss');
   addText(entries, resolve(locales, 'boss.versus.lost'), 'versus-boss');
 
-  // Assessment result.
   addText(entries, resolve(locales, 'assessment.fail-body'), 'assessment');
   for (const lesson of content.lessons) {
     addText(
@@ -289,7 +284,6 @@ function collectUiTemplates(
     );
   }
 
-  // Placement.
   addText(entries, resolve(locales, 'placement.offer-question'), 'placement');
   addText(entries, resolve(locales, 'placement.summary-none-body'), 'placement');
   addText(entries, resolve(locales, 'placement.summary-all-body'), 'placement');
@@ -303,7 +297,6 @@ function collectUiTemplates(
     );
   }
 
-  // Celebration: badge-earned owl line.
   for (const badge of badges) {
     addText(
       entries,
@@ -312,7 +305,6 @@ function collectUiTemplates(
     );
   }
 
-  // Plain owl lines with no variables, included for completeness.
   for (const key of [
     'session.summary-closing',
     'time-limit.body',
@@ -364,8 +356,7 @@ function collectBadgeSpokenLines(
   }
 }
 
-/** Builds the full inventory (deduped by `voiceKey`, sorted by key) plus the report's `skipped`
- * list — a pure function of already-loaded content. */
+/** Deduped by `voiceKey`, sorted by key, plus the report's `skipped` list; pure over already-loaded content. */
 export function buildVoiceInventory(
   locales: Locales,
   content: CompiledContent,
@@ -379,7 +370,7 @@ export function buildVoiceInventory(
   collectBadgeSpokenLines(entries, locales, badges);
   addText(entries, resolve(locales, 'voice-check.sentence'), 'voice-check');
 
-  // Nothing is skipped any more; kept as an empty list so a future unbounded template can log itself.
+  // Empty today; kept so a future unbounded template can log itself.
   const skipped: SkippedTemplate[] = [];
 
   return {

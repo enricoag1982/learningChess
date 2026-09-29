@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { keySchema, textRefSchema } from './schema.ts';
 import type { StimulusContent, SubjectContent } from './subject.ts';
 
-/** A non-empty tuple from a runtime list (`discriminatedUnion` needs one). */
 function nonEmpty<T>(items: readonly T[]): [T, ...T[]] {
   const [first, ...rest] = items;
   if (first === undefined) {
@@ -13,8 +12,8 @@ function nonEmpty<T>(items: readonly T[]): [T, ...T[]] {
   return [first, ...rest];
 }
 
-/** One exercise (`guided` / `exercises` entry, or a `series` round), discriminated by `type`: the
- * kinds' schemas, then the stimulus' and the kind's own cross-field checks, in that order. */
+/** One exercise (`guided` / `exercises` entry or a `series` round) discriminated by `type`: kind schemas, then stimulus and
+ * kind cross-field checks. */
 export function createExerciseSchema(
   kinds: SubjectContent['kinds'],
   stimulus?: Pick<StimulusContent, 'refine'>,

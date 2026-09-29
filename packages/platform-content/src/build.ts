@@ -9,12 +9,10 @@ export interface BuildOptions {
   readonly subject: SubjectContent;
   /** Source root: `locales/`, `lessons/`, `minigames/`, `tracks.yaml`, `badges.yaml`, … */
   readonly root: string;
-  /** Output directory: `content.json`, `tracks.json`, `badges.json`, `voice-texts.json`, the
-   * subject's extra files and `locales/<lang>.json`. */
+  /** Output dir: `content.json`, `tracks.json`, `badges.json`, `voice-texts.json`, extra files, `locales/<lang>.json`. */
   readonly out: string;
 }
 
-/** Compiles `subject`'s content under `root` and writes it to `out`. */
 export async function buildContent({ subject, root, out }: BuildOptions): Promise<CompiledAll> {
   const compiled = compileAll(subject, root);
   const { locales, content, tracks, badges, extraOutputs, voiceTexts } = compiled;

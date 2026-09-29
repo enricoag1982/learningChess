@@ -14,23 +14,18 @@ import { loadTracks } from './tracks-load.ts';
 import { buildVoiceInventory, type VoiceInventory } from './voice-texts.ts';
 import { PLATFORM_LOCALES_DIR } from './paths.ts';
 
-/** Every value `buildContent` writes to `dist/`, computed once. `C` is the subject's own concrete
- * content bundle (chess: exercises/demos with real board positions), inferred from the caller's
- * own declared type — same idiom as `loadContent`'s own `C`. */
+/** Every value `buildContent` writes to `dist/`, computed once; `C` is the subject's concrete content bundle, inferred like
+ * `loadContent`'s. */
 export interface CompiledAll<C extends CompiledContent = CompiledContent> {
-  /** Per-language, per-namespace locale trees — one `dist/locales/<lang>.json` per key. */
   readonly locales: Locales;
   readonly content: C;
   readonly tracks: TracksCatalog;
-  /** The subject's own extra `dist/` outputs, by file name (`SubjectContent.extraOutputs`). */
   readonly extraOutputs: Readonly<Record<string, unknown>>;
   readonly badges: readonly BadgeDef[];
   /** `dist/voice-texts.json`'s own source (`buildContent` writes just its `entries`). */
   readonly voiceTexts: VoiceInventory;
 }
 
-/** Runs the whole content pipeline in memory for `subject`, whose sources live under `root`
- * (`locales/`, `lessons/`, `minigames/`, `tracks.yaml`, `badges.yaml`, plus its extra outputs'). */
 export function compileAll<C extends CompiledContent = CompiledContent>(
   subject: SubjectContent,
   root: string,

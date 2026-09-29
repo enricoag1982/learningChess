@@ -1,15 +1,13 @@
-// The mini-game-mode content abstraction (schema + compile + verify): a uniform interface so
-// `lesson-load.ts` dispatches through a registry (`modes/index.ts`) — the content counterpart of
-// core's `MiniGameMode`.
+// Mini-game-mode content abstraction (schema + compile + verify): `lesson-load.ts` dispatches through a registry
+// (`modes/index.ts`), the content counterpart of core's `MiniGameMode`.
 import type { ExerciseDefBase, MiniGameBase } from '@learn/platform-core';
 import type { z } from 'zod';
 import { compileExercises } from '../kinds/compile-exercise.ts';
 import type { AnyExerciseKindContent } from '../kinds/kind-content.ts';
 import type { ExerciseYamlBase, StimulusContent } from '../subject.ts';
 
-/** Per-mini-game compile helper: `relPath` for a mode's own position field (chess: `static`,
- * `versus`, compiling it directly, being chess-bound content themselves); `exercises` compiles an
- * exercise array field the same way a lesson's own are (`series`' `rounds`). */
+/** `relPath` for a mode's own position field (chess: `static`, `versus`, compiled directly); `exercises` compiles an
+ * exercise array like a lesson's (`series`' `rounds`). */
 export interface MiniGameCompileContext {
   readonly relPath: string;
   readonly issues: string[];
@@ -20,7 +18,6 @@ export interface MiniGameCompileContext {
   ): readonly ExerciseDefBase[] | null;
 }
 
-/** Builds the `MiniGameCompileContext` for one mini-game file (`lesson-load.ts`'s generic loader). */
 export function makeMiniGameCompileContext(
   relPath: string,
   kinds: Readonly<Record<string, AnyExerciseKindContent>>,
@@ -36,16 +33,14 @@ export function makeMiniGameCompileContext(
   };
 }
 
-/** Semantic-check helpers every mode's `verify` needs, without repeating the lesson-level logic
- * they share: `claimId`, `checkExercise`. `issues` is the shared sink. */
+/** Helpers for a mode's `verify`, sharing the lesson-level logic: `claimId`, `checkExercise`; `issues` is the shared sink. */
 export interface ModeVerifyContext {
   readonly issues: string[];
   claimId(id: string, where: string): void;
   checkExercise(exercise: ExerciseDefBase, where: string): void;
 }
 
-/** One mini-game mode's content behaviour. Method syntax is deliberate, same reason as
- * `ExerciseKindContent`: bivariant params let a precise mode widen with no cast. */
+/** One mini-game mode's content behaviour. Method syntax: bivariance lets a precise mode widen with no cast. */
 export interface MiniGameModeContent<G extends MiniGameBase, S extends z.ZodType> {
   readonly mode: G['mode'];
   readonly schema: S;
@@ -61,9 +56,7 @@ export interface MiniGameYamlBase {
   readonly mode?: string;
 }
 
-/** A mode's file schema, as far as the generic loader reads it. */
 export type MiniGameSchema = z.ZodType<MiniGameYamlBase>;
 
-/** Any mini-game mode's content, widened to the base state shape (`SubjectContent.modes`'s own
- * entries); each concrete mode (chess: `MiniGameModeContent<SeriesMiniGame, ...>`) widens to this. */
+/** Widened to the base state shape (`SubjectContent.modes` entries); concrete modes widen to it. */
 export type AnyMiniGameModeContent = MiniGameModeContent<MiniGameBase, MiniGameSchema>;

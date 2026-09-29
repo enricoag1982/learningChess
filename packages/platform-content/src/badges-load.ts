@@ -4,7 +4,6 @@ import { loadYaml } from './yaml-file.ts';
 import { type BadgeConditionYaml, type BadgeYaml, badgesFileSchema } from './badges-schema.ts';
 import type { BadgesContent } from './subject.ts';
 
-/** Every concept id any authored lesson teaches (a lesson's own `concept`, plus per-exercise ones). */
 function allConceptIds(lessons: readonly Lesson[]): ReadonlySet<string> {
   const ids = new Set<string>();
   for (const lesson of lessons) {
@@ -28,8 +27,7 @@ const GENERIC_CONDITION_TYPES = new Set([
   'comeback',
 ]);
 
-/** Checks one badge's `condition` matches its `type`'s own required params and that every id it
- * references exists in the compiled tracks catalog / lesson content. */
+/** Checks a condition matches its `type`'s required params and every id it references exists in tracks / lessons. */
 function validateCondition(
   id: string,
   condition: BadgeConditionYaml,
@@ -114,8 +112,7 @@ function compileBadge(raw: BadgeYaml): BadgeDef {
   };
 }
 
-/** Loads and validates `badges.yaml`, compiling it to `BadgeDef[]`. Cross-checks every id a
- * condition references, and that its name/condition text keys (derived from `id`) resolve. */
+/** Compiles `badges.yaml`; cross-checks every id a condition references and that name / condition text keys (from `id`) resolve. */
 export function loadBadges(
   filePath: string,
   locales: Locales,

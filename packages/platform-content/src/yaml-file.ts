@@ -3,10 +3,8 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { parse as parseYaml } from 'yaml';
 import type { z } from 'zod';
 
-/** What a loader gets back: the value, or every issue found reading it. */
 export type Loaded<T> = { readonly data: T } | { readonly issues: string[] };
 
-/** First line of an error's message, for compact single-line issue reporting. */
 export function errorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
   return message.split('\n')[0] ?? message;
@@ -25,7 +23,6 @@ function formatZodIssue(label: string, issue: z.core.$ZodIssue): string[] {
   return [`${label}: ${path}: ${issue.message}`];
 }
 
-/** Reads and parses one YAML file (duplicate keys rejected); a read or syntax failure is an issue. */
 export function readYaml(filePath: string, label: string): Loaded<unknown> {
   let raw: string;
   try {
@@ -40,7 +37,6 @@ export function readYaml(filePath: string, label: string): Loaded<unknown> {
   }
 }
 
-/** {@link readYaml}, then validates the result against `schema`. */
 export function loadYaml<S extends z.ZodType>(
   filePath: string,
   label: string,
@@ -54,7 +50,6 @@ export function loadYaml<S extends z.ZodType>(
     : { issues: result.error.issues.flatMap((issue) => formatZodIssue(label, issue)) };
 }
 
-/** Reads a directory's entry names, reporting an issue (and returning `[]`) if it cannot be read. */
 export function readEntries(dir: string, issues: string[], description: string): string[] {
   try {
     return readdirSync(dir).sort();

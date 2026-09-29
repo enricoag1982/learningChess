@@ -5,9 +5,8 @@ import type { ExerciseYamlBase, StimulusContent } from '../subject.ts';
 import type { AnyExerciseKindContent } from './kind-content.ts';
 import { makeCompileContext } from './kind-content.ts';
 
-/** Compiles one exercise: compiles its stimulus (the subject's own head/tail, e.g. chess's position
- * + last move), then hands the rest to its own kind's `compile` through a `CompileContext` that
- * supplies the shared head and tail. */
+/** Compiles the stimulus (the subject's head / tail), then hands the rest to the kind's `compile` through a `CompileContext`
+ * supplying both. */
 export function compileExercise(
   relPath: string,
   fieldPath: string,
@@ -33,7 +32,6 @@ export function compileExercise(
   return kinds[raw.type]?.compile(raw, ctx) ?? null;
 }
 
-/** Compiles an array of exercises; `null` (with issues pushed) if any of them failed. */
 export function compileExercises(
   relPath: string,
   fieldPath: string,

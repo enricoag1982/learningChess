@@ -2,7 +2,6 @@ import { z } from 'zod';
 import { keySchema } from './schema.ts';
 import type { ZodShape } from './subject.ts';
 
-/** Every badge condition type (rewards.md §4, `domain/badges.ts`'s `BadgeConditionType`). */
 export const badgeConditionTypeSchema = z.enum([
   'mastered',
   'stars-total',
@@ -16,11 +15,8 @@ export const badgeConditionTypeSchema = z.enum([
   'comeback',
 ]);
 
-/**
- * One badge's condition, shape-only (`badges-load.ts`'s `validateCondition` checks which extra
- * fields each `type` actually needs and cross-references ids against content). `subjectFields`
- * (chess: `extra`/`event`/`mode`) are appended last, after the platform's own optional fields.
- */
+/** Shape-only (`badges-load.ts` checks the per-`type` params and id cross-references); `subjectFields`
+ * (chess: `extra`/`event`/`mode`) are appended last. */
 export function badgeConditionSchema(subjectFields: ZodShape) {
   return z
     .object({
@@ -38,8 +34,7 @@ export function badgeConditionSchema(subjectFields: ZodShape) {
 
 export type BadgeConditionYaml = z.infer<ReturnType<typeof badgeConditionSchema>>;
 
-/** One badge: id, catalogue category (rewards.md §3), and its earning condition. Name/condition
- * text keys are derived from `id` (`rewards:badges.<id>.name` / `.condition`), not authored here. */
+/** id, category (rewards.md §3) and condition; name / condition text keys derive from `id` (`rewards:badges.<id>.name` / `.condition`). */
 export function badgeSchema(subjectFields: ZodShape) {
   return z
     .object({
@@ -52,7 +47,6 @@ export function badgeSchema(subjectFields: ZodShape) {
 
 export type BadgeYaml = z.infer<ReturnType<typeof badgeSchema>>;
 
-/** Whole `badges.yaml` file: a flat list of badges. */
 export function badgesFileSchema(subjectFields: ZodShape) {
   return z
     .object({

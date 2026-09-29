@@ -2,11 +2,9 @@ import { HABITATS } from '@learn/platform-core';
 import { z } from 'zod';
 import { KEY_PATTERN, keySchema, textRefSchema } from './schema.ts';
 
-/** One of the fixed habitats a world can be set in (`@chess-kids/core` `HABITATS`). */
 export const habitatSchema = z.enum(HABITATS);
 
-/** One world: authored order within its track, habitat, title key, and an optional world boss
- * (validated against compiled mini-games/lessons in `loadTracks` — a schema alone cannot check it). */
+/** One world: order in its track, habitat, title key, optional boss (cross-checked against mini-games / lessons in `loadTracks`). */
 export const worldSchema = z
   .object({
     id: keySchema,
@@ -45,7 +43,6 @@ export const rankSchema = z
 
 export type RankYaml = z.infer<typeof rankSchema>;
 
-/** Whole `tracks.yaml` file: tracks (and their worlds) plus the rank ladder. */
 export const tracksFileSchema = z
   .object({
     tracks: z.array(trackSchema).min(1),

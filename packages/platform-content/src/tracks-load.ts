@@ -32,7 +32,6 @@ function compileRank(raw: RankYaml): RankDef {
   return { id: raw.id, after: raw.after };
 }
 
-/** Claims `id` in `claimed`, pushing a duplicate-id issue (with `where`) if already claimed. */
 function claimId(claimed: Map<string, string>, id: string, where: string, issues: string[]): void {
   const claimedAt = claimed.get(id);
   if (claimedAt !== undefined) {
@@ -42,8 +41,7 @@ function claimId(claimed: Map<string, string>, id: string, where: string, issues
   claimed.set(id, where);
 }
 
-/** Checks one world's `boss` (if set) references an existing mini-game, and that mini-game's
- * `unlockAfter` names a lesson of this same world. */
+/** A world's `boss` (if set) references an existing mini-game whose `unlockAfter` is a lesson of this world. */
 function checkWorldBoss(
   world: World,
   worldWhere: string,

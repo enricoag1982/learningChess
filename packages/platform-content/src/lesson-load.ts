@@ -76,8 +76,6 @@ function compileLessonFile(
   };
 }
 
-/** Compiles one mini-game file: schema-validates it, then hands it to its own mode's `compile`
- * through a `MiniGameCompileContext` (board/FEN parsing, `series`' own exercise-array compiling). */
 function compileMiniGameFile(
   filePath: string,
   relPath: string,
@@ -97,10 +95,8 @@ function compileMiniGameFile(
   return content.modes[mode]?.compile(data, ctx) ?? null;
 }
 
-/** Per-exercise semantic checks, shared by a lesson's guided/exercises/variants and a series
- * mini-game's rounds: the instruction text key resolves, the subject's own stimulus check passes
- * unless this kind says otherwise, every extra text key the kind reports resolves too, and the
- * kind's own `verify`. */
+/** Shared by guided / exercises / variants and series rounds: instruction key resolves, the subject's stimulus check passes
+ * (unless the kind says otherwise), extra text keys resolve, then the kind's `verify`. */
 function checkExerciseSemantics(
   exercise: ExerciseDefBase,
   where: string,
@@ -220,9 +216,8 @@ function validateSemantics(
   }
 }
 
-/** Loads and validates every lesson and mini-game file, compiling them to `C` (the caller's own
- * concrete content bundle, inferred from its declared return type). Collects every issue before
- * throwing a single `ContentError`. */
+/** Loads and validates every lesson and mini-game file into `C` (the caller's concrete bundle, inferred); collects every
+ * issue before throwing one `ContentError`. */
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- see above.
 export function loadContent<C extends CompiledContent = CompiledContent>(
   lessonsDir: string,
