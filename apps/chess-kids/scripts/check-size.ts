@@ -80,10 +80,10 @@ if (initialBytes > BUDGET_BYTES) {
   throw new Error(`initial JS size budget exceeded: ${initialKb} KB > ${budgetKb} KB`);
 }
 
-// v4 ceiling (`docs/refactor-v4.md` §6): never above `v2.0.0`'s initial JS; raise it only on purpose.
-const V2_CEILING_BYTES = Math.round(186.2 * 1024);
-if (initialBytes > V2_CEILING_BYTES) {
-  throw new Error(`initial JS above the v2.0.0 ceiling: ${initialKb} KB > 186.2 KB`);
+// v4 ceiling (`docs/refactor-v4.md` §6): `v2.0.0`'s 186.2 KB + 0.3 KB for the owner's m8.34 features; raise it only on purpose.
+const CEILING_KB = 186.5;
+if (initialBytes > Math.round(CEILING_KB * 1024)) {
+  throw new Error(`initial JS above the v4 ceiling: ${initialKb} KB > ${CEILING_KB.toFixed(1)} KB`);
 }
 
 /**
