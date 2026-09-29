@@ -11,7 +11,7 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Fonts | Self-hosted (no Google Fonts at runtime) |
 | Narration | Generated audio files, precached; Web Speech API with on-device voices only (`localService`) as fallback; subtitles always shown, so the app works without voice |
 | Capacitor apps | All assets bundled in the app → offline by default |
-| Updates | No periodic polling (owner decision); checked on load and on return to the app. Applied only at a safe screen (Home / profile picker) — never mid-lesson/game/assessment/time-limit/parent; an update found elsewhere just waits until the kid next lands on one of those (§1.2) |
+| Updates | No periodic polling (owner decision); checked on load and on return to the app. Applied only at a safe screen (Home / profile picker) — never mid-lesson/game/assessment/time-limit/parent; an update found elsewhere just waits until the kid next lands on one of those (§1.2). A grown-up can force a reload from the parent area ("Reload latest version": online only, app data kept, §1.2) |
 | Storage eviction | Request persistent storage; prompt parent to "Add to Home Screen" on iPad (Safari may clear website data after 7 days without use); backup file (§5) |
 | Offline size budget | ≤ 50 MB per language (incl. audio) |
 
@@ -34,6 +34,7 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Adapter | `adapters/app-update.ts`'s `createAppUpdate(register)`: tracks `isUpdateReady()` (`onNeedRefresh` fired) and `apply()` (`updateSW(true)` — skip-waiting + reload, idempotent) |
 | Check | No periodic polling (owner decision); checked on load (service-worker registration) and on return to the app (`registration.update()` on `visibilitychange` → visible) |
 | Apply | `ui/AppUpdater.tsx` (renders nothing): on every screen change, applies a ready update only if the new screen is `'home'` or `'picker'` — an update found elsewhere waits until the kid next lands on one of those |
+| Force refresh | Parent area "Reload latest version" → `AppUpdate.forceRefresh()` (owner 2026-09-29; `AppUpdateProvider` context, no global). Offline (`navigator.onLine` false) → `'offline'`, nothing changes, the button shows "No internet connection. Connect and try again.". Online: a waiting update → `apply()`; else unregister every service worker, delete every Cache Storage entry, `location.reload()`. Each API may be missing (dev, jsdom, old Safari) → still reloads. `localStorage` / IndexedDB / app data never touched |
 | Offline | Precache still covers the whole `dist` output; offline e2e green |
 
 ## 2. Accessibility

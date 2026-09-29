@@ -42,7 +42,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 
 | # | Screen | Purpose | Key elements | Goes to |
 |---|---|---|---|---|
-| 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (password) | Home, Parent area |
+| 1 | Profile picker | Choose player | Avatar tiles, New player, Grown-ups (password); small version line at the bottom (M8.34) | Home, Parent area |
 | 2 | Home | Start | Rank, stars, Owl message, **Start today**, tiles: Journey, Practice, Play, My Den; small version line at the bottom (M6.1) | Lesson story (session), Journey, Practice, Play, My Den, Profile picker |
 | 3 | Journey map | Path | World list + paths, lesson nodes (done / current / locked), **Show you know it** | Lesson story, test-out |
 | 4 | Lesson story | Introduce concept | Step pills (Story → Demo → Try → Exercises → Boss; a skipped step: skip icon, muted, striped bar; phone: phase chip + 5-segment mini track, same states), character, speech bubble, mini demo board, Listen again + **Skip** in one row (Story/Demo/Try only, playtest 2), **Let me try** full width (phone: pinned to the bottom) | Exercise |
@@ -51,7 +51,7 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | 7 | Play | Apply | vs Computer (levels), vs Friend, mini-game grid (locked ones greyed) | Game screens |
 | 8 | vs Friend | Same-device game | Face-to-face board (black pieces rotated), take back + exit per player, turn indicator | Play |
 | 9 | My Den | Motivation | Rank ladder, badges, animal friends | Home |
-| 10 | Parent area (M5.1) | Control | Overview (child cards, app version) → child report (progress by world, concept accuracy, weak concepts, minutes per day, games, badges, assessments) → child settings (daily limit, voice/sound/hints, computer level, piece style, unlock, reset, delete); separate Backup (export / import) and Privacy (M5.5, same text as the first-run password step's own link) | Profile picker |
+| 10 | Parent area (M5.1) | Control | Overview (child cards, app version, **Reload latest version** button + hint; M8.34) → child report (progress by world, concept accuracy, weak concepts, minutes per day, games, badges, assessments) → child settings (daily limit, voice/sound/hints, computer level, piece style, unlock, reset, delete); separate Backup (export / import) and Privacy (M5.5, same text as the first-run password step's own link) | Profile picker |
 
 ## 3. Not sketched yet
 
