@@ -34,6 +34,22 @@ describe('requestPersistentStorageIfNeeded', () => {
 
     expect(persist).toHaveBeenCalledTimes(1);
     expect(rawStoredSettings(storage)).toMatchObject({ storagePersisted: true });
+    expect(window.localStorage.getItem('chess-kids:storage-persist-requested')).toBe('1');
+  });
+
+  it("keeps its flag under the app's own storage prefix", async () => {
+    vi.stubGlobal(
+      'navigator',
+      Object.assign({}, navigator, { storage: { persist: vi.fn().mockResolvedValue(true) } }),
+    );
+    const { deps } = services(createMemoryStorage());
+    await requestPersistentStorageIfNeeded({
+      ...deps,
+      app: { ...deps.app, storagePrefix: 'other:' },
+    });
+
+    expect(window.localStorage.getItem('other:storage-persist-requested')).toBe('1');
+    expect(window.localStorage.getItem('chess-kids:storage-persist-requested')).toBeNull();
   });
 
   it('stores a denied result too, so it is never asked again', async () => {

@@ -1,6 +1,6 @@
 /** Remembers the iPad install banner was dismissed, so it never comes back. A plain top-level
- * key, not part of the versioned app-data schema — a device-only UI preference. */
-const DISMISSED_KEY = 'chess-kids:install-banner-dismissed';
+ * key (under the app's storage prefix), not part of the versioned app-data schema. */
+const DISMISSED_KEY = 'install-banner-dismissed';
 
 /** Plain data so the UA / standalone matrix is unit-testable without a DOM. */
 export interface InstallBannerEnv {
@@ -49,17 +49,17 @@ export function readInstallBannerEnv(): InstallBannerEnv {
 }
 
 /** Never throws (private browsing, disabled storage): a failure only means the banner may show again. */
-export function isInstallBannerDismissed(): boolean {
+export function isInstallBannerDismissed(storagePrefix: string): boolean {
   try {
-    return window.localStorage.getItem(DISMISSED_KEY) === '1';
+    return window.localStorage.getItem(`${storagePrefix}${DISMISSED_KEY}`) === '1';
   } catch {
     return false;
   }
 }
 
-export function dismissInstallBanner(): void {
+export function dismissInstallBanner(storagePrefix: string): void {
   try {
-    window.localStorage.setItem(DISMISSED_KEY, '1');
+    window.localStorage.setItem(`${storagePrefix}${DISMISSED_KEY}`, '1');
   } catch {
     // Best-effort only: worst case, the banner shows again next visit.
   }

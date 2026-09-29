@@ -92,8 +92,14 @@ describe('dismiss', () => {
   });
 
   it('is not dismissed until dismissInstallBanner is called, then stays dismissed', () => {
-    expect(isInstallBannerDismissed()).toBe(false);
-    dismissInstallBanner();
-    expect(isInstallBannerDismissed()).toBe(true);
+    expect(isInstallBannerDismissed('chess-kids:')).toBe(false);
+    dismissInstallBanner('chess-kids:');
+    expect(isInstallBannerDismissed('chess-kids:')).toBe(true);
+    expect(window.localStorage.getItem('chess-kids:install-banner-dismissed')).toBe('1');
+  });
+
+  it('keeps each app prefix apart', () => {
+    dismissInstallBanner('one:');
+    expect(isInstallBannerDismissed('two:')).toBe(false);
   });
 });

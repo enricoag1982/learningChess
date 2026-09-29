@@ -7,17 +7,21 @@ import {
   readInstallBannerEnv,
   shouldShowInstallBanner,
 } from '../adapters/install-banner.ts';
+import { useServices } from '../app/store.ts';
 import { Owl } from './ds/Owl.tsx';
 
-function initiallyVisible(): boolean {
-  return !isInstallBannerDismissed() && shouldShowInstallBanner(readInstallBannerEnv());
+function initiallyVisible(storagePrefix: string): boolean {
+  return (
+    !isInstallBannerDismissed(storagePrefix) && shouldShowInstallBanner(readInstallBannerEnv())
+  );
 }
 
 /** One-time Home banner for iOS Safari, not already installed (`non-functional.md` §1/§4): Safari
  * may clear website data after 7 days unused, so this nudges adding to the Home Screen. */
 export function InstallBanner(): JSX.Element | null {
   const { t } = useTranslation();
-  const [visible, setVisible] = useState(initiallyVisible);
+  const { storagePrefix } = useServices().deps.app;
+  const [visible, setVisible] = useState(() => initiallyVisible(storagePrefix));
 
   if (!visible) {
     return null;
@@ -37,7 +41,7 @@ export function InstallBanner(): JSX.Element | null {
       <button
         type="button"
         onClick={() => {
-          dismissInstallBanner();
+          dismissInstallBanner(storagePrefix);
           setVisible(false);
         }}
         className="flex h-11 min-w-11 flex-shrink-0 items-center justify-center rounded-full px-3 text-sm font-bold text-info underline underline-offset-2"

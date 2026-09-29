@@ -89,6 +89,12 @@ function HomeTile({
   );
 }
 
+/** Literal class names so Tailwind sees them; one column per tile on wide screens. */
+const HOME_GRID_COLUMNS: Readonly<Record<number, string | undefined>> = {
+  3: 'sm:grid-cols-3',
+  4: 'sm:grid-cols-4',
+};
+
 export function HomeScreen(): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
@@ -160,6 +166,43 @@ export function HomeScreen(): JSX.Element {
           : t('home.subtitle-lesson-only')
         : t('home.subtitle-warmup');
 
+  const tiles = [
+    {
+      id: 'journey',
+      order: 1,
+      icon: <JourneyIcon />,
+      label: t('home.journey-tile'),
+      colors: { bg: '#DCEFE3', fg: '#1F5A41', ledge: '#163F2E' },
+      onClick: goToJourney,
+    },
+    {
+      id: 'practice',
+      order: 2,
+      icon: <PracticeTileIcon />,
+      label: t('home.practice-tile'),
+      colors: { bg: '#FBE3D2', fg: '#7A3A10', ledge: '#55290B' },
+      onClick: goToPractice,
+    },
+    ...(pack.homeTiles ?? []).map((tile) => ({
+      id: tile.id,
+      order: tile.order,
+      icon: <tile.Icon />,
+      label: tContent(t, tile.labelKey),
+      colors: tile.colors,
+      onClick: () => {
+        void navigate(tile.route);
+      },
+    })),
+    {
+      id: 'den',
+      order: 4,
+      icon: <DenTileIcon />,
+      label: t('home.den-tile'),
+      colors: { bg: '#EFE4F7', fg: '#4B3A63', ledge: '#352945' },
+      onClick: goToDen,
+    },
+  ].sort((a, b) => a.order - b.order);
+
   return (
     <main className="flex min-h-dvh flex-col gap-6 bg-cream px-4 py-6 sm:px-10 sm:py-8">
       <h1 className="font-display text-lg text-muted sm:text-xl">{t('app.title')}</h1>
@@ -216,55 +259,20 @@ export function HomeScreen(): JSX.Element {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-6">
-        {[
-          {
-            id: 'journey',
-            order: 1,
-            icon: <JourneyIcon />,
-            label: t('home.journey-tile'),
-            colors: { bg: '#DCEFE3', fg: '#1F5A41', ledge: '#163F2E' },
-            onClick: goToJourney,
-          },
-          {
-            id: 'practice',
-            order: 2,
-            icon: <PracticeTileIcon />,
-            label: t('home.practice-tile'),
-            colors: { bg: '#FBE3D2', fg: '#7A3A10', ledge: '#55290B' },
-            onClick: goToPractice,
-          },
-          ...(pack.homeTiles ?? []).map((tile) => ({
-            id: tile.id,
-            order: tile.order,
-            icon: <tile.Icon />,
-            label: tContent(t, tile.labelKey),
-            colors: tile.colors,
-            onClick: () => {
-              void navigate(tile.route);
-            },
-          })),
-          {
-            id: 'den',
-            order: 4,
-            icon: <DenTileIcon />,
-            label: t('home.den-tile'),
-            colors: { bg: '#EFE4F7', fg: '#4B3A63', ledge: '#352945' },
-            onClick: goToDen,
-          },
-        ]
-          .sort((a, b) => a.order - b.order)
-          .map((tile) => (
-            <HomeTile
-              key={tile.id}
-              icon={tile.icon}
-              label={tile.label}
-              bg={tile.colors.bg}
-              fg={tile.colors.fg}
-              ledge={tile.colors.ledge}
-              onClick={tile.onClick}
-            />
-          ))}
+      <div
+        className={`grid grid-cols-2 gap-3 ${HOME_GRID_COLUMNS[tiles.length] ?? 'sm:grid-cols-4'} sm:gap-6`}
+      >
+        {tiles.map((tile) => (
+          <HomeTile
+            key={tile.id}
+            icon={tile.icon}
+            label={tile.label}
+            bg={tile.colors.bg}
+            fg={tile.colors.fg}
+            ledge={tile.colors.ledge}
+            onClick={tile.onClick}
+          />
+        ))}
       </div>
 
       <p className="min-h-[1.75rem] text-center text-base text-go">
