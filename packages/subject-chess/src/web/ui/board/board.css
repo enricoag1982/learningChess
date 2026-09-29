@@ -1,6 +1,6 @@
 /*
- * Board-local animations. Kept out of index.css since these are purely a `Board` concern.
- * The global `prefers-reduced-motion` rule in index.css forces near-zero animation/transition
+ * Board-local animations. Kept out of theme.css since these are purely a `Board` concern.
+ * The global `prefers-reduced-motion` rule in theme.css forces near-zero animation/transition
  * durations everywhere (including these keyframes), so no extra media query is needed here.
  */
 

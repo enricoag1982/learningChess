@@ -5,7 +5,7 @@ export interface StarsRowProps {
   readonly earned: number;
   readonly max?: number;
   readonly size?: string;
-  /** Pop the earned stars in (respects `prefers-reduced-motion` globally, see index.css). */
+  /** Pop the earned stars in (respects `prefers-reduced-motion` globally, see theme.css). */
   readonly animate?: boolean;
 }
 

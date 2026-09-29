@@ -1,26 +1,8 @@
-import { defineConfig, devices } from '@playwright/test';
+import { devices } from '@playwright/test';
+import { defineE2EConfig } from '@learn/platform-web/build/e2e-config.ts';
 
-const PORT = Number(process.env.PW_PORT ?? 4173);
-const baseURL = `http://localhost:${String(PORT)}`;
-
-// Runs against the production build (`pnpm build && pnpm test:e2e`), never the dev server.
-export default defineConfig({
-  testDir: 'e2e',
-  forbidOnly: !!process.env.CI,
-  retries: 0,
-  reporter: [['list'], ['html', { open: 'never' }]],
-  use: {
-    baseURL,
-    // Sandbox chromium is preinstalled here; CI installs its own and leaves this unset.
-    ...(process.env.PW_CHROMIUM_PATH
-      ? { launchOptions: { executablePath: process.env.PW_CHROMIUM_PATH } }
-      : {}),
-  },
-  webServer: {
-    command: `pnpm exec vite preview --port ${String(PORT)} --strictPort`,
-    url: baseURL,
-    reuseExistingServer: !process.env.CI,
-  },
+export default defineE2EConfig({
+  port: 4173,
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: /fit\.spec\.ts/ },
     {

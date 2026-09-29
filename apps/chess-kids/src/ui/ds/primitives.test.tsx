@@ -63,8 +63,8 @@ describe('InfoPanel / InfoPill', () => {
   });
 });
 
-describe('.tap-raised (index.css)', () => {
-  const css = readFileSync(resolve(process.cwd(), 'src/index.css'), 'utf8');
+describe('.tap-raised (theme.css)', () => {
+  const css = readFileSync(resolve(process.cwd(), '../../packages/platform-web/theme.css'), 'utf8');
 
   it('defines the raised look: border, ledge shadow, and per-role edge/ledge tokens (v1.1.0 part B: border and ledge each a darker shade of the fill, neutral shares one dark taupe tone)', () => {
     expect(css).toMatch(/\.tap-raised\s*\{[^}]*box-shadow:\s*0 6px 0 0 var\(--tap-ledge\)/);

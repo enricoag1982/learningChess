@@ -67,7 +67,7 @@ function firstMoveOf(def: ExerciseDef): { readonly from: Square; readonly to: Sq
   return action.move;
 }
 
-// non-functional.md §2: "Respect reduce motion." index.css zeroes animation/transition durations
+// non-functional.md §2: "Respect reduce motion." theme.css zeroes animation/transition durations
 // globally under `prefers-reduced-motion: reduce`, so a played move should land immediately
 // instead of visibly sliding.
 test.use({ reducedMotion: 'reduce' });
