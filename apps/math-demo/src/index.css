@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+@import '../../../packages/platform-web/theme.css';
+@source '../../../packages/platform-web/src';
+@source '../../../packages/subject-math/src';

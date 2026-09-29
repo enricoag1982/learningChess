@@ -9,6 +9,7 @@
   "scripts": {
     "prepare": "pnpm --filter \"@learn/subject-*\" build",
     "dev": "pnpm --filter @learn/chess-kids dev",
+    "dev:math": "pnpm --filter @learn/math-demo dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
