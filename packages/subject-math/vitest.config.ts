@@ -14,10 +14,13 @@ export default defineConfig({
         },
       },
       {
+        // `__APP_VERSION__` (each app's `vite.config.ts` `define`): the services stamp it.
+        define: { __APP_VERSION__: JSON.stringify('0.0.0-test') },
         plugins: [react()],
         test: {
           name: 'web',
           environment: 'jsdom',
+          setupFiles: ['./vitest.web.setup.ts'],
           include: ['src/**/*.test.tsx', 'src/web/**/*.test.ts'],
           exclude: ['**/node_modules/**'],
           testTimeout: 15_000,

@@ -17,6 +17,11 @@ export const MATH_KINDS = {
   'number-entry': numberEntryKind,
 } as const satisfies { readonly [T in ExerciseType]: MathKind<DefOf<T>, MathAction, MathOutcome> };
 
+export type ActionOf<T extends ExerciseType> = Parameters<(typeof MATH_KINDS)[T]['act']>[1];
+export type OutcomeOf<T extends ExerciseType> = ReturnType<
+  (typeof MATH_KINDS)[T]['act']
+>['outcome'];
+
 export type AnyMathKind = MathKind<MathExerciseDef, MathAction, MathOutcome>;
 
 export function kindOf(def: MathExerciseDef): AnyMathKind {

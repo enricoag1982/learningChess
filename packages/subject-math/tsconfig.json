@@ -1,7 +1,15 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "types": ["node", "vite/client"]
   },
-  "include": ["src", "scripts", "vitest.config.ts"]
+  "include": [
+    "src",
+    "scripts",
+    "vitest.config.ts",
+    "vitest.web.setup.ts",
+    "../platform-web/src/app-version.d.ts"
+  ]
 }
