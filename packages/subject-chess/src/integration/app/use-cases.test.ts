@@ -27,7 +27,6 @@ import {
   recordBossResult,
   recordExerciseResult,
   recordReviewResult,
-  saveResumeStep,
   skipLessonPhase,
 } from '@learn/platform-core/app/use-cases';
 
@@ -787,18 +786,6 @@ describe('recordReviewResult', () => {
 
     expect(stats.box).toBe(1);
     expect(stats.dueAt).toBe(new Date('2026-01-02T00:00:00.000Z').toISOString());
-  });
-});
-
-describe('saveResumeStep', () => {
-  it('moves the resume point without recording an attempt', async () => {
-    const deps = makeDeps();
-
-    const progress = await saveResumeStep(deps, 'profile-1', 'rook', 5);
-
-    expect(progress.resumeStep).toBe(5);
-    expect(await deps.progress.listAttempts('profile-1')).toEqual([]);
-    expect(await deps.progress.listLessons('profile-1')).toEqual([progress]);
   });
 });
 

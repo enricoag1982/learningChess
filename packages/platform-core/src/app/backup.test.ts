@@ -22,10 +22,8 @@ import {
 import {
   BackupValidationError,
   backupFileName,
-  backupSummary,
   buildBackupFile,
   exportBackup,
-  importBackup,
   parseBackupFile,
 } from './backup.ts';
 import type { BackupFile } from './backup.ts';
@@ -181,7 +179,7 @@ describe('exportBackup', () => {
   });
 });
 
-describe('parseBackupFile / backupSummary round trip', () => {
+describe('parseBackupFile', () => {
   it('round-trips a built backup file through JSON', async () => {
     const mia = newProfile('p1', 'Mia', 'fox', NOW);
     let progress = newLessonProgress('lp1', 'p1', 'l1', NOW);
@@ -197,7 +195,6 @@ describe('parseBackupFile / backupSummary round trip', () => {
     const parsed = await parseBackupFile(deps, raw);
 
     expect(parsed).toEqual(file);
-    expect(backupSummary(parsed)).toEqual({ profileCount: 1, totalStars: 5 });
   });
 
   it('rejects invalid JSON', async () => {
@@ -235,37 +232,5 @@ describe('parseBackupFile / backupSummary round trip', () => {
     const file = await buildBackupFile(deps);
     const olderRaw = JSON.stringify({ ...file, schemaVersion: 3 });
     await expect(parseBackupFile(deps, olderRaw)).resolves.not.toThrow();
-  });
-});
-
-describe('importBackup', () => {
-  it('parses, then replaces via backupImporter, and returns the summary', async () => {
-    const mia = newProfile('p1', 'Mia', 'fox', NOW);
-    let progress = newLessonProgress('lp1', 'p1', 'l1', NOW);
-    progress = recordExerciseStars(progress, 'l1-01', 3, L1, NOW);
-    const sourceDeps = makeDeps({
-      profiles: makeProfileRepo([mia]),
-      progress: makeProgressRepo([progress]),
-    });
-    const file = await buildBackupFile(sourceDeps);
-    const raw = JSON.stringify(file);
-
-    const importer = makeBackupImporter();
-    const deps = makeDeps({ backupImporter: importer });
-
-    const summary = await importBackup(deps, raw);
-
-    expect(importer.calls).toHaveLength(1);
-    expect(importer.calls[0]?.profiles.map((p) => p.id)).toEqual(['p1']);
-    expect(summary).toEqual({ profileCount: 1, totalStars: 3 });
-  });
-
-  it('never calls backupImporter.replaceAll on an invalid file ("nothing changed")', async () => {
-    const importer = makeBackupImporter();
-    const deps = makeDeps({ backupImporter: importer });
-
-    await expect(importBackup(deps, 'not json')).rejects.toThrow(BackupValidationError);
-
-    expect(importer.calls).toHaveLength(0);
   });
 });

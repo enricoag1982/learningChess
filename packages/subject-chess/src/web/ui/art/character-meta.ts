@@ -5,11 +5,6 @@ export function characterPieceOrNull(character: string): PieceType | null {
   return CHARACTER_PIECES[character] ?? null;
 }
 
-/** Piece type for a lesson character; defaults to rook where none is mapped. */
-export function characterPiece(character: string): PieceType {
-  return characterPieceOrNull(character) ?? 'r';
-}
-
 /** Reverse of `CHARACTER_PIECES`: the animal character a given piece type is taught as
  * (docs/app-structure.md §8), for the board's "animal badge" piece look. */
 const PIECE_CHARACTER: Readonly<Record<PieceType, string>> = {

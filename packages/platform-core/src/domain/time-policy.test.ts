@@ -6,17 +6,11 @@ import { composeDefaultSettings } from './profile-settings.ts';
 const DEFAULT_PROFILE_SETTINGS = composeDefaultSettings({ defaults: {} });
 import { newSessionLog } from './session-log.ts';
 import type { SessionLog } from './session-log.ts';
-import {
-  allowedHoursReason,
-  isWithinAllowedHours,
-  minutesUntilEnd,
-  shouldWarn,
-} from './time-policy.ts';
+import { allowedHoursReason, minutesUntilEnd, shouldWarn } from './time-policy.ts';
 
-describe('allowedHoursReason / isWithinAllowedHours', () => {
+describe('allowedHoursReason', () => {
   it('null (within hours) with both edges off — pre-M7.1 default', () => {
     expect(allowedHoursReason(DEFAULT_PROFILE_SETTINGS, new Date(2026, 0, 5, 23, 0))).toBeNull();
-    expect(isWithinAllowedHours(DEFAULT_PROFILE_SETTINGS, new Date(2026, 0, 5, 23, 0))).toBe(true);
   });
 
   it('"late" once at or past playUntil, "null" just before it', () => {

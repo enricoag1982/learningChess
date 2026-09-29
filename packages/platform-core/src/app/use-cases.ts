@@ -339,19 +339,6 @@ export async function recordReviewResult(
   return stats;
 }
 
-/** Moves the resume point for a lesson without recording an attempt (e.g. leaving mid-story). */
-export async function saveResumeStep(
-  deps: AppDeps,
-  profileId: string,
-  lessonId: string,
-  step: number,
-): Promise<LessonProgress> {
-  const progress = await getLessonProgress(deps, profileId, lessonId);
-  const saved = withResumeStep(progress, step, deps.clock.now());
-  await deps.progress.saveLesson(saved);
-  return saved;
-}
-
 /** Marks `phase` skipped (kid tapped "Skip" on Story/Demo/Try) and moves the resume point past it.
  * No attempt logged: Story/Demo never track one. */
 export async function skipLessonPhase(
@@ -369,8 +356,8 @@ export async function skipLessonPhase(
   return progress;
 }
 
-/** Moves the resume point like `saveResumeStep`, and unmarks `completedPhase` if it was previously
- * skipped — a "Play again" replay that this time plays the phase through. */
+/** Moves the resume point and unmarks `completedPhase` if it was previously skipped — a "Play
+ * again" replay that this time plays the phase through. */
 export async function advanceLessonPhase(
   deps: AppDeps,
   profileId: string,

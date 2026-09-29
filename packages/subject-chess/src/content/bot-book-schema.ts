@@ -22,5 +22,3 @@ export const botBookFileSchema = z
     lines: z.array(bookLineSchema).min(1),
   })
   .strict();
-
-export type BotBookFileYaml = z.infer<typeof botBookFileSchema>;

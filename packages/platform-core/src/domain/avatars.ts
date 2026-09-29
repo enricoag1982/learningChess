@@ -11,8 +11,3 @@ export const AVATARS = [
 ] as const;
 
 export type Avatar = (typeof AVATARS)[number];
-
-/** True if `value` is one of the fixed avatar ids. */
-export function isAvatar(value: string): value is Avatar {
-  return (AVATARS as readonly string[]).includes(value);
-}

@@ -52,5 +52,3 @@ export const tracksFileSchema = z
     ranks: z.array(rankSchema).min(1),
   })
   .strict();
-
-export type TracksFileYaml = z.infer<typeof tracksFileSchema>;

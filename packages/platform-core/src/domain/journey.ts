@@ -17,11 +17,6 @@ export const HABITATS = [
 
 export type Habitat = (typeof HABITATS)[number];
 
-/** True if `value` is one of the fixed habitat ids. */
-export function isHabitat(value: string): value is Habitat {
-  return (HABITATS as readonly string[]).includes(value);
-}
-
 /** One world in a track: one habitat, `lessons[]` are derived from compiled content (`worldLessons`). */
 export interface World {
   readonly id: string;

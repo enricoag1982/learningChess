@@ -15,7 +15,6 @@ import {
   mergeUnlocks,
   rekeyProfileData,
   totalMinutesOverDays,
-  totalMinutesToday,
 } from './merge.ts';
 import type { MergeableProfileData } from './merge.ts';
 import { composeDefaultSettings } from './profile-settings.ts';
@@ -594,19 +593,6 @@ describe('rekeyProfileData', () => {
     expect(rekeyed.lessonProgress[0]?.id).toBe('lp1');
     expect(rekeyed.attempts[0]?.profileId).toBe('local-id');
     expect(rekeyed.streak?.profileId).toBe('local-id');
-  });
-});
-
-describe('totalMinutesToday', () => {
-  it('sums every device row for the given date', () => {
-    const data = fullProfileData({
-      sessionLogs: [
-        sessionLog({ deviceId: 'a', date: '2026-01-10', minutes: 10 }),
-        sessionLog({ id: 'log-b', deviceId: 'b', date: '2026-01-10', minutes: 20 }),
-        sessionLog({ id: 'log-c', deviceId: 'c', date: '2026-01-09', minutes: 99 }),
-      ],
-    });
-    expect(totalMinutesToday(data, NOW)).toBe(30);
   });
 });
 

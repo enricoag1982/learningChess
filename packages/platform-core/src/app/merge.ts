@@ -9,18 +9,9 @@ import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import type { Profile } from '../domain/profile.ts';
 import { totalStars } from '../domain/progress.ts';
 import type { BackupFile, ProfileBackupData } from './backup.ts';
-import { buildBackupFile } from './backup.ts';
+import { buildBackupFile, requireBackupImporter } from './backup.ts';
 import { getOrCreateDeviceId } from './device.ts';
-import type { BackupImporter } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
-
-/** `deps.backupImporter`, or a clear error if this `AppDeps` has not wired it up. */
-function requireBackupImporter(deps: AppDeps): BackupImporter {
-  if (deps.backupImporter === undefined) {
-    throw new Error('AppDeps.backupImporter is not wired up');
-  }
-  return deps.backupImporter;
-}
 
 /** One incoming child's chosen fate: `'add-new'` creates a fresh local profile from the incoming
  * one (id kept — only applies when it matches no local profile); `'merge'` combines its data into
@@ -160,8 +151,7 @@ function resolveMergeTarget(
   return choice.localProfileId ?? localByNickname.get(nicknameKey(incoming.nickname)) ?? null;
 }
 
-/** Outcome of {@link importMerged}: the device's totals after the import (same shape as
- * `app/backup.ts`'s `BackupSummary`, so the "done" screen can reuse the same preview text). */
+/** Outcome of {@link importMerged}: the device's totals after the import. */
 export interface ImportMergedResult {
   readonly profileCount: number;
   readonly totalStars: number;

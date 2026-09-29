@@ -33,16 +33,6 @@ export function allowedHoursReason(
   return null;
 }
 
-/** `true` while `now` is inside the allowed-hours window — both `playFrom`/`playUntil` absent/`null`
- * always reads as "within hours". See {@link allowedHoursReason} for the boundary rules. */
-export function isWithinAllowedHours(
-  settings: Pick<ProfileSettings, 'playFrom' | 'playUntil'>,
-  now: Date,
-  overrideUntil?: string,
-): boolean {
-  return allowedHoursReason(settings, now, overrideUntil) === null;
-}
-
 /** Minutes from `now` to today's `playUntil` edge (or to `overrideUntil` while it is active, since
  * that is the boundary actually in effect then); `null` while `playUntil` is off and no override
  * is active. Can be negative once the edge has already passed (the gate itself, not this helper,

@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { makeExercise, makeLesson as buildLesson } from '../testing/index.ts';
 import {
-  HABITATS,
   currentRank,
-  isHabitat,
   lessonAvailability,
   nextLesson,
   nextStep,
@@ -147,15 +145,6 @@ describe('worldLessons', () => {
 
   it('is empty for a world with no authored lessons (coming-soon)', () => {
     expect(worldLessons(W3, ALL_LESSONS)).toEqual([]);
-  });
-});
-
-describe('isHabitat / HABITATS', () => {
-  it('accepts every fixed habitat and rejects an unknown one', () => {
-    for (const habitat of HABITATS) {
-      expect(isHabitat(habitat)).toBe(true);
-    }
-    expect(isHabitat('desert')).toBe(false);
   });
 });
 

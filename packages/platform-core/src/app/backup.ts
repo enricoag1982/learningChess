@@ -228,7 +228,7 @@ function requireBackupFileWriter(deps: AppDeps): BackupFileWriter {
 }
 
 /** `deps.backupImporter`, or a clear error if this `AppDeps` has not wired it up. */
-function requireBackupImporter(deps: AppDeps): BackupImporter {
+export function requireBackupImporter(deps: AppDeps): BackupImporter {
   if (deps.backupImporter === undefined) {
     throw new Error('AppDeps.backupImporter is not wired up');
   }
@@ -402,34 +402,4 @@ export async function parseBackupFile(deps: AppDeps, raw: string): Promise<Backu
   }
 
   return file;
-}
-
-/** The parent-area Import preview text's own numbers ("2 children, 1,234 stars"). */
-export interface BackupSummary {
-  readonly profileCount: number;
-  readonly totalStars: number;
-}
-
-function lessonStarsSum(bestStars: Readonly<Record<string, 1 | 2 | 3>>): number {
-  return Object.values(bestStars).reduce((sum: number, stars) => sum + stars, 0);
-}
-
-/** `{ profileCount, totalStars }` for `file` — every profile's stars, exercises + boss, summed. */
-export function backupSummary(file: BackupFile): BackupSummary {
-  const totalStars = Object.values(file.data).reduce((sum, data) => {
-    const lessonTotal = data.lessonProgress.reduce(
-      (lessonSum, progress) => lessonSum + lessonStarsSum(progress.bestStars) + progress.bossStars,
-      0,
-    );
-    return sum + lessonTotal;
-  }, 0);
-  return { profileCount: file.profiles.length, totalStars };
-}
-
-/** Parent area "Import": validates `raw`, then atomically replaces every stored record with `raw`'s
- * own. Returns the preview summary so the UI can show what was restored. */
-export async function importBackup(deps: AppDeps, raw: string): Promise<BackupSummary> {
-  const file = await parseBackupFile(deps, raw);
-  await requireBackupImporter(deps).replaceAll(file);
-  return backupSummary(file);
 }

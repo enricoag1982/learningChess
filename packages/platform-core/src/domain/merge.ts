@@ -6,7 +6,6 @@ import type { ConceptStats } from './review.ts';
 import type { SessionLog } from './session-log.ts';
 import { lastNDays, totalMinutesForDate } from './session-log.ts';
 import type { Streak } from './streak.ts';
-import { localDayString } from './streak.ts';
 
 /** One profile's full backed-up data, merge-ready. Structurally identical to `app/backup.ts`'s
  * `ProfileBackupData` — declared here (not imported) so this stays a pure `domain` module. */
@@ -375,11 +374,6 @@ export function mergeProfileData(
     unlocks: mergeUnlocks(local.unlocks, incoming.unlocks),
   };
   return merged;
-}
-
-/** Total minutes played on `now`'s local calendar day, across every device row in `data.sessionLogs`. */
-export function totalMinutesToday(data: MergeableProfileData, now: Date): number {
-  return totalMinutesForDate(data.sessionLogs, localDayString(now));
 }
 
 /** Total minutes played over the last `days` local calendar days ending today, across every device

@@ -1,6 +1,4 @@
 // The exercise-kind registry — the only place exercise-type dispatch happens in `packages/core`.
-import type { Move } from '../core/chess/rules.ts';
-import type { Square } from '../core/chess/types.ts';
 import type { VariantRules } from '../core/variant/rules.ts';
 import type { Hint } from '../core/exercise/hint.ts';
 import type { ExerciseKind } from '@learn/platform-core/domain/exercise/kind';
@@ -72,15 +70,6 @@ export function kindOf(def: ExerciseDef): AnyExerciseKind {
 /** Starts a fresh exercise at its authored position. */
 export function startExercise(def: ExerciseDef): ExerciseState {
   return kindOf(def).init(def);
-}
-
-/** Legal kid moves right now (collect-stars / capture / best-move / mate-in-n only; `[]` otherwise or once solved). */
-export function exerciseMoves(state: ExerciseState, rules: VariantRules, from?: Square): Move[] {
-  const { input } = kindOf(state.def);
-  if (state.solved || (input !== 'static-move' && input !== 'real-move')) {
-    return [];
-  }
-  return rules.legalMoves(state.position, { staticOpponent: true }, from);
 }
 
 /** Advances the hint ladder by one level (capped at 3) and returns the hint for that level. */

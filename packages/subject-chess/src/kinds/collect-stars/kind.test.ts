@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import { parseDiagram } from '../../core/chess/diagram.ts';
 import { createVariantRules } from '../../core/variant/rules.ts';
-import { exerciseMoves, requestHint, starsFor } from '../index.ts';
+import { requestHint, starsFor } from '../index.ts';
 import { initState } from '../../core/exercise/state.ts';
 import type { ExerciseState, ExerciseStateOf } from '../../core/exercise/state.ts';
 import { playMove, undo } from '../static-move.ts';
@@ -157,14 +157,5 @@ describe('collect-stars', () => {
     state = playMove(state, rules, { from: 'a8', to: 'h8' }).state;
 
     expect(starsFor(state)).toBe(2);
-  });
-
-  it('exposes legal kid moves and none once solved', () => {
-    let state = initState(def);
-    expect(exerciseMoves(state, rules, 'a1')).toHaveLength(14);
-
-    state = playMove(state, rules, { from: 'a1', to: 'a8' }).state;
-    state = playMove(state, rules, { from: 'a8', to: 'h8' }).state;
-    expect(exerciseMoves(state, rules)).toEqual([]);
   });
 });

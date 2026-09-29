@@ -60,5 +60,3 @@ export function badgesFileSchema(subjectFields: ZodShape) {
     })
     .strict();
 }
-
-export type BadgesFileYaml = z.infer<ReturnType<typeof badgesFileSchema>>;
