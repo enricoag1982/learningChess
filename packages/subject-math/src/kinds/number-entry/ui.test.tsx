@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import type { MathState, NumberEntryDef } from '../../core/types.ts';
 import { numberEntryKind } from './kind.ts';
+import type { NumberEntryAction } from './kind.ts';
 import type { NumberEntryPlayAreaProps } from './ui.ts';
 import { numberEntryUi } from './ui.ts';
 
@@ -53,33 +54,42 @@ describe('numberEntryUi.toUi', () => {
   });
 });
 
+function playArea(
+  core: Partial<MathState<NumberEntryDef>>,
+  wrongValue?: number,
+  dispatch = vi.fn<NumberEntryPlayAreaProps['dispatch']>(),
+) {
+  return numberEntryUi.PlayArea({
+    def,
+    state: {
+      core: { ...fresh, ...core },
+      hint: null,
+      feedback: { kind: 'instruction' },
+      wrongValue,
+    },
+    dispatch,
+    showHint: true,
+    showCheck: false,
+    surface: { worldId: null },
+    top: <p>Instruction</p>,
+    done: <p>Done</p>,
+  });
+}
+
 function renderPlayArea(core: Partial<MathState<NumberEntryDef>>, wrongValue?: number) {
   const dispatch = vi.fn<NumberEntryPlayAreaProps['dispatch']>();
-  render(
-    numberEntryUi.PlayArea({
-      def,
-      state: {
-        core: { ...fresh, ...core },
-        hint: null,
-        feedback: { kind: 'instruction' },
-        wrongValue,
-      },
-      dispatch,
-      showHint: true,
-      showCheck: false,
-      surface: { worldId: null },
-      top: <p>Instruction</p>,
-      done: <p>Done</p>,
-    }),
-  );
+  render(playArea(core, wrongValue, dispatch));
   return dispatch;
 }
 
+const entryOutput = (name: string) => screen.getByRole('status', { name });
+
 describe('numberEntryUi.PlayArea', () => {
-  it('shows the problem card, the entry and the pad, and dispatches the pad keys', () => {
+  it('shows the entry on the problem card and dispatches the pad keys', () => {
     const dispatch = renderPlayArea({ entry: '4' });
-    expect(screen.getByText('3 + 2 = ?')).toBeTruthy();
-    expect(screen.getByText('Your answer: 4')).toBeTruthy();
+    expect(entryOutput('Your answer: 4').textContent).toBe('4');
+    expect(screen.getByText('3 + 2 =', { exact: false }).textContent).toBe('3 + 2 = 4');
+    expect(screen.queryByText('Your answer:', { exact: false, selector: 'p, div' })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: '9' }));
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
@@ -93,21 +103,41 @@ describe('numberEntryUi.PlayArea', () => {
     ]);
   });
 
+  it('shows ? in place of an empty entry', () => {
+    renderPlayArea({ entry: '' });
+    expect(entryOutput('Your answer: ?').textContent).toBe('?');
+    expect(screen.getByText('3 + 2 =', { exact: false }).textContent).toBe('3 + 2 = ?');
+  });
+
   it('draws the dots only once a hint was asked', () => {
     renderPlayArea({});
     expect(document.querySelectorAll('[data-group]')).toHaveLength(0);
+    cleanup();
     renderPlayArea({ hintLevel: 1 });
     expect(document.querySelectorAll('[data-group]')).toHaveLength(5);
   });
 
-  it('shows a wrong value orange and struck through until the next digit', () => {
-    renderPlayArea({ entry: '' }, 7);
-    const wrong = screen.getByText('Your answer: 7');
+  it('strikes only the number of a wrong value, in orange, until the next digit', () => {
+    let core = fresh;
+    let wrongValue: number | undefined;
+    function press(action: NumberEntryAction): void {
+      const step = numberEntryKind.act(core, action, null);
+      core = step.state;
+      const patch = numberEntryUi.toUi(step.outcome, action, core);
+      if ('wrongValue' in patch) wrongValue = patch.wrongValue;
+    }
+
+    press({ type: 'enter-digit', digit: 6 });
+    press({ type: 'submit-number' });
+    const { rerender } = render(playArea(core, wrongValue));
+    const wrong = entryOutput('Your answer: 6');
     expect(wrong.className).toContain('line-through');
     expect(wrong.className).toContain('text-today');
+    expect(wrong.closest('p')?.className).not.toContain('line-through');
 
-    renderPlayArea({ entry: '2' }, undefined);
-    expect(screen.getByText('Your answer: 2').className).not.toContain('line-through');
+    press({ type: 'enter-digit', digit: 5 });
+    rerender(playArea(core, wrongValue));
+    expect(entryOutput('Your answer: 5').className).not.toContain('line-through');
   });
 
   it('keeps Check disabled while the entry is empty', () => {
@@ -118,6 +148,7 @@ describe('numberEntryUi.PlayArea', () => {
   it('shows the result on the card and the done panel once solved', () => {
     renderPlayArea({ entry: '5', solved: true });
     expect(screen.getByText('3 + 2 = 5')).toBeTruthy();
+    expect(screen.queryByRole('status')).toBeNull();
     expect(screen.getByText('Done')).toBeTruthy();
     expect(screen.queryByRole('group', { name: 'Number pad' })).toBeNull();
   });

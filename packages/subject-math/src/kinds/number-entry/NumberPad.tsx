@@ -38,7 +38,7 @@ export function NumberPad({ onDigit, onErase, onCheck, canCheck }: NumberPadProp
     <div
       role="group"
       aria-label={t('math.pad-label')}
-      className="mx-auto grid w-full max-w-xs grid-cols-3 gap-3"
+      className="mx-auto grid w-full max-w-xs grid-cols-3 gap-x-3 gap-y-2"
     >
       {TOP_DIGITS.map(digitKey)}
       <button type="button" className={WORD_KEY} onClick={onErase}>

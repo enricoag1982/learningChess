@@ -3,11 +3,10 @@ import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
 import { ProblemCard } from '../../web/problem-card.tsx';
-import { EntryDisplay } from './EntryDisplay.tsx';
 import { NumberPad } from './NumberPad.tsx';
 import type { NumberEntryPlayAreaProps } from './ui.ts';
 
-/** The problem card beside the Hint button, what has been typed and the number pad. */
+/** The problem card (it shows what has been typed), the Hint button and the number pad: side by side on a tablet held upright, stacked elsewhere. */
 export function PlayArea({
   def,
   state,
@@ -23,17 +22,22 @@ export function PlayArea({
         problem={def.problem}
         dots={core.hintLevel >= 1}
         answer={core.solved ? def.answer : undefined}
+        entry={core.solved ? undefined : core.entry}
+        wrongValue={state.wrongValue}
       />
     );
   const controls = (
-    <>
-      <ExerciseControls
-        showHint={showHint}
-        onHint={() => {
-          dispatch({ type: 'hint' });
-        }}
-      />
-      <EntryDisplay entry={core.entry} wrongValue={state.wrongValue} />
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3 lg:flex-col lg:items-stretch lg:gap-2">
+      {showHint && (
+        <div className="sm:flex-1 lg:flex-none">
+          <ExerciseControls
+            showHint
+            onHint={() => {
+              dispatch({ type: 'hint' });
+            }}
+          />
+        </div>
+      )}
       <NumberPad
         canCheck={core.entry !== ''}
         onDigit={(digit) => {
@@ -46,7 +50,7 @@ export function PlayArea({
           dispatch({ type: 'submit-number' });
         }}
       />
-    </>
+    </div>
   );
   return <ExerciseFrame board={board} panel={panelBody(top, core.solved, done, controls)} />;
 }

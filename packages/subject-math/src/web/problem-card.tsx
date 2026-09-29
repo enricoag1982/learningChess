@@ -1,4 +1,5 @@
 import type { JSX } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Problem } from '../core/types.ts';
 
 export interface ProblemCardProps {
@@ -9,6 +10,10 @@ export interface ProblemCardProps {
   readonly answer?: number;
   /** A small card for the Story step. */
   readonly compact?: boolean;
+  /** The digits typed so far, shown after `=` in place of the result (`?` while empty). */
+  readonly entry?: string;
+  /** The last wrong answer: orange and struck through until the next digit. */
+  readonly wrongValue?: number;
 }
 
 function DotGroup({
@@ -42,6 +47,28 @@ function DotGroup({
   );
 }
 
+/** What the kid has typed, announced politely as it changes; only the number is struck when it was wrong. */
+function Entry({
+  entry,
+  wrongValue,
+}: {
+  readonly entry: string;
+  readonly wrongValue?: number;
+}): JSX.Element {
+  const { t } = useTranslation();
+  const showWrong = entry === '' && wrongValue !== undefined;
+  const value = showWrong ? String(wrongValue) : entry === '' ? '?' : entry;
+  return (
+    <output
+      aria-live="polite"
+      aria-label={t('math.entry-label', { value })}
+      className={showWrong ? 'text-today line-through' : undefined}
+    >
+      {value}
+    </output>
+  );
+}
+
 /** The problem as the kid sees it: `a op b = ?` and, on request, its two dot groups (for `-`, the second is crossed out).
  * The dots are decoration: the numerals carry the meaning. */
 export function ProblemCard({
@@ -49,6 +76,8 @@ export function ProblemCard({
   dots,
   answer,
   compact = false,
+  entry,
+  wrongValue,
 }: ProblemCardProps): JSX.Element {
   const { a, op, b } = problem;
   const result = answer === undefined ? '?' : String(answer);
@@ -57,7 +86,14 @@ export function ProblemCard({
       <p
         className={`text-center font-display font-bold text-ink ${compact ? 'text-2xl' : 'text-4xl sm:text-5xl'}`}
       >
-        {`${String(a)} ${op} ${String(b)} = ${result}`}
+        {entry === undefined ? (
+          `${String(a)} ${op} ${String(b)} = ${result}`
+        ) : (
+          <>
+            {`${String(a)} ${op} ${String(b)} = `}
+            <Entry entry={entry} wrongValue={wrongValue} />
+          </>
+        )}
       </p>
       {dots && (
         <div
