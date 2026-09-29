@@ -31,6 +31,13 @@ function requireData(file: BackupFile, profileId: string): BackupFile['data'][st
   return data;
 }
 
+/** Writes `file` through `writeMerged` onto a device with no settings of its own. */
+async function importFile(deps: AppDeps, file: BackupFile): Promise<void> {
+  await deps.backupImporter?.writeMerged(file, {
+    deviceSettings: { lastProfileId: null, suggestedLevels: {} },
+  });
+}
+
 /** Fresh `AppDeps` wired directly to `localStorage` (this file's own repos, no `test-services.ts`
  * indirection — keeps this test close to the real `chess-kids:*` storage shape). */
 function makeDeps(): AppDeps {
@@ -99,7 +106,7 @@ describe('LocalStorageBackupImporter', () => {
       updatedAt: '2026-01-01T00:00:00.000Z',
     });
 
-    await deps.backupImporter?.replaceAll(file);
+    await importFile(deps, file);
 
     // Fresh repos over the same (now-swapped) storage.
     const after = makeDeps();
@@ -115,7 +122,7 @@ describe('LocalStorageBackupImporter', () => {
     const profile = await createProfile(deps, 'Mia', 'fox');
     const file = await buildBackupFile(deps, [profile.id]);
 
-    await deps.backupImporter?.replaceAll(file);
+    await importFile(deps, file);
 
     const staging: string[] = [];
     for (let i = 0; i < localStorage.length; i += 1) {
@@ -131,7 +138,7 @@ describe('LocalStorageBackupImporter', () => {
     const file = await buildBackupFile(deps, [profile.id]);
     const newerFile = { ...file, schemaVersion: SCHEMA_VERSION + 1 };
 
-    await expect(deps.backupImporter?.replaceAll(newerFile)).rejects.toThrow();
+    await expect(importFile(deps, newerFile)).rejects.toThrow();
 
     const after = makeDeps();
     expect((await after.profiles.list()).map((p) => p.id)).toEqual([profile.id]);
@@ -182,7 +189,7 @@ describe('LocalStorageBackupImporter', () => {
     });
 
     const file = await buildBackupFile(deps, [profile.id]);
-    await deps.backupImporter?.replaceAll(file);
+    await importFile(deps, file);
 
     const after = makeDeps();
     const settings = await after.settings.get();
@@ -209,7 +216,7 @@ describe('LocalStorageBackupImporter.writeMerged (M7.2 device sharing)', () => {
     const file = await buildBackupFile(deps, [mia.id]);
     const deviceSettings = await deps.settings.get();
 
-    await deps.backupImporter?.writeMerged?.(file, {
+    await deps.backupImporter?.writeMerged(file, {
       localDeviceId: 'this-device',
       deviceSettings,
     });
@@ -259,7 +266,7 @@ describe('LocalStorageBackupImporter.writeMerged (M7.2 device sharing)', () => {
     };
     const deviceSettings = await deps.settings.get();
 
-    await deps.backupImporter?.writeMerged?.(merged, {
+    await deps.backupImporter?.writeMerged(merged, {
       localDeviceId: 'this-device',
       deviceSettings,
     });
@@ -297,7 +304,7 @@ describe('LocalStorageBackupImporter.writeMerged (M7.2 device sharing)', () => {
     };
     try {
       await expect(
-        deps.backupImporter?.writeMerged?.(file, { localDeviceId: undefined, deviceSettings }),
+        deps.backupImporter?.writeMerged(file, { localDeviceId: undefined, deviceSettings }),
       ).rejects.toThrow();
     } finally {
       Storage.prototype.setItem = originalSetItem;
@@ -331,7 +338,7 @@ describe('LocalStorageBackupImporter.writeMerged (M7.2 device sharing)', () => {
     };
     const deviceSettings = await deps.settings.get();
 
-    await deps.backupImporter?.writeMerged?.(merged, { localDeviceId: undefined, deviceSettings });
+    await deps.backupImporter?.writeMerged(merged, { localDeviceId: undefined, deviceSettings });
 
     const after = makeDeps();
     const settings = await after.settings.get();

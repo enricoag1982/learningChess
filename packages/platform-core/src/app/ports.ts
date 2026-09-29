@@ -142,35 +142,30 @@ export interface Clock {
   now(): Date;
 }
 
-/** Randomness in [0, 1); seeded in tests. */
-export interface Random {
-  next(): number;
-}
-
 /** Writes a backup file somewhere the parent can find again — web downloads it, a Capacitor adapter
  * could write to Documents. `filename`/`contents` are computed by `app/backup.ts`. */
 export interface BackupFileWriter {
   write(filename: string, contents: string): Promise<void>;
 }
 
-/** Parent area "Import": replaces every locally stored record with `file`'s own, atomically (a web
- * adapter stages the full write, then swaps it in) so a failure partway never leaves mixed data.
- * Never touches the parent password or `AppSettings.lastProfileId`/`suggestedLevels`. */
+/** This device's own `AppSettings` fields a merge import carries through unchanged. */
+export type DeviceOnlySettings = Pick<
+  AppSettings,
+  'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
+>;
+
+/** What `BackupImporter.writeMerged` needs besides the file. */
+export interface MergeWriteOptions {
+  readonly localDeviceId?: string;
+  readonly deviceSettings: DeviceOnlySettings;
+}
+
+/** Parent area "Import" (`app/merge.ts`'s `importMerged`): atomically writes `file` as this device's
+ * entire new dataset (a web adapter stages the full write, then swaps it in) so a failure partway
+ * never leaves mixed data. Never touches the parent password. Session-log rows are keyed by
+ * (profile, date, device) — `options.localDeviceId` says which rows are this device's own, so a
+ * foreign device's row for the same day is stored alongside it, never overwritten;
+ * `options.deviceSettings` is carried through unchanged rather than reset. */
 export interface BackupImporter {
-  replaceAll(file: BackupFile): Promise<void>;
-  /** Device sharing (`app/merge.ts`'s `importMerged`): atomically writes `file` as this device's
-   * entire new dataset. Session-log rows are keyed by (profile, date, device) —
-   * `options.localDeviceId` says which rows are this device's own, so a foreign device's row for
-   * the same day is stored alongside it, never overwritten; `options.deviceSettings` is carried
-   * through unchanged rather than reset. Optional: `requireBackupImporter` throws without it. */
-  writeMerged?(
-    file: BackupFile,
-    options: {
-      readonly localDeviceId?: string;
-      readonly deviceSettings: Pick<
-        AppSettings,
-        'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
-      >;
-    },
-  ): Promise<void>;
+  writeMerged(file: BackupFile, options: MergeWriteOptions): Promise<void>;
 }

@@ -202,12 +202,6 @@ export const chessJsRules: ChessRules = {
       inCheck() {
         return chess.inCheck();
       },
-      isCheckmate() {
-        return chess.isCheckmate();
-      },
-      isStalemate() {
-        return chess.isStalemate();
-      },
       pieces,
       hash() {
         return fastChess._hash;

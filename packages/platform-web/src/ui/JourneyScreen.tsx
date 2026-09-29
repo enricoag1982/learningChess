@@ -12,7 +12,7 @@ import type {
   WorldBossStatus,
   WorldStatus,
 } from '@learn/platform-core';
-import { lessonStars, worldLessons } from '@learn/platform-core';
+import { lessonStars, worldLessons, worldOrderById } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { usePack } from '../app/subject.ts';
 import { characterName, tContent } from '../content-text.ts';
@@ -151,17 +151,34 @@ export function JourneyScreen(): JSX.Element {
   const mainWorlds = journey.worlds.filter((w) => w.world.track === mainTrack?.id);
   const branchWorlds = journey.worlds.filter((w) => w.world.track !== mainTrack?.id);
   const isWorldOne = (world: World): boolean => world.track === mainTrack?.id && world.order === 1;
-  const worldOrder = new Map(
-    journey.catalog.tracks.flatMap((track) =>
-      track.worlds.map((world) => [world.id, world.order] as const),
-    ),
+  const firstLessonOfCharacter = firstLessonsByCharacter(
+    journey.lessons,
+    worldOrderById(journey.catalog),
   );
-  const firstLessonOfCharacter = firstLessonsByCharacter(journey.lessons, worldOrder);
 
   function selectWorld(id: string): void {
     setSelectedWorldId(id);
     setLockedMessage(null);
     setTestOutOffer(null);
+  }
+
+  function worldRow(
+    { world, status }: NonNullable<typeof journey>['worlds'][number],
+    muted?: boolean,
+  ): JSX.Element {
+    return (
+      <WorldRow
+        key={world.id}
+        name={tContent(t, world.titleKey)}
+        order={world.order}
+        status={status}
+        selected={world.id === worldId}
+        onSelect={() => {
+          selectWorld(world.id);
+        }}
+        muted={muted}
+      />
+    );
   }
 
   function activateLesson(
@@ -250,34 +267,11 @@ export function JourneyScreen(): JSX.Element {
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row lg:gap-6">
         <div className="flex gap-2 overflow-x-auto pb-1 lg:w-64 lg:flex-none lg:flex-col lg:overflow-visible lg:pb-0">
-          {mainWorlds.map(({ world, status }) => (
-            <WorldRow
-              key={world.id}
-              name={tContent(t, world.titleKey)}
-              order={world.order}
-              status={status}
-              selected={world.id === worldId}
-              onSelect={() => {
-                selectWorld(world.id);
-              }}
-            />
-          ))}
+          {mainWorlds.map((entry) => worldRow(entry))}
           <div className="mt-1 flex items-center px-2 text-xs font-extrabold tracking-wide text-muted lg:mt-2 lg:text-[13px] lg:uppercase">
             {tContent(t, 'journey:ui.paths-after-basics')}
           </div>
-          {branchWorlds.map(({ world, status }) => (
-            <WorldRow
-              key={world.id}
-              name={tContent(t, world.titleKey)}
-              order={world.order}
-              status={status}
-              selected={world.id === worldId}
-              onSelect={() => {
-                selectWorld(world.id);
-              }}
-              muted
-            />
-          ))}
+          {branchWorlds.map((entry) => worldRow(entry, true))}
         </div>
 
         <div

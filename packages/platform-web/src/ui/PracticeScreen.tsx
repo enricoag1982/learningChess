@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { ConceptStats, Lesson } from '@learn/platform-core';
-import { isDue, isWeak, lessonStatus } from '@learn/platform-core';
+import { isDue, isWeak, lessonStatus, worldOrderById } from '@learn/platform-core';
 import { useAppStore, useServices } from '../app/store.ts';
 import { avatarName, tContent } from '../content-text.ts';
 import { NarratedBubble } from './ds/NarratedBubble.tsx';
@@ -82,15 +82,10 @@ export function PracticeScreen(): JSX.Element {
   const dueCount = conceptStats.filter((stats) => isDue(stats, now)).length;
 
   const progressByLesson = new Map(progress.map((entry) => [entry.lessonId, entry]));
-  const worldOrder = new Map(
-    journey.catalog.tracks.flatMap((track) =>
-      track.worlds.map((world) => [world.id, world.order] as const),
-    ),
-  );
   const statsByConcept = new Map(conceptStats.map((stats) => [stats.conceptId, stats]));
   const topics = practiceTopics(
     journey.lessons,
-    worldOrder,
+    worldOrderById(journey.catalog),
     (lesson) => {
       const status = lessonStatus(lesson, progressByLesson.get(lesson.id));
       return status === 'complete' || status === 'mastered';

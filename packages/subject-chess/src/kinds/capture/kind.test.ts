@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import { parseDiagram } from '../../core/chess/diagram.ts';
 import { createVariantRules } from '../../core/variant/rules.ts';
-import { starsFor } from '../index.ts';
+import { starsFor } from '../../testing/kind-steps.ts';
 import { initState } from '../../core/exercise/state.ts';
 import { playMove, undo } from '../static-move.ts';
 import type { CaptureDef } from '../../core/exercise/types.ts';

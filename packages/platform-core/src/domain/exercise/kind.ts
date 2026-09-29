@@ -57,6 +57,4 @@ export interface ExerciseSolution<
   solution(def: Def, ctx: Ctx): readonly Action[];
   /** An action sequence producing exactly 1 error from `init(def)`, otherwise unchanged (content tests). */
   wrongAction?(def: Def, ctx: Ctx): readonly Action[];
-  /** Text keys besides `def.textKey` (e.g. `choice` options); default: none. */
-  textKeys?(def: Def): readonly TextKeyRef[];
 }

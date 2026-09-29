@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { chessJsRules } from '../../core/chess/chessjs-rules.ts';
 import type { ExerciseState, ExerciseStateOf } from '../../core/exercise/state.ts';
-import { starsFor } from '../../kinds/index.ts';
+import { starsFor } from '../../testing/kind-steps.ts';
 import type { GameState } from '../../modes/static/def.ts';
 import { gameStars } from '../../modes/static/engine.ts';
 import type { SeriesGameState } from '@learn/platform-core/domain/exercise/modes/series/def';

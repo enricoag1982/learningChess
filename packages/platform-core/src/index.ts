@@ -89,6 +89,7 @@ export {
   nextLesson,
   mainTrackLessons,
   findWorld,
+  worldOrderById,
 } from './domain/journey.ts';
 
 export type {
@@ -101,14 +102,15 @@ export type {
   PasswordFileWriter,
   BackupFileWriter,
   BackupImporter,
+  MergeWriteOptions,
   AppSettings,
   SettingsRepository,
   IdGenerator,
   Narrator,
   ContentSource,
   Clock,
-  Random,
 } from './app/ports.ts';
+export type { Random } from './domain/random.ts';
 
 export type { AppDeps } from './app/use-cases.ts';
 export {
@@ -171,13 +173,7 @@ export {
 
 // Exercise-kind base abstraction (subject-free): every subject's kind registry is built on this;
 // the chess kinds and their registry live behind `./chess` (`@chess-kids/core/chess`).
-export type {
-  ExerciseProgress,
-  ExerciseKind,
-  Step,
-  TextKeyRef,
-  KindInput,
-} from './domain/exercise/kind.ts';
+export type { TextKeyRef } from './domain/exercise/kind.ts';
 
 // The `series` mini-game mode: subject-free, rounds of any exercise type.
 export type { SeriesGameDef, SeriesGameState } from './domain/exercise/modes/series/def.ts';
@@ -193,7 +189,6 @@ export {
 // identifiers, injected via `AppDeps.subject`/`AppDeps.app`, never imported directly.
 export type {
   AnyKind,
-  AnyMode,
   SubjectCore,
   AppConfig,
   ExerciseDefBase,
@@ -202,14 +197,7 @@ export type {
   MiniGameBase,
   MiniGameStateBase,
 } from './domain/subject.ts';
-export type { SubjectRuntime } from './domain/runtime.ts';
 export { createSubjectRuntime } from './domain/runtime.ts';
 
-export type {
-  Resolve,
-  ExerciseFeedbackBase,
-  ExerciseNoteCtx,
-  ExerciseNote,
-  AnyNoteEntry,
-} from './domain/notes.ts';
-export { exerciseNote, isEasierOfferNote } from './domain/notes.ts';
+export type { Resolve, ExerciseFeedbackBase, AnyNoteEntry } from './domain/notes.ts';
+export { exerciseNote } from './domain/notes.ts';

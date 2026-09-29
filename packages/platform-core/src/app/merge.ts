@@ -217,9 +217,6 @@ export async function importMerged(
     data,
   };
 
-  if (importer.writeMerged === undefined) {
-    throw new Error('AppDeps.backupImporter.writeMerged is not wired up');
-  }
   await importer.writeMerged(mergedFile, { localDeviceId, deviceSettings });
 
   const totalStarsAll = profiles.reduce(

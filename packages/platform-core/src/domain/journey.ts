@@ -113,6 +113,15 @@ export function findWorld(catalog: TracksCatalog, worldId: string): World | unde
   return undefined;
 }
 
+/** Every world's `order`, by world id, across all tracks. */
+export function worldOrderById(catalog: TracksCatalog): Map<string, number> {
+  return new Map(
+    catalog.tracks.flatMap((track) =>
+      track.worlds.map((world) => [world.id, world.order] as const),
+    ),
+  );
+}
+
 function findTrack(catalog: TracksCatalog, world: World): Track | undefined {
   return catalog.tracks.find((track) => track.id === world.track);
 }

@@ -1,5 +1,5 @@
 import type { NextStep, TracksCatalog, World } from '../domain/journey.ts';
-import { nextStep } from '../domain/journey.ts';
+import { nextStep, worldOrderById } from '../domain/journey.ts';
 import type { Lesson, MiniGame } from '../domain/lesson.ts';
 import { unlockedMiniGames } from '../domain/play.ts';
 import type { LessonProgress, MiniGameProgress } from '../domain/progress.ts';
@@ -7,7 +7,8 @@ import type { ConceptPoolEntry, ConceptStats, ConceptTask } from '../domain/revi
 import { conceptPool, pickPracticeTasks, pickWarmUp } from '../domain/review.ts';
 import type { ExerciseDefBase } from '../domain/subject.ts';
 import { loadUnlocked } from './assessment.ts';
-import type { ContentSource, Random } from './ports.ts';
+import type { Random } from '../domain/random.ts';
+import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** `content.catalog()`, or a clear error if this `ContentSource` has not wired it up yet. */
@@ -106,11 +107,7 @@ function pickSessionMiniGame(
     return undefined;
   }
 
-  const worldOrder = new Map(
-    catalog.tracks.flatMap((track) =>
-      track.worlds.map((world) => [world.id, world.order] as const),
-    ),
-  );
+  const worldOrder = worldOrderById(catalog);
   const lessonById = new Map(lessons.map((lesson) => [lesson.id, lesson]));
   const bestStarsById = new Map(
     miniGameProgresses.map((entry) => [entry.miniGameId, entry.bestStars]),

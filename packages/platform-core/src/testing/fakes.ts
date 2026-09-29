@@ -313,16 +313,11 @@ export function makeBackupFileWriter(): BackupFileWriter & {
 
 /* -------------------------------------------------------------------- BackupImporter -------- */
 
-/** Records every `replaceAll`/`writeMerged` call in one `calls` list — a test suite drives
- * whichever one its own use case actually calls (never both) and asserts on that. */
+/** Records every `writeMerged` call in `calls`. */
 export function makeBackupImporter(): BackupImporter & { readonly calls: readonly BackupFile[] } {
   const calls: BackupFile[] = [];
   return {
     calls,
-    replaceAll: (file) => {
-      calls.push(file);
-      return Promise.resolve();
-    },
     writeMerged: (file) => {
       calls.push(file);
       return Promise.resolve();

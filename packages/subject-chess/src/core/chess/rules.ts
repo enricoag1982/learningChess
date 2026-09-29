@@ -41,8 +41,6 @@ export interface SearchBoard {
   undo(): void;
   turn(): Color;
   inCheck(): boolean;
-  isCheckmate(): boolean;
-  isStalemate(): boolean;
   /** Occupied squares only. */
   pieces(): Partial<Record<Square, Piece>>;
   /** Current position (markers carried over unchanged from the board this was built from). */

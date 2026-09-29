@@ -1,5 +1,5 @@
 import type { Color, Piece, Position, Square } from './types.ts';
-import { PIECE_BY_LETTER, pieceLetter, squareAt } from './notation.ts';
+import { PIECE_BY_LETTER, squareAt } from './notation.ts';
 
 /** Thrown when a board diagram string is malformed. */
 export class DiagramError extends Error {
@@ -66,27 +66,4 @@ export function parseDiagram(diagram: string, options?: { toMove?: Color }): Pos
     castling: '-',
     enPassant: null,
   };
-}
-
-/** Inverse of `parseDiagram`: 8 lines, tokens single-space-joined, no trailing newline. */
-export function toDiagram(position: Position): string {
-  const lines: string[] = [];
-  for (let rowIndex = 0; rowIndex < 8; rowIndex += 1) {
-    const tokens: string[] = [];
-    for (let colIndex = 0; colIndex < 8; colIndex += 1) {
-      const square = squareAt(rowIndex, colIndex);
-      const piece = position.pieces[square];
-      if (piece !== undefined) {
-        tokens.push(pieceLetter(piece));
-      } else if (position.markers.stars.includes(square)) {
-        tokens.push('*');
-      } else if (position.markers.blocked.includes(square)) {
-        tokens.push('x');
-      } else {
-        tokens.push('.');
-      }
-    }
-    lines.push(tokens.join(' '));
-  }
-  return lines.join('\n');
 }

@@ -26,10 +26,10 @@ import type {
   PasswordFileWriter,
   ProfileRepository,
   ProgressRepository,
-  Random,
   RewardsRepository,
   SettingsRepository,
 } from './ports.ts';
+import type { Random } from '../domain/random.ts';
 import type { Clock } from './ports.ts';
 import { checkRewards } from './rewards.ts';
 

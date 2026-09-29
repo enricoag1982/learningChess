@@ -1,5 +1,5 @@
 // The mini-game-mode abstraction: static/series/versus bosses behind a uniform interface, so
-// `boss-result.ts` dispatches through a registry (`modes/index.ts`) — the mode counterpart of `kind.ts`.
+// `boss-result.ts` dispatches through the subject's mode registry — the mode counterpart of `kind.ts`.
 
 /** The attempt-log fields a boss/mini-game result reduces to, whichever mode played it. */
 export interface BossResultSummary {

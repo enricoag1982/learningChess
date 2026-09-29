@@ -1,4 +1,4 @@
-/** Randomness in [0, 1). Same shape as the app `Random` port, so either can be passed here. */
+/** Randomness in [0, 1); seeded in tests. */
 export interface Random {
   next(): number;
 }
@@ -18,4 +18,19 @@ export function seededRandom(seed: number): Random {
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     },
   };
+}
+
+/** Deterministic Fisher–Yates shuffle driven by `random` (mutates nothing; returns a new array). */
+export function shuffle<T>(items: readonly T[], random: Random): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(random.next() * (i + 1));
+    const a = shuffled[i];
+    const b = shuffled[j];
+    if (a !== undefined && b !== undefined) {
+      shuffled[i] = b;
+      shuffled[j] = a;
+    }
+  }
+  return shuffled;
 }

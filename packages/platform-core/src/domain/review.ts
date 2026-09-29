@@ -1,6 +1,7 @@
 import type { Lesson } from './lesson.ts';
 import type { StoredRecord } from './profile.ts';
 import type { Random } from './random.ts';
+import { shuffle } from './random.ts';
 import type { ExerciseDefBase } from './subject.ts';
 
 /** Review box 1–5 (Leitner), or absent = the concept has not entered review yet. */
@@ -184,21 +185,6 @@ export function pickWarmUp<E extends ExerciseDefBase>(
     }
   }
   return tasks;
-}
-
-/** Deterministic Fisher–Yates shuffle driven by `random` (mutates nothing; returns a new array). */
-function shuffle<T>(items: readonly T[], random: Random): T[] {
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(random.next() * (i + 1));
-    const a = shuffled[i];
-    const b = shuffled[j];
-    if (a !== undefined && b !== undefined) {
-      shuffled[i] = b;
-      shuffled[j] = a;
-    }
-  }
-  return shuffled;
 }
 
 /** Picks `count` practice tasks for one concept, shuffled by `random`; cycles the pool again when

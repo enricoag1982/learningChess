@@ -269,13 +269,4 @@ describe('importMerged', () => {
       importer.calls[0]?.data.p1?.lessonProgress,
     );
   });
-
-  it('throws without deps.backupImporter.writeMerged wired up', async () => {
-    const mia = newProfile('p1', 'Mia', 'fox', NOW);
-    const legacyImporter: BackupImporter = { replaceAll: () => Promise.resolve() };
-    const deps = makeDeps({ profiles: makeProfileRepo([mia]), backupImporter: legacyImporter });
-    const incoming = incomingFileFor(mia);
-
-    await expect(importMerged(deps, incoming, [])).rejects.toThrow();
-  });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DiagramError, parseDiagram, toDiagram } from './diagram.ts';
+import { DiagramError, parseDiagram } from './diagram.ts';
 import type { Position } from './types.ts';
 
 const EXAMPLE = [
@@ -81,11 +81,5 @@ describe('parseDiagram', () => {
   it('defaults toMove to white and accepts an override', () => {
     expect(parseDiagram(EXAMPLE).toMove).toBe('w');
     expect(parseDiagram(EXAMPLE, { toMove: 'b' }).toMove).toBe('b');
-  });
-});
-
-describe('toDiagram', () => {
-  it('is the exact inverse of parseDiagram for normalised input', () => {
-    expect(toDiagram(parseDiagram(EXAMPLE))).toBe(EXAMPLE);
   });
 });

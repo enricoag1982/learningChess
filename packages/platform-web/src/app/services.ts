@@ -41,11 +41,6 @@ function createLazyBackupFileWriter(): BackupFileWriter {
 /** Same reasoning as `createLazyBackupFileWriter`. */
 function createLazyBackupImporter(store: LocalStore): BackupImporter {
   return {
-    async replaceAll(file) {
-      const { LocalStorageBackupImporter } =
-        await import('../adapters/storage/local-backup-importer.ts');
-      return new LocalStorageBackupImporter(store).replaceAll(file);
-    },
     async writeMerged(file, options) {
       const { LocalStorageBackupImporter } =
         await import('../adapters/storage/local-backup-importer.ts');

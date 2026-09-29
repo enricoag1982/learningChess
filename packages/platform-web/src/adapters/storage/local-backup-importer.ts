@@ -4,6 +4,7 @@ import type {
   Attempt,
   BackupFile,
   BackupImporter,
+  MergeWriteOptions,
   ConceptStats,
   EarnedBadge,
   GameRecord,
@@ -53,20 +54,6 @@ function capped<T extends { readonly createdAt: string }>(items: readonly T[], m
   return sorted.length > max ? sorted.slice(sorted.length - max) : sorted;
 }
 
-/** This device's own current `AppSettings` fields a merge import must carry through unchanged,
- * instead of the blank slate a plain "replace" writes. */
-type DeviceOnlySettings = Pick<
-  AppSettings,
-  'lastProfileId' | 'suggestedLevels' | 'storagePersisted' | 'deviceId'
->;
-
-/** Options only `writeMerged` passes (`toRawRecords`' plain `replaceAll` call omits both, matching
- * its pre-merge behaviour exactly: every session-log row keyed bare, `AppSettings` blanked). */
-interface MergeWriteOptions {
-  readonly localDeviceId?: string;
-  readonly deviceSettings?: DeviceOnlySettings;
-}
-
 /** `${profileId}:${date}` for this device's own row (`log.deviceId` absent or equal to
  * `localDeviceId`); a foreign device's row is suffixed so it is stored alongside, never overwriting. */
 function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined): string {
@@ -78,7 +65,7 @@ function sessionLogStorageKey(log: SessionLog, localDeviceId: string | undefined
  * shapes `LocalStorageXRepository`'s own private `readAll`/`writeAll` build and read. */
 function toRawRecords(
   file: BackupFile,
-  options: MergeWriteOptions = {},
+  options: MergeWriteOptions,
 ): Readonly<Record<(typeof RECORD_NAMES)[number], unknown>> {
   const profiles: Record<string, Profile> = {};
   const lessonProgress: Record<string, LessonProgress> = {};
@@ -121,16 +108,13 @@ function toRawRecords(
     unlocks = unlocks.concat(data.unlocks);
   }
 
+  const { lastProfileId, suggestedLevels, storagePersisted, deviceId } = options.deviceSettings;
   const settings: AppSettings = {
-    lastProfileId: options.deviceSettings?.lastProfileId ?? null,
-    suggestedLevels: options.deviceSettings?.suggestedLevels ?? {},
+    lastProfileId,
+    suggestedLevels,
     profileSettings,
-    ...(options.deviceSettings?.storagePersisted === undefined
-      ? {}
-      : { storagePersisted: options.deviceSettings.storagePersisted }),
-    ...(options.deviceSettings?.deviceId === undefined
-      ? {}
-      : { deviceId: options.deviceSettings.deviceId }),
+    ...(storagePersisted === undefined ? {} : { storagePersisted }),
+    ...(deviceId === undefined ? {} : { deviceId }),
   };
 
   return {
@@ -161,28 +145,10 @@ export class LocalStorageBackupImporter implements BackupImporter {
     this.store = store;
   }
 
-  replaceAll(file: BackupFile): Promise<void> {
+  writeMerged(file: BackupFile, options: MergeWriteOptions): Promise<void> {
     return toPromise(() => {
       this.checkSchemaVersion(file);
-      this.stageThenSwap(toRawRecords(file));
-    });
-  }
-
-  writeMerged(
-    file: BackupFile,
-    options: {
-      readonly localDeviceId?: string;
-      readonly deviceSettings: DeviceOnlySettings;
-    },
-  ): Promise<void> {
-    return toPromise(() => {
-      this.checkSchemaVersion(file);
-      this.stageThenSwap(
-        toRawRecords(file, {
-          localDeviceId: options.localDeviceId,
-          deviceSettings: options.deviceSettings,
-        }),
-      );
+      this.stageThenSwap(toRawRecords(file, options));
     });
   }
 
@@ -194,7 +160,7 @@ export class LocalStorageBackupImporter implements BackupImporter {
     }
   }
 
-  /** Stages every `raw` record, then copies all to the real keys; shared by `replaceAll`/`writeMerged`. */
+  /** Stages every `raw` record, then copies all to the real keys. */
   private stageThenSwap(raw: Readonly<Record<(typeof RECORD_NAMES)[number], unknown>>): void {
     const staged: (typeof RECORD_NAMES)[number][] = [];
     try {

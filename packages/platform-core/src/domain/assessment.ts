@@ -3,6 +3,7 @@ import { worldLessons } from './journey.ts';
 import type { Lesson } from './lesson.ts';
 import type { StoredRecord } from './profile.ts';
 import type { Random } from './random.ts';
+import { shuffle } from './random.ts';
 import type { ConceptTask } from './review.ts';
 import type { ExerciseDefBase } from './subject.ts';
 
@@ -25,21 +26,6 @@ export const TEST_OUT_LESSON_TASKS = 5;
 export const TEST_OUT_WORLD_TASKS = 8;
 /** Placement: this many tasks per Basics world. */
 export const PLACEMENT_TASKS_PER_WORLD = 4;
-
-/** Deterministic Fisher–Yates shuffle driven by `random` (mutates nothing; returns a new array). */
-function shuffle<T>(items: readonly T[], random: Random): T[] {
-  const shuffled = [...items];
-  for (let i = shuffled.length - 1; i > 0; i -= 1) {
-    const j = Math.floor(random.next() * (i + 1));
-    const a = shuffled[i];
-    const b = shuffled[j];
-    if (a !== undefined && b !== undefined) {
-      shuffled[i] = b;
-      shuffled[j] = a;
-    }
-  }
-  return shuffled;
-}
 
 /** One task per lesson exercise, for sampling into an assessment run. */
 function poolOf<E extends ExerciseDefBase>(lesson: Lesson<E>): readonly ConceptTask<E>[] {
