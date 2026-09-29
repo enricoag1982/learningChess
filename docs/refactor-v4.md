@@ -8,7 +8,7 @@ Owner request (2026-09-25): same features, better structure (e.g. one folder per
 |---|---|---|---|
 | `packages/core` | 9.1 k (≈ 4.6 k generic, 4.5 k chess) | 11.6 k | `index.ts` exports 348 names, 106 never imported |
 | `packages/content` | 2.9 k + 4.5 k YAML | 4.8 k | `lesson-load.ts` 1.5 k lines, 66 % per exercise type |
-| `apps/web` | 17.0 k | 7.6 k unit + 4.1 k e2e | `store.ts` 1.1 k lines, 23 screens |
+| Web app (now `platform-web` + `apps/chess-kids`) | 17.0 k | 7.6 k unit + 4.1 k e2e | `store.ts` 1.1 k lines, 23 screens |
 | Docs | 245 KB | — | `architecture.md` 68 KB, of which 50 KB milestone history |
 | CI (`quality`) | ≈ 10 min | unit ≈ 2 min, e2e 92 tests ≈ 9 min | a11y curriculum walk ≈ 3 min × 4 browser projects |
 
@@ -28,55 +28,47 @@ Owner request (2026-09-25): same features, better structure (e.g. one folder per
 | 10 | Docs and comments carry history | architecture decision rows up to 7.9 k characters; comments = 23 % of web source characters, some now wrong (`DenScreen.tsx:102`, `persistent-storage.ts:3-11`) |
 | 11 | Latent bug | mate-in-n reply timer only in `ExerciseStep`: a mate-in-2+ inside a boss series or review task would freeze (today all 27 are mate-in-1) |
 
-## 3. Target structure
+## 3. Structure (as built, `m8.23`)
+
+▲ = differs from the plan. Seams, boundaries: [architecture.md](architecture.md) §3.
 
 ```
 packages/
-  platform-core/          pure TS: profiles, lesson flow (story → demo → try → exercises → boss),
-                          progress / mastery / stars, spaced review, assessment / placement, journey,
-                          rewards + badge engine (events, not chess rules), streak, time policy,
-                          settings (+ subject settings slot), backup / merge, ports,
-                          exercise-kind registry + generic kinds: choice, yes-no, multi-select;
-                          mini-game mode: series; testing/ (shared builders + fakes)
-  platform-content/       YAML → Zod → JSON pipeline, kind registry for schema / compile / verify,
-                          default text keys, locale checks, voice-text inventory
-  platform-web/           app shell: route stack + store slices; screens: picker, Home, Journey, Today,
-                          Practice, My Den, parent area, time limit; notice layer, error boundary;
-                          design system (primitives, icons, ScreenHeader, ConfirmDialog, NarratedBubble);
-                          storage collections; narration (audio + device voice); PWA update; i18n;
-                          testing/ (setup, render-app, e2e page objects driven by kind solutions)
+  platform-core/src/
+    domain/           profiles, progress, journey, rewards, time policy, merge, seam types, kind / mode interfaces, series mode
+    app/, testing/    use cases, ports, backup; builders, port fakes, makeDeps, testSubject ▲
+  platform-content/
+    src/              YAML → Zod → JSON pipeline, SubjectContent, voice-text inventory; testing/ = fixture subject ▲
+    locales/en/       platform texts
+  platform-web/src/
+    app/              routes, store slices, services, SubjectWeb
+    adapters/         storage, narration, PWA update, file writers
+    kinds/, modes/    UI dispatch, useExerciseSession, BossStep, series/Step.tsx
+    ui/               screens, ds/ design system, lesson/, parent/, session/, art/
+    testing/, assets/ fakes + renderWithStore; animal art
   subject-chess/
-    pack.ts               the SubjectPack below
-    core/                 rules (chess.js adapter), variants, facts (SAN, pieces, goals, castling …),
-                          bot, games / friend play, chess reward events + badge conditions
-    kinds/<type>/         def.ts · engine.ts · schema.ts · compile.ts · verify.ts · PlayArea.tsx ·
-                          solution.ts · sample.ts · *.test.ts      (collect-stars, capture, best-move,
-                          mate-in-n, setup; select-squares = multi-select on the board surface)
-    modes/<mode>/         static, versus (same file set)
-    web/                  board + pieces (Surface), Play tab (routes + slice + screens), parent panels,
-                          Den stats, art map, rank glyphs
-    content/              lessons/, minigames/, tracks, badges, locales, art, audio
+    src/core/         chess.js adapter, variants, facts, bot, games, solver, chess-core.ts
+    src/kinds/<type>/ kind · content · solution · ui · PlayArea · e2e · sample · tests, + engine / verify ▲ (plan: def / schema / compile)
+    src/modes/<mode>/ static, versus (series: e2e only; engine in platform-core)
+    src/content/      chess schema / compile registries, chessContent, bot-book loader, content tests + snapshots
+    src/web/          chess-pack.ts (chessWeb) ▲ (plan: pack.ts = `SubjectPack`, now `SubjectCore` / `SubjectContent` / `SubjectWeb`, §11), board, Play tab, parent panels, kind / mode UI + e2e registries, dev playgrounds, testing/
+    src/integration/  chess × platform-core use-case tests ▲
+    src/testing/      chess builders, makeDeps, playExerciseToCompletion, solutionOf
+    content/          YAML: lessons, minigames, tracks, badges, bot-book, locales
+    scripts/          content build, voice, calibrate
 apps/
-  chess-kids/             thin shell: vite config, index.html, manifest, pack wiring, e2e specs
-  math-demo/              proof of reuse (R5), dev / test only
-tools/                    voice, art, compat, size, content snapshot
+  chess-kids/         shell: main.tsx, vite / PWA / CSP, public/, e2e/ + e2e/kit/ ▲ (plan: platform-web testing/), test-fixtures/, scripts/ (size, compat, icons)
+tools/                voice/, art/ ▲ (size, compat: app scripts/)
 ```
 
-**Extension points** (only what chess + the math demo need; no speculative hooks):
-
-| Interface | Provides |
-|---|---|
-| `ExerciseKind` (core) | `schema`, `compile`, `textKeys`, `verify?` (build-time answer check), `init`, `act` (check answer → feedback), `hint`, `stars?`, `solution(def)` + `wrongAction?(def)` — one solution drives content tests, loader solvability, e2e |
-| `ExerciseKindUI` (web) | `PlayArea`, feedback text, `sample` (dev playground), e2e `perform(page, action)` |
-| `MiniGameMode` | same pattern for series / static / versus: schema, compile, check, summarise, `isWin`, Step component, e2e play |
-| `SubjectPack` | `stimulus` schema (chess: position + last move; math: expression / number line), `Surface` component, kinds, modes, facts, Home tiles + routes + store slice (chess: Play), parent settings panels, report formatters, Den stats, reward events + badge conditions, character art, rank glyphs, locales, services (rules, bot) |
+Generic kinds `choice` / `yes-no` still live in `subject-chess` ▲ (platform: registry interfaces + `series` only; generic `choice` at R5). Math demo app: R5, not built.
 
 ## 4. Rules for v4 code
 
 | Rule | Why (finding / retro) |
 |---|---|
 | One exercise type = one folder; the registries are the only dispatch on `type` / `mode` (review grep in CI) | 1, 2 |
-| One helper per fact (SAN, pieces, goals) in `subject-chess/core/facts`; content and e2e import it | 3 |
+| One helper per fact (SAN, pieces, goals) in `subject-chess/src/core/chess/facts`; content and e2e import it | 3 |
 | Platform code never imports `subject-*`; enforced by an ESLint import boundary | 4 |
 | Navigation = typed `Route` stack (`navigate`, `back`, gated routes); no origin fields | 5 |
 | UI through the design system only (icons, `TapButton`, `ScreenHeader`, `ConfirmDialog`, `NarratedBubble`, `useAsync`) | 6 |
@@ -93,11 +85,11 @@ tools/                    voice, art, compat, size, content snapshot
 | R1 Kits + trim | `platform` testing kits (builders, fakes, vitest setup file, e2e page objects reusing core), dead exports / `FeatureFlags` removed, docs trimmed (decision rows → 1–2 lines, validation log compacted), stale comments removed | −1.5 k test lines, −95 KB docs, no behaviour change |
 | R2 Web platform pieces | Design-system components + icon set, storage collections, route stack + store slices, one profile-load path | −1.8 k web lines; 92 e2e green. Done: `m8.5` storage collections (−146 lines). Rest after the other session's UI fixes merge |
 | R3 Exercise-kind registry | `ExerciseKind` / `ExerciseKindUI` / `MiniGameMode`; move each type and mode into its folder (core + content + web + e2e together); shared `useExerciseSession` (fixes finding 11) and boss result panel; chess facts out of the loader; YAML defaults | new type = 1 folder + 1 registry line; content snapshot equal. Iterations: `m8.6` core (facts, kinds, modes) done; `m8.7` content kinds done (loader 1 459 → 376 lines); `m8.8` YAML defaults done; `m8.13` web kinds done; `m8.14` web modes + e2e via core solutions done — R3 done |
-| R4 Platform / subject split | Seams first (in place), then package moves; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, Den, report, services; import boundary lint (design §11) | platform builds and tests without `subject-chess`. Iterations: `m8.15` core seams done (ratchet 28 → 12); `m8.16` content seams + settings slot + locale split done (ratchet → 4); `m8.17` web seams 1/2 done (web ratchet 47); `m8.18` web seams 2/2 done (web ratchet 38); `m8.19` ratchet → 0 done (`ContentSource` on base types, 0 casts); `m8.20` core + content package moves done; `m8.21` web + app moves done (145 files; 116 wait on seams); `m8.22` web composition seams + second move pass done (app = shell + integration tests); `m8.23` content pipeline + platform test kit done; `m8.24` docs — R4 done |
+| R4 Platform / subject split | Seams first (in place), then package moves; packages `platform-*` + `subject-chess`; decouple rewards, badges, settings, Den, report, services; import boundary lint (design §11) | platform builds and tests without `subject-chess`. Done: `m8.15`–`m8.19` seams (ratchet 28 → 0, web 47 → 0, 0 casts); `m8.20`–`m8.21` package moves; `m8.22` web composition seams, app = shell; `m8.23` content pipeline + test kit into the platform; `m8.24` docs |
 | R4.5 Trim | Production TS back to ≤ 31.6 k (`v2.0.0`): remove the R4 content-boundary casts, merge thin seam files, cut stale comments; bundle analysis (initial JS ≤ 186.2 KB) | size check green, no behaviour change |
 | R5 Proof of reuse + release | `apps/math-demo`: 1 world, 3 lessons, kinds choice + number-entry, series boss, own locales / art; e2e: complete a lesson, parent area, backup. Chess app released as `v4.0.0` (same features) | both apps green in CI |
 
-Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs in `apps/web/src/ui/**`, R0–R1 stay out of those files; web test kit, e2e helper reuse and comment trim follow once those fixes merge.
+Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs in the web app's `src/ui/**`, R0–R1 stay out of those files; web test kit, e2e helper reuse and comment trim follow once those fixes merge.
 
 ## 6. Targets
 
@@ -105,7 +97,7 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 |---|---|---|
 | Files to add an exercise type | ≈ 15 in 4 packages | 1 folder + 1 registry line |
 | Type / mode dispatch sites | ≈ 45 | registries only (≤ 4) — web: 0 outside the 4 registries at `m8.14` (a vitest grep test enforces it), down from 2 (`BossStep.tsx`'s mode if-chain) at `m8.13` |
-| Production TS lines | ≈ 29 k | No growth vs `v2.0.0` (31.6 k); trim pass before `v4.0.0` (owner 2026-09-28; was −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction) → `m8.11` 32.0 k → `m8.12` 31.3 k (web compaction) → `m8.13` 31.6 k (web kinds: per-kind files outweigh the deleted switches) → `m8.14` 31.6 k (web modes + e2e via core solutions: boss-panel dedup ≈ cancels the new sample.ts fixtures). → `m8.15` 32.0 k (seam types: `SubjectCore`, `AppConfig`, base types). → `m8.16` 32.5 k (content seams, generic pipeline). → `m8.17` 33.1 k (web seams 1/2). → `m8.18` 33.3 k (web seams 2/2). → `m8.19` 33.3 k (ratchet 0). → `m8.20` 33.3 k (package moves). → `m8.21` 33.4 k (web moves). → `m8.22` 33.3 k (composition seams). Initial JS 187.8 KB at `m8.22` vs 186.2 at `v2.0.0`: bundle analysis before `v4.0.0`) |
+| Production TS lines | ≈ 29 k | No growth vs `v2.0.0` (31.6 k); trim pass before `v4.0.0` (owner 2026-09-28; was −12 %) (tracked: `v2.0.0` 31.6 k → `m8.7` 33.1 k → `m8.9` 32.0 k (core / content compaction) → `m8.11` 32.0 k → `m8.12` 31.3 k (web compaction) → `m8.13` 31.6 k (web kinds: per-kind files outweigh the deleted switches) → `m8.14` 31.6 k (web modes + e2e via core solutions: boss-panel dedup ≈ cancels the new sample.ts fixtures). → R4 (§5): `m8.15` 32.0 k → `m8.16` 32.5 k → `m8.17` 33.1 k → `m8.18` 33.3 k → `m8.19` 33.3 k → `m8.20` 33.3 k → `m8.21` 33.4 k → `m8.22` 33.3 k → `m8.23` 33.2 k. Initial JS 187.8 KB at `m8.22` vs 186.2 at `v2.0.0`: bundle analysis before `v4.0.0`) |
 | Test lines | ≈ 28 k | −2.5 k, faster |
 | Lesson YAML | 4.5 k lines | −470 |
 | Docs | 245 KB | ≈ 150 KB (`m8.3`: 172 KB) |
@@ -137,6 +129,8 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 
 ## 9. R3 design (2026-09-27)
 
+§9–§10 paths are as of then; now: §3.
+
 | Piece | Decision |
 |---|---|
 | `ExerciseKind<Def, State, Action, Outcome, Hint, Ctx>` | `type`, `input` (static-move / real-move / select / answer / place), `init`, `act → {state, outcome}`, `hint`, `stars`, `textKeys?`; method signatures so precise kinds widen without casts |
@@ -144,8 +138,8 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | Core layout | `domain/chess/facts/` (SAN, pieces, goals, special moves, line replay: one helper per fact) · `domain/exercise/kinds/<type>/` (def, engine, solution, kind, tests) · `domain/exercise/modes/<mode>/`; `engine.ts` = legacy facade (735 → 73 lines) until R3b, then deleted (`m8.13`) |
 | Content layout (`m8.7`) | `src/kinds/<type>/` schema · compile · verify; `src/modes/<mode>/`; loader generic. File names match core so R4 merges both halves into `subject-chess/kinds/<type>/` by move |
 | Context | `VariantRules` + `chess: ChessRules` (additive) |
-| Web kinds (`m8.13`) | `apps/web/src/kinds/<type>/` (`ui.ts` = core outcome → UI patch, `PlayArea.tsx`) behind `EXERCISE_KIND_UI`; `useExerciseSession` shared by lesson step, series round and review task (reply timer → F5 fixed); note texts as data in core (`EXERCISE_NOTES`, also feeds the voice inventory); legacy `engine.ts`, `adapt.ts`, `minigame.ts`, `versus.ts`, `boss-result.ts` deleted |
-| Web modes + e2e (`m8.14`) | `apps/web/src/modes/<mode>/Step.tsx` behind `MINI_GAME_MODE_UI`, shared `useBossRun` + `BossResultPanel`; `Board`'s grid carries `data-fen`; e2e driven by each kind's/mode's own `EXERCISE_KIND_E2E`/`MINI_GAME_MODE_E2E` (`kinds|modes/e2e-registry.ts`), folded over `solutionOf(def)` — replaces the fixed mate wait, SAN normalizing and FEN-vs-aria-label comparisons; `kinds/<type>/sample.ts` (`import.meta.glob`) replace the playground's inline fixtures; ESLint + a vitest grep test keep type/mode dispatch inside the 4 registries. R3b done |
+| Web kinds (`m8.13`) | web `src/kinds/<type>/` (`ui.ts` = core outcome → UI patch, `PlayArea.tsx`) behind `EXERCISE_KIND_UI`; `useExerciseSession` shared by lesson step, series round and review task (reply timer → F5 fixed); note texts as data in core (`EXERCISE_NOTES`, also feeds the voice inventory); legacy `engine.ts`, `adapt.ts`, `minigame.ts`, `versus.ts`, `boss-result.ts` deleted |
+| Web modes + e2e (`m8.14`) | web `src/modes/<mode>/Step.tsx` behind `MINI_GAME_MODE_UI`, shared `useBossRun` + `BossResultPanel`; `Board`'s grid carries `data-fen`; e2e driven by each kind's/mode's own `EXERCISE_KIND_E2E`/`MINI_GAME_MODE_E2E` (`kinds|modes/e2e-registry.ts`), folded over `solutionOf(def)` — replaces the fixed mate wait, SAN normalizing and FEN-vs-aria-label comparisons; `kinds/<type>/sample.ts` (`import.meta.glob`) replace the playground's inline fixtures; ESLint + a vitest grep test keep type/mode dispatch inside the 4 registries. R3b done |
 
 ## 10. R2 web design (2026-09-27)
 
@@ -160,16 +154,16 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 
 | Piece | Decision |
 |---|---|
-| Packages | `@learn/platform-core` (pure TS), `@learn/platform-content` (Node, zod), `@learn/platform-web` (React), `@learn/subject-chess`, app `@learn/chess-kids`; not published (§8 #4) |
+| Packages | As architecture.md §3; not published (§8 #4) |
 | Order | Seams in today's packages under an ESLint ratchet (leaky files listed, count → 0), then `git mv` commits with an import codemod only (no logic) |
-| `SubjectCore` | `id`, `context` (kind ctx = rules), `kinds`, `modes` (platform adds `series`), `notes` + `noteVars`, `characters` (`{topicKey}`; absent = narrator), `settings` slot (defaults, validation, lazy backup shape), `rewards?` (facts from game records → badge condition values), `gameRecordOf?`; `createSubjectRuntime(core)` builds the registries |
+| `SubjectCore` | Fields: architecture.md §3. `context` = kind ctx (chess: rules); `characters` = `{topicKey}` (absent = narrator); `settings` slot = defaults, validation, lazy backup shape; `rewards?` = facts from game records → badge condition values; `createSubjectRuntime(core)` builds the registries |
 | `AppConfig` | Storage prefix, backup app id, file prefixes, version; chess values unchanged (`chess-kids:`, `chess-kids`) |
 | `SubjectContent` | Stimulus head / tail compile, demo schema, badge fields, extra outputs (`bot-book.json`), voice templates |
-| `SubjectWeb` | Services, locales, kind / mode UIs, surface (Story, Demo, View), character badge, routes + slice + Home tiles (augmentable interfaces), art, Den glyphs / stats, lazy parent panels, dev playgrounds; e2e drivers in `subject-chess/e2e` |
+| `SubjectWeb` | Fields: architecture.md §3. `SubjectServices`, `SubjectState`, `SubjectRoutes` augmentable by the subject; e2e drivers = each kind's / mode's `e2e.ts` (registries: `subject-chess/src/web/{kinds,modes}/e2e-registry.ts`) |
 | Stimulus | Type-level only: chess `position` / `lastMove` stay flat in defs and demo → content JSON byte-equal |
 | Stays platform | Journey habitats (animal theme), `GameRecord` (generic 2-player log), storage keys, schema version, backup format |
 | Locales | Platform + subject roots deep-merged per namespace (duplicate key = build error); snapshot sorted once (order-only diff) |
-| Boundaries | ESLint: platform never imports subject; platform-core / -content no React; subject core / content no web; apps only via package `exports`; `chess.js` only in the rules adapter |
-| Build | Packages export TS source; `resolve.dedupe` for react / i18next / zustand / zod; Tailwind `@source` per package; CI job names unchanged; Pages uploads `apps/chess-kids/dist` (same URL, same `sw.js`) |
+| Boundaries | ESLint import rules (list: architecture.md §3) |
+| Build | CI job names unchanged; Pages uploads `apps/chess-kids/dist` (same URL, same `sw.js`); dedupe, `@source`: architecture.md §11 |
 | R5 needs | Generic `choice` kind in platform, `number-entry` kind, math stimulus + surface, Home grid columns from tile count, `defineAppConfig` + `mountApp`; voice inventory's chess `common` keys → `voiceTemplates`; no default mini-game mode in the loader |
 
