@@ -116,12 +116,27 @@ jobs:
         env:
           CI: true
 
+      # The math demo reuses this job's build and browser; shard 3 has the most headroom.
+      - name: E2E math demo
+        if: matrix.shard == 3
+        run: pnpm --filter @learn/math-demo exec playwright test
+        env:
+          CI: true
+
       - name: Upload Playwright report
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report-shard-${{ matrix.shard }}
           path: apps/chess-kids/playwright-report
+          retention-days: 7
+
+      - name: Upload math Playwright report
+        if: failure() && matrix.shard == 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-math
+          path: apps/math-demo/playwright-report
           retention-days: 7
 
   # Single required check for the master ruleset. Keep the job name stable; it only aggregates the

@@ -18,6 +18,7 @@
     "test:slow": "pnpm -r --if-present test:slow",
     "build": "pnpm -r build",
     "test:e2e": "pnpm --filter @learn/chess-kids test:e2e",
+    "test:e2e:math": "pnpm --filter @learn/math-demo exec playwright test",
     "size": "pnpm --filter @learn/chess-kids size",
     "compat": "pnpm --filter @learn/chess-kids compat",
     "voice:check": "pnpm --filter @learn/subject-chess voice-check",
