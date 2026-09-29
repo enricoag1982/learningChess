@@ -3,8 +3,6 @@ import type { AnyKind, ExerciseDefBase } from '../../../subject.ts';
 import type { SeriesGameDef, SeriesGameState } from './def.ts';
 import { seriesResult, seriesStars, startSeries } from './engine.ts';
 
-/** Builds the `series` mini-game mode over `kinds` — subject-free: any subject's exercise kinds
- * drive a round, not just chess's. */
 export function createSeriesMode<E extends ExerciseDefBase = ExerciseDefBase>(
   kinds: Readonly<Record<string, AnyKind<unknown>>>,
 ): MiniGameMode<SeriesGameDef<E>, SeriesGameState<E>> {

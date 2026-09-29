@@ -11,7 +11,6 @@ import { checkRewards } from './rewards.ts';
 import { getConceptStats, getLessonProgress } from './use-cases.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** `deps.assessment`, or a clear error if this `AppDeps` has not wired it up. */
 function requireAssessment(deps: AppDeps): AssessmentRepository {
   if (deps.assessment === undefined) {
     throw new Error('AppDeps.assessment is not wired up');
@@ -19,7 +18,6 @@ function requireAssessment(deps: AppDeps): AssessmentRepository {
   return deps.assessment;
 }
 
-/** `content.catalog()`, or a clear error if this `ContentSource` has not wired it up yet. */
 function requireCatalog(deps: AppDeps): TracksCatalog {
   const catalog = deps.content.catalog?.();
   if (catalog === undefined) {
@@ -36,9 +34,7 @@ function findWorld(catalog: TracksCatalog, worldId: string) {
   return undefined;
 }
 
-/** Every lesson/world id currently unlocked out of the normal Journey order for this profile: a
- * passed test-out/placement, or a parent unlock. Feeds `journey.ts`'s `unlocked` parameter.
- * `undefined` without `deps.assessment` wired. */
+/** Lesson/world ids unlocked out of Journey order (passed test-out/placement, parent unlock); `undefined` without `deps.assessment`. */
 export async function loadUnlocked(
   deps: AppDeps,
   profileId: string,
@@ -48,7 +44,6 @@ export async function loadUnlocked(
   return new Set(unlocks.map((unlock) => unlock.targetId));
 }
 
-/** Every lesson in `scope` (one for a lesson-scope run, every lesson of the world for a world one). */
 function lessonsInScope(deps: AppDeps, catalog: TracksCatalog, scope: AssessmentScope): Lesson[] {
   if (scope.type === 'lesson') {
     const lesson = deps.content.lesson(scope.lessonId);
@@ -58,7 +53,6 @@ function lessonsInScope(deps: AppDeps, catalog: TracksCatalog, scope: Assessment
   return world === undefined ? [] : [...worldLessons(world, deps.content.lessons())];
 }
 
-/** Input to {@link submitAssessment}. */
 export interface SubmitAssessmentInput {
   readonly profileId: string;
   readonly kind: AssessmentKind;
@@ -68,10 +62,8 @@ export interface SubmitAssessmentInput {
   readonly score: AssessmentScore;
 }
 
-/** Records one taken assessment run: always saves the `AssessmentResult`. A pass also applies its
- * effect: every lesson in `scope` gets `masteredVia: kind`, exercises floored to >= 1 best star,
- * its concept enters review, and the scope's id joins the unlocked set; then `checkRewards` runs.
- * A fail changes nothing else. */
+/** Always saves the `AssessmentResult`. A pass: every lesson in `scope` gets `masteredVia: kind`, exercises floored to 1 star,
+ * its concept enters review, the scope joins the unlocked set, then `checkRewards`; a fail changes nothing else. */
 export async function submitAssessment(
   deps: AppDeps,
   input: SubmitAssessmentInput,
@@ -113,14 +105,12 @@ export async function submitAssessment(
   return score;
 }
 
-/** What a parent unlocks directly. */
 export type ParentUnlockTarget =
   | { readonly type: 'lesson'; readonly lessonId: string }
   | { readonly type: 'world'; readonly worldId: string };
 
-/** Parent area "unlock a lesson/world directly": every lesson in `target` gets
- * `masteredVia: 'parent'` (no star floor — an admin override, not a passed check), and the target's
- * id joins the unlocked set. Also runs `checkRewards`. */
+/** Parent "unlock directly": lessons in `target` get `masteredVia: 'parent'` (no star floor: an admin override, not a
+ * passed check) and the id joins the unlocked set; runs `checkRewards`. */
 export async function parentUnlock(
   deps: AppDeps,
   profileId: string,

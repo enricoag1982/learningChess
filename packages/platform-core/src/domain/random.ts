@@ -3,10 +3,7 @@ export interface Random {
   next(): number;
 }
 
-/**
- * Deterministic PRNG (mulberry32): same seed produces the same sequence, every time, on any
- * platform. Used for reproducible bot play and tests; not for anything security-sensitive.
- */
+/** Deterministic mulberry32 PRNG: same seed, same sequence on any platform; for reproducible bots and tests, not security. */
 export function seededRandom(seed: number): Random {
   let state = seed >>> 0;
   return {
@@ -20,7 +17,6 @@ export function seededRandom(seed: number): Random {
   };
 }
 
-/** Deterministic Fisher–Yates shuffle driven by `random` (mutates nothing; returns a new array). */
 export function shuffle<T>(items: readonly T[], random: Random): T[] {
   const shuffled = [...items];
   for (let i = shuffled.length - 1; i > 0; i -= 1) {

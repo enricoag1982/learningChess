@@ -7,19 +7,16 @@ import type { MiniGameMode } from './exercise/mode.ts';
 import type { AnyNoteEntry } from './notes.ts';
 import type { GameRecordResult } from './progress.ts';
 
-/** Fields shared by every exercise definition, regardless of subject. */
 export interface ExerciseDefBase {
   readonly id: string;
   readonly type: string;
   /** Concept id (e.g. `rook-move`), used for mastery and review tracking. */
   readonly concept: string;
-  /** i18n key for the exercise's instruction text. */
   readonly textKey: string;
   /** Id of an entry in the lesson's `variants`, offered after enough errors on this exercise. */
   readonly easier?: string;
 }
 
-/** Fields shared by every exercise's runtime state, regardless of subject. */
 export interface ExerciseStateBase<
   D extends ExerciseDefBase = ExerciseDefBase,
 > extends ExerciseProgress {
@@ -27,34 +24,28 @@ export interface ExerciseStateBase<
   readonly moves: number;
 }
 
-/** Fields shared by every kind's hint, regardless of subject. */
 export interface HintBase {
   readonly kind: string;
   readonly level: 1 | 2 | 3;
 }
 
-/** Fields shared by every mini-game's content, regardless of subject or mode. */
 export interface MiniGameBase {
   readonly id: string;
   readonly mode: string;
   readonly concept: string;
   readonly titleKey: string;
   readonly goalKey: string;
-  /** Lesson id that unlocks this mini-game. */
   readonly unlockAfter: string;
 }
 
-/** Fields shared by every mini-game's runtime state, regardless of subject or mode. `def` is only
- * `{id}` here (not the full `MiniGameBase`): a mode's own play-time def (`StaticCaptureGameDef`,
- * `VersusGameDef`, …) deliberately omits the catalog fields (title/goal/unlockAfter), which the
- * boss/Play screen already has from the content lesson/mini-game, not the running state. */
+/** `def` is only `{id}`: a mode's play-time def omits the catalog fields (title/goal/unlockAfter), which the
+ * boss/Play screen already has from content. */
 export interface MiniGameStateBase {
   readonly mode: string;
   readonly def: { readonly id: string };
 }
 
-/** One lesson: story, demo, guided tries, scored exercises, optional boss mini-game — generic over
- * the subject's own exercise def (`E`) and demo (`Demo`) shapes. */
+/** One lesson: story, demo, guided tries, scored exercises, optional boss; generic over the subject's exercise def `E` and demo `Demo`. */
 export interface Lesson<
   E extends ExerciseDefBase = ExerciseDefBase,
   Demo extends { readonly textKey: string } = { readonly textKey: string },
@@ -62,13 +53,11 @@ export interface Lesson<
   readonly id: string;
   readonly world: string;
   readonly order: number;
-  /** Concept id (e.g. `rook-move`), used for mastery and review tracking. */
   readonly concept: string;
   /** Character id (e.g. `rhino`); display name at `characters:<character>.name`. */
   readonly character: string;
   readonly titleKey: string;
   readonly storyKey: string;
-  /** Id of the mini-game unlocked by completing this lesson. */
   readonly boss?: string;
   readonly demo: Demo;
   /** Easy tries shown before the exercises; hints on, not scored. */
@@ -79,7 +68,6 @@ export interface Lesson<
   readonly variants?: readonly E[];
 }
 
-/** Any exercise kind, widened to the base def/state/hint shapes plus the subject's own kind context. */
 export type AnyKind<Ctx> = ExerciseKind<
   ExerciseDefBase,
   ExerciseStateBase,
@@ -89,18 +77,14 @@ export type AnyKind<Ctx> = ExerciseKind<
   Ctx
 >;
 
-/** Any mini-game mode, widened to the base state shape. `Def` (a mode's own `start(def)` input) is
- * `unknown`: platform code never starts a mini-game generically, only reads its running state
- * (`isOver`/`isWin`/`stars`/`summarise`) — starting stays each mode's own concrete function
- * (`startStaticCaptureGame`, `startSeries`, `startVersus`). */
+/** Any mini-game mode over the base state. `Def` is `unknown`: platform code only reads running state, never starts a
+ * mini-game generically (each mode has its own `start*` function). */
 export type AnyMode = MiniGameMode<unknown, MiniGameStateBase>;
 
-/** One `GameRecord` to save (`app/games.ts`'s `recordGame`, the Play/boss "versus finished" path):
- * `opponent` is the already-formatted string (chess: `'computer:<level>'`) — the platform never
- * knows how a subject names its opponents. */
+/** One `GameRecord` to save (`app/games.ts`'s `recordGame`): `opponent` is pre-formatted (chess: `'computer:<level>'`),
+ * the platform never knows a subject's naming. */
 export interface RecordGameInput {
   readonly profileId: string;
-  /** `'full'` for a full standard game, else a `versus` mini-game's content id. */
   readonly game: string;
   readonly opponent: string;
   readonly result: GameRecordResult;
@@ -108,11 +92,9 @@ export interface RecordGameInput {
   readonly moves: readonly string[];
 }
 
-/** One subject's whole behaviour behind the platform's uniform interfaces. `rewards`/`gameRecordOf`
- * are optional: a subject without badge facts or its own game log simply omits them (R5's math
- * demo). */
+/** One subject's whole behaviour behind the platform interfaces. `rewards`/`gameRecordOf` are optional: a subject
+ * without badge facts or its own game log omits them. */
 export interface SubjectCore<Ctx = unknown, F = unknown> {
-  /** e.g. `'chess'`. */
   readonly id: string;
   /** The kind context every `ExerciseKind.act`/`hint` call receives (chess: `VariantRules`). */
   readonly context: Ctx;
@@ -122,35 +104,29 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
   /** The subject's own facts for badge condition types the engine's 7 generic ones don't cover
    * (chess: `game-win`/`game-event`/`game-played`). */
   readonly rewards?: SubjectRewards<F>;
-  /** `game`/`state`'s own `GameRecord`, or `null` for a mode/state with no game log (chess:
-   * `static`/`series`) — the versus→GameRecord translation `app/minigames.ts` used to hardcode. */
+  /** The `GameRecord` of a finished mini-game state, or `null` for a mode without a game log (chess: `static`/`series`). */
   gameRecordOf?(
     game: MiniGameBase,
     state: MiniGameStateBase,
   ): Omit<RecordGameInput, 'profileId'> | null;
-  /** Lesson characters that double as an "animal friend" once their lesson is done (World 2:
-   * `rhino` → `piece.r`); key order is `animalFriends`' own friend order. Absent id = a
-   * narrator-taught character (Owl), never a friend. */
+  /** Lesson characters that double as an "animal friend" once their lesson is done (`rhino` → `piece.r`), in
+   * `animalFriends` order; an absent id (Owl) is never a friend. */
   readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
-  /** The subject's own settings-slot fields (chess: computer level, piece style), as an opaque
-   * bag: `defaults` composes into `ProfileSettings`, `isValid` checks a stored one back, and
-   * `loadBackupShape` (dynamic import) supplies the matching zod fields to `app/backup.ts`. */
+  /** The subject's settings-slot fields as an opaque bag: `defaults` composes into `ProfileSettings`, `isValid` checks a
+   * stored one, `loadBackupShape` (dynamic import) supplies the zod fields for `app/backup.ts`. */
   readonly settings: {
     readonly defaults: Readonly<Record<string, unknown>>;
     isValid(s: Readonly<Record<string, unknown>>): boolean;
     loadBackupShape(): Promise<SettingsBackupShape>;
   };
-  /** Every feedback kind's note, keyed by `ExerciseFeedbackBase['kind']` (`domain/notes.ts`'s
-   * `exerciseNote` dispatch) — the subject's own kinds plus the platform-shaped ones
-   * (tap-first, wrong-answer, hint, solved). */
+  /** Every feedback kind's note, keyed by `ExerciseFeedbackBase['kind']`: the subject's own kinds plus the
+   * platform-shaped ones (tap-first, wrong-answer, hint, solved). */
   readonly notes: Readonly<Record<string, AnyNoteEntry>>;
   /** Extra note vars for `character` beyond `{name, stars}` (chess: `{ piece }`). */
   noteVars(character: string): Readonly<Record<string, string>>;
 }
 
-/** App-level values a subject's platform-web shell needs, kept out of storage/backup so swapping
- * subjects never collides on disk. */
-/** A subject's own backup zod fields, spliced into `app/backup.ts`'s settings shape. */
+/** A subject's backup zod fields, spliced into `app/backup.ts`'s settings shape. */
 export type SettingsBackupShape = Readonly<Record<string, ZodType>>;
 
 export interface AppConfig {
@@ -158,9 +134,7 @@ export interface AppConfig {
   readonly storagePrefix: string;
   /** Backup file's `app` field, e.g. `'chess-kids'`. */
   readonly backupAppId: string;
-  /** Downloaded backup file name prefix. */
   readonly backupFilePrefix: string;
-  /** Downloaded parent-code file name prefix. */
   readonly parentCodeFilePrefix: string;
   /** The running build's own version string (web: `__APP_VERSION__`, from `package.json`). */
   readonly version: string;

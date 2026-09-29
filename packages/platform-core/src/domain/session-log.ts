@@ -5,12 +5,10 @@ import { localDayString } from './streak.ts';
 /** Parent "more time" grant: minutes added to the daily limit each tap, once or repeatedly. */
 export const EXTRA_TIME_GRANT_MINUTES = 15;
 
-/** Parent "more time" grant for the allowed-hours edge: a rolling window from the moment of the
- * grant, not additive like {@link EXTRA_TIME_GRANT_MINUTES} — each tap resets
- * `SessionLog.hoursOverrideUntil` to now plus this many minutes. */
+/** Rolling window from the grant: each tap resets `SessionLog.hoursOverrideUntil` to now + this, unlike the
+ * additive {@link EXTRA_TIME_GRANT_MINUTES}. */
 export const HOURS_OVERRIDE_MINUTES = 15;
 
-/** One profile's played minutes for one local calendar day. */
 export interface SessionLog extends StoredRecord {
   readonly profileId: string;
   /** Local calendar day (`YYYY-MM-DD`, device time zone — same format as `Streak.lastDay`). */
@@ -25,15 +23,13 @@ export interface SessionLog extends StoredRecord {
   /** ISO instant the 5-minute warning was last spoken/shown for this day. Absent = not warned yet
    * today — `shouldWarn` shows it once per child per day. */
   readonly warnedAt?: string;
-  /** Which device wrote this row (`AppSettings.deviceId`). Absent = this device's own legacy row.
-   * An imported foreign device's row is a separate physical row, kept side by side so the two can
-   * be summed (`totalMinutesForDate`) without either overwriting the other. */
+  /** Writing device (`AppSettings.deviceId`); absent = this device's legacy row. Imported foreign rows stay separate
+   * so `totalMinutesForDate` can sum them. */
   readonly deviceId?: string;
 }
 
-/** Fresh, unsaved log row for a profile's first recorded minutes on `date`. `deviceId` stamps this
- * device's own id onto a brand-new local row so a later export identifies it; omitted for an
- * imported foreign row or before this device has one yet. */
+/** Fresh row for a profile's first minutes on `date`; `deviceId` stamps this device's id (omitted for imported
+ * foreign rows or before the device has one). */
 export function newSessionLog(
   id: string,
   profileId: string,
@@ -54,8 +50,7 @@ export function newSessionLog(
   };
 }
 
-/** The last `days` local calendar days (`YYYY-MM-DD`, device time zone), oldest first, ending at
- * `now`'s own day. `days <= 0` returns `[]`. */
+/** The last `days` local days (`YYYY-MM-DD`), oldest first, ending today; `[]` for `days <= 0`. */
 export function lastNDays(now: Date, days: number): readonly string[] {
   const result: string[] = [];
   // Local calendar-field subtraction, not millisecond math: a day can be 23 or 25 hours across a
@@ -66,8 +61,7 @@ export function lastNDays(now: Date, days: number): readonly string[] {
   return result;
 }
 
-/** Adds `minutes` to `existing` (same day), or starts a fresh row (`id`/`deviceId` only used then —
- * `existing`, once created, keeps whichever `deviceId` it already has). */
+/** Adds `minutes` to `existing` (same day) or starts a row (`id` / `deviceId` used only then). */
 export function addMinutes(
   existing: SessionLog | undefined,
   id: string,
@@ -83,29 +77,24 @@ export function addMinutes(
   return { ...existing, minutes: existing.minutes + minutes, updatedAt: now.toISOString() };
 }
 
-/** Sum of `minutes` across every row in `logs` for `date`: the daily limit, the parent report and
- * the 5-minute warning all read combined play across every device shared into this one. `0` with
- * no matching row. */
+/** Combined minutes of every row for `date` (all devices), what the limit, report and warning read; `0` when none. */
 export function totalMinutesForDate(logs: readonly SessionLog[], date: string): number {
   return logs.filter((log) => log.date === date).reduce((sum, log) => sum + log.minutes, 0);
 }
 
-/** Minutes played on `now`'s own local day. `0` without a row, or a stale (other-day) one — so
- * callers never need their own explicit midnight-reset check. */
+/** Minutes played on `now`'s local day; `0` without a row or with a stale one, so callers need no midnight reset. */
 export function timeUsedToday(log: SessionLog | undefined, now: Date): number {
   if (log === undefined || log.date !== localDayString(now)) return 0;
   return log.minutes;
 }
 
-/** Extra minutes granted for `now`'s own local day. `0` without a row, or a stale one — same
- * reasoning as {@link timeUsedToday}. */
+/** Extra minutes granted on `now`'s local day; `0` without a row or with a stale one. */
 export function extraMinutesToday(log: SessionLog | undefined, now: Date): number {
   if (log === undefined || log.date !== localDayString(now)) return 0;
   return log.extraMinutes ?? 0;
 }
 
-/** `now`'s own effective daily limit: `weekendLimitMinutes` on a device-local Saturday/Sunday when
- * set, else `dailyLimitMinutes` every day. */
+/** `weekendLimitMinutes` on a device-local Saturday/Sunday when set, else `dailyLimitMinutes`. */
 export function limitForDay(
   settings: Pick<ProfileSettings, 'dailyLimitMinutes' | 'weekendLimitMinutes'>,
   now: Date,
@@ -118,8 +107,7 @@ export function limitForDay(
   return settings.dailyLimitMinutes;
 }
 
-/** `true` once today's played minutes reach {@link limitForDay}'s limit plus any extra granted
- * today; always `false` with that day's limit off (`null`). */
+/** True once today's minutes reach {@link limitForDay} plus extra granted; always false with the limit off (`null`). */
 export function isOverLimit(
   settings: Pick<ProfileSettings, 'dailyLimitMinutes' | 'weekendLimitMinutes'>,
   log: SessionLog | undefined,
@@ -130,8 +118,6 @@ export function isOverLimit(
   return timeUsedToday(log, now) >= limit + extraMinutesToday(log, now);
 }
 
-/** Parent "more time": adds `minutes` (the app layer always passes {@link EXTRA_TIME_GRANT_MINUTES})
- * to today's grant, stored on the same `SessionLog` row as played minutes. */
 export function grantExtraMinutes(
   existing: SessionLog | undefined,
   id: string,
@@ -151,9 +137,7 @@ export function grantExtraMinutes(
   };
 }
 
-/** Parent "more time" for the allowed-hours edge: sets `hoursOverrideUntil` to `now` plus `minutes`
- * — a rolling window, so repeated taps reset it forward rather than stacking like
- * {@link grantExtraMinutes}. */
+/** Sets `hoursOverrideUntil` to `now` + `minutes`: a rolling window, repeated taps reset it rather than stack. */
 export function setHoursOverride(
   existing: SessionLog | undefined,
   id: string,
@@ -170,7 +154,6 @@ export function setHoursOverride(
   return { ...existing, hoursOverrideUntil, updatedAt: now.toISOString() };
 }
 
-/** Marks the 5-minute warning shown for today, so {@link shouldWarn} never shows it again the same day. */
 export function markWarned(
   existing: SessionLog | undefined,
   id: string,

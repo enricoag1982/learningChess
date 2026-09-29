@@ -11,7 +11,6 @@ import type { Random } from '../domain/random.ts';
 import type { ContentSource } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** `content.catalog()`, or a clear error if this `ContentSource` has not wired it up yet. */
 function requireCatalog(content: ContentSource): TracksCatalog {
   const catalog = content.catalog?.();
   if (catalog === undefined) {
@@ -20,7 +19,6 @@ function requireCatalog(content: ContentSource): TracksCatalog {
   return catalog;
 }
 
-/** Every pool a set of concept ids needs, keyed by concept id (`conceptPool`, computed once). */
 function poolsFor<E extends ExerciseDefBase>(
   lessons: readonly Lesson<E>[],
   conceptIds: Iterable<string>,
@@ -32,7 +30,6 @@ function poolsFor<E extends ExerciseDefBase>(
   return pools;
 }
 
-/** Today's warm-up tasks: `[]` when no concept is in review. */
 export function planWarmUp<E extends ExerciseDefBase>(
   lessons: readonly Lesson<E>[],
   conceptStats: readonly ConceptStats[],
@@ -47,9 +44,7 @@ export function planWarmUp<E extends ExerciseDefBase>(
   return pickWarmUp(conceptStats, pools, now, random);
 }
 
-/** Loads today's warm-up tasks for a profile (see `planWarmUp`). Inferred (not annotated) return
- * type: preserves the subject's own concrete exercise def, from `deps.content`, through to the
- * caller (chess: `ConceptTask<ExerciseDef>`). */
+/** Today's warm-up tasks; the inferred return type keeps the subject's concrete exercise def from `deps.content`. */
 export async function loadWarmUp(deps: AppDeps, profileId: string) {
   const [lessons, conceptStats] = await Promise.all([
     Promise.resolve(deps.content.lessons()),
@@ -58,11 +53,8 @@ export async function loadWarmUp(deps: AppDeps, profileId: string) {
   return planWarmUp(lessons, conceptStats, deps.clock.now(), deps.random);
 }
 
-/** Practice screen's default task count for one topic run. */
 export const PRACTICE_TASK_COUNT = 5;
 
-/** Loads `count` Practice tasks for one concept (see `pickPracticeTasks`). Inferred return type,
- * same reason as `loadWarmUp`'s. */
 export async function loadPracticeTasks(
   deps: AppDeps,
   profileId: string,
@@ -77,14 +69,12 @@ export async function loadPracticeTasks(
   return pickPracticeTasks(conceptId, pool, stats?.lastExerciseId, count, deps.random);
 }
 
-/** One activity of a Today session, in play order. */
 export type TodayActivity<E extends ExerciseDefBase = ExerciseDefBase> =
   | { readonly kind: 'warmup'; readonly tasks: readonly ConceptTask<E>[] }
   | { readonly kind: 'lesson'; readonly lesson: Lesson }
   | { readonly kind: 'world-boss'; readonly world: World }
   | { readonly kind: 'minigame'; readonly miniGame: MiniGame };
 
-/** A Today session's full ordered plan (see `planTodaySession`). */
 export interface TodaySessionPlan<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly activities: readonly TodayActivity<E>[];
 }
@@ -140,7 +130,6 @@ export function planTodaySession<E extends ExerciseDefBase>(
   conceptStats: readonly ConceptStats[],
   now: Date,
   random: Random,
-  /** Lesson/world ids unlocked out of order by a test-out/placement/parent unlock. */
   unlocked?: ReadonlySet<string>,
 ): TodaySessionPlan<E> {
   const activities: TodayActivity<E>[] = [];
@@ -180,8 +169,7 @@ export function planTodaySession<E extends ExerciseDefBase>(
   return { activities };
 }
 
-/** Loads and plans a profile's Today session (see `planTodaySession`). */
-/** Inferred (not annotated) return type — same reason as `loadWarmUp`'s. */
+/** Loads and plans a profile's Today session (see `planTodaySession`); inferred return type as in `loadWarmUp`. */
 export async function loadTodaySession(deps: AppDeps, profileId: string) {
   const catalog = requireCatalog(deps.content);
   const lessons = deps.content.lessons();

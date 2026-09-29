@@ -5,8 +5,7 @@ import { lessonStatus } from './progress.ts';
 import type { LessonProgress } from './progress.ts';
 import type { SubjectCore } from './subject.ts';
 
-/** One animal friend, earned once its character's lesson is done. `topicKey` resolves through
- * `t()` as-is (chess: `piece.r` etc. — `SubjectCore.characters`). */
+/** Earned once its character's lesson is done; `topicKey` resolves through `t()` as-is (chess: `piece.r`). */
 export interface AnimalFriend {
   readonly character: string;
   readonly topicKey: string;
@@ -14,9 +13,8 @@ export interface AnimalFriend {
   readonly earned: boolean;
 }
 
-/** The subject's animal friends (chess: Rhino .. Caterpillar), each tied to the earliest lesson
- * that teaches its character, in `characters`' own key order. A character with no authored lesson
- * yet is left out. */
+/** The subject's animal friends (chess: Rhino .. Caterpillar), each tied to the earliest lesson teaching its
+ * character, in `characters` key order; characters without a lesson are left out. */
 export function animalFriends(
   lessons: readonly Lesson[],
   progresses: readonly LessonProgress[],
@@ -42,17 +40,14 @@ export function animalFriends(
   return friends;
 }
 
-/** A rank's place on My Den's ladder, relative to the profile's `currentRank`. */
 export type RankState = 'done' | 'current' | 'locked';
 
-/** One rank on My Den's ladder. */
 export interface RankLadderEntry {
   readonly rank: RankDef;
   readonly state: RankState;
 }
 
-/** Every rank in `catalog.ranks`, tagged by its position relative to `currentRank`'s result: every
- * earlier rank is `done`, the current one `current`, every later one `locked`. */
+/** Every rank tagged relative to `currentRank`: earlier `done`, that one `current`, later `locked`. */
 export function rankLadder(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],

@@ -1,14 +1,12 @@
 // The exercise-kind abstraction (subject-free): one exercise type's whole behaviour behind a
 // uniform interface, so `engine.ts` dispatches through a registry (`kinds/index.ts`), not an `if` chain.
 
-/** Fields every exercise kind's state tracks, independent of the exercise's own subject. */
 export interface ExerciseProgress {
   readonly solved: boolean;
   readonly errors: number;
   readonly hintLevel: 0 | 1 | 2 | 3;
 }
 
-/** A state transition's result: the state after it, plus what happened. */
 export interface Step<S, O> {
   readonly state: S;
   readonly outcome: O;
@@ -21,7 +19,6 @@ export interface TextKeyRef {
   readonly label: string;
 }
 
-/** How a kind's action is driven; replaces the old `NON_MOVE_TYPES` set. */
 export type KindInput = 'static-move' | 'real-move' | 'select' | 'answer' | 'place';
 
 /** One exercise type's full behaviour. Method syntax is deliberate: bivariant parameter checking
@@ -36,9 +33,7 @@ export interface ExerciseKind<
 > {
   readonly type: Def['type'];
   readonly input: KindInput;
-  /** Starts a fresh exercise at its authored position. */
   init(def: Def): State;
-  /** Applies one action. */
   act(state: State, action: Action, ctx: Ctx): Step<State, Outcome>;
   /** Advances the hint ladder; `level` is already bumped (capped at 3). */
   hint(state: State, level: 1 | 2 | 3, ctx: Ctx): { readonly state: State; readonly hint: Hint };

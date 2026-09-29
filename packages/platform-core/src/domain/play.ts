@@ -3,9 +3,7 @@ import { lessonStatus } from './progress.ts';
 import type { LessonProgress, Stars } from './progress.ts';
 import type { MiniGameBase } from './subject.ts';
 
-/** One mini-game's Play-screen state — generic in the subject's own mini-game (`M`) so a caller
- * with a concrete type (chess: `MiniGame`) gets it back on `minigame`, inferred from
- * `unlockedMiniGames`'s own arguments. */
+/** One mini-game's Play-screen state; generic so callers keep their concrete mini-game type. */
 export interface UnlockedMiniGame<M extends MiniGameBase = MiniGameBase> {
   readonly minigame: M;
   readonly unlocked: boolean;

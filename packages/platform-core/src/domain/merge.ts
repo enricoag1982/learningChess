@@ -7,7 +7,6 @@ import type { SessionLog } from './session-log.ts';
 import { lastNDays, totalMinutesForDate } from './session-log.ts';
 import type { Streak } from './streak.ts';
 
-/** One profile's full backed-up data, merge-ready (`app/backup.ts`'s `ProfileBackupData`). */
 export interface MergeableProfileData {
   readonly settings: ProfileSettings;
   readonly lessonProgress: readonly LessonProgress[];
@@ -52,7 +51,6 @@ function unionById<
   return all.length > max ? all.slice(all.length - max) : all;
 }
 
-/** Earliest of two optional ISO timestamps; the defined one if only one is set; `undefined` if neither is. */
 function earliestDefined(a: string | undefined, b: string | undefined): string | undefined {
   if (a === undefined) return b;
   if (b === undefined) return a;
@@ -90,9 +88,8 @@ function sameBestStars(
   return keysA.length === keysB.length && keysA.every((key) => a[key] === b[key]);
 }
 
-// bestStars/bossStars max, completedAt earliest, masteredVia kept if either has it,
-// resumeStep/skippedPhases from whichever side has the newer updatedAt. Returns `local` unchanged
-// when nothing differs, keeping repeated merges of the same `incoming` idempotent.
+// bestStars/bossStars max, completedAt earliest, masteredVia kept if either has it, resumeStep/skippedPhases
+// from the newer side. Returns `local` unchanged when nothing differs (idempotent).
 function mergeOneLessonProgress(
   local: LessonProgress,
   incoming: LessonProgress,
@@ -127,7 +124,6 @@ function mergeOneLessonProgress(
   };
 }
 
-/** A lesson id on only one side is kept as-is; one on both is combined ({@link mergeOneLessonProgress}). */
 export function mergeLessonProgress(
   local: readonly LessonProgress[],
   incoming: readonly LessonProgress[],
@@ -285,9 +281,8 @@ export function mergeProfileSettings(
   return incomingAt > localAt ? incoming : local;
 }
 
-// Keyed by (date, deviceId) so a re-import never double-counts; a row with no deviceId is treated
-// as that side's own legacy row, never merged with the other side's. Larger minutes/extraMinutes,
-// later hoursOverrideUntil/warnedAt win within a matching pair.
+// Keyed by (date, deviceId): a re-import never double-counts; a row without deviceId is that side's legacy row.
+// Within a pair: larger minutes/extraMinutes, later hoursOverrideUntil/warnedAt win.
 function sessionLogKey(log: SessionLog): string {
   return `${log.date}:${log.deviceId ?? `legacy:${log.id}`}`;
 }
@@ -347,9 +342,8 @@ export function mergeUnlocks(local: readonly Unlock[], incoming: readonly Unlock
   return [...byKey.values()];
 }
 
-/** Merges one profile's full backed-up data. `local`/`incoming` must already share the same target
- * profile id (`app/merge.ts` re-keys an incoming child first). Idempotent: re-applying the same
- * `incoming` changes nothing further. */
+/** Merges one profile's backed-up data; `local`/`incoming` must share the target profile id (`app/merge.ts`
+ * re-keys a child first). Idempotent. */
 export function mergeProfileData(
   local: MergeableProfileData,
   incoming: MergeableProfileData,
@@ -375,8 +369,7 @@ export function mergeProfileData(
   return merged;
 }
 
-/** Total minutes played over the last `days` local calendar days ending today, across every device
- * row in `data.sessionLogs`. */
+/** Minutes over the last `days` local calendar days ending today, across all device rows. */
 export function totalMinutesOverDays(data: MergeableProfileData, now: Date, days: number): number {
   return lastNDays(now, days).reduce(
     (sum, date) => sum + totalMinutesForDate(data.sessionLogs, date),
@@ -384,9 +377,7 @@ export function totalMinutesOverDays(data: MergeableProfileData, now: Date, days
   );
 }
 
-/** A brand-new local profile's data: `settings` (the caller's composed default) and every list
- * empty. Safe fallback, not a real code path (`buildBackupFile` always returns one entry per
- * profile). */
+/** Brand-new local profile data: `settings` (the caller's default), all lists empty; a safe fallback only. */
 export function emptyProfileData(settings: ProfileSettings): MergeableProfileData {
   return {
     settings,

@@ -3,18 +3,15 @@ import type { SessionLog } from './session-log.ts';
 import { extraMinutesToday, limitForDay, timeUsedToday } from './session-log.ts';
 import { localDayString } from './streak.ts';
 
-/** `'HH:MM'` -> minutes since local midnight. */
 function hhmmToMinutes(hhmm: string): number {
   const [hours, minutes] = hhmm.split(':').map(Number);
   return (hours ?? 0) * 60 + (minutes ?? 0);
 }
 
-/** `now`'s own local time of day, in minutes since midnight. */
 function nowMinutesOfDay(now: Date): number {
   return now.getHours() * 60 + now.getMinutes();
 }
 
-/** `true` while `overrideUntil` (an ISO instant) is set and still in the future. */
 function overrideActive(overrideUntil: string | undefined, now: Date): boolean {
   return overrideUntil !== undefined && now.getTime() < Date.parse(overrideUntil);
 }
@@ -33,10 +30,8 @@ export function allowedHoursReason(
   return null;
 }
 
-/** Minutes from `now` to today's `playUntil` edge (or to `overrideUntil` while it is active, since
- * that is the boundary actually in effect then); `null` while `playUntil` is off and no override
- * is active. Can be negative once the edge has already passed (the gate itself, not this helper,
- * decides what to do about that). */
+/** Minutes to today's `playUntil` edge (or to `overrideUntil` while active); `null` when `playUntil` is off and no
+ * override is active. Negative once the edge has passed. */
 function minutesUntilHoursEdge(
   playUntil: string | null | undefined,
   now: Date,

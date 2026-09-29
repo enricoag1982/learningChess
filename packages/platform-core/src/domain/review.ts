@@ -7,20 +7,17 @@ import type { ExerciseDefBase } from './subject.ts';
 /** Review box 1–5 (Leitner), or absent = the concept has not entered review yet. */
 export type ReviewBox = 1 | 2 | 3 | 4 | 5;
 
-/** One profile's mastery + review state for one concept. `recent` holds up to the last 10 first-try
- * results, newest last. `box`/`dueAt` unset until the concept first enters review (`enterReview`);
- * `lastExerciseId` is the last task shown, so the picker can avoid repeating it. */
+/** `recent`: up to the last 10 first-try results, newest last. `box`/`dueAt` unset until `enterReview`;
+ * `lastExerciseId` lets the picker avoid a repeat. */
 export interface ConceptStats extends StoredRecord {
   readonly profileId: string;
   readonly conceptId: string;
   readonly recent: readonly boolean[];
   readonly box?: ReviewBox;
-  /** ISO timestamp; set together with `box`. */
   readonly dueAt?: string;
   readonly lastExerciseId?: string;
 }
 
-/** Fresh, unsaved stats for a profile + concept with no attempts yet. */
 export function newConceptStats(
   id: string,
   profileId: string,
@@ -31,10 +28,8 @@ export function newConceptStats(
   return { id, profileId, conceptId, recent: [], createdAt: nowIso, updatedAt: nowIso };
 }
 
-/** `recent` keeps at most this many results. */
 const RECENT_MAX = 10;
 
-/** Appends one first-try result to `recent` (newest last), dropping the oldest past 10. */
 export function appendResult(stats: ConceptStats, correct: boolean, now: Date): ConceptStats {
   const recent = [...stats.recent, correct].slice(-RECENT_MAX);
   return { ...stats, recent, updatedAt: now.toISOString() };
@@ -90,12 +85,10 @@ export function applyReviewResult(
   return { ...stats, box, dueAt, lastExerciseId: exerciseId, updatedAt: now.toISOString() };
 }
 
-/** True once `stats` is in review and its `dueAt` has passed (or is now). */
 export function isDue(stats: ConceptStats, now: Date): boolean {
   return stats.box !== undefined && stats.dueAt !== undefined && stats.dueAt <= now.toISOString();
 }
 
-/** One lesson exercise available for a concept's review pool, alongside the lesson it belongs to. */
 export interface ConceptPoolEntry<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly lessonId: string;
   readonly exercise: E;
@@ -114,7 +107,6 @@ export function conceptPool<E extends ExerciseDefBase>(
   );
 }
 
-/** One task picked for warm-up or practice: a concept's pool exercise, alongside its lesson id. */
 export interface ConceptTask<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly conceptId: string;
   readonly lessonId: string;
@@ -124,7 +116,6 @@ export interface ConceptTask<E extends ExerciseDefBase = ExerciseDefBase> {
 /** Warm-up is always exactly this many tasks (or fewer when review has fewer concepts to draw on). */
 const WARM_UP_SIZE = 3;
 
-/** One random pick from `entries`, avoiding `avoidExerciseId` when another candidate exists. */
 function pickOne<E extends ExerciseDefBase>(
   entries: readonly ConceptPoolEntry<E>[],
   avoidExerciseId: string | undefined,

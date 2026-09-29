@@ -1,11 +1,7 @@
 import type { ExerciseDefBase, ExerciseStateBase } from '../../../subject.ts';
 
-/**
- * A `series` mini-game's content (Square Hunt, Setup Race, and M3's Safe or Not? / Escape the
- * Check / Mate in 1): a fixed sequence of exercise rounds, of any exercise type, scored on total
- * mistakes across all rounds rather than a single win condition. Generic over the round's own
- * subject-specific def shape (`E`); chess instantiates `SeriesGameDef<ExerciseDef>`.
- */
+/** A `series` mini-game: fixed exercise rounds (any kind) scored on total mistakes across rounds.
+ * Generic over the subject's def shape `E`. */
 export interface SeriesGameDef<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly id: string;
   readonly concept: string;
@@ -16,12 +12,10 @@ export interface SeriesGameDef<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly errors2: number;
 }
 
-/** Immutable series mini-game progress: one round played at a time via the normal exercise engine. */
 export interface SeriesGameState<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly mode: 'series';
   readonly def: SeriesGameDef<E>;
   readonly roundIndex: number;
-  /** Current (or, once `done`, last) round's exercise state. */
   readonly round: ExerciseStateBase<E>;
   /** Mistakes (errors + hint level) folded in from every round completed so far. */
   readonly mistakes: number;

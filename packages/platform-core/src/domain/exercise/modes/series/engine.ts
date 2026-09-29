@@ -1,8 +1,6 @@
 import type { AnyKind, ExerciseDefBase, ExerciseStateBase } from '../../../subject.ts';
 import type { SeriesGameDef, SeriesGameState } from './def.ts';
 
-/** Starts a fresh series at its first round, via the given subject's kind registry — no hardcoded
- * exercise kind here, any subject's kinds work. */
 export function startSeries<E extends ExerciseDefBase>(
   def: SeriesGameDef<E>,
   kinds: Readonly<Record<string, AnyKind<unknown>>>,
@@ -21,16 +19,12 @@ export function startSeries<E extends ExerciseDefBase>(
   };
 }
 
-/** The exercise definition for the round currently (or, once `done`, last) in play. */
 export function currentRound<E extends ExerciseDefBase>(state: SeriesGameState<E>): E {
   return state.def.rounds[state.roundIndex] ?? state.round.def;
 }
 
-/**
- * Folds a solved round's mistakes (errors + hint level; hints are allowed but count as mistakes,
- * same as a wrong try) into the series total, then advances to the next round, or marks the series
- * `done` after the last one. `roundState` must be the current round's `solved` exercise state.
- */
+/** Folds a solved round's mistakes (errors + hint level) into the series total, then advances or marks `done`.
+ * `roundState` must be the current, `solved` round. */
 export function completeRound<E extends ExerciseDefBase>(
   state: SeriesGameState<E>,
   roundState: ExerciseStateBase<E>,
@@ -51,7 +45,6 @@ export function completeRound<E extends ExerciseDefBase>(
   };
 }
 
-/** Current series status: `playing` until every round is complete. */
 export function seriesResult(state: SeriesGameState): 'playing' | 'won' {
   return state.done ? 'won' : 'playing';
 }

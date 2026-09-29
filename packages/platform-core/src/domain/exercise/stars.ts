@@ -1,8 +1,4 @@
-/**
- * Stars from errors + hint level: 3 clean, 2 with ≤1 error or ≤1 hint level, else 1. Shared by
- * every kind whose stars depend only on errors/hints, not a move count (select-squares, yes-no,
- * choice, best-move, mate-in-n).
- */
+/** 3 clean, 2 with at most 1 error or 1 hint level, else 1; for kinds whose stars ignore move count. */
 export function errorHintStars(hintLevel: 0 | 1 | 2 | 3, errors: number): 1 | 2 | 3 {
   if (hintLevel === 3) {
     return 1;

@@ -1,9 +1,5 @@
-/**
- * Minimal, dependency-free SHA-256 (FIPS 180-4), synchronous. Used by `voice-text.ts` to derive a
- * stable audio filename from narrated text — needs to run identically in the browser (runtime
- * lookup) and in Node (the content build's inventory script) without relying on `node:crypto` or
- * the async `SubtleCrypto` API, so both sides stay on one pure-TS implementation.
- */
+/** Dependency-free synchronous SHA-256 (FIPS 180-4): `voice-text.ts` derives audio filenames with it, identically in
+ * the browser and Node, without `node:crypto` or async `SubtleCrypto`. */
 
 const K: readonly number[] = [
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
@@ -24,7 +20,6 @@ function rotr(x: number, n: number): number {
   return (x >>> n) | (x << (32 - n));
 }
 
-/** Pads `bytes` to a multiple of 64 bytes per the SHA-256 message schedule. */
 function pad(bytes: Uint8Array): Uint8Array {
   const bitLenHigh = Math.floor(bytes.length / 0x20000000);
   const bitLenLow = (bytes.length << 3) >>> 0;
@@ -44,7 +39,6 @@ function pad(bytes: Uint8Array): Uint8Array {
   return out;
 }
 
-/** SHA-256 digest of `text` (UTF-8), as a lowercase 64-character hex string. */
 export function sha256Hex(text: string): string {
   const message = pad(new TextEncoder().encode(text));
   const h = [...H0];

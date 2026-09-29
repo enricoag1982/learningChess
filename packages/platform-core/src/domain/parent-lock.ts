@@ -6,7 +6,6 @@ export interface ParentLock extends StoredRecord {
   readonly password: string;
   readonly fileLocation: string;
   readonly failedAttempts: number;
-  /** ISO 8601 timestamp until which the gate rejects every attempt; `null` when not locked. */
   readonly lockedUntil: string | null;
 }
 
@@ -19,7 +18,6 @@ export function isValidPassword(password: string): boolean {
   return password.trim().length >= MIN_LENGTH;
 }
 
-/** Fresh lock, no failed attempts, not locked. */
 export function newParentLock(
   id: string,
   password: string,
@@ -38,7 +36,6 @@ export function newParentLock(
   };
 }
 
-/** Sets a new password (parent area "Change password"), resetting attempts and any lock. */
 export function changePassword(
   lock: ParentLock,
   password: string,

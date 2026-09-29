@@ -12,8 +12,6 @@ import { loadJourney } from './journey.ts';
 import type { RewardsRepository } from './ports.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** `deps.rewards`, or a clear error if this `AppDeps` has not wired it up (see `checkRewards` for
- * the permissive, no-op entry point every use case actually calls). */
 function requireRewards(deps: AppDeps): RewardsRepository {
   if (deps.rewards === undefined) {
     throw new Error('AppDeps.rewards is not wired up');
@@ -36,7 +34,6 @@ function perfectLessonsCount(journey: Journey, progresses: readonly LessonProgre
   return count;
 }
 
-/** `'world:<id>'` / `'track:<id>'` for every mastered world/track, from `Journey.worlds`. */
 function masteredScopes(journey: Journey): ReadonlySet<string> {
   const scopes = new Set<string>();
   const worldsByTrack = new Map<string, boolean[]>();
@@ -58,8 +55,7 @@ interface ConceptFacts {
   readonly noHintsInARow: Readonly<Record<string, number>>;
 }
 
-/** Per-concept lifetime/streak facts, from every scored `Attempt` (lesson or review alike), oldest
- * first within each concept. */
+/** Lifetime / streak facts per concept from every scored `Attempt` (lesson or review), oldest first. */
 function conceptFacts(attempts: readonly Attempt[]): ConceptFacts {
   const byConcept = new Map<string, Attempt[]>();
   for (const attempt of attempts) {
@@ -92,9 +88,8 @@ function conceptFacts(attempts: readonly Attempt[]): ConceptFacts {
   return { correctTotal, correctInARow, noHintsInARow };
 }
 
-/** Every fact the badge engine's own 7 generic condition types need, freshly derived from stored
- * profile data + the current `Journey` (the domain engine itself stays pure, `domain/badges.ts`).
- * The other 3 types read `deps.subject.rewards` instead (`evaluateAndRecordBadges`). */
+/** Freshly derived facts for the engine's 7 generic condition types (`domain/badges.ts` stays pure); the other 3 read
+ * `deps.subject.rewards`. */
 export async function buildBadgeFacts(
   deps: AppDeps,
   profileId: string,
@@ -125,7 +120,6 @@ export async function buildBadgeFacts(
   };
 }
 
-/** Evaluates `deps.content.badges()` against fresh facts and persists every newly earned tier. */
 export async function evaluateAndRecordBadges(
   deps: AppDeps,
   profileId: string,
@@ -161,7 +155,6 @@ export async function evaluateAndRecordBadges(
   return saved;
 }
 
-/** Folds today's local calendar day into the profile's streak. */
 export async function recordDailyActivity(
   deps: AppDeps,
   profileId: string,
@@ -177,7 +170,6 @@ export async function recordDailyActivity(
   return updated;
 }
 
-/** Adds `minutes` to today's `SessionLog` row for this profile. */
 export async function recordSessionMinutes(
   deps: AppDeps,
   profileId: string,
@@ -195,15 +187,13 @@ export async function recordSessionMinutes(
   return log;
 }
 
-/** One local calendar day's played minutes (`minutesByDay`'s own result row). */
 export interface DayMinutes {
   readonly date: string;
   readonly minutes: number;
 }
 
-/** A profile's played minutes for the last `days` local calendar days, oldest first, ending today.
- * Each day sums every device's row for that date (`totalMinutesForDate`). `0` without `deps.rewards`
- * wired up, same reasoning as `checkRewards`'s own early return. */
+/** Played minutes for the last `days` local days, oldest first, ending today; each day sums every device's row
+ * (`totalMinutesForDate`). `0` without `deps.rewards`. */
 export async function minutesByDay(
   deps: AppDeps,
   profileId: string,
@@ -218,8 +208,7 @@ export async function minutesByDay(
   return dayStrings.map((date) => ({ date, minutes: totalMinutesForDate(logs, date) }));
 }
 
-/** Stars earned today (sum of every scored `Attempt.stars`, local day) — the "See you tomorrow"
- * screen's celebratory line. Not deduplicated against `bestStars`: a fun daily tally, not a formal one. */
+/** Sum of today's scored `Attempt.stars` for the "See you tomorrow" line; a tally, not deduplicated against `bestStars`. */
 export async function starsToday(deps: AppDeps, profileId: string, now: Date): Promise<number> {
   const attempts = await deps.progress.listAttempts(profileId);
   const today = localDayString(now);
@@ -228,16 +217,13 @@ export async function starsToday(deps: AppDeps, profileId: string, now: Date): P
     .reduce((sum, attempt) => sum + attempt.stars, 0);
 }
 
-/** Outcome of {@link checkRewards}: the streak after today's activity, and any newly earned badges. */
 export interface RewardsCheckResult {
   readonly streak: Streak;
   readonly newBadges: readonly EarnedBadge[];
 }
 
-/** The one call every "activity" choke point makes: folds today into the streak, then evaluates and
- * persists any newly earned badge/tier. Idempotent — a second call for the same event finds
- * nothing new. No-ops (empty result) without `deps.rewards`; badges alone no-op without
- * `deps.content.catalog()`, the streak still counts either way. */
+/** The one call every activity choke point makes: folds today into the streak, then persists newly earned badges/tiers.
+ * Idempotent; no-ops without `deps.rewards`, badges also without `content.catalog()`. */
 export async function checkRewards(deps: AppDeps, profileId: string): Promise<RewardsCheckResult> {
   const now = deps.clock.now();
   if (deps.rewards === undefined) {

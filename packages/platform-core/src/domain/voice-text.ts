@@ -5,9 +5,8 @@ const CURLY_DOUBLE_QUOTES = /[“”]/g;
 const DASHES = /[‐‑‒–—―]/g;
 const WHITESPACE_RUN = /\s+/g;
 
-/** Normalises narrated text before it becomes a generated-audio key: trims, collapses whitespace,
- * folds curly quotes/dashes to one plain form each, so a typographic `'`/em dash still maps to the
- * same key as a plain `'`/`-`. */
+/** Trims, collapses whitespace, folds curly quotes/dashes to one plain form each, so typographic and plain
+ * characters map to the same audio key. */
 export function normalizeVoiceText(text: string): string {
   return text
     .replace(CURLY_SINGLE_QUOTES, "'")
@@ -17,7 +16,6 @@ export function normalizeVoiceText(text: string): string {
     .replace(WHITESPACE_RUN, ' ');
 }
 
-/** Escapes every regex metacharacter in `text`, so it can be dropped into a `RegExp` literally. */
 function escapeRegExp(text: string): string {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

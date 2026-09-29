@@ -2,12 +2,10 @@
 // (`SubjectCore.notes`/`noteVars`) on top of this.
 import type { Stars } from './progress.ts';
 
-/** Resolves an i18n key (+ interpolation vars) to text — `TFunction` satisfies this. */
 export type Resolve = (key: string, vars?: Readonly<Record<string, string | number>>) => string;
 
-/** What the Owl bubble should say right now; a subject's own feedback type extends this with its
- * own literal `kind`s and fields (the index signature lets a kind's own feedback literal, e.g.
- * `{ kind: 'opponent-reply', reply }`, assign straight into a generically-typed `feedback` slot). */
+/** What the Owl bubble says now; a subject's feedback type extends it with its own `kind`s (the index signature lets
+ * a kind's literal, e.g. `{ kind: 'opponent-reply', reply }`, assign into a generic `feedback` slot). */
 export interface ExerciseFeedbackBase {
   readonly kind: string;
   readonly [field: string]: unknown;
@@ -26,9 +24,8 @@ export interface ExerciseNote {
   readonly tone: 'attention' | 'praise';
 }
 
-/** One feedback kind's note: `text` is method syntax (deliberate, same reason as `ExerciseKind`):
- * bivariant parameter checking lets each subject's precise `NoteEntry<F>` widen to `AnyNoteEntry`
- * (`exerciseNote`'s dispatch) with no cast. */
+/** One feedback kind's note. `text` is method syntax (deliberate): bivariance lets a subject's precise `NoteEntry<F>`
+ * widen to `AnyNoteEntry` with no cast. */
 export interface NoteEntry<F extends ExerciseFeedbackBase = ExerciseFeedbackBase> {
   readonly tone: 'attention' | 'praise';
   /** Set on the feedback kinds the easier-variant offer piggybacks on (never a hint, toggle or undo). */
@@ -38,7 +35,6 @@ export interface NoteEntry<F extends ExerciseFeedbackBase = ExerciseFeedbackBase
 
 export type AnyNoteEntry = NoteEntry;
 
-/** `notes[kind]`, widened to `AnyNoteEntry`. */
 function noteEntryOf(
   notes: Readonly<Record<string, AnyNoteEntry>>,
   kind: string,
@@ -46,8 +42,6 @@ function noteEntryOf(
   return notes[kind];
 }
 
-/** True for the feedback kinds the easier-variant offer piggybacks on (never a hint, toggle or
- * undo) — the one place besides `exerciseNote` itself that needs to know. */
 export function isEasierOfferNote(
   notes: Readonly<Record<string, AnyNoteEntry>>,
   kind: string,
@@ -55,9 +49,8 @@ export function isEasierOfferNote(
   return noteEntryOf(notes, kind)?.error === true;
 }
 
-/** The note under the instruction for the current feedback, or `undefined` while just reading the
- * instruction (teaching-process.md §3.3) or for a kind `notes` has no entry for. `offer` appends
- * the easier-variant sentence on an error note (never on a hint, toggle or undo). */
+/** The note under the instruction for the current feedback; `undefined` while just reading it (teaching-process.md
+ * §3.3) or for a kind without an entry. `offer` appends the easier-variant sentence to error notes. */
 export function exerciseNote(
   r: Resolve,
   feedback: ExerciseFeedbackBase,

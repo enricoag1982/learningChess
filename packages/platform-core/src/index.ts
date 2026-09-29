@@ -148,8 +148,7 @@ export type { ChildOverview, ChildReport } from './app/report.ts';
 export { buildChildOverview, buildChildReport } from './app/report.ts';
 
 export type { BackupFile } from './app/backup.ts';
-// Backup/merge values (zod validation) live behind `@chess-kids/core/backup`/`/merge` so zod stays
-// out of the main bundle and the bot worker; only the parent area imports them.
+// Backup / merge values (zod) live behind `@learn/platform-core/backup` and `/merge` so zod stays out of the main bundle and the bot worker.
 
 export { getProfileSettings, updateProfileSettings } from './app/settings.ts';
 
@@ -171,11 +170,9 @@ export {
   selectProfile,
 } from './app/profiles.ts';
 
-// Exercise-kind base abstraction (subject-free): every subject's kind registry is built on this;
-// the chess kinds and their registry live behind `./chess` (`@chess-kids/core/chess`).
+// Exercise-kind base abstraction; each subject builds its kind registry on it.
 export type { TextKeyRef } from './domain/exercise/kind.ts';
 
-// The `series` mini-game mode: subject-free, rounds of any exercise type.
 export type { SeriesGameDef, SeriesGameState } from './domain/exercise/modes/series/def.ts';
 export {
   startSeries,
@@ -185,8 +182,7 @@ export {
   seriesStars,
 } from './domain/exercise/modes/series/engine.ts';
 
-// `SubjectCore`/`AppConfig` and `createSubjectRuntime`: a subject's kind/mode registries + app
-// identifiers, injected via `AppDeps.subject`/`AppDeps.app`, never imported directly.
+// A subject's kind/mode registries and app identifiers, injected via `AppDeps.subject` / `AppDeps.app`.
 export type {
   AnyKind,
   SubjectCore,

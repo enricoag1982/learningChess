@@ -3,7 +3,6 @@ import { lessonStatus, totalStars } from './progress.ts';
 import type { LessonProgress, MiniGameProgress } from './progress.ts';
 import type { ExerciseDefBase } from './subject.ts';
 
-/** Fixed set of habitats a world can be set in (app-structure.md §8: one habitat per world). */
 export const HABITATS = [
   'meadow',
   'savannah',
@@ -17,21 +16,15 @@ export const HABITATS = [
 
 export type Habitat = (typeof HABITATS)[number];
 
-/** One world in a track: one habitat, `lessons[]` are derived from compiled content (`worldLessons`). */
 export interface World {
   readonly id: string;
-  /** Track id this world belongs to. */
   readonly track: string;
   /** 1-based order within its track. */
   readonly order: number;
   readonly habitat: Habitat;
   readonly titleKey: string;
-  /**
-   * Id of this world's boss mini-game (domain-model.md §3 "World mastered"), if it has one.
-   * Distinct from a lesson's own `boss` (its per-lesson mini-game): a world boss is played once
-   * every lesson of the world is complete, gates the world's mastery, and is not tied to any one
-   * lesson's boss slot.
-   */
+  /** Id of this world's boss mini-game (domain-model.md §3); unlike a lesson's `boss`, played once every lesson
+   * is complete, and gates mastery. */
   readonly boss?: string;
 }
 
@@ -43,37 +36,25 @@ export interface Track {
   readonly worlds: readonly World[];
 }
 
-/**
- * A rank's unlock condition: `'start'` (always), `'world:<id>'`, `'track:<id>'` or `'all-tracks'`
- * (domain-model.md §1, Rank).
- */
+/** Unlock condition: `'start'`, `'world:<id>'`, `'track:<id>'` or `'all-tracks'` (domain-model.md §1). */
 export interface RankDef {
   readonly id: string;
   readonly after: string;
 }
 
-/** Whole tracks/worlds/ranks catalog, compiled from `tracks.yaml`. */
 export interface TracksCatalog {
   readonly tracks: readonly Track[];
   readonly ranks: readonly RankDef[];
 }
 
-/** A lesson's status on the Journey map (domain-model.md §3). */
 export type JourneyLessonStatus = 'locked' | 'available' | 'complete' | 'mastered';
 
 /** A world's status on the Journey map. `coming-soon`: no lesson has been authored for it yet. */
 export type WorldStatus = 'locked' | 'available' | 'mastered' | 'coming-soon';
 
-/**
- * A world boss's status (domain-model.md §3): `none` when the world has no boss (`World.boss` is
- * unset); otherwise `locked` / `available` / `won` — see {@link worldBossStatus}.
- */
 export type WorldBossStatus = 'none' | 'locked' | 'available' | 'won';
 
-/**
- * `lessons` belonging to `world`, sorted by `order`. A world with no authored lessons yet (content
- * not written) has none: callers treat that as `coming-soon` (see {@link worldStatus}).
- */
+/** `lessons` of `world` by `order`; none means `coming-soon` (see {@link worldStatus}). */
 export function worldLessons<
   E extends ExerciseDefBase,
   Demo extends { readonly textKey: string } = { readonly textKey: string },
@@ -88,11 +69,7 @@ function worldsSorted(track: Track): readonly World[] {
   return track.worlds.slice().sort((a, b) => a.order - b.order);
 }
 
-/**
- * Every lesson of the main track, in Journey/session order (worlds sorted by `order`, each
- * world's lessons via `worldLessons`). Branch tracks are left out: they only ever open once the
- * whole main track is mastered.
- */
+/** Main-track lessons in Journey/session order; branch tracks open only once the main track is mastered. */
 export function mainTrackLessons<
   E extends ExerciseDefBase,
   Demo extends { readonly textKey: string } = { readonly textKey: string },
@@ -102,7 +79,6 @@ export function mainTrackLessons<
   return worldsSorted(mainTrack).flatMap((world) => worldLessons(world, lessons));
 }
 
-/** The world with this id, in whichever track of `catalog` has it, or `undefined` if none does. */
 export function findWorld(catalog: TracksCatalog, worldId: string): World | undefined {
   for (const track of catalog.tracks) {
     const found = track.worlds.find((world) => world.id === worldId);
@@ -113,7 +89,6 @@ export function findWorld(catalog: TracksCatalog, worldId: string): World | unde
   return undefined;
 }
 
-/** Every world's `order`, by world id, across all tracks. */
 export function worldOrderById(catalog: TracksCatalog): Map<string, number> {
   return new Map(
     catalog.tracks.flatMap((track) =>
@@ -136,12 +111,8 @@ function isWorldBossWon(world: World, miniGames?: readonly MiniGameProgress[]): 
   );
 }
 
-/**
- * World mastered (domain-model.md §3): every authored lesson mastered, every lesson with a boss
- * has `bossStars >= 2` ("boss won"), and — when the world has its own boss (`World.boss`) — that
- * boss is won too. A `coming-soon` world (no authored lessons) is never naturally mastered; see
- * {@link isWorldEffectivelyMastered} for the parent-unlock override.
- */
+/** Every authored lesson mastered, every lesson boss `bossStars >= 2`, and the world boss won (domain-model.md §3).
+ * A `coming-soon` world never masters; see {@link isWorldEffectivelyMastered}. */
 function isWorldMastered(
   world: World,
   lessons: readonly Lesson[],
@@ -163,12 +134,8 @@ function isWorldMastered(
   return lessonsMastered && isWorldBossWon(world, miniGames);
 }
 
-/**
- * `isWorldMastered`, or the world was unlocked by a parent/test-out (`unlocked` holds its id):
- * counts as mastered for gating the next world/track/rank, per `LessonProgress.masteredVia`
- * (`'parent'`) — the parent area (a later task) is what actually adds ids to this set. The
- * override also stands in for an unwon world boss (domain-model.md §3).
- */
+/** `isWorldMastered`, or unlocked by a parent/test-out (`unlocked` holds its id); also stands in for an unwon
+ * world boss (domain-model.md §3). */
 function isWorldEffectivelyMastered(
   world: World,
   lessons: readonly Lesson[],
@@ -179,7 +146,6 @@ function isWorldEffectivelyMastered(
   return isWorldMastered(world, lessons, progresses, miniGames) || unlocked?.has(world.id) === true;
 }
 
-/** Track mastered (domain-model.md §3): all its worlds effectively mastered. */
 function isTrackMastered(
   track: Track,
   lessons: readonly Lesson[],
@@ -210,12 +176,8 @@ function isTrackAvailable(
   );
 }
 
-/**
- * World available (domain-model.md §3): previous world in the track mastered (first world: track
- * available). A `coming-soon` predecessor never blocks — it is skipped when looking for the
- * nearest previous world with authored content, so a later world can still open up (e.g. while
- * content is authored out of order) instead of being locked forever behind unwritten lessons.
- */
+/** Previous world in the track mastered (first world: track available); a `coming-soon` predecessor is skipped
+ * so later worlds can open when content is authored out of order. */
 function isWorldAvailable(
   catalog: TracksCatalog,
   world: World,
@@ -240,13 +202,8 @@ function isWorldAvailable(
   return isTrackAvailable(catalog, track, lessons, progresses, unlocked, miniGames);
 }
 
-/**
- * World status for the Journey map (domain-model.md §3). `unlocked` (lesson/world ids from a
- * parent unlock or test-out) makes a world `available` even where the natural rule would lock it;
- * it does not apply to a `coming-soon` world (there is nothing to show yet). `miniGames` (a
- * profile's standalone mini-game progress) decides whether this world's own boss, if it has one,
- * is won — needed for `mastered`.
- */
+/** Journey-map status (domain-model.md §3). `unlocked` makes a world `available` past the natural rule (not
+ * `coming-soon`); `miniGames` decides whether its boss is won (`mastered`). */
 export function worldStatus(
   catalog: TracksCatalog,
   world: World,
@@ -269,12 +226,8 @@ export function worldStatus(
     : 'locked';
 }
 
-/**
- * A world boss's status (domain-model.md §3): `none` when the world has no boss. Otherwise `won`
- * once its mini-game has any win (`MiniGameProgress.wins >= 1`, from the Journey node or the Play
- * screen); else `available` once every authored lesson of the world is `complete` or better and
- * the world itself is not locked (or `coming-soon`); else `locked`.
- */
+/** `none` without a boss; `won` on any win of its mini-game (Journey or Play); `available` once every authored
+ * lesson is `complete` or better and the world is unlocked; else `locked`. */
 export function worldBossStatus(
   catalog: TracksCatalog,
   world: World,
@@ -302,13 +255,8 @@ export function worldBossStatus(
   return allLessonsDone ? 'available' : 'locked';
 }
 
-/**
- * Per-lesson status for the Journey map (domain-model.md §3): first lesson of a world is
- * `available` when the world is `available` or `mastered`; each next lesson becomes reachable
- * once the previous one is `complete` (a `mastered` lesson also satisfies this — mastery implies
- * at least as much progress as completion). `unlocked` lesson ids are always reachable and count
- * as satisfying that gate for the lesson after them, same as a `complete` one.
- */
+/** First lesson of a world is available with the world; the next once the previous is `complete`+ (`mastered` implies
+ * it); `unlocked` ids are always reachable and satisfy the gate after them (domain-model.md §3). */
 export function lessonAvailability(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
@@ -344,7 +292,6 @@ export function lessonAvailability(
   return result;
 }
 
-/** Total stars earned across a track's authored lessons (used to rank branch tracks by progress). */
 function trackStars(
   track: Track,
   lessons: readonly Lesson[],
@@ -356,11 +303,8 @@ function trackStars(
   return totalStars(progresses.filter((progress) => lessonIds.has(progress.lessonId)));
 }
 
-/**
- * Tracks in session priority order (domain-model.md §3.3): the main track first, then branch
- * tracks by fewest stars earned so far (ties broken by catalog order) — shared by `nextLesson` and
- * `nextStep` so both scan tracks/worlds in the same order.
- */
+/** Session priority (domain-model.md §3.3): main track, then branch tracks by fewest stars (ties: catalog order);
+ * shared by `nextLesson` and `nextStep`. */
 function orderedTracksForNext(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],
@@ -379,13 +323,8 @@ function orderedTracksForNext(
   return mainTrack === undefined ? branchTracks : [mainTrack, ...branchTracks];
 }
 
-/**
- * First available-but-not-complete lesson (domain-model.md §3.3 session order): main-track order
- * first, then the least advanced branch track (fewest stars earned so far, ties broken by catalog
- * order) once Basics is mastered. `null` when nothing is left to do (including: blocked on an
- * available-but-unwon world boss — see {@link nextStep} for that case). The branch-track tie-break
- * is a simple placeholder — refine once more than one branch track has authored content.
- */
+/** First available-but-not-complete lesson (§3.3): main track, then the least advanced branch track; `null` when done
+ * or blocked on an unwon world boss ({@link nextStep}). Branch tie-break is a placeholder until a 2nd branch has content. */
 export function nextLesson<
   E extends ExerciseDefBase,
   Demo extends { readonly textKey: string } = { readonly textKey: string },
@@ -419,13 +358,8 @@ export function nextLesson<
   return null;
 }
 
-/**
- * The next thing to do on the Journey (domain-model.md §3.3, extended for world bosses): the next
- * available lesson (same as {@link nextLesson}), or — once a world's lessons are all done and its
- * boss is `available` but not yet won — that world boss. Scans tracks/worlds in the same priority
- * order as `nextLesson`, so at most one boss can ever be "next" (an earlier one blocks anything
- * after it). `null` once every lesson and every world boss is done.
- */
+/** Next lesson ({@link nextLesson}) or, once a world's lessons are done, its available unwon boss (an earlier boss
+ * blocks later ones); `null` when all done. */
 export type NextStep<
   E extends ExerciseDefBase = ExerciseDefBase,
   Demo extends { readonly textKey: string } = { readonly textKey: string },
@@ -460,7 +394,6 @@ export function nextStep<
   return null;
 }
 
-/** True when a rank's `after` condition is satisfied. */
 function isRankSatisfied(
   after: string,
   catalog: TracksCatalog,
@@ -491,11 +424,7 @@ function isRankSatisfied(
   return false;
 }
 
-/**
- * Highest rank whose `after` condition is satisfied (domain-model.md §3), assuming `catalog.ranks`
- * is listed from easiest to hardest (as authored in `tracks.yaml`). `undefined` only if `ranks` is
- * empty.
- */
+/** Highest rank whose `after` is satisfied, assuming `catalog.ranks` runs easiest to hardest; `undefined` when empty. */
 export function currentRank(
   catalog: TracksCatalog,
   lessons: readonly Lesson[],

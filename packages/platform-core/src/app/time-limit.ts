@@ -18,10 +18,8 @@ import { getOrCreateDeviceId } from './device.ts';
 import { getProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** This device's own session-log row for `now`'s local day, with `minutes` replaced by the sum of
- * every device's row for that same profile + date: the daily limit, remaining-minutes count and
- * 5-minute warning read combined play, while `extraMinutes`/`hoursOverrideUntil`/`warnedAt` stay
- * this device's own (a parent's grant or warning is per device, never shared). */
+/** This device's row for `now`'s day with `minutes` replaced by the sum over all devices (limit, remaining count, warning
+ * read combined play); `extraMinutes`/`hoursOverrideUntil`/`warnedAt` stay per device. */
 export async function combinedSessionLog(
   deps: AppDeps,
   profileId: string,
@@ -40,33 +38,25 @@ export async function combinedSessionLog(
   return minutes === local.minutes ? local : { ...local, minutes };
 }
 
-/** Why the activity gate is blocking right now: over the daily limit, or outside the allowed-hours
- * window (too late / too early); `null` while none apply. */
+/** Why the gate blocks: over the daily limit, or outside the allowed hours (too late / too early). */
 export type TimeLimitReason = 'limit' | 'late' | 'early';
 
-/** What the activity gate found: whether `profileId` is blocked right now, why, plus the numbers
- * the "See you tomorrow" screen and the parent area show. */
+/** What the activity gate found: blocked or not, why, plus the numbers "See you tomorrow" and the parent area show. */
 export interface TimeLimitStatus {
-  /** `true` whenever `reason` is not `null`. */
   readonly overLimit: boolean;
   /** `null` = limit off, this device-local day (weekday vs weekend, `limitForDay`). */
   readonly limitMinutes: number | null;
   readonly usedMinutes: number;
-  /** Parent "more time" already granted today, on top of `limitMinutes`. */
   readonly extraMinutes: number;
-  /** Which boundary is blocking right now, or `null` while under every one of them. */
   readonly reason: TimeLimitReason | null;
-  /** Minutes left before the nearest boundary (daily limit or `playUntil`), `null` when neither is
-   * set — the 5-minute warning's own number, carried here so both read the same value. */
+  /** Minutes to the nearest boundary (daily limit or `playUntil`); `null` when neither is set; also the warning's number. */
   readonly remainingMinutes: number | null;
-  /** `ProfileSettings.playFrom` as read for this check, `null` if off/absent — the "Too early!"
-   * screen's `{{time}}`. Carried here since the store's own copy only refreshes on profile select. */
+  /** `ProfileSettings.playFrom` as read for this check (the "Too early!" `{{time}}`); the store's copy only refreshes on profile select. */
   readonly playFrom: string | null;
 }
 
-/** Activity gate: reads the profile's settings and today's session log, and reports whether it is
- * blocked right now — over the daily limit, or outside allowed hours (hours checked first). A pure
- * read; permissive without `deps.rewards` wired up (reads as under limit, `usedMinutes: 0`). */
+/** Pure read: is the profile blocked now (hours are checked before the daily limit)? Permissive without `deps.rewards`
+ * (under limit, `usedMinutes: 0`). */
 export async function checkActivityGate(
   deps: AppDeps,
   profileId: string,
@@ -88,7 +78,6 @@ export async function checkActivityGate(
   };
 }
 
-/** Rewrites today's session log through `update` and saves it; throws without `deps.rewards` wired up. */
 async function updateTodaysLog(
   deps: AppDeps,
   profileId: string,
@@ -113,8 +102,7 @@ async function updateTodaysLog(
   return log;
 }
 
-/** Parent "more time": grants {@link EXTRA_TIME_GRANT_MINUTES} more for today, on top of the daily
- * limit. Repeatable (each tap adds another); throws without `deps.rewards` wired up. */
+/** Parent "more time": {@link EXTRA_TIME_GRANT_MINUTES} more today, repeatable; throws without `deps.rewards`. */
 export function grantExtraTime(deps: AppDeps, profileId: string): Promise<SessionLog> {
   return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
     grantExtraMinutes(
@@ -129,9 +117,8 @@ export function grantExtraTime(deps: AppDeps, profileId: string): Promise<Sessio
   );
 }
 
-/** Parent "more time" for a late/early gate: grants {@link HOURS_OVERRIDE_MINUTES} from now,
- * regardless of `playUntil`/`playFrom`. Repeatable (resets the window, does not stack); throws
- * without `deps.rewards` wired up. */
+/** Parent "more time" at a late/early gate: {@link HOURS_OVERRIDE_MINUTES} from now, the window resets rather than stacks;
+ * throws without `deps.rewards`. */
 export function grantHoursOverride(deps: AppDeps, profileId: string): Promise<SessionLog> {
   return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
     setHoursOverride(
@@ -146,8 +133,7 @@ export function grantHoursOverride(deps: AppDeps, profileId: string): Promise<Se
   );
 }
 
-/** Marks the 5-minute warning shown for today, so `shouldWarn` never shows it twice the same day.
- * Throws without `deps.rewards` wired up. */
+/** Marks the 5-minute warning shown today; throws without `deps.rewards`. */
 export function markTimeWarning(deps: AppDeps, profileId: string): Promise<SessionLog> {
   return updateTodaysLog(deps, profileId, (existing, date, now, deviceId) =>
     markWarnedLog(existing, deps.ids.next(), profileId, date, now, deviceId),

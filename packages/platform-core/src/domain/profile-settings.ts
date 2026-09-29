@@ -1,5 +1,4 @@
-/** Fields every profile's settings carry regardless of subject. `null` on `dailyLimitMinutes` =
- * daily limit off. */
+/** Subject-independent settings; `dailyLimitMinutes: null` = limit off. */
 export interface ProfileSettingsBase {
   /** "Every day" limit once the weekend toggle is off, else the school-days (Mon–Fri) limit. */
   readonly dailyLimitMinutes: number | null;
@@ -18,16 +17,12 @@ export interface ProfileSettingsBase {
   readonly updatedAt?: string;
 }
 
-/** The full per-profile settings shape: `ProfileSettingsBase` plus whatever the subject's own
- * settings slot adds (chess: `computerLevel`, `pieceStyle`), via module augmentation in the
- * subject's own settings file. */
+/** Base plus the subject's own fields (chess: `computerLevel`, `pieceStyle`) via module augmentation. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented by the subject.
 export interface ProfileSettings extends ProfileSettingsBase {}
 
-/** Daily limit choices: off, or 15/20/30/45/60 minutes. Reused for the weekend limit. */
 export const DAILY_LIMIT_OPTIONS: readonly (number | null)[] = [null, 15, 20, 30, 45, 60];
 
-/** "Play until" choices: off, or a fixed evening cutoff. */
 export const PLAY_UNTIL_OPTIONS: readonly (string | null)[] = [
   null,
   '18:00',
@@ -38,11 +33,9 @@ export const PLAY_UNTIL_OPTIONS: readonly (string | null)[] = [
   '21:00',
 ];
 
-/** "Not before" choices: off, or a fixed morning start. */
 export const PLAY_FROM_OPTIONS: readonly (string | null)[] = [null, '07:00', '08:00', '09:00'];
 
-/** A brand-new profile's platform-only defaults; a subject's own fields (chess: computer level,
- * piece style) come from its settings slot — see {@link composeDefaultSettings}. */
+/** Platform-only defaults; a subject's fields come from its settings slot ({@link composeDefaultSettings}). */
 export const DEFAULT_PROFILE_SETTINGS_BASE: ProfileSettingsBase = {
   dailyLimitMinutes: null,
   voice: true,
@@ -50,22 +43,18 @@ export const DEFAULT_PROFILE_SETTINGS_BASE: ProfileSettingsBase = {
   hints: true,
 };
 
-/** `true` for any of {@link DAILY_LIMIT_OPTIONS}. */
 export function isValidDailyLimit(value: number | null): boolean {
   return DAILY_LIMIT_OPTIONS.includes(value);
 }
 
-/** `true` for `undefined` (absent = same as `dailyLimitMinutes`) or any of {@link DAILY_LIMIT_OPTIONS}. */
 export function isValidWeekendLimit(value: number | null | undefined): boolean {
   return value === undefined || isValidDailyLimit(value);
 }
 
-/** `true` for `undefined`/`null` (off) or any of {@link PLAY_UNTIL_OPTIONS}. */
 export function isValidPlayUntil(value: string | null | undefined): boolean {
   return value === undefined || PLAY_UNTIL_OPTIONS.includes(value);
 }
 
-/** `true` for `undefined`/`null` (off) or any of {@link PLAY_FROM_OPTIONS}. */
 export function isValidPlayFrom(value: string | null | undefined): boolean {
   return value === undefined || PLAY_FROM_OPTIONS.includes(value);
 }
@@ -78,8 +67,6 @@ export function composeDefaultSettings(subject: {
   return { ...DEFAULT_PROFILE_SETTINGS_BASE, ...subject.defaults } as ProfileSettings;
 }
 
-/** `true` when every platform field of `settings` is valid and `subject.isValid` accepts the rest
- * (chess: computer level, piece style). */
 export function isValidProfileSettings(
   subject: { readonly isValid: (s: Readonly<Record<string, unknown>>) => boolean },
   settings: ProfileSettings,

@@ -1,9 +1,7 @@
 import type { Lesson } from './lesson.ts';
 import type { ExerciseDefBase, ExerciseStateBase, MiniGameBase } from './subject.ts';
 
-/** One screen of a lesson session, in play order — generic in the subject's own exercise def (`E`)
- * and mini-game (`M`) so a caller with concrete types (chess: `ExerciseDef`, `MiniGame`) gets them
- * back on `exercise`/`game`, inferred from `lessonSteps`'s own arguments. */
+/** One screen of a lesson session, in play order; generic so callers keep their concrete exercise / mini-game types. */
 export type LessonStep<
   E extends ExerciseDefBase = ExerciseDefBase,
   M extends MiniGameBase = MiniGameBase,
@@ -15,13 +13,11 @@ export type LessonStep<
   | { readonly kind: 'boss'; readonly game: M }
   | { readonly kind: 'complete' };
 
-/** UI phase grouping for a step; guided tries and the demo are distinct from scored exercises. */
 export type LessonPhase = 'story' | 'demo' | 'try' | 'exercises' | 'boss';
 
 /** Phases the kid can "Skip" past: never exercises/boss — those are always scored. */
 export type SkippablePhase = 'story' | 'demo' | 'try';
 
-/** True for a phase the "Skip" button ever appears on. */
 export function isSkippablePhase(phase: LessonPhase | null): phase is SkippablePhase {
   return phase === 'story' || phase === 'demo' || phase === 'try';
 }
@@ -62,7 +58,6 @@ export const EASIER_AFTER_ERRORS = 2;
 /** Stars an exercise is credited when the kid solves its easier variant instead (the "completed" tier). */
 export const EASIER_VARIANT_STARS = 1;
 
-/** `exercise`'s easier variant from `lesson.variants`, if it names one that exists. */
 export function easierVariant<E extends ExerciseDefBase>(
   lesson: Lesson<E>,
   exercise: E,
@@ -73,7 +68,6 @@ export function easierVariant<E extends ExerciseDefBase>(
   return lesson.variants?.find((variant) => variant.id === exercise.easier);
 }
 
-/** True once an unsolved exercise has `EASIER_AFTER_ERRORS` or more errors. */
 export function shouldOfferEasier(state: ExerciseStateBase): boolean {
   return !state.solved && state.errors >= EASIER_AFTER_ERRORS;
 }

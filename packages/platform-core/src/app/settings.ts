@@ -14,8 +14,7 @@ export async function getProfileSettings(
   return stored === undefined ? defaults : { ...defaults, ...stored };
 }
 
-/** Parent area "Settings per child": merges `patch` into this profile's current settings and
- * persists it. Voice/sound/hints/computer level take effect the next time the profile is selected. */
+/** Merges `patch` into the profile's settings; voice/sound/hints/computer level apply the next time the profile is selected. */
 export async function updateProfileSettings(
   deps: AppDeps,
   profileId: string,

@@ -13,27 +13,23 @@ import { buildBackupFile, requireBackupImporter } from './backup.ts';
 import { getOrCreateDeviceId } from './device.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** One incoming child's chosen fate: `'add-new'` creates a fresh local profile from the incoming
- * one (id kept — only applies when it matches no local profile); `'merge'` combines its data into
- * `localProfileId` (re-keyed first when that id differs). */
+/** `'add-new'` creates a local profile (id kept; only when it matches none); `'merge'` combines into `localProfileId`
+ * (re-keyed first when the id differs). */
 export interface ChildImportChoice {
   readonly incomingProfileId: string;
   readonly kind: 'add-new' | 'merge';
   readonly localProfileId?: string;
 }
 
-/** One incoming child's import-preview row (`app/merge.ts`'s `planImport`). */
 export interface ChildImportPlan {
   readonly incomingProfile: Profile;
   /** `true`: this incoming child's id already matches a local profile — merges automatically, no
    * choice control shown. */
   readonly autoMerge: boolean;
   readonly defaultChoice: ChildImportChoice;
-  /** Every local profile, for the "Merge into …" control's own options; `[]` on a fresh device. */
   readonly localProfiles: readonly Profile[];
 }
 
-/** The whole import preview (`app/merge.ts`'s `planImport`): one row per incoming child. */
 export interface ImportPlan {
   readonly incomingFile: BackupFile;
   readonly children: readonly ChildImportPlan[];
@@ -44,9 +40,8 @@ function nicknameKey(nickname: string): string {
   return nickname.trim().toLowerCase();
 }
 
-/** Parent area "Import" preview: for each incoming child, whether it merges automatically (same
- * profile id already exists locally) or needs a choice, defaulting to a nickname match else "Add
- * as new child". Read-only: touches no storage. */
+/** Import preview: per incoming child, auto-merge (same profile id exists) or a choice, defaulting to a nickname match
+ * else "Add as new child". Read-only. */
 export async function planImport(deps: AppDeps, incomingFile: BackupFile): Promise<ImportPlan> {
   const localProfiles = await deps.profiles.list();
   const localById = new Map(localProfiles.map((profile) => [profile.id, profile]));
@@ -86,8 +81,7 @@ export async function planImport(deps: AppDeps, incomingFile: BackupFile): Promi
  * this week" card uses (`app/report.ts`'s `OVERVIEW_MINUTES_DAYS`). */
 const PREVIEW_MINUTES_DAYS = 7;
 
-/** What choosing `choice` would change for one incoming child (import preview's "+12 stars, +3
- * badges, +45 min this week" line). */
+/** What `choice` would change for one incoming child ("+12 stars, +3 badges, +45 min this week"). */
 export interface ImportChangeSummary {
   readonly starsDelta: number;
   readonly badgesDelta: number;
@@ -96,9 +90,8 @@ export interface ImportChangeSummary {
 
 const NO_CHANGE: ImportChangeSummary = { starsDelta: 0, badgesDelta: 0, minutesThisWeekDelta: 0 };
 
-/** Computes {@link ImportChangeSummary} for one incoming child under `choice`, against this
- * device's current stored data (read fresh each call). `'add-new'`: every incoming number.
- * `'merge'`: the merged result vs. what `localProfileId` has today. */
+/** Against this device's current data (read fresh). `'add-new'`: every incoming number; `'merge'`: the merged result vs
+ * what `localProfileId` has today. */
 export async function previewChildChange(
   deps: AppDeps,
   incomingFile: BackupFile,
@@ -136,9 +129,8 @@ export async function previewChildChange(
   };
 }
 
-/** Which local profile id (if any) `incoming` merges into, given `choice` (or its absence — the
- * same nickname-match default `planImport` offers). `null` = "add as new child". A same-id match
- * always wins over `choice`. */
+/** Local profile id `incoming` merges into given `choice` (absent: the nickname-match default of `planImport`); `null` =
+ * add as new child. A same-id match wins over `choice`. */
 function resolveMergeTarget(
   incoming: Profile,
   choice: ChildImportChoice | undefined,
@@ -151,15 +143,13 @@ function resolveMergeTarget(
   return choice.localProfileId ?? localByNickname.get(nicknameKey(incoming.nickname)) ?? null;
 }
 
-/** Outcome of {@link importMerged}: the device's totals after the import. */
 export interface ImportMergedResult {
   readonly profileCount: number;
   readonly totalStars: number;
 }
 
-/** Parent area "Merge": folds `incomingFile`'s children into this device's current, full dataset
- * per `choices` (falling back to {@link planImport}'s default), and atomically writes the result.
- * Idempotent end to end: importing the same file twice changes nothing further. */
+/** Parent "Merge": folds `incomingFile`'s children into the full local dataset per `choices` (default: {@link planImport}),
+ * written atomically. Idempotent: the same file twice changes nothing further. */
 export async function importMerged(
   deps: AppDeps,
   incomingFile: BackupFile,

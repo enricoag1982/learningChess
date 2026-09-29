@@ -8,7 +8,6 @@ import { newProfile, validateNickname } from '../domain/profile.ts';
 import type { Profile } from '../domain/profile.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** True until a parent password has been set up (first run sets it). */
 export async function isFirstRun(deps: AppDeps): Promise<boolean> {
   const lock = await deps.parentLock.get();
   return lock === undefined;
@@ -18,7 +17,6 @@ export interface PasswordFileLocation {
   readonly location: string;
 }
 
-/** First-run parent password: writes the password file, then saves the lock. */
 export async function setupParentPassword(
   deps: AppDeps,
   password: string,
@@ -32,7 +30,6 @@ export async function setupParentPassword(
   return { location };
 }
 
-/** Parent area "Change password": validates, rewrites the file, resets attempts and any lock. */
 export async function changeParentPassword(
   deps: AppDeps,
   password: string,
@@ -50,8 +47,7 @@ export async function changeParentPassword(
   return { location };
 }
 
-/** Parent area "Download code file": writes the current code to a file again (a parent who lost
- * the first copy) and remembers the new location for the grown-ups screen's "Forgot it?" hint. */
+/** Rewrites the code file (lost first copy) and remembers the new location for the "Forgot it?" hint. */
 export async function downloadParentCodeFile(deps: AppDeps): Promise<PasswordFileLocation> {
   const lock = await deps.parentLock.get();
   if (!lock) {
@@ -68,11 +64,9 @@ export async function downloadParentCodeFile(deps: AppDeps): Promise<PasswordFil
 
 export interface VerifyPasswordResult {
   readonly ok: boolean;
-  /** Milliseconds still to wait before the next attempt; `0` unless a lock is in effect. */
   readonly waitMs: number;
 }
 
-/** Checks a parent-area password attempt, persisting the updated attempt/lock state either way. */
 export async function verifyParentPassword(
   deps: AppDeps,
   input: string,
@@ -86,12 +80,10 @@ export async function verifyParentPassword(
   return { ok: result.ok, waitMs: result.waitMs };
 }
 
-/** Every profile on this device, in repository order (id creation order). */
 export async function listProfiles(deps: AppDeps): Promise<Profile[]> {
   return deps.profiles.list();
 }
 
-/** Creates a new player profile (new-player wizard: nickname, then avatar). */
 export async function createProfile(
   deps: AppDeps,
   nickname: string,
@@ -113,7 +105,6 @@ async function requireProfile(deps: AppDeps, profileId: string): Promise<Profile
   return existing;
 }
 
-/** Parent area: renames a child's profile. */
 export async function renameProfile(
   deps: AppDeps,
   profileId: string,
@@ -132,7 +123,6 @@ export async function renameProfile(
   return updated;
 }
 
-/** Parent area: changes a child's avatar. */
 export async function changeAvatar(
   deps: AppDeps,
   profileId: string,
@@ -144,8 +134,7 @@ export async function changeAvatar(
   return updated;
 }
 
-/** Parent area "Delete": removes the profile and every saved lesson-progress/attempt record for it,
- * and clears `lastProfileId` in settings if this was the last-used profile. */
+/** Removes the profile and its saved records; clears `lastProfileId` when it was the last-used profile. */
 export async function deleteProfile(deps: AppDeps, profileId: string): Promise<void> {
   await deps.progress.deleteProfileData(profileId);
   await deps.gameRecords.deleteProfileData(profileId);
@@ -157,9 +146,8 @@ export async function deleteProfile(deps: AppDeps, profileId: string): Promise<v
   }
 }
 
-/** Parent area "Reset child": clears progress, attempts, concept stats, mini-game progress, game
- * records, earned badges, streak and session log — but keeps the profile itself and its assessment
- * results/unlocks. The parent-area UI confirms this with the password first. */
+/** Parent "Reset child": clears progress, attempts, concept stats, mini-game progress, game records, badges, streak and
+ * session log; keeps the profile, assessment results and unlocks (the UI confirms with the password). */
 export async function resetProfileData(deps: AppDeps, profileId: string): Promise<void> {
   await requireProfile(deps, profileId);
   await deps.progress.deleteProfileData(profileId);
@@ -167,7 +155,6 @@ export async function resetProfileData(deps: AppDeps, profileId: string): Promis
   await deps.rewards?.deleteProfileData(profileId);
 }
 
-/** Records which profile the kid picked, so the picker shows it first next time. */
 export async function selectProfile(deps: AppDeps, profileId: string): Promise<void> {
   const settings = await deps.settings.get();
   await deps.settings.save({ ...settings, lastProfileId: profileId });

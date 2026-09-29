@@ -8,7 +8,6 @@ export interface StoredRecord {
 export interface Profile extends StoredRecord {
   readonly accountId: string;
   readonly nickname: string;
-  /** Animal avatar id, e.g. `fox`. */
   readonly avatar: string;
   /** BCP 47 language tag, e.g. `en`. */
   readonly locale: string;
@@ -26,7 +25,6 @@ export function validateNickname(nickname: string): boolean {
   );
 }
 
-/** Fresh, unsaved profile for a new player (nickname is trimmed). */
 export function newProfile(id: string, nickname: string, avatar: string, now: Date): Profile {
   const nowIso = now.toISOString();
   return {

@@ -7,27 +7,18 @@ import { shuffle } from './random.ts';
 import type { ConceptTask } from './review.ts';
 import type { ExerciseDefBase } from './subject.ts';
 
-/** `'test-out'`: the kid taps a locked lesson or world on the Journey. `'placement'`: offered once
- * after creating a new player, one run per Basics world in order. */
+/** `'test-out'`: the kid taps a locked lesson or world. `'placement'`: offered once after creating a player. */
 export type AssessmentKind = 'test-out' | 'placement';
 
-/**
- * What one assessment run covers: one locked lesson (`worldId` is that lesson's world, kept
- * alongside for the UI — which world panel to return to), or a whole world (test-out of a locked
- * world, or one placement world).
- */
+/** One locked lesson (`worldId` = its world, for the UI's return panel) or a whole world (test-out or one placement world). */
 export type AssessmentScope =
   | { readonly type: 'lesson'; readonly lessonId: string; readonly worldId: string }
   | { readonly type: 'world'; readonly worldId: string };
 
-/** Lesson test-out: this many tasks, all from that lesson's own scored exercises. */
 export const TEST_OUT_LESSON_TASKS = 5;
-/** World test-out: this many tasks, spread over the world's lessons (≥ 1 per lesson where possible). */
 export const TEST_OUT_WORLD_TASKS = 8;
-/** Placement: this many tasks per Basics world. */
 export const PLACEMENT_TASKS_PER_WORLD = 4;
 
-/** One task per lesson exercise, for sampling into an assessment run. */
 function poolOf<E extends ExerciseDefBase>(lesson: Lesson<E>): readonly ConceptTask<E>[] {
   return lesson.exercises.map((exercise) => ({
     conceptId: exercise.concept,
@@ -36,7 +27,6 @@ function poolOf<E extends ExerciseDefBase>(lesson: Lesson<E>): readonly ConceptT
   }));
 }
 
-/** `count` tasks picked at random from `pool` (no repeats); every task in `pool` when it has fewer. */
 function samplePool<E extends ExerciseDefBase>(
   pool: readonly ConceptTask<E>[],
   count: number,
@@ -64,8 +54,6 @@ function spreadQuota(sizes: readonly number[], total: number, random: Random): r
   return quotas;
 }
 
-/** Plans a lesson test-out: up to {@link TEST_OUT_LESSON_TASKS} tasks from `lesson`'s own scored
- * exercises, picked with `random`. */
 export function planTestOutLesson<E extends ExerciseDefBase>(
   lesson: Lesson<E>,
   random: Random,
@@ -73,8 +61,7 @@ export function planTestOutLesson<E extends ExerciseDefBase>(
   return samplePool(poolOf(lesson), TEST_OUT_LESSON_TASKS, random);
 }
 
-/** Plans a world test-out: up to {@link TEST_OUT_WORLD_TASKS} tasks spread over every lesson of
- * `world` (≥ 1 each where the lesson has exercises), picked with `random`. */
+/** At least 1 task per lesson that has exercises; see `spreadQuota`. */
 export function planTestOutWorld<E extends ExerciseDefBase>(
   world: World,
   lessons: readonly Lesson<E>[],
@@ -92,14 +79,12 @@ export function planTestOutWorld<E extends ExerciseDefBase>(
   );
 }
 
-/** One Basics world's placement run: its {@link PLACEMENT_TASKS_PER_WORLD} tasks. */
 export interface PlacementWorldPlan<E extends ExerciseDefBase = ExerciseDefBase> {
   readonly world: World;
   readonly tasks: readonly ConceptTask<E>[];
 }
 
-/** Plans the whole placement test: one run per Basics world, in order, `PLACEMENT_TASKS_PER_WORLD`
- * tasks each. Skips a world with no authored lessons yet. `[]` with no main (Basics) track. */
+/** One run per Basics world, in order; skips worlds without lessons; `[]` without a main track. */
 export function planPlacement<E extends ExerciseDefBase>(
   catalog: TracksCatalog,
   lessons: readonly Lesson<E>[],
@@ -118,7 +103,6 @@ export function planPlacement<E extends ExerciseDefBase>(
   return plans;
 }
 
-/** One assessment run's score. */
 export interface AssessmentScore {
   readonly correct: number;
   readonly total: number;
@@ -139,8 +123,7 @@ export function scorePlacementWorld(results: readonly boolean[]): AssessmentScor
   return { correct, total, passed: total > 0 && correct >= Math.ceil(total * 0.75) };
 }
 
-/** One taken assessment's result, kept for the parent report. Placement stores one row per world
- * attempted, `scope: { type: 'world', worldId }`. */
+/** Kept for the parent report; placement stores one row per world attempted. */
 export interface AssessmentResult extends StoredRecord {
   readonly profileId: string;
   readonly kind: AssessmentKind;
@@ -151,7 +134,6 @@ export interface AssessmentResult extends StoredRecord {
   readonly at: string;
 }
 
-/** Fresh `AssessmentResult` for `score`, ready to persist. */
 export function newAssessmentResult(
   id: string,
   profileId: string,
@@ -175,8 +157,7 @@ export function newAssessmentResult(
   };
 }
 
-/** One lesson/world unlocked out of the normal Journey order: a passed test-out/placement, or a
- * direct parent unlock. Read back as `journey.ts`'s `unlocked` parameter (`targetId`s only). */
+/** A lesson/world unlocked out of order (test-out, placement or parent); `targetId`s feed `journey.ts`'s `unlocked`. */
 export interface Unlock extends StoredRecord {
   readonly profileId: string;
   readonly targetType: 'lesson' | 'world';
@@ -184,7 +165,6 @@ export interface Unlock extends StoredRecord {
   readonly via: 'test-out' | 'placement' | 'parent';
 }
 
-/** Fresh `Unlock` row, ready to persist. */
 export function newUnlock(
   id: string,
   profileId: string,

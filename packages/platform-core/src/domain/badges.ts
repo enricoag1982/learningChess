@@ -1,13 +1,10 @@
 import type { StoredRecord } from './profile.ts';
 import type { GameRecord } from './progress.ts';
 
-/** Badge catalogue category. */
 export type BadgeCategory = 'milestone' | 'skill' | 'play' | 'habit';
 
-/** Reward tier shown on an earned badge; `undefined` = no tiers. */
 export type BadgeTier = 'bronze' | 'silver' | 'gold';
 
-/** Every badge condition type, plus the params each one reads off `BadgeCondition`. */
 export type BadgeConditionType =
   | 'mastered'
   | 'stars-total'
@@ -20,9 +17,8 @@ export type BadgeConditionType =
   | 'warmups'
   | 'comeback';
 
-/** One badge's earning rule, compiled from `packages/content/badges.yaml`. Every type is evaluated
- * against `thresholds` (ascending, 1–3 entries — `evaluateBadges` names them bronze/silver/gold);
- * the other fields narrow *what* is counted, one or two set per `type`. */
+/** Compiled from `badges.yaml`. `thresholds`: ascending, 1–3 entries (bronze/silver/gold);
+ * the other fields narrow what is counted, per `type`. */
 export interface BadgeCondition {
   readonly type: BadgeConditionType;
   readonly thresholds: readonly number[];
@@ -44,11 +40,9 @@ export interface BadgeCondition {
   readonly mode?: 'local';
 }
 
-/** One badge definition, compiled from content. */
 export interface BadgeDef {
   readonly id: string;
   readonly category: BadgeCategory;
-  /** Locale key of the badge's display name, e.g. `rewards:badges.first-win.name`. */
   readonly nameKey: string;
   /** Locale key of its spoken/shown condition (pluralized on `count`), e.g. `rewards:badges.first-win.condition`. */
   readonly conditionKey: string;
@@ -60,27 +54,21 @@ export interface EarnedBadge extends StoredRecord {
   readonly profileId: string;
   readonly badgeId: string;
   readonly tier?: BadgeTier;
-  /** ISO timestamp this tier was reached. */
   readonly at: string;
   /** Cleared once shown in a celebration or seen in My Den ("new" dot). */
   readonly seen: boolean;
 }
 
-/** Every fact the badge engine's own 7 generic condition types read, derived from stored profile
- * data + content (`app/rewards.ts` builds this) — the engine itself never reads
- * progress/attempts/game records directly. The other 3 types (`game-win`/`game-event`/
- * `game-played`) read the subject's own facts instead (`SubjectCore.rewards`). */
+/** Facts the engine's 7 generic condition types read (`app/rewards.ts` builds them from stored data + content);
+ * the 3 `game-*` types read the subject's own facts. */
 export interface BadgeFacts {
   /** Mastered worlds/tracks, as `'world:<id>'` / `'track:<id>'`. */
   readonly masteredScopes: ReadonlySet<string>;
   readonly starsTotal: number;
   /** Lessons with 3 stars on every exercise. */
   readonly perfectLessons: number;
-  /** Lifetime correct-solve count per concept id. */
   readonly conceptCorrectTotal: Readonly<Record<string, number>>;
-  /** Current correct-in-a-row streak per concept id. */
   readonly conceptCorrectInARow: Readonly<Record<string, number>>;
-  /** Current hint-free-in-a-row streak per concept id. */
   readonly conceptNoHintsInARow: Readonly<Record<string, number>>;
   /** Today's streak, after folding in today's activity. */
   readonly streakCurrent: number;
@@ -89,22 +77,17 @@ export interface BadgeFacts {
   readonly comebackCount: number;
 }
 
-/** A subject's own badge-condition delegate (`SubjectCore.rewards.conditionValue`): the fact value
- * for a condition type the engine's own 7 don't cover, or `undefined` for one of those 7. */
-/** Method syntax deliberate (bivariant parameter checking, same reason as `ExerciseKind`/
- * `MiniGameMode`): lets a subject's precise `SubjectRewards<ChessRewardFacts>` widen to
- * `SubjectRewards<unknown>` with no cast. */
+/** A subject's badge-condition delegate for the 3 `game-*` types (`undefined` for the engine's own 7). Method syntax:
+ * bivariance lets a precise `SubjectRewards<F>` widen to `<unknown>` with no cast. */
 export interface SubjectRewards<F> {
   facts(records: readonly GameRecord[]): F;
   conditionValue(condition: BadgeCondition, facts: F): number | undefined;
 }
 
-/** Tier names in threshold order, sliced to how many thresholds a condition actually has. */
 const TIER_NAMES: readonly BadgeTier[] = ['bronze', 'silver', 'gold'];
 
-/** The single number `condition.type` is measured against: one of the engine's own 7 generic types
- * read off `facts`, or one of a subject's own 3 (`subject.conditionValue(condition, subjectFacts)`,
- * `0` with no subject rewards wired up or no subject facts given). */
+/** The number `condition.type` is measured against: engine types read `facts`; a subject's 3 go through
+ * `subject.conditionValue` (`0` when unwired). */
 function factValue<F>(
   condition: BadgeCondition,
   facts: BadgeFacts,
@@ -138,7 +121,6 @@ function factValue<F>(
   }
 }
 
-/** One badge newly earned by `evaluateBadges`: its id and tier (`undefined` for a single-tier badge). */
 export interface NewlyEarnedBadge {
   readonly badgeId: string;
   readonly tier?: BadgeTier;
@@ -149,10 +131,8 @@ function earnedKey(badgeId: string, tier: BadgeTier | undefined): string {
   return `${badgeId}:${tier ?? ''}`;
 }
 
-/** Pure badge engine: for every `defs` entry, compares its current fact value against each of its
- * `thresholds` and returns every tier newly crossed not already in `earned`. Badges never lost:
- * this only ever adds. `subject`/`subjectFacts` are the subject's own `game-win`/`game-event`/
- * `game-played` delegate (`SubjectCore.rewards`); omitted, those 3 types never earn. */
+/** Every threshold newly crossed and not yet in `earned` (badges are never lost). `subject`/`subjectFacts`
+ * serve the 3 `game-*` types; omitted, they never earn. */
 export function evaluateBadges<F = unknown>(
   defs: readonly BadgeDef[],
   facts: BadgeFacts,
@@ -179,7 +159,6 @@ export function evaluateBadges<F = unknown>(
   return newlyEarned;
 }
 
-/** Fresh, unsaved `EarnedBadge` row for `badgeId`/`tier`, freshly earned at `now`. */
 export function newEarnedBadge(
   id: string,
   profileId: string,
@@ -200,7 +179,6 @@ export function newEarnedBadge(
   };
 }
 
-/** Marks one earned badge/tier `seen: true` (My Den's "new" dot). No-op if unchanged. */
 export function markSeen(badge: EarnedBadge, now: Date): EarnedBadge {
   if (badge.seen) return badge;
   return { ...badge, seen: true, updatedAt: now.toISOString() };

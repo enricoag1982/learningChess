@@ -14,14 +14,10 @@ import { loadJourney } from './journey.ts';
 import { getProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** Days shown in the parent report's "minutes per day" list. */
 const REPORT_MINUTES_DAYS = 14;
-/** Days the Overview's "minutes today / last 7 days" card reads (`buildChildOverview`). */
 const OVERVIEW_MINUTES_DAYS = 7;
-/** Most recent games / assessments the report keeps. */
 const REPORT_RECENT_COUNT = 10;
 
-/** `deps.profiles.get`, or a clear error if the profile does not exist. */
 async function requireProfile(deps: AppDeps, profileId: string) {
   const profile = await deps.profiles.get(profileId);
   if (profile === undefined) {
@@ -30,7 +26,6 @@ async function requireProfile(deps: AppDeps, profileId: string) {
   return profile;
 }
 
-/** Parent area Overview: one card's worth of at-a-glance stats for one child. */
 export interface ChildOverview {
   readonly profile: Profile;
   readonly rank: RankDef | undefined;
@@ -40,8 +35,7 @@ export interface ChildOverview {
   readonly streakCurrent: number;
 }
 
-/** Builds one child's Overview card: rank, total stars, minutes today / over the last 7 days, and
- * the current streak. Lighter than {@link buildChildReport} — no per-world/concept/game/badge detail. */
+/** One child's Overview card: rank, total stars, minutes today / last 7 days, streak; lighter than {@link buildChildReport}. */
 export async function buildChildOverview(deps: AppDeps, profileId: string): Promise<ChildOverview> {
   const [profile, journey, days, streak] = await Promise.all([
     requireProfile(deps, profileId),
@@ -59,7 +53,6 @@ export async function buildChildOverview(deps: AppDeps, profileId: string): Prom
   };
 }
 
-/** Progress on one world (parent report "Progress by world"). */
 export interface WorldProgressSummary {
   readonly world: World;
   readonly lessonsTotal: number;
@@ -67,12 +60,10 @@ export interface WorldProgressSummary {
   readonly lessonsMastered: number;
   readonly starsEarned: number;
   readonly starsMax: number;
-  /** Lessons in this world with `LessonProgress.skippedPhases` non-empty — the report's small
-   * "intro skipped" per-lesson line. */
+  /** Lessons of this world with non-empty `LessonProgress.skippedPhases` ("intro skipped" line). */
   readonly skippedIntroLessons: readonly Lesson[];
 }
 
-/** One concept's accuracy over its last (up to 10) results (parent report "concept accuracy"). */
 export interface ConceptAccuracySummary {
   readonly conceptId: string;
   readonly accuracy: number;
@@ -80,32 +71,26 @@ export interface ConceptAccuracySummary {
   readonly weak: boolean;
 }
 
-/** Everything the parent area's per-child report screen shows. */
 export interface ChildReport {
   readonly profile: Profile;
   readonly rank: RankDef | undefined;
   readonly totalStars: number;
   readonly worlds: readonly WorldProgressSummary[];
   readonly conceptAccuracy: readonly ConceptAccuracySummary[];
-  /** Concept ids from `conceptAccuracy` with `weak: true`, in the same order. */
   readonly weakConcepts: readonly string[];
   readonly minutesByDay: readonly DayMinutes[];
-  /** The minutes-per-day chart's own limit line. */
   readonly dailyLimitMinutes: number | null;
   /** The "active rules" line under the minutes-per-day chart. */
   readonly weekendLimitMinutes: number | null | undefined;
   readonly playUntil: string | null | undefined;
   readonly playFrom: string | null | undefined;
   readonly streakCurrent: number;
-  /** Most recent games first, capped at {@link REPORT_RECENT_COUNT}. */
   readonly games: readonly GameRecord[];
   readonly badges: readonly EarnedBadge[];
-  /** Most recent assessment runs first, capped at {@link REPORT_RECENT_COUNT}. */
   readonly assessments: readonly AssessmentResult[];
 }
 
-/** One `WorldProgressSummary` for `world`, from `journey`'s lessons/statuses + this profile's own
- * `LessonProgress` rows (for stars — `journey` itself does not carry per-lesson star counts). */
+/** Stars come from this profile's `LessonProgress` rows: `journey` does not carry per-lesson star counts. */
 function worldProgress(
   journey: Journey,
   world: World,
@@ -140,9 +125,7 @@ function worldProgress(
   };
 }
 
-/** Builds one child's full parent-area report: progress by world, concept accuracy + weak-concept
- * list, minutes per day, the last 10 games and assessment runs, and every earned badge. Permissive
- * without `deps.rewards`/`deps.assessment` wired up (reads `[]`). */
+/** Permissive without `deps.rewards` / `deps.assessment` wired up (reads `[]`). */
 export async function buildChildReport(deps: AppDeps, profileId: string): Promise<ChildReport> {
   const [
     profile,

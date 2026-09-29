@@ -4,7 +4,6 @@ import { recordMiniGamePlay } from '../domain/progress.ts';
 import { checkRewards } from './rewards.ts';
 import type { AppDeps } from './use-cases.ts';
 
-/** All saved mini-game progress for a profile (Play screen's best-stars tiles). */
 export async function loadMiniGameProgress(
   deps: AppDeps,
   profileId: string,
@@ -12,7 +11,6 @@ export async function loadMiniGameProgress(
   return deps.progress.listMiniGames(profileId);
 }
 
-/** Result of playing one mini-game, from the Play screen or as a lesson's boss. */
 export interface RecordMiniGameResultInput {
   readonly profileId: string;
   readonly game: MiniGameBase;

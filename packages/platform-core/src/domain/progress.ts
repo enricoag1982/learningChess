@@ -9,26 +9,22 @@ export type Stars = 0 | 1 | 2 | 3;
  * a direct unlock. Absent (or `'play'`, never actually stored) means the ordinary `bestStars` path. */
 export type MasteredVia = 'play' | 'test-out' | 'placement' | 'parent';
 
-/** One profile's saved progress on one lesson. */
 export interface LessonProgress extends StoredRecord {
   readonly profileId: string;
   readonly lessonId: string;
   /** Best stars per scored exercise id (guided tries are not scored). */
   readonly bestStars: Readonly<Record<string, 1 | 2 | 3>>;
-  /** Best stars on the lesson's boss mini-game; `0` if never played. */
   readonly bossStars: Stars;
   /** Index into `lessonSteps(...)` where the kid resumes; `0` = story. */
   readonly resumeStep: number;
   /** First time every exercise had ≥ 1 star. */
   readonly completedAt?: string;
-  /** Set by a passed test-out/placement or a parent unlock; see {@link MasteredVia}. */
   readonly masteredVia?: MasteredVia;
   /** Story/Demo/Try phases the kid tapped "Skip" past; absent = none. Removed the next time the
    * phase is completed normally instead — see `withSkippedPhase`/`withoutSkippedPhase`. */
   readonly skippedPhases?: readonly SkippablePhase[];
 }
 
-/** One recorded try at an exercise or mini-game, scored or not. */
 export interface Attempt extends StoredRecord {
   readonly profileId: string;
   readonly lessonId: string;
@@ -38,8 +34,7 @@ export interface Attempt extends StoredRecord {
   readonly scored: boolean;
   /** `true` for a warm-up/practice review task; absent/`false` for a lesson exercise or mini-game. */
   readonly review?: boolean;
-  /** Set alongside `review`: which screen the task came from — Today's inline warm-up / Practice's
-   * "Daily warm-up" card (`'warmup'`), or a Practice topic run (`'practice'`). */
+  /** Set with `review`: Today's inline warm-up / Practice's "Daily warm-up" card (`'warmup'`) or a Practice topic run (`'practice'`). */
   readonly reviewSource?: 'warmup' | 'practice';
   /** First-try correct: solved with no error and no hint. */
   readonly correct: boolean;
@@ -52,7 +47,6 @@ export interface Attempt extends StoredRecord {
 
 export type LessonStatus = 'new' | 'in-progress' | 'complete' | 'mastered';
 
-/** Fresh, unsaved progress for a profile starting a lesson. */
 export function newLessonProgress(
   id: string,
   profileId: string,
@@ -72,15 +66,11 @@ export function newLessonProgress(
   };
 }
 
-/** True once every exercise in `lesson` has ≥ 1 best star recorded in `bestStars`. */
 function isLessonComplete(lesson: Lesson, bestStars: Readonly<Record<string, 1 | 2 | 3>>): boolean {
   return lesson.exercises.every((exercise) => (bestStars[exercise.id] ?? 0) >= 1);
 }
 
-/**
- * Records `stars` for `exerciseId`, keeping the previous best if it was higher. Sets
- * `completedAt` the first time this makes every exercise in `lesson` ≥ 1 star.
- */
+/** Keeps the previous best if higher; sets `completedAt` the first time every exercise has at least 1 star. */
 export function recordExerciseStars(
   progress: LessonProgress,
   exerciseId: string,
@@ -101,19 +91,16 @@ export function recordExerciseStars(
   };
 }
 
-/** Records boss mini-game stars, keeping the previous best if it was higher. */
 export function recordBossStars(progress: LessonProgress, stars: Stars, now: Date): LessonProgress {
   const bossStars = stars > progress.bossStars ? stars : progress.bossStars;
   return { ...progress, bossStars, updatedAt: now.toISOString() };
 }
 
-/** Moves the resume point (index into `lessonSteps(...)`). */
 export function withResumeStep(progress: LessonProgress, step: number, now: Date): LessonProgress {
   return { ...progress, resumeStep: step, updatedAt: now.toISOString() };
 }
 
-/** Adds `phase` to `skippedPhases` (no duplicate) — the kid tapped "Skip". A no-op (same object)
- * if already marked. */
+/** Adds `phase` to `skippedPhases` (no duplicate); the same object when already marked. */
 export function withSkippedPhase(
   progress: LessonProgress,
   phase: SkippablePhase,
@@ -126,9 +113,7 @@ export function withSkippedPhase(
   return { ...progress, skippedPhases: [...existing, phase], updatedAt: now.toISOString() };
 }
 
-/** Removes `phase` from `skippedPhases`, if present — `phase` was just completed normally
- * (not skipped), e.g. a "Play again" replay playing it through this time. A no-op (same object)
- * if it was not marked. */
+/** Removes `phase` (completed normally, e.g. on a "Play again" replay); the same object when not marked. */
 export function withoutSkippedPhase(
   progress: LessonProgress,
   phase: SkippablePhase,
@@ -161,7 +146,6 @@ export function lessonStatus(lesson: Lesson, progress?: LessonProgress): LessonS
   return isLessonComplete(lesson, progress.bestStars) ? 'complete' : 'in-progress';
 }
 
-/** Stars earned vs. the maximum for a lesson: exercises, plus the boss when the lesson has one. */
 export function lessonStars(
   lesson: Lesson,
   progress?: LessonProgress,
@@ -176,7 +160,6 @@ export function lessonStars(
   return { earned: exerciseEarned + bossEarned, max: exerciseMax + bossMax };
 }
 
-/** Total stars (exercises + boss) across every given lesson progress. */
 export function totalStars(progresses: readonly LessonProgress[]): number {
   return progresses.reduce((sum, progress) => {
     const exerciseStars = Object.values(progress.bestStars).reduce(
@@ -187,23 +170,19 @@ export function totalStars(progresses: readonly LessonProgress[]): number {
   }, 0);
 }
 
-/** One profile's saved progress on one mini-game, played from the Play screen. Kept separate from
- * `LessonProgress.bossStars`; a boss win also updates this record (`recordBossResult`). */
+/** Separate from `LessonProgress.bossStars`; a boss win updates both (`recordBossResult`). */
 export interface MiniGameProgress extends StoredRecord {
   readonly profileId: string;
   readonly miniGameId: string;
   readonly bestStars: Stars;
-  /** Times played, from the Play screen or as a lesson boss. */
   readonly plays: number;
   /** Times ended in a win (a finished `series` mini-game always counts, it has no losing state). */
   readonly wins: number;
 }
 
-/** Outcome of one finished (or left) game vs the computer or a friend, from the kid's side. */
 export type GameRecordResult = 'win' | 'loss' | 'draw' | 'abandoned';
 
-/** One played (or abandoned) game vs the computer or a friend (same device). Saved for a full game
- * (`game: 'full'`) and every `versus` mini-game, standalone or as a lesson boss. */
+/** One played or abandoned game vs the computer or a friend; saved for full games and every `versus` mini-game. */
 export interface GameRecord extends StoredRecord {
   readonly profileId: string;
   /** `'full'` for a full standard game, else the `versus` mini-game's content id (Pawn Wars, …). */

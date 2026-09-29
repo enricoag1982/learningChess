@@ -1,6 +1,5 @@
 import type { StoredRecord } from './profile.ts';
 
-/** One profile's daily-play streak. */
 export interface Streak extends StoredRecord {
   readonly profileId: string;
   readonly current: number;
@@ -11,7 +10,6 @@ export interface Streak extends StoredRecord {
   readonly skipsUsedThisWeek: number;
 }
 
-/** Fresh, unsaved streak for a profile with no counted day yet. */
 export function newStreak(id: string, profileId: string, now: Date): Streak {
   const nowIso = now.toISOString();
   return {
@@ -25,7 +23,6 @@ export function newStreak(id: string, profileId: string, now: Date): Streak {
   };
 }
 
-/** `date`'s local calendar day (device time zone), `YYYY-MM-DD`. */
 export function localDayString(date: Date): string {
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
@@ -52,9 +49,8 @@ export function isoWeekKey(day: string): string {
   return `${String(isoYear)}-W${String(week)}`;
 }
 
-/** Folds one day's activity into `streak`: the same day is a no-op; the next day extends the
- * streak; a single missed day is bridged by one free skip per ISO week, else it restarts at 1
- * silently. `best` only ever grows. */
+/** Same day: no-op; next day extends; one missed day is bridged by 1 free skip per ISO week, else restarts at 1
+ * silently. `best` only grows. */
 export function recordActivityDay(streak: Streak, day: string, now: Date): Streak {
   if (streak.lastDay === day) {
     return streak;
@@ -88,9 +84,8 @@ export function recordActivityDay(streak: Streak, day: string, now: Date): Strea
   }
 
   if (gap === 2) {
-    // The skip is charged against the *reporting* day's ISO week (when the gap is noticed), not
-    // the missed day's — simplest to reason about, and the two are the same week except right at
-    // a week boundary.
+    // The skip is charged to the reporting day's ISO week (when the gap is noticed), not the missed day's;
+    // they differ only at a week boundary.
     const skipWeek = isoWeekKey(day);
     const skipsUsedThisWeek =
       isoWeekKey(streak.lastDay) === skipWeek ? streak.skipsUsedThisWeek : 0;

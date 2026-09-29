@@ -33,16 +33,12 @@ import type { Random } from '../domain/random.ts';
 import type { Clock } from './ports.ts';
 import { checkRewards } from './rewards.ts';
 
-/** Everything a use case needs, gathered in one place so call sites pass a single `deps` object. */
 export interface AppDeps {
   readonly profiles: ProfileRepository;
   readonly progress: ProgressRepository;
-  /** Full games and versus mini-games played vs the computer. */
   readonly gameRecords: GameRecordRepository;
-  /** Earned badges, streak, session log. Optional so an `AppDeps` fixture keeps typechecking
-   * unchanged; `checkRewards` simply no-ops without it. */
+  /** Optional so `AppDeps` fixtures keep typechecking; `checkRewards` no-ops without it. */
   readonly rewards?: RewardsRepository;
-  /** Assessment results + unlocked lesson/world ids. Optional, same reason `rewards` is. */
   readonly assessment?: AssessmentRepository;
   readonly clock: Clock;
   readonly ids: IdGenerator;
@@ -50,24 +46,17 @@ export interface AppDeps {
   readonly parentLock: ParentLockRepository;
   readonly passwordFile: PasswordFileWriter;
   readonly settings: SettingsRepository;
-  /** Seeded in tests; drives warm-up/practice task selection. */
   readonly random: Random;
-  /** Backup export's file destination. Optional: `app/backup.ts`'s `exportBackup` throws without it. */
+  /** Optional: `exportBackup` throws without it. */
   readonly backupFileWriter?: BackupFileWriter;
-  /** Backup import's atomic replace, same optional-port reasoning as `backupFileWriter`. */
   readonly backupImporter?: BackupImporter;
-  /** Current local storage schema version, injected so `app/backup.ts` can stamp/validate a backup
-   * file without `packages/core` importing a web adapter constant. Optional, same reason as above. */
+  /** Current storage schema version, injected so `app/backup.ts` stamps / validates backups without importing a web adapter constant. */
   readonly storageSchemaVersion?: number;
-  /** This profile's subject (chess): kind + mode registries, via `createSubjectRuntime` — the only
-   * way platform code reaches an exercise kind or mini-game mode. */
+  /** Kind + mode registries via `createSubjectRuntime`: the only way platform code reaches an exercise kind or mini-game mode. */
   readonly subject: SubjectRuntime;
-  /** App identifiers: storage key prefix, backup app id, backup/parent-code file name prefixes,
-   * app version. */
   readonly app: AppConfig;
 }
 
-/** Stars earned so far for `state`, via its subject's own kind; `0` until solved. */
 function starsFor(subject: SubjectRuntime, state: ExerciseStateBase): 0 | 1 | 2 | 3 {
   if (!state.solved) {
     return 0;
@@ -75,7 +64,6 @@ function starsFor(subject: SubjectRuntime, state: ExerciseStateBase): 0 | 1 | 2 
   return subject.kinds[state.def.type]?.stars(state) ?? 0;
 }
 
-/** Existing concept stats, or fresh (unsaved) ones if this profile has no attempt for it yet. */
 export async function getConceptStats(
   deps: AppDeps,
   profileId: string,
@@ -88,8 +76,7 @@ export async function getConceptStats(
   return newConceptStats(deps.ids.next(), profileId, conceptId, deps.clock.now());
 }
 
-/** Folds one scored attempt's outcome into its concept's stats: always appends `correct` to
- * `recent`; `EASIER_AFTER_ERRORS`-or-more errors also puts the concept in review, due immediately. */
+/** Appends `correct` to `recent`; `EASIER_AFTER_ERRORS`+ errors also put the concept in review, due immediately. */
 async function recordConceptOutcome(
   deps: AppDeps,
   profileId: string,
@@ -106,17 +93,14 @@ async function recordConceptOutcome(
   await deps.progress.saveConceptStats(stats);
 }
 
-/** All saved lesson progress for a profile. */
 export async function loadProgress(deps: AppDeps, profileId: string): Promise<LessonProgress[]> {
   return deps.progress.listLessons(profileId);
 }
 
-/** Full games and versus mini-games recorded for a profile (Play's vs Computer tally, My Den). */
 export function loadGameRecords(deps: AppDeps, profileId: string): Promise<GameRecord[]> {
   return deps.gameRecords.listByProfile(profileId);
 }
 
-/** Saved progress for one lesson, or fresh (unsaved) progress if the kid has not started it. */
 export async function getLessonProgress(
   deps: AppDeps,
   profileId: string,
@@ -129,7 +113,6 @@ export async function getLessonProgress(
   return newLessonProgress(deps.ids.next(), profileId, lessonId, deps.clock.now());
 }
 
-/** Input to log one exercise attempt (see `recordAttempt`). */
 export interface RecordAttemptInput {
   readonly profileId: string;
   readonly lesson: Lesson;
@@ -139,9 +122,8 @@ export interface RecordAttemptInput {
   readonly durationMs: number;
 }
 
-/** Logs one `Attempt` without touching lesson progress. Used on its own when the kid leaves an
- * unsolved exercise for its easier variant (that failed attempt always has `errors >=
- * EASIER_AFTER_ERRORS`); also folds a scored attempt's outcome into concept stats. */
+/** Logs one `Attempt` without touching lesson progress (alone when an unsolved exercise is left for its easier variant);
+ * a scored attempt also folds into concept stats. */
 export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): Promise<void> {
   const { profileId, lesson, state, scored, durationMs } = input;
   const now = deps.clock.now();
@@ -170,27 +152,21 @@ export async function recordAttempt(deps: AppDeps, input: RecordAttemptInput): P
   }
 }
 
-/** Result of an exercise attempt (guided try or scored exercise). */
 export interface RecordExerciseResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
   readonly state: ExerciseStateBase;
-  /** `false` for guided tries and the demo: recorded as an attempt but never scored. */
   readonly scored: boolean;
   readonly durationMs: number;
-  /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
-  /** Set when `state` is an easier variant: the scored exercise id it replaces; solving credits that
-   * exercise `EASIER_VARIANT_STARS`. */
+  /** Set for an easier variant: the scored exercise it replaces; solving credits it `EASIER_VARIANT_STARS`. */
   readonly standsInFor?: string;
-  /** Set when this solve leaves a skippable phase normally (`LessonScreen` computes it): unmarks it
-   * from `skippedPhases` if a previous "Skip" had set it — a "Play again" playing it through. */
+  /** Set when this solve leaves a skippable phase normally (`LessonScreen`): unmarks a previous "Skip" of it. */
   readonly completesPhase?: SkippablePhase;
 }
 
-/** Records an exercise attempt: always saves an `Attempt`; when solved, updates the lesson's best
- * stars (`standsInFor` if set, else this exercise when `scored`); advances `resumeStep`. The call
- * that first completes the lesson also enters its concept into review, due in 1 day. */
+/** Always saves an `Attempt`; when solved, updates best stars (`standsInFor` else this exercise if `scored`) and
+ * `resumeStep`. The call that first completes the lesson also enters its concept into review, due in 1 day. */
 export async function recordExerciseResult(
   deps: AppDeps,
   input: RecordExerciseResultInput,
@@ -231,19 +207,16 @@ export async function recordExerciseResult(
   return progress;
 }
 
-/** Result of playing a lesson's boss mini-game: `static`, `series`, or `versus` (vs the bot). */
 export interface RecordBossResultInput {
   readonly profileId: string;
   readonly lesson: Lesson;
   readonly state: MiniGameStateBase;
   readonly durationMs: number;
-  /** Step index to resume at next (see `lessonSteps`). */
   readonly nextStep: number;
 }
 
-/** Records a boss mini-game attempt: always saves an `Attempt`, updates the lesson's best boss
- * stars, advances `resumeStep`. Also folds the play into the boss's own `MiniGameProgress`
- * (`saveMiniGamePlay`), so the Play screen's tile reflects a win made from inside the lesson too. */
+/** Always saves an `Attempt`; updates the lesson's best boss stars and `resumeStep`; also folds the play into the boss's
+ * `MiniGameProgress` (`saveMiniGamePlay`) so the Play tile reflects an in-lesson win. */
 export async function recordBossResult(
   deps: AppDeps,
   input: RecordBossResultInput,
@@ -288,14 +261,12 @@ export async function recordBossResult(
   return progress;
 }
 
-/** Result of one warm-up/practice review task (see `recordReviewResult`). */
 export interface RecordReviewResultInput {
   readonly profileId: string;
   readonly task: ConceptTask;
   readonly state: ExerciseStateBase;
   readonly durationMs: number;
-  /** `'warmup'` for Today's inline warm-up or Practice's "Daily warm-up" card, `'practice'` for a
-   * Practice topic run. */
+  /** `'warmup'`: Today's warm-up or Practice's "Daily warm-up" card; `'practice'`: a Practice topic run. */
   readonly reviewSource: 'warmup' | 'practice';
 }
 
