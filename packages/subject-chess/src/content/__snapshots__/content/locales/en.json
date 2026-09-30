@@ -152,7 +152,7 @@
    "games-with-friends_other": "{{count}} games with friends",
    "games-won_one": "{{count}} game won",
    "games-won_other": "{{count}} games won",
-   "owl-line": "Look at all your friends!",
+   "owl-line": "Look at all your pieces!",
    "rank-after-track": "After {{track}}",
    "rank-after-world": "After World {{order}}",
    "rank-all-tracks": "After all paths",
@@ -571,7 +571,7 @@
    "leave": "Leave",
    "summary-closing": "See you tomorrow!",
    "summary-done": "Done",
-   "summary-new-friend": "New friend!",
+   "summary-new-friend": "New piece!",
    "summary-new-rank": "New rank!",
    "summary-title": "Great session!",
    "warmup-of": "Warm-up {{current}}/{{total}}"

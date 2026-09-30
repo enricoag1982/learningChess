@@ -118,6 +118,9 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
     readonly defaults: Readonly<Record<string, unknown>>;
     /** Fields an older version stored and this one no longer has: a stored one loads, is ignored, and is dropped on the next save. */
     readonly retired?: readonly string[];
+    /** Constant fields every exported profile's settings carry, write-only (import ignores them): an older version's importer
+     * still requires them, so it still accepts files from this build. */
+    readonly legacyExport?: Readonly<Record<string, unknown>>;
     isValid(s: Readonly<Record<string, unknown>>): boolean;
     loadBackupShape(): Promise<SettingsBackupShape>;
   };

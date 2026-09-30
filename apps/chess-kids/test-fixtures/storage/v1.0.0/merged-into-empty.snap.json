@@ -30,7 +30,8 @@
      "voice": true,
      "sound": true,
      "hints": true,
-     "computerLevel": "auto"
+     "computerLevel": "auto",
+     "pieceStyle": "classic"
     },
     "lessonProgress": [
      {
@@ -784,7 +785,8 @@
      "voice": true,
      "sound": true,
      "hints": true,
-     "computerLevel": "auto"
+     "computerLevel": "auto",
+     "pieceStyle": "classic"
     },
     "lessonProgress": [],
     "attempts": [],

@@ -17,6 +17,9 @@ export const CHESS_SETTINGS_DEFAULTS: { readonly computerLevel: ComputerLevelSet
 /** Written by v1.0.0 to v2.0.0 (the animal-badge "Piece style"); still loads, is ignored and dropped on the next save. */
 export const CHESS_RETIRED_SETTINGS: readonly string[] = ['pieceStyle'];
 
+/** Exported for a v1.0.0-v2.0.0 install, whose backup import still requires the field; never read back. */
+export const CHESS_LEGACY_EXPORT: Readonly<Record<string, unknown>> = { pieceStyle: 'classic' };
+
 export function isValidComputerLevel(value: unknown): value is ComputerLevelSetting {
   return value === 'auto' || (typeof value === 'number' && value >= 1 && value <= 5);
 }

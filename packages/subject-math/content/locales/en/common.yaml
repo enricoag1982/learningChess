@@ -1,5 +1,13 @@
 app:
   title: Math for Kids
+den:
+  owl-line: Look at all your friends!
+  friends-heading: Your friends
+  friend-name: '{{character}}, friend'
+  friend-name-locked: '{{character}}, locked, finish the {{piece}} lesson'
+  friend-condition: 'Finish the {{piece}} lesson'
+session:
+  summary-new-friend: New friend!
 parent:
   privacy:
     intro: Math for Kids keeps everything on this device. Here's exactly what that means.

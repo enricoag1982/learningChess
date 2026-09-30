@@ -1,15 +1,13 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePack } from '../../app/subject.ts';
 import { characterName } from '../../content-text.ts';
 import { characterColor } from '../art/animal-images.ts';
 import { CharacterIcon } from '../art/characters.tsx';
 
-/** Portrait + name, and (except Owl) a subject-supplied badge (chess: piece icon). A compact row on phones, a big portrait over
+/** Portrait + name (chess: the piece icon and its name). A compact row on phones, a big portrait over
  * a column from `sm` up. */
 export function CharacterCard({ character }: { readonly character: string }): JSX.Element {
   const { t } = useTranslation();
-  const pack = usePack();
 
   return (
     <div className="flex w-full shrink-0 items-center gap-3 sm:w-auto sm:flex-col sm:justify-center sm:gap-3">
@@ -24,7 +22,6 @@ export function CharacterCard({ character }: { readonly character: string }): JS
       <span className="font-display text-lg text-ink sm:text-xl md:text-2xl">
         {characterName(t, character)}
       </span>
-      {pack.CharacterBadge && <pack.CharacterBadge character={character} />}
     </div>
   );
 }

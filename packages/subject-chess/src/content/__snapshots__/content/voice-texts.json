@@ -1095,11 +1095,6 @@
   "source": "badge-locked"
  },
  {
-  "key": "4805eee9fb3cd71d",
-  "text": "Look at all your friends!",
-  "source": "owl-line"
- },
- {
   "key": "484c6568bace97ec",
   "text": "Sharp Eyes",
   "source": "badge-earned"
@@ -2638,6 +2633,11 @@
   "key": "b3499596196d3280",
   "text": "A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "b3628b5a214a37d6",
+  "text": "Look at all your pieces!",
+  "source": "owl-line"
  },
  {
   "key": "b390ed2f338beceb",

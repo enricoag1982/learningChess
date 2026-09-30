@@ -14,7 +14,7 @@ import { createPlaySlice, type PlaySlice } from './slices/play.ts';
 import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
 import { MINI_GAME_MODE_UI } from './modes/ui-registry.ts';
-import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
+import { Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 import { Board } from './ui/board/Board.tsx';
 import { PieceIcon } from './ui/board/pieces.tsx';
@@ -89,7 +89,6 @@ export const chessWeb = {
   kinds: EXERCISE_KIND_UI,
   modes: MINI_GAME_MODE_UI,
   surface: { Story: SurfaceStory, Demo: SurfaceDemo, View: SurfaceView },
-  CharacterBadge,
   characterArt,
   art: ANIMAL_IMAGES,
   homeTiles: HOME_TILES,

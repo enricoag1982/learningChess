@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { composeDefaultSettings } from '../domain/profile-settings.ts';
 import { newProfile } from '../domain/profile.ts';
 import { newLessonProgress, recordExerciseStars } from '../domain/progress.ts';
+import { createSubjectRuntime } from '../domain/runtime.ts';
 import type { GameRecord, LessonProgress } from '../domain/progress.ts';
 import type { AppConfig } from '../domain/subject.ts';
 import {
@@ -18,6 +19,7 @@ import {
   makeLesson as buildLesson,
   makeContentSource,
   makeDeps as buildDeps,
+  testSubject,
 } from '../testing/index.ts';
 import {
   BackupValidationError,
@@ -129,6 +131,24 @@ describe('buildBackupFile', () => {
     const file = await buildBackupFile(deps);
 
     expect(file.data.p1?.settings).toEqual(DEFAULT_PROFILE_SETTINGS);
+  });
+
+  it('adds the subject’s legacyExport constants to every profile’s settings (write-only)', async () => {
+    const mia = newProfile('p1', 'Mia', 'fox', NOW);
+    const deps = makeDeps({
+      profiles: makeProfileRepo([mia]),
+      subject: createSubjectRuntime({
+        ...testSubject,
+        settings: { ...testSubject.settings, legacyExport: { legacy: 'const' } },
+      }),
+    });
+
+    const file = await buildBackupFile(deps);
+    expect(file.data.p1?.settings).toEqual({ ...DEFAULT_PROFILE_SETTINGS, legacy: 'const' });
+
+    // Reading the file back drops it: the subject's backup shape does not know the field.
+    const parsed = await parseBackupFile(deps, JSON.stringify(file));
+    expect(parsed.data.p1?.settings).toEqual(DEFAULT_PROFILE_SETTINGS);
   });
 });
 

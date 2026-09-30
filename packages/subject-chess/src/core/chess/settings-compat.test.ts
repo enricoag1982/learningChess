@@ -56,3 +56,32 @@ describe('a stored v2.0.0 settings object with pieceStyle', () => {
     expect(Object.keys(settings ?? {})).not.toContain('pieceStyle');
   });
 });
+
+describe('backup export for a v2.0.0 install', () => {
+  it('writes a constant pieceStyle "classic" in every child, overriding any stored value', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    const leo = await createProfile(deps, 'Leo', 'panda');
+    const animalStyle = { ...V2_SETTINGS, pieceStyle: 'animal' };
+    await deps.settings.save({
+      lastProfileId: null,
+      suggestedLevels: {},
+      profileSettings: { [mia.id]: animalStyle },
+    });
+
+    const file = await buildBackupFile(deps);
+
+    expect(file.data[mia.id]?.settings).toMatchObject({ pieceStyle: 'classic', computerLevel: 2 });
+    expect(file.data[leo.id]?.settings).toMatchObject({ pieceStyle: 'classic' });
+  });
+
+  it('is read back without the field (write-only)', async () => {
+    const deps = makeDeps();
+    const mia = await createProfile(deps, 'Mia', 'fox');
+    const file = await buildBackupFile(deps, [mia.id]);
+
+    const parsed = await parseBackupFile(deps, JSON.stringify(file));
+
+    expect(Object.keys(parsed.data[mia.id]?.settings ?? {})).not.toContain('pieceStyle');
+  });
+});

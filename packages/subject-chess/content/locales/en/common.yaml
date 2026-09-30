@@ -153,6 +153,14 @@ exercise:
     hint-square: Put it on the orange square.
 app:
   title: Chess for Kids
+den:
+  owl-line: Look at all your pieces!
+  friends-heading: Your pieces
+  friend-name: '{{piece}}, learned'
+  friend-name-locked: 'Locked. Learn the {{piece}} lesson'
+  friend-condition: 'Learn the {{piece}} lesson'
+session:
+  summary-new-friend: New piece!
 voice-check:
   # Parent area "Test voice" (M6.3 item 2): the one fixed sentence it speaks. Deliberately its own
   # top-level key, not under `parent:` — every `parent.*`/`new-player.*`/`backup.*`/`privacy.*` key

@@ -52,8 +52,6 @@ export interface SubjectWeb {
     Demo(props: { readonly lesson: Lesson }): JSX.Element;
     View(props: { state: ExerciseStateBase }): JSX.Element;
   };
-  /** The piece-icon pill under a character's portrait (`CharacterCard`); absent for a subject without one. */
-  CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
   /** A character's portrait drawn by the subject instead of an image (chess: the piece's classic icon), or `null` for one
    * without (Owl): `CharacterIcon` then falls back to `art`. */
   characterArt?(character: string): JSX.Element | null;

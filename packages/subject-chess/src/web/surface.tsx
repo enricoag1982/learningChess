@@ -1,33 +1,16 @@
-// Chess's board surfaces (`SubjectWeb.surface`) and character badge, part of the chess pack.
+// Chess's board surfaces (`SubjectWeb.surface`) and games stats, part of the chess pack.
 import { useState } from 'react';
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { GameRecord } from '@learn/platform-core';
-import { CHARACTER_PIECES, chessCore } from '../core/chess-core.ts';
+import { chessCore } from '../core/chess-core.ts';
 import { friendGamesPlayed } from '../core/app/friend-play.ts';
 import type { Lesson } from '../core/chess/lesson.ts';
 import type { Position, Square } from '../core/chess/types.ts';
-import { characterName, tContent } from '@learn/platform-web/content-text.ts';
+import { characterName } from '@learn/platform-web/content-text.ts';
 import { Board } from './ui/board/Board.tsx';
 import { MiniBoard } from './ui/board/MiniBoard.tsx';
-import { PieceIcon } from './ui/board/pieces.tsx';
 import { InfoPill } from '@learn/platform-web/ui/ds/primitives.tsx';
-
-/** The piece-icon pill under a character's portrait; nothing for a narrator-taught character (Owl). */
-export function CharacterBadge({ character }: { readonly character: string }): JSX.Element | null {
-  const { t } = useTranslation();
-  const topicKey = chessCore.characters[character]?.topicKey;
-  if (topicKey === undefined) return null;
-  const piece = CHARACTER_PIECES[character] ?? 'r';
-  return (
-    <div className="info-flat ml-auto flex items-center gap-2 rounded-full bg-cream px-3 py-1.5 font-bold text-ink sm:ml-0 sm:px-4 sm:py-2">
-      <span className="h-6 w-6 sm:h-7 sm:w-7">
-        <PieceIcon piece={{ color: 'w', type: piece }} />
-      </span>
-      {tContent(t, topicKey)}
-    </div>
-  );
-}
 
 /** Story board: the demo position with its highlighted squares, sized for a phone column (`compact`) or a side-by-side row. */
 export function SurfaceStory({

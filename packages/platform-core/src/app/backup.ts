@@ -246,7 +246,7 @@ async function profileBackupData(deps: AppDeps, profileId: string): Promise<Prof
   ]);
 
   return {
-    settings,
+    settings: { ...settings, ...deps.subject.settings.legacyExport },
     lessonProgress,
     attempts,
     miniGameProgress,

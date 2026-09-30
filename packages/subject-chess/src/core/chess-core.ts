@@ -2,6 +2,7 @@
 // (`createSubjectRuntime`, `AppDeps.subject`/`app`) plugs in for this app. Chess-bound.
 import { chessGameRecordOf } from './app/games.ts';
 import {
+  CHESS_LEGACY_EXPORT,
   CHESS_RETIRED_SETTINGS,
   CHESS_SETTINGS_DEFAULTS,
   isValidComputerLevel,
@@ -57,6 +58,7 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   settings: {
     defaults: CHESS_SETTINGS_DEFAULTS,
     retired: CHESS_RETIRED_SETTINGS,
+    legacyExport: CHESS_LEGACY_EXPORT,
     isValid: (s) => isValidComputerLevel(s.computerLevel),
     loadBackupShape: async () =>
       (await import('./chess/settings-backup.ts')).chessSettingsBackupShape,

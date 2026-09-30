@@ -114,8 +114,8 @@ Owner 2026-09-30: pieces are no longer animals. They are called by their real na
 - Journey map: one habitat per world.
 - Profile avatars: animals.
 - Bot levels: Mouse → Rabbit → Fox → Wolf → Bear.
-- My Den lists the pieces ("Your pieces"): a piece is earned when its lesson is done; a locked one reads "Learn the ‹piece› lesson".
-- Old data: v1.0.0–v2.0.0 stored `pieceStyle`; it still loads (in settings and backup files), is ignored and dropped on the next save.
+- My Den lists the pieces ("Your pieces"): a piece is earned when its lesson is done; a locked one reads "Learn the ‹piece› lesson". The Den / session-summary friend texts belong to each subject's locale (chess: pieces; math: friends).
+- Old data: v1.0.0–v2.0.0 stored `pieceStyle`; it still loads (in settings and backup files), is ignored and dropped on the next save. Exports still write a constant `pieceStyle: 'classic'` per child (write-only) so a `v2.0.0` install accepts files from this build.
 
 ## 9. Functional building blocks
 
