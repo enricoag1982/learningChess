@@ -11,7 +11,6 @@ import {
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { SECONDARY_BUTTON } from './button-styles.ts';
@@ -103,23 +102,21 @@ function ExerciseAttempt({
     onTakeEasier?.();
   }
 
-  const top = (
-    <>
-      <SpeechBubble text={instructionText} note={note} />
-      {/* Easier-variant offer shares the replay row so Hint/Undo stay on screen; offered, never
-          forced (teaching-process.md §3.3). */}
-      <div className="flex gap-3">
-        <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
-        {/* Guided tries only: skips the rest of Try, straight to the first scored exercise. */}
+  const top = <SpeechBubble text={instructionText} note={note} onReplay={replay} />;
+
+  // Skip (guided tries only) and the Easier offer (never forced, teaching-process.md §3.3) join the
+  // kind's action row.
+  const actions =
+    (guided && onSkip) || offerEasier ? (
+      <>
         {guided && onSkip && <SkipButton onClick={onSkip} />}
         {offerEasier && (
           <button type="button" onClick={handleTakeEasier} className={SECONDARY_BUTTON}>
             {t('exercise.easier')}
           </button>
         )}
-      </div>
-    </>
-  );
+      </>
+    ) : undefined;
 
   const done = solved ? (
     <div className="mt-auto flex flex-col items-center gap-4">
@@ -149,6 +146,7 @@ function ExerciseAttempt({
       surface={{ worldId: lesson.world }}
       top={top}
       done={done}
+      actions={actions}
     />
   );
 }

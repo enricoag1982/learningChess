@@ -14,15 +14,27 @@ const HintIcon = (): JSX.Element => (
 export interface ExerciseControlsProps {
   readonly showHint: boolean;
   readonly onHint: () => void;
+  /** A read-only chip that leads the row (a move-counted kind's Moves counter). */
+  readonly info?: ReactNode;
   /** select-squares' Check button, or a move-counted kind's Undo button; `undefined` otherwise. */
   readonly slot?: ReactNode;
+  /** The host's own buttons for this row (`PlayAreaProps.actions`: Skip on a guided try, the Easier offer). */
+  readonly extras?: ReactNode;
 }
 
-/** Hint (unless hidden), then the kind's one extra button if any (select-squares' Check or a move-counted kind's Undo). */
-export function ExerciseControls({ showHint, onHint, slot }: ExerciseControlsProps): JSX.Element {
+/** The exercise's one action row: leading chip, Hint (unless hidden), the kind's extra button, then the host's extras.
+ * Wraps only where the row is narrow (`@xl`), and then only to give the chip a line of its own. */
+export function ExerciseControls({
+  showHint,
+  onHint,
+  info,
+  slot,
+  extras,
+}: ExerciseControlsProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div className="flex gap-3">
+    <div className="@container flex flex-wrap items-center gap-3">
+      {info}
       {showHint && (
         <button type="button" onClick={onHint} className={SECONDARY_BUTTON}>
           <HintIcon />
@@ -30,6 +42,7 @@ export function ExerciseControls({ showHint, onHint, slot }: ExerciseControlsPro
         </button>
       )}
       {slot}
+      {extras}
     </div>
   );
 }

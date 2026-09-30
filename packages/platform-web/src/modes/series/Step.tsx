@@ -14,8 +14,8 @@ import { usePack } from '../../app/subject.ts';
 import { tContent } from '../../content-text.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { ReplayButton } from '../../ui/ds/ReplayButton.tsx';
 import { SpeechBubble } from '../../ui/ds/SpeechBubble.tsx';
+import { INFO_CHIP } from '../../ui/ds/primitives-styles.ts';
 import { useNarratedText } from '../../ui/ds/useNarratedText.ts';
 import { GameLayout } from '../../ui/lesson/GameLayout.tsx';
 import { NextButton } from '../../ui/lesson/NextButton.tsx';
@@ -36,7 +36,7 @@ function SeriesCounters({
 }): JSX.Element {
   const { t } = useTranslation();
   return (
-    <div className="info-flat flex flex-col gap-1 rounded-3xl bg-card px-5 py-4 font-display text-lg text-ink">
+    <div className={INFO_CHIP}>
       <span>{t('boss.series.round-of', { current, total })}</span>
       <span>{t('boss.series.mistakes', { count: mistakes })}</span>
     </div>
@@ -64,7 +64,6 @@ function SeriesRound({
   priorMistakes,
   onNext,
 }: SeriesRoundProps): JSX.Element {
-  const { t } = useTranslation();
   const hintsEnabled = useAppStore((state) => state.activeProfileSettings.hints);
 
   // No save: a series round scores only as part of the series' total mistakes.
@@ -83,8 +82,7 @@ function SeriesRound({
 
   const top = (
     <>
-      <SpeechBubble text={instructionText} note={note} />
-      <ReplayButton onClick={replay} label={t('exercise.replay')} />
+      <SpeechBubble text={instructionText} note={note} onReplay={replay} />
       <SeriesCounters current={roundNumber} total={totalRounds} mistakes={liveMistakes} />
     </>
   );
@@ -164,8 +162,7 @@ export function Step({
           board={<pack.surface.View state={series.round} surface={{ worldId: lesson.world }} />}
           panel={
             <>
-              <SpeechBubble text={goalText} />
-              <ReplayButton onClick={replay} label={t('exercise.replay')} />
+              <SpeechBubble text={goalText} onReplay={replay} />
               <SeriesCounters
                 current={minigame.rounds.length}
                 total={minigame.rounds.length}

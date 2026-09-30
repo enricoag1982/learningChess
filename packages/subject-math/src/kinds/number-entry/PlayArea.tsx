@@ -14,6 +14,7 @@ export function PlayArea({
   showHint,
   top,
   done,
+  actions,
 }: NumberEntryPlayAreaProps): JSX.Element {
   const { core } = state;
   const board =
@@ -28,13 +29,14 @@ export function PlayArea({
     );
   const controls = (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:gap-3 lg:flex-col lg:items-stretch lg:gap-2">
-      {showHint && (
+      {(showHint || actions !== undefined) && (
         <div className="sm:flex-1 lg:flex-none">
           <ExerciseControls
-            showHint
+            showHint={showHint}
             onHint={() => {
               dispatch({ type: 'hint' });
             }}
+            extras={actions}
           />
         </div>
       )}

@@ -11,7 +11,7 @@ import { chessWeb } from '../../web/chess-pack.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../../web/ui/board/piece-style.ts';
-import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
+import { INFO_CHIP } from '@learn/platform-web/ui/ds/primitives-styles.ts';
 import { SpeechBubble } from '@learn/platform-web/ui/ds/SpeechBubble.tsx';
 import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
 import { GameLayout } from '@learn/platform-web/ui/lesson/GameLayout.tsx';
@@ -79,9 +79,8 @@ export function Step({
         }
         panel={
           <>
-            <SpeechBubble text={goalText} />
-            <ReplayButton onClick={replay} label={t('exercise.replay')} />
-            <div className="info-flat flex flex-col gap-1 rounded-3xl bg-card px-5 py-4 font-display text-lg text-ink">
+            <SpeechBubble text={goalText} onReplay={replay} />
+            <div className={INFO_CHIP}>
               <span>
                 {isCollectStars
                   ? t('boss.stars-of', { current: starsCollected, total: totalStars })

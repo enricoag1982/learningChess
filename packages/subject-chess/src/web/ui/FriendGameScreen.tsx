@@ -361,7 +361,7 @@ function FriendMatch({
 
   return (
     <main
-      className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6"
+      className="flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-4"
       data-friend-match-status={ongoing ? 'ongoing' : result.kind}
       data-friend-match-turn={position.toMove}
     >

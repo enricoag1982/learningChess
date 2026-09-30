@@ -46,7 +46,7 @@ function withI18n(ui: ReactElement): ReactElement {
 }
 
 describe('ChoiceOptions', () => {
-  it('draws each option as a tall tile with its visual, and names a text-less one by the look', () => {
+  it('draws each option as a 56px tile with its visual, and names a text-less one by the look', () => {
     render(
       withI18n(
         <ChoiceOptions options={OPTIONS} wrongOptionIds={[]} onPick={vi.fn()} look={LOOK} />,
@@ -54,7 +54,7 @@ describe('ChoiceOptions', () => {
     );
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(3);
-    for (const button of buttons) expect(button.className).toContain('min-h-24');
+    for (const button of buttons) expect(button.className).toContain('min-h-14');
     expect(screen.getAllByTestId('numeral').map((node) => node.textContent)).toEqual(['3', '4']);
     expect(screen.getByRole('button', { name: 'Four 3' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Four' }).hasAttribute('aria-label')).toBe(false);

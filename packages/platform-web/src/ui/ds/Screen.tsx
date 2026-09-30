@@ -8,7 +8,7 @@ export type ScreenKind = 'page' | 'game' | 'center' | 'form';
 
 const SCREEN_BASE: Readonly<Record<ScreenKind, string>> = {
   page: 'flex min-h-dvh flex-col gap-4 bg-cream px-4 py-5 sm:px-8 sm:py-6',
-  game: 'flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-6',
+  game: 'flex h-dvh flex-col gap-3 overflow-y-auto bg-cream px-3 py-3 sm:px-8 sm:py-4',
   center: 'flex min-h-dvh flex-col items-center justify-center bg-cream text-center',
   form: 'flex min-h-dvh flex-col items-center justify-center bg-cream',
 };
@@ -33,24 +33,19 @@ export function BlankScreen(): JSX.Element {
 export interface RoundIconButtonProps {
   readonly label: string;
   readonly onClick: () => void;
-  /** `kid` = 64px (touch target, non-functional.md §2), `parent` = 44px. */
-  readonly size?: 'kid' | 'parent';
+  /** `round` = 64px (touch target, non-functional.md §2), `round-md` = 56px (game screens), `round-sm` = 44px (parent). */
+  readonly look?: 'round' | 'round-md' | 'round-sm';
   readonly children: ReactNode;
 }
 
 export function RoundIconButton({
   label,
   onClick,
-  size = 'kid',
+  look = 'round',
   children,
 }: RoundIconButtonProps): JSX.Element {
   return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      className={tapClass(size === 'kid' ? 'round' : 'round-sm')}
-    >
+    <button type="button" aria-label={label} onClick={onClick} className={tapClass(look)}>
       {children}
     </button>
   );
@@ -90,7 +85,7 @@ export function ScreenHeader({
       <RoundIconButton
         label={actionLabel}
         onClick={onAction}
-        size={look === 'parent' ? 'parent' : 'kid'}
+        look={look === 'page' ? 'round' : look === 'game' ? 'round-md' : 'round-sm'}
       >
         {icon ?? (action === 'back' ? <BackIcon /> : <CloseIcon />)}
       </RoundIconButton>

@@ -1,11 +1,9 @@
 import type { JSX } from 'react';
-import { useTranslation } from 'react-i18next';
 import type { ConceptTask, ExerciseStateBase } from '@learn/platform-core';
 import { recordReviewResult } from '@learn/platform-core';
 import { useAppStore, useServices } from '../../app/store.ts';
 import { ExercisePlay } from '../../kinds/ExercisePlay.tsx';
 import { useExerciseSession } from '../../kinds/session.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { StarsRow } from '../StarsRow.tsx';
 import { NextButton } from '../lesson/NextButton.tsx';
@@ -31,7 +29,6 @@ export function ReviewExerciseStep({
   showHint = true,
   onRecord,
 }: ReviewExerciseStepProps): JSX.Element {
-  const { t } = useTranslation();
   const services = useServices();
   const profile = useAppStore((state) => state.profile);
   const exercise = task.exercise;
@@ -64,12 +61,7 @@ export function ReviewExerciseStep({
     },
   });
 
-  const top = (
-    <>
-      <SpeechBubble text={instructionText} note={note} />
-      <ReplayButton onClick={replay} label={t('exercise.replay')} className="w-full" />
-    </>
-  );
+  const top = <SpeechBubble text={instructionText} note={note} onReplay={replay} />;
 
   const done = solved ? (
     <div className="mt-auto flex flex-col items-center gap-4">

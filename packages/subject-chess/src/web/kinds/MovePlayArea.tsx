@@ -13,7 +13,7 @@ import type { UndoAction } from '../../kinds/static-move.ts';
 import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
 import type { SurfaceContext } from '@learn/platform-web/app/subject.ts';
 import { Svg } from '@learn/platform-web/ui/ds/icons.tsx';
-import { InfoPanel } from '@learn/platform-web/ui/ds/primitives.tsx';
+import { INFO_CHIP } from '@learn/platform-web/ui/ds/primitives-styles.ts';
 import { StarsRow } from '@learn/platform-web/ui/StarsRow.tsx';
 import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
 import { ExerciseControls } from '@learn/platform-web/kinds/ExerciseControls.tsx';
@@ -35,27 +35,24 @@ export const UndoIcon = (): JSX.Element => (
   </Svg>
 );
 
-export interface MovesCardProps {
+export interface MovesChipProps {
   readonly current: number;
   readonly target: number;
 }
 
-/** Moves-so-far counter (collect-stars / capture): info, flat (docs/screens.md §1), never a button. */
-export function MovesCard({ current, target }: MovesCardProps): JSX.Element {
+/** Moves-so-far counter (collect-stars / capture) as an inline chip in the action row: info, flat
+ * (docs/screens.md §1), never a button. The target ("in 1 move") is read out, the stars show it. */
+export function MovesChip({ current, target }: MovesChipProps): JSX.Element {
   const { t } = useTranslation();
   return (
-    <InfoPanel className="flex flex-col gap-2 rounded-3xl px-5 py-4">
-      <span className="text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
+    <div className={`${INFO_CHIP} w-full @xl:w-auto`}>
+      <span className="text-sm font-extrabold uppercase tracking-wide text-muted">
         {t('exercise.moves-label')}
       </span>
-      <span className="font-display text-3xl font-semibold text-ink">
-        {t('exercise.moves-of', { current, total: target })}
-      </span>
-      <div className="flex items-center gap-2 text-sm font-bold text-muted">
-        <StarsRow earned={3} max={3} size="1.1rem" />
-        {t('exercise.moves-target', { count: target })}
-      </div>
-    </InfoPanel>
+      <span className="font-semibold">{t('exercise.moves-of', { current, total: target })}</span>
+      <StarsRow earned={3} max={3} size="1rem" />
+      <span className="sr-only">{t('exercise.moves-target', { count: target })}</span>
+    </div>
   );
 }
 
@@ -69,7 +66,8 @@ interface MovePlayAreaProps {
   readonly surface: SurfaceContext;
   readonly top: ReactNode;
   readonly done: ReactNode | null;
-  readonly counter?: ReactNode;
+  readonly actions?: ReactNode;
+  readonly info?: ReactNode;
   readonly undo?: ReactNode;
 }
 
@@ -81,7 +79,8 @@ export function MovePlayArea({
   surface,
   top,
   done,
-  counter,
+  actions,
+  info,
   undo,
 }: MovePlayAreaProps): JSX.Element {
   const pieceBadges = useSurfacePieceBadges(surface);
@@ -110,16 +109,15 @@ export function MovePlayArea({
   );
 
   const controls = (
-    <>
-      {counter}
-      <ExerciseControls
-        showHint={showHint}
-        onHint={() => {
-          dispatch({ type: 'hint' });
-        }}
-        slot={undo}
-      />
-    </>
+    <ExerciseControls
+      showHint={showHint}
+      onHint={() => {
+        dispatch({ type: 'hint' });
+      }}
+      info={info}
+      slot={undo}
+      extras={actions}
+    />
   );
 
   return <ExerciseFrame board={board} panel={panelBody(top, state.core.solved, done, controls)} />;
@@ -138,7 +136,7 @@ export function CountedPlayArea(
   return (
     <MovePlayArea
       {...props}
-      counter={<MovesCard current={state.core.moves} target={def.stars3} />}
+      info={<MovesChip current={state.core.moves} target={def.stars3} />}
       undo={
         <button
           type="button"

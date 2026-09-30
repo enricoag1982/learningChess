@@ -18,7 +18,6 @@ export type TapLook =
   | 'wide'
   | 'next'
   | 'primary'
-  | 'secondary'
   | 'compact'
   | 'parent'
   | 'custom';
@@ -42,8 +41,6 @@ const LOOK_BASE: Readonly<Record<TapLook, string>> = {
   // Lesson's one forward action (NextButton, and vs Friend's own final CTA).
   next: 'flex h-16 items-center justify-center gap-3 rounded-3xl px-6 font-display text-xl font-semibold',
   primary:
-    'flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold',
-  secondary:
     'flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold',
   // Game-screen action (Hint / Undo / Check / Skip / answers): 56px, icon + short label, shares one row.
   compact:

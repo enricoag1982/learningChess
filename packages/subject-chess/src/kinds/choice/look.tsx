@@ -6,7 +6,7 @@ import { PieceIcon } from '../../web/ui/board/pieces.tsx';
 export const CHESS_CHOICE_LOOK: ChoiceLook<ChoiceOption> = {
   visual: ({ piece }) =>
     piece && (
-      <span className="h-14 w-14 flex-shrink-0">
+      <span className="h-12 w-12 flex-shrink-0">
         <PieceIcon piece={piece} />
       </span>
     ),

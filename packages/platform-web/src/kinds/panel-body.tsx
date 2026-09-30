@@ -10,7 +10,7 @@ export function panelBody(
   return (
     <>
       {top}
-      {solved ? done : <div className="mt-auto flex flex-col gap-4">{controls}</div>}
+      {solved ? done : <div className="mt-auto flex flex-col gap-3">{controls}</div>}
     </>
   );
 }
