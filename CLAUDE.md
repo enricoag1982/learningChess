@@ -38,12 +38,13 @@ Offline chess learning app for an 8-year-old beginner. `v4.0.0` = v2 features on
 - Offline app: no server; all data on device. v2 = offline time controls + device sharing by file with merge (owner 2026-09-25). Online (login, remote play, automatic sync) parked, hooks only.
 - TypeScript + React + Vite PWA; Capacitor later for Android / iPad. GitHub Pages hosts the static app.
 - Packages (`packages/*`, `apps/*`): `@learn/platform-core` (pure TS: domain, use cases, ports); `@learn/platform-content` (YAML → Zod → JSON build); `@learn/platform-web` (React shell, adapters); `@learn/subject-chess` (chess pack: core, kinds, modes, content, web); `@learn/subject-math` (math demo pack); apps `@learn/chess-kids` (deployed) and `@learn/math-demo` (dev / test only), thin shells. Dependencies point only to earlier entries; platform never imports a subject (ESLint boundaries, `docs/architecture.md` §3).
-- Animal theme; English first (i18n); narration = Web Speech API (device voices) up to v1.1, pre-generated audio (Kokoro) from M6.
+- Animal theme (avatars, Journey, bots; pieces use real names, no animal badges — owner 2026-09-30); English first (i18n); narration = Web Speech API (device voices) up to v1.1, pre-generated audio (Kokoro) from M6.
 - Parent code (UI term; not a real password) kept in a simple plain-text file; the code screen reminds where the file is (web: copy in Downloads, again via "Download parent code file" in the grown-ups area; store apps: editable file in app Documents). Daily time limit in v1.
 
 ## Status and next step
 
 - Done: M0–M7 (`m0` … `m7`), releases `v1.0.0`, `v1.1.0` (owner playtest 2), `v1.1.1` (iPad mini 4 / iOS 15 fix), `v2.0.0` (generated voice, Fluent 3D art, parent code, time controls, device sharing); M8 = v4 refactor, `m8.1` … `m8.36` (R0–R4 package split, R4.5 trim, R5 math demo, owner requests m8.34–m8.35), `v4.0.0` (tag after the owner's `docs/release.md` §1 checks). Live: https://enricoag1982.github.io/learningChess/ (deploy on every push to `master`). Pending user action: playtests 1–4 (`docs/roadmap.md` §5), offline check on real tablets (`docs/release.md` §1).
+- M9 (post-v4 owner requests): `m9.1` real piece names (no animal badges, no Piece style setting; owner 2026-09-30).
 - Next: follow-ups F4 (Bear strength), F6–F8 (`docs/roadmap.md` §3.2); apply `docs/retrospective.md` §6 and §9 learnings. Release steps: `docs/release.md`.
 - Local: `pnpm install` (also builds the content JSON) · `pnpm dev` · `pnpm test` (one package: `pnpm --filter @learn/<pkg> test`) · `pnpm test:slow` · `pnpm lint` · `pnpm typecheck` · `pnpm format:check` · `pnpm build && PW_CHROMIUM_PATH=/opt/pw-browsers/chromium pnpm test:e2e` (cloud sandbox browser path) · `pnpm size` · `pnpm compat` · `pnpm voice:check` · math demo: `pnpm dev:math`, `pnpm test:e2e:math`.
 - Dev playgrounds (dev builds only): `/#board`, `/#exercises`, `/#lesson=<id>&view=<story|demo|boss|exercise id>`.
