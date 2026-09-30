@@ -60,14 +60,21 @@ describe('SpeechBubble', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 
-  it('with `onReplay`, ends the owl row with a compact replay icon named "Say it again"', () => {
+  it('with `onReplay`, shows a compact replay icon named "Say it again" in the avatar column', () => {
     const onReplay = vi.fn();
     render(bubble({ text: 'Tap.', onReplay }));
     const replay = screen.getByRole('button', { name: 'Say it again' });
     expect(replay.textContent).toBe('');
     expect(replay.className).toContain('w-14');
-    expect(replay.parentElement?.lastElementChild).toBe(replay);
-    expect(replay.parentElement?.contains(screen.getByText('Tap.'))).toBe(true);
+    // Stacked layouts: that column dissolves and `order` puts the icon after the bubble; from
+    // `lg` it stacks under the owl and the bubble takes the whole remaining width.
+    const column = replay.parentElement;
+    expect(column?.className).toContain('contents');
+    expect(column?.className).toContain('lg:flex-col');
+    expect(column?.firstElementChild?.contains(replay)).toBe(false);
+    expect(column?.parentElement?.contains(screen.getByText('Tap.'))).toBe(true);
+    expect(replay.className).toContain('order-2');
+    expect(screen.getByText('Tap.').closest('.order-1')).not.toBeNull();
 
     fireEvent.click(replay);
     expect(onReplay).toHaveBeenCalledOnce();

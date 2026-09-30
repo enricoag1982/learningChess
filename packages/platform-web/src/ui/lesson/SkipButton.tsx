@@ -5,23 +5,17 @@ import { SkipIcon } from '../ds/icons.tsx';
 
 export interface SkipButtonProps {
   readonly onClick: () => void;
-  /** Story / Demo: a narrow button in a row of its own, above the primary (never beside it). */
-  readonly alone?: boolean;
+  readonly className?: string;
 }
 
 /** "Skip" (teaching-process.md §2): Story/Demo/Try only, never Exercises/Boss. One tap skips the
  * rest of the current phase and marks it in `StepPills`. */
-export function SkipButton({ onClick, alone = false }: SkipButtonProps): JSX.Element {
+export function SkipButton({ onClick, className = '' }: SkipButtonProps): JSX.Element {
   const { t } = useTranslation();
-  const button = (
-    <button
-      type="button"
-      onClick={onClick}
-      className={alone ? `${SECONDARY_BUTTON} max-w-48` : SECONDARY_BUTTON}
-    >
+  return (
+    <button type="button" onClick={onClick} className={`${SECONDARY_BUTTON} ${className}`}>
       <SkipIcon />
       {t('lesson.skip')}
     </button>
   );
-  return alone ? <div className="flex">{button}</div> : button;
 }

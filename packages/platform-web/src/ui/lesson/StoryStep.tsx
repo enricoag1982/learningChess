@@ -8,8 +8,7 @@ import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { useIsCompact } from '../useMediaQuery.ts';
 import { useNarratedText } from '../ds/useNarratedText.ts';
 import { CharacterCard } from './CharacterCard.tsx';
-import { NextButton } from './NextButton.tsx';
-import { SkipButton } from './SkipButton.tsx';
+import { ForwardRow } from './ForwardRow.tsx';
 
 export interface StoryStepProps {
   readonly lesson: Lesson;
@@ -36,17 +35,23 @@ export function StoryStep({ lesson, onNext, onSkip }: StoryStepProps): JSX.Eleme
             {/* Mini board centred, capped width; buttons pinned to the bottom so the primary is
                 always in view on a phone (playtest 2: it sat below the fold). */}
             <pack.surface.Story lesson={lesson} compact />
-            <div className="sticky bottom-0 flex flex-col gap-3 bg-cream pt-2 pb-1">
-              <SkipButton alone onClick={onSkip} />
-              <NextButton onClick={onNext} label={t('story.primary')} className="w-full" />
-            </div>
+            <ForwardRow
+              onSkip={onSkip}
+              onNext={onNext}
+              label={t('story.primary')}
+              className="sticky bottom-0 bg-cream pt-2 pb-1"
+            />
           </>
         ) : (
           <>
-            <SkipButton alone onClick={onSkip} />
             <div className="flex items-end gap-6">
               <pack.surface.Story lesson={lesson} compact={false} />
-              <NextButton onClick={onNext} label={t('story.primary')} className="flex-1" />
+              <ForwardRow
+                onSkip={onSkip}
+                onNext={onNext}
+                label={t('story.primary')}
+                className="flex-1"
+              />
             </div>
           </>
         )}

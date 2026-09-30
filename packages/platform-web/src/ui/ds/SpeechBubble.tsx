@@ -33,8 +33,20 @@ export function SpeechBubble({
   const { t } = useTranslation();
   return (
     <div className="flex items-start gap-3">
-      <Owl className={avatarClassName} />
-      <div className="relative min-w-0 flex-1">
+      {/* Stacked layouts: the wrapper dissolves and the replay icon ends the row (`order`); side
+          column (`lg`): it sits under the avatar, so the bubble gets the whole remaining width. */}
+      <div className="contents lg:flex lg:flex-col lg:items-center lg:gap-2">
+        <Owl className={avatarClassName} />
+        {onReplay && (
+          <ReplayButton
+            compact
+            onClick={onReplay}
+            label={replayLabel ?? t('exercise.replay')}
+            className="order-2"
+          />
+        )}
+      </div>
+      <div className="relative order-1 min-w-0 flex-1">
         {/* The bubble's tail: a small rotated square, same fill, behind the left edge. */}
         <span
           aria-hidden="true"
@@ -51,9 +63,6 @@ export function SpeechBubble({
           )}
         </div>
       </div>
-      {onReplay && (
-        <ReplayButton compact onClick={onReplay} label={replayLabel ?? t('exercise.replay')} />
-      )}
     </div>
   );
 }

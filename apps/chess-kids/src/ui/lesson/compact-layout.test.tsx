@@ -55,7 +55,7 @@ describe('lesson header and story / demo steps', () => {
     expect(close.className).toContain('w-14');
   });
 
-  it('Story and Demo: "Listen / Say it again" is an icon at the end of the owl row; Skip has its own row above the 64px primary', async () => {
+  it('Story and Demo: the replay icon leaves the bubble row; Skip shares one row with the 64px primary', async () => {
     const lesson = fixtureLesson();
     const services = createTestServices(fixtureContentSource(lesson));
     const { store } = await renderWithStore(<LessonScreen />, services, chessWeb);
@@ -71,13 +71,15 @@ describe('lesson header and story / demo steps', () => {
       const replay = await screen.findByRole('button', { name: replayName });
       expect(replay.textContent).toBe('');
       expect(replay.className).toContain('w-14');
-      expect(replay.parentElement?.lastElementChild).toBe(replay);
 
       const skip = screen.getByRole('button', { name: 'Skip' });
+      const primary = screen.getByRole('button', { name: primaryName });
       expect(skip.className).toContain('h-14');
       expect(skip.parentElement).not.toBe(replay.parentElement);
-
-      const primary = screen.getByRole('button', { name: primaryName });
+      expect(skip.parentElement).toBe(primary.parentElement);
+      expect(skip.nextElementSibling).toBe(primary);
+      expect(skip.className).toContain('flex-none!');
+      expect(primary.className).toContain('flex-1');
       expect(primary.className).toContain('h-16');
       expect(primary.className).not.toContain('h-20');
 
@@ -87,7 +89,7 @@ describe('lesson header and story / demo steps', () => {
 });
 
 describe('exercise action row', () => {
-  it('a guided move-counted try: Moves chip (40px, flat), Hint, Undo and Skip share one row; replay is an icon at the owl row end', async () => {
+  it('a guided move-counted try: Moves chip (40px, flat), Hint, Undo and Skip share one row; replay is an icon in the avatar column', async () => {
     const lesson = fixtureLesson({ guided: [noteExercise], exercises: [] });
     const services = createTestServices(fixtureContentSource(lesson));
     await renderWithStore(
@@ -126,8 +128,9 @@ describe('exercise action row', () => {
     expect(replay.textContent).toBe('');
     expect(replay.className).toContain('h-14');
     expect(replay.className).toContain('w-14');
-    expect(replay.parentElement?.lastElementChild).toBe(replay);
-    expect(replay.parentElement?.contains(screen.getByText('note-instruction'))).toBe(true);
+    expect(
+      replay.parentElement?.parentElement?.contains(screen.getByText('note-instruction')),
+    ).toBe(true);
   });
 
   it('a hint note sits inside the bubble under the instruction, not in a box of its own', async () => {

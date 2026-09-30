@@ -7,8 +7,7 @@ import { tContent } from '../../content-text.ts';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { useNarratedText } from '../ds/useNarratedText.ts';
 import { GameLayout } from './GameLayout.tsx';
-import { NextButton } from './NextButton.tsx';
-import { SkipButton } from './SkipButton.tsx';
+import { ForwardRow } from './ForwardRow.tsx';
 
 export interface DemoStepProps {
   readonly lesson: Lesson;
@@ -31,9 +30,7 @@ export function DemoStep({ lesson, onNext, onSkip }: DemoStepProps): JSX.Element
       panel={
         <>
           <SpeechBubble text={text} onReplay={replay} />
-          {/* Skip keeps a row of its own (same place as on Story), never beside the primary. */}
-          <SkipButton alone onClick={onSkip} />
-          <NextButton onClick={onNext} className="mt-auto w-full" />
+          <ForwardRow onSkip={onSkip} onNext={onNext} className="mt-auto" />
         </>
       }
     />
