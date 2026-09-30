@@ -43,7 +43,7 @@ export function makeLesson(overrides: Partial<Lesson> = {}): Lesson {
     world: 'pieces',
     order: 1,
     concept: 'rook-move',
-    character: 'rhino',
+    character: 'rook',
     titleKey: `lessons:${id}.title`,
     storyKey: `lessons:${id}.story`,
     demo: {

@@ -341,10 +341,10 @@ den:
   rank-after-world: 'After World {{order}}'
   rank-after-track: 'After {{track}}'
   rank-all-tracks: After all paths
-  friends-heading: Animal friends
-  friend-name: '{{character}}, friend'
-  friend-name-locked: '{{character}}, locked, finish the {{piece}} lesson'
-  friend-condition: 'Finish the {{piece}} lesson'
+  friends-heading: Your pieces
+  friend-name: '{{piece}}, learned'
+  friend-name-locked: 'Locked. Learn the {{piece}} lesson'
+  friend-condition: 'Learn the {{piece}} lesson'
 badges:
   heading: Badges
   category-milestone: Milestones

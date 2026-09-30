@@ -31,12 +31,12 @@ describe('HomeScreen', () => {
   });
 
   it('new lesson, piece lesson: Owl greets by character, primary button says Start today', async () => {
-    const lesson = fixtureLesson({ character: 'rhino' });
+    const lesson = fixtureLesson({ character: 'rook' });
     const services = createTestServices(fixtureContentSource(lesson));
     await seedReturningProfile(services, 'Mia');
     await renderApp(services, { at: 'home' });
 
-    const character = i18n.t('characters:rhino.name');
+    const character = i18n.t('characters:rook.name');
     await screen.findByText(i18n.t('home.owl-next', { character }));
     expect(screen.getByRole('button', { name: /Start today/ })).toBeTruthy();
     expect(screen.getByText('Pawn rank')).toBeTruthy();
@@ -203,7 +203,7 @@ const BOSS_MINIGAME: MiniGame = {
 
 describe('HomeScreen next step is a world boss', () => {
   it('Owl announces the world boss and "Start today" starts its mini-game session', async () => {
-    const lesson = fixtureLesson({ id: 'bl', character: 'rhino' });
+    const lesson = fixtureLesson({ id: 'bl', character: 'rook' });
     const services = createTestServices(
       makeContentSource({ lessons: [lesson], minigames: [BOSS_MINIGAME], catalog: CATALOG_BOSS }),
     );

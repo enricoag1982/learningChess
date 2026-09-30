@@ -80,15 +80,12 @@ export function lessonLabel(lesson: Lesson): string {
 
 /**
  * Accessible name of a lesson's Journey node for `status` (matches `JourneyScreen`'s
- * `LessonNode`). For a piece lesson, the piece word is wildcarded: only app UI code
- * (`character-meta.ts`) maps character -> piece, which this e2e helper doesn't duplicate.
+ * `LessonNode`): the lesson's label (a piece character's name is the piece, said once).
  */
 export function journeyNodeName(lesson: Lesson, status: 'current' | 'locked'): RegExp {
   const statusWord = escapeRegExp(contentText(`journey:ui.status-${status}`));
-  const label = escapeRegExp(lessonLabel(lesson));
-  const namePart = characterPieceOrNull(lesson.character) === null ? label : `${label} the .+`;
   const pattern = interpolate(contentText('journey:ui.node-name'), {
-    name: namePart,
+    name: escapeRegExp(lessonLabel(lesson)),
     status: statusWord,
   });
   return new RegExp(`^${pattern}$`);

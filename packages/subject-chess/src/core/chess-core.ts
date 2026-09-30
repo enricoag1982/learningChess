@@ -23,18 +23,18 @@ import { composeDefaultSettings } from '@learn/platform-core/domain/profile-sett
 import type { AppConfig, SubjectCore } from '@learn/platform-core/domain/subject';
 import type { ProfileSettings } from '@learn/platform-core/domain/profile-settings';
 
-/** The World-2 piece-lesson characters' pieces, Rhino .. Caterpillar: the one source `CHESS_CHARACTERS.topicKey`,
- * `character-meta.ts` and content's `voice-texts.ts` derive from. */
+/** The World-2 piece-lesson characters, one per piece (Rook .. Pawn): the one source `CHESS_CHARACTERS.topicKey`,
+ * the pack's `characterArt` and content's `voice-texts.ts` derive from. */
 export const CHARACTER_PIECES: Readonly<Record<string, PieceType>> = {
-  rhino: 'r',
-  elephant: 'b',
-  lioness: 'q',
-  lion: 'k',
-  horse: 'n',
-  caterpillar: 'p',
+  rook: 'r',
+  bishop: 'b',
+  queen: 'q',
+  king: 'k',
+  knight: 'n',
+  pawn: 'p',
 };
 
-/** The World-2 piece-lesson characters; key order is `animalFriends`' friend order. */
+/** The World-2 piece-lesson characters; key order is `animalFriends`' friend order (the Den's piece order). */
 export const CHESS_CHARACTERS = Object.fromEntries(
   Object.entries(CHARACTER_PIECES).map(([character, piece]) => [
     character,
@@ -43,7 +43,7 @@ export const CHESS_CHARACTERS = Object.fromEntries(
 );
 
 /** Chess's `SubjectCore`: 8 exercise kinds, `static` / `versus` modes (`series` comes from `createSubjectRuntime`), its badge
- * facts, versus→GameRecord translation and animal friends. */
+ * facts, versus→GameRecord translation and piece characters. */
 export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   id: 'chess',
   context: createVariantRules(chessJsRules),

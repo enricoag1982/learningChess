@@ -20,10 +20,11 @@ function AnimalImg({
   );
 }
 
-/** Character portrait by lesson-character id (`docs/app-structure.md` §8): the pack's `art` first, else the platform's own. */
+/** Character portrait by lesson-character id (`docs/app-structure.md` §8): the pack's own drawing (`characterArt`), else its
+ * image `art`, else the platform's own. */
 export function CharacterIcon({ character }: { readonly character: string }): JSX.Element {
   const pack = usePack();
-  return <AnimalImg id={character} subjectArt={pack.art} />;
+  return pack.characterArt?.(character) ?? <AnimalImg id={character} subjectArt={pack.art} />;
 }
 
 export function OwlIcon(): JSX.Element {

@@ -1,7 +1,7 @@
 id: knight
 order: 5
 concept: knight-move
-character: horse
+character: knight
 demo:
   board: |
     . . . . . . . .

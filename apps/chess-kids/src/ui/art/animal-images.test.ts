@@ -1,16 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { PieceType } from '@learn/subject-chess';
 import { AVATARS } from '@learn/platform-core';
-import { bot } from '@learn/subject-chess';
-import { characterForPiece } from '@learn/subject-chess/web/ui/art/character-meta.ts';
+import { bot, chessCore } from '@learn/subject-chess';
+import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 
-const PIECE_TYPES: readonly PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
-
-/** Every lesson-character id real content authors (`packages/subject-chess/content/lessons/**\/*.yaml`,
- * `character:`), plus Owl (the narrator, World 1) and Fox (the kid's own avatar, also usable as a
- * `CharacterIcon` — `characters.tsx`). */
-const LESSON_CHARACTER_IDS = [...PIECE_TYPES.map(characterForPiece), 'owl', 'fox'];
+/** The lesson characters `CharacterIcon` draws from an image: Owl (the narrator, World 1) and Fox (the kid's own avatar,
+ * also usable as a `CharacterIcon` — `characters.tsx`). Piece characters are drawn by the pack (`characterArt`). */
+const LESSON_CHARACTER_IDS = ['owl', 'fox'];
 
 /**
  * Every id `CharacterIcon`/`AvatarIcon`/the Play screen's level chips can be given in the real app
@@ -36,5 +32,16 @@ describe('ANIMAL_IMAGES covers every real id', () => {
     for (const [id, src] of Object.entries(ANIMAL_IMAGES)) {
       expect(src, id).toBeTruthy();
     }
+  });
+});
+
+describe('piece characters are drawn by the chess pack, not from an image', () => {
+  it.each(Object.keys(chessCore.characters))('character %s is its piece icon', (id) => {
+    expect(chessWeb.characterArt(id)).not.toBeNull();
+    expect(Object.hasOwn(ANIMAL_IMAGES, id)).toBe(false);
+  });
+
+  it('leaves Owl to its image', () => {
+    expect(chessWeb.characterArt('owl')).toBeNull();
   });
 });

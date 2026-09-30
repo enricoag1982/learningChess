@@ -1,7 +1,7 @@
 id: pawn
 order: 6
 concept: pawn-move
-character: caterpillar
+character: pawn
 demo:
   board: |
     . . . . . . . .

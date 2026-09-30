@@ -1,7 +1,7 @@
 id: king
 order: 4
 concept: king-move
-character: lion
+character: king
 demo:
   board: |
     . . . . . . . .

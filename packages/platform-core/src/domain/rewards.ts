@@ -13,7 +13,7 @@ export interface AnimalFriend {
   readonly earned: boolean;
 }
 
-/** The subject's animal friends (chess: Rhino .. Caterpillar), each tied to the earliest lesson teaching its
+/** The subject's friends (chess: Rook .. Pawn, shown as "Your pieces"), each tied to the earliest lesson teaching its
  * character, in `characters` key order; characters without a lesson are left out. */
 export function animalFriends(
   lessons: readonly Lesson[],

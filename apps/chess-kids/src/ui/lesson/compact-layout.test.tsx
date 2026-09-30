@@ -143,7 +143,7 @@ describe('exercise action row', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
-    const note = await screen.findByText('Look at Rhino.');
+    const note = await screen.findByText('Look at Rook.');
     const instruction = screen.getByText('note-instruction');
     expect(note.parentElement).toBe(instruction.parentElement);
     expect(note.className).toContain('border-t');

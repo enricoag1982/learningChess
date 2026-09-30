@@ -28,7 +28,7 @@ const FULL_GAME_LESSON: Lesson = {
   world: 'check',
   order: 0,
   concept: 'full-game',
-  character: 'lion',
+  character: 'king',
   titleKey: 'play.full-game-title',
   storyKey: 'play.full-game-title',
   demo: {

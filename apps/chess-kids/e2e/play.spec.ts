@@ -59,12 +59,12 @@ test.describe('Play screen and My Den', () => {
     expect(progress?.wins).toBe(1);
     expect(progress?.bestStars).toBe(3);
 
-    // Back to Home, then My Den: Rhino is now a friend, and the rank is still Pawn (only the
+    // Back to Home, then My Den: the Rook is now learned, and the rank is still Pawn (only the
     // Rook lesson is mastered — World 2 as a whole is not).
     await page.getByRole('button', { name: 'Back to Home' }).click();
     await page.getByRole('button', { name: 'My Den' }).click();
     await expect(page.getByText("Kid's Den")).toBeVisible();
-    await expect(page.getByRole('listitem', { name: 'Rhino, friend' })).toBeVisible();
+    await expect(page.getByRole('listitem', { name: 'Rook, learned' })).toBeVisible();
     await expect(page.getByRole('listitem', { name: 'Pawn, You are here' })).toBeVisible();
   });
 });

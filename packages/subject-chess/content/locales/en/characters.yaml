@@ -1,14 +1,14 @@
-rhino:
-  name: Rhino
-elephant:
-  name: Elephant
-lioness:
-  name: Lioness
-lion:
-  name: Lion
-horse:
-  name: Horse
-caterpillar:
-  name: Caterpillar
+rook:
+  name: Rook
+bishop:
+  name: Bishop
+queen:
+  name: Queen
+king:
+  name: King
+knight:
+  name: Knight
+pawn:
+  name: Pawn
 owl:
   name: Owl

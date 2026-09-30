@@ -79,7 +79,7 @@ export function fixtureLesson(overrides: Partial<Lesson> = {}): Lesson {
     world: 'test',
     order: 1,
     concept: 'fixture-move',
-    character: 'rhino',
+    character: 'rook',
     titleKey: 'fixtures:title',
     storyKey: 'fixtures:story',
     demo: {

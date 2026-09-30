@@ -1,7 +1,7 @@
 // The chess `SubjectWeb` pack (docs/refactor-v4.md §11): everything the platform reaches of chess.
 import { createElement, lazy } from 'react';
 import { useTranslation } from 'react-i18next';
-import { chessCore } from '../core/chess-core.ts';
+import { CHARACTER_PIECES, chessCore } from '../core/chess-core.ts';
 import { isInCheck } from '../core/chess/facts/position.ts';
 import { kingSquare } from '../core/chess/facts/pieces.ts';
 import type { BotPlayer } from '../core/app/bot-player.ts';
@@ -17,6 +17,7 @@ import { MINI_GAME_MODE_UI } from './modes/ui-registry.ts';
 import { CharacterBadge, Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
 import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
 import { Board } from './ui/board/Board.tsx';
+import { PieceIcon } from './ui/board/pieces.tsx';
 import { PlayScreen } from './ui/PlayScreen.tsx';
 import { FullGameScreen } from './ui/FullGameScreen.tsx';
 
@@ -57,6 +58,12 @@ declare module '@learn/platform-web/app/routes.ts' {
   }
 }
 
+/** A piece character's portrait is its own classic (white) piece icon; `null` for the narrator (Owl), which keeps its image. */
+function characterArt(character: string) {
+  const type = CHARACTER_PIECES[character];
+  return type === undefined ? null : createElement(PieceIcon, { piece: { color: 'w', type } });
+}
+
 function createChessServices() {
   const content = createBundledContentSource();
   return { content, subject: { botPlayer: createWorkerBotPlayer(), content } };
@@ -83,6 +90,7 @@ export const chessWeb = {
   modes: MINI_GAME_MODE_UI,
   surface: { Story: SurfaceStory, Demo: SurfaceDemo, View: SurfaceView },
   CharacterBadge,
+  characterArt,
   art: ANIMAL_IMAGES,
   homeTiles: HOME_TILES,
   den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },

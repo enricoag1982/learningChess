@@ -1,7 +1,7 @@
 id: queen
 order: 3
 concept: queen-move
-character: lioness
+character: queen
 demo:
   board: |
     . . . . . . . .

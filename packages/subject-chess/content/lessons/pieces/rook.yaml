@@ -1,7 +1,7 @@
 id: rook
 order: 1
 concept: rook-move
-character: rhino
+character: rook
 demo:
   board: |
     . . . . . . . .

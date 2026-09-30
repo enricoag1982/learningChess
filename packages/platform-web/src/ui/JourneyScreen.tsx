@@ -544,12 +544,11 @@ function LessonNode({
   const characterEntry = characters[lesson.character];
   const isFirstOfCharacter = firstLessonOfCharacter.get(lesson.character) === lesson.id;
   const characterLabel = journeyNodeLabel(t, characters, lesson, firstLessonOfCharacter);
+  const pieceLabel = characterEntry === undefined ? '' : tContent(t, characterEntry.topicKey);
+  // "Rhino the Rook" for a character named apart from its topic; a character that is its topic ("Rook") is not said twice.
   const nameLabel =
-    characterEntry !== undefined && isFirstOfCharacter
-      ? tContent(t, 'journey:ui.character-piece', {
-          character: characterLabel,
-          piece: tContent(t, characterEntry.topicKey),
-        })
+    characterEntry !== undefined && isFirstOfCharacter && pieceLabel !== characterLabel
+      ? tContent(t, 'journey:ui.character-piece', { character: characterLabel, piece: pieceLabel })
       : characterLabel;
   const statusWord = tContent(t, `journey:ui.status-${status}`);
   const accessibleName =

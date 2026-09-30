@@ -40,7 +40,7 @@ describe('real content', () => {
     expect(rook.world).toBe('pieces');
     expect(rook.order).toBe(1);
     expect(rook.concept).toBe('rook-move');
-    expect(rook.character).toBe('rhino');
+    expect(rook.character).toBe('rook');
     expect(rook.guided).toHaveLength(2);
     expect(rook.exercises).toHaveLength(8);
     expect(rook.exercises.map((exercise) => exercise.type)).toEqual([
@@ -119,7 +119,7 @@ describe('real content', () => {
       id: 'rook',
       order: 1,
       concept: 'rook-move',
-      character: 'rhino',
+      character: 'rook',
       exerciseCount: 8,
       boss: 'hungry-rook',
     },
@@ -127,7 +127,7 @@ describe('real content', () => {
       id: 'bishop',
       order: 2,
       concept: 'bishop-move',
-      character: 'elephant',
+      character: 'bishop',
       exerciseCount: 8,
       boss: 'hungry-bishop',
     },
@@ -135,7 +135,7 @@ describe('real content', () => {
       id: 'queen',
       order: 3,
       concept: 'queen-move',
-      character: 'lioness',
+      character: 'queen',
       exerciseCount: 8,
       boss: 'hungry-queen',
     },
@@ -143,7 +143,7 @@ describe('real content', () => {
       id: 'king',
       order: 4,
       concept: 'king-move',
-      character: 'lion',
+      character: 'king',
       exerciseCount: 6,
       boss: 'king-walk',
     },
@@ -151,7 +151,7 @@ describe('real content', () => {
       id: 'knight',
       order: 5,
       concept: 'knight-move',
-      character: 'horse',
+      character: 'knight',
       exerciseCount: 8,
       boss: 'knight-maze',
     },

@@ -1,7 +1,7 @@
 id: bishop
 order: 2
 concept: bishop-move
-character: elephant
+character: bishop
 demo:
   board: |
     . . . . . . . .

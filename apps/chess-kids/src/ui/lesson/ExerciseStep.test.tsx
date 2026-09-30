@@ -82,7 +82,7 @@ describe('ExerciseStep', () => {
     fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
     fireEvent.click(screen.getByRole('button', { name: /^b2,/ })); // diagonal: illegal for a rook
 
-    await screen.findByText('Rhino only runs in straight lines!');
+    await screen.findByText('Rook only runs in straight lines!');
     expect(screen.getByRole('button', { name: /^a1, white rook/ })).toBeTruthy();
   });
 
@@ -98,7 +98,7 @@ describe('ExerciseStep', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /^d4,/ })); // empty, nothing selected yet
 
-    await screen.findByText('Tap Rhino first.');
+    await screen.findByText('Tap Rook first.');
   });
 
   it('walks the hint ladder from piece to target to the move', async () => {
@@ -113,7 +113,7 @@ describe('ExerciseStep', () => {
 
     const hintButton = screen.getByRole('button', { name: /Hint/ });
     fireEvent.click(hintButton);
-    await screen.findByText('Look at Rhino.');
+    await screen.findByText('Look at Rook.');
     fireEvent.click(hintButton);
     await screen.findByText('Try the orange square.');
     fireEvent.click(hintButton);
@@ -208,17 +208,17 @@ describe('ExerciseStep', () => {
     expect(narrator.spoken).toEqual(['note-instruction']); // no note yet: nothing to append
 
     fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
-    await screen.findByText('Look at Rhino.');
+    await screen.findByText('Look at Rook.');
     expect(screen.getByText('note-instruction')).toBeTruthy();
     // The note alone, not the whole instruction re-read (owner report 2026-09-26).
-    expect(narrator.spoken).toEqual(['note-instruction', 'Look at Rhino.']);
+    expect(narrator.spoken).toEqual(['note-instruction', 'Look at Rook.']);
 
     // A second hint note is appended alone too — the instruction is still not repeated.
     fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
     await screen.findByText('Try the orange square.');
     expect(narrator.spoken).toEqual([
       'note-instruction',
-      'Look at Rhino.',
+      'Look at Rook.',
       'Try the orange square.',
     ]);
 
@@ -483,7 +483,7 @@ describe('ExerciseStep', () => {
 
       const hintButton = screen.getByRole('button', { name: /Hint/ });
       fireEvent.click(hintButton);
-      await screen.findByText('Look at Rhino.');
+      await screen.findByText('Look at Rook.');
       fireEvent.click(hintButton);
       await screen.findByText('Try the orange square.');
       fireEvent.click(hintButton);
@@ -679,7 +679,7 @@ describe('ExerciseStep', () => {
 
       makeIllegalMoves(1);
 
-      await screen.findByText('Rhino only runs in straight lines!');
+      await screen.findByText('Rook only runs in straight lines!');
       expect(screen.queryByText(/tricky/)).toBeNull();
       expect(screen.queryByRole('button', { name: 'Easier one' })).toBeNull();
     });
@@ -696,7 +696,7 @@ describe('ExerciseStep', () => {
       makeIllegalMoves(2);
 
       await screen.findByText(
-        'Rhino only runs in straight lines! This one is tricky. Want an easier one?',
+        'Rook only runs in straight lines! This one is tricky. Want an easier one?',
       );
       expect(screen.getByRole('button', { name: 'Easier one' })).toBeTruthy();
     });

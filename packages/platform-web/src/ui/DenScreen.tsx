@@ -175,11 +175,10 @@ export function DenScreen(): JSX.Element {
           <h2 className="font-display text-xl text-ink sm:text-2xl">{t('den.friends-heading')}</h2>
           <ul className="grid grid-cols-3 gap-4 sm:grid-cols-4 lg:grid-cols-6">
             {friends.map((friend) => {
-              const characterLabel = tContent(t, `characters:${friend.character}.name`);
               const pieceLabel = tContent(t, friend.topicKey);
               const name = friend.earned
-                ? t('den.friend-name', { character: characterLabel })
-                : t('den.friend-name-locked', { character: characterLabel, piece: pieceLabel });
+                ? t('den.friend-name', { piece: pieceLabel })
+                : t('den.friend-name-locked', { piece: pieceLabel });
               return (
                 <li
                   key={friend.character}
@@ -201,13 +200,8 @@ export function DenScreen(): JSX.Element {
                     )}
                   </span>
                   <span className="text-xs font-extrabold text-ink">
-                    {friend.earned
-                      ? characterLabel
-                      : t('den.friend-condition', { piece: pieceLabel })}
+                    {friend.earned ? pieceLabel : t('den.friend-condition', { piece: pieceLabel })}
                   </span>
-                  {friend.earned && (
-                    <span className="text-xs font-bold text-muted">{pieceLabel}</span>
-                  )}
                 </li>
               );
             })}

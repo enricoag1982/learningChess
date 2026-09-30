@@ -10,6 +10,11 @@
   "source": "exercise-note"
  },
  {
+  "key": "0078fb0cf3c815e7",
+  "text": "Tap Queen first.",
+  "source": "exercise-note"
+ },
+ {
   "key": "00b2d60ea447e5e3",
   "text": "After Good Trade or Bad Trade? lesson",
   "source": "play"
@@ -28,11 +33,6 @@
   "key": "0249223adf63d3c7",
   "text": "Finish Mate in 1 first!",
   "source": "journey"
- },
- {
-  "key": "024d3e49e0ce58c3",
-  "text": "Lioness moves straight or diagonal, not like that!",
-  "source": "exercise-note"
  },
  {
   "key": "026c21d1fa82fb45",
@@ -85,6 +85,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "0463ca346f4e85bf",
+  "text": "Today you meet Knight!",
+  "source": "home"
+ },
+ {
   "key": "04a83fcf89fa37d0",
   "text": "See you tomorrow!",
   "source": "owl-line"
@@ -120,19 +125,9 @@
   "source": "voice-check"
  },
  {
-  "key": "058069e04d71d8c2",
-  "text": "Tap Lioness first.",
-  "source": "exercise-note"
- },
- {
   "key": "058adf11eda43504",
   "text": "The rook on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?",
   "source": "lesson-exercise"
- },
- {
-  "key": "062f0a5e59c6c148",
-  "text": "Today you meet Lion!",
-  "source": "home"
  },
  {
   "key": "0690ad789ee8dec4",
@@ -153,6 +148,11 @@
   "key": "07bfcff8117b1ae2",
   "text": "Look at every piece on the board. Stalemate, not enough material — or not a draw at all?",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "081c0d967b0d5f7f",
+  "text": "Today you meet Rook!",
+  "source": "home"
  },
  {
   "key": "088ec26edcb70f9c",
@@ -240,9 +240,9 @@
   "source": "exercise-note"
  },
  {
-  "key": "0c4bf1826ed7f100",
-  "text": "Horse only jumps in an L shape! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
+  "key": "0c6dc90ddb10a7a9",
+  "text": "Finish Rook first!",
+  "source": "journey"
  },
  {
   "key": "0c6f15d42fb2d968",
@@ -300,11 +300,6 @@
   "source": "versus-boss"
  },
  {
-  "key": "1037609d2cd2244d",
-  "text": "You already know Lioness!",
-  "source": "assessment"
- },
- {
   "key": "107b8e07dd43c18b",
   "text": "Checkmate in one! Lion guards the flight squares.",
   "source": "minigame-round"
@@ -313,6 +308,11 @@
   "key": "10873e9e675bff22",
   "text": "Rabbit moved a queen.",
   "source": "versus-boss"
+ },
+ {
+  "key": "10d6e564d7faf297",
+  "text": "Knight only jumps in an L shape! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "10fe297e68da1e7f",
@@ -355,24 +355,9 @@
   "source": "lesson-story"
  },
  {
-  "key": "1384c7bed0b12264",
-  "text": "Look at Rhino.",
-  "source": "exercise-note"
- },
- {
   "key": "14236cf8670f229b",
   "text": "Perfect Lesson. Get 3 stars on every exercise in 15 lessons",
   "source": "badge-locked"
- },
- {
-  "key": "147c8dabadca9298",
-  "text": "Elephant only walks on diagonal paths! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
-  "key": "14db0c55c08bc625",
-  "text": "Want to show me you already know Rhino?",
-  "source": "journey"
  },
  {
   "key": "151d1b7180a01e47",
@@ -425,6 +410,11 @@
   "source": "minigame-round"
  },
  {
+  "key": "199a2bf1adc5e3c5",
+  "text": "Bishop only walks on diagonal paths! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
+ },
+ {
   "key": "19a4cf94217eacf1",
   "text": "Hi! I'm Owl. Today: Defend Your Pieces!",
   "source": "home"
@@ -433,6 +423,11 @@
   "key": "19b4dd80194ed130",
   "text": "World boss time: Your First Full Game!!",
   "source": "home"
+ },
+ {
+  "key": "1a6c72785c35a796",
+  "text": "Finish Pawn first!",
+  "source": "journey"
  },
  {
   "key": "1b2d2cb531df06bf",
@@ -457,11 +452,6 @@
  {
   "key": "1b6e989773d7157d",
   "text": "Finish Meet the Squares first!",
-  "source": "journey"
- },
- {
-  "key": "1be881f391d880f6",
-  "text": "Want to show me you already know Lioness?",
   "source": "journey"
  },
  {
@@ -555,6 +545,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "227e96eae4cbc5d9",
+  "text": "Finish Bishop first!",
+  "source": "journey"
+ },
+ {
   "key": "228d69f70adbaaed",
   "text": "Checkmate in one! The black king is trapped by his own pawns.",
   "source": "minigame-round"
@@ -575,13 +570,13 @@
   "source": "badge-earned"
  },
  {
-  "key": "22e56fff8c4aa883",
-  "text": "Today you meet Lioness!",
-  "source": "home"
- },
- {
   "key": "232216f232126f03",
   "text": "Black moved the queen.",
+  "source": "exercise-note"
+ },
+ {
+  "key": "2390538cbd431999",
+  "text": "Tap Bishop first.",
   "source": "exercise-note"
  },
  {
@@ -608,11 +603,6 @@
   "key": "25a5867b9a20c9eb",
   "text": "Tap every square Elephant can reach. Look — they're all the same colour!",
   "source": "lesson-exercise"
- },
- {
-  "key": "260bc23931b7f555",
-  "text": "Look at Lion.",
-  "source": "exercise-note"
  },
  {
   "key": "2657c267cd9bbf6c",
@@ -660,11 +650,6 @@
   "source": "play"
  },
  {
-  "key": "2b42c29615349469",
-  "text": "Horse only jumps in an L shape!",
-  "source": "exercise-note"
- },
- {
   "key": "2beb3a346509098c",
   "text": "The rook giving check isn't guarded. Capture it with Lion!",
   "source": "minigame-round"
@@ -673,11 +658,6 @@
   "key": "2c03a083b8124d13",
   "text": "A black rook is giving Lion check! Can Lion castle kingside right now?",
   "source": "lesson-exercise"
- },
- {
-  "key": "2d2d12b8471e6786",
-  "text": "Look at Caterpillar.",
-  "source": "exercise-note"
  },
  {
   "key": "2d6c5a140b17ac0e",
@@ -693,6 +673,11 @@
   "key": "2e452612f5d9dedf",
   "text": "You earned the Escape Artist badge!",
   "source": "celebration"
+ },
+ {
+  "key": "2e4c1fc5d8c73b89",
+  "text": "Today you meet King!",
+  "source": "home"
  },
  {
   "key": "2e516290f091f825",
@@ -738,6 +723,11 @@
   "key": "3090e873795f8cc9",
   "text": "Every chessboard is a checkerboard: light squares and dark squares, side by side. Here's Owl's favourite trick — the corner near your right hand is always light!",
   "source": "lesson-story"
+ },
+ {
+  "key": "30a2ba10d682c730",
+  "text": "Queen moves straight or diagonal, not like that! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "3192fa57e01dc8c2",
@@ -800,6 +790,11 @@
   "source": "owl-line"
  },
  {
+  "key": "3428dadb62fce506",
+  "text": "Want to show me you already know Queen?",
+  "source": "journey"
+ },
+ {
   "key": "347c075b4716c2ce",
   "text": "This time, tap every square in your king's column.",
   "source": "lesson-exercise"
@@ -808,11 +803,6 @@
   "key": "34ddd2f3581bb79f",
   "text": "Tap every square in each highlighted line, as fast as you can!",
   "source": "minigame-goal"
- },
- {
-  "key": "352eb42d42f668ac",
-  "text": "Want to show me you already know Lion?",
-  "source": "journey"
  },
  {
   "key": "354bb016ede97b52",
@@ -868,6 +858,11 @@
   "key": "388c6d0025ca7934",
   "text": "Wolf, locked, Beat Rabbit 3 times",
   "source": "play"
+ },
+ {
+  "key": "38c55e419fa9c3cf",
+  "text": "Look at Knight.",
+  "source": "exercise-note"
  },
  {
   "key": "391f22f3226df43d",
@@ -955,11 +950,6 @@
   "source": "versus-boss"
  },
  {
-  "key": "3ef9fa7ffb67a3af",
-  "text": "Finish Elephant first!",
-  "source": "journey"
- },
- {
   "key": "3f157ebd75633581",
   "text": "First Win. Win a game vs the computer",
   "source": "badge-locked"
@@ -1040,9 +1030,14 @@
   "source": "play"
  },
  {
-  "key": "455ff49e1911d688",
-  "text": "You already know Rhino!",
-  "source": "assessment"
+  "key": "4540b425a2326b84",
+  "text": "Tap Rook first.",
+  "source": "exercise-note"
+ },
+ {
+  "key": "45b749afc97c360d",
+  "text": "Knight only jumps in an L shape!",
+  "source": "exercise-note"
  },
  {
   "key": "4601a366963180c8",
@@ -1068,11 +1063,6 @@
   "key": "46b3cffe4438aa7e",
   "text": "Rhino is hungry. Gobble up the pawn!",
   "source": "lesson-exercise"
- },
- {
-  "key": "46db9fb5bd0b195c",
-  "text": "Tap Elephant first.",
-  "source": "exercise-note"
  },
  {
   "key": "4711f361d4dd5f44",
@@ -1103,11 +1093,6 @@
   "key": "47ab6aa66fb66173",
   "text": "Mate Master. Solve 25 mates in 1",
   "source": "badge-locked"
- },
- {
-  "key": "47e019fb9a6df03f",
-  "text": "Today you meet Rhino!",
-  "source": "home"
  },
  {
   "key": "4805eee9fb3cd71d",
@@ -1148,6 +1133,11 @@
   "key": "4aa03e41ab7a4dd0",
   "text": "Watch Rhino run to every green dot. Straight lines, any distance!",
   "source": "lesson-demo"
+ },
+ {
+  "key": "4ad7b01487ca90a9",
+  "text": "Today you meet Pawn!",
+  "source": "home"
  },
  {
   "key": "4ae8a25ecc4ea45c",
@@ -1195,6 +1185,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "4db20e5d1123106f",
+  "text": "Want to show me you already know King?",
+  "source": "journey"
+ },
+ {
   "key": "4e386f426e5264be",
   "text": "Capture both pawns on Elephant's diagonals.",
   "source": "lesson-variant"
@@ -1208,6 +1203,11 @@
   "key": "4ee601eff2a5afcb",
   "text": "Capture the pawn, then reach the star!",
   "source": "lesson-variant"
+ },
+ {
+  "key": "4f01fabfe1212344",
+  "text": "Tap King first.",
+  "source": "exercise-note"
  },
  {
   "key": "4f587a1891092dd1",
@@ -1258,6 +1258,11 @@
   "key": "51988b972cd1fa42",
   "text": "Lion is the most important piece of all! He only steps one square at a time, in any direction, and he must always stay safe.",
   "source": "lesson-story"
+ },
+ {
+  "key": "51c95b988faf88eb",
+  "text": "Today you meet Queen!",
+  "source": "home"
  },
  {
   "key": "521b3157f700c85a",
@@ -1340,11 +1345,6 @@
   "source": "assessment"
  },
  {
-  "key": "56b2f6d8b9be298f",
-  "text": "Elephant only walks on diagonal paths!",
-  "source": "exercise-note"
- },
- {
   "key": "56f4a4b8be046f30",
   "text": "Want to show me you already know Safe or Not??",
   "source": "journey"
@@ -1415,11 +1415,6 @@
   "source": "owl-line"
  },
  {
-  "key": "5b6aa329ce540363",
-  "text": "Want to show me you already know Horse?",
-  "source": "journey"
- },
- {
   "key": "5b9897fa228d897d",
   "text": "Try it! Move Lion two squares toward a Rhino to castle.",
   "source": "lesson-demo"
@@ -1458,6 +1453,11 @@
   "key": "5ca07cc526aede07",
   "text": "A rock blocks one landing spot. Tap every square Horse can jump to.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "5cb6fc6c685f5faa",
+  "text": "You already know King!",
+  "source": "assessment"
  },
  {
   "key": "5cd7cecf19cf64fa",
@@ -1635,16 +1635,6 @@
   "source": "play"
  },
  {
-  "key": "6935e125c12df235",
-  "text": "Lion only steps one square at a time!",
-  "source": "exercise-note"
- },
- {
-  "key": "693bccd5e6db6e66",
-  "text": "Finish Lioness first!",
-  "source": "journey"
- },
- {
   "key": "694324e24d73a08c",
   "text": "Black's pawn just rushed two squares past your Caterpillar on h5. Can you capture it en passant right now?",
   "source": "lesson-exercise"
@@ -1658,11 +1648,6 @@
   "key": "699651bb352a4dce",
   "text": "Castle Builder",
   "source": "badge-earned"
- },
- {
-  "key": "699932993dacfe83",
-  "text": "Rhino only runs in straight lines!",
-  "source": "exercise-note"
  },
  {
   "key": "69b06abb83b697d9",
@@ -1830,11 +1815,6 @@
   "source": "lesson-demo"
  },
  {
-  "key": "777766cd510976ec",
-  "text": "Caterpillar only moves straight ahead (and captures diagonally)! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
   "key": "7784d4eeee67e7f1",
   "text": "Only the queenside Rhino is still home. Castle queenside!",
   "source": "lesson-exercise"
@@ -1925,6 +1905,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "7e21327947f4a50f",
+  "text": "Finish King first!",
+  "source": "journey"
+ },
+ {
   "key": "7e8385e20899919b",
   "text": "Mouse took your queen!",
   "source": "versus-boss"
@@ -1935,18 +1920,8 @@
   "source": "badge-locked"
  },
  {
-  "key": "7f2334b114b282a4",
-  "text": "Tap Horse first.",
-  "source": "exercise-note"
- },
- {
   "key": "7f3f063a92b67dcd",
   "text": "Place the white knight next.",
-  "source": "exercise-note"
- },
- {
-  "key": "7f4f8864b93f1487",
-  "text": "Look at Horse.",
   "source": "exercise-note"
  },
  {
@@ -2110,6 +2085,11 @@
   "source": "journey"
  },
  {
+  "key": "8a05799e99c6277f",
+  "text": "You already know Knight!",
+  "source": "assessment"
+ },
+ {
   "key": "8a287b28eba064ab",
   "text": "Tap every square in your king's column, all the way across the board.",
   "source": "lesson-exercise"
@@ -2120,18 +2100,13 @@
   "source": "journey"
  },
  {
-  "key": "8ab7a7283722c6fe",
-  "text": "Tap Rhino first.",
-  "source": "exercise-note"
- },
- {
   "key": "8ad8167226fdbfee",
   "text": "Rabbit, locked, Beat Fox 3 times",
   "source": "play"
  },
  {
-  "key": "8b434e19564248ac",
-  "text": "You already know Horse!",
+  "key": "8aea387be5dc16e2",
+  "text": "You already know Queen!",
   "source": "assessment"
  },
  {
@@ -2190,6 +2165,11 @@
   "source": "celebration"
  },
  {
+  "key": "8e1a6165acf6b1c5",
+  "text": "You already know Rook!",
+  "source": "assessment"
+ },
+ {
   "key": "8ed5bbec4791fae6",
   "text": "Watch Elephant walk to every green dot. Diagonal paths, any distance!",
   "source": "lesson-demo"
@@ -2200,9 +2180,19 @@
   "source": "lesson-guided"
  },
  {
+  "key": "90b94dc683e8e38e",
+  "text": "Finish Queen first!",
+  "source": "journey"
+ },
+ {
   "key": "90ddadf9605907e9",
   "text": "You already know Castling: King and Rook Swap!",
   "source": "assessment"
+ },
+ {
+  "key": "910dfb2e316add55",
+  "text": "Today you meet Bishop!",
+  "source": "home"
  },
  {
   "key": "9138a8e8be2080d9",
@@ -2235,8 +2225,13 @@
   "source": "assessment"
  },
  {
-  "key": "9334a8f6a48f0c1a",
-  "text": "Want to show me you already know Elephant?",
+  "key": "93262641a6ca161e",
+  "text": "Rook only runs in straight lines!",
+  "source": "exercise-note"
+ },
+ {
+  "key": "932d09330dc8614e",
+  "text": "Want to show me you already know Knight?",
   "source": "journey"
  },
  {
@@ -2310,11 +2305,6 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "98fc72f2833a60bb",
-  "text": "Finish Lion first!",
-  "source": "journey"
- },
- {
   "key": "9971f642515557a2",
   "text": "Never Give Up, Bronze",
   "source": "badge-earned"
@@ -2375,6 +2365,11 @@
   "source": "celebration"
  },
  {
+  "key": "9da85600e2a7f941",
+  "text": "Pawn only moves straight ahead (and captures diagonally)! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
+ },
+ {
   "key": "9ec825f5447c05ea",
   "text": "Is the knight on d4 in danger?",
   "source": "minigame-round"
@@ -2430,16 +2425,6 @@
   "source": "placement"
  },
  {
-  "key": "a0c90b935f1bd139",
-  "text": "Tap Caterpillar first.",
-  "source": "exercise-note"
- },
- {
-  "key": "a0e91a15718c7cde",
-  "text": "Tap Lion first.",
-  "source": "exercise-note"
- },
- {
   "key": "a21b6eddd12def6f",
   "text": "Place the white queen next.",
   "source": "exercise-note"
@@ -2450,6 +2435,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "a2f825f6112d2693",
+  "text": "You already know Bishop!",
+  "source": "assessment"
+ },
+ {
   "key": "a36111dcb6752312",
   "text": "Help Elephant grab both stars, corner to corner.",
   "source": "lesson-exercise"
@@ -2458,6 +2448,11 @@
   "key": "a397da098a6bf4f8",
   "text": "Bear Buddy",
   "source": "badge-earned"
+ },
+ {
+  "key": "a40b05e388ffe200",
+  "text": "Look at Pawn.",
+  "source": "exercise-note"
  },
  {
   "key": "a4bbef6456158a3c",
@@ -2498,6 +2493,11 @@
   "key": "a6e82b53c2eaff51",
   "text": "Tap every square where Caterpillar could transform this move.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "a725bb1b44222abb",
+  "text": "Look at Rook.",
+  "source": "exercise-note"
  },
  {
   "key": "a75d462594a44458",
@@ -2570,11 +2570,6 @@
   "source": "journey"
  },
  {
-  "key": "adfff642cce9df5e",
-  "text": "Today you meet Caterpillar!",
-  "source": "home"
- },
- {
   "key": "ae07a692f8381ef9",
   "text": "Want to show me you already know Defend Your Pieces?",
   "source": "journey"
@@ -2605,9 +2600,9 @@
   "source": "lesson-guided"
  },
  {
-  "key": "afc4dc879f6ac33a",
-  "text": "Today you meet Horse!",
-  "source": "home"
+  "key": "b02a57145aff29f2",
+  "text": "Queen moves straight or diagonal, not like that!",
+  "source": "exercise-note"
  },
  {
   "key": "b03754f292d0a635",
@@ -2635,16 +2630,6 @@
   "source": "lesson-guided"
  },
  {
-  "key": "b27637c3029cef5e",
-  "text": "Want to show me you already know Caterpillar?",
-  "source": "journey"
- },
- {
-  "key": "b289bf042af87723",
-  "text": "You already know Caterpillar!",
-  "source": "assessment"
- },
- {
   "key": "b2c4dd43bdf0133f",
   "text": "White moved the knight.",
   "source": "exercise-note"
@@ -2665,6 +2650,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "b49494ae073ed150",
+  "text": "Look at Queen.",
+  "source": "exercise-note"
+ },
+ {
   "key": "b4b0376cb8edfca0",
   "text": "Ready for the Wolf?",
   "source": "play"
@@ -2680,6 +2670,11 @@
   "source": "play"
  },
  {
+  "key": "b5a1ea747c516035",
+  "text": "Want to show me you already know Rook?",
+  "source": "journey"
+ },
+ {
   "key": "b5fb431f9efbc039",
   "text": "Finish Check or Checkmate? first!",
   "source": "journey"
@@ -2693,6 +2688,11 @@
   "key": "b7ff3791a55d4f4d",
   "text": "Mouse moved a knight.",
   "source": "versus-boss"
+ },
+ {
+  "key": "b8590a322a49a287",
+  "text": "Bishop only walks on diagonal paths!",
+  "source": "exercise-note"
  },
  {
   "key": "b888f88ecb41f21f",
@@ -2713,6 +2713,11 @@
   "key": "ba00b6cf4944c657",
   "text": "Next come the bishops, next to the knights.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "ba163b3e52a41184",
+  "text": "Want to show me you already know Pawn?",
+  "source": "journey"
  },
  {
   "key": "baac9d505f19a08c",
@@ -2755,16 +2760,6 @@
   "source": "badge-locked"
  },
  {
-  "key": "bc4bb6ea9a33b8f8",
-  "text": "Rhino only runs in straight lines! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
-  "key": "bc999acf9733e0e1",
-  "text": "Lioness moves straight or diagonal, not like that! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
   "key": "bce280c32736f95d",
   "text": "Tap every square Lioness can reach from here.",
   "source": "lesson-exercise"
@@ -2785,11 +2780,6 @@
   "source": "journey"
  },
  {
-  "key": "bdd535eed6ae34ed",
-  "text": "Look at Elephant.",
-  "source": "exercise-note"
- },
- {
   "key": "bddf8e5f0254e422",
   "text": "After Setting Up the Board lesson",
   "source": "play"
@@ -2803,11 +2793,6 @@
   "key": "be96f81d5e60d899",
   "text": "Good try!",
   "source": "exercise-note"
- },
- {
-  "key": "bebcd70a54d5344e",
-  "text": "You already know Lion!",
-  "source": "assessment"
  },
  {
   "key": "bfb1a3d72566b43e",
@@ -2832,6 +2817,11 @@
  {
   "key": "c0e12002b66ab641",
   "text": "Finish Draws: Nobody Wins first!",
+  "source": "journey"
+ },
+ {
+  "key": "c0f7b4e580100e8b",
+  "text": "Finish Knight first!",
   "source": "journey"
  },
  {
@@ -2910,19 +2900,9 @@
   "source": "play"
  },
  {
-  "key": "c584521e5ad19658",
-  "text": "Finish Horse first!",
-  "source": "journey"
- },
- {
   "key": "c5b7d1633423fb73",
   "text": "Fox Outsmarter. Win a game vs Fox",
   "source": "badge-locked"
- },
- {
-  "key": "c5e2907beeb0eef4",
-  "text": "Lion only steps one square at a time! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
  },
  {
   "key": "c64aa7d3f8120016",
@@ -3085,6 +3065,11 @@
   "source": "lesson-story"
  },
  {
+  "key": "d31a32841be92a63",
+  "text": "King only steps one square at a time!",
+  "source": "exercise-note"
+ },
+ {
   "key": "d335c4fcd5853320",
   "text": "One swift diagonal move reaches the far star!",
   "source": "lesson-exercise"
@@ -3093,6 +3078,11 @@
   "key": "d38ae3e6a2d4e292",
   "text": "Move Lion out of check — nothing can block or capture this rook here.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "d4424e5c676a9914",
+  "text": "Pawn only moves straight ahead (and captures diagonally)!",
+  "source": "exercise-note"
  },
  {
   "key": "d452450299f77561",
@@ -3185,8 +3175,8 @@
   "source": "home"
  },
  {
-  "key": "d9062835a190ecf7",
-  "text": "Look at Lioness.",
+  "key": "d90a7f0ffb280009",
+  "text": "Look at King.",
   "source": "exercise-note"
  },
  {
@@ -3210,19 +3200,14 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "dad7a414829ab9fd",
-  "text": "Today you meet Elephant!",
-  "source": "home"
+  "key": "d9eafa4d7a933d4f",
+  "text": "Tap Pawn first.",
+  "source": "exercise-note"
  },
  {
   "key": "db5be91a16595a88",
   "text": "After What Does It Attack? lesson",
   "source": "play"
- },
- {
-  "key": "dc0d8b1dabdd46ad",
-  "text": "You already know Elephant!",
-  "source": "assessment"
  },
  {
   "key": "dc60f06b8205aa5f",
@@ -3300,6 +3285,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "e245e06062c6bb38",
+  "text": "Tap Knight first.",
+  "source": "exercise-note"
+ },
+ {
   "key": "e2bdcc76fbfe7cc6",
   "text": "Caterpillar now blocks the diagonal. Is Lion in check?",
   "source": "lesson-exercise"
@@ -3313,6 +3303,11 @@
   "key": "e35739d3ed4451d0",
   "text": "Mouse, locked, Beat Wolf 3 times",
   "source": "play"
+ },
+ {
+  "key": "e35a052cedae8069",
+  "text": "Want to show me you already know Bishop?",
+  "source": "journey"
  },
  {
   "key": "e44152098ac7e029",
@@ -3333,6 +3328,11 @@
   "key": "e5c9de26f4a313df",
   "text": "A rock blocks the way! Go around it to reach the star.",
   "source": "lesson-variant"
+ },
+ {
+  "key": "e6180016c48a7a26",
+  "text": "Look at Bishop.",
+  "source": "exercise-note"
  },
  {
   "key": "e651f28e42fa6269",
@@ -3408,11 +3408,6 @@
   "key": "ebfe4bb7a2bfc7e6",
   "text": "One more step and Caterpillar transforms! Move her to the last row.",
   "source": "lesson-exercise"
- },
- {
-  "key": "ec6483a4dfbd2a8b",
-  "text": "Caterpillar only moves straight ahead (and captures diagonally)!",
-  "source": "exercise-note"
  },
  {
   "key": "ec6bba56527a384d",
@@ -3575,6 +3570,11 @@
   "source": "badge-earned"
  },
  {
+  "key": "f48a374eede406ac",
+  "text": "King only steps one square at a time! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
+ },
+ {
   "key": "f49d54ae03df8767",
   "text": "You took a bishop!",
   "source": "versus-boss"
@@ -3600,6 +3600,11 @@
   "source": "play"
  },
  {
+  "key": "f68b30924fd0d580",
+  "text": "You already know Pawn!",
+  "source": "assessment"
+ },
+ {
   "key": "f695ccfea6975e94",
   "text": "Collect every star. Plan Rhino's path first!",
   "source": "lesson-exercise"
@@ -3608,6 +3613,11 @@
   "key": "f73749ff85e7a65d",
   "text": "You already know What Does It Attack?!",
   "source": "assessment"
+ },
+ {
+  "key": "f7650b0ca8cba211",
+  "text": "Rook only runs in straight lines! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "f79eb78a3fa36769",
@@ -3670,11 +3680,6 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "fd1649fb5fcea694",
-  "text": "Finish Rhino first!",
-  "source": "journey"
- },
- {
   "key": "fd5992c8ecb9c7d9",
   "text": "Want to show me you already know Setting Up the Board?",
   "source": "journey"
@@ -3713,11 +3718,6 @@
   "key": "ff74ff7fda4af7c9",
   "text": "You already know Escape the Check!!",
   "source": "assessment"
- },
- {
-  "key": "ffbf3adace8f345a",
-  "text": "Finish Caterpillar first!",
-  "source": "journey"
  },
  {
   "key": "ffdbd2be9b075a06",

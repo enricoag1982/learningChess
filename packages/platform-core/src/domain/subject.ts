@@ -54,7 +54,7 @@ export interface Lesson<
   readonly world: string;
   readonly order: number;
   readonly concept: string;
-  /** Character id (e.g. `rhino`); display name at `characters:<character>.name`. */
+  /** Character id (e.g. `rook`); display name at `characters:<character>.name`. */
   readonly character: string;
   readonly titleKey: string;
   readonly storyKey: string;
@@ -109,7 +109,7 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
     game: MiniGameBase,
     state: MiniGameStateBase,
   ): Omit<RecordGameInput, 'profileId'> | null;
-  /** Lesson characters that double as an "animal friend" once their lesson is done (`rhino` → `piece.r`), in
+  /** Lesson characters that double as a "friend" once their lesson is done (`rook` → `piece.r`), in
    * `animalFriends` order; an absent id (Owl) is never a friend. */
   readonly characters: Readonly<Record<string, { readonly topicKey: string }>>;
   /** The subject's settings-slot fields as an opaque bag: `defaults` composes into `ProfileSettings`, `isValid` checks a

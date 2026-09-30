@@ -397,7 +397,7 @@ describe('Full game / vs Friend', () => {
 describe('Test-out / Practice', () => {
   it('test-out opens on top of Journey (ungated); exit pops back', async () => {
     const l1 = fixtureLesson({ id: 'l1', order: 1 });
-    const l2 = fixtureLesson({ id: 'l2', order: 2, character: 'elephant' });
+    const l2 = fixtureLesson({ id: 'l2', order: 2, character: 'bishop' });
     const services = createTestServices(
       makeContentSource({ lessons: [l1, l2], catalog: fixtureCatalog }),
     );

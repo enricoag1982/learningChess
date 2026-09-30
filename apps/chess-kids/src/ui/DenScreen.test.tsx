@@ -6,7 +6,7 @@ import { seedReturningProfile } from '@learn/subject-chess/web/testing/app-test-
 import { renderApp } from '@learn/subject-chess/web/testing/render-app.tsx';
 
 describe('DenScreen', () => {
-  it('shows every friend unearned and the Pawn rank current, with nothing played', async () => {
+  it('shows every piece unearned and the Pawn rank current, with nothing played', async () => {
     const services = createTestServices('bundled');
     await seedReturningProfile(services, 'Mia');
     await renderApp(services, { at: 'home' });
@@ -14,14 +14,12 @@ describe('DenScreen', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
 
-    expect(
-      screen.getByRole('listitem', { name: 'Rhino, locked, finish the Rook lesson' }),
-    ).toBeTruthy();
+    expect(screen.getByRole('listitem', { name: 'Locked. Learn the Rook lesson' })).toBeTruthy();
     expect(screen.getByRole('listitem', { name: 'Pawn, You are here' })).toBeTruthy();
     expect(screen.getByRole('listitem', { name: 'Knight, After World 2' })).toBeTruthy();
   });
 
-  it('marks Rhino a friend once the Rook lesson is complete', async () => {
+  it('marks the Rook learned once the Rook lesson is complete', async () => {
     const services = createTestServices('bundled');
     const profile = await seedReturningProfile(services, 'Mia');
     const rook = services.deps.content.lesson('rook');
@@ -36,11 +34,9 @@ describe('DenScreen', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'My Den' }));
     await screen.findByText("Mia's Den");
 
-    expect(screen.getByRole('listitem', { name: 'Rhino, friend' })).toBeTruthy();
-    // Only Rhino's own lesson counts: Elephant (Bishop lesson) is still unearned.
-    expect(
-      screen.getByRole('listitem', { name: 'Elephant, locked, finish the Bishop lesson' }),
-    ).toBeTruthy();
+    expect(screen.getByRole('listitem', { name: 'Rook, learned' })).toBeTruthy();
+    // Only the Rook's own lesson counts: the Bishop lesson is still unearned.
+    expect(screen.getByRole('listitem', { name: 'Locked. Learn the Bishop lesson' })).toBeTruthy();
   });
 
   it('shows every badge locked with its condition, and no streak yet, on a fresh profile', async () => {

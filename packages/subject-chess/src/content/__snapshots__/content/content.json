@@ -5385,7 +5385,7 @@
    "world": "pieces",
    "order": 2,
    "concept": "bishop-move",
-   "character": "elephant",
+   "character": "bishop",
    "titleKey": "lessons:bishop.title",
    "storyKey": "lessons:bishop.story",
    "demo": {
@@ -5731,7 +5731,7 @@
    "world": "pieces",
    "order": 4,
    "concept": "king-move",
-   "character": "lion",
+   "character": "king",
    "titleKey": "lessons:king.title",
    "storyKey": "lessons:king.story",
    "demo": {
@@ -6014,7 +6014,7 @@
    "world": "pieces",
    "order": 5,
    "concept": "knight-move",
-   "character": "horse",
+   "character": "knight",
    "titleKey": "lessons:knight.title",
    "storyKey": "lessons:knight.story",
    "demo": {
@@ -6357,7 +6357,7 @@
    "world": "pieces",
    "order": 6,
    "concept": "pawn-move",
-   "character": "caterpillar",
+   "character": "pawn",
    "titleKey": "lessons:pawn.title",
    "storyKey": "lessons:pawn.story",
    "demo": {
@@ -6715,7 +6715,7 @@
    "world": "pieces",
    "order": 7,
    "concept": "promotion",
-   "character": "caterpillar",
+   "character": "pawn",
    "titleKey": "lessons:promotion.title",
    "storyKey": "lessons:promotion.story",
    "demo": {
@@ -7020,7 +7020,7 @@
    "world": "pieces",
    "order": 3,
    "concept": "queen-move",
-   "character": "lioness",
+   "character": "queen",
    "titleKey": "lessons:queen.title",
    "storyKey": "lessons:queen.story",
    "demo": {
@@ -7362,7 +7362,7 @@
    "world": "pieces",
    "order": 1,
    "concept": "rook-move",
-   "character": "rhino",
+   "character": "rook",
    "titleKey": "lessons:rook.title",
    "storyKey": "lessons:rook.story",
    "demo": {

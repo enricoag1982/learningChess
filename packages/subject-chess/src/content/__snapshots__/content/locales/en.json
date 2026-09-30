@@ -1,25 +1,25 @@
 {
  "characters": {
-  "caterpillar": {
-   "name": "Caterpillar"
+  "bishop": {
+   "name": "Bishop"
   },
-  "elephant": {
-   "name": "Elephant"
+  "king": {
+   "name": "King"
   },
-  "horse": {
-   "name": "Horse"
-  },
-  "lion": {
-   "name": "Lion"
-  },
-  "lioness": {
-   "name": "Lioness"
+  "knight": {
+   "name": "Knight"
   },
   "owl": {
    "name": "Owl"
   },
-  "rhino": {
-   "name": "Rhino"
+  "pawn": {
+   "name": "Pawn"
+  },
+  "queen": {
+   "name": "Queen"
+  },
+  "rook": {
+   "name": "Rook"
   }
  },
  "common": {
@@ -144,10 +144,10 @@
    "board-label": "{{name}}'s board"
   },
   "den": {
-   "friend-condition": "Finish the {{piece}} lesson",
-   "friend-name": "{{character}}, friend",
-   "friend-name-locked": "{{character}}, locked, finish the {{piece}} lesson",
-   "friends-heading": "Animal friends",
+   "friend-condition": "Learn the {{piece}} lesson",
+   "friend-name": "{{piece}}, learned",
+   "friend-name-locked": "Locked. Learn the {{piece}} lesson",
+   "friends-heading": "Your pieces",
    "games-with-friends_one": "{{count}} game with friends",
    "games-with-friends_other": "{{count}} games with friends",
    "games-won_one": "{{count}} game won",

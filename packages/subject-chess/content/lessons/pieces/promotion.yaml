@@ -1,7 +1,7 @@
 id: promotion
 order: 7
 concept: promotion
-character: caterpillar
+character: pawn
 demo:
   board: |
     . . . . . . . .

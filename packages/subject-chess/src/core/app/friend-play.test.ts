@@ -181,7 +181,7 @@ describe('friendGameOptions', () => {
     world: 'check',
     order: 1,
     concept: 'promotion',
-    character: 'rhino',
+    character: 'rook',
     titleKey: 'lessons:promotion.title',
     storyKey: 'lessons:promotion.story',
     demo: {

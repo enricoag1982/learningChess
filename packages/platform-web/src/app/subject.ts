@@ -54,8 +54,11 @@ export interface SubjectWeb {
   };
   /** The piece-icon pill under a character's portrait (`CharacterCard`); absent for a subject without one. */
   CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
-  /** This subject's own art (chess: lesson characters, bot levels), keyed by id; falls back to the
-   * platform's own (avatars, Owl) for an id it doesn't have. */
+  /** A character's portrait drawn by the subject instead of an image (chess: the piece's classic icon), or `null` for one
+   * without (Owl): `CharacterIcon` then falls back to `art`. */
+  characterArt?(character: string): JSX.Element | null;
+  /** This subject's own image art keyed by id; falls back to the platform's own (avatars, Owl, bot levels) for an id it
+   * doesn't have. */
   readonly art: Readonly<Record<string, string>>;
   /** Extra Home tiles (chess: Play), merged with the platform's and sorted by `order`. */
   readonly homeTiles?: readonly HomeTile[];
