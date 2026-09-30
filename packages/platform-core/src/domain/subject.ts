@@ -127,7 +127,7 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
   /** Every feedback kind's note, keyed by `ExerciseFeedbackBase['kind']`: the subject's own kinds plus the
    * platform-shaped ones (tap-first, wrong-answer, hint, solved). */
   readonly notes: Readonly<Record<string, AnyNoteEntry>>;
-  /** Extra note vars for `character` beyond `{name, stars}` (chess: `{ piece }`). */
+  /** Extra note vars for `character` beyond `{name, stars}` (chess: none). */
   noteVars(character: string): Readonly<Record<string, string>>;
 }
 

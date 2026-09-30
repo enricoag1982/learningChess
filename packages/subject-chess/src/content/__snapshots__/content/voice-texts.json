@@ -395,6 +395,11 @@
   "source": "journey"
  },
  {
+  "key": "1b75351718266095",
+  "text": "That piece can't move there! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
+ },
+ {
   "key": "1c245b2c8485f46b",
   "text": "Move the queen straight up to the star.",
   "source": "lesson-guided"
@@ -650,6 +655,11 @@
   "source": "exercise-note"
  },
  {
+  "key": "33ac1ce2e49d9eb9",
+  "text": "That piece can't move there!",
+  "source": "exercise-note"
+ },
+ {
   "key": "33cacbfd0bfeadc3",
   "text": "A grown-up helps set things up first.",
   "source": "owl-line"
@@ -728,6 +738,11 @@
   "key": "388c6d0025ca7934",
   "text": "Wolf, locked, Beat Rabbit 3 times",
   "source": "play"
+ },
+ {
+  "key": "38aa3401b69130cf",
+  "text": "Checkmate! The queen checks the king, and every square around it is covered.",
+  "source": "lesson-demo"
  },
  {
   "key": "391f22f3226df43d",
@@ -1287,11 +1302,6 @@
  {
   "key": "58e2feb33d7ba5bd",
   "text": "Checkmate in one! Your queen and king team up.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "593c06fb47bfea9d",
-  "text": "The rook (black) attacks your rook on a4, but your other rook guards it. Is it hanging?",
   "source": "lesson-exercise"
  },
  {
@@ -2455,9 +2465,9 @@
   "source": "minigame-goal"
  },
  {
-  "key": "aae98d6822b956bc",
-  "text": "Checkmate! The queen checks the king, and every square around him is covered.",
-  "source": "lesson-demo"
+  "key": "ab756c3437be875e",
+  "text": "The rook (black) attacks your rook on a4, but your other rook guards it. Is your rook on a4 hanging?",
+  "source": "lesson-exercise"
  },
  {
   "key": "ab9353c22ff39637",

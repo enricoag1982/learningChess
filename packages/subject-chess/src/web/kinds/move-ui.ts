@@ -1,7 +1,8 @@
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { Move } from '../../core/chess/rules.ts';
-import type { MoveOutcome } from '../../kinds/static-move.ts';
-import type { Square } from '../../core/chess/types.ts';
+import type { MoveAction } from '../../kinds/base.ts';
+import type { MoveOutcome, UndoAction } from '../../kinds/static-move.ts';
+import type { PieceType, Position, Square } from '../../core/chess/types.ts';
 import type { VariantRules } from '../../core/variant/rules.ts';
 import type { ExerciseState, ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { ExerciseDefBase, ExerciseStateBase } from '@learn/platform-core';
@@ -45,14 +46,33 @@ export function baseInitUi(def: { readonly lastMove?: FromTo }): WrongSquaresExt
   return { wrongSquares: [], ...(def.lastMove ? { lastMove: def.lastMove } : {}) };
 }
 
+/** The piece the kid tried to move: the one on the attempt's from-square; `undefined` for a SAN string or an empty square. */
+function attemptedPiece(
+  action: MoveAction | UndoAction,
+  position: Position,
+): PieceType | undefined {
+  if (action.type !== 'move' || typeof action.move === 'string') return undefined;
+  return position.pieces[action.move.from]?.type;
+}
+
 /** Shared by every move kind's `toUi` (mate-in-n layers its scripted-reply handling on top for `moved` / `solved`); generic in
  * `D` / `S` (never read): each kind's precise pair flows from its `toUi` return type. */
 export function moveToUi<
   D extends ExerciseDefBase = ExerciseDefBase,
   S extends ExerciseStateBase<D> = ExerciseStateBase<D>,
->(outcome: MoveOutcome): UiPatch<D, S, MoveExtra> {
+>(
+  outcome: MoveOutcome,
+  action: MoveAction | UndoAction,
+  next: { readonly position: Position },
+): UiPatch<D, S, MoveExtra> {
   if (outcome.kind === 'illegal') {
-    return { feedback: { kind: 'illegal' }, hint: null, wrongSquares: [], wrongMove: undefined };
+    const piece = attemptedPiece(action, next.position);
+    return {
+      feedback: piece === undefined ? { kind: 'illegal' } : { kind: 'illegal', piece },
+      hint: null,
+      wrongSquares: [],
+      wrongMove: undefined,
+    };
   }
   if (outcome.kind === 'wrong') {
     return {

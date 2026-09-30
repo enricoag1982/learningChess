@@ -86,6 +86,38 @@ describe('ExerciseStep', () => {
     expect(screen.getByRole('button', { name: /^a1, white rook/ })).toBeTruthy();
   });
 
+  it("an illegal move in an Owl-taught lesson names the piece that was dragged, not the lesson's", async () => {
+    const exercise: BestMoveDef = {
+      id: 'illegal-knight',
+      concept: 'fixture-move',
+      textKey: 'fixtures:bm',
+      position: parseDiagram(`
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        . . . . . . . .
+        N . . . . . . .
+      `),
+      type: 'best-move',
+      solutions: ['Nb3'],
+    };
+    const lesson = fixtureLesson({ character: 'owl', exercises: [exercise] });
+    const services = createTestServices(fixtureContentSource(lesson));
+    await renderWithStore(
+      <ExerciseStep lesson={lesson} exercise={exercise} guided={false} nextStepIndex={3} />,
+      services,
+      chessWeb,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /^a1,/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^b2,/ })); // diagonal: illegal for a knight
+
+    await screen.findByText('The knight only jumps in an L shape!');
+  });
+
   it('a tap with nothing selected asks the kid to tap the piece first (not an error)', async () => {
     const exercise = fixtureExercise('tap-first-me');
     const lesson = fixtureLesson({ exercises: [exercise] });

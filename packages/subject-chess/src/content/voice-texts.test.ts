@@ -135,6 +135,7 @@ describe('voice text inventory (real content)', () => {
     expect(notes).toContain('Checkmate! Amazing!'); // checkmate + praise-3 concatenation
     expect(notes).toContain('Tap your piece first.'); // exercise.tap-piece-first
     expect(notes).toContain('Look at the piece in the orange box.'); // exercise.hint-piece
+    expect(notes).toContain("That piece can't move there!"); // exercise.illegal.generic
     for (const piece of ['rook', 'bishop', 'queen', 'king', 'knight', 'pawn']) {
       expect(notes.some((text) => text.startsWith(`The ${piece} `))).toBe(true); // exercise.illegal.<piece>
     }

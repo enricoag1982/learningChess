@@ -14,7 +14,7 @@ export const mateInNUi: ChessKindUI<'mate-in-n', MoveExtra> = {
 
   clearWrongUi: () => ({ wrongSquares: [] }),
 
-  toUi(outcome, _action, next): UiPatch<DefOf<'mate-in-n'>, MateInNState, MoveExtra> {
+  toUi(outcome, action, next): UiPatch<DefOf<'mate-in-n'>, MateInNState, MoveExtra> {
     if (outcome.kind === 'moved') {
       // Stages the already-applied reply for its delayed reveal; the pre-reply position is
       // `next.history`'s last entry (pushed by `mateInNKind.act`).
@@ -48,7 +48,7 @@ export const mateInNUi: ChessKindUI<'mate-in-n', MoveExtra> = {
       };
     }
     // 'illegal' / 'wrong': same shape as every move kind's own outcome.
-    return { ...moveToUi(outcome), pending: undefined };
+    return { ...moveToUi(outcome, action, next), pending: undefined };
   },
 
   PlayArea: MovePlayArea,

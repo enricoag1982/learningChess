@@ -9,7 +9,7 @@ import { hasPieceOf } from '../core/chess/facts/pieces.ts';
 import type { CompiledContent, DemoHighlight } from '../core/chess/lesson.ts';
 import type { ExerciseFeedback, ExerciseNoteCtx, Resolve } from '../core/exercise/notes.ts';
 import type { Hint } from '../core/exercise/hint.ts';
-import type { PieceType, Position, Square } from '../core/chess/types.ts';
+import type { Position, Square } from '../core/chess/types.ts';
 import { chessCore } from '../core/chess-core.ts';
 import { z } from 'zod';
 import { loadBotBook } from './bot-book-load.ts';
@@ -210,21 +210,10 @@ function levelConditionTexts(r: Resolve): readonly string[] {
   ];
 }
 
-/** The piece a lesson character stands for (`core.characters`' `topicKey`); `null` for a narrator-taught (Owl) character. */
-function characterPieceOf(character: string): PieceType | null {
-  const topicKey = chessCore.characters[character]?.topicKey;
-  return topicKey?.startsWith('piece.') ? (topicKey.slice('piece.'.length) as PieceType) : null;
-}
-
 /** Every `EXERCISE_NOTES` entry's text as its own utterance via the app's `exerciseNote` dispatch. Each note shape's domain is
- * bounded and content-derived (characters, 1-3 stars, colour × piece, one `Hint` per wording); error notes also get the easier-offer sentence. */
-function exerciseNoteTemplates(
-  add: (text: string, source: string) => void,
-  r: Resolve,
-  all: CompiledContent,
-): void {
-  const characters = [...new Set(all.lessons.map((lesson) => lesson.character))];
-  const placeholderCtx: ExerciseNoteCtx = { name: '', vars: { piece: 'r' }, stars: 3 };
+ * bounded and content-derived (1-3 stars, illegal-move piece, colour × piece, one `Hint` per wording); error notes also get the easier-offer sentence. */
+function exerciseNoteTemplates(add: (text: string, source: string) => void, r: Resolve): void {
+  const placeholderCtx: ExerciseNoteCtx = { name: '', vars: {}, stars: 3 };
 
   function addNote(feedback: ExerciseFeedback, ctx: ExerciseNoteCtx): void {
     if (feedback.kind === 'instruction') return;
@@ -237,17 +226,10 @@ function exerciseNoteTemplates(
     }
   }
 
-  // Every character's own display name and the piece it stands for (default rook).
-  const ctxByCharacter = characters.map((character) => ({
-    name: r(`characters:${character}.name`),
-    piece: characterPieceOf(character) ?? 'r',
-  }));
-
-  // tap-first (never gets the easier offer: not an error kind) and illegal move (its own piece).
-  for (const { name, piece } of ctxByCharacter) {
-    addNote({ kind: 'tap-first' }, { name, vars: { piece }, stars: 3 });
-    addNote({ kind: 'illegal' }, { name, vars: { piece }, stars: 3 });
-  }
+  // tap-first (never gets the easier offer: not an error kind); illegal move: one line per piece type, and the generic one.
+  addNote({ kind: 'tap-first' }, placeholderCtx);
+  for (const piece of VERSUS_PIECE_TYPES) addNote({ kind: 'illegal', piece }, placeholderCtx);
+  addNote({ kind: 'illegal' }, placeholderCtx);
 
   // Plain error notes with no variables.
   addNote({ kind: 'select-wrong' }, placeholderCtx);
@@ -257,15 +239,9 @@ function exerciseNoteTemplates(
   addNote({ kind: 'wrong-move' }, placeholderCtx);
   addNote({ kind: 'wrong-placement' }, placeholderCtx);
 
-  // Hint ladder (never gets the easier offer). Level-1 "squares" (piece hint) is the only shape
-  // that varies by character; every other shape's text is character-independent.
-  for (const { name, piece } of ctxByCharacter) {
-    addNote(
-      { kind: 'hint', hint: { kind: 'squares', level: 1, squares: [] } },
-      { name, vars: { piece }, stars: 3 },
-    );
-  }
+  // Hint ladder (never gets the easier offer): every shape's text is character-independent.
   const otherHints: readonly Hint[] = [
+    { kind: 'squares', level: 1, squares: [] },
     { kind: 'squares', level: 2, squares: [] },
     { kind: 'squares', level: 3, squares: [] },
     { kind: 'yes-no', level: 1, squares: [], reveal: false },
@@ -357,7 +333,7 @@ export function chessVoiceTemplates(
   for (const piece of VERSUS_PIECE_TYPES) {
     add(r('boss.versus.kid-captured', { piece: r(`board.piece.${piece}`) }), 'versus-boss');
   }
-  exerciseNoteTemplates(add, r, all);
+  exerciseNoteTemplates(add, r);
   playScreenTemplates(add, r, all);
 }
 

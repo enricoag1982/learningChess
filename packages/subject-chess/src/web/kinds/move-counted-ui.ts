@@ -20,7 +20,7 @@ export function moveCountedUi<D extends CollectStarsDef | CaptureDef>(
     type,
     initUi: baseInitUi,
     clearWrongUi: () => ({ wrongSquares: [] }),
-    toUi(outcome) {
+    toUi(outcome, action, next) {
       if (outcome.kind === 'undone') {
         return {
           feedback: { kind: 'instruction' },
@@ -30,7 +30,7 @@ export function moveCountedUi<D extends CollectStarsDef | CaptureDef>(
           lastMove: undefined,
         };
       }
-      return moveToUi(outcome);
+      return moveToUi(outcome, action, next);
     },
     PlayArea: CountedPlayArea,
   };

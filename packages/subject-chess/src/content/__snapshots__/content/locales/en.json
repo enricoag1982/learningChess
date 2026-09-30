@@ -176,6 +176,7 @@
    "hint-think-again": "Think about it again.",
    "illegal": {
     "b": "The bishop only moves on diagonal paths!",
+    "generic": "That piece can't move there!",
     "k": "The king only steps one square at a time!",
     "n": "The knight only jumps in an L shape!",
     "p": "The pawn only moves straight ahead (and captures diagonally)!",
@@ -740,7 +741,7 @@
   "check-g1": "Is your king in check from the black rook?",
   "check-g2": "Your rook can give check! Find the move that attacks the black king.",
   "checkmate": {
-   "demo": "Checkmate! The queen checks the king, and every square around him is covered.",
+   "demo": "Checkmate! The queen checks the king, and every square around it is covered.",
    "story": "Checkmate means the king is in check AND has no way out at all — no move, no block, no capture. The game is won!",
    "title": "Check or Checkmate?"
   },
@@ -1042,7 +1043,7 @@
   "safe-pieces-02": "A pawn now guards your knight. Is it still hanging?",
   "safe-pieces-03": "Nothing attacks your bishop. Is it hanging?",
   "safe-pieces-04": "The knight (black) attacks your pawn and nothing guards it. Is your pawn hanging?",
-  "safe-pieces-05": "The rook (black) attacks your rook on a4, but your other rook guards it. Is it hanging?",
+  "safe-pieces-05": "The rook (black) attacks your rook on a4, but your other rook guards it. Is your rook on a4 hanging?",
   "safe-pieces-06": "The knight (black) attacks your queen and nothing guards it. Is your queen hanging?",
   "safe-pieces-07": "The bishop (black) is undefended. Capture it for free with your queen!",
   "safe-pieces-08": "Two pawns (black) are waiting. Only one is undefended — capture that one for free!",

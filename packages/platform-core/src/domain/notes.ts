@@ -12,7 +12,7 @@ export interface ExerciseFeedbackBase {
 }
 
 /** Vars every note's `text` may draw on: the platform ones, plus the subject's own
- * (`SubjectCore.noteVars(character)`, chess: `{ piece }`). */
+ * (`SubjectCore.noteVars(character)`, chess: none). */
 export interface ExerciseNoteCtx {
   readonly name: string;
   readonly stars: Stars;

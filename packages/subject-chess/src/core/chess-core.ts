@@ -54,7 +54,7 @@ export const chessCore: SubjectCore<VariantRules, ChessRewardFacts> = {
   gameRecordOf: chessGameRecordOf,
   characters: CHESS_CHARACTERS,
   notes: EXERCISE_NOTES,
-  noteVars: (character) => ({ piece: CHARACTER_PIECES[character] ?? 'r' }),
+  noteVars: () => ({}),
   settings: {
     defaults: CHESS_SETTINGS_DEFAULTS,
     retired: CHESS_RETIRED_SETTINGS,

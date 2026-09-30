@@ -146,6 +146,7 @@ exercise:
     k: The king only steps one square at a time!
     n: The knight only jumps in an L shape!
     p: The pawn only moves straight ahead (and captures diagonally)!
+    generic: That piece can't move there!
   setup:
     wrong: Not quite! Try a different piece or square.
     palette-label: Pieces to place

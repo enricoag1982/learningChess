@@ -1,6 +1,7 @@
 // The Owl bubble's feedback note as data: one entry per `ExerciseFeedback` kind, driving the live app (`exerciseNote`) and the
 // content build's voice inventory. Chess-bound: platform note dispatch (`domain/notes.ts`) is subject-free.
 import type { Move } from '../chess/rules.ts';
+import type { PieceType } from '../chess/types.ts';
 import type {
   AnyNoteEntry,
   ExerciseNote,
@@ -20,7 +21,8 @@ export type { AnyNoteEntry, ExerciseNote, ExerciseNoteCtx, Resolve };
 export type ExerciseFeedback =
   | { readonly kind: 'instruction' }
   | { readonly kind: 'tap-first' }
-  | { readonly kind: 'illegal' }
+  /** A move that is not legal; `piece` = the piece the kid tried to move (absent when unknown). */
+  | { readonly kind: 'illegal'; readonly piece?: PieceType }
   /** select-squares: only wrong picks. */
   | { readonly kind: 'select-wrong' }
   /** select-squares: only missing squares. */
@@ -44,8 +46,8 @@ export type ExerciseNoteKind = Exclude<ExerciseFeedback['kind'], 'instruction'>;
 
 type NoteFeedback<K extends ExerciseNoteKind> = Extract<ExerciseFeedback, { readonly kind: K }>;
 
-function illegalMoveText(r: Resolve, piece: string, name: string): string {
-  return r(`exercise.illegal.${piece}`, { name });
+function illegalMoveText(r: Resolve, piece: PieceType | undefined): string {
+  return r(piece === undefined ? 'exercise.illegal.generic' : `exercise.illegal.${piece}`);
 }
 
 function hintNoteText(r: Resolve, hint: Hint, name: string): string {
@@ -79,7 +81,7 @@ export const EXERCISE_NOTES = {
   illegal: {
     tone: 'attention',
     error: true,
-    text: (r, _f, { vars, name }) => illegalMoveText(r, vars.piece ?? 'r', name),
+    text: (r, f) => illegalMoveText(r, f.piece),
   },
   'select-wrong': { tone: 'attention', error: true, text: (r) => r('exercise.select-wrong') },
   'select-missing': { tone: 'attention', error: true, text: (r) => r('exercise.select-missing') },
