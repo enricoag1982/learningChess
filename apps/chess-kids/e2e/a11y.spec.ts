@@ -191,12 +191,23 @@ async function expectOnlyButtonsRaised(page: Page, screen: string): Promise<void
   );
 }
 
-/** Kid touch targets must be >= 64px both ways (docs/screens.md §1). */
-async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<void> {
+async function expectTargetSize(page: Page, name: RegExp | string, min: number): Promise<void> {
   const box = await page.getByRole('button', { name }).boundingBox();
   expect(box, `no bounding box for button matching ${String(name)}`).not.toBeNull();
-  expect(box?.width ?? 0, `${String(name)} width`).toBeGreaterThanOrEqual(64);
-  expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(64);
+  expect(box?.width ?? 0, `${String(name)} width`).toBeGreaterThanOrEqual(min);
+  expect(box?.height ?? 0, `${String(name)} height`).toBeGreaterThanOrEqual(min);
+}
+
+/** Kid touch targets outside the game screens (Home, Journey, Den, picker, first run, results,
+ * primary Next) must be >= 64px both ways (docs/screens.md §1). */
+async function expectKidTouchTarget(page: Page, name: RegExp | string): Promise<void> {
+  await expectTargetSize(page, name, 64);
+}
+
+/** Game screens (lesson steps, boss / series, review, vs Computer / vs Friend, assessment tasks):
+ * >= 56px both ways (docs/screens.md §1, owner 2026-09-30). */
+async function expectGameTouchTarget(page: Page, name: RegExp | string): Promise<void> {
+  await expectTargetSize(page, name, 56);
 }
 
 /** Parent-area touch targets must be >= 44px both ways (docs/screens.md §1). `role` defaults to
@@ -365,26 +376,26 @@ function allExerciseTypes(): ReadonlySet<string> {
  * exercises a wrong pick (orange note, never red — non-functional.md §2).
  */
 async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
-  await expectKidTouchTarget(page, /Hint/);
+  await expectGameTouchTarget(page, /Hint/);
   if (isMoveCountedExercise(def)) {
-    await expectKidTouchTarget(page, /Undo/);
+    await expectGameTouchTarget(page, /Undo/);
   }
-  await expectKidTouchTarget(page, /Say it again/);
+  await expectGameTouchTarget(page, /Say it again/);
 
   // With a hint note under the instruction the panel is at its tallest: targets must not shrink.
   await page.getByRole('button', { name: /Hint/ }).click();
-  await expectKidTouchTarget(page, /Say it again/);
-  await expectKidTouchTarget(page, /Hint/);
+  await expectGameTouchTarget(page, /Say it again/);
+  await expectGameTouchTarget(page, /Hint/);
   await expectNoSeriousViolations(page, `Exercise (${def.type}, hint shown)`);
   await expectOnlyButtonsRaised(page, `Exercise (${def.type}, hint shown)`);
 
   if (def.type === 'yes-no') {
-    await expectKidTouchTarget(page, contentText('exercise.yes'));
-    await expectKidTouchTarget(page, contentText('exercise.no'));
+    await expectGameTouchTarget(page, contentText('exercise.yes'));
+    await expectGameTouchTarget(page, contentText('exercise.no'));
   } else if (def.type === 'choice') {
     for (const option of def.options) {
       if (option.textKey !== undefined) {
-        await expectKidTouchTarget(page, contentText(option.textKey));
+        await expectGameTouchTarget(page, contentText(option.textKey));
         continue;
       }
       if (!option.piece) {
@@ -392,7 +403,7 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
       }
       const color = contentText(`board.color.${option.piece.color}`);
       const piece = contentText(`board.piece.${option.piece.type}`);
-      await expectKidTouchTarget(page, `${color} ${piece}`);
+      await expectGameTouchTarget(page, `${color} ${piece}`);
     }
   } else if (def.type === 'select-squares') {
     const answer = new Set(selectSquaresAnswer(def));
@@ -401,7 +412,7 @@ async function deepScanExercise(page: Page, def: ExerciseDef): Promise<void> {
       throw new Error(`select-squares exercise "${def.id}": every square is a correct answer`);
     }
     await clickSquare(page, wrongSquare);
-    await expectKidTouchTarget(page, /Check/);
+    await expectGameTouchTarget(page, /Check/);
     await page.getByRole('button', { name: /Check/ }).click();
     await expect(page.getByText(contentText('exercise.select-both'))).toBeVisible();
     await expectNoSeriousViolations(page, 'Exercise (select-squares, wrong pick)');
@@ -578,7 +589,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('button', { name: 'Play', exact: true }).click();
           await expectKidTouchTarget(page, /Play a full game/);
           await page.getByRole('button', { name: 'Play a full game' }).click();
-          await expectKidTouchTarget(page, 'Close');
+          await expectGameTouchTarget(page, 'Close');
           await scan('Full game (start)');
 
           await playOneKidVersusMove(page, previousWorldBoss);
@@ -587,8 +598,8 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
           await page.getByRole('button', { name: 'Close' }).click();
           await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
-          await expectKidTouchTarget(page, 'Stop game');
-          await expectKidTouchTarget(page, 'Keep playing');
+          await expectGameTouchTarget(page, 'Stop game');
+          await expectGameTouchTarget(page, 'Keep playing');
           await scan('Full game (leave confirm)');
           await page.getByRole('button', { name: 'Stop game' }).click();
 
@@ -612,8 +623,8 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
           await page.getByRole('button', { name: 'Pass and play' }).click();
           await page.getByRole('button', { name: 'Start' }).click();
           await page.getByRole('button', { name: /^e2,/ }).waitFor();
-          await expectKidTouchTarget(page, 'Take back');
-          await expectKidTouchTarget(page, 'Stop');
+          await expectGameTouchTarget(page, 'Take back');
+          await expectGameTouchTarget(page, 'Stop');
           await scan('vs Friend (game, start)');
 
           await clickSquare(page, 'e2');
@@ -623,16 +634,16 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
           await page.getByRole('button', { name: 'Take back' }).click();
           await page.getByRole('alertdialog', { name: 'Allow take back?' }).waitFor();
-          await expectKidTouchTarget(page, 'Yes');
-          await expectKidTouchTarget(page, 'No');
+          await expectGameTouchTarget(page, 'Yes');
+          await expectGameTouchTarget(page, 'No');
           await scan('vs Friend (take-back ask)');
           await page.getByRole('button', { name: 'Yes' }).click();
           await page.getByRole('button', { name: /^e2, white pawn/ }).waitFor();
 
           await page.getByRole('button', { name: 'Stop' }).click();
           await page.getByRole('alertdialog', { name: 'Stop this game?' }).waitFor();
-          await expectKidTouchTarget(page, 'Stop game');
-          await expectKidTouchTarget(page, 'Keep playing');
+          await expectGameTouchTarget(page, 'Stop game');
+          await expectGameTouchTarget(page, 'Keep playing');
           await scan('vs Friend (stop confirm)');
           await page.getByRole('button', { name: 'Stop game' }).click();
 
@@ -669,10 +680,10 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
     // Story.
     if (!storyDemoScanned) {
-      await expectKidTouchTarget(page, 'Close lesson');
-      await expectKidTouchTarget(page, /Listen again/);
+      await expectGameTouchTarget(page, 'Close lesson');
+      await expectGameTouchTarget(page, /Listen again/);
       await expectKidTouchTarget(page, /Let me try/);
-      await expectKidTouchTarget(page, 'Skip'); // playtest 2
+      await expectGameTouchTarget(page, 'Skip'); // playtest 2
       await scan('Story');
     }
     await page.getByRole('button', { name: /Let me try/ }).click();
@@ -680,7 +691,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
     // Demo.
     if (!storyDemoScanned) {
       await expectKidTouchTarget(page, /^Next/);
-      await expectKidTouchTarget(page, 'Skip'); // playtest 2
+      await expectGameTouchTarget(page, 'Skip'); // playtest 2
       await scan('Demo');
       storyDemoScanned = true;
     }
@@ -688,10 +699,10 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
     // Guided tries (not individually a11y-scanned; deep-scanned scored exercises cover the UI).
     for (const guided of lesson.guided) {
-      await expectKidTouchTarget(page, 'Skip'); // playtest 2: every guided try shows it
-      await expectKidTouchTarget(page, /Hint/);
+      await expectGameTouchTarget(page, 'Skip'); // playtest 2: every guided try shows it
+      await expectGameTouchTarget(page, /Hint/);
       if (isMoveCountedExercise(guided)) {
-        await expectKidTouchTarget(page, /Undo/);
+        await expectGameTouchTarget(page, /Undo/);
       }
       await completeExercise(page, guided);
     }
@@ -730,7 +741,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
         await page.getByRole('button', { name: /^Next/ }).click();
         staticBossScanned = true;
       } else if (boss.mode === 'versus' && !versusBossScanned) {
-        await expectKidTouchTarget(page, /Take back/);
+        await expectGameTouchTarget(page, /Take back/);
         await scan('Boss (versus, start)');
         await playOneKidVersusMove(page, boss);
         await waitForVersusTurnOrEnd(page);
@@ -976,10 +987,10 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
 
     // Story.
     if (!storyDemoScanned) {
-      await expectKidTouchTarget(page, 'Close lesson');
-      await expectKidTouchTarget(page, /Listen again/);
+      await expectGameTouchTarget(page, 'Close lesson');
+      await expectGameTouchTarget(page, /Listen again/);
       await expectKidTouchTarget(page, /Let me try/);
-      await expectKidTouchTarget(page, 'Skip');
+      await expectGameTouchTarget(page, 'Skip');
       await scan('Story');
     }
     await page.getByRole('button', { name: 'Skip' }).click(); // Story -> Demo
@@ -987,7 +998,7 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
     // Demo.
     if (!storyDemoScanned) {
       await expectKidTouchTarget(page, /^Next/);
-      await expectKidTouchTarget(page, 'Skip');
+      await expectGameTouchTarget(page, 'Skip');
       await scan('Demo');
       storyDemoScanned = true;
     }
@@ -1044,7 +1055,7 @@ test('seeded scan reaches the lesson-flow walk’s scan points without playing t
         await page.getByRole('button', { name: /^Next/ }).click();
         staticBossScanned = true;
       } else if (target.bossToScan !== undefined && boss.mode === 'versus') {
-        await expectKidTouchTarget(page, /Take back/);
+        await expectGameTouchTarget(page, /Take back/);
         await scan('Boss (versus, start)');
         await playOneKidVersusMove(page, boss);
         await waitForVersusTurnOrEnd(page);
@@ -1117,7 +1128,7 @@ test('test-out sheet, runner and result screen have no serious/critical violatio
   // The runner: no Hint control (domain-model.md §3.2 "no hints offered").
   await page.getByText(/^Task 1\//).waitFor();
   await expect(page.getByRole('button', { name: /Hint/ })).toHaveCount(0);
-  await expectKidTouchTarget(page, /Say it again/);
+  await expectGameTouchTarget(page, /Say it again/);
   await expectNoSeriousViolations(page, 'Test-out runner');
 
   // Answers every task wrong-then-right (whichever the app picked at random from the lesson's own

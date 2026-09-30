@@ -63,11 +63,14 @@ export interface PlayAreaProps<
    * follow-up F6). */
   readonly showCheck: boolean;
   readonly surface: SurfaceContext;
-  /** The instruction bubble + replay/skip/easier row — identical across every kind, computed once
+  /** The instruction bubble with its replay button — identical across every kind, computed once
    * by the host and rendered above the board/controls (or `done`). */
   readonly top: ReactNode;
   /** The solved-state stars + Next block, or `null` while not solved — also host-computed. */
   readonly done: ReactNode | null;
+  /** Host buttons for the kind's action row (Skip on a guided try, the Easier offer); a kind passes them on as
+   * `ExerciseControls`' `extras`. */
+  readonly actions?: ReactNode;
 }
 
 /** One exercise kind's whole UI: core outcome → UI patch, its extra UI fields' initial values, board + controls. Method syntax:

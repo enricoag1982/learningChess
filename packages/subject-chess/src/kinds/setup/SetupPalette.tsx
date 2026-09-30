@@ -30,11 +30,16 @@ export function SetupPalette({
 
   return (
     // Flat, no border (docs/screens.md §1): a row of raised piece buttons, so a card border would compete.
-    <div className="info-flat flex flex-col gap-2 rounded-3xl bg-[#F3EDE0] p-4">
-      <span className="text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
+    // Under the board (`compact`) the label sits left of the tiles from `sm` up, saving a line of board height.
+    <div
+      className={`info-flat flex flex-col gap-2 rounded-3xl bg-[#F3EDE0] p-3 ${compact ? 'sm:flex-row sm:items-center sm:gap-4' : ''}`}
+    >
+      <span className="shrink-0 text-xs font-extrabold uppercase tracking-wide text-muted sm:text-sm">
         {t('exercise.setup.palette-label')}
       </span>
-      <div className={`flex gap-3 ${compact ? 'flex-nowrap overflow-x-auto pb-1' : 'flex-wrap'}`}>
+      <div
+        className={`flex gap-3 ${compact ? 'min-w-0 flex-nowrap overflow-x-auto pb-1' : 'flex-wrap'}`}
+      >
         {palette.map((entry) => {
           const key = pieceKey(entry);
           const isSelected = selected !== null && pieceKey(selected) === key;
@@ -53,7 +58,7 @@ export function SetupPalette({
               onClick={() => {
                 onSelect({ color: entry.color, type: entry.type });
               }}
-              className={`tap-raised relative flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl border-4 bg-board-light ${
+              className={`tap-raised relative flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border-4 bg-board-light ${
                 isSelected
                   ? 'border-go'
                   : isHinted

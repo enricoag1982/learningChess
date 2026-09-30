@@ -42,7 +42,7 @@ Related: [architecture.md](architecture.md), [app-structure.md](app-structure.md
 | Area | Requirement |
 |---|---|
 | Non-readers | Every text spoken; replay button; icons on every action |
-| Touch | Targets ≥ 64 px (kid), ≥ 44 px (parent); tap-tap and drag both supported |
+| Touch | Targets ≥ 56 px on game screens (lesson steps, boss / series, review, vs Computer / vs Friend, assessment tasks; owner 2026-09-30), ≥ 64 px on the other kid screens, ≥ 44 px (parent); tap-tap and drag both supported |
 | Colour | Never the only signal (lock icons, check marks, dots / rings); text contrast ≥ 4.5:1 |
 | Motion / sound | Respect "reduce motion"; sound and voice toggles; subtitles always on |
 | Screen readers | All controls labelled; board squares announced ("e4, white bishop"); parent area WCAG 2.2 AA |

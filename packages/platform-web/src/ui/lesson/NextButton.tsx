@@ -9,7 +9,7 @@ export interface NextButtonProps {
   readonly className?: string;
 }
 
-/** The lesson's one primary action: green, ≥64px tall, icon + label, always going forward. */
+/** The lesson's one primary action: green, 64px tall, icon + label, always going forward. */
 export function NextButton({ onClick, label, className = '' }: NextButtonProps): JSX.Element {
   const { t } = useTranslation();
   return (

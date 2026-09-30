@@ -17,7 +17,7 @@ describe('TapButton', () => {
   });
 
   it('carries no colour-tone class for the default neutral tone', () => {
-    render(<TapButton look="secondary">Neutral</TapButton>);
+    render(<TapButton look="compact">Neutral</TapButton>);
     const button = screen.getByRole('button', { name: 'Neutral' });
     expect(button.className).toContain('tap-raised');
     expect(button.className).not.toMatch(/tap-(go|today|info)\b/);

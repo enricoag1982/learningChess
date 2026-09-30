@@ -19,6 +19,7 @@ export function PlayArea({
   surface,
   top,
   done,
+  actions,
 }: ChessPlayAreaProps<'select-squares', SelectSquaresExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
@@ -53,6 +54,7 @@ export function PlayArea({
       onHint={() => {
         dispatch({ type: 'hint' });
       }}
+      extras={actions}
       slot={
         <button
           type="button"

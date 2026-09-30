@@ -4,12 +4,10 @@ import type { Lesson } from '@learn/platform-core';
 import { useServices } from '../../app/store.ts';
 import { usePack } from '../../app/subject.ts';
 import { tContent } from '../../content-text.ts';
-import { ReplayButton } from '../ds/ReplayButton.tsx';
 import { SpeechBubble } from '../ds/SpeechBubble.tsx';
 import { useNarratedText } from '../ds/useNarratedText.ts';
 import { GameLayout } from './GameLayout.tsx';
-import { NextButton } from './NextButton.tsx';
-import { SkipButton } from './SkipButton.tsx';
+import { ForwardRow } from './ForwardRow.tsx';
 
 export interface DemoStepProps {
   readonly lesson: Lesson;
@@ -31,13 +29,8 @@ export function DemoStep({ lesson, onNext, onSkip }: DemoStepProps): JSX.Element
       board={<pack.surface.Demo lesson={lesson} />}
       panel={
         <>
-          <SpeechBubble text={text} />
-          {/* Skip sits beside Replay (same place as on Story / Try), never beside the primary. */}
-          <div className="flex gap-3">
-            <ReplayButton onClick={replay} label={t('exercise.replay')} className="flex-1" />
-            <SkipButton onClick={onSkip} />
-          </div>
-          <NextButton onClick={onNext} className="mt-auto w-full" />
+          <SpeechBubble text={text} onReplay={replay} />
+          <ForwardRow onSkip={onSkip} onNext={onNext} className="mt-auto" />
         </>
       }
     />

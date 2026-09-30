@@ -10,3 +10,7 @@ export function infoPanelClass(tint = 'bg-cream', extra = ''): string {
 export function infoPillClass(tint = '', extra = ''): string {
   return `info-flat inline-flex items-center gap-2 rounded-2xl px-4 ${tint} ${extra}`.trim();
 }
+
+/** One-line stat chip (boss counters, the moves chip): flat white, about 40 px tall (docs/screens.md §1). */
+export const INFO_CHIP =
+  'info-flat flex flex-wrap items-center gap-x-4 rounded-2xl bg-card px-4 py-2 font-display text-base text-ink';

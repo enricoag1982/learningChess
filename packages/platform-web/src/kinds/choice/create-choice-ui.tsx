@@ -47,7 +47,7 @@ export function createChoiceUi<
     },
 
     PlayArea(props) {
-      const { def, state, dispatch, showHint, top, done } = props;
+      const { def, state, dispatch, showHint, top, done, actions } = props;
       const controls = (
         <>
           <ExerciseControls
@@ -55,6 +55,7 @@ export function createChoiceUi<
             onHint={() => {
               dispatch({ type: 'hint' });
             }}
+            extras={actions}
           />
           <ChoiceOptions
             options={def.options}

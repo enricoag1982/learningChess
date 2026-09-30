@@ -21,6 +21,7 @@ export function PlayArea({
   surface,
   top,
   done,
+  actions,
 }: ChessPlayAreaProps<'setup', WrongSquaresExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
@@ -74,6 +75,7 @@ export function PlayArea({
         onHint={() => {
           dispatch({ type: 'hint' });
         }}
+        extras={actions}
       />
       {!isStacked && tray}
     </>

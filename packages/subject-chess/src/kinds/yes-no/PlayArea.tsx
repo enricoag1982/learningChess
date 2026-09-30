@@ -20,6 +20,7 @@ export function PlayArea({
   surface,
   top,
   done,
+  actions,
 }: ChessPlayAreaProps<'yes-no', YesNoExtra>): JSX.Element {
   const { t } = useTranslation();
   const pieceBadges = useSurfacePieceBadges(surface);
@@ -51,6 +52,7 @@ export function PlayArea({
         onHint={() => {
           dispatch({ type: 'hint' });
         }}
+        extras={actions}
       />
       <YesNoButtons
         wrongValue={state.wrongAnswer}

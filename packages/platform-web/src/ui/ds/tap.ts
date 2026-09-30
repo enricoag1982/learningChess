@@ -9,6 +9,7 @@ export type TapTone = 'neutral' | 'go' | 'today' | 'info' | 'none';
  * `parent-chip`/`parent-row` live in `ds/parent-styles-lazy.ts`, same reason as `TapTone`. */
 export type TapLook =
   | 'round'
+  | 'round-md'
   | 'round-sm'
   | 'dialog'
   | 'block'
@@ -17,13 +18,14 @@ export type TapLook =
   | 'wide'
   | 'next'
   | 'primary'
-  | 'secondary'
+  | 'compact'
   | 'parent'
   | 'custom';
 
 const LOOK_BASE: Readonly<Record<TapLook, string>> = {
-  // Round icon-only button: kid 64px (Back/Close headers) and parent 44px (ChevronLeft headers).
+  // Round icon-only button: kid 64px (Back headers), game 56px (Close header, replay) and parent 44px (ChevronLeft headers).
   round: 'flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full',
+  'round-md': 'flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full',
   'round-sm': 'flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full',
   // Confirm-dialog Yes/No pair (kid alertdialogs, FriendGame/FullGame).
   dialog:
@@ -34,14 +36,15 @@ const LOOK_BASE: Readonly<Record<TapLook, string>> = {
   hero: 'flex h-16 w-full max-w-sm items-center justify-center rounded-[2rem] px-8 font-display text-xl font-semibold sm:h-20 sm:text-2xl',
   // Lesson Complete's Play again / Continue pair.
   cta: 'h-20 flex-1 rounded-3xl font-display text-xl font-semibold',
-  // Mid-width in-flow option (vs Friend setup picks).
-  wide: 'flex h-16 items-center justify-center rounded-2xl px-4 font-display text-base font-semibold',
+  // Mid-width in-flow option (vs Friend's per-player strip).
+  wide: 'flex h-14 items-center justify-center rounded-2xl px-4 font-display text-base font-semibold',
   // Lesson's one forward action (NextButton, and vs Friend's own final CTA).
-  next: 'flex h-20 items-center justify-center gap-3 rounded-3xl px-6 font-display text-2xl font-semibold',
+  next: 'flex h-16 items-center justify-center gap-3 rounded-3xl px-6 font-display text-xl font-semibold',
   primary:
     'flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold',
-  secondary:
-    'flex h-16 flex-1 items-center justify-center gap-2 rounded-2xl px-4 font-display text-lg font-semibold',
+  // Game-screen action (Hint / Undo / Check / Skip / answers): 56px, icon + short label, shares one row.
+  compact:
+    'flex h-14 min-w-14 flex-1 items-center justify-center gap-2 rounded-2xl px-3 font-display text-base font-semibold',
   parent: 'flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold',
   custom: '',
 };

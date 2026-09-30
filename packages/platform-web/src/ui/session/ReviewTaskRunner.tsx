@@ -55,7 +55,7 @@ export function ReviewTaskRunner({
         <div className="min-w-0 flex-1 truncate text-center font-display text-lg font-semibold text-ink sm:text-xl">
           {headerText(index + 1, tasks.length)}
         </div>
-        <div className="h-16 w-16 flex-shrink-0" aria-hidden="true" />
+        <div className="h-14 w-14 flex-shrink-0" aria-hidden="true" />
       </ScreenHeader>
 
       <ProgressDots current={index} total={tasks.length} hidden />

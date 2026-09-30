@@ -76,7 +76,7 @@ test.describe('2 errors offer an easier variant (teaching-process.md §3.3)', ()
     await clickSquare(page, 'b2');
     await clickSquare(page, 'b2');
 
-    // Offered, never forced: the extra sentence plus a real (>=64px tall) button.
+    // Offered, never forced: the extra sentence plus a real (>=56px tall, game screen) button.
     await expect(page.getByText(contentText('exercise.easier-offer'))).toBeVisible();
     const easierButton = page.getByRole('button', {
       name: contentText('exercise.easier'),
@@ -84,7 +84,7 @@ test.describe('2 errors offer an easier variant (teaching-process.md §3.3)', ()
     });
     await expect(easierButton).toBeVisible();
     const box = await easierButton.boundingBox();
-    expect(box?.height ?? 0).toBeGreaterThanOrEqual(64);
+    expect(box?.height ?? 0).toBeGreaterThanOrEqual(56);
 
     await easierButton.click();
 

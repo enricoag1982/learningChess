@@ -12,12 +12,12 @@ const OPTIONS: readonly ChoiceOption[] = [
 ];
 
 describe('ChoiceOptions', () => {
-  it('renders every option as a big tile, at least 64px tall (min-h-24)', () => {
+  it('renders every option as a tile at least 56px tall (min-h-14)', () => {
     render(<ChoiceOptions options={OPTIONS} wrongOptionIds={[]} onPick={vi.fn()} />);
     const buttons = screen.getAllByRole('button');
     expect(buttons).toHaveLength(OPTIONS.length);
     for (const button of buttons) {
-      expect(button.className).toContain('min-h-24');
+      expect(button.className).toContain('min-h-14');
     }
   });
 

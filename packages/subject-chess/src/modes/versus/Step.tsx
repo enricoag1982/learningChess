@@ -25,7 +25,7 @@ import { tContent } from '@learn/platform-web/content-text.ts';
 import { UndoIcon } from '../../web/kinds/MovePlayArea.tsx';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { isClassicOnlyContext, showPieceBadges } from '../../web/ui/board/piece-style.ts';
-import { ReplayButton } from '@learn/platform-web/ui/ds/ReplayButton.tsx';
+import { INFO_CHIP } from '@learn/platform-web/ui/ds/primitives-styles.ts';
 import { SpeechBubble } from '@learn/platform-web/ui/ds/SpeechBubble.tsx';
 import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
 import { SECONDARY_BUTTON } from '@learn/platform-web/ui/lesson/button-styles.ts';
@@ -286,9 +286,8 @@ export function Step({
         }
         panel={
           <>
-            <SpeechBubble text={spokenText} />
-            <ReplayButton onClick={replay} label={t('exercise.replay')} />
-            <div className="info-flat flex flex-col gap-1 rounded-3xl bg-card px-5 py-4 font-display text-lg text-ink">
+            <SpeechBubble text={spokenText} onReplay={replay} />
+            <div className={INFO_CHIP}>
               {thinking && <span>{t('boss.versus.thinking', { name: botName() })}</span>}
               <span>{t('boss.versus.moves', { count: moves })}</span>
             </div>
