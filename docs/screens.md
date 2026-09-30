@@ -51,8 +51,8 @@ Related: [app-structure.md](app-structure.md). Visual sketches: [canvas](https:/
 | 6 | Lesson complete | Reward | Stars, new badge, next lesson, new mini-game, Play again / **Continue** | Journey, Exercise |
 | 7 | Play | Apply | vs Computer (levels), vs Friend, mini-game grid (locked ones greyed) | Game screens |
 | 8 | vs Friend | Same-device game | Face-to-face board (black pieces rotated), take back + exit per player, turn indicator | Play |
-| 9 | My Den | Motivation | Rank ladder, badges, animal friends | Home |
-| 10 | Parent area (M5.1) | Control | Overview (child cards, app version, **Reload latest version** button + hint; M8.34) → child report (progress by world, concept accuracy, weak concepts, minutes per day, games, badges, assessments) → child settings (daily limit, voice/sound/hints, computer level, piece style, unlock, reset, delete); separate Backup (export / import) and Privacy (M5.5, same text as the first-run password step's own link) | Profile picker |
+| 9 | My Den | Motivation | Rank ladder, badges, your pieces | Home |
+| 10 | Parent area (M5.1) | Control | Overview (child cards, app version, **Reload latest version** button + hint; M8.34) → child report (progress by world, concept accuracy, weak concepts, minutes per day, games, badges, assessments) → child settings (daily limit, voice/sound/hints, computer level, unlock, reset, delete); separate Backup (export / import) and Privacy (M5.5, same text as the first-run password step's own link) | Profile picker |
 
 ## 3. Not sketched yet
 

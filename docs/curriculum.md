@@ -22,12 +22,12 @@ Related: [teaching-process.md](teaching-process.md), [domain-model.md](domain-mo
 
 | # | Lesson | Concept | Content | Types | Ex. | Src | Boss |
 |---|---|---|---|---|---|---|---|
-| 4 | Rook (Rhino) | `rook-move` | Straight lines, any distance; capture | star, sel, cap | 8 | A | Hungry Rook |
-| 5 | Bishop (Elephant) | `bishop-move` | Diagonals; stays on one colour; capture | star, sel, cap | 8 | A | Hungry Bishop |
-| 6 | Queen (Lioness) | `queen-move` | Rook + bishop moves; capture | star, sel, cap | 8 | A | Hungry Queen |
-| 7 | King (Lion) | `king-move` | One step; cannot go where it can be captured | star, sel | 6 | A | King Walk |
-| 8 | Knight (Horse) | `knight-move` | L jump; jumps over pieces; capture | star, sel, cap | 8 | A | Knight Maze |
-| 9 | Pawn (Caterpillar) | `pawn-move` | Forward only; double first step; diagonal capture; blocked | star, sel, cap | 8 | A | Pawn Wars (4 pawns) |
+| 4 | Rook | `rook-move` | Straight lines, any distance; capture | star, sel, cap | 8 | A | Hungry Rook |
+| 5 | Bishop | `bishop-move` | Diagonals; stays on one colour; capture | star, sel, cap | 8 | A | Hungry Bishop |
+| 6 | Queen | `queen-move` | Rook + bishop moves; capture | star, sel, cap | 8 | A | Hungry Queen |
+| 7 | King | `king-move` | One step; cannot go where it can be captured | star, sel | 6 | A | King Walk |
+| 8 | Knight | `knight-move` | L jump; jumps over pieces; capture | star, sel, cap | 8 | A | Knight Maze |
+| 9 | Pawn | `pawn-move` | Forward only; double first step; diagonal capture; blocked | star, sel, cap | 8 | A | Pawn Wars (4 pawns) |
 | 10 | Promotion | `promotion` | Last row → transform; choose piece | best, ch | 5 | A | Pawn Wars (8 pawns) |
 
 ### World 3 — Attack & Defence (Jungle)

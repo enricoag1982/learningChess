@@ -15,7 +15,7 @@ started.
 
 Each lesson walks through five steps:
 
-1. **Story** — an animal character (Rhino the Rook, Elephant the Bishop, …) introduces the idea.
+1. **Story** — a piece character (the Rook, the Bishop, …), guided by Owl, introduces the idea.
 2. **Demo** — Owl shows the move on the board.
 3. **Try** — a couple of guided tries with help on hand.
 4. **Exercises** — a rising-difficulty set of tasks (tap squares, capture, choose, set up a
@@ -23,7 +23,7 @@ Each lesson walks through five steps:
    offered.
 5. **Boss** — a mini-game that puts the new skill to use.
 
-Progress, stars, and rewards (animal friends, badges, a streak) are saved automatically and never
+Progress, stars, and rewards (your pieces, badges, a streak) are saved automatically and never
 leave the device.
 
 ## The Basics (Worlds 1–5)

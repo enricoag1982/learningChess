@@ -20,7 +20,7 @@ Related: [app-structure.md](app-structure.md), [domain-model.md](domain-model.md
 |---|---|---|
 | Stars | Exercises and mini-games (1–3 each) | Top bar, Journey nodes, My Den |
 | Rank | Worlds and paths (Pawn → King) | Home, My Den |
-| Animal friends | Piece lessons in World 2 (Rhino, Elephant, Lioness, Lion, Horse, Caterpillar) | My Den |
+| Your pieces | Piece lessons in World 2 (Rook, Bishop, Queen, King, Knight, Pawn) | My Den |
 | Badges | Catalogue below | Lesson complete screen, My Den |
 
 ## 3. Badge catalogue

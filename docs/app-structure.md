@@ -8,7 +8,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 |---|---|
 | Path | Fixed order; skippable via test-out (kid) or unlock (parent) |
 | Profiles | Multiple per device |
-| Theme | Animals |
+| Theme | Animals (guide, avatars, habitats, bot levels); pieces keep their real names (§8) |
 | Categories | Basics linear (worlds 1–5); then tracks: Openings, Tactics, Checkmates & Endgames (any order); Strategy later |
 | Play vs person | Same device only in v1 |
 | Login / online | Off in v1; hooks in place (see §13) |
@@ -46,7 +46,7 @@ Platform/tech independent. Pedagogy in [teaching-process.md](teaching-process.md
 | **Journey** (map) | Main learning path | Main road (Basics) splitting into 3 tracks; habitat per world, node per lesson, next node highlighted |
 | **Practice** | Review | Daily warm-up; puzzles by category on unlocked topics |
 | **Play** | Application | Unlocked mini-games; full game vs computer; vs Friend (same device) |
-| **My Den** | Motivation | Stars, badges, animal collection, rank |
+| **My Den** | Motivation | Stars, badges, your pieces (learned lessons), rank |
 
 ## 5. Content hierarchy
 
@@ -55,7 +55,7 @@ Journey
 └─ Track (Basics = main road; Openings / Tactics / Checkmates & Endgames)
    └─ World (one habitat)
       └─ Lesson (one concept)
-         ├─ Story card (animal + rule)
+         ├─ Story card (piece + rule)
          ├─ Demo
          ├─ Guided tries (hints on)
          ├─ Exercises (5–10 stages, 1–3 stars)
@@ -98,18 +98,24 @@ Exercise definition: position + task type + goal + answer check + hints + star c
 
 ## 8. Animal theme
 
-| Piece | Animal | Story hook |
-|---|---|---|
-| Rook | Rhino | Charges straight, any distance |
-| Bishop | Elephant | Walks diagonal paths. Historical: bishop = elephant (Arabic *al-fil* → Italian *alfiere*) |
-| Queen | Lioness | Rhino + elephant moves; strongest hunter |
-| King | Lion | Most important; one step at a time; must stay safe |
-| Knight | Horse | Jumps in an L, over anyone |
-| Pawn | Caterpillar | Only forward; at the last row transforms (promotion) |
-| Guide | Owl | Narrates, gives hints |
+Owner 2026-09-30: pieces are no longer animals. They are called by their real names everywhere (lessons, Den, Journey, speech); the boards draw classic pieces with no animal badge; there is no "Piece style" setting. Animals stay for the guide, avatars, habitats and bot levels.
 
+| Piece | Story hook |
+|---|---|
+| Rook | Charges straight, any distance |
+| Bishop | Walks diagonal paths |
+| Queen | Rook + bishop moves; strongest |
+| King | Most important; one step at a time; must stay safe |
+| Knight | Jumps in an L, over anyone |
+| Pawn | Only forward; at the last row transforms (promotion) |
+
+- Lesson characters = the pieces (`rook`, `bishop`, `queen`, `king`, `knight`, `pawn`); their art is the classic piece icon (`SubjectWeb.characterArt`), not an image.
+- Guide: Owl (narrates, gives hints; World 1 characters).
 - Journey map: one habitat per world.
 - Profile avatars: animals.
+- Bot levels: Mouse → Rabbit → Fox → Wolf → Bear.
+- My Den lists the pieces ("Your pieces"): a piece is earned when its lesson is done; a locked one reads "Learn the ‹piece› lesson".
+- Old data: v1.0.0–v2.0.0 stored `pieceStyle`; it still loads (in settings and backup files), is ignored and dropped on the next save.
 
 ## 9. Functional building blocks
 
@@ -142,10 +148,10 @@ Behind the parent gate; three screens deep — **Overview → child report → c
 |---|---|
 | Overview | One card per child: avatar, nickname, rank, total stars, minutes today / last 7 days, streak (≥ 2 days). Tap → that child's report. Also: Add child, Backup, Change password. At the bottom: the app version and **Reload latest version** (hint: downloads the app again from the internet; progress and settings stay on this device). Offline → "No internet connection. Connect and try again.", nothing changes |
 | Child report | Progress by world (lessons complete/mastered, stars) — worlds with no authored lessons yet are skipped. Concept accuracy (last 10 results) with a "needs practice" summary + a tag on each weak row. Minutes per day, last 14 days (bar + the exact number as visible text, so it reads to a screen reader too; a line marks the daily limit). Games, last 10, newest first (opponent by name, result, date). Badges earned (name + tier). Assessments (test-out/placement: kind, score, pass/fail, date). A **Settings** button opens that child's settings |
-| Child settings | Rename, change avatar. Daily limit (off / 15 / 20 / 30 / 45 / 60 min). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Piece style (animal badge / classic). Unlock lessons & worlds panel. Send to other device / Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent code). Delete (removes the profile entirely) |
+| Child settings | Rename, change avatar. Daily limit (off / 15 / 20 / 30 / 45 / 60 min). Voice / sound / hints toggles. Computer level (Automatic, or a fixed unlocked level — locked ones shown, disabled). Unlock lessons & worlds panel. Send to other device / Export this child's data. Reset (clears progress/attempts/concept stats/mini-game progress/game records/badges/streak/session log; keeps nickname, avatar, settings, and any assessment/unlock rows; confirmed by re-entering the parent code). Delete (removes the profile entirely) |
 | Backup | **Send to other device** (primary button, per child and "all children"): shares the same JSON via the share sheet (`chess-for-kids-<nickname or all>-<date>.json`), falling back to a download when file sharing is unavailable. Export: one JSON file for every child, or (from a child's own Settings) just that one — `chess-kids-backup-<date>.json` / `chess-kids-backup-<nickname>-<date>.json`. Import: pick a file → preview, per incoming child ("Merging into Mia", or a choice between "Add as new child"/"Merge into ‹local child›" + what would change) → **Merge**: folds the file's progress into this device's own — nothing on either side is lost, importing the same file twice changes nothing (`docs/domain-model.md` §3.5); an invalid or too-new file shows a clear error and changes nothing |
 
-**Settings effect now**: voice / hints / computer level take effect the next time that profile is selected (not live mid-session — the parent area is reached through "Switch player", which always ends back at the picker); sound has nothing to gate yet (no sound-effect system exists in v1); daily limit is enforced live, read fresh at every activity gate check; piece style applies on every board (§14).
+**Settings effect now**: voice / hints / computer level take effect the next time that profile is selected (not live mid-session — the parent area is reached through "Switch player", which always ends back at the picker); sound has nothing to gate yet (no sound-effect system exists in v1); daily limit is enforced live, read fresh at every activity gate check.
 
 **Backup scope**: never the parent code (`ParentLockRepository`). The device's own `lastProfileId` / "Automatic level" suggestions / `storagePersisted` / `deviceId` are never *exported*; on import (always a merge) this device's own values are kept exactly as they were, not reset.
 
@@ -181,5 +187,4 @@ Nickname, avatar, lesson status + stars, per-concept accuracy, review queue, tes
 
 | Topic | Options | Recommendation |
 |---|---|---|
-| Piece look on board | Animal pieces / classic pieces / classic + animal badge | Classic + animal badge in Worlds 1–4, classic only from World 5 and any full game (transfer to real boards) — `ui/board/piece-style.ts`. Parent toggle (`ProfileSettings.pieceStyle`, per child in the parent area's Settings screen): `classic` forces classic everywhere, overriding the above; `animal` (default) shows the badge everywhere except World 5 / a full game — it does not force badges into those, since that transfer moment is a fixed design decision |
 | "Win the Queen" (World 3, before check) | King capturable / kings removed | Kings removed |

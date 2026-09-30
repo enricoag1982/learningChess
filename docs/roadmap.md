@@ -110,7 +110,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | F4 | Bear stronger than Wolf | `computer-opponent.md` §6.6: null-move pruning + LMR + history heuristic; bear vs wolf 13.3% → 20.0% (N = 30), still short of ≥ 70% | Open. Next: richer `staticEval` for Bear, isolating each technique's own share, wider opening-book coverage |
 | F5 | Mate-in-2+ outside a lesson step | Scripted-reply timer lived only in `ExerciseStep.tsx`; a mate-in-2+ in a series boss round or review task froze | Done (`m8.13`): the reply timer is part of the shared `useExerciseSession`; regression tests for a series round and a review task |
 | F6 | Check ring in series boss rounds | "Escape the Check" series rounds show no check ring (lessons do); the ring is part of each square's accessible name, so changing it is a visible + a11y change | Found in the v4 R3b design (2026-09-27); kept as is in v4 (same behaviour); owner decision |
-| F7 | Chess art in platform-web | Chess characters, bot art and colours sit in `platform-web/src/ui/art/animal-images.ts`; the math demo precaches 7 unused WebP files (≈ 35 KB) | Found in v4 R5 design (2026-09-29); moving them changes chess JS; after `v4.0.0` |
+| F7 | Chess art in platform-web | Chess bot art and character colours sit in `platform-web/src/ui/art/animal-images.ts` (piece characters are drawn by the pack since `m9.1`); the math demo precaches 7 unused WebP files (≈ 35 KB) | Found in v4 R5 design (2026-09-29); moving them changes chess JS; after `v4.0.0` |
 | F8 | Chess-named narrator keys | `audio-narrator.ts` still writes `chess-kids:voice-report` and sets `__chessKidsVoiceMisses` (a dev flag chess e2e reads) for every app | Found in v4 R5 design; key from `AppConfig.storagePrefix` needs a storage-compat check; after `v4.0.0` |
 
 ## 4. After MVP
@@ -146,11 +146,12 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 
 | Topic | Decision |
 |---|---|
-| Illustrations | Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped); lioness has no emoji → lion image with the mane masked out |
+| Illustrations | Microsoft Fluent Emoji 3D (MIT, 256 px WebP, 3–6 KB each, bundled, license file shipped) for Owl, avatars and bot levels. Piece characters were animals (lioness = lion image, mane masked out) until 2026-09-30; now classic piece icons (row below) |
 | Web hosting | GitHub Pages: delivers the app files only (first install + update checks); no user data sent |
 | v2 scope | Offline only: time controls + file-based device sharing with merge; online (login, remote play, cloud sync) parked — server, child-consent law (COPPA / GDPR Art. 8), moderation, for little gain with one child at home |
 | 5-min warning | App-level notice (reusable for later notices), calm screens only, never mid-exercise/game; once per child per day, spoken, info style (not tappable) |
 | Device sharing | Chosen over QR / parent's cloud drive / family-code sync: share a backup file, merge on import (`domain-model.md` §3.5) + "Send to other device" via the Web Share API, download fallback. Time limit is per device between shares |
 | Voice | Pre-generated audio: Kokoro-82M int8, `af_heart` voice, speed 0.92, MP3 mono 32 kbps (Apache-2.0, generated offline, no cloud TTS, no cost); one narrator voice (Owl, third-person); Web Speech API fallback for texts without audio |
 | v4 numbering | v4 refactor = M8 (`m8.x` tags); Store apps → M9, Paths → M10 |
+| Real piece names (owner 2026-09-30) | To make the app simpler: no animal per piece, no animal badge on boards, no "Piece style" setting. Lesson characters are the pieces (`rook` … `pawn`, art = classic piece icon); My Den shows "Your pieces". Owl, avatars, Journey habitats, bot levels (Mouse → Bear) and the Den stay. Old `pieceStyle` data still loads and is dropped on the next save. Run A (`m9.1`): code and content ids; run B: lesson texts and voice audio (~200 texts say Rhino / Elephant / …) |
 | v4 size target | Production TS: no growth vs `v2.0.0` (31.6 k), trim pass before `v4.0.0` (owner 2026-09-28) |

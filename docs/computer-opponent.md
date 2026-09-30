@@ -170,7 +170,7 @@ Richer eval (mobility, king safety, passed pawns) is the next lever not yet trie
 
 ## 9. Later
 
-- **Game review:** after a game, Owl shows up to 3 key moments (material swing ≥ 3), e.g. "Here the Horse could take the Rook".
+- **Game review:** after a game, Owl shows up to 3 key moments (material swing ≥ 3), e.g. "Here the Knight could take the Rook".
 - **Bear strength (§6.6, roadmap F4 — still open):** 13.3% → 20.0% bear-vs-wolf, still well
   short of 70%. Likely next levers, in order of expected payoff for the effort: a richer
   `staticEval` for Bear only (mobility, king safety, passed pawns — the one option from F4's own

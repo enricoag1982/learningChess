@@ -27,7 +27,7 @@ Character 1─1 piece type
 | Exercise | `id`, `concept`, `type`, `board`, `textKey`, type-specific fields, optional `easier` (id of a `variants` entry of the same lesson) |
 | MiniGame | `id`, `concept`, `unlockAfter` (lesson id), `board`, `rules`, `win`, `opponent`, `moveLimit`, `kidColor` |
 | Assessment | `id`, `kind` (`placement` / `test-out` / `world-test`), `scope`, `tasksPerConcept`, `pass` (default 0.8) |
-| Character | `id` (`rhino`, …), `piece`, `nameKey`, `storyKey` |
+| Character | `id` (`rook`, …), `piece`, `nameKey`, `storyKey` |
 | Rank | `id` (`pawn` … `king`), `after` (world id, track id, or `all-tracks`) |
 | BadgeDef | `id`, `category` (`milestone` / `skill` / `play` / `habit`), `nameKey`/`conditionKey` (derived from `id`: `rewards:badges.<id>.name`/`.condition`, not authored per badge), `condition` (`type` + `thresholds[]` (1 = single-tier, 3 = bronze/silver/gold) + type-specific params) — see [rewards.md](rewards.md) §4 |
 | BotLevel | `level` (1–5), `name` (`mouse` … `bear`), `random`, `shallow`, `depth`, `book`, `queenHomeMoves`, `aids` — see [computer-opponent.md](computer-opponent.md) |
@@ -72,7 +72,7 @@ Character 1─1 piece type
 | Account | `id`, `kind` (`guest` in v1 / `parent` in v2), `profiles[]` |
 | ParentLock | `password` (the parent code; plain text; kid-gate only), `filePath`, `failedAttempts`, `lockedUntil` |
 | Profile | `id`, `accountId`, `nickname`, `avatar`, `createdAt`, `locale`, `settings` |
-| Settings (`ProfileSettings`) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60), `weekendLimitMinutes?` (absent = same as `dailyLimitMinutes`; Sat/Sun device-local), `playUntil?`/`playFrom?` (`'HH:MM'` local or `null`/absent = that edge off; `playUntil` options 18:00–21:00 every 30 min, `playFrom` 07:00/08:00/09:00), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `pieceStyle` (`'animal'` / `'classic'`), `updatedAt?` (ISO instant, set by every `updateProfileSettings` call — device-sharing merge's "newest wins", §3.5). No `aids` overrides in v1 — `BotLevel.aids` is per-level, not per-profile |
+| Settings (`ProfileSettings`) | Per profile, keyed into `AppSettings.profileSettings`: `dailyLimitMinutes` (`null` = off, else 15/20/30/45/60), `weekendLimitMinutes?` (absent = same as `dailyLimitMinutes`; Sat/Sun device-local), `playUntil?`/`playFrom?` (`'HH:MM'` local or `null`/absent = that edge off; `playUntil` options 18:00–21:00 every 30 min, `playFrom` 07:00/08:00/09:00), `voice`, `sound`, `hints` (all `boolean`), `computerLevel` (`'auto'` or a `BotLevel.level` 1–5), `updatedAt?` (ISO instant, set by every `updateProfileSettings` call — device-sharing merge's "newest wins", §3.5). No `aids` overrides in v1 — `BotLevel.aids` is per-level, not per-profile. `SubjectCore.settings.retired` lists fields an older version stored (chess: `pieceStyle`, removed 2026-09-30): a stored one loads, is ignored, dropped on the next save, never rejects a backup file |
 | LessonProgress | `lessonId`, `status` (`locked` / `available` / `complete` / `mastered`), `bestStars{exerciseId}`, `masteredVia` (`play` / `test-out` / `placement` / `parent`), `skippedPhases?` (`('story'\|'demo'\|'try')[]`, absent = none; set on a "Skip" tap, a phase removed once later played through normally — e.g. a replay) |
 | ConceptStats | `conceptId`, `recent[]` (last 10 first-try results), `box` (1–5, absent = not in review), `dueAt`, `lastExerciseId` (avoids repeating the last task shown) |
 | Attempt | `exerciseId`, `conceptId`, `correct`, `hints`, `errors`, `durationMs`, `at`; `reviewSource` (only alongside `review: true`): `'warmup'` (Today's inline warm-up, or Practice's own "Daily warm-up" card) vs `'practice'` (a Practice topic run) — what "Warm-up Champ" counts |
@@ -252,7 +252,7 @@ Lesson:
 id: rook
 order: 1
 concept: rook-move
-character: rhino
+character: rook
 demo:
   board: |
     . . . . . . . .
@@ -305,6 +305,6 @@ opponent: { bot: 1 }
 Locale (`locales/en/lessons.yaml`):
 ```yaml
 rook:
-  story: Rhino charges straight ahead, as far as he wants!
-rook-02: Help Rhino collect all the stars.
+  story: The rook charges straight ahead, as far as it wants!
+rook-02: Help the rook collect all the stars.
 ```

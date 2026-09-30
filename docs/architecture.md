@@ -18,7 +18,7 @@ Related: [teaching-process.md](teaching-process.md), [app-structure.md](app-stru
 | Language | TypeScript (strict) | Types enforce layer boundaries; one language end to end |
 | UI | React + Vite | Mature ecosystem, fast builds |
 | Styling / motion | Tailwind CSS + Motion | Consistent design, smooth animations |
-| Board | Own SVG component | Full control: stars, blocked squares, animal badges, arrows, tap-tap; crisp on tablets |
+| Board | Own SVG component | Full control: stars, blocked squares, arrows, tap-tap; crisp on tablets |
 | Chess rules | chess.js (BSD-2) + own variant layer | Standard rules from chess.js; variants (no kings, custom win conditions) in own layer |
 | Computer opponent | Own engine (minimax depth 1–4 + controlled mistakes) in a Web Worker | Weak human-like play for kids; no GPL; UI stays smooth. Details: [computer-opponent.md](computer-opponent.md) |
 | Content | YAML (authoring) → Zod validation → JSON (runtime) | Readable, commentable lessons; app loads plain JSON |
