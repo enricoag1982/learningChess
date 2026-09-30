@@ -7,7 +7,6 @@ import type { GameRecord } from '@learn/platform-core';
 import { loadGameRecords, loadJourney } from '@learn/platform-core';
 import { bot, computerLevelStatus } from '../chess.ts';
 import type { ComputerLevelStatus } from '../chess.ts';
-import type { PieceStyleSetting } from '../core/chess/settings.ts';
 import { useServices } from '@learn/platform-web/app/store.ts';
 import type { ParentSettingsProps, ReportSectionProps } from '@learn/platform-web/app/subject.ts';
 import {
@@ -82,29 +81,6 @@ export function SettingsPanel({
               }
             >
               {t(`boss.versus.bot-name.${status.name}`)}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <h3 className="text-sm font-extrabold text-ink">{t('parent.piece-style-heading')}</h3>
-        <div
-          className="flex flex-wrap gap-2"
-          role="group"
-          aria-label={t('parent.piece-style-heading')}
-        >
-          {(['animal', 'classic'] satisfies PieceStyleSetting[]).map((style) => (
-            <button
-              key={style}
-              type="button"
-              aria-pressed={settings.pieceStyle === style}
-              onClick={() => {
-                void patchSettings({ pieceStyle: style });
-              }}
-              className={settings.pieceStyle === style ? PARENT_CHIP_SELECTED : PARENT_CHIP}
-            >
-              {t(`parent.piece-style-${style}`)}
             </button>
           ))}
         </div>

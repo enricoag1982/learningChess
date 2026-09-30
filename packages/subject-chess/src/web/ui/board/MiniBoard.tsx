@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import type { Color, Position, Square } from '../../../core/chess/types.ts';
-import { PieceBadge, PieceIcon } from './pieces.tsx';
+import { PieceIcon } from './pieces.tsx';
 import { cellToSquare } from './geometry.ts';
 
 const CELLS: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -17,7 +17,6 @@ export interface MiniBoardProps {
   readonly highlightSquares?: readonly Square[];
   readonly orientation?: Color;
   readonly label: string;
-  readonly pieceBadges?: boolean;
 }
 
 /** A small non-interactive board diagram (the Story step's "here's how I move"): nothing responds to taps or drags. */
@@ -26,7 +25,6 @@ export function MiniBoard({
   highlightSquares = [],
   orientation = 'w',
   label,
-  pieceBadges = false,
 }: MiniBoardProps): JSX.Element {
   return (
     <div
@@ -50,7 +48,6 @@ export function MiniBoard({
                 {piece && (
                   <span className="absolute inset-[6%]">
                     <PieceIcon piece={piece} />
-                    {pieceBadges && <PieceBadge type={piece.type} />}
                   </span>
                 )}
                 {isDot && <span className="h-[28%] w-[28%] rounded-full bg-go/60" />}

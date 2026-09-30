@@ -10,8 +10,7 @@ import type { ExerciseStateOf } from '../../core/exercise/state.ts';
 import type { Hint } from '../../core/exercise/hint.ts';
 import type { MoveAction } from '../../kinds/base.ts';
 import type { UndoAction } from '../../kinds/static-move.ts';
-import { chessWeb, checkSquareFor, useSurfacePieceBadges } from '../chess-pack.ts';
-import type { SurfaceContext } from '@learn/platform-web/app/subject.ts';
+import { chessWeb, checkSquareFor } from '../chess-pack.ts';
 import { Svg } from '@learn/platform-web/ui/ds/icons.tsx';
 import { INFO_CHIP } from '@learn/platform-web/ui/ds/primitives-styles.ts';
 import { StarsRow } from '@learn/platform-web/ui/StarsRow.tsx';
@@ -63,7 +62,6 @@ interface MovePlayAreaProps {
   readonly dispatch: (action: SessionAction<MoveAction>) => void;
   readonly showHint: boolean;
   readonly showCheck: boolean;
-  readonly surface: SurfaceContext;
   readonly top: ReactNode;
   readonly done: ReactNode | null;
   readonly actions?: ReactNode;
@@ -76,14 +74,12 @@ export function MovePlayArea({
   dispatch,
   showHint,
   showCheck,
-  surface,
   top,
   done,
   actions,
   info,
   undo,
 }: MovePlayAreaProps): JSX.Element {
-  const pieceBadges = useSurfacePieceBadges(surface);
   // While mate-in-n's reply is pending, the board shows the position right after the kid's own
   // move (not the reply, already applied in `state.core`) until `reveal` fires.
   const displayPosition = state.pending ? state.pending.state.position : state.core.position;
@@ -104,7 +100,6 @@ export function MovePlayArea({
       lastMove={state.lastMove}
       wrongMove={state.wrongMove}
       checkSquare={showCheck ? checkSquareFor(displayPosition) : undefined}
-      pieceBadges={pieceBadges}
     />
   );
 

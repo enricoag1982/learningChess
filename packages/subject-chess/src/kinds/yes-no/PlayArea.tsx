@@ -1,7 +1,7 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Hint } from '../../core/exercise/hint.ts';
-import { checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
+import { checkSquareFor } from '../../web/chess-pack.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import { ExerciseFrame } from '@learn/platform-web/kinds/ExercisePlay.tsx';
 import { panelBody } from '@learn/platform-web/kinds/panel-body.tsx';
@@ -17,13 +17,11 @@ export function PlayArea({
   dispatch,
   showHint,
   showCheck,
-  surface,
   top,
   done,
   actions,
 }: ChessPlayAreaProps<'yes-no', YesNoExtra>): JSX.Element {
   const { t } = useTranslation();
-  const pieceBadges = useSurfacePieceBadges(surface);
   const solved = state.core.solved;
   const checkSquare = showCheck ? checkSquareFor(state.core.position) : undefined;
   // `useExerciseSession` (generic) types `state.hint` by its base shape; the pack's own registry
@@ -41,7 +39,6 @@ export function PlayArea({
         ...(checkSquare === undefined ? {} : { check: checkSquare }),
       }}
       label={t('lesson.board-label')}
-      pieceBadges={pieceBadges}
     />
   );
 

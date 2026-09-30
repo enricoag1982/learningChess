@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isValidComputerLevel, isValidPieceStyle } from './settings.ts';
+import { isValidComputerLevel } from './settings.ts';
 
 describe('isValidComputerLevel', () => {
   it('accepts "auto" and every level 1-5', () => {
@@ -15,17 +15,5 @@ describe('isValidComputerLevel', () => {
     expect(isValidComputerLevel(6)).toBe(false);
     expect(isValidComputerLevel('manual')).toBe(false);
     expect(isValidComputerLevel(null)).toBe(false);
-  });
-});
-
-describe('isValidPieceStyle', () => {
-  it('accepts "animal" and "classic"', () => {
-    expect(isValidPieceStyle('animal')).toBe(true);
-    expect(isValidPieceStyle('classic')).toBe(true);
-  });
-
-  it('rejects anything else', () => {
-    expect(isValidPieceStyle('wood')).toBe(false);
-    expect(isValidPieceStyle(undefined)).toBe(false);
   });
 });

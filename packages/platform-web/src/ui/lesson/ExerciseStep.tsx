@@ -143,7 +143,6 @@ function ExerciseAttempt({
       // auto-hint (`useExerciseSession`'s mount effect, unaffected by this setting).
       showHint={hintsEnabled}
       showCheck
-      surface={{ worldId: lesson.world }}
       top={top}
       done={done}
       actions={actions}

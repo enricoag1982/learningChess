@@ -1,6 +1,6 @@
 import type { JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { checkSquareFor, useSurfacePieceBadges } from '../../web/chess-pack.ts';
+import { checkSquareFor } from '../../web/chess-pack.ts';
 import { Board } from '../../web/ui/board/Board.tsx';
 import type { WrongSquaresExtra, ChessPlayAreaProps } from '../../web/kinds/move-ui.ts';
 
@@ -8,11 +8,9 @@ import type { WrongSquaresExtra, ChessPlayAreaProps } from '../../web/kinds/move
 export function ChoiceBoard({
   def,
   state,
-  surface,
   showCheck,
 }: ChessPlayAreaProps<'choice', WrongSquaresExtra>): JSX.Element | null {
   const { t } = useTranslation();
-  const pieceBadges = useSurfacePieceBadges(surface);
   if (!def.showBoard) {
     return null;
   }
@@ -23,7 +21,6 @@ export function ChoiceBoard({
       legalMoves={[]}
       highlights={checkSquare === undefined ? {} : { check: checkSquare }}
       label={t('lesson.board-label')}
-      pieceBadges={pieceBadges}
     />
   );
 }

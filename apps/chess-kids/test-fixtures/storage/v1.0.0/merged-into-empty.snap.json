@@ -30,8 +30,7 @@
      "voice": true,
      "sound": true,
      "hints": true,
-     "computerLevel": "auto",
-     "pieceStyle": "animal"
+     "computerLevel": "auto"
     },
     "lessonProgress": [
      {
@@ -785,8 +784,7 @@
      "voice": true,
      "sound": true,
      "hints": true,
-     "computerLevel": "auto",
-     "pieceStyle": "animal"
+     "computerLevel": "auto"
     },
     "lessonProgress": [],
     "attempts": [],
@@ -825,16 +823,14 @@
     "voice": true,
     "sound": true,
     "hints": true,
-    "computerLevel": "auto",
-    "pieceStyle": "animal"
+    "computerLevel": "auto"
    },
    "685599c5-ff26-4d4b-83b1-ae2079f8cdf5": {
     "dailyLimitMinutes": null,
     "voice": true,
     "sound": true,
     "hints": true,
-    "computerLevel": "auto",
-    "pieceStyle": "animal"
+    "computerLevel": "auto"
    }
   }
  }

@@ -157,7 +157,6 @@ describe('LocalStorageBackupImporter', () => {
           sound: true,
           hints: false,
           computerLevel: 2,
-          pieceStyle: 'classic',
         },
       },
     });

@@ -116,6 +116,8 @@ export interface SubjectCore<Ctx = unknown, F = unknown> {
    * stored one, `loadBackupShape` (dynamic import) supplies the zod fields for `app/backup.ts`. */
   readonly settings: {
     readonly defaults: Readonly<Record<string, unknown>>;
+    /** Fields an older version stored and this one no longer has: a stored one loads, is ignored, and is dropped on the next save. */
+    readonly retired?: readonly string[];
     isValid(s: Readonly<Record<string, unknown>>): boolean;
     loadBackupShape(): Promise<SettingsBackupShape>;
   };

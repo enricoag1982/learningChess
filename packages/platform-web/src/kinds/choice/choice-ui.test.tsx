@@ -107,7 +107,6 @@ function props(
     dispatch,
     showHint: true,
     showCheck: true,
-    surface: { worldId: null },
     top: <p>instruction</p>,
     done: <p>well done</p>,
   };

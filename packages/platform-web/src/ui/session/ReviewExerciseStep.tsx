@@ -77,7 +77,6 @@ export function ReviewExerciseStep({
       dispatch={dispatch}
       showHint={showHint}
       showCheck
-      surface={{ worldId: null }}
       top={top}
       done={done}
     />

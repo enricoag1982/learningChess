@@ -24,7 +24,6 @@ import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { tContent } from '@learn/platform-web/content-text.ts';
 import { UndoIcon } from '../../web/kinds/MovePlayArea.tsx';
 import { Board } from '../../web/ui/board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from '../../web/ui/board/piece-style.ts';
 import { INFO_CHIP } from '@learn/platform-web/ui/ds/primitives-styles.ts';
 import { SpeechBubble } from '@learn/platform-web/ui/ds/SpeechBubble.tsx';
 import { useNarratedText } from '@learn/platform-web/ui/ds/useNarratedText.ts';
@@ -101,16 +100,7 @@ export function Step({
 }: VersusStepProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const goToStep = useAppStore((state) => state.goToStep);
-  const pieceBadges = showPieceBadges(
-    pieceStyle,
-    isClassicOnlyContext({
-      worldId: lesson.world,
-      kings: minigame.rules.kings,
-      position: minigame.position,
-    }),
-  );
 
   const [versus, setVersus] = useState<VersusState>(() => startVersus(minigame));
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | undefined>(undefined);
@@ -281,7 +271,6 @@ export function Step({
               ...(hint ? { hint: [hint.from, hint.to] } : {}),
             }}
             label={t('lesson.board-label')}
-            pieceBadges={pieceBadges}
           />
         }
         panel={

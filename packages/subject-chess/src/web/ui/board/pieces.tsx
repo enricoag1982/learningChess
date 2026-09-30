@@ -1,7 +1,5 @@
 import type { JSX } from 'react';
 import type { Color, PieceType } from '../../../core/chess/types.ts';
-import { characterForPiece } from '../art/character-meta.ts';
-import { animalImage, characterColor } from '@learn/platform-web/ui/art/animal-images.ts';
 
 export interface PieceIconProps {
   readonly piece: { readonly color: Color; readonly type: PieceType };
@@ -211,29 +209,6 @@ export function PieceIcon({ piece, size }: PieceIconProps): JSX.Element {
         </g>
       )}
     </svg>
-  );
-}
-
-/** Small animal-face badge on a piece's corner, decorative (`aria-hidden`); an SVG `<image>` so it composes with the badge ring at this size. */
-export function PieceBadge({ type }: { readonly type: PieceType }): JSX.Element {
-  const character = characterForPiece(type);
-  return (
-    <span
-      aria-hidden="true"
-      className="absolute -bottom-0.5 -right-0.5 flex h-[40%] w-[40%] items-center justify-center overflow-hidden rounded-full border border-white/80 p-0.5"
-      style={{ backgroundColor: characterColor(character) }}
-    >
-      <svg viewBox="0 0 100 100" className="h-full w-full">
-        <image
-          href={animalImage(character)}
-          x={0}
-          y={0}
-          width={100}
-          height={100}
-          preserveAspectRatio="xMidYMid meet"
-        />
-      </svg>
-    </span>
   );
 }
 

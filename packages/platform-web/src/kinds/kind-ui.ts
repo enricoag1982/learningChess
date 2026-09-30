@@ -5,7 +5,6 @@ import type {
   HintBase,
 } from '@learn/platform-core';
 import type { JSX, ReactNode } from 'react';
-import type { SurfaceContext } from '../app/subject.ts';
 
 /** UI-only state over the core state: `core`, `hint`, `feedback`, `pending?` are shared by every kind; a kind's extras
  * (`Extra`, e.g. `lastMove`) come from `initUi` / `toUi`. */
@@ -62,7 +61,6 @@ export interface PlayAreaProps<
   /** The board's check ring (default on; a `series` round keeps it off, `docs/refactor-v4.md`
    * follow-up F6). */
   readonly showCheck: boolean;
-  readonly surface: SurfaceContext;
   /** The instruction bubble with its replay button — identical across every kind, computed once
    * by the host and rendered above the board/controls (or `done`). */
   readonly top: ReactNode;

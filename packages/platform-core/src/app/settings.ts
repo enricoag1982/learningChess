@@ -1,9 +1,13 @@
-import { composeDefaultSettings, isValidProfileSettings } from '../domain/profile-settings.ts';
+import {
+  composeDefaultSettings,
+  dropRetiredSettings,
+  isValidProfileSettings,
+} from '../domain/profile-settings.ts';
 import type { ProfileSettings } from '../domain/profile-settings.ts';
 import type { AppDeps } from './use-cases.ts';
 
 /** A profile's parent-set settings, or its subject's composed defaults if never changed. Always
- * full/valid: merges the stored (possibly partial) entry over the defaults field by field. */
+ * full/valid: merges the stored (possibly partial) entry over the defaults field by field, minus retired fields. */
 export async function getProfileSettings(
   deps: AppDeps,
   profileId: string,
@@ -11,7 +15,9 @@ export async function getProfileSettings(
   const settings = await deps.settings.get();
   const stored = settings.profileSettings[profileId];
   const defaults = composeDefaultSettings(deps.subject.settings);
-  return stored === undefined ? defaults : { ...defaults, ...stored };
+  return stored === undefined
+    ? defaults
+    : dropRetiredSettings(deps.subject.settings, { ...defaults, ...stored });
 }
 
 /** Merges `patch` into the profile's settings; voice/sound/hints/computer level apply the next time the profile is selected. */

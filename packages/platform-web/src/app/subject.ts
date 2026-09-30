@@ -37,12 +37,6 @@ export interface ReportSectionProps {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented per subject
 export interface SubjectServices {}
 
-/** A board/story/demo surface's own lesson world, for the subject's piece look (chess: the animal
- * badge, off in World 5 and for a review task, `worldId: null`). */
-export interface SurfaceContext {
-  readonly worldId: string | null;
-}
-
 /** One subject's whole web behaviour behind the platform interface (docs/refactor-v4.md §11); a subject omits what it doesn't use. */
 export interface SubjectWeb {
   readonly core: SubjectCore;
@@ -56,7 +50,7 @@ export interface SubjectWeb {
   readonly surface: {
     Story(props: { readonly lesson: Lesson; readonly compact: boolean }): JSX.Element;
     Demo(props: { readonly lesson: Lesson }): JSX.Element;
-    View(props: { state: ExerciseStateBase; surface: SurfaceContext }): JSX.Element;
+    View(props: { state: ExerciseStateBase }): JSX.Element;
   };
   /** The piece-icon pill under a character's portrait (`CharacterCard`); absent for a subject without one. */
   CharacterBadge?(props: { readonly character: string }): JSX.Element | null;
@@ -70,7 +64,7 @@ export interface SubjectWeb {
     rankGlyph(rankId: string): string;
     Stats?(props: { readonly gameRecords: readonly GameRecord[] }): JSX.Element;
   };
-  /** Lazy parent-area panels (chess: level + piece-style chips, games-played section): a dynamic import, so they stay in the
+  /** Lazy parent-area panels (chess: level chips, games-played section): a dynamic import, so they stay in the
    * lazy parent chunk, not the initial bundle. */
   loadParent?(): Promise<ParentPanels>;
   /** Routes this subject contributes (chess: `play`, `full-game`, `friend-setup`, `friend-game`); the platform's never appear here. */

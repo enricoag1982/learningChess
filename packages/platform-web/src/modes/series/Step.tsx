@@ -45,7 +45,6 @@ function SeriesCounters({
 
 interface SeriesRoundProps {
   readonly character: string;
-  readonly worldId: string;
   readonly exercise: ExerciseDefBase;
   readonly roundNumber: number;
   readonly totalRounds: number;
@@ -57,7 +56,6 @@ interface SeriesRoundProps {
 /** One round of a series boss: `ExerciseStep`'s UI, scored only in the series' total mistakes; moving on is an explicit "Next" tap. */
 function SeriesRound({
   character,
-  worldId,
   exercise,
   roundNumber,
   totalRounds,
@@ -106,7 +104,6 @@ function SeriesRound({
       showHint={hintsEnabled}
       // The check ring stays off in a series round (`docs/refactor-v4.md` follow-up F6).
       showCheck={false}
-      surface={{ worldId }}
       top={top}
       done={done}
     />
@@ -150,7 +147,6 @@ export function Step({
         <SeriesRound
           key={series.roundIndex}
           character={lesson.character}
-          worldId={lesson.world}
           exercise={currentRound(series)}
           roundNumber={series.roundIndex + 1}
           totalRounds={minigame.rounds.length}
@@ -159,7 +155,7 @@ export function Step({
         />
       ) : (
         <GameLayout
-          board={<pack.surface.View state={series.round} surface={{ worldId: lesson.world }} />}
+          board={<pack.surface.View state={series.round} />}
           panel={
             <>
               <SpeechBubble text={goalText} onReplay={replay} />

@@ -17,7 +17,7 @@ export interface ProfileSettingsBase {
   readonly updatedAt?: string;
 }
 
-/** Base plus the subject's own fields (chess: `computerLevel`, `pieceStyle`) via module augmentation. */
+/** Base plus the subject's own fields (chess: `computerLevel`) via module augmentation. */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type -- augmented by the subject.
 export interface ProfileSettings extends ProfileSettingsBase {}
 
@@ -65,6 +65,16 @@ export function composeDefaultSettings(subject: {
   readonly defaults: Readonly<Record<string, unknown>>;
 }): ProfileSettings {
   return { ...DEFAULT_PROFILE_SETTINGS_BASE, ...subject.defaults } as ProfileSettings;
+}
+
+/** `settings` minus the subject's retired fields (`SubjectCore.settings.retired`). */
+export function dropRetiredSettings<T extends object>(
+  subject: { readonly retired?: readonly string[] },
+  settings: T,
+): T {
+  const copy = { ...settings };
+  for (const key of subject.retired ?? []) Reflect.deleteProperty(copy, key);
+  return copy;
 }
 
 export function isValidProfileSettings(

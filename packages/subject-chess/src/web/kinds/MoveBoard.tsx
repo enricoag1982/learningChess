@@ -18,7 +18,6 @@ export interface MoveBoardProps {
   readonly lastMove?: FromTo;
   readonly wrongMove?: FromTo;
   readonly checkSquare?: Square;
-  readonly pieceBadges: boolean;
 }
 
 /** The board shared by every move kind (collect-stars, capture, best-move, mate-in-n): legal-move
@@ -32,7 +31,6 @@ export function MoveBoard({
   lastMove,
   wrongMove,
   checkSquare,
-  pieceBadges,
 }: MoveBoardProps): JSX.Element {
   const { t } = useTranslation();
   return (
@@ -56,7 +54,6 @@ export function MoveBoard({
         ...(checkSquare === undefined ? {} : { check: checkSquare }),
       }}
       label={t('lesson.board-label')}
-      pieceBadges={pieceBadges}
     />
   );
 }

@@ -7,11 +7,9 @@ import { CHARACTER_PIECES, chessCore } from '../core/chess-core.ts';
 import { friendGamesPlayed } from '../core/app/friend-play.ts';
 import type { Lesson } from '../core/chess/lesson.ts';
 import type { Position, Square } from '../core/chess/types.ts';
-import { useAppStore } from '@learn/platform-web/app/store.ts';
 import { characterName, tContent } from '@learn/platform-web/content-text.ts';
 import { Board } from './ui/board/Board.tsx';
 import { MiniBoard } from './ui/board/MiniBoard.tsx';
-import { isClassicOnlyContext, showPieceBadges } from './ui/board/piece-style.ts';
 import { PieceIcon } from './ui/board/pieces.tsx';
 import { InfoPill } from '@learn/platform-web/ui/ds/primitives.tsx';
 
@@ -40,7 +38,6 @@ export function SurfaceStory({
   readonly compact: boolean;
 }): JSX.Element {
   const { t } = useTranslation();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const { demo } = lesson;
   const dots =
     'legalMovesFrom' in demo.highlight
@@ -48,14 +45,8 @@ export function SurfaceStory({
           .legalMoves(demo.position, { staticOpponent: true }, demo.highlight.legalMovesFrom)
           .map((move) => move.to)
       : demo.highlight.squares;
-  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
   const board = (
-    <MiniBoard
-      position={demo.position}
-      highlightSquares={dots}
-      label={t('lesson.board-label')}
-      pieceBadges={pieceBadges}
-    />
+    <MiniBoard position={demo.position} highlightSquares={dots} label={t('lesson.board-label')} />
   );
   return compact ? (
     <div className="mx-auto w-full max-w-[240px]">
@@ -68,10 +59,8 @@ export function SurfaceStory({
 
 export function SurfaceDemo({ lesson }: { readonly lesson: Lesson }): JSX.Element {
   const { t } = useTranslation();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
   const [position, setPosition] = useState<Position>(lesson.demo.position);
   const [lastMove, setLastMove] = useState<{ from: Square; to: Square } | undefined>(undefined);
-  const pieceBadges = showPieceBadges(pieceStyle, isClassicOnlyContext({ worldId: lesson.world }));
   const legalMoves = chessCore.context.legalMoves(position, { staticOpponent: true });
 
   function handleMove(move: { from: Square; to: Square }): void {
@@ -88,7 +77,6 @@ export function SurfaceDemo({ lesson }: { readonly lesson: Lesson }): JSX.Elemen
       onMove={handleMove}
       highlights={lastMove ? { lastMove } : undefined}
       label={t('demo.board-label', { name: characterName(t, lesson.character) })}
-      pieceBadges={pieceBadges}
     />
   );
 }

@@ -71,7 +71,6 @@ function renderPlayArea(core: Partial<MathState<MathChoiceDef>>, problem = def.p
       dispatch,
       showHint: true,
       showCheck: false,
-      surface: { worldId: null },
       top: <p>Instruction</p>,
       done: <p>Done</p>,
     }),

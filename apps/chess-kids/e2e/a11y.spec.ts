@@ -308,7 +308,7 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectOnlyButtonsRaised(page, 'Parent area: child report');
 
   // 8.6. Report -> Settings: rename/avatar, daily limit (weekend toggle + hours), voice/
-  // sound/hints, computer level, piece style, unlock panel, export, reset/delete — every control
+  // sound/hints, computer level, unlock panel, export, reset/delete — every control
   // on the busiest parent screen.
   await page.getByRole('button', { name: 'Settings' }).click();
   await expectParentTouchTarget(page, 'Rename');
@@ -319,7 +319,6 @@ test('onboarding and profile screens have no serious/critical violations and cor
   await expectParentTouchTarget(page.getByRole('group', { name: 'Not before' }), '08:00');
   await expectParentTouchTarget(page, 'Voice', 'switch');
   await expectParentTouchTarget(page, 'Automatic');
-  await expectParentTouchTarget(page, /^Animal badge$/);
   await expectParentTouchTarget(page, "Export this child's data");
   await expectParentTouchTarget(page, 'Reset progress');
   await expectParentTouchTarget(page, 'Delete');

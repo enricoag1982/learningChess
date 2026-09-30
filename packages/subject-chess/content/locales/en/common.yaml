@@ -31,9 +31,6 @@ board:
 parent:
   computer-level-heading: Computer level
   computer-level-auto: Automatic
-  piece-style-heading: Piece style
-  piece-style-animal: Animal badge
-  piece-style-classic: Classic
   privacy:
     intro: Chess for Kids keeps everything on this device. Here's exactly what that means.
 boss:

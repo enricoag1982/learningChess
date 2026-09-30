@@ -13,7 +13,6 @@ import type { FriendBoardMode, FriendOpponentChoice } from '../slices/play.ts';
 import { useAppStore, useServices } from '@learn/platform-web/app/store.ts';
 import { Board } from './board/Board.tsx';
 import type { BoardHighlights } from './board/Board.tsx';
-import { isClassicOnlyContext, showPieceBadges } from './board/piece-style.ts';
 import { GuestIcon } from '@learn/platform-web/ui/ds/icons-lazy.tsx';
 import { tapClass } from '@learn/platform-web/ui/ds/tap.ts';
 import { BlankScreen } from '@learn/platform-web/ui/ds/Screen.tsx';
@@ -239,11 +238,6 @@ function FriendMatch({
 }: FriendMatchProps): JSX.Element {
   const { t } = useTranslation();
   const services = useServices();
-  const pieceStyle = useAppStore((state) => state.activeProfileSettings.pieceStyle);
-  const pieceBadges = showPieceBadges(
-    pieceStyle,
-    isClassicOnlyContext({ kings: def.rules.kings, position: def.position }),
-  );
 
   const [swapped, setSwapped] = useState(initialSwapColours);
   const [match, setMatch] = useState<game.LocalMatchState>(() =>
@@ -383,7 +377,6 @@ function FriendMatch({
               onMove={handleMove}
               highlights={highlights}
               label={t('lesson.board-label')}
-              pieceBadges={pieceBadges}
             />
           </SquareArea>
           <PlayerStrip player={whitePlayer} isTurn={position.toMove === 'w'} {...stripCommon} />
@@ -401,7 +394,6 @@ function FriendMatch({
               onMove={handleMove}
               highlights={highlights}
               label={t('lesson.board-label')}
-              pieceBadges={pieceBadges}
             />
           </SquareArea>
           <PlayerStrip player={toMovePlayer} isTurn {...stripCommon} />

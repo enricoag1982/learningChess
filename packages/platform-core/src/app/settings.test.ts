@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { composeDefaultSettings } from '../domain/profile-settings.ts';
-import { makeSettingsRepo, makeDeps as buildDeps } from '../testing/index.ts';
+import { createSubjectRuntime } from '../domain/runtime.ts';
+import { makeSettingsRepo, makeDeps as buildDeps, testSubject } from '../testing/index.ts';
 import { getProfileSettings, updateProfileSettings } from './settings.ts';
 import type { AppDeps } from './use-cases.ts';
 import type { AppSettings } from './ports.ts';
@@ -79,5 +80,43 @@ describe('updateProfileSettings', () => {
     const invalid = { hints: true, difficulty: 'nightmare' };
     await expect(updateProfileSettings(deps, 'p1', valid)).resolves.toMatchObject(valid);
     await expect(updateProfileSettings(deps, 'p1', invalid)).rejects.toThrow();
+  });
+});
+
+describe('retired subject settings (SubjectCore.settings.retired)', () => {
+  const subject = createSubjectRuntime({
+    ...testSubject,
+    settings: { ...testSubject.settings, retired: ['legacy'] },
+  });
+  const stored = { ...DEFAULT_PROFILE_SETTINGS, legacy: 'kept-by-an-old-version' };
+
+  function makeRetiredDeps(): AppDeps {
+    return buildDeps({
+      subject,
+      settings: makeSettingsRepo({
+        ...EMPTY_SETTINGS,
+        profileSettings: { p1: stored },
+      }),
+    });
+  }
+
+  it('reads a stored profile without its retired field', async () => {
+    const loaded = await getProfileSettings(makeRetiredDeps(), 'p1');
+    expect(loaded).toEqual(DEFAULT_PROFILE_SETTINGS);
+    expect(Object.keys(loaded)).not.toContain('legacy');
+  });
+
+  it('drops the retired field on the next save', async () => {
+    const deps = makeRetiredDeps();
+    await updateProfileSettings(deps, 'p1', { hints: false });
+    const saved = (await deps.settings.get()).profileSettings.p1;
+    expect(Object.keys(saved ?? {})).not.toContain('legacy');
+  });
+
+  it('keeps an unknown stored field when the subject retires none', async () => {
+    const deps = buildDeps({
+      settings: makeSettingsRepo({ ...EMPTY_SETTINGS, profileSettings: { p1: stored } }),
+    });
+    expect(Object.keys(await getProfileSettings(deps, 'p1'))).toContain('legacy');
   });
 });

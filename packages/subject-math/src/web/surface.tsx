@@ -1,6 +1,5 @@
 // Math's lesson surfaces (`SubjectWeb.surface`): the problem card where chess draws its board.
 import type { JSX } from 'react';
-import type { SurfaceContext } from '@learn/platform-web/app/subject.ts';
 import { evaluate } from '../core/problem.ts';
 import type { MathLesson, MathState } from '../core/types.ts';
 import { ProblemCard } from './problem-card.tsx';
@@ -28,12 +27,7 @@ export function SurfaceDemo({ lesson }: { readonly lesson: MathLesson }): JSX.El
 }
 
 /** A finished round's card: its problem and result. */
-export function SurfaceView({
-  state,
-}: {
-  readonly state: MathState;
-  readonly surface: SurfaceContext;
-}): JSX.Element {
+export function SurfaceView({ state }: { readonly state: MathState }): JSX.Element {
   const { problem } = state.def;
   return problem === undefined ? (
     <div />

@@ -788,8 +788,7 @@
      "voice": true,
      "sound": true,
      "hints": true,
-     "computerLevel": "auto",
-     "pieceStyle": "animal"
+     "computerLevel": "auto"
     },
     "lessonProgress": [],
     "attempts": [],

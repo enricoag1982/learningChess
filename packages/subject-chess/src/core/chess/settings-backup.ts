@@ -5,5 +5,4 @@ import type { SettingsBackupShape } from '@learn/platform-core/domain/subject';
 
 export const chessSettingsBackupShape: SettingsBackupShape = {
   computerLevel: z.union([z.literal('auto'), z.number().int().min(1).max(5)]),
-  pieceStyle: z.union([z.literal('animal'), z.literal('classic')]),
 };

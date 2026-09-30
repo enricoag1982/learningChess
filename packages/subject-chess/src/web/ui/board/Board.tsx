@@ -6,7 +6,7 @@ import type { Color, Piece, Position, Square } from '../../../core/chess/types.t
 import type { Move } from '../../../core/chess/rules.ts';
 import { toFen } from '../../../core/chess/fen.ts';
 import { StarIcon } from '@learn/platform-web/ui/ds/icons.tsx';
-import { BlockedIcon, PieceBadge, PieceIcon } from './pieces.tsx';
+import { BlockedIcon, PieceIcon } from './pieces.tsx';
 import { cellToSquare, distance, squareAt, squareToCell } from './geometry.ts';
 import './board.css';
 
@@ -57,8 +57,6 @@ export interface BoardProps {
   /** vs Friend's difficulty toggle: `false` hides the possible-move dot/ring; squares stay tappable. */
   readonly showLegalMoveDots?: boolean;
   readonly label: string;
-  /** Small corner badge naming each piece's taught animal; callers gate this on `showPieceBadges`. */
-  readonly pieceBadges?: boolean;
 }
 
 const CELLS: readonly number[] = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -150,7 +148,6 @@ export function Board({
   rotateTopPieces = false,
   showLegalMoveDots = true,
   label,
-  pieceBadges = false,
 }: BoardProps): JSX.Element {
   const { t } = useTranslation();
   const squareMode = onSquareTap !== undefined;
@@ -521,7 +518,6 @@ export function Board({
                           >
                             <PieceIcon piece={piece} />
                           </span>
-                          {pieceBadges && <PieceBadge type={piece.type} />}
                         </span>
                       )}
 
@@ -647,7 +643,6 @@ export function Board({
             >
               <PieceIcon piece={draggedPiece} />
             </span>
-            {pieceBadges && <PieceBadge type={draggedPiece.type} />}
           </div>
         )}
       </div>

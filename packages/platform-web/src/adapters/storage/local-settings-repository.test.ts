@@ -56,7 +56,6 @@ describe('LocalStorageSettingsRepository', () => {
       sound: true,
       hints: false,
       computerLevel: 3 as const,
-      pieceStyle: 'classic' as const,
     };
     await repo.save({
       lastProfileId: null,
