@@ -1,17 +1,7 @@
 [
  {
-  "key": "001e6e54797b7ab3",
-  "text": "The bishop giving check isn't guarded. Capture it with Lion!",
-  "source": "lesson-exercise"
- },
- {
   "key": "004ebf106a2e4763",
   "text": "White moved the king.",
-  "source": "exercise-note"
- },
- {
-  "key": "0078fb0cf3c815e7",
-  "text": "Tap Queen first.",
   "source": "exercise-note"
  },
  {
@@ -23,6 +13,11 @@
   "key": "0124ea95773f9f1c",
   "text": "No kings today — the first side to capture the enemy queen wins!",
   "source": "minigame-goal"
+ },
+ {
+  "key": "014a5b377e161daf",
+  "text": "Tap only the squares where the king is safe.",
+  "source": "lesson-exercise"
  },
  {
   "key": "020f7c20cf60c6a3",
@@ -55,19 +50,14 @@
   "source": "badge-locked"
  },
  {
+  "key": "030560550515e511",
+  "text": "A knight blocks the square ahead, but the pawn can capture its way to the last row. Find the winning move!",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "03302c406961afd6",
   "text": "Fox took your rook!",
   "source": "versus-boss"
- },
- {
-  "key": "033a00292549d6be",
-  "text": "Checkmate! Lioness checks the king, and every square around him is covered.",
-  "source": "lesson-demo"
- },
- {
-  "key": "03c00d3365ec86c3",
-  "text": "Checkmate in one! Rhino delivers check along the open file.",
-  "source": "lesson-demo"
  },
  {
   "key": "03c53a589e54fca5",
@@ -83,11 +73,6 @@
   "key": "042eea15c86c95ca",
   "text": "Two jumps, two captures. Get them both!",
   "source": "lesson-exercise"
- },
- {
-  "key": "0463ca346f4e85bf",
-  "text": "Today you meet Knight!",
-  "source": "home"
  },
  {
   "key": "04a83fcf89fa37d0",
@@ -110,13 +95,8 @@
   "source": "assessment"
  },
  {
-  "key": "0550510275488ab2",
-  "text": "Block the check! Move Elephant between Lion and the rook.",
-  "source": "minigame-round"
- },
- {
-  "key": "0553f112739b5497",
-  "text": "Caterpillar only creeps straight ahead, never sideways or back. On her very first move she can creep one square or two — after that, always just one. To capture, she steps diagonally forward instead, never straight ahead.",
+  "key": "0554446c93d1cc7b",
+  "text": "The pawn only moves straight ahead, never sideways or back. On its very first move it can go one square or two — after that, always just one. To capture, it steps diagonally forward instead, never straight ahead.",
   "source": "lesson-story"
  },
  {
@@ -125,13 +105,13 @@
   "source": "voice-check"
  },
  {
-  "key": "058adf11eda43504",
-  "text": "The rook on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?",
-  "source": "lesson-exercise"
+  "key": "064b0c935bcfd178",
+  "text": "The queen moves straight or diagonal, not like that! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
-  "key": "0690ad789ee8dec4",
-  "text": "Horse is hungry. Gobble up the pawn!",
+  "key": "0697089e3f8cce27",
+  "text": "The knight is hungry. Gobble up the pawn!",
   "source": "lesson-exercise"
  },
  {
@@ -150,16 +130,6 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "081c0d967b0d5f7f",
-  "text": "Today you meet Rook!",
-  "source": "home"
- },
- {
-  "key": "088ec26edcb70f9c",
-  "text": "Lion's longest walk yet. Stay safe all the way to the star.",
-  "source": "lesson-exercise"
- },
- {
   "key": "089f030dce660968",
   "text": "Star Collector, Silver",
   "source": "badge-earned"
@@ -175,14 +145,9 @@
   "source": "lesson-guided"
  },
  {
-  "key": "09d474d39457364a",
-  "text": "Lion must reach both stars, one careful step at a time, always staying safe.",
-  "source": "minigame-goal"
- },
- {
-  "key": "09e058dad9c1467b",
-  "text": "A black rook sits on a different line, far from Lion. Is Lion in check?",
-  "source": "lesson-exercise"
+  "key": "0932e22d75cc52f2",
+  "text": "The rook moves in straight lines: up, down, left, or right, as far as it likes. It can never jump over another piece.",
+  "source": "lesson-story"
  },
  {
   "key": "09f8755e30579390",
@@ -195,11 +160,6 @@
   "source": "placement"
  },
  {
-  "key": "0a535263090ff947",
-  "text": "Elephant only visits squares of one colour. Can Elephant reach the star?",
-  "source": "lesson-exercise"
- },
- {
   "key": "0a7d1ef3771354e7",
   "text": "Daily Player. Play 30 days in a row",
   "source": "badge-locked"
@@ -208,6 +168,11 @@
   "key": "0ac175a5fe4fd672",
   "text": "Bear moved a queen.",
   "source": "versus-boss"
+ },
+ {
+  "key": "0b2e06d3c0e5fff3",
+  "text": "Your knight captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?",
+  "source": "lesson-exercise"
  },
  {
   "key": "0b3716fa8ea57848",
@@ -235,19 +200,9 @@
   "source": "celebration"
  },
  {
-  "key": "0c3590910d2457fe",
-  "text": "Tap Owl first.",
-  "source": "exercise-note"
- },
- {
   "key": "0c6dc90ddb10a7a9",
   "text": "Finish Rook first!",
   "source": "journey"
- },
- {
-  "key": "0c6f15d42fb2d968",
-  "text": "A piece waits on the diagonal. Capture it, then keep creeping to the star!",
-  "source": "lesson-exercise"
  },
  {
   "key": "0c82e5d379b62776",
@@ -255,9 +210,14 @@
   "source": "versus-boss"
  },
  {
-  "key": "0d691605252b0c2e",
-  "text": "A black bishop watches the square right next to Lion. Can Lion castle queenside right now?",
+  "key": "0c97009b5f6f0dc9",
+  "text": "Move the pawn to the star. Its first move can go one square or two!",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "0d0492bbe105e2c8",
+  "text": "Move the rook straight across to the star.",
+  "source": "lesson-guided"
  },
  {
   "key": "0d838bbde23884e7",
@@ -275,6 +235,11 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "0f10031f5a61d62c",
+  "text": "Checkmate in one! Move your queen right next to the black king.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "0f72c73c106477d9",
   "text": "Bear, locked, After World 4",
   "source": "play"
@@ -283,11 +248,6 @@
   "key": "0fa546c2ef0e3904",
   "text": "Now add all eight pawns, standing guard in front.",
   "source": "minigame-round"
- },
- {
-  "key": "0fc1741ac64b2fd1",
-  "text": "Creep Caterpillar forward, one square, to the star.",
-  "source": "lesson-guided"
  },
  {
   "key": "0fe808e05043163d",
@@ -300,19 +260,14 @@
   "source": "versus-boss"
  },
  {
-  "key": "107b8e07dd43c18b",
-  "text": "Checkmate in one! Lion guards the flight squares.",
-  "source": "minigame-round"
- },
- {
   "key": "10873e9e675bff22",
   "text": "Rabbit moved a queen.",
   "source": "versus-boss"
  },
  {
-  "key": "10d6e564d7faf297",
-  "text": "Knight only jumps in an L shape! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
+  "key": "10c942543e1a2874",
+  "text": "When your king is in check, there are 3 ways out: move it to safety, block the attack, or capture the attacker. Let's practise all three!",
+  "source": "lesson-story"
  },
  {
   "key": "10fe297e68da1e7f",
@@ -320,28 +275,13 @@
   "source": "versus-boss"
  },
  {
-  "key": "116b52d9314e81ba",
-  "text": "The knight (black) attacks Caterpillar and nothing guards her. Is she hanging?",
-  "source": "lesson-exercise"
- },
- {
   "key": "11b5b0c9c14899b2",
   "text": "Escape Artist. Escape check without a hint 10 times in a row",
   "source": "badge-locked"
  },
  {
-  "key": "11c1e52047c98c84",
-  "text": "Rhino is coming for Horse! Horse can hop away to safety, or a friend could guard him.",
-  "source": "lesson-demo"
- },
- {
-  "key": "11c36eb3718a3cc4",
-  "text": "Tap every square Horse can jump to.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "122d3ab8c03f9352",
-  "text": "Elephant is hungry. Gobble up the pawn!",
+  "key": "12607f6d1485d38e",
+  "text": "Move your king out of check — nothing can block or capture this rook here.",
   "source": "lesson-exercise"
  },
  {
@@ -350,14 +290,14 @@
   "source": "exercise-note-easier-offer"
  },
  {
-  "key": "1347b8c21bd55555",
-  "text": "Castling is a special move! Lion and a Rhino move together: Lion jumps two squares toward a Rhino that hasn't moved yet, and that Rhino hops right over to stand beside him. It's the only time two pieces move in one turn!",
-  "source": "lesson-story"
- },
- {
   "key": "14236cf8670f229b",
   "text": "Perfect Lesson. Get 3 stars on every exercise in 15 lessons",
   "source": "badge-locked"
+ },
+ {
+  "key": "149113692109d6b1",
+  "text": "Move your knight so it attacks the bishop on c4.",
+  "source": "lesson-exercise"
  },
  {
   "key": "151d1b7180a01e47",
@@ -373,6 +313,11 @@
   "key": "15e14723d09ef5ad",
   "text": "Bear, locked, Beat Wolf 3 times",
   "source": "play"
+ },
+ {
+  "key": "161305d8bada154a",
+  "text": "A pawn now blocks the diagonal. Is your king in check?",
+  "source": "lesson-exercise"
  },
  {
   "key": "161fdcce3e2e7cdb",
@@ -395,24 +340,24 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "1833e7701fb763c0",
-  "text": "Sometimes a Caterpillar rushes two squares on its very first move, right past an enemy Caterpillar standing beside it. That's not quite fair — so, just this once, the enemy Caterpillar may capture it anyway, as if it had only moved one square. This is called \"en passant\" (French for \"in passing\"), and it only works right away, the very next move.",
-  "source": "lesson-story"
+  "key": "179afc6998f7ee50",
+  "text": "Checkmate in one! Your king guards the flight squares.",
+  "source": "minigame-round"
+ },
+ {
+  "key": "184d4068f18c10f2",
+  "text": "Today you meet the King!",
+  "source": "home"
+ },
+ {
+  "key": "191e158590e98ce7",
+  "text": "The queen moves straight or diagonal, not like that!",
+  "source": "exercise-note"
  },
  {
   "key": "193f01675b8380a6",
   "text": "Queen Keeper",
   "source": "badge-earned"
- },
- {
-  "key": "1942f89b4583e733",
-  "text": "Capture the checking knight with Caterpillar!",
-  "source": "minigame-round"
- },
- {
-  "key": "199a2bf1adc5e3c5",
-  "text": "Bishop only walks on diagonal paths! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
  },
  {
   "key": "19a4cf94217eacf1",
@@ -435,18 +380,13 @@
   "source": "versus-boss"
  },
  {
-  "key": "1b35e1c4130401b8",
-  "text": "Rhino (black) is coming for Horse on b5! Move Horse to safety.",
-  "source": "lesson-exercise"
- },
- {
   "key": "1b385cfecc43ba25",
   "text": "Want to show me you already know En Passant: Catch It \"In Passing\"?",
   "source": "journey"
  },
  {
-  "key": "1b44907361ae57fe",
-  "text": "The knight (black) attacks Lioness and nothing guards her. Is she hanging?",
+  "key": "1b52f185a7648edc",
+  "text": "The rook is hungry. Gobble up the pawn!",
   "source": "lesson-exercise"
  },
  {
@@ -455,9 +395,24 @@
   "source": "journey"
  },
  {
+  "key": "1c245b2c8485f46b",
+  "text": "Move the queen straight up to the star.",
+  "source": "lesson-guided"
+ },
+ {
+  "key": "1c36b4a1496c5ccf",
+  "text": "Watch the pawn move forward. On its very first step it can go one square or two!",
+  "source": "lesson-demo"
+ },
+ {
   "key": "1c80bb35fed72d54",
   "text": "You already know What Is Check?!",
   "source": "assessment"
+ },
+ {
+  "key": "1c917dca930ca0b1",
+  "text": "The black rook is coming for your knight! The knight can hop away to safety, or a friend could guard it.",
+  "source": "lesson-demo"
  },
  {
   "key": "1cc496b599135792",
@@ -490,11 +445,6 @@
   "source": "play"
  },
  {
-  "key": "1e47cc2bb7a5e4f3",
-  "text": "Block the check! Move Rhino between Lion and the bishop.",
-  "source": "minigame-round"
- },
- {
   "key": "1ecbc04f54186c6e",
   "text": "Castle Builder. Castle in 5 games",
   "source": "badge-locked"
@@ -515,34 +465,14 @@
   "source": "journey"
  },
  {
-  "key": "204f4240fcf41a4d",
-  "text": "Rhino captures the queen! He gives up a rook (worth 5) to win a queen (worth 9) — a great trade!",
-  "source": "lesson-demo"
- },
- {
   "key": "2099439c4ccc8445",
   "text": "Never Give Up. Come back from 2 or more wrong tries 25 times",
   "source": "badge-locked"
  },
  {
-  "key": "20ccf7deeda961b8",
-  "text": "Two pieces stand in Caterpillar's way. Creep closer, then capture them both!",
-  "source": "lesson-exercise"
- },
- {
-  "key": "20cdf6c490cb48fa",
-  "text": "Look at Owl.",
-  "source": "exercise-note"
- },
- {
   "key": "2173fa781f23d8ba",
   "text": "Fox, locked, Beat Fox 3 times",
   "source": "play"
- },
- {
-  "key": "21a70cd128aeea13",
-  "text": "A friend blocks one line, a pawn waits on another. Tap every square Lioness can reach.",
-  "source": "lesson-exercise"
  },
  {
   "key": "227e96eae4cbc5d9",
@@ -560,11 +490,6 @@
   "source": "exercise-note"
  },
  {
-  "key": "22a3a7df368bb410",
-  "text": "Jump Horse to the star.",
-  "source": "lesson-exercise"
- },
- {
   "key": "22b01b253f3c18b9",
   "text": "Never Give Up, Gold",
   "source": "badge-earned"
@@ -575,19 +500,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "2390538cbd431999",
-  "text": "Tap Bishop first.",
-  "source": "exercise-note"
+  "key": "238d6cfdf408a78b",
+  "text": "The pawn is about to transform! Which piece should it become?",
+  "source": "lesson-exercise"
  },
  {
   "key": "23cd937dbf1dbfd6",
   "text": "After Knight lesson",
   "source": "play"
- },
- {
-  "key": "248f47492efa5cee",
-  "text": "A check! The black rook attacks Lion along the open file.",
-  "source": "lesson-demo"
  },
  {
   "key": "25127be3648ef16b",
@@ -598,16 +518,6 @@
   "key": "2523037596d467f4",
   "text": "Rabbit moved a bishop.",
   "source": "versus-boss"
- },
- {
-  "key": "25a5867b9a20c9eb",
-  "text": "Tap every square Elephant can reach. Look — they're all the same colour!",
-  "source": "lesson-exercise"
- },
- {
-  "key": "2657c267cd9bbf6c",
-  "text": "Look at Caterpillar. Is she about to transform into a new piece?",
-  "source": "lesson-exercise"
  },
  {
   "key": "27554104bfb22255",
@@ -630,16 +540,6 @@
   "source": "versus-boss"
  },
  {
-  "key": "28ec895175cbc75e",
-  "text": "Elephant can capture two different pieces. Find a good trade.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "29300f86ecc7c0e0",
-  "text": "Walk Lion to the star, one step at a time.",
-  "source": "lesson-exercise"
- },
- {
   "key": "29c744141f9ea1cd",
   "text": "Is the knight on d5 defended?",
   "source": "lesson-exercise"
@@ -650,39 +550,14 @@
   "source": "play"
  },
  {
-  "key": "2beb3a346509098c",
-  "text": "The rook giving check isn't guarded. Capture it with Lion!",
-  "source": "minigame-round"
- },
- {
-  "key": "2c03a083b8124d13",
-  "text": "A black rook is giving Lion check! Can Lion castle kingside right now?",
+  "key": "2cf13bf512ac47ce",
+  "text": "Tap every square the pawn attacks — the knight and the bishop are both there.",
   "source": "lesson-exercise"
- },
- {
-  "key": "2d6c5a140b17ac0e",
-  "text": "Caterpillar is blocked straight ahead, but she can still capture on either diagonal. Tap every square she can reach.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "2e3d29d7b914d7fb",
-  "text": "Butterfly Maker. Promote 10 pawns in games",
-  "source": "badge-locked"
  },
  {
   "key": "2e452612f5d9dedf",
   "text": "You earned the Escape Artist badge!",
   "source": "celebration"
- },
- {
-  "key": "2e4c1fc5d8c73b89",
-  "text": "Today you meet King!",
-  "source": "home"
- },
- {
-  "key": "2e516290f091f825",
-  "text": "Horse has more than one jump. Which move attacks the rook on b5?",
-  "source": "lesson-exercise"
  },
  {
   "key": "2e721abe0ad71553",
@@ -700,19 +575,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "2f55b86ee05bfb0a",
-  "text": "A rock blocks one path, a pawn waits on another. Tap every square Elephant can reach.",
+  "key": "2f5fd132ab9bb1bb",
+  "text": "Your queen is very powerful. Find a move that attacks the knight on f6.",
   "source": "lesson-exercise"
  },
  {
   "key": "2f9256bba3a0bae8",
   "text": "Mate Master, Bronze",
   "source": "badge-earned"
- },
- {
-  "key": "2f9bc7e25d732463",
-  "text": "Is Horse hanging?",
-  "source": "lesson-guided"
  },
  {
   "key": "303bcdd338642c85",
@@ -723,11 +593,6 @@
   "key": "3090e873795f8cc9",
   "text": "Every chessboard is a checkerboard: light squares and dark squares, side by side. Here's Owl's favourite trick — the corner near your right hand is always light!",
   "source": "lesson-story"
- },
- {
-  "key": "30a2ba10d682c730",
-  "text": "Queen moves straight or diagonal, not like that! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
  },
  {
   "key": "3192fa57e01dc8c2",
@@ -755,6 +620,11 @@
   "source": "minigame-goal"
  },
  {
+  "key": "327600e69c488021",
+  "text": "Move the king one step up to the star.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "32c70c6b81a5c86e",
   "text": "Is the bishop on e4 in danger?",
   "source": "minigame-round"
@@ -765,19 +635,14 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "3334cc21d3a3d8f4",
-  "text": "Checkmate in one! Lioness can reach the back row.",
-  "source": "lesson-exercise"
+  "key": "32f5411f80227cb6",
+  "text": "The knight jumps in an L shape: two squares one way, then one more to the side. It can jump right over anyone standing in between!",
+  "source": "lesson-story"
  },
  {
   "key": "333be4c471ecb673",
   "text": "Rabbit moved a pawn.",
   "source": "versus-boss"
- },
- {
-  "key": "3371bbc03c27a27e",
-  "text": "A knight's check can never be blocked! Move Lion to safety.",
-  "source": "minigame-round"
  },
  {
   "key": "3384f1a8ab8283d3",
@@ -797,6 +662,11 @@
  {
   "key": "347c075b4716c2ce",
   "text": "This time, tap every square in your king's column.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "34c1d00f33b1ae11",
+  "text": "Move your bishop so it gives check to the black king.",
   "source": "lesson-exercise"
  },
  {
@@ -825,6 +695,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "360352facc1570cf",
+  "text": "Your king and the queenside rook are both still home, with a clear path between them. Can your king castle queenside right now?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "36054cb070543896",
   "text": "Daily Player, Bronze",
   "source": "badge-earned"
@@ -845,24 +720,14 @@
   "source": "versus-boss"
  },
  {
-  "key": "375843d25a5f9a08",
-  "text": "Here they are in order: Caterpillar 1, Horse or Elephant 3, Rhino 5, Lioness 9.",
-  "source": "lesson-demo"
- },
- {
-  "key": "37cce3c8e9c89a98",
-  "text": "Lion and the queenside Rhino are both still home, with a clear path between them. Can Lion castle queenside right now?",
-  "source": "lesson-exercise"
+  "key": "3761085eb6c648b5",
+  "text": "The pawn only moves straight ahead (and captures diagonally)!",
+  "source": "exercise-note"
  },
  {
   "key": "388c6d0025ca7934",
   "text": "Wolf, locked, Beat Rabbit 3 times",
   "source": "play"
- },
- {
-  "key": "38c55e419fa9c3cf",
-  "text": "Look at Knight.",
-  "source": "exercise-note"
  },
  {
   "key": "391f22f3226df43d",
@@ -890,6 +755,16 @@
   "source": "play"
  },
  {
+  "key": "3a54cc36b3dcb5e8",
+  "text": "Your king is in check from a bishop far away. Tap every safe square for it.",
+  "source": "minigame-round"
+ },
+ {
+  "key": "3ab59282ca6ede3d",
+  "text": "Capture the checking knight with your pawn!",
+  "source": "minigame-round"
+ },
+ {
   "key": "3b12cd8431a7eca7",
   "text": "Only two lone kings are left on the board. Stalemate, not enough material — or not a draw at all?",
   "source": "lesson-guided"
@@ -900,9 +775,19 @@
   "source": "exercise-note"
  },
  {
+  "key": "3bf39d766af0bb03",
+  "text": "Black's pawn just rushed two squares past your pawn on h5. Can you capture it en passant right now?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "3c4f0becaedfa091",
   "text": "Checkmate means the king is in check AND has no way out at all — no move, no block, no capture. The game is won!",
   "source": "lesson-story"
+ },
+ {
+  "key": "3c95b7e7358fed17",
+  "text": "The bishop is hungry. Gobble up the pawn!",
+  "source": "lesson-exercise"
  },
  {
   "key": "3ca723897905576d",
@@ -915,14 +800,14 @@
   "source": "lesson-guided"
  },
  {
+  "key": "3d15acdbd3a3823f",
+  "text": "Your rook captures the queen on h1. Is this trade good, equal, or bad?",
+  "source": "lesson-guided"
+ },
+ {
   "key": "3d58a2aaccafc0a8",
   "text": "Tap every square in your king's row.",
   "source": "minigame-round"
- },
- {
-  "key": "3d6237e7261435da",
-  "text": "Watch Caterpillar creep forward. On her very first step she can go one square or two!",
-  "source": "lesson-demo"
  },
  {
   "key": "3d798d0d980ccc6f",
@@ -935,11 +820,6 @@
   "source": "celebration"
  },
  {
-  "key": "3ddcec183cd943a6",
-  "text": "A knight blocks the square ahead, but Caterpillar can capture her way to the last row. Find the winning move!",
-  "source": "lesson-exercise"
- },
- {
   "key": "3e0f495d4f2a61cc",
   "text": "Which is worth more: the rook or the queen?",
   "source": "lesson-exercise"
@@ -950,9 +830,24 @@
   "source": "versus-boss"
  },
  {
+  "key": "3eada43630059c35",
+  "text": "Today you meet the Bishop!",
+  "source": "home"
+ },
+ {
+  "key": "3f0a929fba0f07b9",
+  "text": "The rook only moves in straight lines!",
+  "source": "exercise-note"
+ },
+ {
   "key": "3f157ebd75633581",
   "text": "First Win. Win a game vs the computer",
   "source": "badge-locked"
+ },
+ {
+  "key": "400206411896f5c8",
+  "text": "Watch the king take one careful step in every direction.",
+  "source": "lesson-demo"
  },
  {
   "key": "40130d5bf978c04d",
@@ -1000,18 +895,13 @@
   "source": "exercise-note"
  },
  {
-  "key": "4246ac2286f05e31",
-  "text": "Both Rhinos are still home! Castle with either one.",
-  "source": "lesson-exercise"
- },
- {
   "key": "42e3d26dd48892c2",
   "text": "Mouse took your bishop!",
   "source": "versus-boss"
  },
  {
-  "key": "43bc7c8f11acb3d4",
-  "text": "Rhino (black) is attacking Elephant. Move Elephant to safety.",
+  "key": "43eb3394f966edb5",
+  "text": "A rock blocks one path, a pawn waits on another. Tap every square the bishop can reach.",
   "source": "lesson-exercise"
  },
  {
@@ -1025,19 +915,19 @@
   "source": "badge-earned"
  },
  {
+  "key": "44332d4428c20f67",
+  "text": "The queen is starving! Capture every piece before the moves run out.",
+  "source": "minigame-goal"
+ },
+ {
   "key": "44dca79bb9ba987e",
   "text": "Rabbit, locked, Beat Mouse 3 times",
   "source": "play"
  },
  {
-  "key": "4540b425a2326b84",
-  "text": "Tap Rook first.",
-  "source": "exercise-note"
- },
- {
-  "key": "45b749afc97c360d",
-  "text": "Knight only jumps in an L shape!",
-  "source": "exercise-note"
+  "key": "4573449517f801cd",
+  "text": "A check! The black rook attacks your king along the open file.",
+  "source": "lesson-demo"
  },
  {
   "key": "4601a366963180c8",
@@ -1060,9 +950,9 @@
   "source": "lesson-story"
  },
  {
-  "key": "46b3cffe4438aa7e",
-  "text": "Rhino is hungry. Gobble up the pawn!",
-  "source": "lesson-exercise"
+  "key": "46f583e954b83ad7",
+  "text": "Watch the rook go to every green dot. Straight lines, any distance!",
+  "source": "lesson-demo"
  },
  {
   "key": "4711f361d4dd5f44",
@@ -1080,14 +970,19 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "475af1e0c59688e5",
-  "text": "Move Horse so he gives check to the black king.",
+  "key": "47727af8c179c8cf",
+  "text": "Move your rook so it gives check to the black king.",
   "source": "lesson-exercise"
  },
  {
   "key": "4784c9e1eb851893",
   "text": "Fox took your queen!",
   "source": "versus-boss"
+ },
+ {
+  "key": "4792d8a622f7d490",
+  "text": "Today you meet the Pawn!",
+  "source": "home"
  },
  {
   "key": "47ab6aa66fb66173",
@@ -1110,6 +1005,11 @@
   "source": "journey"
  },
  {
+  "key": "49f4af130260e02b",
+  "text": "The pawn only moves straight ahead (and captures diagonally)! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
+ },
+ {
   "key": "4a0f318714ead1d2",
   "text": "Find checkmate in one move, ten times in a row!",
   "source": "minigame-goal"
@@ -1125,19 +1025,19 @@
   "source": "minigame-round"
  },
  {
-  "key": "4aa03e41ab7a4dd0",
-  "text": "Watch Rhino run to every green dot. Straight lines, any distance!",
-  "source": "lesson-demo"
- },
- {
-  "key": "4ad7b01487ca90a9",
-  "text": "Today you meet Pawn!",
-  "source": "home"
+  "key": "4ac4c6b0160c7a44",
+  "text": "Move your bishop so it attacks the knight on a5.",
+  "source": "lesson-exercise"
  },
  {
   "key": "4ae8a25ecc4ea45c",
   "text": "After King Walk lesson",
   "source": "play"
+ },
+ {
+  "key": "4b330b9fbbfe054e",
+  "text": "The bishop (black) is undefended. Capture it for free with your queen!",
+  "source": "lesson-exercise"
  },
  {
   "key": "4b72e440da25e118",
@@ -1150,6 +1050,11 @@
   "source": "assessment"
  },
  {
+  "key": "4bd878e72d9bbc0b",
+  "text": "Help the rook grab both stars in the corners.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "4c2ac377ddb55a67",
   "text": "Fox took your knight!",
   "source": "versus-boss"
@@ -1160,9 +1065,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "4cce95aecafc7a93",
-  "text": "Black's last move was the king, not the pawn. Can your Caterpillar on d5 capture the e5 pawn en passant right now?",
+  "key": "4ca099e8cb420260",
+  "text": "A black knight jumps into position to attack your king. Is your king in check?",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "4cbfd13ad6e98fe1",
+  "text": "Find the checkmate in one move — your queen and king work together.",
+  "source": "lesson-guided"
  },
  {
   "key": "4cf566488898f780",
@@ -1180,14 +1090,14 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "4da2b64093b81c6c",
+  "text": "Your king is in check from the bishop. Tap every square where it is safe.",
+  "source": "minigame-round"
+ },
+ {
   "key": "4db20e5d1123106f",
   "text": "Want to show me you already know King?",
   "source": "journey"
- },
- {
-  "key": "4e386f426e5264be",
-  "text": "Capture both pawns on Elephant's diagonals.",
-  "source": "lesson-variant"
  },
  {
   "key": "4ec9660e0ca390d1",
@@ -1200,13 +1110,18 @@
   "source": "lesson-variant"
  },
  {
-  "key": "4f01fabfe1212344",
-  "text": "Tap King first.",
-  "source": "exercise-note"
+  "key": "4f17d54192bb3bd1",
+  "text": "A black rook sits on a different line, far from your king. Is your king in check?",
+  "source": "lesson-exercise"
  },
  {
-  "key": "4f587a1891092dd1",
-  "text": "Horse jumps in an L. Tap every square he attacks from d4 — some are empty, some have pieces!",
+  "key": "4f20c0972a31d545",
+  "text": "Nothing attacks your bishop. Is it hanging?",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "4f2ac38dab45baaf",
+  "text": "The king's longest walk yet. Stay safe all the way to the star.",
   "source": "lesson-exercise"
  },
  {
@@ -1240,9 +1155,24 @@
   "source": "assessment"
  },
  {
+  "key": "51487da2d3173f3e",
+  "text": "Your knight (a1) is trapped and the black rook is attacking it! Move your bishop so it guards the knight.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "5155209e7a6f50a7",
   "text": "Wolf moved a queen.",
   "source": "versus-boss"
+ },
+ {
+  "key": "516ff7ff2354ba82",
+  "text": "Eight pawns each! Race to transform first, or capture every piece.",
+  "source": "minigame-goal"
+ },
+ {
+  "key": "5171c44fb039f308",
+  "text": "Move the pawn forward, one square, to the star.",
+  "source": "lesson-guided"
  },
  {
   "key": "51736da09b44ff70",
@@ -1250,14 +1180,9 @@
   "source": "versus-boss"
  },
  {
-  "key": "51988b972cd1fa42",
-  "text": "Lion is the most important piece of all! He only steps one square at a time, in any direction, and he must always stay safe.",
-  "source": "lesson-story"
- },
- {
-  "key": "51c95b988faf88eb",
-  "text": "Today you meet Queen!",
-  "source": "home"
+  "key": "51ff569ed050be52",
+  "text": "Your pawn is blocked straight ahead, but it can still capture on either diagonal. Tap every square it can reach.",
+  "source": "lesson-exercise"
  },
  {
   "key": "521b3157f700c85a",
@@ -1273,11 +1198,6 @@
   "key": "539529f7daf5f0ec",
   "text": "A pawn is watching a square! Find a safe path to the star.",
   "source": "lesson-exercise"
- },
- {
-  "key": "53e095889573b159",
-  "text": "Help Lion escape check 10 times — by moving, blocking, or capturing!",
-  "source": "minigame-goal"
  },
  {
   "key": "541148f5150c1290",
@@ -1310,19 +1230,19 @@
   "source": "badge-earned"
  },
  {
-  "key": "5537b6c87f30b30e",
-  "text": "Horse must collect every star by jumping over the rocks!",
-  "source": "minigame-goal"
+  "key": "551c4ac833644a89",
+  "text": "Walk the king to the star, one step at a time.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "552c59fd6622c5e4",
+  "text": "Look at the piece in the orange box.",
+  "source": "exercise-note"
  },
  {
   "key": "55a33bf05ad0d8c5",
   "text": "After Check or Checkmate? lesson",
   "source": "play"
- },
- {
-  "key": "55a6c633fcba450a",
-  "text": "Find the good trade: capture a piece worth more than Rhino.",
-  "source": "lesson-exercise"
  },
  {
   "key": "55bee42c92fb2286",
@@ -1340,6 +1260,11 @@
   "source": "assessment"
  },
  {
+  "key": "56d310d75873db3b",
+  "text": "The bishop only visits squares of one colour. Can it reach the star?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "56f4a4b8be046f30",
   "text": "Want to show me you already know Safe or Not??",
   "source": "journey"
@@ -1355,14 +1280,24 @@
   "source": "versus-boss"
  },
  {
+  "key": "5825b76d968e3613",
+  "text": "Tap every square the rook can reach from here.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "58e2feb33d7ba5bd",
+  "text": "Checkmate in one! Your queen and king team up.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "593c06fb47bfea9d",
+  "text": "The rook (black) attacks your rook on a4, but your other rook guards it. Is it hanging?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "5975daf7cd7cef89",
   "text": "Pick a topic, or start your warm-up!",
   "source": "owl-line"
- },
- {
-  "key": "59a2eea9957cc04f",
-  "text": "Watch Lioness run to every green dot. Straight lines and diagonals, any distance!",
-  "source": "lesson-demo"
  },
  {
   "key": "59c18abf457d8ce0",
@@ -1370,9 +1305,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "59f77c5802bfb2dd",
-  "text": "Watch Caterpillar creep all the way to the last row. There, she transforms!",
-  "source": "lesson-demo"
+  "key": "5a3b7be23e69cced",
+  "text": "When a king is attacked, that's CHECK — danger! Your king must get to safety right away. Owl will teach you to spot it, and how to give check yourself.",
+  "source": "lesson-story"
+ },
+ {
+  "key": "5a5c4823bb0ab5ee",
+  "text": "Block the check! Move your rook between your king and the bishop.",
+  "source": "minigame-round"
  },
  {
   "key": "5a6bb8ac1c12dd8d",
@@ -1395,6 +1335,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "5aae3b3e7b79e893",
+  "text": "A rock blocks one landing spot. Tap every square the knight can jump to.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "5ad39a579dc913d0",
   "text": "Wolf took your knight!",
   "source": "versus-boss"
@@ -1410,14 +1355,19 @@
   "source": "owl-line"
  },
  {
-  "key": "5b9897fa228d897d",
-  "text": "Try it! Move Lion two squares toward a Rhino to castle.",
-  "source": "lesson-demo"
+  "key": "5b3e971e6cebdbd7",
+  "text": "Castling is a special move! The king and a rook move together: the king jumps two squares toward a rook that hasn't moved yet, and that rook hops right over to stand beside him. It's the only time two pieces move in one turn!",
+  "source": "lesson-story"
  },
  {
   "key": "5bc246352efddb90",
   "text": "Look at your two corners. The one near your right hand is light. The one near your left hand is dark.",
   "source": "lesson-demo"
+ },
+ {
+  "key": "5bf3b03593700011",
+  "text": "Find the good trade: capture a piece worth more than your rook.",
+  "source": "lesson-exercise"
  },
  {
   "key": "5bf596ac561c5832",
@@ -1443,11 +1393,6 @@
   "key": "5c727966a40d4b69",
   "text": "Ready for the Mouse?",
   "source": "play"
- },
- {
-  "key": "5ca07cc526aede07",
-  "text": "A rock blocks one landing spot. Tap every square Horse can jump to.",
-  "source": "lesson-exercise"
  },
  {
   "key": "5cb6fc6c685f5faa",
@@ -1480,6 +1425,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "5ebe4bc2f8bd17af",
+  "text": "Your rook can give check! Find the move that attacks the black king.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "5f437dd0d3965866",
   "text": "Place the black king next.",
   "source": "exercise-note"
@@ -1493,11 +1443,6 @@
   "key": "5fd83574c2551c74",
   "text": "After Defend Your Pieces lesson",
   "source": "play"
- },
- {
-  "key": "60096eb86b222740",
-  "text": "Checkmate in one! Lion guards the squares Rhino can't reach.",
-  "source": "lesson-exercise"
  },
  {
   "key": "6011b6c40d8f4cbf",
@@ -1520,6 +1465,11 @@
   "source": "home"
  },
  {
+  "key": "613fa1ea066bb8b9",
+  "text": "Try it! Move your king two squares toward a rook to castle.",
+  "source": "lesson-demo"
+ },
+ {
   "key": "618913f28a6cd2f2",
   "text": "Want to show me you already know World 4 · Check & Mate?",
   "source": "journey"
@@ -1540,11 +1490,6 @@
   "source": "versus-boss"
  },
  {
-  "key": "62cfe924644bb8b8",
-  "text": "Rhino is coming for Horse! Move Horse to safety.",
-  "source": "lesson-guided"
- },
- {
   "key": "62f897c4502712bc",
   "text": "Star Collector, Bronze",
   "source": "badge-earned"
@@ -1555,24 +1500,19 @@
   "source": "versus-boss"
  },
  {
+  "key": "6307bb87c8cd8637",
+  "text": "Your queen can check the black king in several ways. Find one!",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "630a7222d3857b4b",
   "text": "After Your First Full Game! lesson",
   "source": "play"
  },
  {
-  "key": "63804b4d23471401",
-  "text": "Move Lioness straight up to the star.",
-  "source": "lesson-guided"
- },
- {
   "key": "63892c929d296ac1",
   "text": "Mouse Tamer",
   "source": "badge-earned"
- },
- {
-  "key": "63b31d6097919848",
-  "text": "Is Lion in check from the black rook?",
-  "source": "lesson-guided"
  },
  {
   "key": "63f7070ba52519f8",
@@ -1590,33 +1530,13 @@
   "source": "minigame-goal"
  },
  {
-  "key": "64e43fb4559c04d0",
-  "text": "After Caterpillar Transforms! lesson",
-  "source": "play"
- },
- {
-  "key": "6505fa368a7b67b8",
-  "text": "Black's pawn just rushed two squares past your Caterpillar on c5. Can you capture it en passant right now?",
-  "source": "lesson-guided"
- },
- {
   "key": "657fb158688d30f5",
   "text": "Hi! I'm Owl. Today: Escape the Check!!",
   "source": "home"
  },
  {
-  "key": "659e6eb1297e2444",
-  "text": "Owl only runs in straight lines! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
-  "key": "65cd81a68a46c494",
-  "text": "Nothing attacks Elephant. Is he hanging?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "661e24f11905ad67",
-  "text": "Checkmate in one! Lioness and Lion team up.",
+  "key": "66980bc257c4b8e5",
+  "text": "Both rooks are still home! Castle with either one.",
   "source": "lesson-exercise"
  },
  {
@@ -1630,9 +1550,14 @@
   "source": "play"
  },
  {
-  "key": "694324e24d73a08c",
-  "text": "Black's pawn just rushed two squares past your Caterpillar on h5. Can you capture it en passant right now?",
-  "source": "lesson-exercise"
+  "key": "6758da3ed86bf7c5",
+  "text": "Your king and the kingside rook haven't moved, and nothing stands between them. Can your king castle kingside right now?",
+  "source": "lesson-guided"
+ },
+ {
+  "key": "695eb2f5f2b4ddfe",
+  "text": "Queen Maker. Promote 10 pawns in games",
+  "source": "badge-locked"
  },
  {
   "key": "6968e9c3162fed5a",
@@ -1645,9 +1570,19 @@
   "source": "badge-earned"
  },
  {
-  "key": "69b06abb83b697d9",
-  "text": "Lion is in check from the rook. Tap every square where he is safe.",
-  "source": "minigame-round"
+  "key": "69e4d764ad40ad28",
+  "text": "A knight stands between your king and the kingside rook. Can your king castle kingside right now?",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "6a2cb9e6929db443",
+  "text": "Your knight has more than one jump. Which move attacks the rook on b5?",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "6a3f2d412b01d607",
+  "text": "A black bishop watches the square right next to your king. Can your king castle queenside right now?",
+  "source": "lesson-exercise"
  },
  {
   "key": "6a47d106f8be353a",
@@ -1655,14 +1590,14 @@
   "source": "celebration"
  },
  {
+  "key": "6b5d979d100478ff",
+  "text": "Your bishop can capture two different pieces. Find a good trade.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "6b7c99a2427b3ccd",
   "text": "Want to show me you already know Watch Out for Stalemate!?",
   "source": "journey"
- },
- {
-  "key": "6bc188807a781050",
-  "text": "Horse (a1) is trapped and Rhino is attacking him! Move Elephant so he guards Horse.",
-  "source": "lesson-exercise"
  },
  {
   "key": "6be647d678a14220",
@@ -1680,11 +1615,6 @@
   "source": "journey"
  },
  {
-  "key": "6cae453ea2e0e9ed",
-  "text": "Eight caterpillars each! Race to transform first, or capture every piece.",
-  "source": "minigame-goal"
- },
- {
   "key": "6ce1a1be842b06ed",
   "text": "Bear, locked, Beat Rabbit 3 times",
   "source": "play"
@@ -1695,11 +1625,6 @@
   "source": "exercise-note"
  },
  {
-  "key": "6d01df5543c8c25f",
-  "text": "The pawn on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?",
-  "source": "lesson-exercise"
- },
- {
   "key": "6d181a3fa92e9390",
   "text": "After Rows, Columns, and Diagonals lesson",
   "source": "play"
@@ -1708,11 +1633,6 @@
   "key": "6d5068ea14fad936",
   "text": "After Setup Race lesson",
   "source": "play"
- },
- {
-  "key": "6d6e0717e8f832b1",
-  "text": "Move Lion one step up to the star.",
-  "source": "lesson-guided"
  },
  {
   "key": "6e4211fd1dd3886e",
@@ -1730,16 +1650,6 @@
   "source": "badge-locked"
  },
  {
-  "key": "6e8092eabb793f6f",
-  "text": "Move Horse so he attacks the bishop on c4.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "6ebe84a5d0f0ed55",
-  "text": "The bishop on c3 is attacking Rhino! Move Horse to capture it.",
-  "source": "lesson-exercise"
- },
- {
   "key": "6f2a5ed0e4eacdc1",
   "text": "Checkmate in one! One rook cuts off the rank.",
   "source": "minigame-round"
@@ -1750,14 +1660,14 @@
   "source": "celebration"
  },
  {
-  "key": "70be70a80745dce0",
-  "text": "Something blocks Caterpillar's path straight ahead. Tap every square she can still reach.",
-  "source": "lesson-exercise"
- },
- {
   "key": "70e24e5bd845309a",
   "text": "Mouse took your king!",
   "source": "versus-boss"
+ },
+ {
+  "key": "718b5feb369fb527",
+  "text": "Every piece has a value: a pawn is worth 1, a knight and a bishop are worth 3, a rook is worth 5, and the queen is worth a mighty 9! Knowing this helps you decide if a trade is worth it.",
+  "source": "lesson-story"
  },
  {
   "key": "719de0ac13d053e7",
@@ -1770,11 +1680,6 @@
   "source": "play"
  },
  {
-  "key": "7217e4dbccdf4c54",
-  "text": "Two of your Caterpillars could catch this one — either capture works!",
-  "source": "lesson-exercise"
- },
- {
   "key": "7267cc34907ccd00",
   "text": "Not quite! Try a different piece or square.",
   "source": "exercise-note"
@@ -1783,6 +1688,11 @@
   "key": "72bdbaee1c8cd158",
   "text": "You earned the Fox Outsmarter badge!",
   "source": "celebration"
+ },
+ {
+  "key": "72e73d01cd6f5733",
+  "text": "The rook giving check isn't guarded. Capture it with your king!",
+  "source": "minigame-round"
  },
  {
   "key": "73304f943036f8a4",
@@ -1795,23 +1705,18 @@
   "source": "journey"
  },
  {
+  "key": "752ce655c620494f",
+  "text": "Your king is in check from the rook. Tap every square where it is safe.",
+  "source": "minigame-round"
+ },
+ {
+  "key": "75419446abb043eb",
+  "text": "When a pawn reaches the very last row, something amazing happens: it transforms into a brand-new piece! It can become a queen, a rook, a bishop, or a knight — the powerful queen is almost always the best choice.",
+  "source": "lesson-story"
+ },
+ {
   "key": "76071ba26fd329af",
   "text": "Your king is in a corner, so he sits on just one diagonal. Tap every square on it.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "76849014684da252",
-  "text": "Horse captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "76bcd38f72c6abb0",
-  "text": "Look at Horse. Rhino attacks him and nothing guards him — Horse is hanging!",
-  "source": "lesson-demo"
- },
- {
-  "key": "7784d4eeee67e7f1",
-  "text": "Only the queenside Rhino is still home. Castle queenside!",
   "source": "lesson-exercise"
  },
  {
@@ -1828,6 +1733,16 @@
   "key": "781a7cb6bc01c5f6",
   "text": "Now put the queen right next to him, on his left side.",
   "source": "lesson-guided"
+ },
+ {
+  "key": "79181c60dd5d124e",
+  "text": "The pawn on f4 is undefended. If your bishop captures it, good, equal, or bad trade?",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "79245dd6f6e79310",
+  "text": "Checkmate in one! Your king guards your queen's checking square.",
+  "source": "minigame-round"
  },
  {
   "key": "7942e2367738fc97",
@@ -1855,14 +1770,19 @@
   "source": "celebration"
  },
  {
+  "key": "7a3a5ca52f21a22c",
+  "text": "Help the bishop grab both stars, corner to corner.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "7a730885e173b6a4",
   "text": "Star Collector, Gold",
   "source": "badge-earned"
  },
  {
-  "key": "7b8f0175444c105e",
-  "text": "Checkmate in one! Move Lioness right next to the black king.",
-  "source": "lesson-exercise"
+  "key": "7a956f407a8ed50a",
+  "text": "The bishop only moves on diagonal paths! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "7b924f7355b969a2",
@@ -1875,19 +1795,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "7bbe1eb73c2df65c",
-  "text": "Checkmate in one! Lion and Rhino trap the black king in the corner.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "7c0e6ea4f767b987",
-  "text": "Lioness is very powerful. Find a move that attacks the knight on f6.",
-  "source": "lesson-exercise"
- },
- {
   "key": "7c2a9a6d72082670",
   "text": "You earned the Warm-up Champ badge!",
   "source": "celebration"
+ },
+ {
+  "key": "7c3c11ee2ab0e2ca",
+  "text": "Move your rook so it attacks the knight on d4.",
+  "source": "lesson-exercise"
  },
  {
   "key": "7d760321d62d7e10",
@@ -1895,8 +1810,13 @@
   "source": "journey"
  },
  {
-  "key": "7d9887b0892c0042",
-  "text": "Collect every star. Plan Elephant's diagonal path first!",
+  "key": "7db21498caedf840",
+  "text": "Checkmate in one! Your king guards the squares your rook can't reach.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "7dc46a4424658841",
+  "text": "The rook on h1 is guarded by a knight. If your rook captures it, good, equal, or bad trade?",
   "source": "lesson-exercise"
  },
  {
@@ -1905,9 +1825,24 @@
   "source": "journey"
  },
  {
+  "key": "7e7223b6fd3d7863",
+  "text": "Move the rook straight up to the star.",
+  "source": "lesson-guided"
+ },
+ {
+  "key": "7e756b18ca059a2e",
+  "text": "Tap every square where the pawn could transform this move.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "7e8385e20899919b",
   "text": "Mouse took your queen!",
   "source": "versus-boss"
+ },
+ {
+  "key": "7eb251fc03bd449d",
+  "text": "The knight must collect every star by jumping over the rocks!",
+  "source": "minigame-goal"
  },
  {
   "key": "7f0e2c2d95320ed2",
@@ -1927,6 +1862,16 @@
  {
   "key": "803300414cee2b0a",
   "text": "The white rook checks along the back row. Is the black king checkmated?",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "8051f86109a85a59",
+  "text": "Tap every square the bishop can reach. Look — they're all the same colour!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "807c829677f9d61d",
+  "text": "The knight (black) attacks your queen and nothing guards it. Is your queen hanging?",
   "source": "lesson-exercise"
  },
  {
@@ -1950,29 +1895,24 @@
   "source": "play"
  },
  {
-  "key": "82734abb9e088d33",
-  "text": "Lion is in check from the bishop. Tap every square where he is safe.",
-  "source": "minigame-round"
- },
- {
   "key": "830badf6040760e2",
   "text": "Ten pieces, ten questions: is each one safe, or in danger?",
   "source": "minigame-goal"
  },
  {
-  "key": "838cc59fe360d3c0",
-  "text": "Move Elephant so he attacks the knight on a5.",
+  "key": "83287434445de3fb",
+  "text": "The queen's biggest challenge yet. Collect every star around the rock.",
   "source": "lesson-exercise"
  },
  {
-  "key": "83a435832e78dace",
-  "text": "Elephant's biggest challenge yet. Capture all four pawns.",
+  "key": "836d606f57ab88d5",
+  "text": "Black's last move was the king, not the pawn. Can your pawn on d5 capture the e5 pawn en passant right now?",
   "source": "lesson-exercise"
  },
  {
-  "key": "83e5af2806bd283a",
-  "text": "Lion is in check! Tap every square where he can escape.",
-  "source": "lesson-guided"
+  "key": "840b41dbfaf4d1b2",
+  "text": "Capture both pawns on the bishop's diagonals.",
+  "source": "lesson-variant"
  },
  {
   "key": "843fec056215ecc8",
@@ -1995,36 +1935,6 @@
   "source": "badge-locked"
  },
  {
-  "key": "8546d9749e83e55e",
-  "text": "The rook (black) attacks Rhino on a4, but your other rook guards him. Is he hanging?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "85865989a7659ada",
-  "text": "Move Rhino so he attacks the knight on d4.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "8601c0a9a74abc9d",
-  "text": "Caterpillar can only capture on a diagonal, never straight ahead. Find the piece she can capture.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "86496313e8451fec",
-  "text": "Move Lion out of check.",
-  "source": "minigame-round"
- },
- {
-  "key": "866573adfe8cec17",
-  "text": "Find the checkmate in one move — check Rhino's path to the back row.",
-  "source": "lesson-guided"
- },
- {
-  "key": "86ba9bbe636b4119",
-  "text": "Horse stands between Lion and the kingside Rhino. Can Lion castle kingside right now?",
-  "source": "lesson-exercise"
- },
- {
   "key": "86c72c79b643d0e7",
   "text": "Board Explorer",
   "source": "badge-earned"
@@ -2045,23 +1955,13 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "87a71b801484f3fb",
-  "text": "Lion is in check from the rook. Tap every safe square for him.",
-  "source": "minigame-round"
- },
- {
   "key": "87cd76e01993bc21",
   "text": "Sharp Eyes. Answer \"Safe or not?\" right 10 times in a row",
   "source": "badge-locked"
  },
  {
-  "key": "87fc3b7d489c2dd5",
-  "text": "Move Lion one step to the star.",
-  "source": "lesson-guided"
- },
- {
-  "key": "889680ab694cab07",
-  "text": "The pawn on f4 is undefended. If Elephant captures it, good, equal, or bad trade?",
+  "key": "88ee25df294820aa",
+  "text": "The queen is hungry. Gobble up the pawn!",
   "source": "lesson-exercise"
  },
  {
@@ -2070,9 +1970,14 @@
   "source": "journey"
  },
  {
-  "key": "8976dfc6b79e956e",
-  "text": "Tap every square Caterpillar the Pawn attacks.",
-  "source": "lesson-guided"
+  "key": "8920e55361104927",
+  "text": "The black rook is coming for your knight on b5! Move the knight to safety.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "897ebe1546c69095",
+  "text": "Checkmate in one! Your queen can reach the back row.",
+  "source": "lesson-exercise"
  },
  {
   "key": "89833795be6293c1",
@@ -2087,6 +1992,11 @@
  {
   "key": "8a287b28eba064ab",
   "text": "Tap every square in your king's column, all the way across the board.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "8a3520040586fac5",
+  "text": "A friend blocks one line, a pawn waits on another. Tap every square the queen can reach.",
   "source": "lesson-exercise"
  },
  {
@@ -2105,14 +2015,14 @@
   "source": "assessment"
  },
  {
-  "key": "8b58f93a1bea3df1",
-  "text": "Lioness is starving! Capture every piece before the moves run out.",
-  "source": "minigame-goal"
- },
- {
   "key": "8b89769909ec6247",
   "text": "You're ready to explore every path.",
   "source": "placement"
+ },
+ {
+  "key": "8bbad92532a8d285",
+  "text": "A pawn now guards your knight. Is it still hanging?",
+  "source": "lesson-exercise"
  },
  {
   "key": "8c125c93a3486d11",
@@ -2130,13 +2040,8 @@
   "source": "play"
  },
  {
-  "key": "8d10dea18c070af8",
-  "text": "Help Rhino grab both stars in the corners.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "8d43daee9b4c3911",
-  "text": "Move Rhino so he gives check to the black king.",
+  "key": "8ccf1900b5f89bf6",
+  "text": "The rook's biggest challenge yet. Collect every star around the rock.",
   "source": "lesson-exercise"
  },
  {
@@ -2155,6 +2060,11 @@
   "source": "exercise-note"
  },
  {
+  "key": "8df6d76876dfecd8",
+  "text": "The bishop (black) attacks your knight and nothing guards it. Is your knight hanging?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "8e02731a06ac4687",
   "text": "You earned the Pawn Wars Winner badge!",
   "source": "celebration"
@@ -2165,14 +2075,14 @@
   "source": "assessment"
  },
  {
-  "key": "8ed5bbec4791fae6",
-  "text": "Watch Elephant walk to every green dot. Diagonal paths, any distance!",
-  "source": "lesson-demo"
+  "key": "8e6f0f96c4c5d30c",
+  "text": "Today you meet the Rook!",
+  "source": "home"
  },
  {
-  "key": "90331a72e01ddb57",
-  "text": "Horse wants to attack the bishop on d4. Which move lets him attack it?",
-  "source": "lesson-guided"
+  "key": "8fd8231e4b9c4449",
+  "text": "Today you meet the Queen!",
+  "source": "home"
  },
  {
   "key": "90b94dc683e8e38e",
@@ -2185,24 +2095,14 @@
   "source": "assessment"
  },
  {
-  "key": "910dfb2e316add55",
-  "text": "Today you meet Bishop!",
-  "source": "home"
- },
- {
   "key": "9138a8e8be2080d9",
   "text": "Hi! I'm Owl. Today: Check or Checkmate?!",
   "source": "home"
  },
  {
-  "key": "91c3d6be97368a39",
-  "text": "Tap every square Lion can step to.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "91ee9e431ede7c24",
-  "text": "Every piece has a value: Caterpillar is worth 1, Horse and Elephant are worth 3, Rhino is worth 5, and Lioness is worth a mighty 9! Knowing this helps you decide if a trade is worth it.",
-  "source": "lesson-story"
+  "key": "921f3bd78d70fa34",
+  "text": "The rook only moves in straight lines! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "9222927b309b1e59",
@@ -2215,14 +2115,14 @@
   "source": "play"
  },
  {
+  "key": "92aff3570049e2a8",
+  "text": "After The Pawn Transforms! lesson",
+  "source": "play"
+ },
+ {
   "key": "92c65f88c00a9cec",
   "text": "You already know Safe or Not?!",
   "source": "assessment"
- },
- {
-  "key": "93262641a6ca161e",
-  "text": "Rook only runs in straight lines!",
-  "source": "exercise-note"
  },
  {
   "key": "932d09330dc8614e",
@@ -2233,6 +2133,11 @@
   "key": "93886c5da6b2c8cf",
   "text": "Your king sits on two diagonals. Tap every square of the short one.",
   "source": "lesson-variant"
+ },
+ {
+  "key": "938e78a20e0a1e28",
+  "text": "The kingside rook already moved away from the corner. Can your king castle kingside right now?",
+  "source": "lesson-exercise"
  },
  {
   "key": "9397e5ee40b8347e",
@@ -2250,6 +2155,16 @@
   "source": "lesson-guided"
  },
  {
+  "key": "9516834724685045",
+  "text": "The king is the most important piece of all! It only steps one square at a time, in any direction, and it must always stay safe.",
+  "source": "lesson-story"
+ },
+ {
+  "key": "9535c8b9b3d759bd",
+  "text": "Your king is in check! Tap every square where it can escape.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "957f278d66fde401",
   "text": "No worries — nothing is lost. Keep practising on your path!",
   "source": "assessment"
@@ -2260,19 +2175,24 @@
   "source": "play"
  },
  {
-  "key": "95ad4db7963b0c98",
-  "text": "Lion is in check from a bishop far away. Tap every safe square for him.",
-  "source": "minigame-round"
- },
- {
   "key": "95c55b0bdcb416b6",
   "text": "Star Collector. Earn 150 stars",
   "source": "badge-locked"
  },
  {
+  "key": "95da6a757a9f4ea8",
+  "text": "Your knight jumps in an L. Tap every square it attacks from d4 — some are empty, some have pieces!",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "963f5feaca3c74b4",
   "text": "Checkmate! Amazing!",
   "source": "exercise-note"
+ },
+ {
+  "key": "96ef7ce7a0057063",
+  "text": "Help the queen grab both stars in the corners.",
+  "source": "lesson-exercise"
  },
  {
   "key": "978df6fbc782fd14",
@@ -2285,11 +2205,6 @@
   "source": "lesson-story"
  },
  {
-  "key": "97e0c375be63d1ae",
-  "text": "Butterfly Maker",
-  "source": "badge-earned"
- },
- {
   "key": "980e721fc9ca4bad",
   "text": "Two pieces (black) are undefended. Find a move that captures one for free.",
   "source": "lesson-exercise"
@@ -2298,6 +2213,16 @@
   "key": "983668f8a80c6052",
   "text": "Checkmate in one — but careful, some moves would stalemate instead!",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "9870ee8460c8953d",
+  "text": "Collect every star. Plan the rook's path first!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "98c3b909b2429539",
+  "text": "The king only steps one square at a time!",
+  "source": "exercise-note"
  },
  {
   "key": "9971f642515557a2",
@@ -2325,6 +2250,16 @@
   "source": "placement"
  },
  {
+  "key": "9abd9dfc3d43e587",
+  "text": "Two of your pawns could catch this one — either capture works!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "9b2e87fafc4b3485",
+  "text": "The bishop on c3 is attacking your rook! Move your knight to capture it.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "9b3c1810b169ee25",
   "text": "Mouse took your pawn!",
   "source": "versus-boss"
@@ -2340,14 +2275,14 @@
   "source": "badge-earned"
  },
  {
-  "key": "9c388bade60fe382",
-  "text": "Elephant is starving! Capture every piece before the moves run out.",
-  "source": "minigame-goal"
- },
- {
   "key": "9cb13f879a5173e5",
   "text": "Fox, locked, Beat Wolf 3 times",
   "source": "play"
+ },
+ {
+  "key": "9d1ee63ca2bd1625",
+  "text": "The black rook is attacking your bishop. Move the bishop to safety.",
+  "source": "lesson-exercise"
  },
  {
   "key": "9d45bcf243092a0a",
@@ -2355,14 +2290,14 @@
   "source": "badge-earned"
  },
  {
+  "key": "9d6926797219914d",
+  "text": "Is your knight hanging?",
+  "source": "lesson-guided"
+ },
+ {
   "key": "9d9af1261222b3b3",
   "text": "You earned the Bear Buddy badge!",
   "source": "celebration"
- },
- {
-  "key": "9da85600e2a7f941",
-  "text": "Pawn only moves straight ahead (and captures diagonally)! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
  },
  {
   "key": "9ec825f5447c05ea",
@@ -2385,19 +2320,14 @@
   "source": "play"
  },
  {
-  "key": "9fd4624030447a7a",
-  "text": "You finished everything for now. Come back soon for more!",
-  "source": "home"
- },
- {
-  "key": "a0050cc57766951d",
-  "text": "Rhino (black) is attacking Horse. Is Horse defended by the white rook on d2?",
+  "key": "9f8947614a789857",
+  "text": "Tap every square the king can step to.",
   "source": "lesson-exercise"
  },
  {
-  "key": "a06b830dff6ab164",
-  "text": "Move Rhino straight up to the star.",
-  "source": "lesson-guided"
+  "key": "9fd4624030447a7a",
+  "text": "You finished everything for now. Come back soon for more!",
+  "source": "home"
  },
  {
   "key": "a072bd13ad5c88ff",
@@ -2405,13 +2335,13 @@
   "source": "play"
  },
  {
-  "key": "a08d79f82b4b2bb5",
-  "text": "Rhino's biggest challenge yet. Collect every star around the rock.",
-  "source": "lesson-exercise"
+  "key": "a07dd6c6445f78d6",
+  "text": "Your knight wants to attack the bishop on d4. Which move lets it do that?",
+  "source": "lesson-guided"
  },
  {
-  "key": "a0a062f7ffd7b6e8",
-  "text": "Move Rhino straight across to the star.",
+  "key": "a0ab077f06be0c20",
+  "text": "The black pawn is undefended. Capture it for free!",
   "source": "lesson-guided"
  },
  {
@@ -2420,9 +2350,19 @@
   "source": "placement"
  },
  {
+  "key": "a210debde46c5f1c",
+  "text": "Move the queen straight across to the star.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "a21b6eddd12def6f",
   "text": "Place the white queen next.",
   "source": "exercise-note"
+ },
+ {
+  "key": "a23a52aedfc449b6",
+  "text": "Tap every square the knight can jump to.",
+  "source": "lesson-exercise"
  },
  {
   "key": "a2e08a2c7a77d764",
@@ -2435,24 +2375,19 @@
   "source": "assessment"
  },
  {
-  "key": "a36111dcb6752312",
-  "text": "Help Elephant grab both stars, corner to corner.",
+  "key": "a30e5a07a0148c30",
+  "text": "Only the queenside rook is still home. Castle queenside!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "a36b5d0f08faf1f8",
+  "text": "Your knight (a1) still can't move. Save it — block the attack, or capture the attacking rook!",
   "source": "lesson-exercise"
  },
  {
   "key": "a397da098a6bf4f8",
   "text": "Bear Buddy",
   "source": "badge-earned"
- },
- {
-  "key": "a40b05e388ffe200",
-  "text": "Look at Pawn.",
-  "source": "exercise-note"
- },
- {
-  "key": "a4bbef6456158a3c",
-  "text": "Move Elephant diagonally to the star.",
-  "source": "lesson-guided"
  },
  {
   "key": "a4e8e2f932f4994c",
@@ -2470,33 +2405,18 @@
   "source": "badge-earned"
  },
  {
-  "key": "a58b30085f518494",
-  "text": "Help Lioness grab both stars in the corners.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "a60e50c58dfc9e68",
-  "text": "The bishop (black) attacks Horse and nothing guards him. Is Horse hanging?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "a6593620776afdf4",
-  "text": "Find the checkmate in one move — Lioness and Lion work together.",
-  "source": "lesson-guided"
- },
- {
-  "key": "a6e82b53c2eaff51",
-  "text": "Tap every square where Caterpillar could transform this move.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "a725bb1b44222abb",
-  "text": "Look at Rook.",
+  "key": "a5ed2cc026e713d7",
+  "text": "Tap your piece first.",
   "source": "exercise-note"
  },
  {
   "key": "a75d462594a44458",
   "text": "Checkmate in one! One rook cuts off the escape, the other delivers check.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "a7a3724dcfdc14a3",
+  "text": "The pawn already made its first move. Now it moves one square at a time. Reach the star.",
   "source": "lesson-exercise"
  },
  {
@@ -2515,14 +2435,9 @@
   "source": "assessment"
  },
  {
-  "key": "a8c52202cde3c536",
-  "text": "Watch Horse jump to every green dot. Always an L shape!",
-  "source": "lesson-demo"
- },
- {
-  "key": "a906dec1c8da7d0b",
-  "text": "Elephant only walks on diagonal paths, but he can go as far as he likes! Long ago people even called this piece \"the Elephant.\" He always stays on squares of one colour.",
-  "source": "lesson-story"
+  "key": "a8fe67afe19c00d2",
+  "text": "The rook attacks in straight lines. Tap every square it attacks from d1.",
+  "source": "lesson-exercise"
  },
  {
   "key": "a93462737231e103",
@@ -2530,19 +2445,19 @@
   "source": "home"
  },
  {
-  "key": "a95336576893e4d4",
-  "text": "When a king is attacked, that's CHECK — danger! Lion must get to safety right away. Owl will teach you to spot it, and how to give check yourself.",
-  "source": "lesson-story"
+  "key": "aad306bf7027209c",
+  "text": "Your king is in check. Every green dot is a square where it would be safe.",
+  "source": "lesson-demo"
  },
  {
-  "key": "aab9403119fb86b2",
-  "text": "Rocks are in the way, but Horse jumps right over them!",
-  "source": "lesson-exercise"
+  "key": "aae68c79484b2acc",
+  "text": "The bishop is starving! Capture every piece before the moves run out.",
+  "source": "minigame-goal"
  },
  {
-  "key": "aac842912c107bc6",
-  "text": "Checkmate in one! Horse guards the squares for Lioness.",
-  "source": "lesson-exercise"
+  "key": "aae98d6822b956bc",
+  "text": "Checkmate! The queen checks the king, and every square around him is covered.",
+  "source": "lesson-demo"
  },
  {
   "key": "ab9353c22ff39637",
@@ -2550,13 +2465,23 @@
   "source": "lesson-demo"
  },
  {
+  "key": "ab9e9edbdbe431c2",
+  "text": "The bishop giving check isn't guarded. Capture it with your king!",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "aba4c3964ea7d74e",
   "text": "Mouse moved a rook.",
   "source": "versus-boss"
  },
  {
-  "key": "ace624600c12cfd6",
-  "text": "The pawn on c3 is guarded by another pawn. If Horse captures it, good, equal, or bad trade?",
+  "key": "abe16277997175dc",
+  "text": "Watch the bishop go to every green dot. Diagonal paths, any distance!",
+  "source": "lesson-demo"
+ },
+ {
+  "key": "abf579c2849dc418",
+  "text": "Checkmate in one! Your knight and pawn guard the black king's escape.",
   "source": "lesson-exercise"
  },
  {
@@ -2570,34 +2495,14 @@
   "source": "journey"
  },
  {
-  "key": "ae2dd36ff8634699",
-  "text": "On her very first move, Caterpillar can creep two squares. Reach the star!",
-  "source": "lesson-guided"
+  "key": "ae42edd5da98bb2b",
+  "text": "Two pieces stand in your pawn's way. Move closer, then capture them both!",
+  "source": "lesson-exercise"
  },
  {
   "key": "ae4d355908b58f34",
   "text": "Daily Player, Gold",
   "source": "badge-earned"
- },
- {
-  "key": "ae88380bca3f2786",
-  "text": "Lion is in check. Every green dot is a square where he'd be safe.",
-  "source": "lesson-demo"
- },
- {
-  "key": "aec997df67c7ee80",
-  "text": "You earned the Butterfly Maker badge!",
-  "source": "celebration"
- },
- {
-  "key": "af443b914b41d646",
-  "text": "The only way out is to move Lion — find a safe square.",
-  "source": "lesson-guided"
- },
- {
-  "key": "b02a57145aff29f2",
-  "text": "Queen moves straight or diagonal, not like that!",
-  "source": "exercise-note"
  },
  {
   "key": "b03754f292d0a635",
@@ -2625,14 +2530,14 @@
   "source": "lesson-guided"
  },
  {
+  "key": "b1e3a550da8f6a7c",
+  "text": "On its very first move, the pawn can go two squares. Reach the star!",
+  "source": "lesson-guided"
+ },
+ {
   "key": "b2c4dd43bdf0133f",
   "text": "White moved the knight.",
   "source": "exercise-note"
- },
- {
-  "key": "b3499596196d3280",
-  "text": "A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.",
-  "source": "lesson-exercise"
  },
  {
   "key": "b3628b5a214a37d6",
@@ -2648,11 +2553,6 @@
   "key": "b3fdb162e49f957b",
   "text": "Wolf moved a king.",
   "source": "versus-boss"
- },
- {
-  "key": "b49494ae073ed150",
-  "text": "Look at Queen.",
-  "source": "exercise-note"
  },
  {
   "key": "b4b0376cb8edfca0",
@@ -2680,9 +2580,34 @@
   "source": "journey"
  },
  {
+  "key": "b6227258c189c4ef",
+  "text": "The queen combines the rook's straight lines and the bishop's diagonal paths. It is the strongest piece on the board!",
+  "source": "lesson-story"
+ },
+ {
+  "key": "b67ad4f3e3314794",
+  "text": "Is your king in check from the black rook?",
+  "source": "lesson-guided"
+ },
+ {
   "key": "b6af24d2b9e20652",
   "text": "Checkmate in one! Two rooks trap the black king together.",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "b6b9f41b8b7274f6",
+  "text": "Sometimes a pawn rushes two squares on its very first move, right past an enemy pawn standing beside it. That's not quite fair — so, just this once, the enemy pawn may capture it anyway, as if it had only moved one square. This is called \"en passant\" (French for \"in passing\"), and it only works right away, the very next move.",
+  "source": "lesson-story"
+ },
+ {
+  "key": "b771fbd877a1c809",
+  "text": "The bishop only moves on diagonal paths!",
+  "source": "exercise-note"
+ },
+ {
+  "key": "b7ca2faa0d78329b",
+  "text": "The king must reach both stars, one careful step at a time, always staying safe.",
+  "source": "minigame-goal"
  },
  {
   "key": "b7ff3791a55d4f4d",
@@ -2690,9 +2615,9 @@
   "source": "versus-boss"
  },
  {
-  "key": "b8590a322a49a287",
-  "text": "Bishop only walks on diagonal paths!",
-  "source": "exercise-note"
+  "key": "b815d7a5f42862cd",
+  "text": "Move the bishop the other diagonal way to the star.",
+  "source": "lesson-guided"
  },
  {
   "key": "b888f88ecb41f21f",
@@ -2712,6 +2637,11 @@
  {
   "key": "ba00b6cf4944c657",
   "text": "Next come the bishops, next to the knights.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "ba0c9de7605a3983",
+  "text": "The bishop's biggest challenge yet. Capture all four pawns.",
   "source": "lesson-exercise"
  },
  {
@@ -2735,11 +2665,6 @@
   "source": "lesson-story"
  },
  {
-  "key": "bb7a4b6d3ae7cdd5",
-  "text": "Watch Caterpillar the Pawn. She attacks both diagonal squares in front of her!",
-  "source": "lesson-demo"
- },
- {
   "key": "bb97ace258c90408",
   "text": "Place the white rook next.",
   "source": "exercise-note"
@@ -2760,18 +2685,13 @@
   "source": "badge-locked"
  },
  {
-  "key": "bce280c32736f95d",
-  "text": "Tap every square Lioness can reach from here.",
-  "source": "lesson-exercise"
+  "key": "bc4714b60b42ad25",
+  "text": "Watch the queen go to every green dot. Straight lines and diagonals, any distance!",
+  "source": "lesson-demo"
  },
  {
   "key": "bcf3d2c4cdce204f",
   "text": "Is the black king stalemated?",
-  "source": "lesson-guided"
- },
- {
-  "key": "bd114f6924880b8d",
-  "text": "Rhino can give check! Find the move that attacks the black king.",
   "source": "lesson-guided"
  },
  {
@@ -2790,9 +2710,19 @@
   "source": "play"
  },
  {
+  "key": "be6bb26c969ccdc1",
+  "text": "A friend blocks one line, a pawn waits on another. Tap every square the rook can reach.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "be96f81d5e60d899",
   "text": "Good try!",
   "source": "exercise-note"
+ },
+ {
+  "key": "bf0857df0cd3d2ae",
+  "text": "Black's pawn just rushed two squares past your pawn on c5. Can you capture it en passant right now?",
+  "source": "lesson-guided"
  },
  {
   "key": "bfb1a3d72566b43e",
@@ -2813,6 +2743,11 @@
   "key": "c0513bfe82ec2692",
   "text": "Not quite! Tap the orange squares again to take them away.",
   "source": "exercise-note"
+ },
+ {
+  "key": "c07c549b29584fc1",
+  "text": "Castle kingside! Move your king two squares to swap places with the rook.",
+  "source": "lesson-guided"
  },
  {
   "key": "c0e12002b66ab641",
@@ -2845,19 +2780,19 @@
   "source": "exercise-note"
  },
  {
-  "key": "c27d92ada5f0fac3",
-  "text": "A black knight jumps into position to attack Lion. Is Lion in check?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "c285487e9aa2a6e4",
-  "text": "Checkmate in one! Lion guards the checking square.",
-  "source": "minigame-round"
- },
- {
   "key": "c29df93318366d04",
   "text": "Finish How Much Is Each Piece Worth? first!",
   "source": "journey"
+ },
+ {
+  "key": "c2af8b28172bad7e",
+  "text": "Tap every square the queen can reach from here.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "c2f37aa38291e6d8",
+  "text": "A knight's check can never be blocked! Move your king to safety.",
+  "source": "minigame-round"
  },
  {
   "key": "c3072ba46aeecbb7",
@@ -2875,19 +2810,24 @@
   "source": "owl-line"
  },
  {
+  "key": "c3a61831ccd32486",
+  "text": "One more step and the pawn transforms! Move it to the last row.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "c41b5ac98d7e5e59",
   "text": "Bear took your king!",
   "source": "versus-boss"
  },
  {
-  "key": "c4c87dd172f34482",
-  "text": "Move Elephant so he gives check to the black king.",
-  "source": "lesson-exercise"
+  "key": "c42688b9b27fc0a8",
+  "text": "Move the bishop diagonally to the star.",
+  "source": "lesson-guided"
  },
  {
-  "key": "c4e5c7a98ab93e56",
-  "text": "Watch Lion take one careful step in every direction.",
-  "source": "lesson-demo"
+  "key": "c4bef2da3a2358a8",
+  "text": "Your king is in check from the rook. Tap every safe square for it.",
+  "source": "minigame-round"
  },
  {
   "key": "c4ed393925283415",
@@ -2935,11 +2875,6 @@
   "source": "badge-earned"
  },
  {
-  "key": "c725cc9eccec5bb8",
-  "text": "Checkmate in one! Lion guards Lioness's checking square.",
-  "source": "minigame-round"
- },
- {
   "key": "c777e28143c65ca6",
   "text": "After Draws: Nobody Wins lesson",
   "source": "play"
@@ -2965,9 +2900,19 @@
   "source": "versus-boss"
  },
  {
+  "key": "c9e41d26c64f86bc",
+  "text": "Checkmate in one! Your king and rook trap the black king in the corner.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "ca20f82c9c65023a",
   "text": "Tap the dark square in the bottom-left corner.",
   "source": "lesson-variant"
+ },
+ {
+  "key": "ca42439e025f4065",
+  "text": "Look at your knight. The black rook attacks it and nothing guards it — the knight is hanging!",
+  "source": "lesson-demo"
  },
  {
   "key": "ca895e627a2ba1c5",
@@ -2975,29 +2920,19 @@
   "source": "journey"
  },
  {
-  "key": "cb092fa5f0be11c5",
-  "text": "Lioness's biggest challenge yet. Collect every star around the rock.",
-  "source": "lesson-exercise"
- },
- {
   "key": "cb2f37bf4fde4335",
   "text": "Mate Master. Solve 50 mates in 1",
   "source": "badge-locked"
  },
  {
-  "key": "cb5c8dfec9440762",
-  "text": "At the very last row, something amazing happens: Caterpillar transforms into a brand-new piece! She can become a queen, a rook, a bishop, or a knight — the powerful queen is almost always the best choice.",
-  "source": "lesson-story"
- },
- {
-  "key": "cb7fb078f48d7c40",
-  "text": "The bishop (black) is undefended. Capture it for free with Lioness!",
-  "source": "lesson-exercise"
- },
- {
   "key": "cbf49daaf7fc340f",
   "text": "Bear moved a knight.",
   "source": "versus-boss"
+ },
+ {
+  "key": "cd4a4e3e207a1174",
+  "text": "The knight only jumps in an L shape!",
+  "source": "exercise-note"
  },
  {
   "key": "cdbf050a1d94880a",
@@ -3025,9 +2960,9 @@
   "source": "play"
  },
  {
-  "key": "cf7647b1758c9aee",
-  "text": "Lion and the kingside Rhino haven't moved, and nothing stands between them. Can Lion castle kingside right now?",
-  "source": "lesson-guided"
+  "key": "cff06c7e7378f4ef",
+  "text": "Something blocks your pawn's path straight ahead. Tap every square it can still reach.",
+  "source": "lesson-exercise"
  },
  {
   "key": "d18513e39b012798",
@@ -3055,9 +2990,14 @@
   "source": "celebration"
  },
  {
-  "key": "d2f73d5e1ad054a8",
-  "text": "Tap only the squares where Lion is safe.",
-  "source": "lesson-exercise"
+  "key": "d2b083a5f363997b",
+  "text": "Find the checkmate in one move — look at your rook's path to the back row.",
+  "source": "lesson-guided"
+ },
+ {
+  "key": "d2fb5bf606964a42",
+  "text": "The rook is starving! Capture every piece before the moves run out.",
+  "source": "minigame-goal"
  },
  {
   "key": "d306fc236ece158a",
@@ -3065,34 +3005,14 @@
   "source": "lesson-story"
  },
  {
-  "key": "d31a32841be92a63",
-  "text": "King only steps one square at a time!",
-  "source": "exercise-note"
- },
- {
   "key": "d335c4fcd5853320",
   "text": "One swift diagonal move reaches the far star!",
   "source": "lesson-exercise"
  },
  {
-  "key": "d38ae3e6a2d4e292",
-  "text": "Move Lion out of check — nothing can block or capture this rook here.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "d4424e5c676a9914",
-  "text": "Pawn only moves straight ahead (and captures diagonally)!",
-  "source": "exercise-note"
- },
- {
   "key": "d452450299f77561",
   "text": "Finish Safe or Not? first!",
   "source": "journey"
- },
- {
-  "key": "d46104ccc65a641d",
-  "text": "Rhino is starving! Capture every piece before the moves run out.",
-  "source": "minigame-goal"
  },
  {
   "key": "d464beb39f152a3a",
@@ -3120,8 +3040,8 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "d5e4be1d1921a12a",
-  "text": "Lioness can check the black king in several ways. Find one!",
+  "key": "d5de695a8a19a248",
+  "text": "The knight is boxed in by rocks, but knights jump right over them!",
   "source": "lesson-exercise"
  },
  {
@@ -3133,6 +3053,11 @@
   "key": "d60ff3966a0593c4",
   "text": "Is the rook on a1 in danger?",
   "source": "minigame-round"
+ },
+ {
+  "key": "d62fa5cb58a5c769",
+  "text": "Help your king escape check 10 times — by moving, blocking, or capturing!",
+  "source": "minigame-goal"
  },
  {
   "key": "d631120b871b976d",
@@ -3165,24 +3090,9 @@
   "source": "exercise-note-easier-offer"
  },
  {
-  "key": "d8701a5f093acc7a",
-  "text": "The knight on c3 is guarded by a pawn. If Horse captures it, good, equal, or bad trade?",
-  "source": "lesson-exercise"
- },
- {
   "key": "d8c8232a4c05d3b7",
   "text": "Hi! I'm Owl. Today: Meet the Squares!",
   "source": "home"
- },
- {
-  "key": "d90a7f0ffb280009",
-  "text": "Look at King.",
-  "source": "exercise-note"
- },
- {
-  "key": "d915cee3b59011fe",
-  "text": "Horse (a1) still can't move. Save him — block the attack, or capture the attacking rook!",
-  "source": "lesson-exercise"
  },
  {
   "key": "d9402c0aa7561bf6",
@@ -3195,14 +3105,9 @@
   "source": "lesson-variant"
  },
  {
-  "key": "d9a0d6e6a955c663",
-  "text": "Only the kingside Rhino is still home. Castle kingside!",
-  "source": "lesson-exercise"
- },
- {
-  "key": "d9eafa4d7a933d4f",
-  "text": "Tap Pawn first.",
-  "source": "exercise-note"
+  "key": "daaac0aca7c27463",
+  "text": "Move the king one step to the star.",
+  "source": "lesson-guided"
  },
  {
   "key": "db5be91a16595a88",
@@ -3210,9 +3115,19 @@
   "source": "play"
  },
  {
+  "key": "dc0d499a54554ebc",
+  "text": "The knight (black) attacks your pawn and nothing guards it. Is your pawn hanging?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "dc60f06b8205aa5f",
   "text": "Want to show me you already know Draws: Nobody Wins?",
   "source": "journey"
+ },
+ {
+  "key": "dcb002cab19d8861",
+  "text": "Your pawn can only capture on a diagonal, never straight ahead. Find the piece it can capture.",
+  "source": "lesson-exercise"
  },
  {
   "key": "dce4b7415d42be00",
@@ -3225,18 +3140,23 @@
   "source": "versus-boss"
  },
  {
+  "key": "dd696227f422bc26",
+  "text": "Tap every square the pawn attacks.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "ddb3592f42808fa8",
   "text": "Some games end in a draw — nobody wins! Stalemate is one way: no legal move, but not in check. A game is also a draw when there isn't enough material left to checkmate (like a lone king against a lone king), if the exact same position happens three times in a row, or if 50 moves pass with no capture and no pawn move.",
   "source": "lesson-story"
  },
  {
-  "key": "dded0a7f894fb769",
-  "text": "Now he hopped to your left-hand corner. Is that square light?",
-  "source": "lesson-guided"
+  "key": "ddcbbaf9e395a5b6",
+  "text": "Rocks are in the way, but the knight jumps right over them!",
+  "source": "lesson-exercise"
  },
  {
-  "key": "de07e3b8044868d0",
-  "text": "Move Elephant the other diagonal way to the star.",
+  "key": "dded0a7f894fb769",
+  "text": "Now he hopped to your left-hand corner. Is that square light?",
   "source": "lesson-guided"
  },
  {
@@ -3245,34 +3165,19 @@
   "source": "lesson-exercise"
  },
  {
-  "key": "deade29e85d6bcda",
-  "text": "Lioness is hungry. Gobble up the pawn!",
-  "source": "lesson-exercise"
+  "key": "de639ff6e6e8a65d",
+  "text": "Is your knight defended by the pawn on c3?",
+  "source": "lesson-guided"
  },
  {
-  "key": "ded1d54c90cc1f17",
-  "text": "Creep Caterpillar to the star. Her first move can go one square or two!",
-  "source": "lesson-exercise"
- },
- {
-  "key": "ded9c580dc55936a",
-  "text": "Caterpillar is about to transform! Which piece should she become?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "df75307270bfcff8",
-  "text": "Lioness must capture every caterpillar before one of them transforms!",
-  "source": "minigame-goal"
+  "key": "dfdf4aa8b99d263c",
+  "text": "The knight only jumps in an L shape! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "e009473e83342f76",
   "text": "Piece Master. Master World 2: The Pieces",
   "source": "badge-locked"
- },
- {
-  "key": "e0a309473ab251fa",
-  "text": "Tap every square Caterpillar the Pawn attacks — the knight and the bishop are both there.",
-  "source": "lesson-exercise"
  },
  {
   "key": "e0b6e83b79f6b635",
@@ -3283,16 +3188,6 @@
   "key": "e116fe25d92b3ba7",
   "text": "Wolf moved a bishop.",
   "source": "versus-boss"
- },
- {
-  "key": "e245e06062c6bb38",
-  "text": "Tap Knight first.",
-  "source": "exercise-note"
- },
- {
-  "key": "e2bdcc76fbfe7cc6",
-  "text": "Caterpillar now blocks the diagonal. Is Lion in check?",
-  "source": "lesson-exercise"
  },
  {
   "key": "e2c57df74acc5758",
@@ -3310,14 +3205,24 @@
   "source": "journey"
  },
  {
-  "key": "e44152098ac7e029",
-  "text": "A pawn now guards Horse. Is he still hanging?",
+  "key": "e42e1781a86ce6ae",
+  "text": "The black rook is attacking your knight. Is your knight defended by the white rook on d2?",
   "source": "lesson-exercise"
+ },
+ {
+  "key": "e4bb9e48623352c3",
+  "text": "The only way out is to move your king — find a safe square.",
+  "source": "lesson-guided"
  },
  {
   "key": "e4c6da1ca335f94d",
   "text": "After Mate in 1 lesson",
   "source": "play"
+ },
+ {
+  "key": "e557cf151944f366",
+  "text": "A black rook is giving your king check! Can your king castle kingside right now?",
+  "source": "lesson-exercise"
  },
  {
   "key": "e5780078fc7e3983",
@@ -3330,29 +3235,19 @@
   "source": "lesson-variant"
  },
  {
-  "key": "e6180016c48a7a26",
-  "text": "Look at Bishop.",
-  "source": "exercise-note"
+  "key": "e5fba3586828632c",
+  "text": "Queen Maker",
+  "source": "badge-earned"
  },
  {
-  "key": "e651f28e42fa6269",
-  "text": "Castle kingside! Move Lion two squares to swap places with Rhino.",
-  "source": "lesson-guided"
- },
- {
-  "key": "e67e6d9fb7290030",
-  "text": "Collect both stars. Plan Horse's jumps!",
-  "source": "lesson-exercise"
+  "key": "e6b234718c13eae9",
+  "text": "Here they are in order: pawn 1, knight or bishop 3, rook 5, queen 9.",
+  "source": "lesson-demo"
  },
  {
   "key": "e6dd3db7d2a21a07",
   "text": "Let's keep going!",
   "source": "home"
- },
- {
-  "key": "e6e1d3e278393968",
-  "text": "Rhino attacks in straight lines. Tap every square he attacks from d1.",
-  "source": "lesson-exercise"
  },
  {
   "key": "e7251cbc3880dd04",
@@ -3370,11 +3265,6 @@
   "source": "owl-line"
  },
  {
-  "key": "e88970d99f3789c4",
-  "text": "Rhino loves charging straight ahead! He runs up, down, left, or right, as far as he wants. He can never jump over another piece.",
-  "source": "lesson-story"
- },
- {
   "key": "e8b716318987fa16",
   "text": "Guardian. Master World 3: Attack & Defence",
   "source": "badge-locked"
@@ -3385,9 +3275,19 @@
   "source": "versus-boss"
  },
  {
+  "key": "e936013b40581f33",
+  "text": "Today you meet the Knight!",
+  "source": "home"
+ },
+ {
   "key": "e96b85a8f0b5fefd",
   "text": "Escape Artist",
   "source": "badge-earned"
+ },
+ {
+  "key": "e990c2a1d71c52be",
+  "text": "Watch the knight jump to every green dot. Always an L shape!",
+  "source": "lesson-demo"
  },
  {
   "key": "eab11ccd4cf96490",
@@ -3400,23 +3300,8 @@
   "source": "exercise-note"
  },
  {
-  "key": "eb207c6f6bfc0b65",
-  "text": "Horse is boxed in by rocks, but a knight jumps right over them!",
-  "source": "lesson-exercise"
- },
- {
-  "key": "ebfe4bb7a2bfc7e6",
-  "text": "One more step and Caterpillar transforms! Move her to the last row.",
-  "source": "lesson-exercise"
- },
- {
-  "key": "ec6bba56527a384d",
-  "text": "Caterpillar (black) is undefended. Capture her for free!",
-  "source": "lesson-guided"
- },
- {
-  "key": "ecb00be5ea565ae3",
-  "text": "Caterpillar already made her first move. Now she creeps one square at a time. Reach the star.",
+  "key": "ec11ed7840ca2c04",
+  "text": "A black bishop attacks your king along the diagonal. Is your king in check?",
   "source": "lesson-exercise"
  },
  {
@@ -3430,14 +3315,14 @@
   "source": "exercise-note"
  },
  {
-  "key": "ececc29e77c33c28",
-  "text": "The knight (black) is undefended. Capture it with Elephant — a free piece is always a good trade!",
-  "source": "lesson-guided"
- },
- {
   "key": "eced8010d9d9563f",
   "text": "Rule Master",
   "source": "badge-earned"
+ },
+ {
+  "key": "ed28f22a74edb145",
+  "text": "Checkmate in one! Your king guards the checking square.",
+  "source": "minigame-round"
  },
  {
   "key": "ed39c3bc7245682a",
@@ -3448,11 +3333,6 @@
   "key": "ed87a45bd151903b",
   "text": "You took a rook!",
   "source": "versus-boss"
- },
- {
-  "key": "edcbe77e4ecf3604",
-  "text": "Lioness combines Rhino's straight charges and Elephant's diagonal paths. She is the strongest hunter on the board!",
-  "source": "lesson-story"
  },
  {
   "key": "edeeeb101fe531e6",
@@ -3480,6 +3360,11 @@
   "source": "badge-locked"
  },
  {
+  "key": "eeb2451c3da44d09",
+  "text": "The bishop only moves on diagonal paths, but it can go as far as it likes! It always stays on squares of one colour.",
+  "source": "lesson-story"
+ },
+ {
   "key": "eee7013b61a2fdf8",
   "text": "Fox took your bishop!",
   "source": "versus-boss"
@@ -3493,11 +3378,6 @@
   "key": "ef233aefa4715b5c",
   "text": "Every chess champion starts with the first step.",
   "source": "placement"
- },
- {
-  "key": "ef36f362da3c682b",
-  "text": "A black bishop attacks Lion along the diagonal. Is Lion in check?",
-  "source": "lesson-exercise"
  },
  {
   "key": "eff1ec82aba3209e",
@@ -3515,14 +3395,19 @@
   "source": "exercise-note"
  },
  {
+  "key": "f0a5d4397c9a2479",
+  "text": "The black rook is coming for your knight! Move the knight to safety.",
+  "source": "lesson-guided"
+ },
+ {
   "key": "f0d247b8fa347621",
   "text": "Want to show me you already know World 2 · Pieces?",
   "source": "journey"
  },
  {
-  "key": "f13b6303ac3aa812",
-  "text": "Horse jumps in an L shape: two squares one way, then one more to the side. He can jump right over anyone standing in between!",
-  "source": "lesson-story"
+  "key": "f1506b0713ed8dae",
+  "text": "Only the kingside rook is still home. Castle kingside!",
+  "source": "lesson-exercise"
  },
  {
   "key": "f192f577987925a7",
@@ -3530,18 +3415,8 @@
   "source": "celebration"
  },
  {
-  "key": "f2047ef38eb3e11c",
-  "text": "Move Lioness straight across to the star.",
-  "source": "lesson-guided"
- },
- {
   "key": "f25e2a6949f442ed",
   "text": "It's White's turn. Stalemate, not enough material — or not a draw at all?",
-  "source": "lesson-exercise"
- },
- {
-  "key": "f28e2e2fd8a5f0d8",
-  "text": "Checkmate in one! Horse and Caterpillar guard the king's escape.",
   "source": "lesson-exercise"
  },
  {
@@ -3555,6 +3430,11 @@
   "source": "versus-boss"
  },
  {
+  "key": "f322295c32257aed",
+  "text": "Move the pawn to the last row. Push forward, or capture the rook — either way it transforms!",
+  "source": "lesson-variant"
+ },
+ {
   "key": "f35b4e84100a1416",
   "text": "The black king has no moves, and he is not in check. Is he stalemated?",
   "source": "lesson-exercise"
@@ -3565,14 +3445,19 @@
   "source": "badge-earned"
  },
  {
+  "key": "f388da2cb2f411e4",
+  "text": "The queen must capture every pawn before one of them transforms!",
+  "source": "minigame-goal"
+ },
+ {
+  "key": "f3da049f0e27dadf",
+  "text": "Checkmate in one! Your knight guards the squares for your queen.",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "f449af6305006cb0",
   "text": "Basics Graduate",
   "source": "badge-earned"
- },
- {
-  "key": "f48a374eede406ac",
-  "text": "King only steps one square at a time! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
  },
  {
   "key": "f49d54ae03df8767",
@@ -3585,14 +3470,39 @@
   "source": "play"
  },
  {
-  "key": "f50c626b1086d1cf",
-  "text": "The kingside Rhino already moved away from the corner. Can Lion castle kingside right now?",
+  "key": "f4f1ad08533ac5f1",
+  "text": "Checkmate in one! Your rook delivers check along the open file.",
+  "source": "lesson-demo"
+ },
+ {
+  "key": "f507dcb8aea2e971",
+  "text": "The knight (black) is undefended. Capture it with your bishop — a free piece is always a good trade!",
+  "source": "lesson-guided"
+ },
+ {
+  "key": "f5428de634a1f2cd",
+  "text": "Look at the pawn. Is it about to transform into a new piece?",
   "source": "lesson-exercise"
  },
  {
-  "key": "f66c22b63dfbb038",
-  "text": "Move Caterpillar to the last row. Push forward, or capture the rook — either way she transforms!",
-  "source": "lesson-variant"
+  "key": "f573007f46028b19",
+  "text": "Block the check! Move your bishop between your king and the rook.",
+  "source": "minigame-round"
+ },
+ {
+  "key": "f576d146d21aec6e",
+  "text": "Watch the pawn move all the way to the last row. There, it transforms!",
+  "source": "lesson-demo"
+ },
+ {
+  "key": "f581197b2472fe74",
+  "text": "Collect every star. Plan the bishop's diagonal path first!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "f63def49ed125bf3",
+  "text": "The king only steps one square at a time! This one is tricky. Want an easier one?",
+  "source": "exercise-note-easier-offer"
  },
  {
   "key": "f67238655b40eccc",
@@ -3605,8 +3515,8 @@
   "source": "assessment"
  },
  {
-  "key": "f695ccfea6975e94",
-  "text": "Collect every star. Plan Rhino's path first!",
+  "key": "f703dbbccc02eb1b",
+  "text": "The pawn on h1 is guarded by a knight. If your rook captures it, good, equal, or bad trade?",
   "source": "lesson-exercise"
  },
  {
@@ -3615,14 +3525,9 @@
   "source": "assessment"
  },
  {
-  "key": "f7650b0ca8cba211",
-  "text": "Rook only runs in straight lines! This one is tricky. Want an easier one?",
-  "source": "exercise-note-easier-offer"
- },
- {
-  "key": "f79eb78a3fa36769",
-  "text": "When Lion is in check, there are 3 ways out: move him to safety, block the attack, or capture the attacker. Let's practise all three!",
-  "source": "lesson-story"
+  "key": "f773ab68635d273c",
+  "text": "A piece waits on the diagonal. Capture it, then keep going to the star!",
+  "source": "lesson-exercise"
  },
  {
   "key": "f8ae391f6a156498",
@@ -3640,18 +3545,28 @@
   "source": "lesson-exercise"
  },
  {
+  "key": "f918ad28c539fbf2",
+  "text": "Watch the pawn. It attacks both diagonal squares in front of it!",
+  "source": "lesson-demo"
+ },
+ {
+  "key": "f949542761ca45c0",
+  "text": "The knight on c3 is guarded by a pawn. If your knight captures it, good, equal, or bad trade?",
+  "source": "lesson-exercise"
+ },
+ {
   "key": "fa268d624ef74f18",
   "text": "After Full Game vs Rabbit lesson",
   "source": "play"
  },
  {
-  "key": "fa2e3a0e74cddcca",
-  "text": "Rhino captures the queen on h1. Is this trade good, equal, or bad?",
-  "source": "lesson-guided"
+  "key": "fadf634a171e4b4e",
+  "text": "Move your king out of check.",
+  "source": "minigame-round"
  },
  {
-  "key": "faf54bbc0a253689",
-  "text": "Four caterpillars each! Be the first to transform into a queen, or capture every enemy.",
+  "key": "fb1b99bbf372e0ca",
+  "text": "Four pawns each! Be the first to transform into a queen, or capture every enemy.",
   "source": "minigame-goal"
  },
  {
@@ -3660,14 +3575,24 @@
   "source": "lesson-guided"
  },
  {
-  "key": "fb246ad2ec0b7379",
-  "text": "Tap every square Rhino can reach from here.",
-  "source": "lesson-exercise"
- },
- {
   "key": "fb6ea891b06a8e6b",
   "text": "Bear moved a bishop.",
   "source": "versus-boss"
+ },
+ {
+  "key": "fb704562cd8c3ce4",
+  "text": "Collect both stars. Plan the knight's jumps!",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "fba09874a22568d8",
+  "text": "Jump the knight to the star.",
+  "source": "lesson-exercise"
+ },
+ {
+  "key": "fc057da552c199fa",
+  "text": "Your rook captures the queen! You give up a rook (worth 5) to win a queen (worth 9) — a great trade!",
+  "source": "lesson-demo"
  },
  {
   "key": "fc39ec3cc7a06601",
@@ -3685,14 +3610,24 @@
   "source": "journey"
  },
  {
-  "key": "fd991827165bee75",
-  "text": "Is Horse defended by the pawn on c3?",
-  "source": "lesson-guided"
+  "key": "fd78f2bcb79cc4fe",
+  "text": "The pawn on c3 is guarded by another pawn. If your knight captures it, good, equal, or bad trade?",
+  "source": "lesson-exercise"
  },
  {
   "key": "fe0ca95cf6060f0b",
   "text": "Hi! I'm Owl. Today: Watch Out for Stalemate!!",
   "source": "home"
+ },
+ {
+  "key": "fe315ad53b36c322",
+  "text": "You earned the Queen Maker badge!",
+  "source": "celebration"
+ },
+ {
+  "key": "fe48de8395bb293f",
+  "text": "Move your knight so it gives check to the black king.",
+  "source": "lesson-exercise"
  },
  {
   "key": "feeaa9beb983ed8c",
@@ -3718,10 +3653,5 @@
   "key": "ff74ff7fda4af7c9",
   "text": "You already know Escape the Check!!",
   "source": "assessment"
- },
- {
-  "key": "ffdbd2be9b075a06",
-  "text": "Owl only runs in straight lines!",
-  "source": "exercise-note"
  }
 ]

@@ -114,6 +114,7 @@ placement:
   summary-none-body: Every chess champion starts with the first step.
 home:
   play-tile: Play
+  owl-next: 'Today you meet the {{character}}!'
 lesson:
   board-label: Chess board
 exercise:
@@ -124,7 +125,7 @@ exercise:
   moves-of: '{{current}} of {{total}}'
   moves-target_one: 'in {{count}} move'
   moves-target_other: 'in {{count}} moves'
-  tap-piece-first: 'Tap {{name}} first.'
+  tap-piece-first: Tap your piece first.
   select-wrong: Not quite! Tap the orange squares again to take them away.
   select-missing: Almost! Tap the squares with a dashed orange line too.
   select-both: Not quite! Take away the orange squares and tap the dashed ones.
@@ -134,17 +135,17 @@ exercise:
   opponent-color:
     w: White
     b: Black
-  hint-piece: 'Look at {{name}}.'
+  hint-piece: Look at the piece in the orange box.
   hint-target: Try the orange square.
   hint-look: Look closely.
   hint-think-again: Think about it again.
   illegal:
-    r: '{{name}} only runs in straight lines!'
-    b: '{{name}} only walks on diagonal paths!'
-    q: '{{name}} moves straight or diagonal, not like that!'
-    k: '{{name}} only steps one square at a time!'
-    n: '{{name}} only jumps in an L shape!'
-    p: '{{name}} only moves straight ahead (and captures diagonally)!'
+    r: The rook only moves in straight lines!
+    b: The bishop only moves on diagonal paths!
+    q: The queen moves straight or diagonal, not like that!
+    k: The king only steps one square at a time!
+    n: The knight only jumps in an L shape!
+    p: The pawn only moves straight ahead (and captures diagonally)!
   setup:
     wrong: Not quite! Try a different piece or square.
     palette-label: Pieces to place

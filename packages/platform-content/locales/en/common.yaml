@@ -14,7 +14,6 @@ app-error:
   body: Tap "Try again". If this keeps happening, ask a grown-up to send the text below to the app's maker.
   retry: Try again
 home:
-  owl-next: 'Today you meet {{character}}!'
   owl-next-topic: "Hi! I'm Owl. Today: {{topic}}!"
   owl-resume: Let's keep going!
   owl-world-boss: 'World boss time: {{title}}!'

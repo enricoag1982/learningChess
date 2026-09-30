@@ -40,10 +40,10 @@ describe('ReviewExerciseStep', () => {
     expect(narrator.spoken).toEqual(['hint-me']);
 
     fireEvent.click(screen.getByRole('button', { name: /Hint/ }));
-    await screen.findByText('Look at Rook.');
+    await screen.findByText('Look at the piece in the orange box.');
     // Two separate utterances, in order — not one `${instruction} ${note}` string (each is looked
     // up for generated audio on its own, `docs/voice.md`).
-    expect(narrator.spoken.slice(-2)).toEqual(['hint-me', 'Look at Rook.']);
+    expect(narrator.spoken.slice(-2)).toEqual(['hint-me', 'Look at the piece in the orange box.']);
   });
 
   it('F5: a mate-in-2 review task reveals the scripted reply instead of freezing', async () => {

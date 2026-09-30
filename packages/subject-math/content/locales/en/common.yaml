@@ -1,5 +1,7 @@
 app:
   title: Math for Kids
+home:
+  owl-next: 'Today you meet {{character}}!'
 den:
   owl-line: Look at all your friends!
   friends-heading: Your friends

@@ -50,7 +50,7 @@ Tiers: bronze / silver / gold where 3 values are given.
 | Sharp Eyes | 10 correct "Safe or not?" answers in a row |
 | Escape Artist | 10 check escapes without hints |
 | Mate Master | Mates in 1 solved: 10 / 25 / 50 |
-| Butterfly Maker | Promote 10 pawns in games |
+| Queen Maker | Promote 10 pawns in games |
 | Castle Builder | Castle in 5 games |
 | Fork Finder | 10 forks found |
 

@@ -39,7 +39,7 @@ badges:
     condition_one: 'Solve {{count}} mate in 1'
     condition_other: 'Solve {{count}} mates in 1'
   butterfly-maker:
-    name: Butterfly Maker
+    name: Queen Maker
     condition_one: 'Promote {{count}} pawn in games'
     condition_other: 'Promote {{count}} pawns in games'
   castle-builder:

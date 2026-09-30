@@ -300,6 +300,7 @@ export function writeFullContent(): void {
     'locales/en/common.yaml',
     stringify({
       'voice-check': { sentence: 'Say hello' },
+      home: { 'owl-next': 'Today you meet {{character}}!' },
       den: { 'owl-line': 'Look at everything!' },
       'time-limit': { 'early-body': 'Opens at {{time}}' },
       placement: { 'offer-question': 'Want to start?', 'summary-none-body': 'Start here' },

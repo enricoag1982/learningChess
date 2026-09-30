@@ -133,9 +133,10 @@ describe('voice text inventory (real content)', () => {
     expect(notes).toContain('Amazing!'); // exercise.praise-3
     expect(notes).toContain('Here is the answer.'); // exercise.hint-answer, shared across every kind
     expect(notes).toContain('Checkmate! Amazing!'); // checkmate + praise-3 concatenation
-    for (const lesson of content.lessons) {
-      const name = lookupLocale(locales, `characters:${lesson.character}.name`);
-      expect(notes.some((text) => text.includes(name))).toBe(true);
+    expect(notes).toContain('Tap your piece first.'); // exercise.tap-piece-first
+    expect(notes).toContain('Look at the piece in the orange box.'); // exercise.hint-piece
+    for (const piece of ['rook', 'bishop', 'queen', 'king', 'knight', 'pawn']) {
+      expect(notes.some((text) => text.startsWith(`The ${piece} `))).toBe(true); // exercise.illegal.<piece>
     }
 
     const withOffer = textsBySource.get('exercise-note-easier-offer') ?? [];

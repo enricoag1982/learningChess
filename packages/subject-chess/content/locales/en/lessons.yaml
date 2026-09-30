@@ -1,141 +1,141 @@
 rook:
-  title: Meet Rhino the Rook
+  title: Meet the Rook
   story: >-
-    Rhino loves charging straight ahead! He runs up, down, left, or right, as far
-    as he wants. He can never jump over another piece.
-  demo: Watch Rhino run to every green dot. Straight lines, any distance!
-rook-g1: Move Rhino straight up to the star.
-rook-g2: Move Rhino straight across to the star.
-rook-01: Help Rhino grab both stars in the corners.
-rook-02: Collect every star. Plan Rhino's path first!
-rook-03: Tap every square Rhino can reach from here.
+    The rook moves in straight lines: up, down, left, or right, as far as it likes. It can never
+    jump over another piece.
+  demo: Watch the rook go to every green dot. Straight lines, any distance!
+rook-g1: Move the rook straight up to the star.
+rook-g2: Move the rook straight across to the star.
+rook-01: Help the rook grab both stars in the corners.
+rook-02: Collect every star. Plan the rook's path first!
+rook-03: Tap every square the rook can reach from here.
 rook-04: A rock blocks the way! Find another path to the star.
-rook-05: Rhino is hungry. Gobble up the pawn!
-rook-06: A friend blocks one line, a pawn waits on another. Tap every square Rhino can reach.
+rook-05: The rook is hungry. Gobble up the pawn!
+rook-06: A friend blocks one line, a pawn waits on another. Tap every square the rook can reach.
 rook-07: Three pawns, three captures. Get them all!
-rook-08: Rhino's biggest challenge yet. Collect every star around the rock.
+rook-08: The rook's biggest challenge yet. Collect every star around the rock.
 rook-04-easy: A rock blocks the way! Go around it to reach the star.
 rook-08-easy: Collect both stars. The rock is in the way!
 hungry-rook:
   title: Hungry Rook
-  goal: Rhino is starving! Capture every piece before the moves run out.
+  goal: The rook is starving! Capture every piece before the moves run out.
 bishop:
-  title: Meet Elephant the Bishop
+  title: Meet the Bishop
   story: >-
-    Elephant only walks on diagonal paths, but he can go as far as he likes! Long ago people even
-    called this piece "the Elephant." He always stays on squares of one colour.
-  demo: Watch Elephant walk to every green dot. Diagonal paths, any distance!
-bishop-g1: Move Elephant diagonally to the star.
-bishop-g2: Move Elephant the other diagonal way to the star.
-bishop-01: Help Elephant grab both stars, corner to corner.
-bishop-02: Collect every star. Plan Elephant's diagonal path first!
-bishop-03: Elephant only visits squares of one colour. Can Elephant reach the star?
-bishop-04: Tap every square Elephant can reach. Look — they're all the same colour!
+    The bishop only moves on diagonal paths, but it can go as far as it likes! It always stays on
+    squares of one colour.
+  demo: Watch the bishop go to every green dot. Diagonal paths, any distance!
+bishop-g1: Move the bishop diagonally to the star.
+bishop-g2: Move the bishop the other diagonal way to the star.
+bishop-01: Help the bishop grab both stars, corner to corner.
+bishop-02: Collect every star. Plan the bishop's diagonal path first!
+bishop-03: The bishop only visits squares of one colour. Can it reach the star?
+bishop-04: Tap every square the bishop can reach. Look — they're all the same colour!
 bishop-05: A rock blocks the diagonal! Find another way to the star.
-bishop-06: Elephant is hungry. Gobble up the pawn!
-bishop-07: A rock blocks one path, a pawn waits on another. Tap every square Elephant can reach.
-bishop-08: Elephant's biggest challenge yet. Capture all four pawns.
-bishop-08-easy: Capture both pawns on Elephant's diagonals.
+bishop-06: The bishop is hungry. Gobble up the pawn!
+bishop-07: A rock blocks one path, a pawn waits on another. Tap every square the bishop can reach.
+bishop-08: The bishop's biggest challenge yet. Capture all four pawns.
+bishop-08-easy: Capture both pawns on the bishop's diagonals.
 hungry-bishop:
   title: Hungry Bishop
-  goal: Elephant is starving! Capture every piece before the moves run out.
+  goal: The bishop is starving! Capture every piece before the moves run out.
 queen:
-  title: Meet Lioness the Queen
+  title: Meet the Queen
   story: >-
-    Lioness combines Rhino's straight charges and Elephant's diagonal paths. She is the strongest
-    hunter on the board!
-  demo: Watch Lioness run to every green dot. Straight lines and diagonals, any distance!
-queen-g1: Move Lioness straight up to the star.
-queen-g2: Move Lioness straight across to the star.
-queen-01: Help Lioness grab both stars in the corners.
+    The queen combines the rook's straight lines and the bishop's diagonal paths. It is the
+    strongest piece on the board!
+  demo: Watch the queen go to every green dot. Straight lines and diagonals, any distance!
+queen-g1: Move the queen straight up to the star.
+queen-g2: Move the queen straight across to the star.
+queen-01: Help the queen grab both stars in the corners.
 queen-02: One swift diagonal move reaches the far star!
-queen-03: Tap every square Lioness can reach from here.
+queen-03: Tap every square the queen can reach from here.
 queen-04: A rock blocks the way! Find another path to the star.
-queen-05: Lioness is hungry. Gobble up the pawn!
-queen-06: A friend blocks one line, a pawn waits on another. Tap every square Lioness can reach.
+queen-05: The queen is hungry. Gobble up the pawn!
+queen-06: A friend blocks one line, a pawn waits on another. Tap every square the queen can reach.
 queen-07: Three pawns, three captures. Get them all!
-queen-08: Lioness's biggest challenge yet. Collect every star around the rock.
+queen-08: The queen's biggest challenge yet. Collect every star around the rock.
 queen-08-easy: Collect both stars in the corners below.
 hungry-queen:
   title: Hungry Queen
-  goal: Lioness is starving! Capture every piece before the moves run out.
+  goal: The queen is starving! Capture every piece before the moves run out.
 king:
-  title: Meet Lion the King
+  title: Meet the King
   story: >-
-    Lion is the most important piece of all! He only steps one square at a time, in any direction,
-    and he must always stay safe.
-  demo: Watch Lion take one careful step in every direction.
-king-g1: Move Lion one step up to the star.
-king-g2: Move Lion one step to the star.
-king-01: Walk Lion to the star, one step at a time.
-king-02: Tap every square Lion can step to.
+    The king is the most important piece of all! It only steps one square at a time, in any
+    direction, and it must always stay safe.
+  demo: Watch the king take one careful step in every direction.
+king-g1: Move the king one step up to the star.
+king-g2: Move the king one step to the star.
+king-01: Walk the king to the star, one step at a time.
+king-02: Tap every square the king can step to.
 king-03: A pawn is watching a square! Find a safe path to the star.
-king-04: Tap only the squares where Lion is safe.
+king-04: Tap only the squares where the king is safe.
 king-05: A pawn blocks the direct path. Find the safe way to the star.
-king-06: Lion's longest walk yet. Stay safe all the way to the star.
+king-06: The king's longest walk yet. Stay safe all the way to the star.
 king-06-easy: A short walk this time. Stay safe on the way to the star.
 king-walk:
   title: King Walk
-  goal: Lion must reach both stars, one careful step at a time, always staying safe.
+  goal: The king must reach both stars, one careful step at a time, always staying safe.
 knight:
-  title: Meet Horse the Knight
+  title: Meet the Knight
   story: >-
-    Horse jumps in an L shape: two squares one way, then one more to the side. He can jump right
-    over anyone standing in between!
-  demo: Watch Horse jump to every green dot. Always an L shape!
-knight-g1: Jump Horse to the star.
-knight-g2: Jump Horse to the star.
-knight-01: Jump Horse to the star.
-knight-02: Rocks are in the way, but Horse jumps right over them!
-knight-03: Tap every square Horse can jump to.
-knight-04: Horse is hungry. Gobble up the pawn!
-knight-05: A rock blocks one landing spot. Tap every square Horse can jump to.
-knight-06: Horse is boxed in by rocks, but a knight jumps right over them!
+    The knight jumps in an L shape: two squares one way, then one more to the side. It can jump
+    right over anyone standing in between!
+  demo: Watch the knight jump to every green dot. Always an L shape!
+knight-g1: Jump the knight to the star.
+knight-g2: Jump the knight to the star.
+knight-01: Jump the knight to the star.
+knight-02: Rocks are in the way, but the knight jumps right over them!
+knight-03: Tap every square the knight can jump to.
+knight-04: The knight is hungry. Gobble up the pawn!
+knight-05: A rock blocks one landing spot. Tap every square the knight can jump to.
+knight-06: The knight is boxed in by rocks, but knights jump right over them!
 knight-07: Two jumps, two captures. Get them both!
-knight-08: Collect both stars. Plan Horse's jumps!
+knight-08: Collect both stars. Plan the knight's jumps!
 knight-08-easy: Collect both stars. Just two quick jumps!
 knight-maze:
   title: Knight Maze
-  goal: Horse must collect every star by jumping over the rocks!
+  goal: The knight must collect every star by jumping over the rocks!
 pawn:
-  title: Meet Caterpillar the Pawn
+  title: Meet the Pawn
   story: >-
-    Caterpillar only creeps straight ahead, never sideways or back. On her very first move she can
-    creep one square or two — after that, always just one. To capture, she steps diagonally
-    forward instead, never straight ahead.
-  demo: Watch Caterpillar creep forward. On her very first step she can go one square or two!
-pawn-g1: Creep Caterpillar forward, one square, to the star.
-pawn-g2: On her very first move, Caterpillar can creep two squares. Reach the star!
-pawn-01: Creep Caterpillar to the star. Her first move can go one square or two!
-pawn-02: Caterpillar already made her first move. Now she creeps one square at a time. Reach the star.
-pawn-03: Something blocks Caterpillar's path straight ahead. Tap every square she can still reach.
-pawn-04: Caterpillar can only capture on a diagonal, never straight ahead. Find the piece she can capture.
-pawn-05: Caterpillar is blocked straight ahead, but she can still capture on either diagonal. Tap every square she can reach.
-pawn-06: A piece waits on the diagonal. Capture it, then keep creeping to the star!
-pawn-07: Two pieces stand in Caterpillar's way. Creep closer, then capture them both!
+    The pawn only moves straight ahead, never sideways or back. On its very first move it can go
+    one square or two — after that, always just one. To capture, it steps diagonally forward
+    instead, never straight ahead.
+  demo: Watch the pawn move forward. On its very first step it can go one square or two!
+pawn-g1: Move the pawn forward, one square, to the star.
+pawn-g2: On its very first move, the pawn can go two squares. Reach the star!
+pawn-01: Move the pawn to the star. Its first move can go one square or two!
+pawn-02: The pawn already made its first move. Now it moves one square at a time. Reach the star.
+pawn-03: Something blocks your pawn's path straight ahead. Tap every square it can still reach.
+pawn-04: Your pawn can only capture on a diagonal, never straight ahead. Find the piece it can capture.
+pawn-05: Your pawn is blocked straight ahead, but it can still capture on either diagonal. Tap every square it can reach.
+pawn-06: A piece waits on the diagonal. Capture it, then keep going to the star!
+pawn-07: Two pieces stand in your pawn's way. Move closer, then capture them both!
 pawn-08: Collect the first star, then find a way around the blocker to reach the second!
 pawn-08-easy: Capture the pawn, then reach the star!
 pawn-wars-4:
   title: Pawn Wars Jr.
-  goal: Four caterpillars each! Be the first to transform into a queen, or capture every enemy.
+  goal: Four pawns each! Be the first to transform into a queen, or capture every enemy.
 promotion:
-  title: Caterpillar Transforms!
+  title: The Pawn Transforms!
   story: >-
-    At the very last row, something amazing happens: Caterpillar transforms into a brand-new
-    piece! She can become a queen, a rook, a bishop, or a knight — the powerful queen is almost
-    always the best choice.
-  demo: Watch Caterpillar creep all the way to the last row. There, she transforms!
-promotion-g1: One more step and Caterpillar transforms! Move her to the last row.
-promotion-g2: Caterpillar is about to transform! Which piece should she become?
-promotion-01: One more step and Caterpillar transforms! Move her to the last row.
-promotion-02: Caterpillar is about to transform! Which piece should she become?
-promotion-03: A knight blocks the square ahead, but Caterpillar can capture her way to the last row. Find the winning move!
-promotion-04: Tap every square where Caterpillar could transform this move.
-promotion-05: Look at Caterpillar. Is she about to transform into a new piece?
-promotion-03-easy: Move Caterpillar to the last row. Push forward, or capture the rook — either way she transforms!
+    When a pawn reaches the very last row, something amazing happens: it transforms into a
+    brand-new piece! It can become a queen, a rook, a bishop, or a knight — the powerful queen is
+    almost always the best choice.
+  demo: Watch the pawn move all the way to the last row. There, it transforms!
+promotion-g1: One more step and the pawn transforms! Move it to the last row.
+promotion-g2: The pawn is about to transform! Which piece should it become?
+promotion-01: One more step and the pawn transforms! Move it to the last row.
+promotion-02: The pawn is about to transform! Which piece should it become?
+promotion-03: A knight blocks the square ahead, but the pawn can capture its way to the last row. Find the winning move!
+promotion-04: Tap every square where the pawn could transform this move.
+promotion-05: Look at the pawn. Is it about to transform into a new piece?
+promotion-03-easy: Move the pawn to the last row. Push forward, or capture the rook — either way it transforms!
 pawn-wars:
   title: Pawn Wars
-  goal: Eight caterpillars each! Race to transform first, or capture every piece.
+  goal: Eight pawns each! Race to transform first, or capture every piece.
 squares:
   title: Meet the Squares
   story: >-
@@ -201,57 +201,57 @@ attack:
   story: >-
     A piece "attacks" every square it could capture on right now, even the empty ones! Before you
     move, Owl wants you to spot every attack on the board.
-  demo: Watch Caterpillar the Pawn. She attacks both diagonal squares in front of her!
-attack-g1: Tap every square Caterpillar the Pawn attacks.
-attack-g2: 'Horse wants to attack the bishop on d4. Which move lets him attack it?'
-attack-01: Tap every square Caterpillar the Pawn attacks — the knight and the bishop are both there.
-attack-02: 'Horse jumps in an L. Tap every square he attacks from d4 — some are empty, some have pieces!'
-attack-03: Rhino attacks in straight lines. Tap every square he attacks from d1.
-attack-04: Move Horse so he attacks the bishop on c4.
-attack-05: Move Rhino so he attacks the knight on d4.
-attack-06: Move Elephant so he attacks the knight on a5.
-attack-07: 'Horse has more than one jump. Which move attacks the rook on b5?'
-attack-08: Lioness is very powerful. Find a move that attacks the knight on f6.
+  demo: Watch the pawn. It attacks both diagonal squares in front of it!
+attack-g1: Tap every square the pawn attacks.
+attack-g2: Your knight wants to attack the bishop on d4. Which move lets it do that?
+attack-01: Tap every square the pawn attacks — the knight and the bishop are both there.
+attack-02: Your knight jumps in an L. Tap every square it attacks from d4 — some are empty, some have pieces!
+attack-03: The rook attacks in straight lines. Tap every square it attacks from d1.
+attack-04: Move your knight so it attacks the bishop on c4.
+attack-05: Move your rook so it attacks the knight on d4.
+attack-06: Move your bishop so it attacks the knight on a5.
+attack-07: Your knight has more than one jump. Which move attacks the rook on b5?
+attack-08: Your queen is very powerful. Find a move that attacks the knight on f6.
 defend:
   title: Defend Your Pieces
   story: >-
     When an enemy attacks your piece, you can move it away, bring a friend to guard it, block the
     attack, or capture the attacker. Owl calls all of these "defending"!
-  demo: Rhino is coming for Horse! Horse can hop away to safety, or a friend could guard him.
-defend-g1: 'Is Horse defended by the pawn on c3?'
-defend-g2: Rhino is coming for Horse! Move Horse to safety.
+  demo: The black rook is coming for your knight! The knight can hop away to safety, or a friend could guard it.
+defend-g1: Is your knight defended by the pawn on c3?
+defend-g2: The black rook is coming for your knight! Move the knight to safety.
 defend-01: 'Is the knight on d5 defended?'
 defend-02: 'A pawn now guards d5. Is the knight defended?'
-defend-03: 'Rhino (black) is attacking Horse. Is Horse defended by the white rook on d2?'
-defend-04: Rhino (black) is coming for Horse on b5! Move Horse to safety.
-defend-05: Horse (a1) is trapped and Rhino is attacking him! Move Elephant so he guards Horse.
-defend-06: Horse (a1) still can't move. Save him — block the attack, or capture the attacking rook!
-defend-07: Rhino (black) is attacking Elephant. Move Elephant to safety.
-defend-08: The bishop on c3 is attacking Rhino! Move Horse to capture it.
+defend-03: The black rook is attacking your knight. Is your knight defended by the white rook on d2?
+defend-04: The black rook is coming for your knight on b5! Move the knight to safety.
+defend-05: Your knight (a1) is trapped and the black rook is attacking it! Move your bishop so it guards the knight.
+defend-06: Your knight (a1) still can't move. Save it — block the attack, or capture the attacking rook!
+defend-07: The black rook is attacking your bishop. Move the bishop to safety.
+defend-08: The bishop on c3 is attacking your rook! Move your knight to capture it.
 safe-pieces:
   title: Safe or Not?
   story: >-
     A piece is "hanging" when it is attacked and nothing protects it — the enemy could take it for
     free! Owl's #1 safety habit is always asking, "Is my piece safe?"
-  demo: Look at Horse. Rhino attacks him and nothing guards him — Horse is hanging!
-safe-pieces-g1: 'Is Horse hanging?'
-safe-pieces-g2: Caterpillar (black) is undefended. Capture her for free!
-safe-pieces-01: 'The bishop (black) attacks Horse and nothing guards him. Is Horse hanging?'
-safe-pieces-02: 'A pawn now guards Horse. Is he still hanging?'
-safe-pieces-03: 'Nothing attacks Elephant. Is he hanging?'
-safe-pieces-04: 'The knight (black) attacks Caterpillar and nothing guards her. Is she hanging?'
-safe-pieces-05: 'The rook (black) attacks Rhino on a4, but your other rook guards him. Is he hanging?'
-safe-pieces-06: 'The knight (black) attacks Lioness and nothing guards her. Is she hanging?'
-safe-pieces-07: The bishop (black) is undefended. Capture it for free with Lioness!
+  demo: Look at your knight. The black rook attacks it and nothing guards it — the knight is hanging!
+safe-pieces-g1: Is your knight hanging?
+safe-pieces-g2: The black pawn is undefended. Capture it for free!
+safe-pieces-01: The bishop (black) attacks your knight and nothing guards it. Is your knight hanging?
+safe-pieces-02: A pawn now guards your knight. Is it still hanging?
+safe-pieces-03: Nothing attacks your bishop. Is it hanging?
+safe-pieces-04: The knight (black) attacks your pawn and nothing guards it. Is your pawn hanging?
+safe-pieces-05: The rook (black) attacks your rook on a4, but your other rook guards it. Is it hanging?
+safe-pieces-06: The knight (black) attacks your queen and nothing guards it. Is your queen hanging?
+safe-pieces-07: The bishop (black) is undefended. Capture it for free with your queen!
 safe-pieces-08: Two pawns (black) are waiting. Only one is undefended — capture that one for free!
 safe-pieces-09: Two pieces (black) are undefended. Find a move that captures one for free.
 safe-pieces-10: One rook (black) is undefended, the other is guarded. Capture the free one!
 piece-values:
   title: How Much Is Each Piece Worth?
   story: >-
-    Every piece has a value: Caterpillar is worth 1, Horse and Elephant are worth 3, Rhino is worth
-    5, and Lioness is worth a mighty 9! Knowing this helps you decide if a trade is worth it.
-  demo: 'Here they are in order: Caterpillar 1, Horse or Elephant 3, Rhino 5, Lioness 9.'
+    Every piece has a value: a pawn is worth 1, a knight and a bishop are worth 3, a rook is worth
+    5, and the queen is worth a mighty 9! Knowing this helps you decide if a trade is worth it.
+  demo: 'Here they are in order: pawn 1, knight or bishop 3, rook 5, queen 9.'
 piece-values-g1: 'Which is worth more: the pawn or the rook?'
 piece-values-g2: 'Which is worth more: the knight or the queen?'
 piece-values-01: 'Which is worth more: the pawn or the knight?'
@@ -265,23 +265,23 @@ trades:
   story: >-
     Before you capture, ask what you give up and what you get. Taking a bigger piece, or an
     undefended one, is good — losing more than you gain is bad!
-  demo: Rhino captures the queen! He gives up a rook (worth 5) to win a queen (worth 9) — a great trade!
+  demo: Your rook captures the queen! You give up a rook (worth 5) to win a queen (worth 9) — a great trade!
 trade-good: Good trade
 trade-equal: Equal trade
 trade-bad: Bad trade
-trades-g1: 'Rhino captures the queen on h1. Is this trade good, equal, or bad?'
-trades-g2: The knight (black) is undefended. Capture it with Elephant — a free piece is always a good trade!
-trades-01: 'Horse captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?'
-trades-02: 'The pawn on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?'
-trades-03: 'The rook on h1 is guarded by a knight. If Rhino captures it, good, equal, or bad trade?'
-trades-04: 'The pawn on f4 is undefended. If Elephant captures it, good, equal, or bad trade?'
-trades-05: 'The pawn on c3 is guarded by another pawn. If Horse captures it, good, equal, or bad trade?'
-trades-06: 'The knight on c3 is guarded by a pawn. If Horse captures it, good, equal, or bad trade?'
-trades-07: 'Find the good trade: capture a piece worth more than Rhino.'
-trades-08: Elephant can capture two different pieces. Find a good trade.
+trades-g1: Your rook captures the queen on h1. Is this trade good, equal, or bad?
+trades-g2: The knight (black) is undefended. Capture it with your bishop — a free piece is always a good trade!
+trades-01: Your knight captures the rook on d5, even though a pawn guards it. Good, equal, or bad trade?
+trades-02: The pawn on h1 is guarded by a knight. If your rook captures it, good, equal, or bad trade?
+trades-03: The rook on h1 is guarded by a knight. If your rook captures it, good, equal, or bad trade?
+trades-04: The pawn on f4 is undefended. If your bishop captures it, good, equal, or bad trade?
+trades-05: The pawn on c3 is guarded by another pawn. If your knight captures it, good, equal, or bad trade?
+trades-06: The knight on c3 is guarded by a pawn. If your knight captures it, good, equal, or bad trade?
+trades-07: 'Find the good trade: capture a piece worth more than your rook.'
+trades-08: Your bishop can capture two different pieces. Find a good trade.
 queen-vs-pawns:
   title: Queen vs Pawns
-  goal: Lioness must capture every caterpillar before one of them transforms!
+  goal: The queen must capture every pawn before one of them transforms!
 army-battle:
   title: Army Battle
   goal: Pawns and knights on both sides! Capture every enemy piece, or be first to transform.
@@ -304,43 +304,43 @@ safe-or-not-r10: 'Is the queen on f4 in danger?'
 check:
   title: What Is Check?
   story: >-
-    When a king is attacked, that's CHECK — danger! Lion must get to safety right away.
-    Owl will teach you to spot it, and how to give check yourself.
-  demo: A check! The black rook attacks Lion along the open file.
-check-g1: 'Is Lion in check from the black rook?'
-check-g2: 'Rhino can give check! Find the move that attacks the black king.'
-check-01: 'A black bishop attacks Lion along the diagonal. Is Lion in check?'
-check-02: 'Caterpillar now blocks the diagonal. Is Lion in check?'
-check-03: A black knight jumps into position to attack Lion. Is Lion in check?
-check-04: 'A black rook sits on a different line, far from Lion. Is Lion in check?'
-check-05: Move Rhino so he gives check to the black king.
-check-06: Move Elephant so he gives check to the black king.
-check-07: Lioness can check the black king in several ways. Find one!
-check-08: Move Horse so he gives check to the black king.
+    When a king is attacked, that's CHECK — danger! Your king must get to safety right away. Owl
+    will teach you to spot it, and how to give check yourself.
+  demo: A check! The black rook attacks your king along the open file.
+check-g1: Is your king in check from the black rook?
+check-g2: Your rook can give check! Find the move that attacks the black king.
+check-01: A black bishop attacks your king along the diagonal. Is your king in check?
+check-02: A pawn now blocks the diagonal. Is your king in check?
+check-03: A black knight jumps into position to attack your king. Is your king in check?
+check-04: A black rook sits on a different line, far from your king. Is your king in check?
+check-05: Move your rook so it gives check to the black king.
+check-06: Move your bishop so it gives check to the black king.
+check-07: Your queen can check the black king in several ways. Find one!
+check-08: Move your knight so it gives check to the black king.
 escape-check:
   title: Escape the Check!
   story: >-
-    When Lion is in check, there are 3 ways out: move him to safety, block the attack, or
+    When your king is in check, there are 3 ways out: move it to safety, block the attack, or
     capture the attacker. Let's practise all three!
-  demo: Lion is in check. Every green dot is a square where he'd be safe.
-escape-check-g1: 'Lion is in check! Tap every square where he can escape.'
-escape-check-g2: The only way out is to move Lion — find a safe square.
-escape-check-01: 'Lion is in check from the rook. Tap every square where he is safe.'
-escape-check-02: 'Lion is in check from the bishop. Tap every square where he is safe.'
-escape-check-03: 'Lion is in check from the rook. Tap every safe square for him.'
-escape-check-04: 'Lion is in check from a bishop far away. Tap every safe square for him.'
-escape-check-05: A knight's check can never be blocked! Move Lion to safety.
-escape-check-06: Move Lion out of check — nothing can block or capture this rook here.
-escape-check-07: Block the check! Move Elephant between Lion and the rook.
-escape-check-08: Block the check! Move Rhino between Lion and the bishop.
+  demo: Your king is in check. Every green dot is a square where it would be safe.
+escape-check-g1: Your king is in check! Tap every square where it can escape.
+escape-check-g2: The only way out is to move your king — find a safe square.
+escape-check-01: Your king is in check from the rook. Tap every square where it is safe.
+escape-check-02: Your king is in check from the bishop. Tap every square where it is safe.
+escape-check-03: Your king is in check from the rook. Tap every safe square for it.
+escape-check-04: Your king is in check from a bishop far away. Tap every safe square for it.
+escape-check-05: A knight's check can never be blocked! Move your king to safety.
+escape-check-06: Move your king out of check — nothing can block or capture this rook here.
+escape-check-07: Block the check! Move your bishop between your king and the rook.
+escape-check-08: Block the check! Move your rook between your king and the bishop.
 escape-check-09: Capture the checking knight!
-escape-check-10: The bishop giving check isn't guarded. Capture it with Lion!
+escape-check-10: The bishop giving check isn't guarded. Capture it with your king!
 checkmate:
   title: Check or Checkmate?
   story: >-
     Checkmate means the king is in check AND has no way out at all — no move, no block, no
     capture. The game is won!
-  demo: Checkmate! Lioness checks the king, and every square around him is covered.
+  demo: Checkmate! The queen checks the king, and every square around him is covered.
 checkmate-g1: 'Is the black king checkmated?'
 checkmate-g2: 'Is the black king checkmated? Look for an escape.'
 checkmate-01: 'The white rook checks along the back row. Is the black king checkmated?'
@@ -356,21 +356,21 @@ mate-in-1:
   story: >-
     Owl challenges you to deliver CHECKMATE in just one move! Look for a move that traps
     the king completely.
-  demo: Checkmate in one! Rhino delivers check along the open file.
-mate-in-1-g1: Find the checkmate in one move — check Rhino's path to the back row.
-mate-in-1-g2: Find the checkmate in one move — Lioness and Lion work together.
+  demo: Checkmate in one! Your rook delivers check along the open file.
+mate-in-1-g1: Find the checkmate in one move — look at your rook's path to the back row.
+mate-in-1-g2: Find the checkmate in one move — your queen and king work together.
 mate-in-1-01: Checkmate in one! The black king is trapped by his own pawns.
 mate-in-1-02: Checkmate in one! Find the move along the open file.
-mate-in-1-03: Checkmate in one! Lioness can reach the back row.
-mate-in-1-04: Checkmate in one! Lioness and Lion team up.
-mate-in-1-05: Checkmate in one! Move Lioness right next to the black king.
-mate-in-1-06: Checkmate in one! Lion guards Lioness's checking square.
+mate-in-1-03: Checkmate in one! Your queen can reach the back row.
+mate-in-1-04: Checkmate in one! Your queen and king team up.
+mate-in-1-05: Checkmate in one! Move your queen right next to the black king.
+mate-in-1-06: Checkmate in one! Your king guards your queen's checking square.
 mate-in-1-07: Checkmate in one! Two rooks trap the black king together.
 mate-in-1-08: Checkmate in one! One rook cuts off the escape, the other delivers check.
-mate-in-1-09: Checkmate in one! Lion guards the squares Rhino can't reach.
-mate-in-1-10: Checkmate in one! Lion and Rhino trap the black king in the corner.
-mate-in-1-11: Checkmate in one! Horse guards the squares for Lioness.
-mate-in-1-12: Checkmate in one! Horse and Caterpillar guard the king's escape.
+mate-in-1-09: Checkmate in one! Your king guards the squares your rook can't reach.
+mate-in-1-10: Checkmate in one! Your king and rook trap the black king in the corner.
+mate-in-1-11: Checkmate in one! Your knight guards the squares for your queen.
+mate-in-1-12: Checkmate in one! Your knight and pawn guard the black king's escape.
 stalemate:
   title: Watch Out for Stalemate!
   story: >-
@@ -387,65 +387,65 @@ stalemate-05: Checkmate in one — but careful, some moves would stalemate inste
 stalemate-06: Checkmate in one — but careful, some moves would stalemate instead!
 escape-the-check:
   title: Escape the Check
-  goal: Help Lion escape check 10 times — by moving, blocking, or capturing!
-escape-the-check-r1: 'Lion is in check from the rook. Tap every square where he is safe.'
-escape-the-check-r2: 'Lion is in check from the bishop. Tap every square where he is safe.'
-escape-the-check-r3: 'Lion is in check from the rook. Tap every safe square for him.'
-escape-the-check-r4: 'Lion is in check from a bishop far away. Tap every safe square for him.'
-escape-the-check-r5: A knight's check can never be blocked! Move Lion to safety.
-escape-the-check-r6: Move Lion out of check.
-escape-the-check-r7: Block the check! Move Elephant between Lion and the rook.
-escape-the-check-r8: Block the check! Move Rhino between Lion and the bishop.
-escape-the-check-r9: Capture the checking knight with Caterpillar!
-escape-the-check-r10: The rook giving check isn't guarded. Capture it with Lion!
+  goal: Help your king escape check 10 times — by moving, blocking, or capturing!
+escape-the-check-r1: Your king is in check from the rook. Tap every square where it is safe.
+escape-the-check-r2: Your king is in check from the bishop. Tap every square where it is safe.
+escape-the-check-r3: Your king is in check from the rook. Tap every safe square for it.
+escape-the-check-r4: Your king is in check from a bishop far away. Tap every safe square for it.
+escape-the-check-r5: A knight's check can never be blocked! Move your king to safety.
+escape-the-check-r6: Move your king out of check.
+escape-the-check-r7: Block the check! Move your bishop between your king and the rook.
+escape-the-check-r8: Block the check! Move your rook between your king and the bishop.
+escape-the-check-r9: Capture the checking knight with your pawn!
+escape-the-check-r10: The rook giving check isn't guarded. Capture it with your king!
 mate-hunt:
   title: Mate in 1
   goal: Find checkmate in one move, ten times in a row!
 mate-hunt-r1: Checkmate in one! The black king is trapped by his own pawns.
 mate-hunt-r2: Checkmate in one! Find the move along the open file.
-mate-hunt-r3: Checkmate in one! Lion guards the checking square.
-mate-hunt-r4: Checkmate in one! Lion guards the checking square.
+mate-hunt-r3: Checkmate in one! Your king guards the checking square.
+mate-hunt-r4: Checkmate in one! Your king guards the checking square.
 mate-hunt-r5: Checkmate in one! Two rooks work together.
 mate-hunt-r6: Checkmate in one! One rook cuts off the rank.
-mate-hunt-r7: Checkmate in one! Lion guards the flight squares.
+mate-hunt-r7: Checkmate in one! Your king guards the flight squares.
 mate-hunt-r8: Checkmate in one! The black king is trapped by his own pawns.
-mate-hunt-r9: Checkmate in one! Lion guards Lioness's checking square.
-mate-hunt-r10: Checkmate in one! Lion guards the checking square.
+mate-hunt-r9: Checkmate in one! Your king guards your queen's checking square.
+mate-hunt-r10: Checkmate in one! Your king guards the checking square.
 first-game:
   title: Your First Full Game!
   goal: Play a whole game against Mouse. Checkmate him to win — good luck!
 castling:
   title: 'Castling: King and Rook Swap'
   story: >-
-    Castling is a special move! Lion and a Rhino move together: Lion jumps two squares
-    toward a Rhino that hasn't moved yet, and that Rhino hops right over to stand beside
-    him. It's the only time two pieces move in one turn!
-  demo: Try it! Move Lion two squares toward a Rhino to castle.
-castling-g1: "Lion and the kingside Rhino haven't moved, and nothing stands between them. Can Lion castle kingside right now?"
-castling-g2: Castle kingside! Move Lion two squares to swap places with Rhino.
-castling-01: 'Lion and the queenside Rhino are both still home, with a clear path between them. Can Lion castle queenside right now?'
-castling-02: 'The kingside Rhino already moved away from the corner. Can Lion castle kingside right now?'
-castling-03: A black rook is giving Lion check! Can Lion castle kingside right now?
-castling-04: Horse stands between Lion and the kingside Rhino. Can Lion castle kingside right now?
-castling-05: A black bishop watches the square right next to Lion. Can Lion castle queenside right now?
-castling-06: Only the queenside Rhino is still home. Castle queenside!
-castling-07: Only the kingside Rhino is still home. Castle kingside!
-castling-08: Both Rhinos are still home! Castle with either one.
+    Castling is a special move! The king and a rook move together: the king jumps two squares
+    toward a rook that hasn't moved yet, and that rook hops right over to stand beside him. It's
+    the only time two pieces move in one turn!
+  demo: Try it! Move your king two squares toward a rook to castle.
+castling-g1: Your king and the kingside rook haven't moved, and nothing stands between them. Can your king castle kingside right now?
+castling-g2: Castle kingside! Move your king two squares to swap places with the rook.
+castling-01: Your king and the queenside rook are both still home, with a clear path between them. Can your king castle queenside right now?
+castling-02: The kingside rook already moved away from the corner. Can your king castle kingside right now?
+castling-03: A black rook is giving your king check! Can your king castle kingside right now?
+castling-04: A knight stands between your king and the kingside rook. Can your king castle kingside right now?
+castling-05: A black bishop watches the square right next to your king. Can your king castle queenside right now?
+castling-06: Only the queenside rook is still home. Castle queenside!
+castling-07: Only the kingside rook is still home. Castle kingside!
+castling-08: Both rooks are still home! Castle with either one.
 en-passant:
   title: 'En Passant: Catch It "In Passing"'
   story: >-
-    Sometimes a Caterpillar rushes two squares on its very first move, right past an enemy
-    Caterpillar standing beside it. That's not quite fair — so, just this once, the enemy
-    Caterpillar may capture it anyway, as if it had only moved one square. This is called
-    "en passant" (French for "in passing"), and it only works right away, the very next move.
+    Sometimes a pawn rushes two squares on its very first move, right past an enemy pawn standing
+    beside it. That's not quite fair — so, just this once, the enemy pawn may capture it anyway,
+    as if it had only moved one square. This is called "en passant" (French for "in passing"), and
+    it only works right away, the very next move.
   demo: Black's pawn just rushed two squares past yours. Capture it en passant, right now!
 en-passant-g1: Black's pawn just rushed two squares and landed beside yours. Capture it en passant!
-en-passant-g2: "Black's pawn just rushed two squares past your Caterpillar on c5. Can you capture it en passant right now?"
+en-passant-g2: Black's pawn just rushed two squares past your pawn on c5. Can you capture it en passant right now?
 en-passant-01: Black's pawn just rushed two squares past yours. Capture it en passant!
 en-passant-02: Black's pawn just rushed two squares past yours. Capture it en passant!
-en-passant-03: Two of your Caterpillars could catch this one — either capture works!
-en-passant-04: "Black's pawn just rushed two squares past your Caterpillar on h5. Can you capture it en passant right now?"
-en-passant-05: "Black's last move was the king, not the pawn. Can your Caterpillar on d5 capture the e5 pawn en passant right now?"
+en-passant-03: Two of your pawns could catch this one — either capture works!
+en-passant-04: Black's pawn just rushed two squares past your pawn on h5. Can you capture it en passant right now?
+en-passant-05: Black's last move was the king, not the pawn. Can your pawn on d5 capture the e5 pawn en passant right now?
 draws:
   title: 'Draws: Nobody Wins'
   story: >-
