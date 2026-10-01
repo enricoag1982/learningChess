@@ -73,6 +73,33 @@ describe('determinism', () => {
   });
 });
 
+describe('search report (calibrate telemetry)', () => {
+  const state = startGame(
+    STANDARD,
+    parseFen('r1bqk2r/ppp2ppp/2n2n2/2bpp3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 4 6'),
+  );
+
+  it('reports the completed depth of a searched move, within the level depth', () => {
+    const reports: { depth: number; targetDepth: number; cutByTime: boolean }[] = [];
+    const bear = levelNamed('bear');
+    chooseMove(state, bear, rules, seededRandom(7), undefined, (report) => reports.push(report));
+    expect(reports).toHaveLength(1);
+    const [report] = reports;
+    expect(report?.targetDepth).toBe(bear.depth);
+    expect(report?.depth).toBeGreaterThanOrEqual(1);
+    expect(report?.depth).toBeLessThanOrEqual(bear.depth);
+    expect(report?.cutByTime).toBe((report?.depth ?? 0) < bear.depth);
+  });
+
+  it('reports nothing when the move is not chosen by search (Mouse never searches)', () => {
+    const reports: unknown[] = [];
+    chooseMove(state, levelNamed('mouse'), rules, seededRandom(7), undefined, (report) =>
+      reports.push(report),
+    );
+    expect(reports).toEqual([]);
+  });
+});
+
 describe('tactics', () => {
   // Back-rank mate: 1.Ra8#.
   const BACK_RANK_MATE = parseFen('6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1');
