@@ -125,7 +125,7 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-shard-${{ matrix.shard }}
           path: apps/chess-kids/playwright-report
@@ -133,7 +133,7 @@ jobs:
 
       - name: Upload math Playwright report
         if: failure() && matrix.shard == 3
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-math
           path: apps/math-demo/playwright-report
