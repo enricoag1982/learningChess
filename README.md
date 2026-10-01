@@ -46,7 +46,7 @@ After the Basics, three paths continue: **Openings**, **Tactics**, and **Checkma
 
 | A lesson | Parent area |
 |---|---|
-| ![Lesson story step](docs/images/lesson.png) | ![Parent area](docs/images/parent-area.png) |
+| ![Lesson try step](docs/images/lesson.png) | ![Parent area](docs/images/parent-area.png) |
 
 ## Run it yourself
 
