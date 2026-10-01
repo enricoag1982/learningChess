@@ -64,8 +64,9 @@ sequence (or an explicit cancel) stops whatever is currently playing before its 
 
 ## 6. Missed-text report and Test voice
 
-`localStorage['chess-kids:voice-report'] = '1'` makes the narrator record every text that fell back
-for a content reason (manifest miss / decode failure) into `window.__chessKidsVoiceMisses` — off by
+`localStorage['<storagePrefix>voice-report'] = '1'` (chess: `chess-kids:voice-report`) makes the narrator
+record every text that fell back for a content reason (manifest miss / decode failure) into
+`window.__learnVoiceMisses` — off by
 default, no cost otherwise. The e2e a11y curriculum walk sets it, asserts the list is empty
 (chromium project only). Parent area → child Settings → Voice → "Test voice" speaks one fixed
 sentence, showing "Recorded voice ✓" or the fallback reason (`ChildSettings.tsx`/`Services.testVoice`).

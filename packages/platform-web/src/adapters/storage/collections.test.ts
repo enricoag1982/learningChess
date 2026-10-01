@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { cappedList, keyedCollection, singleton } from './collections.ts';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 
 interface Row {
   readonly id: string;
@@ -23,7 +24,7 @@ beforeEach(() => {
 
 describe('keyedCollection', () => {
   it('gets, lists (with and without a filter), puts and removes, keyed by keyOf', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = keyedCollection(store, 'rows', (r: Row) => r.id, isRow);
 
     await rows.put(row('a', 'x'));
@@ -45,7 +46,7 @@ describe('keyedCollection', () => {
   });
 
   it('removeWhere deletes every matching record, keeping the rest', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = keyedCollection(store, 'rows', (r: Row) => r.id, isRow);
     await rows.put(row('a', 'x'));
     await rows.put(row('b', 'x'));
@@ -57,16 +58,16 @@ describe('keyedCollection', () => {
   });
 
   it('a new collection instance over the same store sees data an earlier instance wrote', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     await keyedCollection(store, 'rows', (r: Row) => r.id, isRow).put(row('a'));
 
-    const second = keyedCollection(openLocalStore(localStorage), 'rows', (r: Row) => r.id, isRow);
+    const second = keyedCollection(openTestStore(), 'rows', (r: Row) => r.id, isRow);
     expect(await second.get('a')).toEqual(row('a'));
     expect(await second.list()).toEqual([row('a')]);
   });
 
   it('rejects with StorageError when the stored value is not a valid record map', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('rows', { a: { nope: true } });
     const rows = keyedCollection(store, 'rows', (r: Row) => r.id, isRow);
 
@@ -74,7 +75,7 @@ describe('keyedCollection', () => {
   });
 
   it('rejects with StorageError when the stored value is an array, not a record map', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('rows', [row('a')]);
     const rows = keyedCollection(store, 'rows', (r: Row) => r.id, isRow);
 
@@ -84,7 +85,7 @@ describe('keyedCollection', () => {
 
 describe('cappedList', () => {
   it('add appends (newest last) and list filters', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = cappedList(store, 'rows', undefined, isRow);
 
     await rows.add(row('a', 'x'));
@@ -95,7 +96,7 @@ describe('cappedList', () => {
   });
 
   it('drops the oldest entries once the list grows past cap', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = cappedList(store, 'rows', 3, isRow);
 
     for (let i = 0; i < 5; i += 1) {
@@ -107,7 +108,7 @@ describe('cappedList', () => {
   });
 
   it('never trims when cap is undefined', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = cappedList(store, 'rows', undefined, isRow);
 
     for (let i = 0; i < 10; i += 1) {
@@ -118,7 +119,7 @@ describe('cappedList', () => {
   });
 
   it('removeWhere deletes every matching record, keeping the rest and their order', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const rows = cappedList(store, 'rows', undefined, isRow);
     await rows.add(row('a', 'x'));
     await rows.add(row('b', 'y'));
@@ -130,15 +131,15 @@ describe('cappedList', () => {
   });
 
   it('a new collection instance over the same store sees data an earlier instance wrote', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     await cappedList(store, 'rows', undefined, isRow).add(row('a'));
 
-    const second = cappedList(openLocalStore(localStorage), 'rows', undefined, isRow);
+    const second = cappedList(openTestStore(), 'rows', undefined, isRow);
     expect(await second.list()).toEqual([row('a')]);
   });
 
   it('rejects with StorageError when the stored value is not an array of valid records', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('rows', [{ nope: true }]);
     const rows = cappedList(store, 'rows', undefined, isRow);
 
@@ -148,7 +149,7 @@ describe('cappedList', () => {
 
 describe('singleton', () => {
   it('is undefined before anything is set, then round-trips and updates in place', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const value = singleton<Row>(store, 'row');
 
     expect(await value.get()).toBeUndefined();
@@ -161,22 +162,22 @@ describe('singleton', () => {
   });
 
   it('returns defaults when nothing has been stored yet', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     const value = singleton<Row>(store, 'row', row('fallback'));
 
     expect(await value.get()).toEqual(row('fallback'));
   });
 
   it('a new collection instance over the same store sees data an earlier instance wrote', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     await singleton<Row>(store, 'row').set(row('a'));
 
-    const second = singleton<Row>(openLocalStore(localStorage), 'row');
+    const second = singleton<Row>(openTestStore(), 'row');
     expect(await second.get()).toEqual(row('a'));
   });
 
   it('rejects with StorageError on corrupt JSON at the underlying key', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     localStorage.setItem('chess-kids:row', '{not json');
     const value = singleton<Row>(store, 'row');
 

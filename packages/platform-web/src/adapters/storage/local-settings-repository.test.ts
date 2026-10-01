@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageSettingsRepository } from './local-settings-repository.ts';
 
 beforeEach(() => {
@@ -8,7 +9,7 @@ beforeEach(() => {
 
 describe('LocalStorageSettingsRepository', () => {
   it('defaults to lastProfileId: null, suggestedLevels: {}, profileSettings: {} before anything is saved', async () => {
-    const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageSettingsRepository(openTestStore());
     expect(await repo.get()).toEqual({
       lastProfileId: null,
       suggestedLevels: {},
@@ -17,7 +18,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('saves and reads back settings, updates in place', async () => {
-    const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageSettingsRepository(openTestStore());
     await repo.save({
       lastProfileId: 'profile-1',
       suggestedLevels: { 'profile-1': 3 },
@@ -38,7 +39,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('keeps storagePersisted through a save / get round trip (M5.4)', async () => {
-    const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageSettingsRepository(openTestStore());
     await repo.save({
       lastProfileId: null,
       suggestedLevels: {},
@@ -49,7 +50,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('saves and reads back per-profile settings (M5.1)', async () => {
-    const repo = new LocalStorageSettingsRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageSettingsRepository(openTestStore());
     const settings = {
       dailyLimitMinutes: 30,
       voice: false,
@@ -70,7 +71,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('reads a pre-M4.2 record with no suggestedLevels as {}', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('settings', { lastProfileId: 'profile-1' });
     const repo = new LocalStorageSettingsRepository(store);
 
@@ -82,7 +83,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('reads a pre-M5.1 record with no profileSettings as {}', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('settings', { lastProfileId: 'profile-1', suggestedLevels: { 'profile-1': 2 } });
     const repo = new LocalStorageSettingsRepository(store);
 
@@ -94,7 +95,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('settings', { lastProfileId: 42 });
     const repo = new LocalStorageSettingsRepository(store);
 
@@ -102,7 +103,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('rejects with StorageError on a corrupt suggestedLevels', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('settings', { lastProfileId: null, suggestedLevels: 'nope' });
     const repo = new LocalStorageSettingsRepository(store);
 
@@ -110,7 +111,7 @@ describe('LocalStorageSettingsRepository', () => {
   });
 
   it('rejects with StorageError on a corrupt profileSettings', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('settings', { lastProfileId: null, suggestedLevels: {}, profileSettings: 'nope' });
     const repo = new LocalStorageSettingsRepository(store);
 

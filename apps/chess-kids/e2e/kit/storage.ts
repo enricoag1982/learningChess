@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import type { AppSettings, ProfileSettings, TracksCatalog } from '@learn/platform-core';
 import type { Lesson } from '@learn/subject-chess';
 import { localDayString } from '@learn/platform-core';
-import { DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
+import { CHESS_APP_CONFIG, DEFAULT_PROFILE_SETTINGS } from '@learn/subject-chess';
 import { LocalStorageGameRecordRepository } from '@learn/platform-web/adapters/storage/local-game-record-repository.ts';
 import { LocalStorageProfileRepository } from '@learn/platform-web/adapters/storage/local-profile-repository.ts';
 import { LocalStorageProgressRepository } from '@learn/platform-web/adapters/storage/local-progress-repository.ts';
@@ -59,7 +59,11 @@ export async function withAppStorage<T>(
   const storage = createMemoryStorage();
   for (const [key, value] of Object.entries(before)) storage.setItem(key, value);
 
-  const store = openLocalStore(storage, { version: SCHEMA_VERSION, migrations: MIGRATIONS });
+  const store = openLocalStore(storage, {
+    version: SCHEMA_VERSION,
+    migrations: MIGRATIONS,
+    keyPrefix: CHESS_APP_CONFIG.storagePrefix,
+  });
   const repos: AppStorageRepos = {
     profiles: new LocalStorageProfileRepository(store),
     progress: new LocalStorageProgressRepository(store),

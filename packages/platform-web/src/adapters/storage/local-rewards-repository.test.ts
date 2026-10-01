@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { EarnedBadge, SessionLog, Streak } from '@learn/platform-core';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageRewardsRepository } from './local-rewards-repository.ts';
 
 function makeBadge(overrides: Partial<EarnedBadge> = {}): EarnedBadge {
@@ -47,7 +48,7 @@ beforeEach(() => {
 });
 
 function makeRepo(): LocalStorageRewardsRepository {
-  const store = openLocalStore(localStorage);
+  const store = openTestStore();
   return new LocalStorageRewardsRepository(store);
 }
 
@@ -122,7 +123,7 @@ describe('LocalStorageRewardsRepository', () => {
   });
 
   it('rejects with StorageError on corrupt data at any of its three keys', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     localStorage.setItem('chess-kids:earned-badges', JSON.stringify({ not: 'an array' }));
     const repo = new LocalStorageRewardsRepository(store);
 

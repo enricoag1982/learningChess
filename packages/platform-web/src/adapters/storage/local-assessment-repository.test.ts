@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { AssessmentResult, Unlock } from '@learn/platform-core';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageAssessmentRepository } from './local-assessment-repository.ts';
 
 function makeResult(overrides: Partial<AssessmentResult> = {}): AssessmentResult {
@@ -37,7 +38,7 @@ beforeEach(() => {
 });
 
 function makeRepo(): LocalStorageAssessmentRepository {
-  const store = openLocalStore(localStorage);
+  const store = openTestStore();
   return new LocalStorageAssessmentRepository(store);
 }
 
@@ -80,7 +81,7 @@ describe('LocalStorageAssessmentRepository', () => {
   });
 
   it('rejects with StorageError on corrupt data at either key', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     localStorage.setItem('chess-kids:assessment-results', JSON.stringify({ not: 'an array' }));
     const repo = new LocalStorageAssessmentRepository(store);
 

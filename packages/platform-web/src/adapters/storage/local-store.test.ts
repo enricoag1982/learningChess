@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Migration } from './local-store.ts';
 import { openLocalStore, SCHEMA_VERSION, StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 
 beforeEach(() => {
   localStorage.clear();
@@ -8,12 +9,22 @@ beforeEach(() => {
 
 describe('openLocalStore', () => {
   it('writes the current version on fresh storage', () => {
-    openLocalStore(localStorage);
+    openTestStore();
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
   });
 
+  it("keeps every key under the given prefix and leaves another app's keys alone", () => {
+    localStorage.setItem('other-app:settings', '{"sound":false}');
+    const store = openLocalStore(localStorage, { keyPrefix: 'math-demo:' });
+    store.write('settings', { sound: true });
+
+    expect(localStorage.getItem('math-demo:schema-version')).toBe(String(SCHEMA_VERSION));
+    expect(localStorage.getItem('math-demo:settings')).toBe('{"sound":true}');
+    expect(localStorage.getItem('other-app:settings')).toBe('{"sound":false}');
+  });
+
   it('round-trips read, write and remove', () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     expect(store.read('settings')).toBeUndefined();
 
     store.write('settings', { sound: true });
@@ -25,7 +36,7 @@ describe('openLocalStore', () => {
   });
 
   it('throws StorageError on corrupt JSON', () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     localStorage.setItem('chess-kids:settings', '{not json');
     expect(() => store.read('settings')).toThrow(StorageError);
   });
@@ -38,7 +49,7 @@ describe('openLocalStore', () => {
       { to: 3, migrate: () => applied.push(3) },
     ];
 
-    openLocalStore(localStorage, { version: 3, migrations });
+    openTestStore({ version: 3, migrations });
 
     expect(applied).toEqual([2, 3]);
     expect(localStorage.getItem('chess-kids:schema-version')).toBe('3');
@@ -48,14 +59,14 @@ describe('openLocalStore', () => {
     localStorage.setItem('chess-kids:schema-version', '1');
     const migrations: Migration[] = [{ to: 3, migrate: () => undefined }];
 
-    expect(() => openLocalStore(localStorage, { version: 3, migrations })).toThrow(StorageError);
+    expect(() => openTestStore({ version: 3, migrations })).toThrow(StorageError);
   });
 
   it('throws StorageError and leaves data untouched when the stored version is newer', () => {
     localStorage.setItem('chess-kids:schema-version', '99');
     localStorage.setItem('chess-kids:settings', '{"sound":true}');
 
-    expect(() => openLocalStore(localStorage, { version: 1 })).toThrow(StorageError);
+    expect(() => openTestStore({ version: 1 })).toThrow(StorageError);
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe('99');
     expect(localStorage.getItem('chess-kids:settings')).toBe('{"sound":true}');
@@ -63,6 +74,6 @@ describe('openLocalStore', () => {
 
   it('throws StorageError for unversioned existing data', () => {
     localStorage.setItem('chess-kids:settings', '{"sound":true}');
-    expect(() => openLocalStore(localStorage)).toThrow(StorageError);
+    expect(() => openTestStore()).toThrow(StorageError);
   });
 });
