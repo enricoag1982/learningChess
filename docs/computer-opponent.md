@@ -143,10 +143,46 @@ depth only if that still beats `alpha`: `LMR_MIN_DEPTH = 3`, `LMR_FULL_MOVE_COUN
 `LMR_REDUCTION = 1`), and a history heuristic (`HistoryTable`, keyed by colour + from + to,
 weighted by `depth²`, reused as `orderMoves`'s tiebreak below captures/TT/killers at any ply).
 
-**Measured** (`pnpm --filter @learn/subject-chess calibrate 30 bear`, same seeds before/after): bear vs
-wolf **13.3% → 20.0%** (6/30 wins) — a real ≈ 1.5× gain, still well short of the ≥ 70% target
-(§8). Speed unaffected (p50/p95 stay in §6.5's range); `fox vs rabbit`/`wolf vs fox` unchanged.
-Richer eval (mobility, king safety, passed pawns) is the next lever not yet tried (§9).
+**Measured, first attempt** (`calibrate 30 bear`, same seeds before/after): bear vs wolf **13.3% → 20.0%**
+(6/30). Speed unaffected; `fox vs rabbit` / `wolf vs fox` unchanged.
+
+**Why it stayed low (`m10.1` diagnosis, `calibrate` W/D/L + reasons + depth):**
+
+| Fact (code before the fix, seeds 1–30) | Value |
+|---|---|
+| W / D / L | 7 / 1 / 22 (set 2, seeds 1001–1030: 8 / 1 / 21) |
+| Non-wins | 22 × checkmate against Bear, 1 × threefold repetition; no 50-move, stalemate, insufficient-material or ply-cap result |
+| Bear ahead | never: peak material lead ≤ 2 pawns in 19 of 23 non-wins; final lead mostly −8 to −33 |
+| Search depth (Bear) | d1 11, d2 425, d3 389, d4 274 (median 3, p10 2); time cap cut 75% |
+| Time cap lifted (always depth 4), seeds 1–12 | 1 / 1 / 10, no better |
+
+Not a conversion problem (so mop-up, draw avoidance and passed-pawn levers do not apply) and not a
+depth problem. Cause: `searchRoot` searched each sibling with window `(-∞, -alpha)`, so a refuted
+move only returned a fail-low *bound*. A bound equal to `alpha` (first refutation = a capture of
+the same value as the best line) passed the near-best test `best - score ≤ margin`, so the pool held
+moves that lose at once: root scores for one position were `e1f2:-1.06` (best) and 17 other moves
+at `-1.06`, of which `a2b2` allows `Bg3#` (true score −998); `preferSafe` / `pickUniform` then chose
+among them.
+
+**Lever (Bear only, `bear !== undefined` via `BearSearch.rootWindow`):** each root sibling is searched with
+`beta = -alpha + 0.055` (`BEAR_ROOT_WINDOW` = `BEAR_NEAR_BEST_MARGIN` + 0.005), so every move inside
+the pool has an exact score; the same position now gives `a2b2:-998` and a pool of `e1f2` only. One lever, so its own share is the whole gain:
+
+| `calibrate 30 bear` (W / D / L, 3 × 10-game shards in parallel) | Before | After |
+|---|---|---|
+| Seeds 1–30 | 7 / 1 / 22 (23.3%) | **30 / 0 / 0** (100%) |
+| Seeds 1001–1030 (`calibrate 10 bear 1000/1010/1020`) | 8 / 1 / 21 (26.7%) | **30 / 0 / 0** (100%) |
+| `fox vs rabbit` (30) | 23 / 7 / 0 | 23 / 7 / 0 |
+| `wolf vs fox` (30) | 27 / 2 / 1 | 27 / 2 / 1 |
+
+Speed: the wider root window costs some pruning. Reference set (10 quiet middlegames, this machine, single
+process): p50 ≈ 268 ms, p95 ≈ 277 ms (before: 270 / 288 ms); completed depth 1–2 on every position (before:
+2, one 1); `search.slow.test.ts` green. Under 3 parallel self-play processes the share of d1 searches is 3–4%
+(before 0.2–1%). Not tried, not needed for the target: mop-up eval, draw / repetition avoidance, passed-pawn
+bonus, piece-square tables (§9).
+
+**Same flaw at lower levels, left as is:** Rabbit, Fox and Wolf pick from the same bound-only pool (margin
+0.3), which is part of why they blunder; changing it would re-calibrate every level below Bear.
 
 ## 7. Mini-games and exercises
 
@@ -165,16 +201,15 @@ Richer eval (mobility, king safety, passed pawns) is the next lever not yet trie
 | Determinism | Same position + seed → same move (Bear's own case, `search.test.ts`, given §6.5's mid-search time cap) |
 | Performance | Bear ≤ 300 ms per move (p50) / ≤ 600 ms (p95, CI) on a 10-position reference set |
 | Book | `bookCandidates`/`bookMove` (`book.test.ts`): prefix matching, ply cap, dedup, determinism; `chooseMove` wiring (`search.test.ts`) |
-| Calibration (manual, not in CI) | `pnpm --filter @learn/subject-chess calibrate [games] [level]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate; the optional 3rd arg filters to one pairing by its higher level's name (`calibrate 30 bear`, a quick smoke check while tuning one level). Not a nightly job (no CI schedule wired up) |
+| Calibration (manual, not in CI) | `pnpm --filter @learn/subject-chess calibrate [games] [level] [seed offset]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate. Prints W / D / L, the reason of every non-win (draw reason or checkmate), material lead at the end / peak, and the higher level's completed search depth (median, p10, histogram, share cut by the time cap). `calibrate 30 bear` filters to one pairing by its higher level's name; the 4th arg shifts the seeds (`calibrate 10 bear 1000` = seeds 1001–1010; keep it even so colours alternate the same way), e.g. a second seed set or one shard of a parallel run. Self-play has no opening book. Bear and Wolf depth depends on machine load (250 ms cap), so a run is only reproducible on the same load. Not a nightly job (no CI schedule wired up) |
+| Bear root pool | `search.test.ts`: from a position where most moves allow mate in 1, no roll of the dice picks one (24 rolls over the whole pool); red without `BEAR_ROOT_WINDOW`, green with it |
 | Mate hint | `mateHint` returns a legal move for the side to move; finds a mate-in-1 when one exists; `null` only with no legal move at all |
 
 ## 9. Later
 
 - **Game review:** after a game, Owl shows up to 3 key moments (material swing ≥ 3), e.g. "Here the Knight could take the Rook".
-- **Bear strength (§6.6, roadmap F4 — still open):** 13.3% → 20.0% bear-vs-wolf, still well
-  short of 70%. Likely next levers, in order of expected payoff for the effort: a richer
-  `staticEval` for Bear only (mobility, king safety, passed pawns — the one option from F4's own
-  list not yet tried); isolating each of null-move/LMR/history's own individual contribution (§6.6
-  measured them together only, for time); wider opening-book coverage so fewer games ever leave it
-  in the first place. The calibration script (§8, `calibrate 30 bear` for a faster read on this one
-  pairing) is how to check progress on any of them.
+- **Bear strength (§6.6, roadmap F4 — done in `m10.1`):** 100% bear vs wolf on two seed sets. Levers not
+  needed so far, in order if Bear ever needs more: speed (profile: ≈ 27% GC, move-object creation in
+  `searchBoard.moves()` ≈ 10%, `pieces()` ≈ 6%; faster nodes = deeper search under the 250 ms cap, also on
+  slow tablets); piece-square tables / king safety (Bear's flat evaluation picks random pawn moves in quiet
+  openings; the book hides this in the app); mop-up and draw avoidance (draws: 2 in 60 games before the fix, 0 after).
