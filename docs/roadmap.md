@@ -121,8 +121,10 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | v1.1 | Owner playtest 2 (done 2026-09-25) | Skip for Story / Demo / Try (marked skipped in the track); unmistakable buttons (≥ 3:1 edge contrast, 6 px ledge, dashed locked, info without boxes); app update applied at Home / picker, checked on load and on return (no polling) |
 | M6 | Voice & art (v3 scope, pulled forward 2026-09-25) | Generated voice audio (English first), nicer illustrations, version on Home; iterations §3 `m6.x`; ships in `v2.0.0` (with M7, 2026-09-25: M6.3 merged after M7.1, no M6-only release point) |
 | M8 | v4 learning-platform refactor | `docs/refactor-v4.md`; iterations §3 `m8.x`; released as `v4.0.0` |
-| M9 | Store apps | Capacitor Android + iPad, native storage, store listings |
-| M10 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
+| M9 | Post-v4 owner requests (done) | Real piece names (`m9.1`), release `v4.1.0` (`m9.2`) |
+| M10 | Follow-ups F4–F9 (done) | §3.2: Bear strength + time-cut safety, platform cleanup, check ring in series rounds, README screenshots (`m10.1`–`m10.5`) |
+| M11 | Store apps | Capacitor Android + iPad, native storage, store listings |
+| M12 | Paths | Openings, Tactics, Checkmates & Endgames; Lichess puzzle import; path badges |
 | v2 → M7 | Time controls + device sharing (offline, no server; owner 2026-09-25; iterations §3 `m7.x`; ships as `v2.0.0`) | Do: 5-min warning (app-level notice, calm screens only), limits per weekday, allowed hours; optional: Play vs Learning limits, holiday overrides, detailed time log. Sharing: merge rules + "Send to other device" file (share sheet) → import merges |
 | Later, maybe | Online | Parent login, online play with friends, automatic sync ("family code": end-to-end encrypted blob on a tiny free store, same merge rules) — only if file sharing proves annoying; hooks stay in code |
 | v3 | Nicer media | → M6; later languages reuse the M6 audio pipeline |
@@ -153,6 +155,6 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | 5-min warning | App-level notice (reusable for later notices), calm screens only, never mid-exercise/game; once per child per day, spoken, info style (not tappable) |
 | Device sharing | Chosen over QR / parent's cloud drive / family-code sync: share a backup file, merge on import (`domain-model.md` §3.5) + "Send to other device" via the Web Share API, download fallback. Time limit is per device between shares |
 | Voice | Pre-generated audio: Kokoro-82M int8, `af_heart` voice, speed 0.92, MP3 mono 32 kbps (Apache-2.0, generated offline, no cloud TTS, no cost); one narrator voice (Owl, third-person); Web Speech API fallback for texts without audio |
-| v4 numbering | v4 refactor = M8 (`m8.x` tags); Store apps → M9, Paths → M10 |
+| v4 numbering | v4 refactor = M8 (`m8.x` tags). Post-v4 (2026-10-01): owner requests = M9, follow-ups F4–F9 = M10 (tags exist); Store apps → M11, Paths → M12 |
 | Real piece names (owner 2026-09-30) | To make the app simpler: no animal per piece, no animal badge on boards, no "Piece style" setting. Lesson characters are the pieces (`rook` … `pawn`, art = classic piece icon); My Den shows "Your pieces". Owl, avatars, Journey habitats, bot levels (Mouse → Bear) and the Den stay. Old `pieceStyle` data still loads and is dropped on the next save. Run A (`m9.1`): code and content ids; run B: lesson texts and voice audio (~200 texts say Rhino / Elephant / …) |
 | v4 size target | Production TS: no growth vs `v2.0.0` (31.6 k), trim pass before `v4.0.0` (owner 2026-09-28) |
