@@ -112,7 +112,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 | F6 | Check ring in series boss rounds | "Escape the Check" series rounds show no check ring (lessons do); the ring is part of each square's accessible name, so changing it is a visible + a11y change | Found in the v4 R3b design (2026-09-27); kept as is in v4 (same behaviour); owner decision |
 | F7 | Chess art in platform-web | Chess bot art and character colours sit in `platform-web/src/ui/art/animal-images.ts` (piece characters are drawn by the pack since `m9.1`); the math demo precaches 7 unused WebP files (≈ 35 KB) | Found in v4 R5 design (2026-09-29); moving them changes chess JS; after `v4.0.0` |
 | F8 | Chess-named narrator keys | `audio-narrator.ts` still writes `chess-kids:voice-report` and sets `__chessKidsVoiceMisses` (a dev flag chess e2e reads) for every app | Found in v4 R5 design; key from `AppConfig.storagePrefix` needs a storage-compat check; after `v4.0.0` |
-| F9 | README screenshots | `docs/images/{home,journey,lesson,parent-area}.png` predate the compact game screens (`m8.35`) and real piece names (`m9.1`) | Done (`m10.4`): retaken from the production build at 1024×768, seeded mid-progress profile |
+| F9 | README screenshots | `docs/images/{home,journey,lesson,parent-area}.png` predate the compact game screens (`m8.35`) and real piece names (`m9.1`) | Done (`m10.5`): retaken from the production build at 1024×768, seeded mid-progress profile |
 
 ## 4. After MVP
 
