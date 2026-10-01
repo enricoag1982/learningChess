@@ -55,9 +55,10 @@ export interface SubjectWeb {
   /** A character's portrait drawn by the subject instead of an image (chess: the piece's classic icon), or `null` for one
    * without (Owl): `CharacterIcon` then falls back to `art`. */
   characterArt?(character: string): JSX.Element | null;
-  /** This subject's own image art keyed by id; falls back to the platform's own (avatars, Owl, bot levels) for an id it
-   * doesn't have. */
+  /** This subject's own image art keyed by id; falls back to the platform's own (avatars, Owl) for an id it doesn't have. */
   readonly art: Readonly<Record<string, string>>;
+  /** The badge colour behind a character's portrait (chess: a tint per piece); `undefined` falls back to the platform's neutral. */
+  characterColor?(character: string): string | undefined;
   /** Extra Home tiles (chess: Play), merged with the platform's and sorted by `order`. */
   readonly homeTiles?: readonly HomeTile[];
   /** My Den bits: a glyph per rank id, and an optional extra stats row (chess: games won / with friends). */

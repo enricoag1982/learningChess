@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { chessJsRules as rules } from '../chess/chessjs-rules.ts';
 import { parseFen } from '../chess/fen.ts';
@@ -70,6 +70,108 @@ describe('determinism', () => {
     for (let i = 0; i < 4; i += 1) {
       expect(chooseMove(state, bear, rules, seededRandom(42))).toEqual(first);
     }
+  });
+});
+
+describe('search report (calibrate telemetry)', () => {
+  const state = startGame(
+    STANDARD,
+    parseFen('r1bqk2r/ppp2ppp/2n2n2/2bpp3/2B1P3/3P1N2/PPP2PPP/RNBQ1RK1 w kq - 4 6'),
+  );
+
+  it('reports the completed depth of a searched move, within the level depth', () => {
+    const reports: { depth: number; targetDepth: number; cutByTime: boolean }[] = [];
+    const bear = levelNamed('bear');
+    chooseMove(state, bear, rules, seededRandom(7), undefined, (report) => reports.push(report));
+    expect(reports).toHaveLength(1);
+    const [report] = reports;
+    expect(report?.targetDepth).toBe(bear.depth);
+    expect(report?.depth).toBeGreaterThanOrEqual(1);
+    expect(report?.depth).toBeLessThanOrEqual(bear.depth);
+    expect(report?.cutByTime).toBe((report?.depth ?? 0) < bear.depth);
+  });
+
+  it('reports nothing when the move is not chosen by search (Mouse never searches)', () => {
+    const reports: unknown[] = [];
+    chooseMove(state, levelNamed('mouse'), rules, seededRandom(7), undefined, (report) =>
+      reports.push(report),
+    );
+    expect(reports).toEqual([]);
+  });
+});
+
+describe('Bear root pool', () => {
+  // White to move, Black's bishop on f4 threatens Bg3#. Ke1-f2 is the only move that keeps
+  // the exact best score; most of the others lose at once (Black mates), yet a bound-only root
+  // score once tied them with the best and let the pool pick them (m10.1 diagnosis).
+  const state = startGame(
+    STANDARD,
+    parseFen('rnb1k1nr/p2pqp2/2p1p1pp/1p6/1P3bPP/P1P5/R2PP3/1NBQKBNR w Kkq - 0 1'),
+  );
+  // Depth 2 already sees the mate and keeps the sweep fast; `level: 5` still switches Bear's search on.
+  const bear = { ...levelNamed('bear'), depth: 2 };
+
+  function allowsMateInOne(move: Move): boolean {
+    const played = playGameMove(state, rules, move);
+    if (played === null) {
+      return false;
+    }
+    return rules.legalMoves(played.state.position).some((reply) => {
+      const after = rules.play(played.state.position, reply);
+      return after !== null && rules.status(after.position).checkmate;
+    });
+  }
+
+  // Each sweep runs 24 searches (≈ 100 ms each here): several seconds on a slow runner, past vitest's 5 s default.
+  const SWEEP_TIMEOUT_MS = 15_000;
+
+  it(
+    'never picks a move that allows mate in 1, whichever pool entry the dice select',
+    { timeout: SWEEP_TIMEOUT_MS },
+    () => {
+      for (let i = 0; i < 24; i += 1) {
+        const roll = (i + 0.5) / 24;
+        const move = chooseMove(state, bear, rules, { next: () => roll });
+        expect(move).not.toBeNull();
+        if (move !== null) {
+          expect(allowsMateInOne(move)).toBe(false);
+        }
+      }
+    },
+  );
+
+  describe('on a slow device (every clock read is past the time budget)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it(
+      'stops at depth 1 yet no roll picks a move that allows mate in 1',
+      { timeout: SWEEP_TIMEOUT_MS },
+      () => {
+        let now = 0;
+        vi.spyOn(performance, 'now').mockImplementation(() => (now += 1_000));
+        for (let i = 0; i < 24; i += 1) {
+          const roll = (i + 0.5) / 24;
+          let depth = 0;
+          const move = chooseMove(
+            state,
+            levelNamed('bear'),
+            rules,
+            { next: () => roll },
+            undefined,
+            (report) => {
+              depth = report.depth;
+            },
+          );
+          expect(depth).toBe(1);
+          expect(move).not.toBeNull();
+          if (move !== null) {
+            expect(allowsMateInOne(move)).toBe(false);
+          }
+        }
+      },
+    );
   });
 });
 

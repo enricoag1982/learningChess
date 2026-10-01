@@ -13,7 +13,7 @@ import {
   firstLessonsByCharacter,
   unlockLabel,
 } from '@learn/platform-web/ui/lesson-character-labels.ts';
-import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
+import { botImage } from '../art/chess-art.ts';
 import { OwlIcon } from '@learn/platform-web/ui/art/characters.tsx';
 import { NarratedBubble } from '@learn/platform-web/ui/ds/NarratedBubble.tsx';
 import { ComputerIcon, FriendIcon, LockIcon } from '@learn/platform-web/ui/ds/icons.tsx';
@@ -219,7 +219,7 @@ export function PlayScreen(): JSX.Element {
                   >
                     <span className="flex items-center gap-1.5" aria-hidden="true">
                       <img
-                        src={animalImage(status.name)}
+                        src={botImage(status.name)}
                         alt=""
                         draggable={false}
                         className={`h-6 w-6 flex-shrink-0 rounded-full object-contain ${

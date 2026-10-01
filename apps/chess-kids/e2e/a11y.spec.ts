@@ -469,7 +469,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
   // to deep-scan `choice`/`best-move`, Pawn Wars too) — set now, well before either is reached.
   // The voice-report flag (above) is set here too, not via `addInitScript` before the first
   // `page.goto`: every `chess-kids:*` key is reserved for the app's own versioned storage
-  // (`local-store.ts`), which throws "Unversioned chess-kids data found in storage" if one is
+  // (`local-store.ts`), which throws "Unversioned data found under …" if one is
   // already present before the app's own startup writes its version key. Setting it only once the
   // app is already up (same as `test-seed` already did) still covers the whole curriculum walk
   // below — only the first-run screens themselves go unwatched, and those are scanned separately
@@ -798,8 +798,7 @@ test('lesson flow has no serious/critical accessibility violations and kid-sized
 
   if (checkVoiceMisses) {
     const misses = await page.evaluate(
-      () =>
-        (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses ?? [],
+      () => (window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses ?? [],
     );
     // A miss records the *original* text (`audio-narrator.ts`), which may still carry the
     // nickname this walk's profile used ("Kid") even though the generated-audio lookup itself

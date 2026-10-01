@@ -95,6 +95,7 @@ export function createServices(
   // any text without generated audio — `createGatedNarrator` wraps the combined pair.
   const audioNarrator = createAudioNarrator({
     baseUrl: `${import.meta.env.BASE_URL}audio/en/`,
+    storagePrefix: appConfig.storagePrefix,
     fallback: createWebSpeechNarrator(),
   });
   const narrator = createGatedNarrator(audioNarrator);

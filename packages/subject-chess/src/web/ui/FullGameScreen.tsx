@@ -8,7 +8,7 @@ import { bot, parseFen, recordGame, versusGameRecordResult, versusGameState } fr
 import { useAppStore, useRoute, useServices } from '@learn/platform-web/app/store.ts';
 import type { BossPlaySession } from '@learn/platform-web/modes/mode-ui.ts';
 import { Step as VersusStep } from '../../modes/versus/Step.tsx';
-import { animalImage } from '@learn/platform-web/ui/art/animal-images.ts';
+import { botImage } from '../art/chess-art.ts';
 import { BlankScreen, Screen, ScreenHeader } from '@learn/platform-web/ui/ds/Screen.tsx';
 import { ConfirmDialog } from '@learn/platform-web/ui/ds/ConfirmDialog.tsx';
 
@@ -148,7 +148,7 @@ export function FullGameScreen(): JSX.Element {
         onAction={requestLeave}
       >
         <img
-          src={animalImage(botLevel?.name ?? 'mouse')}
+          src={botImage(botLevel?.name ?? 'mouse')}
           alt=""
           draggable={false}
           className="h-9 w-9 flex-shrink-0 rounded-full object-contain sm:h-10 sm:w-10"

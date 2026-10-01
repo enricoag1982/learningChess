@@ -136,6 +136,7 @@ class FakeFetch {
 }
 
 const BASE_URL = 'https://example.test/audio/en/';
+const PREFIX = 'test-app:';
 const TEXT = 'Watch Rhino run to every green dot.';
 const KEY = voiceKey(TEXT);
 
@@ -155,8 +156,9 @@ beforeEach(() => {
 afterEach(() => {
   (window as unknown as { AudioContext?: typeof AudioContext }).AudioContext = realAudioContext;
   vi.restoreAllMocks();
-  window.localStorage.removeItem('chess-kids:voice-report');
-  delete (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses;
+  window.localStorage.removeItem(`${PREFIX}voice-report`);
+  window.localStorage.removeItem('other-app:voice-report');
+  delete (window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses;
 });
 
 describe('createAudioNarrator', () => {
@@ -168,6 +170,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -192,6 +195,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -219,6 +223,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -243,6 +248,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -264,6 +270,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -285,6 +292,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -308,6 +316,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -326,6 +335,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: () => Promise.reject(new Error('should not be called')),
       audioContextFactory: () => {
@@ -352,6 +362,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -378,6 +389,7 @@ describe('createAudioNarrator', () => {
       const fallback = new FakeFallback();
       const narrator = createAudioNarrator({
         baseUrl: BASE_URL,
+        storagePrefix: PREFIX,
         fallback,
         fetch: fetch.fn,
         audioContextFactory: () => ctx as unknown as AudioContext,
@@ -405,6 +417,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -434,6 +447,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -458,6 +472,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -495,6 +510,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -527,6 +543,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -551,6 +568,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -573,6 +591,7 @@ describe('createAudioNarrator', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -609,6 +628,7 @@ describe('iOS unlock listeners (owner report: voice sounds mechanical on iPad)',
     const addEventListenerSpy = vi.spyOn(document, 'addEventListener');
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -645,6 +665,7 @@ describe('iOS unlock listeners (owner report: voice sounds mechanical on iPad)',
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -689,7 +710,7 @@ describe('iOS unlock listeners (owner report: voice sounds mechanical on iPad)',
 });
 
 describe('missed-text report (M6.3 item 4)', () => {
-  it('off by default: a manifest miss records nothing to window.__chessKidsVoiceMisses', async () => {
+  it('off by default: a manifest miss records nothing to window.__learnVoiceMisses', async () => {
     const ctx = new FakeAudioContext();
     const fetch = new FakeFetch();
     fetch.on(`${BASE_URL}manifest.json`, () =>
@@ -698,6 +719,7 @@ describe('missed-text report (M6.3 item 4)', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -711,12 +733,12 @@ describe('missed-text report (M6.3 item 4)', () => {
     await speaking;
 
     expect(
-      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
+      (window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses,
     ).toBeUndefined();
   });
 
-  it('on (chess-kids:voice-report=1): records a manifest miss and a decode failure', async () => {
-    window.localStorage.setItem('chess-kids:voice-report', '1');
+  it("ignores another app's flag: only <storagePrefix>voice-report turns the report on", async () => {
+    window.localStorage.setItem('other-app:voice-report', '1');
 
     const ctx = new FakeAudioContext();
     const fetch = new FakeFetch();
@@ -726,6 +748,36 @@ describe('missed-text report (M6.3 item 4)', () => {
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
+      fallback,
+      fetch: fetch.fn,
+      audioContextFactory: () => ctx as unknown as AudioContext,
+    });
+
+    const speaking = narrator.speak(TEXT);
+    await vi.waitFor(() => {
+      expect(fallback.speakCalls).toEqual([TEXT]);
+    });
+    fallback.resolveNext();
+    await speaking;
+
+    expect(
+      (window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses,
+    ).toBeUndefined();
+  });
+
+  it('on (<prefix>voice-report=1): records a manifest miss and a decode failure', async () => {
+    window.localStorage.setItem(`${PREFIX}voice-report`, '1');
+
+    const ctx = new FakeAudioContext();
+    const fetch = new FakeFetch();
+    fetch.on(`${BASE_URL}manifest.json`, () =>
+      Promise.resolve(jsonResponse(manifestWith('other-key'))),
+    );
+    const fallback = new FakeFallback();
+    const narrator = createAudioNarrator({
+      baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -744,6 +796,7 @@ describe('missed-text report (M6.3 item 4)', () => {
     // A fresh narrator, so a fresh (uncached) manifest fetch picks up the handler swap above.
     const narrator2 = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: fetch.fn,
       audioContextFactory: () => ctx as unknown as AudioContext,
@@ -755,17 +808,19 @@ describe('missed-text report (M6.3 item 4)', () => {
     fallback.resolveNext();
     await speaking2;
 
-    expect(
-      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
-    ).toEqual([TEXT, TEXT]);
+    expect((window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses).toEqual([
+      TEXT,
+      TEXT,
+    ]);
   });
 
   it('does not record an environmental fallback (no AudioContext) — not a content gap', async () => {
-    window.localStorage.setItem('chess-kids:voice-report', '1');
+    window.localStorage.setItem(`${PREFIX}voice-report`, '1');
 
     const fallback = new FakeFallback();
     const narrator = createAudioNarrator({
       baseUrl: BASE_URL,
+      storagePrefix: PREFIX,
       fallback,
       fetch: () => Promise.reject(new Error('should not be called')),
       audioContextFactory: () => {
@@ -781,7 +836,7 @@ describe('missed-text report (M6.3 item 4)', () => {
     await speaking;
 
     expect(
-      (window as unknown as { __chessKidsVoiceMisses?: string[] }).__chessKidsVoiceMisses,
+      (window as unknown as { __learnVoiceMisses?: string[] }).__learnVoiceMisses,
     ).toBeUndefined();
   });
 });

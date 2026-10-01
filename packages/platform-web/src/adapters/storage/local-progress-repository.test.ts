@@ -6,7 +6,8 @@ import {
   makeConceptStats as buildConceptStats,
   makeAttempt as buildAttempt,
 } from '@learn/platform-core/testing';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 
 function makeProgress(overrides: Partial<LessonProgress> = {}): LessonProgress {
@@ -37,7 +38,7 @@ beforeEach(() => {
 
 describe('LocalStorageProgressRepository — lesson progress', () => {
   it('saves, gets and lists lessons keyed by profile + lesson, and updates in place', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     const rook = makeProgress({ id: 'a', lessonId: 'rook' });
     const bishop = makeProgress({ id: 'b', lessonId: 'bishop' });
     const otherProfile = makeProgress({ id: 'c', profileId: 'profile-2', lessonId: 'rook' });
@@ -57,7 +58,7 @@ describe('LocalStorageProgressRepository — lesson progress', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('lesson-progress', { 'profile-1:rook': { nope: true } });
     const repo = new LocalStorageProgressRepository(store);
 
@@ -67,7 +68,7 @@ describe('LocalStorageProgressRepository — lesson progress', () => {
 
 describe('LocalStorageProgressRepository — deleteProfileData', () => {
   it('removes lesson progress and attempts for the profile, leaving other profiles untouched', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     await repo.saveLesson(makeProgress({ id: 'a', lessonId: 'rook' }));
     await repo.saveLesson(makeProgress({ id: 'b', profileId: 'profile-2', lessonId: 'rook' }));
     await repo.addAttempt(makeAttempt({ id: 'a1' }));
@@ -82,7 +83,7 @@ describe('LocalStorageProgressRepository — deleteProfileData', () => {
   });
 
   it('also removes mini-game progress for the profile, leaving other profiles untouched', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     await repo.saveMiniGame(makeMiniGameProgress({ id: 'a' }));
     await repo.saveMiniGame(makeMiniGameProgress({ id: 'b', profileId: 'profile-2' }));
 
@@ -95,7 +96,7 @@ describe('LocalStorageProgressRepository — deleteProfileData', () => {
 
 describe('LocalStorageProgressRepository — mini-game progress', () => {
   it('saves, gets and lists mini-games keyed by profile + mini-game, and updates in place', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     const rook = makeMiniGameProgress({ id: 'a', miniGameId: 'hungry-rook' });
     const bishop = makeMiniGameProgress({ id: 'b', miniGameId: 'hungry-bishop' });
     const otherProfile = makeMiniGameProgress({
@@ -119,7 +120,7 @@ describe('LocalStorageProgressRepository — mini-game progress', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('minigame-progress', { 'profile-1:hungry-rook': { nope: true } });
     const repo = new LocalStorageProgressRepository(store);
 
@@ -129,7 +130,7 @@ describe('LocalStorageProgressRepository — mini-game progress', () => {
 
 describe('LocalStorageProgressRepository — concept stats', () => {
   it('saves, gets and lists concept stats keyed by profile + concept, and updates in place', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     const rookMove = makeConceptStats({ id: 'a', conceptId: 'rook-move' });
     const bishopMove = makeConceptStats({ id: 'b', conceptId: 'bishop-move' });
     const otherProfile = makeConceptStats({
@@ -155,7 +156,7 @@ describe('LocalStorageProgressRepository — concept stats', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('concept-stats', { 'profile-1:rook-move': { nope: true } });
     const repo = new LocalStorageProgressRepository(store);
 
@@ -165,7 +166,7 @@ describe('LocalStorageProgressRepository — concept stats', () => {
 
 describe('LocalStorageProgressRepository — deleteProfileData also clears concept stats', () => {
   it('removes concept stats for the profile, leaving other profiles untouched', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     await repo.saveConceptStats(makeConceptStats({ id: 'a' }));
     await repo.saveConceptStats(makeConceptStats({ id: 'b', profileId: 'profile-2' }));
 
@@ -178,7 +179,7 @@ describe('LocalStorageProgressRepository — deleteProfileData also clears conce
 
 describe('LocalStorageProgressRepository — attempts', () => {
   it('appends attempts newest last and filters by profile', async () => {
-    const repo = new LocalStorageProgressRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProgressRepository(openTestStore());
     const first = makeAttempt({ id: 'a1' });
     const second = makeAttempt({ id: 'a2' });
     const otherProfile = makeAttempt({ id: 'a3', profileId: 'profile-2' });
@@ -194,7 +195,7 @@ describe('LocalStorageProgressRepository — attempts', () => {
   it('caps stored attempts at 2000, dropping the oldest first', async () => {
     // Seed 1998 directly (adding them one by one re-serialises the list each time), then cross
     // the cap through the repository.
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write(
       'attempts',
       Array.from({ length: 1998 }, (_, i) => makeAttempt({ id: `a${String(i)}` })),
@@ -211,7 +212,7 @@ describe('LocalStorageProgressRepository — attempts', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('attempts', [{ nope: true }]);
     const repo = new LocalStorageProgressRepository(store);
 

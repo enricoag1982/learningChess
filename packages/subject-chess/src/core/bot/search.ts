@@ -138,9 +138,10 @@ function fromTT(score: number, plyFromRoot: number): number {
   return score;
 }
 
-// Bear-only search extras bundled into one optional param: quiescenceDepth, rules (to build the
+// Bear-only search extras bundled into one optional param: rootWindow, quiescenceDepth, rules (to build the
 // post-null-move position) and the history table. undefined for every other level.
 interface BearSearch {
+  readonly rootWindow: number;
   readonly quiescenceDepth: number;
   readonly rules: ChessRules;
   readonly history: HistoryTable;
@@ -555,6 +556,10 @@ function preferSafe(pool: readonly ScoredMove[], board: SearchBoard): ScoredMove
 const NEAR_BEST_MARGIN = 0.3;
 // Bear's own near-best margin: much tighter than NEAR_BEST_MARGIN (see `nearBestMargin`).
 const BEAR_NEAR_BEST_MARGIN = 0.05;
+// Bear's root searches each sibling with beta raised by this much above the best so far, so every
+// move inside the near-best pool gets an exact score: outside it a root score is only an upper bound
+// (fail-low) that can tie the best by accident and put a refuted move into the pool.
+const BEAR_ROOT_WINDOW = BEAR_NEAR_BEST_MARGIN + 0.005;
 
 // Bear needs a much narrower near-best pool than the other levels to avoid picking outright weak
 // moves while still keeping some variety (never fully deterministic).
@@ -587,7 +592,7 @@ function searchRoot(
         needsPieces,
         depth - 1,
         -Infinity,
-        -alpha,
+        -alpha + (bear?.rootWindow ?? 0),
         1,
         move,
         tt,
@@ -609,6 +614,32 @@ function searchRoot(
 // Wall-clock budget for one chooseBySearch call; `checkDeadline` can abort mid-depth (a depth-4 pass may overrun it). Only a
 // completed depth's result is used, so the move stays deterministic in position + seed.
 const TIME_BUDGET_MS = 250;
+// Below this completed depth Bear's scores cannot see the opponent's winning reply: a loaded CI runner once cut Bear to
+// depth 1 into a move that allowed mate in 1. Then such moves leave the pool (`withoutLosingAtOnce`).
+const BEAR_SAFE_DEPTH = 2;
+
+// The scored moves after which the opponent cannot win at once, or all of them if every move loses at once.
+function withoutLosingAtOnce(
+  scored: readonly ScoredMove[],
+  board: SearchBoard,
+  def: GameRulesDef,
+): readonly ScoredMove[] {
+  const safe = scored.filter((entry) => {
+    board.play(entry.move);
+    const losing = findImmediateWin(def, board, board.moves()) !== null;
+    board.undo();
+    return !losing;
+  });
+  return safe.length > 0 ? safe : scored;
+}
+
+/** One search's telemetry for tools (calibrate): last fully completed depth, the level's own depth, and
+ * whether the time budget stopped it short. */
+export interface SearchReport {
+  readonly depth: number;
+  readonly targetDepth: number;
+  readonly cutByTime: boolean;
+}
 
 // Iterative deepening to level.depth: each shallower pass orders the next by its own best-first,
 // so alpha rises quickly and most root siblings cut off fast. tt/killers are shared across depths.
@@ -619,20 +650,28 @@ function chooseBySearch(
   level: BotLevel,
   random: Random,
   rules: ChessRules,
+  onSearch?: (report: SearchReport) => void,
 ): Move {
   const needsPieces = needsPiecesForTerminal(def);
   const bear: BearSearch | undefined =
     level.level === 5
-      ? { quiescenceDepth: QUIESCENCE_DEPTH, rules, history: new Map<string, number>() }
+      ? {
+          rootWindow: BEAR_ROOT_WINDOW,
+          quiescenceDepth: QUIESCENCE_DEPTH,
+          rules,
+          history: new Map<string, number>(),
+        }
       : undefined;
   const tt: TranspositionTable = new Map();
   const killers: Killers = [];
   const clock: SearchClock = { nodes: 0, deadline: performance.now() + TIME_BUDGET_MS };
   let ordered = orderMoves(candidates);
   let scored: ScoredMove[] = [];
+  let completedDepth = 0;
   for (let depth = 1; depth <= level.depth; depth += 1) {
     try {
       scored = searchRoot(ordered, board, def, needsPieces, depth, tt, killers, bear, clock);
+      completedDepth = depth;
     } catch (error) {
       if (error instanceof SearchAborted) {
         // Past budget mid-depth: board is already undone back to this call's own position, and
@@ -646,12 +685,21 @@ function chooseBySearch(
       break;
     }
   }
+  onSearch?.({
+    depth: completedDepth,
+    targetDepth: level.depth,
+    cutByTime: completedDepth < level.depth,
+  });
   if (scored.length === 0) {
     // Defensive only: even depth 1 never completed. Falls back to a plain 1-ply choice.
     return chooseShallow(candidates, board, def, random);
   }
-  const best = Math.max(...scored.map((entry) => entry.score));
-  let pool = scored.filter((entry) => best - entry.score <= nearBestMargin(level));
+  const trusted =
+    bear !== undefined && completedDepth < BEAR_SAFE_DEPTH
+      ? withoutLosingAtOnce(scored, board, def)
+      : scored;
+  const best = Math.max(...trusted.map((entry) => entry.score));
+  let pool = trusted.filter((entry) => best - entry.score <= nearBestMargin(level));
   if (level.level === 5) {
     pool = preferSafe(pool, board);
   }
@@ -695,6 +743,7 @@ export function chooseMove(
   rules: ChessRules,
   random: Random,
   book?: BotBook,
+  onSearch?: (report: SearchReport) => void,
 ): Move | null {
   const legalMoves = rules.legalMoves(state.position);
   if (legalMoves.length === 0) {
@@ -726,7 +775,7 @@ export function chooseMove(
   if (level.depth <= 0 || roll < level.random + level.shallow) {
     return chooseShallow(candidates, board, state.def, random);
   }
-  return chooseBySearch(candidates, board, state.def, level, random, rules);
+  return chooseBySearch(candidates, board, state.def, level, random, rules, onSearch);
 }
 
 function pickUniform(moves: readonly Move[], random: Random): Move {
