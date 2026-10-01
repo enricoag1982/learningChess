@@ -122,16 +122,21 @@ describe('Bear root pool', () => {
     });
   }
 
-  it('never picks a move that allows mate in 1, whichever pool entry the dice select', () => {
-    for (let i = 0; i < 24; i += 1) {
-      const roll = (i + 0.5) / 24;
-      const move = chooseMove(state, bear, rules, { next: () => roll });
-      expect(move).not.toBeNull();
-      if (move !== null) {
-        expect(allowsMateInOne(move)).toBe(false);
+  // 24 searches, each capped by Bear's 250 ms time budget: up to ~6 s on a slow runner, past vitest's 5 s default.
+  it(
+    'never picks a move that allows mate in 1, whichever pool entry the dice select',
+    { timeout: 15_000 },
+    () => {
+      for (let i = 0; i < 24; i += 1) {
+        const roll = (i + 0.5) / 24;
+        const move = chooseMove(state, bear, rules, { next: () => roll });
+        expect(move).not.toBeNull();
+        if (move !== null) {
+          expect(allowsMateInOne(move)).toBe(false);
+        }
       }
-    }
-  });
+    },
+  );
 });
 
 describe('tactics', () => {
