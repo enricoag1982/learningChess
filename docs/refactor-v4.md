@@ -181,5 +181,5 @@ Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec �
 | Guards | ESLint globs `subject-*` / `apps/*`; one `dispatchGuard` helper (`platform-web/src/testing/dispatch-guard.ts`) per pack; `prepare` builds every subject |
 | e2e + CI | Page flows / texts in `platform-web/e2e/`; chess kit binds them; math: 4 specs (lesson, parent area, backup, world boss) in the CI e2e job, shard 3; Pages still deploys chess only |
 | Size | Math lines counted outside the chess target (§6) |
-| Deferred | Roadmap F7 (chess art in platform-web), F8 (chess-named narrator report key + dev flag) |
+| Deferred | Roadmap F7 (chess art in platform-web), F8 (chess-named narrator report key + dev flag): done in `m10.2` |
 
