@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { chessJsRules as rules } from '../chess/chessjs-rules.ts';
 import { parseFen } from '../chess/fen.ts';
@@ -122,15 +122,56 @@ describe('Bear root pool', () => {
     });
   }
 
-  it('never picks a move that allows mate in 1, whichever pool entry the dice select', () => {
-    for (let i = 0; i < 24; i += 1) {
-      const roll = (i + 0.5) / 24;
-      const move = chooseMove(state, bear, rules, { next: () => roll });
-      expect(move).not.toBeNull();
-      if (move !== null) {
-        expect(allowsMateInOne(move)).toBe(false);
+  // Each sweep runs 24 searches (≈ 100 ms each here): several seconds on a slow runner, past vitest's 5 s default.
+  const SWEEP_TIMEOUT_MS = 15_000;
+
+  it(
+    'never picks a move that allows mate in 1, whichever pool entry the dice select',
+    { timeout: SWEEP_TIMEOUT_MS },
+    () => {
+      for (let i = 0; i < 24; i += 1) {
+        const roll = (i + 0.5) / 24;
+        const move = chooseMove(state, bear, rules, { next: () => roll });
+        expect(move).not.toBeNull();
+        if (move !== null) {
+          expect(allowsMateInOne(move)).toBe(false);
+        }
       }
-    }
+    },
+  );
+
+  describe('on a slow device (every clock read is past the time budget)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it(
+      'stops at depth 1 yet no roll picks a move that allows mate in 1',
+      { timeout: SWEEP_TIMEOUT_MS },
+      () => {
+        let now = 0;
+        vi.spyOn(performance, 'now').mockImplementation(() => (now += 1_000));
+        for (let i = 0; i < 24; i += 1) {
+          const roll = (i + 0.5) / 24;
+          let depth = 0;
+          const move = chooseMove(
+            state,
+            levelNamed('bear'),
+            rules,
+            { next: () => roll },
+            undefined,
+            (report) => {
+              depth = report.depth;
+            },
+          );
+          expect(depth).toBe(1);
+          expect(move).not.toBeNull();
+          if (move !== null) {
+            expect(allowsMateInOne(move)).toBe(false);
+          }
+        }
+      },
+    );
   });
 });
 

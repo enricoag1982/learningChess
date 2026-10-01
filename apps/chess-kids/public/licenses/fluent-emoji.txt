@@ -1,8 +1,8 @@
 Chess for Kids ships animal artwork from Microsoft Fluent Emoji 3D
 (https://github.com/microsoft/fluentui-emoji), copied via the npm package
 @lobehub/fluent-emoji-3d (https://www.npmjs.com/package/@lobehub/fluent-emoji-3d) into
-apps/web/src/assets/art/ (not a runtime dependency of this app). Both the emoji artwork and the
-npm package are MIT-licensed:
+packages/platform-web/src/assets/art/ and packages/subject-chess/src/web/art/ (not a runtime
+dependency of this app). Both the emoji artwork and the npm package are MIT-licensed:
 
 MIT License
 

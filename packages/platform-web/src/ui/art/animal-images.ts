@@ -9,10 +9,8 @@ import cat from '../../assets/art/cat.webp';
 import panda from '../../assets/art/panda.webp';
 import penguin from '../../assets/art/penguin.webp';
 import frog from '../../assets/art/frog.webp';
-import mouse from '../../assets/art/mouse.webp';
-import wolf from '../../assets/art/wolf.webp';
 
-/** Every animal image this app ships, by id (the Owl guide, avatars, bot levels); `animal-images.test.ts` checks each module's ids resolve here. */
+/** The images the platform itself draws, by id: the Owl guide and the profile avatars. A subject's own art goes in its pack's `art`. */
 export const ANIMAL_IMAGES = {
   elephant,
   owl,
@@ -23,8 +21,6 @@ export const ANIMAL_IMAGES = {
   panda,
   penguin,
   frog,
-  mouse,
-  wolf,
 } as const;
 
 /** `subjectArt` (the pack's `art`) first, else the platform's own; the fox for an unknown id (defensive only). */
@@ -32,18 +28,4 @@ export function animalImage(id: string, subjectArt: Readonly<Record<string, stri
   return (
     subjectArt[id] ?? (ANIMAL_IMAGES as Record<string, string | undefined>)[id] ?? ANIMAL_IMAGES.fox
   );
-}
-
-/** Pastel badge colour per lesson character (the piece characters keep the tints their animals had). */
-const CHARACTER_COLOR: Readonly<Record<string, string>> = {
-  rook: '#DCE3D9',
-  bishop: '#DCE3EA',
-  queen: '#FBE3D2',
-  king: '#FBEFD3',
-  knight: '#F1E4C8',
-  pawn: '#DCEFE3',
-};
-
-export function characterColor(character: string): string {
-  return CHARACTER_COLOR[character] ?? '#E9DFF3';
 }

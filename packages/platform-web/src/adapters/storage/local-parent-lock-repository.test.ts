@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ParentLock } from '@learn/platform-core';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageParentLockRepository } from './local-parent-lock-repository.ts';
 
 function makeLock(overrides: Partial<ParentLock> = {}): ParentLock {
@@ -22,12 +23,12 @@ beforeEach(() => {
 
 describe('LocalStorageParentLockRepository', () => {
   it('get() is undefined before any lock is saved', async () => {
-    const repo = new LocalStorageParentLockRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageParentLockRepository(openTestStore());
     expect(await repo.get()).toBeUndefined();
   });
 
   it('saves and reads back the lock, updates in place', async () => {
-    const repo = new LocalStorageParentLockRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageParentLockRepository(openTestStore());
     const lock = makeLock();
     await repo.save(lock);
     expect(await repo.get()).toEqual(lock);
@@ -38,7 +39,7 @@ describe('LocalStorageParentLockRepository', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('parent-lock', { nope: true });
     const repo = new LocalStorageParentLockRepository(store);
 

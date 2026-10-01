@@ -6,6 +6,8 @@ export interface CreateAudioNarratorOptions {
   readonly baseUrl: string;
   /** For text with no generated audio, or when playback is unavailable or fails. */
   readonly fallback: Narrator;
+  /** `AppConfig.storagePrefix`: the dev missed-text report flag lives at `<prefix>voice-report`. */
+  readonly storagePrefix: string;
   readonly fetch?: typeof fetch;
   /** Injectable `AudioContext` constructor (tests, `webkitAudioContext` shim). */
   readonly audioContextFactory?: () => AudioContext;
@@ -43,24 +45,22 @@ function hasAudioContextSupport(): boolean {
   return typeof w.AudioContext === 'function' || typeof w.webkitAudioContext === 'function';
 }
 
-/** `localStorage` key for the missed-text report (`docs/voice.md`): off by default, a plain read. */
-const VOICE_REPORT_STORAGE_KEY = 'chess-kids:voice-report';
-
-function voiceReportEnabled(): boolean {
+/** The missed-text report (`docs/voice.md`) is off unless `localStorage['<prefix>voice-report']` is `'1'`; a plain read. */
+function voiceReportEnabled(storagePrefix: string): boolean {
   try {
-    return window.localStorage.getItem(VOICE_REPORT_STORAGE_KEY) === '1';
+    return window.localStorage.getItem(`${storagePrefix}voice-report`) === '1';
   } catch {
     return false;
   }
 }
 
 /** Records a text that fell back for a content reason (manifest miss, decode failure — not an
- * environmental one) while `voiceReportEnabled()`; the e2e a11y walk asserts this list stays empty. */
-function recordVoiceMiss(text: string): void {
-  if (!voiceReportEnabled()) return;
-  const w = window as unknown as { __chessKidsVoiceMisses?: string[] };
-  w.__chessKidsVoiceMisses ??= [];
-  w.__chessKidsVoiceMisses.push(text);
+ * environmental one) into `window.__learnVoiceMisses` while the report is on; the e2e a11y walk asserts it stays empty. */
+function recordVoiceMiss(storagePrefix: string, text: string): void {
+  if (!voiceReportEnabled(storagePrefix)) return;
+  const w = window as unknown as { __learnVoiceMisses?: string[] };
+  w.__learnVoiceMisses ??= [];
+  w.__learnVoiceMisses.push(text);
 }
 
 function defaultAudioContextFactory(): AudioContext {
@@ -77,7 +77,7 @@ function defaultAudioContextFactory(): AudioContext {
 
 /** Pre-generated Kokoro audio (`docs/voice.md`), falling back to `fallback` for text without audio or when playback cannot go ahead. */
 export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioNarrator {
-  const { baseUrl, fallback } = options;
+  const { baseUrl, fallback, storagePrefix } = options;
   const fetchFn = options.fetch ?? fetch;
   const audioContextFactory = options.audioContextFactory ?? defaultAudioContextFactory;
 
@@ -323,7 +323,7 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     }
     if (!keys.has(key)) {
       lastOutcomeValue = { kind: 'fallback', reason: 'no-generated-audio' };
-      recordVoiceMiss(text);
+      recordVoiceMiss(storagePrefix, text);
       return fallback.speak(text);
     }
 
@@ -331,7 +331,7 @@ export function createAudioNarrator(options: CreateAudioNarratorOptions): AudioN
     if (myToken !== token) return;
     if ('reason' in result) {
       lastOutcomeValue = { kind: 'fallback', reason: result.reason };
-      if (result.reason === 'decode-failed') recordVoiceMiss(text);
+      if (result.reason === 'decode-failed') recordVoiceMiss(storagePrefix, text);
       return fallback.speak(text);
     }
 

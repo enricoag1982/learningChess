@@ -21,14 +21,12 @@ export interface Migration {
 export interface OpenLocalStoreOptions {
   readonly version?: number;
   readonly migrations?: readonly Migration[];
-  /** Namespace for every key, e.g. `'chess-kids:'` (`AppConfig.storagePrefix`); defaults to `DEFAULT_KEY_PREFIX`. */
-  readonly keyPrefix?: string;
+  /** Namespace for every key, e.g. `'chess-kids:'`: the app's `AppConfig.storagePrefix`. */
+  readonly keyPrefix: string;
 }
 
 /** Schema version used when `options.version` is omitted (`migrations.ts`: what each adds). */
 export const SCHEMA_VERSION = 5;
-
-export const DEFAULT_KEY_PREFIX = 'chess-kids:';
 
 function namespacedKey(keyPrefix: string, name: string): string {
   return `${keyPrefix}${name}`;
@@ -76,17 +74,17 @@ function readStoredVersion(storage: Storage, versionKey: string): number | undef
 
 /** Fresh storage starts at the target version; below it migrates one step at a time (a missing step throws); above it, or
  * unversioned namespaced data, throws without touching anything. */
-export function openLocalStore(storage: Storage, options?: OpenLocalStoreOptions): LocalStore {
-  const targetVersion = options?.version ?? SCHEMA_VERSION;
-  const migrations = options?.migrations ?? [];
-  const keyPrefix = options?.keyPrefix ?? DEFAULT_KEY_PREFIX;
+export function openLocalStore(storage: Storage, options: OpenLocalStoreOptions): LocalStore {
+  const targetVersion = options.version ?? SCHEMA_VERSION;
+  const migrations = options.migrations ?? [];
+  const { keyPrefix } = options;
   const versionKey = `${keyPrefix}schema-version`;
   const store = createStore(storage, keyPrefix);
   const storedVersion = readStoredVersion(storage, versionKey);
 
   if (storedVersion === undefined) {
     if (hasNamespacedData(storage, keyPrefix, versionKey)) {
-      throw new StorageError('Unversioned chess-kids data found in storage');
+      throw new StorageError(`Unversioned data found under "${keyPrefix}" in storage`);
     }
     storage.setItem(versionKey, String(targetVersion));
     return store;

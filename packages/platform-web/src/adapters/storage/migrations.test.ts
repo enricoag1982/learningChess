@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { openLocalStore, SCHEMA_VERSION } from './local-store.ts';
+import { SCHEMA_VERSION } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { MIGRATIONS } from './migrations.ts';
 import { LocalStorageProgressRepository } from './local-progress-repository.ts';
 import { LocalStorageGameRecordRepository } from './local-game-record-repository.ts';
@@ -18,7 +19,7 @@ describe('MIGRATIONS (v1 -> v2, M3.4 concept stats)', () => {
       JSON.stringify({ 'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' } }),
     );
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
     expect(store.read('lesson-progress')).toEqual({
@@ -29,7 +30,7 @@ describe('MIGRATIONS (v1 -> v2, M3.4 concept stats)', () => {
   it('a profile upgraded from v1 (no concept-stats key yet) reads as no stats for any concept', async () => {
     localStorage.setItem('chess-kids:schema-version', '1');
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
     const repo = new LocalStorageProgressRepository(store);
 
     expect(await repo.listConceptStats('profile-1')).toEqual([]);
@@ -45,7 +46,7 @@ describe('MIGRATIONS (v2 -> v3, M3.5 game records)', () => {
       JSON.stringify({ 'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' } }),
     );
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
     expect(store.read('lesson-progress')).toEqual({
@@ -56,7 +57,7 @@ describe('MIGRATIONS (v2 -> v3, M3.5 game records)', () => {
   it('a profile upgraded from v1 or v2 (no game-records key yet) reads as no games played', async () => {
     localStorage.setItem('chess-kids:schema-version', '1');
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
     const repo = new LocalStorageGameRecordRepository(store);
 
     expect(await repo.listByProfile('profile-1')).toEqual([]);
@@ -71,7 +72,7 @@ describe('MIGRATIONS (v3 -> v4, M4.4 badges/streak/session log)', () => {
       JSON.stringify({ 'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' } }),
     );
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
     expect(store.read('lesson-progress')).toEqual({
@@ -82,7 +83,7 @@ describe('MIGRATIONS (v3 -> v4, M4.4 badges/streak/session log)', () => {
   it('a profile upgraded from v1-v3 (no rewards keys yet) reads as no badges/streak/session log', async () => {
     localStorage.setItem('chess-kids:schema-version', '1');
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
     const repo = new LocalStorageRewardsRepository(store);
 
     expect(await repo.listEarnedBadges('profile-1')).toEqual([]);
@@ -99,7 +100,7 @@ describe('MIGRATIONS (v4 -> v5, M4.5 assessment results/unlocks)', () => {
       JSON.stringify({ 'profile-1:rook': { id: 'lp1', profileId: 'profile-1', lessonId: 'rook' } }),
     );
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
 
     expect(localStorage.getItem('chess-kids:schema-version')).toBe(String(SCHEMA_VERSION));
     expect(store.read('lesson-progress')).toEqual({
@@ -110,7 +111,7 @@ describe('MIGRATIONS (v4 -> v5, M4.5 assessment results/unlocks)', () => {
   it('a profile upgraded from v1-v4 (no assessment keys yet) reads as no results/unlocks', async () => {
     localStorage.setItem('chess-kids:schema-version', '1');
 
-    const store = openLocalStore(localStorage, { migrations: MIGRATIONS });
+    const store = openTestStore({ migrations: MIGRATIONS });
     const repo = new LocalStorageAssessmentRepository(store);
 
     expect(await repo.listAssessmentResults('profile-1')).toEqual([]);

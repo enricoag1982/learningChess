@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { Profile } from '@learn/platform-core';
 import { makeProfile } from '@learn/platform-core/testing';
-import { openLocalStore, StorageError } from './local-store.ts';
+import { StorageError } from './local-store.ts';
+import { openTestStore } from '../../testing/open-test-store.ts';
 import { LocalStorageProfileRepository } from './local-profile-repository.ts';
 
 beforeEach(() => {
@@ -10,7 +11,7 @@ beforeEach(() => {
 
 describe('LocalStorageProfileRepository', () => {
   it('saves, gets, lists ordered by createdAt then id, updates and no-op deletes', async () => {
-    const repo = new LocalStorageProfileRepository(openLocalStore(localStorage));
+    const repo = new LocalStorageProfileRepository(openTestStore());
     const early = makeProfile({ id: 'a', createdAt: '2026-01-01T00:00:00.000Z' });
     const late = makeProfile({ id: 'b', createdAt: '2026-01-02T00:00:00.000Z' });
 
@@ -33,7 +34,7 @@ describe('LocalStorageProfileRepository', () => {
   });
 
   it('rejects with StorageError on a corrupt stored shape', async () => {
-    const store = openLocalStore(localStorage);
+    const store = openTestStore();
     store.write('profiles', { a: { nickname: 'no id field' } });
     const repo = new LocalStorageProfileRepository(store);
 

@@ -614,6 +614,24 @@ function searchRoot(
 // Wall-clock budget for one chooseBySearch call; `checkDeadline` can abort mid-depth (a depth-4 pass may overrun it). Only a
 // completed depth's result is used, so the move stays deterministic in position + seed.
 const TIME_BUDGET_MS = 250;
+// Below this completed depth Bear's scores cannot see the opponent's winning reply: a loaded CI runner once cut Bear to
+// depth 1 into a move that allowed mate in 1. Then such moves leave the pool (`withoutLosingAtOnce`).
+const BEAR_SAFE_DEPTH = 2;
+
+// The scored moves after which the opponent cannot win at once, or all of them if every move loses at once.
+function withoutLosingAtOnce(
+  scored: readonly ScoredMove[],
+  board: SearchBoard,
+  def: GameRulesDef,
+): readonly ScoredMove[] {
+  const safe = scored.filter((entry) => {
+    board.play(entry.move);
+    const losing = findImmediateWin(def, board, board.moves()) !== null;
+    board.undo();
+    return !losing;
+  });
+  return safe.length > 0 ? safe : scored;
+}
 
 /** One search's telemetry for tools (calibrate): last fully completed depth, the level's own depth, and
  * whether the time budget stopped it short. */
@@ -676,8 +694,12 @@ function chooseBySearch(
     // Defensive only: even depth 1 never completed. Falls back to a plain 1-ply choice.
     return chooseShallow(candidates, board, def, random);
   }
-  const best = Math.max(...scored.map((entry) => entry.score));
-  let pool = scored.filter((entry) => best - entry.score <= nearBestMargin(level));
+  const trusted =
+    bear !== undefined && completedDepth < BEAR_SAFE_DEPTH
+      ? withoutLosingAtOnce(scored, board, def)
+      : scored;
+  const best = Math.max(...trusted.map((entry) => entry.score));
+  let pool = trusted.filter((entry) => best - entry.score <= nearBestMargin(level));
   if (level.level === 5) {
     pool = preferSafe(pool, board);
   }

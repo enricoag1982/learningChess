@@ -118,7 +118,11 @@ plies) at the leaves in place of a single static evaluation; iterative deepening
 budget, checked roughly every 256 visited nodes, unwinding cleanly back to the last depth that
 fully completed. Every depth actually *used* is a complete, exact alpha-beta pass, so the move
 stays a deterministic function of the position and seed; only *how many* depths complete can vary
-with machine load.
+with machine load. **Time-cut safety (`m10.2`):** when the budget stops Bear below depth 2, its scores cannot see the
+opponent's reply, so moves after which the opponent wins at once (mate in 1, or a variant's own win) leave
+the pool unless every move does (`BEAR_SAFE_DEPTH`, `withoutLosingAtOnce`). Found on a loaded CI runner
+(depth 1 picked a move that allowed mate in 1; calibration had shown depth 1 on 11 of 1 099 moves). Not a
+depth floor: forcing depth 2 cost up to 671 ms on one reference position under load (p95 bound 600 ms).
 
 **Scoped to Bear only** (`chooseMove`/`chooseBySearch` gate `tt`/`killers`/`quiesce` on
 `level.level === 5`): the transposition table and killer moves also reorder equally-scored quiet
@@ -203,6 +207,7 @@ bonus, piece-square tables (§9).
 | Book | `bookCandidates`/`bookMove` (`book.test.ts`): prefix matching, ply cap, dedup, determinism; `chooseMove` wiring (`search.test.ts`) |
 | Calibration (manual, not in CI) | `pnpm --filter @learn/subject-chess calibrate [games] [level] [seed offset]` (default 40 games, every pairing): self-play, each level vs the previous, target ≥ 70% win rate. Prints W / D / L, the reason of every non-win (draw reason or checkmate), material lead at the end / peak, and the higher level's completed search depth (median, p10, histogram, share cut by the time cap). `calibrate 30 bear` filters to one pairing by its higher level's name; the 4th arg shifts the seeds (`calibrate 10 bear 1000` = seeds 1001–1010; keep it even so colours alternate the same way), e.g. a second seed set or one shard of a parallel run. Self-play has no opening book. Bear and Wolf depth depends on machine load (250 ms cap), so a run is only reproducible on the same load. Not a nightly job (no CI schedule wired up) |
 | Bear root pool | `search.test.ts`: from a position where most moves allow mate in 1, no roll of the dice picks one (24 rolls over the whole pool); red without `BEAR_ROOT_WINDOW`, green with it |
+| Bear time-cut safety | `search.test.ts`: the same position with every clock read past the budget (slow device): Bear stops at depth 1 and no roll picks a move that allows mate in 1; red without `withoutLosingAtOnce`, green with it |
 | Mate hint | `mateHint` returns a legal move for the side to move; finds a mate-in-1 when one exists; `null` only with no legal move at all |
 
 ## 9. Later
