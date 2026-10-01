@@ -15,7 +15,7 @@ import { HOME_TILES } from './home-tiles.ts';
 import { EXERCISE_KIND_UI } from './kinds/ui-registry.ts';
 import { MINI_GAME_MODE_UI } from './modes/ui-registry.ts';
 import { Stats, SurfaceDemo, SurfaceStory } from './surface.tsx';
-import { ANIMAL_IMAGES } from '@learn/platform-web/ui/art/animal-images.ts';
+import { CHESS_ART, characterColor } from './art/chess-art.ts';
 import { Board } from './ui/board/Board.tsx';
 import { PieceIcon } from './ui/board/pieces.tsx';
 import { PlayScreen } from './ui/PlayScreen.tsx';
@@ -90,7 +90,8 @@ export const chessWeb = {
   modes: MINI_GAME_MODE_UI,
   surface: { Story: SurfaceStory, Demo: SurfaceDemo, View: SurfaceView },
   characterArt,
-  art: ANIMAL_IMAGES,
+  art: CHESS_ART,
+  characterColor,
   homeTiles: HOME_TILES,
   den: { rankGlyph: (rankId) => RANK_GLYPH[rankId] ?? '?', Stats },
   loadParent: () => import('./parent-panels.tsx'),
