@@ -14,6 +14,7 @@ Related: [validation.md](validation.md), [roadmap.md](roadmap.md), [../CONTRIBUT
 | Cold start | `apps/chess-kids/e2e/performance.spec.ts`'s timing (CPU-throttled, tablet) — logged in `docs/validation.md`, target < 3 s local / < 5 s CI |
 | Data backup / restore | Parent area → Backup: export a profile, import it back (or on a second device), progress matches |
 | Manual smoke | One full lesson + one mini-game + one full game vs computer, on a real tablet if available |
+| README screenshots | Retake when a shown screen changes (1024×768, production build, seeded mid-progress profile) |
 
 ## 2. Tagging `v1.0.0`
 
