@@ -102,8 +102,7 @@ function SeriesRound({
       state={state}
       dispatch={dispatch}
       showHint={hintsEnabled}
-      // The check ring stays off in a series round (`docs/refactor-v4.md` follow-up F6).
-      showCheck={false}
+      showCheck
       top={top}
       done={done}
     />

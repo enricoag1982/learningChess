@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import type { MiniGame } from '@learn/subject-chess';
-import type { MateInNDef, SelectSquaresDef } from '@learn/subject-chess';
+import type { BestMoveDef, MateInNDef, SelectSquaresDef } from '@learn/subject-chess';
 import { parseDiagram } from '@learn/subject-chess';
 import { chessWeb } from '@learn/subject-chess/web/chess-pack.ts';
 import '../../app-i18n.ts';
@@ -11,6 +11,7 @@ import { stubMatchMedia } from '@learn/platform-web/testing/mock-media-query.ts'
 import { renderWithStore } from '@learn/platform-web/testing/render-with-store.tsx';
 import { createTestServices } from '@learn/subject-chess/web/testing/test-services.ts';
 import { BossStep } from '@learn/platform-web/modes/BossStep.tsx';
+import { ExerciseStep } from '@learn/platform-web/ui/lesson/ExerciseStep.tsx';
 
 const EMPTY_POSITION = parseDiagram(
   [
@@ -191,5 +192,90 @@ describe('SeriesBossStep (via BossStep dispatching on mode)', () => {
     } finally {
       restoreMatchMedia();
     }
+  });
+
+  // F6: the king in check carries the same ring and accessible name as in a lesson step.
+  describe('check ring (F6)', () => {
+    // The first two "Escape the Check" rounds: a rook check (select-squares) and a knight check
+    // (best-move), the two chess kinds that draw the ring through different PlayAreas.
+    const rookCheck = parseDiagram(
+      [
+        'k . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . K . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . r . . . .',
+      ].join('\n'),
+    );
+    const knightCheck = parseDiagram(
+      [
+        '. . . . . . . k',
+        '. . . . . . . .',
+        '. . . . n . . .',
+        '. . . . . . . .',
+        '. . . K . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+        '. . . . . . . .',
+      ].join('\n'),
+    );
+    const selectRound: SelectSquaresDef = {
+      id: 'ring-select',
+      concept: 'check-escape',
+      textKey: 'fixtures:ring-select',
+      position: rookCheck,
+      type: 'select-squares',
+      answer: { derive: 'check-escapes' },
+    };
+    const bestMoveRound: BestMoveDef = {
+      id: 'ring-best-move',
+      concept: 'check-escape',
+      textKey: 'fixtures:ring-best-move',
+      position: knightCheck,
+      type: 'best-move',
+      solutions: ['Kd5', 'Ke5', 'Ke4', 'Ke3', 'Kd3', 'Kc3', 'Kc4'],
+    };
+
+    it.each([
+      ['select-squares', selectRound, /^d5, white king, in check/],
+      ['best-move', bestMoveRound, /^d4, white king, in check/],
+    ] as const)(
+      'a %s round rings the king in check, as a lesson step does',
+      async (_kind, def, ring) => {
+        const boss: MiniGame = {
+          mode: 'series',
+          id: 'fixture-ring-series',
+          concept: 'check-escape',
+          rounds: [def],
+          errors3: 0,
+          errors2: 2,
+          titleKey: 'fixtures:boss-title',
+          goalKey: 'fixtures:boss-goal',
+          unlockAfter: 'fixture',
+        };
+        const lesson = fixtureLesson({ boss: boss.id, exercises: [def] });
+        const services = createTestServices(fixtureContentSource(lesson, [boss]));
+
+        await renderWithStore(
+          <ExerciseStep lesson={lesson} exercise={def} guided={false} nextStepIndex={3} />,
+          services,
+          chessWeb,
+        );
+        const lessonName = screen.getByRole('button', { name: ring }).getAttribute('aria-label');
+        cleanup();
+
+        await renderWithStore(
+          <BossStep lesson={lesson} game={boss} nextStepIndex={5} />,
+          services,
+          chessWeb,
+        );
+        expect(screen.getByRole('button', { name: ring }).getAttribute('aria-label')).toBe(
+          lessonName,
+        );
+      },
+    );
   });
 });

@@ -58,8 +58,7 @@ export interface PlayAreaProps<
   readonly dispatch: (action: SessionAction<A>) => void;
   /** Hides the Hint button (domain-model.md §3.2: an assessment task offers no hints). */
   readonly showHint: boolean;
-  /** The board's check ring (default on; a `series` round keeps it off, `docs/refactor-v4.md`
-   * follow-up F6). */
+  /** The board's check ring; on for lessons, series rounds and review tasks (F6, `docs/roadmap.md`). */
   readonly showCheck: boolean;
   /** The instruction bubble with its replay button — identical across every kind, computed once
    * by the host and rendered above the board/controls (or `done`). */
