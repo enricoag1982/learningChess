@@ -138,9 +138,10 @@ function fromTT(score: number, plyFromRoot: number): number {
   return score;
 }
 
-// Bear-only search extras bundled into one optional param: quiescenceDepth, rules (to build the
+// Bear-only search extras bundled into one optional param: rootWindow, quiescenceDepth, rules (to build the
 // post-null-move position) and the history table. undefined for every other level.
 interface BearSearch {
+  readonly rootWindow: number;
   readonly quiescenceDepth: number;
   readonly rules: ChessRules;
   readonly history: HistoryTable;
@@ -555,6 +556,10 @@ function preferSafe(pool: readonly ScoredMove[], board: SearchBoard): ScoredMove
 const NEAR_BEST_MARGIN = 0.3;
 // Bear's own near-best margin: much tighter than NEAR_BEST_MARGIN (see `nearBestMargin`).
 const BEAR_NEAR_BEST_MARGIN = 0.05;
+// Bear's root searches each sibling with beta raised by this much above the best so far, so every
+// move inside the near-best pool gets an exact score: outside it a root score is only an upper bound
+// (fail-low) that can tie the best by accident and put a refuted move into the pool.
+const BEAR_ROOT_WINDOW = BEAR_NEAR_BEST_MARGIN + 0.005;
 
 // Bear needs a much narrower near-best pool than the other levels to avoid picking outright weak
 // moves while still keeping some variety (never fully deterministic).
@@ -587,7 +592,7 @@ function searchRoot(
         needsPieces,
         depth - 1,
         -Infinity,
-        -alpha,
+        -alpha + (bear?.rootWindow ?? 0),
         1,
         move,
         tt,
@@ -632,7 +637,12 @@ function chooseBySearch(
   const needsPieces = needsPiecesForTerminal(def);
   const bear: BearSearch | undefined =
     level.level === 5
-      ? { quiescenceDepth: QUIESCENCE_DEPTH, rules, history: new Map<string, number>() }
+      ? {
+          rootWindow: BEAR_ROOT_WINDOW,
+          quiescenceDepth: QUIESCENCE_DEPTH,
+          rules,
+          history: new Map<string, number>(),
+        }
       : undefined;
   const tt: TranspositionTable = new Map();
   const killers: Killers = [];

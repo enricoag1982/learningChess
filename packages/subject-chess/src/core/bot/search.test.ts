@@ -100,6 +100,40 @@ describe('search report (calibrate telemetry)', () => {
   });
 });
 
+describe('Bear root pool', () => {
+  // White to move, Black's bishop on f4 threatens Bg3#. Ke1-f2 is the only move that keeps
+  // the exact best score; most of the others lose at once (Black mates), yet a bound-only root
+  // score once tied them with the best and let the pool pick them (m10.1 diagnosis).
+  const state = startGame(
+    STANDARD,
+    parseFen('rnb1k1nr/p2pqp2/2p1p1pp/1p6/1P3bPP/P1P5/R2PP3/1NBQKBNR w Kkq - 0 1'),
+  );
+  // Depth 2 already sees the mate and keeps the sweep fast; `level: 5` still switches Bear's search on.
+  const bear = { ...levelNamed('bear'), depth: 2 };
+
+  function allowsMateInOne(move: Move): boolean {
+    const played = playGameMove(state, rules, move);
+    if (played === null) {
+      return false;
+    }
+    return rules.legalMoves(played.state.position).some((reply) => {
+      const after = rules.play(played.state.position, reply);
+      return after !== null && rules.status(after.position).checkmate;
+    });
+  }
+
+  it('never picks a move that allows mate in 1, whichever pool entry the dice select', () => {
+    for (let i = 0; i < 24; i += 1) {
+      const roll = (i + 0.5) / 24;
+      const move = chooseMove(state, bear, rules, { next: () => roll });
+      expect(move).not.toBeNull();
+      if (move !== null) {
+        expect(allowsMateInOne(move)).toBe(false);
+      }
+    }
+  });
+});
+
 describe('tactics', () => {
   // Back-rank mate: 1.Ra8#.
   const BACK_RANK_MATE = parseFen('6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1');
