@@ -135,6 +135,7 @@ M5 run order (2026-09-25): `m5.1` ∥ `m5.4` → `m5.2` ∥ `m5.5` → `m5.3` la
 - With 1–3 kids aged 7–9, 20 min each, parent present, no help unless stuck > 1 min.
 - Observe: starts alone? understands voice instructions? where stuck or bored? taps that miss?
 - Record: lesson completion, first-try accuracy, hints used, wants to continue (yes / no).
+- Status: playtests 1–4 done, owner 2026-10-02 ("all checked, we are good"); no findings reported.
 
 ## 6. MVP success metrics (on device, parent report)
 

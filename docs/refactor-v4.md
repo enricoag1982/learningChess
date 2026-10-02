@@ -107,6 +107,8 @@ Started 2026-09-26 (owner), after `v2.0.0`. While another session fixes v2 bugs 
 | Initial JS | 181.5 KB gz | ≤ now |
 | Features | — | identical: 92 e2e green, content snapshot equal, old storage and backup files load |
 
+Close-out (owner 2026-10-02, "we are good here"): met: features identical, production TS 31.0 k (≤ 31.6 k), initial JS 185.2 KB, add-a-kind = 1 folder, lesson YAML 3.3 k, CI ≈ 5 min. Above target, accepted as is: docs 264 KB (no trim pass), test lines ≈ 33 k (new baseline). No separate M8 retrospective. Separate platform repo / npm stays deferred (§8 #4).
+
 Effort: ≈ 10 iterations (R2–R4 two each); at the M5 rate (1.2–2.6 h spec → merge) ≈ 15–25 h, mostly agent time.
 
 ## 7. Risks
