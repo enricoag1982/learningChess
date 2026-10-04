@@ -32,6 +32,7 @@ Offline chess learning app for an 8-year-old beginner. `v4.0.0` = v2 features on
 | `docs/release.md` | Release checklist, tagging, rollback |
 | `docs/retrospective.md` | M0–M5 retrospective: outcome, time spent, went well / wrong, learnings |
 | `docs/refactor-v4.md` | v4 plan: learning-platform refactor (platform packages + chess subject pack), phases, targets |
+| `docs/new-subjects.md` | Ideas for new subjects on the platform (coding, math, logic, games, …), product shape, open owner decisions |
 
 ## Key decisions
 
